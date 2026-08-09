@@ -24,19 +24,6 @@ return new class extends Migration
 
             $table->string('password');
 
-            /**
-             * Roles disponibles en Venexpress:
-             *
-             * admin   → Administración central
-             * aliado  → Taquilla aliada
-             * chofer  → Operaciones de campo
-             */
-            $table->enum('role', [
-                'admin',
-                'aliado',
-                'chofer',
-            ])->default('aliado')->index();
-
             $table->rememberToken();
 
             $table->timestamps();

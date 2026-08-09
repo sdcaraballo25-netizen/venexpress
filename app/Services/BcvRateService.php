@@ -3,46 +3,49 @@
 namespace App\Services;
 
 use App\Models\BcvRate;
+use Carbon\Carbon;
+use RuntimeException;
 
 class BcvRateService
 {
     /**
-     * Obtiene la tasa BCV vigente.
+     * Obtiene la tasa BCV vigente más reciente.
+     *
+     * @throws RuntimeException si no hay ninguna tasa registrada.
      */
-    public function current(): ?BcvRate
+    public function getCurrentRate(): BcvRate
     {
-        return BcvRate::query()
-            ->orderByDesc('effective_date')
-            ->first();
-    }
+        $rate = BcvRate::current();
 
-    /**
-     * Obtiene únicamente el valor de la tasa vigente.
-     */
-    public function currentRate(): ?float
-    {
-        $rate = $this->current();
-
-        return $rate
-            ? (float) $rate->rate
-            : null;
-    }
-
-    /**
-     * Convierte un monto en USD a VES.
-     */
-    public function convertUsdToVes(
-        float $usd,
-        ?float $rate = null
-    ): float {
-        $rate ??= $this->currentRate();
-
-        if (!$rate || $rate <= 0) {
-            throw new \RuntimeException(
-                'No existe una tasa BCV válida configurada.'
-            );
+        if (! $rate) {
+            throw new RuntimeException('No hay ninguna tasa BCV registrada todavía.');
         }
 
-        return round($usd * $rate, 2);
+        return $rate;
+    }
+
+    /**
+     * Registra (o actualiza) la tasa BCV para una fecha determinada.
+     * Por defecto usa la fecha de hoy.
+     */
+    public function setRate(float $rate, ?Carbon $effectiveDate = null): BcvRate
+    {
+        $effectiveDate ??= Carbon::today();
+
+        return BcvRate::updateOrCreate(
+            ['effective_date' => $effectiveDate->toDateString()],
+            ['rate' => $rate],
+        );
+    }
+
+    /**
+     * Convierte un monto en USD a VES usando la tasa indicada,
+     * o la tasa vigente si no se pasa ninguna.
+     */
+    public function convertUsdToVes(float $usdAmount, ?BcvRate $rate = null): float
+    {
+        $rate ??= $this->getCurrentRate();
+
+        return round($usdAmount * (float) $rate->rate, 2);
     }
 }

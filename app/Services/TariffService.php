@@ -7,132 +7,95 @@ use RuntimeException;
 
 class TariffService
 {
-    /**
-     * Calcula el peso volumétrico.
-     *
-     * Fórmula:
-     *
-     * Largo × Ancho × Alto / 5000
-     */
-    public function calculateVolumetricWeight(
-        float $length,
-        float $width,
-        float $height
-    ): float {
-        if (
-            $length <= 0 ||
-            $width <= 0 ||
-            $height <= 0
-        ) {
-            return 0;
-        }
-
-        return round(
-            ($length * $width * $height) / 5000,
-            3
-        );
+    public function __construct(
+        protected BcvRateService $bcvRateService,
+    ) {
     }
 
     /**
-     * Determina el peso que será utilizado
-     * para facturar el envío.
+     * Peso volumétrico = Largo × Ancho × Alto / 5000.
+     * Si faltan dimensiones, se considera 0 (no aplica volumétrico).
      */
-    public function calculateBillableWeight(
-        float $physicalWeight,
-        float $volumetricWeight
-    ): float {
-        return round(
-            max(
-                $physicalWeight,
-                $volumetricWeight
-            ),
-            3
-        );
+    public function calculateVolumetricWeight(?float $lengthCm, ?float $widthCm, ?float $heightCm): float
+    {
+        if (! $lengthCm || ! $widthCm || ! $heightCm) {
+            return 0.0;
+        }
+
+        return round(($lengthCm * $widthCm * $heightCm) / 5000, 3);
+    }
+
+    /**
+     * Peso facturable = MAX(peso físico, peso volumétrico).
+     */
+    public function calculateBillableWeight(float $physicalWeightKg, float $volumetricWeightKg): float
+    {
+        return max($physicalWeightKg, $volumetricWeightKg);
     }
 
     /**
      * Busca la tarifa configurada para una ruta.
-     */
-    public function findRoute(
-        string $originCity,
-        string $destinationCity
-    ): ?RateMatrix {
-        return RateMatrix::query()
-            ->where('origin_city', $originCity)
-            ->where(
-                'destination_city',
-                $destinationCity
-            )
-            ->first();
-    }
-
-    /**
-     * Calcula el precio total del envío.
      *
-     * Precio =
-     * tarifa base + (peso facturable × precio por kg)
+     * @throws RuntimeException si la ruta no tiene tarifa configurada.
      */
-    public function calculatePrice(
-        float $billableWeight,
-        RateMatrix $route
-    ): float {
-        $price = (float) $route->base_price_usd
-            + (
-                $billableWeight
-                * (float) $route->price_per_kg_usd
-            );
+    public function findRate(string $originCity, string $destinationCity): RateMatrix
+    {
+        $rate = RateMatrix::forRoute($originCity, $destinationCity);
 
-        return round($price, 2);
+        if (! $rate) {
+            throw new RuntimeException(
+                "No existe una tarifa configurada para la ruta {$originCity} → {$destinationCity}."
+            );
+        }
+
+        return $rate;
     }
 
     /**
-     * Ejecuta el cálculo completo de una tarifa.
+     * Total en USD = precio base + (peso facturable × precio por kg).
+     */
+    public function calculateTotalUsd(RateMatrix $rateMatrix, float $billableWeightKg): float
+    {
+        return round(
+            (float) $rateMatrix->base_price_usd + ($billableWeightKg * (float) $rateMatrix->price_per_kg_usd),
+            2
+        );
+    }
+
+    /**
+     * Calcula todo lo necesario para facturar un paquete: pesos,
+     * total en USD/VES y la tasa BCV utilizada.
+     *
+     * @return array{
+     *   volumetric_weight_kg: float,
+     *   billable_weight_kg: float,
+     *   total_price_usd: float,
+     *   total_price_ves: float,
+     *   bcv_rate_used: float,
+     * }
      */
     public function calculate(
         string $originCity,
         string $destinationCity,
-        float $physicalWeight,
-        float $length,
-        float $width,
-        float $height
+        float $physicalWeightKg,
+        ?float $lengthCm = null,
+        ?float $widthCm = null,
+        ?float $heightCm = null,
     ): array {
-        $volumetricWeight =
-            $this->calculateVolumetricWeight(
-                $length,
-                $width,
-                $height
-            );
+        $rateMatrix = $this->findRate($originCity, $destinationCity);
+        $bcvRate = $this->bcvRateService->getCurrentRate();
 
-        $billableWeight =
-            $this->calculateBillableWeight(
-                $physicalWeight,
-                $volumetricWeight
-            );
-
-        $route = $this->findRoute(
-            $originCity,
-            $destinationCity
-        );
-
-        if (!$route) {
-            throw new RuntimeException(
-                "No existe una tarifa configurada para "
-                . "{$originCity} → {$destinationCity}."
-            );
-        }
-
-        $totalUsd = $this->calculatePrice(
-            $billableWeight,
-            $route
-        );
+        $volumetricWeight = $this->calculateVolumetricWeight($lengthCm, $widthCm, $heightCm);
+        $billableWeight = $this->calculateBillableWeight($physicalWeightKg, $volumetricWeight);
+        $totalUsd = $this->calculateTotalUsd($rateMatrix, $billableWeight);
+        $totalVes = $this->bcvRateService->convertUsdToVes($totalUsd, $bcvRate);
 
         return [
             'volumetric_weight_kg' => $volumetricWeight,
             'billable_weight_kg' => $billableWeight,
-            'base_price_usd' => (float) $route->base_price_usd,
-            'price_per_kg_usd' => (float) $route->price_per_kg_usd,
             'total_price_usd' => $totalUsd,
-            'route_id' => $route->id,
+            'total_price_ves' => $totalVes,
+            'bcv_rate_used' => (float) $bcvRate->rate,
         ];
     }
 }

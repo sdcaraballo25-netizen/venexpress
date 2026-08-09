@@ -2,207 +2,122 @@
 
 namespace App\Services;
 
+use App\Models\Driver;
 use App\Models\Package;
 use App\Models\PackageHistory;
 use Illuminate\Support\Facades\DB;
-use InvalidArgumentException;
+use RuntimeException;
 
 class PackageService
 {
-    /**
-     * Estados válidos y orden de la máquina de estados.
-     */
-    public const STATUSES = [
-        'RECIBIDO_AGENCIA',
-        'RECOLECTADO_VENEXPRESS',
-        'EN_HUB',
-        'EN_TRANSITO_NACIONAL',
-        'LISTO_RETIRO',
-        'ENTREGADO',
-    ];
+    public function __construct(
+        protected TariffService $tariffService,
+    ) {
+    }
 
     /**
-     * Crea una nueva guía y registra automáticamente
-     * el primer evento de tracking.
+     * Crea un nuevo paquete: calcula tarifa, pesos y número de guía,
+     * y registra el primer evento en el historial.
+     *
+     * @param array{
+     *   ally_id:int, sender_name:string, sender_id_doc:string, sender_phone:string,
+     *   recipient_name:string, recipient_id_doc:string, recipient_phone:string,
+     *   origin_city:string, destination_city:string, package_type:string,
+     *   physical_weight_kg:float, length_cm?:float|null, width_cm?:float|null, height_cm?:float|null,
+     * } $data
      */
-    public function create(
-        array $data,
-        int $allyId,
-        int $userId
-    ): Package {
-        return DB::transaction(function () use (
-            $data,
-            $allyId,
-            $userId
-        ) {
+    public function createPackage(array $data, ?int $registeredByUserId = null): Package
+    {
+        return DB::transaction(function () use ($data, $registeredByUserId) {
+            $pricing = $this->tariffService->calculate(
+                originCity: $data['origin_city'],
+                destinationCity: $data['destination_city'],
+                physicalWeightKg: $data['physical_weight_kg'],
+                lengthCm: $data['length_cm'] ?? null,
+                widthCm: $data['width_cm'] ?? null,
+                heightCm: $data['height_cm'] ?? null,
+            );
+
             $package = Package::create([
                 ...$data,
-
-                'ally_id' => $allyId,
-
-                'current_status' =>
-                    'RECIBIDO_AGENCIA',
+                'tracking_number' => $this->generateTrackingNumber(),
+                'volumetric_weight_kg' => $pricing['volumetric_weight_kg'],
+                'billable_weight_kg' => $pricing['billable_weight_kg'],
+                'total_price_usd' => $pricing['total_price_usd'],
+                'total_price_ves' => $pricing['total_price_ves'],
+                'bcv_rate_used' => $pricing['bcv_rate_used'],
+                'current_status' => Package::STATUS_RECIBIDO_AGENCIA,
             ]);
 
-            PackageHistory::create([
-                'package_id' => $package->id,
+            $this->recordHistory(
+                $package,
+                Package::STATUS_RECIBIDO_AGENCIA,
+                $registeredByUserId,
+                'Guía registrada en taquilla aliada',
+            );
 
-                'status' =>
-                    'RECIBIDO_AGENCIA',
-
-                'location_description' =>
-                    $package->origin_city,
-
-                'scanned_by_user_id' =>
-                    $userId,
-            ]);
-
-            return $package->fresh([
-                'ally',
-                'histories',
-            ]);
+            return $package;
         });
     }
 
     /**
-     * Cambia el estado de una guía.
+     * Cambia el estado de un paquete y deja constancia en su historial.
      *
-     * Solo permite avanzar al siguiente estado.
+     * @throws RuntimeException si el estado no es válido.
      */
-    public function transition(
+    public function changeStatus(
         Package $package,
         string $newStatus,
-        int $userId,
-        ?string $location = null
+        ?int $userId = null,
+        ?string $locationDescription = null,
     ): Package {
-        if (!in_array(
-            $newStatus,
-            self::STATUSES,
-            true
-        )) {
-            throw new InvalidArgumentException(
-                'El estado indicado no es válido.'
-            );
+        if (! in_array($newStatus, Package::STATUSES, true)) {
+            throw new RuntimeException("Estado inválido: {$newStatus}");
         }
 
-        $currentIndex = array_search(
-            $package->current_status,
-            self::STATUSES,
-            true
-        );
+        return DB::transaction(function () use ($package, $newStatus, $userId, $locationDescription) {
+            $package->update(['current_status' => $newStatus]);
 
-        $newIndex = array_search(
-            $newStatus,
-            self::STATUSES,
-            true
-        );
+            $this->recordHistory($package, $newStatus, $userId, $locationDescription);
 
-        if ($currentIndex === false) {
-            throw new InvalidArgumentException(
-                'El estado actual de la guía no es válido.'
-            );
-        }
-
-        /**
-         * Evitamos saltos de estados.
-         */
-        if ($newIndex !== $currentIndex + 1) {
-            throw new InvalidArgumentException(
-                "No se puede cambiar de "
-                . "{$package->current_status} a "
-                . "{$newStatus}."
-            );
-        }
-
-        return DB::transaction(
-            function () use (
-                $package,
-                $newStatus,
-                $userId,
-                $location
-            ) {
-                $package->update([
-                    'current_status' =>
-                        $newStatus,
-                ]);
-
-                PackageHistory::create([
-                    'package_id' =>
-                        $package->id,
-
-                    'status' =>
-                        $newStatus,
-
-                    'location_description' =>
-                        $location,
-
-                    'scanned_by_user_id' =>
-                        $userId,
-                ]);
-
-                return $package->fresh([
-                    'ally',
-                    'histories',
-                ]);
-            }
-        );
+            return $package->fresh();
+        });
     }
 
     /**
-     * Comprueba si una transición es válida.
+     * Asigna (o reasigna) un chofer a un paquete.
      */
-    public function canTransition(
+    public function assignDriver(Package $package, Driver $driver): Package
+    {
+        $package->update(['driver_id' => $driver->id]);
+
+        return $package->fresh();
+    }
+
+    /**
+     * Genera un número de guía único con formato VEN-YYYYMMDD-NNNNNN.
+     */
+    protected function generateTrackingNumber(): string
+    {
+        $prefix = 'VEN-' . now()->format('Ymd') . '-';
+
+        do {
+            $candidate = $prefix . str_pad((string) random_int(1, 999999), 6, '0', STR_PAD_LEFT);
+        } while (Package::where('tracking_number', $candidate)->exists());
+
+        return $candidate;
+    }
+
+    protected function recordHistory(
         Package $package,
-        string $newStatus
-    ): bool {
-        $currentIndex = array_search(
-            $package->current_status,
-            self::STATUSES,
-            true
-        );
-
-        $newIndex = array_search(
-            $newStatus,
-            self::STATUSES,
-            true
-        );
-
-        if (
-            $currentIndex === false ||
-            $newIndex === false
-        ) {
-            return false;
-        }
-
-        return $newIndex === $currentIndex + 1;
-    }
-
-    /**
-     * Devuelve el siguiente estado disponible.
-     */
-    public function nextStatus(
-        Package $package
-    ): ?string {
-        $currentIndex = array_search(
-            $package->current_status,
-            self::STATUSES,
-            true
-        );
-
-        if ($currentIndex === false) {
-            return null;
-        }
-
-        return self::STATUSES[$currentIndex + 1]
-            ?? null;
-    }
-
-    /**
-     * Indica si la guía ya fue entregada.
-     */
-    public function isDelivered(
-        Package $package
-    ): bool {
-        return $package->current_status === 'ENTREGADO';
+        string $status,
+        ?int $userId,
+        ?string $locationDescription,
+    ): PackageHistory {
+        return $package->histories()->create([
+            'status' => $status,
+            'location_description' => $locationDescription,
+            'scanned_by_user_id' => $userId,
+        ]);
     }
 }
