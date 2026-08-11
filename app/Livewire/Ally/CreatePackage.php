@@ -123,6 +123,6 @@ class CreatePackage extends Component
 
     public function render()
     {
-        return view('livewire.ally.create-package');
+        return view('livewire.ally.package-create');
     }
 }

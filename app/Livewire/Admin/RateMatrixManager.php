@@ -120,7 +120,7 @@ class RateMatrixManager extends Component
 
     public function render()
     {
-        return view('Livewire.Admin.rate-matrix-manager', [
+        return view('livewire.admin.rate-matrix-manager', [
             'matrices' => RateMatrix::query()
                 ->orderBy('origin_city')
                 ->orderBy('destination_city')

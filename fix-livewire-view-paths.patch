@@ -1,0 +1,110 @@
+diff --git a/app/Livewire/Admin/BcvRateManager.php b/app/Livewire/Admin/BcvRateManager.php
+index 1e34760..a823645 100644
+--- a/app/Livewire/Admin/BcvRateManager.php
++++ b/app/Livewire/Admin/BcvRateManager.php
+@@ -106,7 +106,7 @@ protected function resetForm(): void
+ 
+     public function render()
+     {
+-        return view('Livewire.Admin.bcv-rate-manager', [
++        return view('livewire.admin.bcv-rate-manager', [
+             'current' => BcvRate::current(),
+             'history' => BcvRate::query()
+                 ->orderByDesc('effective_date')
+diff --git a/app/Livewire/Admin/RateMatrixManager.php b/app/Livewire/Admin/RateMatrixManager.php
+index 212b542..b800c99 100644
+--- a/app/Livewire/Admin/RateMatrixManager.php
++++ b/app/Livewire/Admin/RateMatrixManager.php
+@@ -120,7 +120,7 @@ protected function resetForm(): void
+ 
+     public function render()
+     {
+-        return view('Livewire.Admin.rate-matrix-manager', [
++        return view('livewire.admin.rate-matrix-manager', [
+             'matrices' => RateMatrix::query()
+                 ->orderBy('origin_city')
+                 ->orderBy('destination_city')
+diff --git a/app/Livewire/Ally/CreatePackage.php b/app/Livewire/Ally/CreatePackage.php
+index 5a233a7..370a07e 100644
+--- a/app/Livewire/Ally/CreatePackage.php
++++ b/app/Livewire/Ally/CreatePackage.php
+@@ -123,6 +123,6 @@ public function save(PackageService $packageService): void
+ 
+     public function render()
+     {
+-        return view('livewire.ally.create-package');
++        return view('livewire.ally.package-create');
+     }
+ }
+diff --git a/resources/views/Livewire/Admin/bcv-rate-manager.blade.php b/resources/views/livewire/admin/bcv-rate-manager.blade.php
+similarity index 100%
+rename from resources/views/Livewire/Admin/bcv-rate-manager.blade.php
+rename to resources/views/livewire/admin/bcv-rate-manager.blade.php
+diff --git a/resources/views/Livewire/Admin/dashboard.blade.php b/resources/views/livewire/admin/dashboard.blade.php
+similarity index 100%
+rename from resources/views/Livewire/Admin/dashboard.blade.php
+rename to resources/views/livewire/admin/dashboard.blade.php
+diff --git a/resources/views/Livewire/Admin/rate-matrix-manager.blade.php b/resources/views/livewire/admin/rate-matrix-manager.blade.php
+similarity index 100%
+rename from resources/views/Livewire/Admin/rate-matrix-manager.blade.php
+rename to resources/views/livewire/admin/rate-matrix-manager.blade.php
+diff --git a/resources/views/Livewire/Ally/daily-cash-cut.blade.php b/resources/views/livewire/ally/daily-cash-cut.blade.php
+similarity index 100%
+rename from resources/views/Livewire/Ally/daily-cash-cut.blade.php
+rename to resources/views/livewire/ally/daily-cash-cut.blade.php
+diff --git a/resources/views/Livewire/Ally/package-create.blade.php b/resources/views/livewire/ally/package-create.blade.php
+similarity index 100%
+rename from resources/views/Livewire/Ally/package-create.blade.php
+rename to resources/views/livewire/ally/package-create.blade.php
+diff --git a/resources/views/Livewire/Driver/field-scanner.blade.php b/resources/views/livewire/driver/field-scanner.blade.php
+similarity index 100%
+rename from resources/views/Livewire/Driver/field-scanner.blade.php
+rename to resources/views/livewire/driver/field-scanner.blade.php
+diff --git a/resources/views/Livewire/layout/navigation.blade.php b/resources/views/livewire/layout/navigation.blade.php
+similarity index 100%
+rename from resources/views/Livewire/layout/navigation.blade.php
+rename to resources/views/livewire/layout/navigation.blade.php
+diff --git a/resources/views/Livewire/pages/auth/confirm-password.blade.php b/resources/views/livewire/pages/auth/confirm-password.blade.php
+similarity index 100%
+rename from resources/views/Livewire/pages/auth/confirm-password.blade.php
+rename to resources/views/livewire/pages/auth/confirm-password.blade.php
+diff --git a/resources/views/Livewire/pages/auth/forgot-password.blade.php b/resources/views/livewire/pages/auth/forgot-password.blade.php
+similarity index 100%
+rename from resources/views/Livewire/pages/auth/forgot-password.blade.php
+rename to resources/views/livewire/pages/auth/forgot-password.blade.php
+diff --git a/resources/views/Livewire/pages/auth/login.blade.php b/resources/views/livewire/pages/auth/login.blade.php
+similarity index 100%
+rename from resources/views/Livewire/pages/auth/login.blade.php
+rename to resources/views/livewire/pages/auth/login.blade.php
+diff --git a/resources/views/Livewire/pages/auth/register.blade.php b/resources/views/livewire/pages/auth/register.blade.php
+similarity index 100%
+rename from resources/views/Livewire/pages/auth/register.blade.php
+rename to resources/views/livewire/pages/auth/register.blade.php
+diff --git a/resources/views/Livewire/pages/auth/reset-password.blade.php b/resources/views/livewire/pages/auth/reset-password.blade.php
+similarity index 100%
+rename from resources/views/Livewire/pages/auth/reset-password.blade.php
+rename to resources/views/livewire/pages/auth/reset-password.blade.php
+diff --git a/resources/views/Livewire/pages/auth/verify-email.blade.php b/resources/views/livewire/pages/auth/verify-email.blade.php
+similarity index 100%
+rename from resources/views/Livewire/pages/auth/verify-email.blade.php
+rename to resources/views/livewire/pages/auth/verify-email.blade.php
+diff --git a/resources/views/Livewire/profile/delete-user-form.blade.php b/resources/views/livewire/profile/delete-user-form.blade.php
+similarity index 100%
+rename from resources/views/Livewire/profile/delete-user-form.blade.php
+rename to resources/views/livewire/profile/delete-user-form.blade.php
+diff --git a/resources/views/Livewire/profile/update-password-form.blade.php b/resources/views/livewire/profile/update-password-form.blade.php
+similarity index 100%
+rename from resources/views/Livewire/profile/update-password-form.blade.php
+rename to resources/views/livewire/profile/update-password-form.blade.php
+diff --git a/resources/views/Livewire/profile/update-profile-information-form.blade.php b/resources/views/livewire/profile/update-profile-information-form.blade.php
+similarity index 100%
+rename from resources/views/Livewire/profile/update-profile-information-form.blade.php
+rename to resources/views/livewire/profile/update-profile-information-form.blade.php
+diff --git a/resources/views/Livewire/Tracking/public-tracking.blade.php b/resources/views/livewire/tracking/public-tracking.blade.php
+similarity index 100%
+rename from resources/views/Livewire/Tracking/public-tracking.blade.php
+rename to resources/views/livewire/tracking/public-tracking.blade.php
+diff --git a/resources/views/Livewire/welcome/navigation.blade.php b/resources/views/livewire/welcome/navigation.blade.php
+similarity index 100%
+rename from resources/views/Livewire/welcome/navigation.blade.php
+rename to resources/views/livewire/welcome/navigation.blade.php

@@ -106,7 +106,7 @@ class BcvRateManager extends Component
 
     public function render()
     {
-        return view('Livewire.Admin.bcv-rate-manager', [
+        return view('livewire.admin.bcv-rate-manager', [
             'current' => BcvRate::current(),
             'history' => BcvRate::query()
                 ->orderByDesc('effective_date')
