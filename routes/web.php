@@ -1,31 +1,48 @@
 <?php
 
 use App\Livewire\Ally\CreatePackage;
+use App\Livewire\Admin\Dashboard;
+use App\Livewire\Admin\BcvRateManager;
+use App\Livewire\Admin\RateMatrixManager;
 use Illuminate\Support\Facades\Route;
 
-Route::get('/', function () {
-    return view('welcome');
-});
+Route::view('/', 'welcome');
+
+Route::view('dashboard', 'dashboard')
+    ->middleware(['auth', 'verified'])
+    ->name('dashboard');
+
+Route::view('profile', 'profile')
+    ->middleware(['auth'])
+    ->name('profile');
 
 /*
 |--------------------------------------------------------------------------
 | Taquilla Aliada
 |--------------------------------------------------------------------------
 |
-| Por ahora solo protegidas con 'auth'. Cuando definamos el middleware
-| de rol (Fase 5 - Panel Administrativo), aquí se agrega 'role:aliado'
-| para que solophp artisan config:clear  usuarios con ese rol puedan entrar.
+| Protegidas con 'auth'. El middleware de rol 'role:aliado' se agregará
+| cuando se defina formalmente el flujo de permisos del aliado.
 |
 */
 Route::middleware(['auth'])->prefix('aliado')->name('ally.')->group(function () {
     Route::get('/guias/nueva', CreatePackage::class)->name('packages.create');
 });
 
+/*
+|--------------------------------------------------------------------------
+| Panel Administrativo
+|--------------------------------------------------------------------------
+*/
 Route::middleware(['auth', 'role:admin'])
     ->prefix('admin')
     ->name('admin.')
     ->group(function () {
-        Route::get('/', function () {
-            return view('admin.dashboard');
-        })->name('dashboard');
+        Route::get('/', Dashboard::class)->name('dashboard');
+
+        // Fase 5 — Tasa BCV y matrices de tarifas
+        Route::get('/tasa-bcv', BcvRateManager::class)->name('bcv-rates');
+        Route::get('/tarifas', RateMatrixManager::class)->name('rate-matrices');
     });
+
+require __DIR__.'/auth.php';
