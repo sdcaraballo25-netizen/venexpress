@@ -4,9 +4,12 @@ use App\Livewire\Ally\CreatePackage;
 use App\Livewire\Admin\Dashboard;
 use App\Livewire\Admin\BcvRateManager;
 use App\Livewire\Admin\RateMatrixManager;
+use App\Livewire\Admin\CityDistanceManager;
 use Illuminate\Support\Facades\Route;
 
 Route::view('/', 'welcome');
+
+Route::get('/rastreo', [App\Http\Controllers\TrackingController::class, 'index'])->name('tracking.index');
 
 Route::view('dashboard', 'dashboard')
     ->middleware(['auth', 'verified'])
@@ -43,6 +46,8 @@ Route::middleware(['auth', 'role:admin'])
         // Fase 5 — Tasa BCV y matrices de tarifas
         Route::get('/tasa-bcv', BcvRateManager::class)->name('bcv-rates');
         Route::get('/tarifas', RateMatrixManager::class)->name('rate-matrices');
+        Route::get('/distancias', CityDistanceManager::class)->name('city-distances');
     });
 
 require __DIR__.'/auth.php';
+

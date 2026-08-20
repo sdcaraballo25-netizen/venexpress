@@ -2,6 +2,7 @@
 
 namespace App\Services;
 
+use App\Models\CityDistance;
 use App\Models\RateMatrix;
 use RuntimeException;
 
@@ -34,41 +35,62 @@ class TariffService
     }
 
     /**
-     * Busca la tarifa configurada para una ruta.
+     * Obtiene la tarifa global vigente (base + por kg + por km).
      *
-     * @throws RuntimeException si la ruta no tiene tarifa configurada.
+     * @throws RuntimeException si todavía no se ha configurado ninguna tarifa.
      */
-    public function findRate(string $originCity, string $destinationCity): RateMatrix
+    public function findRate(): RateMatrix
     {
-        $rate = RateMatrix::forRoute($originCity, $destinationCity);
+        $rate = RateMatrix::current();
 
         if (! $rate) {
-            throw new RuntimeException(
-                "No existe una tarifa configurada para la ruta {$originCity} → {$destinationCity}."
-            );
+            throw new RuntimeException('No hay ninguna tarifa configurada todavía.');
         }
 
         return $rate;
     }
 
     /**
-     * Total en USD = precio base + (peso facturable × precio por kg).
+     * Busca la distancia registrada entre dos ciudades.
+     *
+     * @throws RuntimeException si la ruta no tiene distancia configurada.
      */
-    public function calculateTotalUsd(RateMatrix $rateMatrix, float $billableWeightKg): float
+    public function findDistance(string $originCity, string $destinationCity): CityDistance
+    {
+        $distance = CityDistance::between($originCity, $destinationCity);
+
+        if (! $distance) {
+            throw new RuntimeException(
+                "No existe una distancia configurada para la ruta {$originCity} → {$destinationCity}."
+            );
+        }
+
+        return $distance;
+    }
+
+    /**
+     * Total en USD = precio base
+     *              + (peso facturable × precio por kg)
+     *              + (distancia en km × precio por km).
+     */
+    public function calculateTotalUsd(RateMatrix $rateMatrix, float $billableWeightKg, int $distanceKm): float
     {
         return round(
-            (float) $rateMatrix->base_price_usd + ($billableWeightKg * (float) $rateMatrix->price_per_kg_usd),
+            (float) $rateMatrix->base_price_usd
+                + ($billableWeightKg * (float) $rateMatrix->price_per_kg_usd)
+                + ($distanceKm * (float) $rateMatrix->price_per_km_usd),
             2
         );
     }
 
     /**
      * Calcula todo lo necesario para facturar un paquete: pesos,
-     * total en USD/VES y la tasa BCV utilizada.
+     * distancia, total en USD/VES y la tasa BCV utilizada.
      *
      * @return array{
      *   volumetric_weight_kg: float,
      *   billable_weight_kg: float,
+     *   distance_km: int,
      *   total_price_usd: float,
      *   total_price_ves: float,
      *   bcv_rate_used: float,
@@ -82,17 +104,19 @@ class TariffService
         ?float $widthCm = null,
         ?float $heightCm = null,
     ): array {
-        $rateMatrix = $this->findRate($originCity, $destinationCity);
+        $rateMatrix = $this->findRate();
+        $cityDistance = $this->findDistance($originCity, $destinationCity);
         $bcvRate = $this->bcvRateService->getCurrentRate();
 
         $volumetricWeight = $this->calculateVolumetricWeight($lengthCm, $widthCm, $heightCm);
         $billableWeight = $this->calculateBillableWeight($physicalWeightKg, $volumetricWeight);
-        $totalUsd = $this->calculateTotalUsd($rateMatrix, $billableWeight);
+        $totalUsd = $this->calculateTotalUsd($rateMatrix, $billableWeight, $cityDistance->distance_km);
         $totalVes = $this->bcvRateService->convertUsdToVes($totalUsd, $bcvRate);
 
         return [
             'volumetric_weight_kg' => $volumetricWeight,
             'billable_weight_kg' => $billableWeight,
+            'distance_km' => $cityDistance->distance_km,
             'total_price_usd' => $totalUsd,
             'total_price_ves' => $totalVes,
             'bcv_rate_used' => (float) $bcvRate->rate,
