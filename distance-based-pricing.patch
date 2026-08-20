@@ -1,0 +1,935 @@
+diff --git a/app/Livewire/Admin/BcvRateManager.php b/app/Livewire/Admin/BcvRateManager.php
+index 1e34760..a823645 100644
+--- a/app/Livewire/Admin/BcvRateManager.php
++++ b/app/Livewire/Admin/BcvRateManager.php
+@@ -106,7 +106,7 @@ protected function resetForm(): void
+ 
+     public function render()
+     {
+-        return view('Livewire.Admin.bcv-rate-manager', [
++        return view('livewire.admin.bcv-rate-manager', [
+             'current' => BcvRate::current(),
+             'history' => BcvRate::query()
+                 ->orderByDesc('effective_date')
+diff --git a/app/Livewire/Admin/CityDistanceManager.php b/app/Livewire/Admin/CityDistanceManager.php
+new file mode 100644
+index 0000000..7ede3c8
+--- /dev/null
++++ b/app/Livewire/Admin/CityDistanceManager.php
+@@ -0,0 +1,122 @@
++<?php
++
++namespace App\Livewire\Admin;
++
++use App\Models\CityDistance;
++use Livewire\Attributes\Layout;
++use Livewire\Attributes\Title;
++use Livewire\Component;
++use Livewire\WithPagination;
++
++/**
++ * CRUD de distancias entre ciudades, usadas por TariffService para
++ * calcular el componente de precio por km de cada guía.
++ *
++ * Las distancias son simétricas (A→B = B→A): el modelo CityDistance
++ * se encarga de normalizar el orden para no duplicar la ruta inversa.
++ */
++#[Layout('layouts.admin')]
++#[Title('Distancias entre ciudades')]
++class CityDistanceManager extends Component
++{
++    use WithPagination;
++
++    public ?int $editingId = null;
++
++    public string $city_one = '';
++
++    public string $city_two = '';
++
++    public string $distance_km = '';
++
++    public bool $showForm = false;
++
++    protected function rules(): array
++    {
++        return [
++            'city_one' => ['required', 'string', 'max:255'],
++            'city_two' => ['required', 'string', 'max:255', 'different:city_one'],
++            'distance_km' => ['required', 'integer', 'min:1'],
++        ];
++    }
++
++    protected $messages = [
++        'city_one.required' => 'Ingresa la primera ciudad.',
++        'city_two.required' => 'Ingresa la segunda ciudad.',
++        'city_two.different' => 'Las dos ciudades deben ser distintas.',
++        'distance_km.required' => 'Ingresa la distancia en kilómetros.',
++        'distance_km.integer' => 'La distancia debe ser un número entero de km.',
++    ];
++
++    public function create(): void
++    {
++        $this->resetForm();
++        $this->showForm = true;
++    }
++
++    public function save(): void
++    {
++        $this->validate();
++
++        // Si estamos editando, primero liberamos esa fila del chequeo de duplicados.
++        $existing = CityDistance::between($this->city_one, $this->city_two);
++
++        if ($existing && $existing->id !== $this->editingId) {
++            $this->addError('city_two', 'Ya existe una distancia registrada para estas dos ciudades.');
++
++            return;
++        }
++
++        if ($this->editingId && $existing?->id === $this->editingId) {
++            // Se está editando la misma pareja de ciudades: solo actualiza el km.
++            $existing->update(['distance_km' => $this->distance_km]);
++        } elseif ($this->editingId) {
++            // Se cambiaron las ciudades al editar: hay que reemplazar la fila.
++            CityDistance::find($this->editingId)?->delete();
++            CityDistance::setDistance($this->city_one, $this->city_two, (int) $this->distance_km);
++        } else {
++            CityDistance::setDistance($this->city_one, $this->city_two, (int) $this->distance_km);
++        }
++
++        session()->flash('success', 'Distancia guardada correctamente.');
++        $this->resetForm();
++    }
++
++    public function edit(int $id): void
++    {
++        $distance = CityDistance::findOrFail($id);
++
++        $this->editingId = $distance->id;
++        $this->city_one = $distance->city_a;
++        $this->city_two = $distance->city_b;
++        $this->distance_km = (string) $distance->distance_km;
++        $this->showForm = true;
++    }
++
++    public function delete(int $id): void
++    {
++        CityDistance::findOrFail($id)->delete();
++        session()->flash('success', 'Distancia eliminada.');
++    }
++
++    public function cancelEdit(): void
++    {
++        $this->resetForm();
++    }
++
++    protected function resetForm(): void
++    {
++        $this->reset(['editingId', 'city_one', 'city_two', 'distance_km', 'showForm']);
++        $this->resetErrorBag();
++    }
++
++    public function render()
++    {
++        return view('livewire.admin.city-distance-manager', [
++            'distances' => CityDistance::query()
++                ->orderBy('city_a')
++                ->orderBy('city_b')
++                ->paginate(10),
++        ]);
++    }
++}
+diff --git a/app/Livewire/Admin/RateMatrixManager.php b/app/Livewire/Admin/RateMatrixManager.php
+index 212b542..e1bcd3e 100644
+--- a/app/Livewire/Admin/RateMatrixManager.php
++++ b/app/Livewire/Admin/RateMatrixManager.php
+@@ -6,125 +6,75 @@
+ use Livewire\Attributes\Layout;
+ use Livewire\Attributes\Title;
+ use Livewire\Component;
+-use Livewire\WithPagination;
+ 
++/**
++ * Tarifa global de Venexpress (base + por kg + por km).
++ *
++ * Ya no es "por ruta": la diferencia de precio entre ciudades la
++ * aporta la distancia configurada en CityDistanceManager. Aquí solo
++ * se administra una fila (se edita si ya existe, se crea si no).
++ */
+ #[Layout('layouts.admin')]
+-#[Title('Matrices de tarifas')]
++#[Title('Tarifa')]
+ class RateMatrixManager extends Component
+ {
+-    use WithPagination;
++    public ?int $rateMatrixId = null;
+ 
+-    public ?int $editingId = null;
+-
+-    public string $origin_city = '';
+-
+-    public string $destination_city = '';
++    public string $base_price_usd = '0';
+ 
+     public string $price_per_kg_usd = '';
+ 
+-    public string $base_price_usd = '0';
+-
+-    public bool $showForm = false;
++    public string $price_per_km_usd = '';
+ 
+     protected function rules(): array
+     {
+-        $uniqueRule = 'unique:rate_matrices,origin_city,NULL,id,destination_city,' . $this->destination_city;
+-
+         return [
+-            'origin_city' => ['required', 'string', 'max:255'],
+-            'destination_city' => ['required', 'string', 'max:255'],
+-            'price_per_kg_usd' => ['required', 'numeric', 'min:0'],
+             'base_price_usd' => ['required', 'numeric', 'min:0'],
++            'price_per_kg_usd' => ['required', 'numeric', 'min:0'],
++            'price_per_km_usd' => ['required', 'numeric', 'min:0'],
+         ];
+     }
+ 
+     protected $messages = [
+-        'origin_city.required' => 'Ingresa la ciudad de origen.',
+-        'destination_city.required' => 'Ingresa la ciudad de destino.',
+-        'price_per_kg_usd.required' => 'Ingresa el precio por kg.',
+         'base_price_usd.required' => 'Ingresa el precio base.',
++        'price_per_kg_usd.required' => 'Ingresa el precio por kg.',
++        'price_per_km_usd.required' => 'Ingresa el precio por km.',
+     ];
+ 
+-    public function create(): void
++    public function mount(): void
+     {
+-        $this->resetForm();
+-        $this->showForm = true;
++        $current = RateMatrix::current();
++
++        if ($current) {
++            $this->rateMatrixId = $current->id;
++            $this->base_price_usd = (string) $current->base_price_usd;
++            $this->price_per_kg_usd = (string) $current->price_per_kg_usd;
++            $this->price_per_km_usd = (string) $current->price_per_km_usd;
++        }
+     }
+ 
+     public function save(): void
+     {
+         $this->validate();
+ 
+-        $exists = RateMatrix::query()
+-            ->where('origin_city', $this->origin_city)
+-            ->where('destination_city', $this->destination_city)
+-            ->when($this->editingId, fn ($q) => $q->where('id', '!=', $this->editingId))
+-            ->exists();
+-
+-        if ($exists) {
+-            $this->addError('destination_city', 'Ya existe una tarifa configurada para esta ruta.');
+-
+-            return;
+-        }
++        $data = [
++            'base_price_usd' => $this->base_price_usd,
++            'price_per_kg_usd' => $this->price_per_kg_usd,
++            'price_per_km_usd' => $this->price_per_km_usd,
++        ];
+ 
+-        if ($this->editingId) {
+-            RateMatrix::findOrFail($this->editingId)->update([
+-                'origin_city' => $this->origin_city,
+-                'destination_city' => $this->destination_city,
+-                'price_per_kg_usd' => $this->price_per_kg_usd,
+-                'base_price_usd' => $this->base_price_usd,
+-            ]);
+-            session()->flash('success', 'Ruta actualizada correctamente.');
++        if ($this->rateMatrixId) {
++            RateMatrix::findOrFail($this->rateMatrixId)->update($data);
+         } else {
+-            RateMatrix::create([
+-                'origin_city' => $this->origin_city,
+-                'destination_city' => $this->destination_city,
+-                'price_per_kg_usd' => $this->price_per_kg_usd,
+-                'base_price_usd' => $this->base_price_usd,
+-            ]);
+-            session()->flash('success', 'Ruta creada correctamente.');
++            $rateMatrix = RateMatrix::create($data);
++            $this->rateMatrixId = $rateMatrix->id;
+         }
+ 
+-        $this->resetForm();
+-    }
+-
+-    public function edit(int $id): void
+-    {
+-        $matrix = RateMatrix::findOrFail($id);
+-
+-        $this->editingId = $matrix->id;
+-        $this->origin_city = $matrix->origin_city;
+-        $this->destination_city = $matrix->destination_city;
+-        $this->price_per_kg_usd = (string) $matrix->price_per_kg_usd;
+-        $this->base_price_usd = (string) $matrix->base_price_usd;
+-        $this->showForm = true;
+-    }
+-
+-    public function delete(int $id): void
+-    {
+-        RateMatrix::findOrFail($id)->delete();
+-        session()->flash('success', 'Ruta eliminada.');
+-    }
+-
+-    public function cancelEdit(): void
+-    {
+-        $this->resetForm();
+-    }
+-
+-    protected function resetForm(): void
+-    {
+-        $this->reset(['editingId', 'origin_city', 'destination_city', 'price_per_kg_usd', 'showForm']);
+-        $this->base_price_usd = '0';
+-        $this->resetErrorBag();
++        session()->flash('success', 'Tarifa actualizada correctamente.');
+     }
+ 
+     public function render()
+     {
+-        return view('Livewire.Admin.rate-matrix-manager', [
+-            'matrices' => RateMatrix::query()
+-                ->orderBy('origin_city')
+-                ->orderBy('destination_city')
+-                ->paginate(10),
+-        ]);
++        return view('livewire.admin.rate-matrix-manager');
+     }
+-}
+\ No newline at end of file
++}
+diff --git a/app/Livewire/Ally/CreatePackage.php b/app/Livewire/Ally/CreatePackage.php
+index 5a233a7..370a07e 100644
+--- a/app/Livewire/Ally/CreatePackage.php
++++ b/app/Livewire/Ally/CreatePackage.php
+@@ -123,6 +123,6 @@ public function save(PackageService $packageService): void
+ 
+     public function render()
+     {
+-        return view('livewire.ally.create-package');
++        return view('livewire.ally.package-create');
+     }
+ }
+diff --git a/app/Models/CityDistance.php b/app/Models/CityDistance.php
+new file mode 100644
+index 0000000..59d10b6
+--- /dev/null
++++ b/app/Models/CityDistance.php
+@@ -0,0 +1,79 @@
++<?php
++
++namespace App\Models;
++
++use Illuminate\Database\Eloquent\Factories\HasFactory;
++use Illuminate\Database\Eloquent\Model;
++
++class CityDistance extends Model
++{
++    use HasFactory;
++
++    /**
++     * Los atributos que se pueden asignar de forma masiva.
++     *
++     * @var list<string>
++     */
++    protected $fillable = [
++        'city_a',
++        'city_b',
++        'distance_km',
++    ];
++
++    /**
++     * Obtiene los atributos que deben convertirse.
++     *
++     * @return array<string, string>
++     */
++    protected function casts(): array
++    {
++        return [
++            'distance_km' => 'integer',
++        ];
++    }
++
++    /**
++     * Busca la distancia registrada entre dos ciudades.
++     *
++     * Las distancias son simétricas, así que no importa el orden
++     * en el que se pasen origen/destino: siempre se normalizan
++     * alfabéticamente antes de consultar.
++     */
++    public static function between(string $cityOne, string $cityTwo): ?self
++    {
++        [$a, $b] = self::normalizePair($cityOne, $cityTwo);
++
++        return static::query()
++            ->where('city_a', $a)
++            ->where('city_b', $b)
++            ->first();
++    }
++
++    /**
++     * Crea o actualiza la distancia entre dos ciudades, normalizando
++     * el orden alfabético para no duplicar la ruta inversa.
++     */
++    public static function setDistance(string $cityOne, string $cityTwo, int $distanceKm): self
++    {
++        [$a, $b] = self::normalizePair($cityOne, $cityTwo);
++
++        return static::updateOrCreate(
++            ['city_a' => $a, 'city_b' => $b],
++            ['distance_km' => $distanceKm],
++        );
++    }
++
++    /**
++     * Ordena alfabéticamente un par de ciudades para que
++     * "Caracas, Valencia" y "Valencia, Caracas" sean la misma fila.
++     *
++     * @return array{0: string, 1: string}
++     */
++    protected static function normalizePair(string $cityOne, string $cityTwo): array
++    {
++        $pair = [$cityOne, $cityTwo];
++        sort($pair);
++
++        return $pair;
++    }
++}
+diff --git a/app/Models/RateMatrix.php b/app/Models/RateMatrix.php
+index 414bb1e..255ca30 100644
+--- a/app/Models/RateMatrix.php
++++ b/app/Models/RateMatrix.php
+@@ -15,10 +15,9 @@ class RateMatrix extends Model
+      * @var list<string>
+      */
+     protected $fillable = [
+-        'origin_city',
+-        'destination_city',
+-        'price_per_kg_usd',
+         'base_price_usd',
++        'price_per_kg_usd',
++        'price_per_km_usd',
+     ];
+ 
+     /**
+@@ -29,19 +28,20 @@ class RateMatrix extends Model
+     protected function casts(): array
+     {
+         return [
+-            'price_per_kg_usd' => 'decimal:2',
+             'base_price_usd' => 'decimal:2',
++            'price_per_kg_usd' => 'decimal:2',
++            'price_per_km_usd' => 'decimal:2',
+         ];
+     }
+ 
+     /**
+-     * Busca la tarifa configurada para una ruta específica.
++     * La tarifa vigente. Actualmente es global (una sola fila
++     * para toda la plataforma): si en el futuro se necesitan
++     * varias tarifas (por ejemplo por package_type), este es
++     * el único método que habría que cambiar.
+      */
+-    public static function forRoute(string $originCity, string $destinationCity): ?self
++    public static function current(): ?self
+     {
+-        return static::query()
+-            ->where('origin_city', $originCity)
+-            ->where('destination_city', $destinationCity)
+-            ->first();
++        return static::query()->latest('updated_at')->first();
+     }
+ }
+diff --git a/app/Services/TariffService.php b/app/Services/TariffService.php
+index 5fe17e2..16e645e 100644
+--- a/app/Services/TariffService.php
++++ b/app/Services/TariffService.php
+@@ -2,6 +2,7 @@
+ 
+ namespace App\Services;
+ 
++use App\Models\CityDistance;
+ use App\Models\RateMatrix;
+ use RuntimeException;
+ 
+@@ -34,41 +35,62 @@ public function calculateBillableWeight(float $physicalWeightKg, float $volumetr
+     }
+ 
+     /**
+-     * Busca la tarifa configurada para una ruta.
++     * Obtiene la tarifa global vigente (base + por kg + por km).
+      *
+-     * @throws RuntimeException si la ruta no tiene tarifa configurada.
++     * @throws RuntimeException si todavía no se ha configurado ninguna tarifa.
+      */
+-    public function findRate(string $originCity, string $destinationCity): RateMatrix
++    public function findRate(): RateMatrix
+     {
+-        $rate = RateMatrix::forRoute($originCity, $destinationCity);
++        $rate = RateMatrix::current();
+ 
+         if (! $rate) {
++            throw new RuntimeException('No hay ninguna tarifa configurada todavía.');
++        }
++
++        return $rate;
++    }
++
++    /**
++     * Busca la distancia registrada entre dos ciudades.
++     *
++     * @throws RuntimeException si la ruta no tiene distancia configurada.
++     */
++    public function findDistance(string $originCity, string $destinationCity): CityDistance
++    {
++        $distance = CityDistance::between($originCity, $destinationCity);
++
++        if (! $distance) {
+             throw new RuntimeException(
+-                "No existe una tarifa configurada para la ruta {$originCity} → {$destinationCity}."
++                "No existe una distancia configurada para la ruta {$originCity} → {$destinationCity}."
+             );
+         }
+ 
+-        return $rate;
++        return $distance;
+     }
+ 
+     /**
+-     * Total en USD = precio base + (peso facturable × precio por kg).
++     * Total en USD = precio base
++     *              + (peso facturable × precio por kg)
++     *              + (distancia en km × precio por km).
+      */
+-    public function calculateTotalUsd(RateMatrix $rateMatrix, float $billableWeightKg): float
++    public function calculateTotalUsd(RateMatrix $rateMatrix, float $billableWeightKg, int $distanceKm): float
+     {
+         return round(
+-            (float) $rateMatrix->base_price_usd + ($billableWeightKg * (float) $rateMatrix->price_per_kg_usd),
++            (float) $rateMatrix->base_price_usd
++                + ($billableWeightKg * (float) $rateMatrix->price_per_kg_usd)
++                + ($distanceKm * (float) $rateMatrix->price_per_km_usd),
+             2
+         );
+     }
+ 
+     /**
+      * Calcula todo lo necesario para facturar un paquete: pesos,
+-     * total en USD/VES y la tasa BCV utilizada.
++     * distancia, total en USD/VES y la tasa BCV utilizada.
+      *
+      * @return array{
+      *   volumetric_weight_kg: float,
+      *   billable_weight_kg: float,
++     *   distance_km: int,
+      *   total_price_usd: float,
+      *   total_price_ves: float,
+      *   bcv_rate_used: float,
+@@ -82,17 +104,19 @@ public function calculate(
+         ?float $widthCm = null,
+         ?float $heightCm = null,
+     ): array {
+-        $rateMatrix = $this->findRate($originCity, $destinationCity);
++        $rateMatrix = $this->findRate();
++        $cityDistance = $this->findDistance($originCity, $destinationCity);
+         $bcvRate = $this->bcvRateService->getCurrentRate();
+ 
+         $volumetricWeight = $this->calculateVolumetricWeight($lengthCm, $widthCm, $heightCm);
+         $billableWeight = $this->calculateBillableWeight($physicalWeightKg, $volumetricWeight);
+-        $totalUsd = $this->calculateTotalUsd($rateMatrix, $billableWeight);
++        $totalUsd = $this->calculateTotalUsd($rateMatrix, $billableWeight, $cityDistance->distance_km);
+         $totalVes = $this->bcvRateService->convertUsdToVes($totalUsd, $bcvRate);
+ 
+         return [
+             'volumetric_weight_kg' => $volumetricWeight,
+             'billable_weight_kg' => $billableWeight,
++            'distance_km' => $cityDistance->distance_km,
+             'total_price_usd' => $totalUsd,
+             'total_price_ves' => $totalVes,
+             'bcv_rate_used' => (float) $bcvRate->rate,
+diff --git a/database/migrations/2026_08_11_193200_create_city_distances_table.php b/database/migrations/2026_08_11_193200_create_city_distances_table.php
+new file mode 100644
+index 0000000..11635cb
+--- /dev/null
++++ b/database/migrations/2026_08_11_193200_create_city_distances_table.php
+@@ -0,0 +1,45 @@
++<?php
++
++use Illuminate\Database\Migrations\Migration;
++use Illuminate\Database\Schema\Blueprint;
++use Illuminate\Support\Facades\Schema;
++
++return new class extends Migration
++{
++    /**
++     * Ejecuta la migración.
++     */
++    public function up(): void
++    {
++        Schema::create('city_distances', function (Blueprint $table) {
++            $table->id();
++
++            /**
++             * Las distancias son simétricas (A→B = B→A), así que
++             * SIEMPRE se guardan y consultan con las ciudades
++             * ordenadas alfabéticamente (ver CityDistance::between()).
++             * Esto evita tener dos filas para la misma ruta.
++             *
++             * Ejemplo:
++             * "Barquisimeto" y "Caracas" → se guarda como
++             * city_a = "Barquisimeto", city_b = "Caracas"
++             */
++            $table->string('city_a');
++            $table->string('city_b');
++
++            $table->unsignedInteger('distance_km');
++
++            $table->timestamps();
++
++            $table->unique(['city_a', 'city_b']);
++        });
++    }
++
++    /**
++     * Revierte la migración.
++     */
++    public function down(): void
++    {
++        Schema::dropIfExists('city_distances');
++    }
++};
+diff --git a/database/migrations/2026_08_11_193201_convert_rate_matrices_to_global_tariff.php b/database/migrations/2026_08_11_193201_convert_rate_matrices_to_global_tariff.php
+new file mode 100644
+index 0000000..d26aaa0
+--- /dev/null
++++ b/database/migrations/2026_08_11_193201_convert_rate_matrices_to_global_tariff.php
+@@ -0,0 +1,48 @@
++<?php
++
++use Illuminate\Database\Migrations\Migration;
++use Illuminate\Database\Schema\Blueprint;
++use Illuminate\Support\Facades\Schema;
++
++return new class extends Migration
++{
++    /**
++     * Ejecuta la migración.
++     *
++     * Antes: cada fila de rate_matrices representaba una ruta
++     * específica (origin_city → destination_city).
++     *
++     * Ahora: la diferencia de precio entre rutas la aporta
++     * city_distances (price_per_km_usd × distancia_km), así que
++     * rate_matrices deja de tener columnas de ruta y pasa a ser
++     * una tarifa única global (base + por kg + por km).
++     */
++    public function up(): void
++    {
++        Schema::table('rate_matrices', function (Blueprint $table) {
++            $table->dropUnique(['origin_city', 'destination_city']);
++            $table->dropIndex(['origin_city']);
++            $table->dropIndex(['destination_city']);
++            $table->dropColumn(['origin_city', 'destination_city']);
++
++            $table->decimal('price_per_km_usd', 12, 2)->default(0)->after('price_per_kg_usd');
++        });
++    }
++
++    /**
++     * Revierte la migración.
++     */
++    public function down(): void
++    {
++        Schema::table('rate_matrices', function (Blueprint $table) {
++            $table->dropColumn('price_per_km_usd');
++
++            $table->string('origin_city')->after('id');
++            $table->string('destination_city')->after('origin_city');
++
++            $table->unique(['origin_city', 'destination_city']);
++            $table->index('origin_city');
++            $table->index('destination_city');
++        });
++    }
++};
+diff --git a/resources/views/Livewire/Admin/bcv-rate-manager.blade.php b/resources/views/livewire/admin/bcv-rate-manager.blade.php
+similarity index 100%
+rename from resources/views/Livewire/Admin/bcv-rate-manager.blade.php
+rename to resources/views/livewire/admin/bcv-rate-manager.blade.php
+diff --git a/resources/views/Livewire/Admin/rate-matrix-manager.blade.php b/resources/views/livewire/admin/city-distance-manager.blade.php
+similarity index 53%
+rename from resources/views/Livewire/Admin/rate-matrix-manager.blade.php
+rename to resources/views/livewire/admin/city-distance-manager.blade.php
+index f2908b1..235607f 100644
+--- a/resources/views/Livewire/Admin/rate-matrix-manager.blade.php
++++ b/resources/views/livewire/admin/city-distance-manager.blade.php
+@@ -1,13 +1,13 @@
+ <div class="space-y-6">
+     <div class="flex items-center justify-between">
+         <div>
+-            <h1 class="font-display text-2xl font-bold text-[#0B1220]">Matrices de tarifas</h1>
+-            <p class="text-sm text-[#64748B]">Precio base y por kg facturable para cada ruta origen → destino.</p>
++            <h1 class="font-display text-2xl font-bold text-[#0B1220]">Distancias entre ciudades</h1>
++            <p class="text-sm text-[#64748B]">Se usan para calcular el componente de precio por km de cada guía. Son simétricas: solo hace falta cargar cada par de ciudades una vez.</p>
+         </div>
+         @unless ($showForm)
+             <button wire:click="create"
+                 class="rounded-lg bg-[#FF6A1A] px-4 py-2 text-sm font-semibold text-white hover:bg-[#e65f16]">
+-                + Nueva ruta
++                + Nueva distancia
+             </button>
+         @endunless
+     </div>
+@@ -21,42 +21,35 @@ class="rounded-lg bg-[#FF6A1A] px-4 py-2 text-sm font-semibold text-white hover:
+     @if ($showForm)
+         <div class="rounded-2xl border border-[#E2E8F0] bg-white p-6 shadow-sm">
+             <h2 class="font-display text-lg font-semibold text-[#0B1220]">
+-                {{ $editingId ? 'Editar ruta' : 'Nueva ruta' }}
++                {{ $editingId ? 'Editar distancia' : 'Nueva distancia' }}
+             </h2>
+ 
+-            <form wire:submit="save" class="mt-4 grid grid-cols-1 gap-4 sm:grid-cols-2 lg:grid-cols-4">
++            <form wire:submit="save" class="mt-4 grid grid-cols-1 gap-4 sm:grid-cols-3">
+                 <div>
+-                    <label class="text-xs font-semibold text-[#64748B]">Ciudad origen</label>
+-                    <input type="text" wire:model="origin_city"
++                    <label class="text-xs font-semibold text-[#64748B]">Ciudad</label>
++                    <input type="text" wire:model="city_one"
+                         class="mt-1 w-full rounded-lg border-[#E2E8F0] text-sm focus:border-[#FF6A1A] focus:ring-[#FF6A1A]">
+-                    @error('origin_city') <p class="mt-1 text-xs text-red-600">{{ $message }}</p> @enderror
++                    @error('city_one') <p class="mt-1 text-xs text-red-600">{{ $message }}</p> @enderror
+                 </div>
+ 
+                 <div>
+-                    <label class="text-xs font-semibold text-[#64748B]">Ciudad destino</label>
+-                    <input type="text" wire:model="destination_city"
++                    <label class="text-xs font-semibold text-[#64748B]">Ciudad</label>
++                    <input type="text" wire:model="city_two"
+                         class="mt-1 w-full rounded-lg border-[#E2E8F0] text-sm focus:border-[#FF6A1A] focus:ring-[#FF6A1A]">
+-                    @error('destination_city') <p class="mt-1 text-xs text-red-600">{{ $message }}</p> @enderror
++                    @error('city_two') <p class="mt-1 text-xs text-red-600">{{ $message }}</p> @enderror
+                 </div>
+ 
+                 <div>
+-                    <label class="text-xs font-semibold text-[#64748B]">Precio base (USD)</label>
+-                    <input type="number" step="0.01" wire:model="base_price_usd"
++                    <label class="text-xs font-semibold text-[#64748B]">Distancia (km)</label>
++                    <input type="number" step="1" wire:model="distance_km"
+                         class="mt-1 w-full rounded-lg border-[#E2E8F0] font-tracking text-sm focus:border-[#FF6A1A] focus:ring-[#FF6A1A]">
+-                    @error('base_price_usd') <p class="mt-1 text-xs text-red-600">{{ $message }}</p> @enderror
++                    @error('distance_km') <p class="mt-1 text-xs text-red-600">{{ $message }}</p> @enderror
+                 </div>
+ 
+-                <div>
+-                    <label class="text-xs font-semibold text-[#64748B]">Precio por kg (USD)</label>
+-                    <input type="number" step="0.01" wire:model="price_per_kg_usd"
+-                        class="mt-1 w-full rounded-lg border-[#E2E8F0] font-tracking text-sm focus:border-[#FF6A1A] focus:ring-[#FF6A1A]">
+-                    @error('price_per_kg_usd') <p class="mt-1 text-xs text-red-600">{{ $message }}</p> @enderror
+-                </div>
+-
+-                <div class="flex items-end gap-2 sm:col-span-2 lg:col-span-4">
++                <div class="flex items-end gap-2 sm:col-span-3">
+                     <button type="submit"
+                         class="rounded-lg bg-[#FF6A1A] px-4 py-2 text-sm font-semibold text-white hover:bg-[#e65f16]">
+-                        {{ $editingId ? 'Guardar cambios' : 'Crear ruta' }}
++                        {{ $editingId ? 'Guardar cambios' : 'Crear distancia' }}
+                     </button>
+                     <button type="button" wire:click="cancelEdit"
+                         class="rounded-lg border border-[#E2E8F0] px-4 py-2 text-sm font-semibold text-[#64748B] hover:bg-slate-50">
+@@ -71,32 +64,32 @@ class="rounded-lg border border-[#E2E8F0] px-4 py-2 text-sm font-semibold text-[
+         <table class="w-full text-sm">
+             <thead>
+                 <tr class="border-b border-[#E2E8F0] text-left text-xs font-semibold uppercase tracking-wide text-[#94A3B8]">
+-                    <th class="px-6 py-3">Origen</th>
+-                    <th class="px-6 py-3">Destino</th>
+-                    <th class="px-6 py-3">Base (USD)</th>
+-                    <th class="px-6 py-3">Por kg (USD)</th>
++                    <th class="px-6 py-3">Ciudad</th>
++                    <th class="px-6 py-3">Ciudad</th>
++                    <th class="px-6 py-3">Distancia (km)</th>
+                     <th class="px-6 py-3 text-right">Acciones</th>
+                 </tr>
+             </thead>
+             <tbody>
+-                @forelse ($matrices as $matrix)
++                @forelse ($distances as $distance)
+                     <tr class="border-b border-[#F1F5F9] last:border-0">
+-                        <td class="px-6 py-3">{{ $matrix->origin_city }}</td>
+-                        <td class="px-6 py-3">{{ $matrix->destination_city }}</td>
+-                        <td class="px-6 py-3 font-tracking">${{ number_format($matrix->base_price_usd, 2) }}</td>
+-                        <td class="px-6 py-3 font-tracking">${{ number_format($matrix->price_per_kg_usd, 2) }}</td>
++                        <td class="px-6 py-3">{{ $distance->city_a }}</td>
++                        <td class="px-6 py-3">{{ $distance->city_b }}</td>
++                        <td class="px-6 py-3 font-tracking">{{ number_format($distance->distance_km) }} km</td>
+                         <td class="px-6 py-3 text-right">
+-                            <button wire:click="edit({{ $matrix->id }})" class="text-xs font-semibold text-[#FF6A1A] hover:underline">Editar</button>
+-                            <button wire:click="delete({{ $matrix->id }})"
+-                                wire:confirm="¿Eliminar esta ruta?"
++                            <button wire:click="edit({{ $distance->id }})" class="text-xs font-semibold text-[#FF6A1A] hover:underline">Editar</button>
++                            <button wire:click="delete({{ $distance->id }})"
++                                wire:confirm="¿Eliminar esta distancia?"
+                                 class="ml-3 text-xs font-semibold text-red-500 hover:underline">Eliminar</button>
+                         </td>
+                     </tr>
+                 @empty
+-                    <tr><td colspan="5" class="px-6 py-6 text-center text-[#94A3B8]">Sin rutas configuradas.</td></tr>
++                    <tr><td colspan="4" class="px-6 py-6 text-center text-[#94A3B8]">Sin distancias configuradas.</td></tr>
+                 @endforelse
+             </tbody>
+         </table>
+         <div class="px-6 py-4">
+-            {{ $matrices->links() }}
+-        </div>
+\ No newline at end of file
++            {{ $distances->links() }}
++        </div>
++    </div>
++</div>
+diff --git a/resources/views/Livewire/Admin/dashboard.blade.php b/resources/views/livewire/admin/dashboard.blade.php
+similarity index 100%
+rename from resources/views/Livewire/Admin/dashboard.blade.php
+rename to resources/views/livewire/admin/dashboard.blade.php
+diff --git a/resources/views/livewire/admin/rate-matrix-manager.blade.php b/resources/views/livewire/admin/rate-matrix-manager.blade.php
+new file mode 100644
+index 0000000..52714dd
+--- /dev/null
++++ b/resources/views/livewire/admin/rate-matrix-manager.blade.php
+@@ -0,0 +1,49 @@
++<div class="space-y-6">
++    <div>
++        <h1 class="font-display text-2xl font-bold text-[#0B1220]">Tarifa</h1>
++        <p class="text-sm text-[#64748B]">
++            Tarifa única para todas las rutas. El costo de una guía se calcula como:
++            precio base + (peso facturable × precio por kg) + (distancia × precio por km).
++            Las distancias entre ciudades se configuran aparte, en
++            <a href="{{ route('admin.city-distances') }}" class="font-semibold text-[#FF6A1A] hover:underline">Distancias</a>.
++        </p>
++    </div>
++
++    @if (session('success'))
++        <div class="rounded-lg border border-emerald-200 bg-emerald-50 px-4 py-3 text-sm text-emerald-700">
++            {{ session('success') }}
++        </div>
++    @endif
++
++    <div class="rounded-2xl border border-[#E2E8F0] bg-white p-6 shadow-sm">
++        <form wire:submit="save" class="grid grid-cols-1 gap-4 sm:grid-cols-3">
++            <div>
++                <label class="text-xs font-semibold text-[#64748B]">Precio base (USD)</label>
++                <input type="number" step="0.01" wire:model="base_price_usd"
++                    class="mt-1 w-full rounded-lg border-[#E2E8F0] font-tracking text-sm focus:border-[#FF6A1A] focus:ring-[#FF6A1A]">
++                @error('base_price_usd') <p class="mt-1 text-xs text-red-600">{{ $message }}</p> @enderror
++            </div>
++
++            <div>
++                <label class="text-xs font-semibold text-[#64748B]">Precio por kg facturable (USD)</label>
++                <input type="number" step="0.01" wire:model="price_per_kg_usd"
++                    class="mt-1 w-full rounded-lg border-[#E2E8F0] font-tracking text-sm focus:border-[#FF6A1A] focus:ring-[#FF6A1A]">
++                @error('price_per_kg_usd') <p class="mt-1 text-xs text-red-600">{{ $message }}</p> @enderror
++            </div>
++
++            <div>
++                <label class="text-xs font-semibold text-[#64748B]">Precio por km (USD)</label>
++                <input type="number" step="0.01" wire:model="price_per_km_usd"
++                    class="mt-1 w-full rounded-lg border-[#E2E8F0] font-tracking text-sm focus:border-[#FF6A1A] focus:ring-[#FF6A1A]">
++                @error('price_per_km_usd') <p class="mt-1 text-xs text-red-600">{{ $message }}</p> @enderror
++            </div>
++
++            <div class="sm:col-span-3">
++                <button type="submit"
++                    class="rounded-lg bg-[#FF6A1A] px-4 py-2 text-sm font-semibold text-white hover:bg-[#e65f16]">
++                    Guardar tarifa
++                </button>
++            </div>
++        </form>
++    </div>
++</div>
+diff --git a/resources/views/Livewire/Ally/daily-cash-cut.blade.php b/resources/views/livewire/ally/daily-cash-cut.blade.php
+similarity index 100%
+rename from resources/views/Livewire/Ally/daily-cash-cut.blade.php
+rename to resources/views/livewire/ally/daily-cash-cut.blade.php
+diff --git a/resources/views/Livewire/Ally/package-create.blade.php b/resources/views/livewire/ally/package-create.blade.php
+similarity index 100%
+rename from resources/views/Livewire/Ally/package-create.blade.php
+rename to resources/views/livewire/ally/package-create.blade.php
+diff --git a/resources/views/Livewire/Driver/field-scanner.blade.php b/resources/views/livewire/driver/field-scanner.blade.php
+similarity index 100%
+rename from resources/views/Livewire/Driver/field-scanner.blade.php
+rename to resources/views/livewire/driver/field-scanner.blade.php
+diff --git a/resources/views/Livewire/layout/navigation.blade.php b/resources/views/livewire/layout/navigation.blade.php
+similarity index 100%
+rename from resources/views/Livewire/layout/navigation.blade.php
+rename to resources/views/livewire/layout/navigation.blade.php
+diff --git a/resources/views/Livewire/pages/auth/confirm-password.blade.php b/resources/views/livewire/pages/auth/confirm-password.blade.php
+similarity index 100%
+rename from resources/views/Livewire/pages/auth/confirm-password.blade.php
+rename to resources/views/livewire/pages/auth/confirm-password.blade.php
+diff --git a/resources/views/Livewire/pages/auth/forgot-password.blade.php b/resources/views/livewire/pages/auth/forgot-password.blade.php
+similarity index 100%
+rename from resources/views/Livewire/pages/auth/forgot-password.blade.php
+rename to resources/views/livewire/pages/auth/forgot-password.blade.php
+diff --git a/resources/views/Livewire/pages/auth/login.blade.php b/resources/views/livewire/pages/auth/login.blade.php
+similarity index 100%
+rename from resources/views/Livewire/pages/auth/login.blade.php
+rename to resources/views/livewire/pages/auth/login.blade.php
+diff --git a/resources/views/Livewire/pages/auth/register.blade.php b/resources/views/livewire/pages/auth/register.blade.php
+similarity index 100%
+rename from resources/views/Livewire/pages/auth/register.blade.php
+rename to resources/views/livewire/pages/auth/register.blade.php
+diff --git a/resources/views/Livewire/pages/auth/reset-password.blade.php b/resources/views/livewire/pages/auth/reset-password.blade.php
+similarity index 100%
+rename from resources/views/Livewire/pages/auth/reset-password.blade.php
+rename to resources/views/livewire/pages/auth/reset-password.blade.php
+diff --git a/resources/views/Livewire/pages/auth/verify-email.blade.php b/resources/views/livewire/pages/auth/verify-email.blade.php
+similarity index 100%
+rename from resources/views/Livewire/pages/auth/verify-email.blade.php
+rename to resources/views/livewire/pages/auth/verify-email.blade.php
+diff --git a/resources/views/Livewire/profile/delete-user-form.blade.php b/resources/views/livewire/profile/delete-user-form.blade.php
+similarity index 100%
+rename from resources/views/Livewire/profile/delete-user-form.blade.php
+rename to resources/views/livewire/profile/delete-user-form.blade.php
+diff --git a/resources/views/Livewire/profile/update-password-form.blade.php b/resources/views/livewire/profile/update-password-form.blade.php
+similarity index 100%
+rename from resources/views/Livewire/profile/update-password-form.blade.php
+rename to resources/views/livewire/profile/update-password-form.blade.php
+diff --git a/resources/views/Livewire/profile/update-profile-information-form.blade.php b/resources/views/livewire/profile/update-profile-information-form.blade.php
+similarity index 100%
+rename from resources/views/Livewire/profile/update-profile-information-form.blade.php
+rename to resources/views/livewire/profile/update-profile-information-form.blade.php
+diff --git a/resources/views/Livewire/Tracking/public-tracking.blade.php b/resources/views/livewire/tracking/public-tracking.blade.php
+similarity index 100%
+rename from resources/views/Livewire/Tracking/public-tracking.blade.php
+rename to resources/views/livewire/tracking/public-tracking.blade.php
+diff --git a/resources/views/Livewire/welcome/navigation.blade.php b/resources/views/livewire/welcome/navigation.blade.php
+similarity index 100%
+rename from resources/views/Livewire/welcome/navigation.blade.php
+rename to resources/views/livewire/welcome/navigation.blade.php
+diff --git a/routes/web.php b/routes/web.php
+index a525a4e..9d5f373 100644
+--- a/routes/web.php
++++ b/routes/web.php
+@@ -4,6 +4,7 @@
+ use App\Livewire\Admin\Dashboard;
+ use App\Livewire\Admin\BcvRateManager;
+ use App\Livewire\Admin\RateMatrixManager;
++use App\Livewire\Admin\CityDistanceManager;
+ use Illuminate\Support\Facades\Route;
+ 
+ Route::view('/', 'welcome');
+@@ -43,6 +44,7 @@
+         // Fase 5 — Tasa BCV y matrices de tarifas
+         Route::get('/tasa-bcv', BcvRateManager::class)->name('bcv-rates');
+         Route::get('/tarifas', RateMatrixManager::class)->name('rate-matrices');
++        Route::get('/distancias', CityDistanceManager::class)->name('city-distances');
+     });
+ 
+ require __DIR__.'/auth.php';
+\ No newline at end of file

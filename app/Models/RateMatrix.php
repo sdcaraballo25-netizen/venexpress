@@ -15,10 +15,9 @@ class RateMatrix extends Model
      * @var list<string>
      */
     protected $fillable = [
-        'origin_city',
-        'destination_city',
-        'price_per_kg_usd',
         'base_price_usd',
+        'price_per_kg_usd',
+        'price_per_km_usd',
     ];
 
     /**
@@ -29,19 +28,20 @@ class RateMatrix extends Model
     protected function casts(): array
     {
         return [
-            'price_per_kg_usd' => 'decimal:2',
             'base_price_usd' => 'decimal:2',
+            'price_per_kg_usd' => 'decimal:2',
+            'price_per_km_usd' => 'decimal:2',
         ];
     }
 
     /**
-     * Busca la tarifa configurada para una ruta específica.
+     * La tarifa vigente. Actualmente es global (una sola fila
+     * para toda la plataforma): si en el futuro se necesitan
+     * varias tarifas (por ejemplo por package_type), este es
+     * el único método que habría que cambiar.
      */
-    public static function forRoute(string $originCity, string $destinationCity): ?self
+    public static function current(): ?self
     {
-        return static::query()
-            ->where('origin_city', $originCity)
-            ->where('destination_city', $destinationCity)
-            ->first();
+        return static::query()->latest('updated_at')->first();
     }
 }
