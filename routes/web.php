@@ -9,6 +9,8 @@ use Illuminate\Support\Facades\Route;
 
 Route::view('/', 'welcome');
 
+Route::get('/rastreo', [App\Http\Controllers\TrackingController::class, 'index'])->name('tracking.index');
+
 Route::view('dashboard', 'dashboard')
     ->middleware(['auth', 'verified'])
     ->name('dashboard');
@@ -48,3 +50,4 @@ Route::middleware(['auth', 'role:admin'])
     });
 
 require __DIR__.'/auth.php';
+
