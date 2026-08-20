@@ -17,9 +17,6 @@ new #[Layout('layouts.guest')] class extends Component
             'email' => ['required', 'string', 'email'],
         ]);
 
-        // We will send the password reset link to this user. Once we have attempted
-        // to send the link, we will examine the response then see the message we
-        // need to show to the user. Finally, we'll send out a proper response.
         $status = Password::sendResetLink(
             $this->only('email')
         );
@@ -37,25 +34,31 @@ new #[Layout('layouts.guest')] class extends Component
 }; ?>
 
 <div>
-    <div class="mb-4 text-sm text-gray-600">
-        {{ __('Forgot your password? No problem. Just let us know your email address and we will email you a password reset link that will allow you to choose a new one.') }}
+    <div class="mb-8 lg:hidden">
+        <x-venexpress-logo size="md" />
     </div>
 
-    <!-- Session Status -->
-    <x-auth-session-status class="mb-4" :status="session('status')" />
+    <h1 class="font-display text-2xl font-bold text-navy-900">Recuperar contraseña</h1>
+    <p class="mt-1.5 text-sm text-slate-500">
+        Ingresa tu correo y te enviaremos un enlace para elegir una nueva contraseña.
+    </p>
 
-    <form wire:submit="sendPasswordResetLink">
-        <!-- Email Address -->
+    <x-auth-session-status class="mt-6" :status="session('status')" />
+
+    <form wire:submit="sendPasswordResetLink" class="mt-8 space-y-5">
         <div>
-            <x-input-label for="email" :value="__('Email')" />
-            <x-text-input wire:model="email" id="email" class="block mt-1 w-full" type="email" name="email" required autofocus />
+            <x-input-label for="email" value="Correo electrónico" />
+            <x-text-input wire:model="email" id="email" class="block mt-1.5 w-full" type="email" name="email" required autofocus placeholder="tu@correo.com" />
             <x-input-error :messages="$errors->get('email')" class="mt-2" />
         </div>
 
-        <div class="flex items-center justify-end mt-4">
-            <x-primary-button>
-                {{ __('Email Password Reset Link') }}
-            </x-primary-button>
-        </div>
+        <x-primary-button class="w-full py-3">
+            Enviar enlace de recuperación
+        </x-primary-button>
     </form>
+
+    <p class="mt-8 text-center text-sm text-slate-500">
+        ¿Recordaste tu contraseña?
+        <a href="{{ route('login') }}" class="font-semibold text-navy-700 hover:text-navy-900" wire:navigate>Inicia sesión</a>
+    </p>
 </div>

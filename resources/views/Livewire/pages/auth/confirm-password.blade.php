@@ -34,29 +34,29 @@ new #[Layout('layouts.guest')] class extends Component
 }; ?>
 
 <div>
-    <div class="mb-4 text-sm text-gray-600">
-        {{ __('This is a secure area of the application. Please confirm your password before continuing.') }}
+    <div class="mb-8 lg:hidden">
+        <x-venexpress-logo size="md" />
     </div>
 
-    <form wire:submit="confirmPassword">
-        <!-- Password -->
-        <div>
-            <x-input-label for="password" :value="__('Password')" />
+    <h1 class="font-display text-2xl font-bold text-navy-900">Confirma tu contraseña</h1>
+    <p class="mt-1.5 text-sm text-slate-500">
+        Esta es un área protegida. Confirma tu contraseña antes de continuar.
+    </p>
 
+    <form wire:submit="confirmPassword" class="mt-8 space-y-5">
+        <div>
+            <x-input-label for="password" value="Contraseña" />
             <x-text-input wire:model="password"
                           id="password"
-                          class="block mt-1 w-full"
+                          class="block mt-1.5 w-full"
                           type="password"
                           name="password"
-                          required autocomplete="current-password" />
-
+                          required autocomplete="current-password" placeholder="••••••••" />
             <x-input-error :messages="$errors->get('password')" class="mt-2" />
         </div>
 
-        <div class="flex justify-end mt-4">
-            <x-primary-button>
-                {{ __('Confirm') }}
-            </x-primary-button>
-        </div>
+        <x-primary-button class="w-full py-3">
+            Confirmar
+        </x-primary-button>
     </form>
 </div>
