@@ -754,5 +754,131 @@
     "seen": 1787328126.9283884,
     "ast_hash": "804b9fdf6105c34a0a14bed82a9d6026",
     "semantic_hash": "804b9fdf6105c34a0a14bed82a9d6026"
+  },
+  ".claude/CLAUDE.md": {
+    "mtime": 1787329292.5537837,
+    "seen": 1787330583.410349,
+    "ast_hash": "79cfbb927776339a0bf09285f1eef8a8",
+    "semantic_hash": ""
+  },
+  ".claude/skills/graphify/SKILL.md": {
+    "mtime": 1787327972.0782056,
+    "seen": 1787330583.4103503,
+    "ast_hash": "3953c31b4ef6d89d3b1cb43f0110817d",
+    "semantic_hash": ""
+  },
+  ".claude/skills/graphify/references/add-watch.md": {
+    "mtime": 1787327927.7027266,
+    "seen": 1787330583.4103515,
+    "ast_hash": "d59d027fe449f06aa03905a01184e779",
+    "semantic_hash": ""
+  },
+  ".claude/skills/graphify/references/exports.md": {
+    "mtime": 1787327927.7037256,
+    "seen": 1787330583.4103525,
+    "ast_hash": "9da2a2152e60a22f07f05fed5158f287",
+    "semantic_hash": ""
+  },
+  ".claude/skills/graphify/references/extraction-spec.md": {
+    "mtime": 1787327927.7037256,
+    "seen": 1787330583.4103532,
+    "ast_hash": "42fef56a01698118f7fd722acdadea34",
+    "semantic_hash": ""
+  },
+  ".claude/skills/graphify/references/github-and-merge.md": {
+    "mtime": 1787327927.7037256,
+    "seen": 1787330583.410354,
+    "ast_hash": "cde13df085e4c492aeb7ba298a996d0d",
+    "semantic_hash": ""
+  },
+  ".claude/skills/graphify/references/hooks.md": {
+    "mtime": 1787327927.7047265,
+    "seen": 1787330583.4103544,
+    "ast_hash": "3f545db6ce646650bb9de588f5512a27",
+    "semantic_hash": ""
+  },
+  ".claude/skills/graphify/references/query.md": {
+    "mtime": 1787327927.7047265,
+    "seen": 1787330583.410355,
+    "ast_hash": "3c46f8ad006874260614ed8657d02307",
+    "semantic_hash": ""
+  },
+  ".claude/skills/graphify/references/transcribe.md": {
+    "mtime": 1787327927.7057261,
+    "seen": 1787330583.410356,
+    "ast_hash": "67b6a5fa6c0974e18f60db9f8932fbd8",
+    "semantic_hash": ""
+  },
+  ".claude/skills/graphify/references/update.md": {
+    "mtime": 1787327927.7067263,
+    "seen": 1787330583.4103565,
+    "ast_hash": "9378bd03d56baaf78bd738ab3848f142",
+    "semantic_hash": ""
+  },
+  ".github/copilot-instructions.md": {
+    "mtime": 1787329526.2277892,
+    "seen": 1787330583.4103572,
+    "ast_hash": "2b23503628bf2ec71d067a85ca8948ab",
+    "semantic_hash": ""
+  },
+  "CLAUDE.md": {
+    "mtime": 1787327972.080205,
+    "seen": 1787330583.410358,
+    "ast_hash": "8a6643a420fdad6bfb583523bc6cef16",
+    "semantic_hash": ""
+  },
+  "README.md": {
+    "mtime": 1787275504.2982633,
+    "seen": 1787330583.4103587,
+    "ast_hash": "c9fd29cc7c9057820aebcdcd6bbddca3",
+    "semantic_hash": ""
+  },
+  "public/robots.txt": {
+    "mtime": 1787275504.317599,
+    "seen": 1787330583.4103596,
+    "ast_hash": "b6216d61c03e6ce0c9aea6ca7808f7ca",
+    "semantic_hash": ""
+  },
+  "resources/views/tracking/venexpress-landing.html": {
+    "mtime": 1787275504.329312,
+    "seen": 1787330583.4103603,
+    "ast_hash": "f70fe9284db083e93818f908a41f0cb2",
+    "semantic_hash": ""
+  },
+  "public/images/skyline-hero.png": {
+    "mtime": 1787283447.2905748,
+    "seen": 1787330583.4103608,
+    "ast_hash": "78635abbc56ca22a754bf49817b87aea",
+    "semantic_hash": ""
+  },
+  "public/images/van-hero.png": {
+    "mtime": 1787283447.2926376,
+    "seen": 1787330583.4103615,
+    "ast_hash": "76c84e62ba74424758bdde8e82164a8b",
+    "semantic_hash": ""
+  },
+  "public/images/venexpress-logo-solo.png": {
+    "mtime": 1787283447.2926376,
+    "seen": 1787330583.4103625,
+    "ast_hash": "d1a49f8b7895a77aef1bb7c9a91bf0b4",
+    "semantic_hash": ""
+  },
+  "public/images/venexpress-logo-white.png": {
+    "mtime": 1787283447.2937167,
+    "seen": 1787330583.410363,
+    "ast_hash": "595e21cf8775ed62ab56b01565020731",
+    "semantic_hash": ""
+  },
+  "public/images/venexpress-logo.png": {
+    "mtime": 1787283447.2947192,
+    "seen": 1787330583.4103637,
+    "ast_hash": "ae3ce76b64d9e814ed12aedef97374d0",
+    "semantic_hash": ""
+  },
+  "public/images/venezuela-map.png": {
+    "mtime": 1787283447.2958407,
+    "seen": 1787330583.4103644,
+    "ast_hash": "281f016f82be18beb9138ab372d4e35d",
+    "semantic_hash": ""
   }
 }
