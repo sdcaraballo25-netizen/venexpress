@@ -13,6 +13,15 @@ Route::get('/', function () {
     return view('welcome');
 })->name('home');
 
+
+    Route::view('dashboard', 'dashboard')
+    ->middleware(['auth', 'verified'])
+    ->name('dashboard');
+
+Route::view('profile', 'profile')
+    ->middleware(['auth'])
+    ->name('profile');
+
 // Rastreo público
 Route::get('/rastreo', function () {
     return view('tracking.index');

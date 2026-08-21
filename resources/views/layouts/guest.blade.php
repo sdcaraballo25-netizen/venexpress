@@ -7,8 +7,12 @@
 
         <title>{{ config('app.name', 'VenExpress') }}</title>
 
-        <link rel="preconnect" href="https://fonts.bunny.net">
-        <link href="https://fonts.bunny.net/css?family=inter:400,500,600,700|space-grotesk:500,600,700&display=swap" rel="stylesheet" />
+        <link rel="preconnect" href="https://fonts.googleapis.com">
+        <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+        <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+        <style>
+            body, .font-sans, .font-display { font-family: 'Poppins', sans-serif; }
+        </style>
 
         @vite(['resources/css/app.css', 'resources/js/app.js'])
     </head>

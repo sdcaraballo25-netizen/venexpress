@@ -57,7 +57,7 @@
             </h1>
 
             <p class="mt-4 text-gray-500 max-w-sm">
-                Ingresa tu número de guía para conocer el estado actual de tu paquete.
+                Ingresa tu número de guía para conocer el estado de tu paquete en tiempo real.
             </p>
 
             <form action="{{ route('tracking.show') }}" method="GET"
@@ -78,7 +78,7 @@
         </div>
 
         <!-- Van -->
-        <div class="relative flex justify-center items-end pb-16">
+        <div class="relative flex justify-center items-end pb-10">
             <img
                 src="{{ asset('images/van-hero.png') }}"
                 alt="Furgoneta Venexpress"
@@ -172,7 +172,7 @@
                     <span class="absolute -top-2 -left-1 w-7 h-7 rounded-full bg-blue-950 text-white text-xs font-bold flex items-center justify-center">4</span>
                 </div>
                 <h3 class="font-semibold text-blue-950 mt-4">Recibe tu paquete</h3>
-                <p class="text-sm text-gray-500 mt-1">Retira en agencia o recibe en tu domicilio.</p>
+                <p class="text-sm text-gray-500 mt-1">Retira en agencia o recibe en la dirección indicada.</p>
             </div>
         </div>
     </section>
@@ -230,8 +230,8 @@
     <footer id="ayuda" class="bg-blue-950">
         <div class="max-w-7xl mx-auto px-6 py-14 grid md:grid-cols-5 gap-10">
             <div>
-                <img src="{{ asset('images/venexpress-logo-white.svg') }}" alt="Venexpress" class="h-8 mb-4 brightness-0 invert">
-                <p class="text-sm text-blue-200">Conectamos a Venezuela con soluciones de envío rápidas, seguras y confiables.</p>
+                <img src="{{ asset('images/venexpress-logo-white.png') }}" alt="Venexpress" class="h-8 mb-4>
+                <p class="text-sm" style="color: #ffffff !important;">Conectamos a Venezuela con soluciones de envío rápidas, seguras y confiables.</p>
                 <div class="flex items-center gap-3 mt-5">
                     <a href="#" class="w-8 h-8 rounded-full bg-white/10 flex items-center justify-center hover:bg-white/20 transition">
                         <i class="fa-brands fa-facebook-f text-white text-sm"></i>
@@ -265,6 +265,7 @@
                     <li><a href="#" class="hover:text-white transition">Envíos Nacionales</a></li>
                     <li><a href="#" class="hover:text-white transition">Envíos Express</a></li>
                     <li><a href="#" class="hover:text-white transition">Carga Empresarial</a></li>
+                    <li><a href="#" class="hover:text-white transition">Casillero Internacional</a></li>
                 </ul>
             </div>
 
@@ -282,15 +283,15 @@
                 <h4 class="text-white font-semibold text-sm mb-4">Contáctanos</h4>
                 <ul class="space-y-3 text-sm text-blue-200">
                     <li class="flex items-start gap-2">
-                        <i class="fa-solid fa-phone mt-0.5 text-white"></i>
+                        <i class="fa-solid fa-phone mt-0.5"></i>
                         <span>0800-VENEXPRESS<br>0800-83639773</span>
                     </li>
                     <li class="flex items-center gap-2">
-                        <i class="fa-solid fa-envelope text-white"></i>
+                        <i class="fa-solid fa-envelope"></i>
                         <span>info@venexpress.com</span>
                     </li>
                     <li class="flex items-center gap-2">
-                        <i class="fa-solid fa-location-dot text-white"></i>
+                        <i class="fa-solid fa-location-dot"></i>
                         <span>Caracas, Venezuela</span>
                     </li>
                 </ul>
