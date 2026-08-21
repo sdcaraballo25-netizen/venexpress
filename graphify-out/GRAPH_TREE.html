@@ -1,0 +1,363 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <title>/ — graphify tree viewer</title>
+  <style>
+    body {
+      font-family: 'Segoe UI', sans-serif;
+      margin: 0;
+      padding: 0;
+      background: #f9f9f9;
+      color: #333;
+    }
+    h1 {
+      margin: 20px 0 0 24px;
+      font-size: 2.2rem;
+      font-weight: bold;
+      color: #1e3a56;
+    }
+    .controls {
+      margin: 20px 0 15px 24px;
+    }
+    button {
+      margin-right: 10px;
+      padding: 8px 18px;
+      background: #007bff;
+      color: #fff;
+      border: none;
+      border-radius: 5px;
+      font-size: 0.95rem;
+      cursor: pointer;
+      transition: background 0.2s ease-in-out;
+      box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+    }
+    button:hover {
+      background: #0056b3;
+    }
+    button:active {
+      background: #004085;
+    }
+    #tree-container {
+      width: calc(100vw - 48px); /* Adjust for body margin/padding */
+      height: 85vh;
+      overflow: auto;
+      border-radius: 8px;
+      background: #fff;
+      margin-left: 24px;
+      margin-right: 24px;
+      box-shadow: 0 4px 12px rgba(0,0,0,0.08);
+      border: 1px solid #ddd;
+    }
+    svg {
+      background: #fff;
+      border-radius: 8px;
+      display: block; /* Important for D3 */
+    }
+    .node circle {
+      stroke-width: 2.5px;
+    }
+    .node text { /* Base style for the <text> container */
+      font: 13px 'Segoe UI', sans-serif;
+      paint-order: stroke fill; /* Ensures text is readable over lines */
+      stroke: #fff; /* White halo */
+      stroke-width: 3px; /* Halo thickness */
+      stroke-linejoin: round;
+      stroke-opacity: 0.85; /* Halo opacity */
+    }
+    .link {
+      fill: none;
+      stroke-opacity: 0.7;
+      stroke-width: 2px;
+    }
+  </style>
+</head>
+<body>
+  <h1>/ — Knowledge Graph</h1>
+  <div class="controls">
+    <button onclick="expandAll()">Expand All</button>
+    <button onclick="collapseAll()">Collapse All</button>
+    <button onclick="resetView()">Reset View</button>
+  </div>
+  <div id="tree-container">
+    <svg id="tree-svg" width="6000" height="8000"></svg>
+  </div>
+
+  <script src="https://d3js.org/d3.v7.min.js"></script>
+  <script>
+    const initialJsonData = {"name":"/","total_count":349,"children":[{"name":"app","total_count":109,"children":[{"name":"Http","total_count":6,"children":[{"name":"Controllers","total_count":4,"children":[{"name":"Auth","total_count":2,"children":[{"name":"VerifyEmailController.php","total_count":2,"children":[{"name":".__invoke()","total_count":1,"children":[]},{"name":"VerifyEmailController","total_count":1,"children":[]}]}]},{"name":"Controller.php","total_count":1,"children":[{"name":"Controller","total_count":1,"children":[]}]},{"name":"DriverScanController.php","total_count":1,"children":[{"name":"DriverScanController","total_count":1,"children":[]}]}]},{"name":"Middleware","total_count":2,"children":[{"name":"EnsureUserHasRole.php","total_count":2,"children":[{"name":".handle()","total_count":1,"children":[]},{"name":"EnsureUserHasRole","total_count":1,"children":[]}]}]}]},{"name":"Livewire","total_count":39,"children":[{"name":"Actions","total_count":2,"children":[{"name":"Logout.php","total_count":2,"children":[{"name":".__invoke()","total_count":1,"children":[]},{"name":"Logout","total_count":1,"children":[]}]}]},{"name":"Admin","total_count":25,"children":[{"name":"BcvRateManager.php","total_count":9,"children":[{"name":".cancelEdit()","total_count":1,"children":[]},{"name":".delete()","total_count":1,"children":[]},{"name":".edit()","total_count":1,"children":[]},{"name":".mount()","total_count":1,"children":[]},{"name":".render()","total_count":1,"children":[]},{"name":".resetForm()","total_count":1,"children":[]},{"name":".rules()","total_count":1,"children":[]},{"name":".save()","total_count":1,"children":[]},{"name":"BcvRateManager","total_count":1,"children":[]}]},{"name":"CityDistanceManager.php","total_count":9,"children":[{"name":".cancelEdit()","total_count":1,"children":[]},{"name":".create()","total_count":1,"children":[]},{"name":".delete()","total_count":1,"children":[]},{"name":".edit()","total_count":1,"children":[]},{"name":".render()","total_count":1,"children":[]},{"name":".resetForm()","total_count":1,"children":[]},{"name":".rules()","total_count":1,"children":[]},{"name":".save()","total_count":1,"children":[]},{"name":"CityDistanceManager","total_count":1,"children":[]}]},{"name":"Dashboard.php","total_count":2,"children":[{"name":".render()","total_count":1,"children":[]},{"name":"Dashboard","total_count":1,"children":[]}]},{"name":"RateMatrixManager.php","total_count":5,"children":[{"name":".mount()","total_count":1,"children":[]},{"name":".render()","total_count":1,"children":[]},{"name":".rules()","total_count":1,"children":[]},{"name":".save()","total_count":1,"children":[]},{"name":"RateMatrixManager","total_count":1,"children":[]}]}]},{"name":"Ally","total_count":6,"children":[{"name":"CreatePackage.php","total_count":5,"children":[{"name":".pricingPreview()","total_count":1,"children":[]},{"name":".render()","total_count":1,"children":[]},{"name":".rules()","total_count":1,"children":[]},{"name":".save()","total_count":1,"children":[]},{"name":"CreatePackage","total_count":1,"children":[]}]},{"name":"DailyCashCut.php","total_count":1,"children":[]}]},{"name":"Driver","total_count":1,"children":[{"name":"FieldScanner.php","total_count":1,"children":[]}]},{"name":"Forms","total_count":4,"children":[{"name":"LoginForm.php","total_count":4,"children":[{"name":".authenticate()","total_count":1,"children":[]},{"name":".ensureIsNotRateLimited()","total_count":1,"children":[]},{"name":".throttleKey()","total_count":1,"children":[]},{"name":"LoginForm","total_count":1,"children":[]}]}]},{"name":"Tracking","total_count":1,"children":[{"name":"PublicTracking.php","total_count":1,"children":[]}]}]},{"name":"Models","total_count":35,"children":[{"name":"Ally.php","total_count":4,"children":[{"name":".casts()","total_count":1,"children":[]},{"name":".packages()","total_count":1,"children":[]},{"name":".user()","total_count":1,"children":[]},{"name":"Ally","total_count":1,"children":[]}]},{"name":"BcvRate.php","total_count":3,"children":[{"name":".casts()","total_count":1,"children":[]},{"name":".current()","total_count":1,"children":[]},{"name":"BcvRate","total_count":1,"children":[]}]},{"name":"CityDistance.php","total_count":5,"children":[{"name":".between()","total_count":1,"children":[]},{"name":".casts()","total_count":1,"children":[]},{"name":".normalizePair()","total_count":1,"children":[]},{"name":".setDistance()","total_count":1,"children":[]},{"name":"CityDistance","total_count":1,"children":[]}]},{"name":"Driver.php","total_count":3,"children":[{"name":".packages()","total_count":1,"children":[]},{"name":".user()","total_count":1,"children":[]},{"name":"Driver","total_count":1,"children":[]}]},{"name":"Package.php","total_count":6,"children":[{"name":".ally()","total_count":1,"children":[]},{"name":".casts()","total_count":1,"children":[]},{"name":".driver()","total_count":1,"children":[]},{"name":".histories()","total_count":1,"children":[]},{"name":".isDelivered()","total_count":1,"children":[]},{"name":"Package","total_count":1,"children":[]}]},{"name":"PackageHistory.php","total_count":3,"children":[{"name":".package()","total_count":1,"children":[]},{"name":".scannedBy()","total_count":1,"children":[]},{"name":"PackageHistory","total_count":1,"children":[]}]},{"name":"RateMatrix.php","total_count":3,"children":[{"name":".casts()","total_count":1,"children":[]},{"name":".current()","total_count":1,"children":[]},{"name":"RateMatrix","total_count":1,"children":[]}]},{"name":"User.php","total_count":8,"children":[{"name":".ally()","total_count":1,"children":[]},{"name":".casts()","total_count":1,"children":[]},{"name":".driver()","total_count":1,"children":[]},{"name":".isAdmin()","total_count":1,"children":[]},{"name":".isAliado()","total_count":1,"children":[]},{"name":".isChofer()","total_count":1,"children":[]},{"name":".packageHistories()","total_count":1,"children":[]},{"name":"User","total_count":1,"children":[]}]}]},{"name":"Providers","total_count":6,"children":[{"name":"AppServiceProvider.php","total_count":3,"children":[{"name":".boot()","total_count":1,"children":[]},{"name":".register()","total_count":1,"children":[]},{"name":"AppServiceProvider","total_count":1,"children":[]}]},{"name":"VoltServiceProvider.php","total_count":3,"children":[{"name":".boot()","total_count":1,"children":[]},{"name":".register()","total_count":1,"children":[]},{"name":"VoltServiceProvider","total_count":1,"children":[]}]}]},{"name":"Services","total_count":19,"children":[{"name":"BcvRateService.php","total_count":4,"children":[{"name":".convertUsdToVes()","total_count":1,"children":[]},{"name":".getCurrentRate()","total_count":1,"children":[]},{"name":".setRate()","total_count":1,"children":[]},{"name":"BcvRateService","total_count":1,"children":[]}]},{"name":"PackageService.php","total_count":7,"children":[{"name":".__construct()","total_count":1,"children":[]},{"name":".assignDriver()","total_count":1,"children":[]},{"name":".changeStatus()","total_count":1,"children":[]},{"name":".createPackage()","total_count":1,"children":[]},{"name":".generateTrackingNumber()","total_count":1,"children":[]},{"name":".recordHistory()","total_count":1,"children":[]},{"name":"PackageService","total_count":1,"children":[]}]},{"name":"TariffService.php","total_count":8,"children":[{"name":".__construct()","total_count":1,"children":[]},{"name":".calculate()","total_count":1,"children":[]},{"name":".calculateBillableWeight()","total_count":1,"children":[]},{"name":".calculateTotalUsd()","total_count":1,"children":[]},{"name":".calculateVolumetricWeight()","total_count":1,"children":[]},{"name":".findDistance()","total_count":1,"children":[]},{"name":".findRate()","total_count":1,"children":[]},{"name":"TariffService","total_count":1,"children":[]}]}]},{"name":"View","total_count":4,"children":[{"name":"Components","total_count":4,"children":[{"name":"AppLayout.php","total_count":2,"children":[{"name":".render()","total_count":1,"children":[]},{"name":"AppLayout","total_count":1,"children":[]}]},{"name":"GuestLayout.php","total_count":2,"children":[{"name":".render()","total_count":1,"children":[]},{"name":"GuestLayout","total_count":1,"children":[]}]}]}]}]},{"name":"bootstrap","total_count":2,"children":[{"name":"app.php","total_count":1,"children":[]},{"name":"providers.php","total_count":1,"children":[]}]},{"name":"composer.json","total_count":69,"children":[{"name":"$schema","total_count":1,"children":[]},{"name":"@php -r \\\"file_exists('.env') || copy('.env.example', '.env');\\","total_count":1,"children":[]},{"name":"@php -r \\\"file_exists('database/database.sqlite') || touch('database/database.sqlite');\\","total_count":1,"children":[]},{"name":"@php artisan config:clear --ansi","total_count":1,"children":[]},{"name":"@php artisan key:generate","total_count":1,"children":[]},{"name":"@php artisan key:generate --ansi","total_count":1,"children":[]},{"name":"@php artisan migrate --force","total_count":1,"children":[]},{"name":"@php artisan migrate --graceful --ansi","total_count":1,"children":[]},{"name":"@php artisan package:discover --ansi","total_count":1,"children":[]},{"name":"@php artisan test","total_count":1,"children":[]},{"name":"@php artisan vendor:publish --tag=laravel-assets --ansi --force","total_count":1,"children":[]},{"name":"allow-plugins","total_count":1,"children":[]},{"name":"App\\\\","total_count":1,"children":[]},{"name":"autoload","total_count":1,"children":[]},{"name":"autoload-dev","total_count":1,"children":[]},{"name":"composer install","total_count":1,"children":[]},{"name":"Composer\\\\Config::disableProcessTimeout","total_count":1,"children":[]},{"name":"config","total_count":1,"children":[]},{"name":"Database\\\\Factories\\\\","total_count":1,"children":[]},{"name":"Database\\\\Seeders\\\\","total_count":1,"children":[]},{"name":"description","total_count":1,"children":[]},{"name":"dev","total_count":1,"children":[]},{"name":"dont-discover","total_count":1,"children":[]},{"name":"extra","total_count":1,"children":[]},{"name":"fakerphp/faker","total_count":1,"children":[]},{"name":"framework","total_count":1,"children":[]},{"name":"Illuminate\\\\Foundation\\\\ComposerScripts::postAutoloadDump","total_count":1,"children":[]},{"name":"Illuminate\\\\Foundation\\\\ComposerScripts::prePackageUninstall","total_count":1,"children":[]},{"name":"keywords","total_count":1,"children":[]},{"name":"laravel","total_count":1,"children":[]},{"name":"laravel","total_count":1,"children":[]},{"name":"laravel/breeze","total_count":1,"children":[]},{"name":"laravel/framework","total_count":1,"children":[]},{"name":"laravel/pail","total_count":1,"children":[]},{"name":"laravel/pint","total_count":1,"children":[]},{"name":"laravel/sail","total_count":1,"children":[]},{"name":"laravel/tinker","total_count":1,"children":[]},{"name":"license","total_count":1,"children":[]},{"name":"livewire/livewire","total_count":1,"children":[]},{"name":"livewire/volt","total_count":1,"children":[]},{"name":"minimum-stability","total_count":1,"children":[]},{"name":"mockery/mockery","total_count":1,"children":[]},{"name":"name","total_count":1,"children":[]},{"name":"npm install","total_count":1,"children":[]},{"name":"npm run build","total_count":1,"children":[]},{"name":"npx concurrently -c \\\"#93c5fd,#c4b5fd,#fb7185,#fdba74\\\" \\\"php artisan serve\\\" \\\"php artisan queue:listen --tries=1 --timeout=0\\\" \\\"php artisan pail --timeout=0\\\" \\\"npm run dev\\\" --names=server,queue,logs,vite --kill-others","total_count":1,"children":[]},{"name":"nunomaduro/collision","total_count":1,"children":[]},{"name":"optimize-autoloader","total_count":1,"children":[]},{"name":"pestphp/pest-plugin","total_count":1,"children":[]},{"name":"php","total_count":1,"children":[]},{"name":"php-http/discovery","total_count":1,"children":[]},{"name":"phpunit/phpunit","total_count":1,"children":[]},{"name":"post-autoload-dump","total_count":1,"children":[]},{"name":"post-create-project-cmd","total_count":1,"children":[]},{"name":"post-root-package-install","total_count":1,"children":[]},{"name":"post-update-cmd","total_count":1,"children":[]},{"name":"pre-package-uninstall","total_count":1,"children":[]},{"name":"prefer-stable","total_count":1,"children":[]},{"name":"preferred-install","total_count":1,"children":[]},{"name":"psr-4","total_count":1,"children":[]},{"name":"psr-4","total_count":1,"children":[]},{"name":"require","total_count":1,"children":[]},{"name":"require-dev","total_count":1,"children":[]},{"name":"scripts","total_count":1,"children":[]},{"name":"setup","total_count":1,"children":[]},{"name":"sort-packages","total_count":1,"children":[]},{"name":"test","total_count":1,"children":[]},{"name":"Tests\\\\","total_count":1,"children":[]},{"name":"type","total_count":1,"children":[]}]},{"name":"config","total_count":10,"children":[{"name":"app.php","total_count":1,"children":[]},{"name":"auth.php","total_count":1,"children":[]},{"name":"cache.php","total_count":1,"children":[]},{"name":"database.php","total_count":1,"children":[]},{"name":"filesystems.php","total_count":1,"children":[]},{"name":"logging.php","total_count":1,"children":[]},{"name":"mail.php","total_count":1,"children":[]},{"name":"queue.php","total_count":1,"children":[]},{"name":"services.php","total_count":1,"children":[]},{"name":"session.php","total_count":1,"children":[]}]},{"name":"database","total_count":35,"children":[{"name":"factories","total_count":3,"children":[{"name":"UserFactory.php","total_count":3,"children":[{"name":".definition()","total_count":1,"children":[]},{"name":".unverified()","total_count":1,"children":[]},{"name":"UserFactory","total_count":1,"children":[]}]}]},{"name":"migrations","total_count":30,"children":[{"name":"0001_01_01_000000_create_users_table.php","total_count":2,"children":[{"name":"down()","total_count":1,"children":[]},{"name":"up()","total_count":1,"children":[]}]},{"name":"0001_01_01_000001_create_cache_table.php","total_count":2,"children":[{"name":"down()","total_count":1,"children":[]},{"name":"up()","total_count":1,"children":[]}]},{"name":"0001_01_01_000002_create_jobs_table.php","total_count":2,"children":[{"name":"down()","total_count":1,"children":[]},{"name":"up()","total_count":1,"children":[]}]},{"name":"2026_08_08_232920_create_drivers_table.php","total_count":2,"children":[{"name":"down()","total_count":1,"children":[]},{"name":"up()","total_count":1,"children":[]}]},{"name":"2026_08_08_232921_create_bcv_rates_table.php","total_count":2,"children":[{"name":"down()","total_count":1,"children":[]},{"name":"up()","total_count":1,"children":[]}]},{"name":"2026_08_08_232921_create_rate_matrices_table.php","total_count":2,"children":[{"name":"down()","total_count":1,"children":[]},{"name":"up()","total_count":1,"children":[]}]},{"name":"2026_08_08_232923_create_allies_table.php","total_count":2,"children":[{"name":"down()","total_count":1,"children":[]},{"name":"up()","total_count":1,"children":[]}]},{"name":"2026_08_08_232924_create_packages_table.php","total_count":2,"children":[{"name":"down()","total_count":1,"children":[]},{"name":"up()","total_count":1,"children":[]}]},{"name":"2026_08_08_232925_create_package_histories.php","total_count":2,"children":[{"name":"down()","total_count":1,"children":[]},{"name":"up()","total_count":1,"children":[]}]},{"name":"2026_08_09_000724_add_role_to_users_table.php","total_count":2,"children":[{"name":"down()","total_count":1,"children":[]},{"name":"up()","total_count":1,"children":[]}]},{"name":"2026_08_09_010000_add_driver_id_to_packages_table.php","total_count":2,"children":[{"name":"down()","total_count":1,"children":[]},{"name":"up()","total_count":1,"children":[]}]},{"name":"2026_08_09_010500_drop_redundant_indexes.php","total_count":2,"children":[{"name":"down()","total_count":1,"children":[]},{"name":"up()","total_count":1,"children":[]}]},{"name":"2026_08_11_193200_create_city_distances_table.php","total_count":2,"children":[{"name":"down()","total_count":1,"children":[]},{"name":"up()","total_count":1,"children":[]}]},{"name":"2026_08_11_193201_convert_rate_matrices_to_global_tariff.php","total_count":2,"children":[{"name":"down()","total_count":1,"children":[]},{"name":"up()","total_count":1,"children":[]}]},{"name":"2026_08_20_000000_create_sessions_table.php","total_count":2,"children":[{"name":"down()","total_count":1,"children":[]},{"name":"up()","total_count":1,"children":[]}]}]},{"name":"seeders","total_count":2,"children":[{"name":"DatabaseSeeder.php","total_count":2,"children":[{"name":".run()","total_count":1,"children":[]},{"name":"DatabaseSeeder","total_count":1,"children":[]}]}]}]},{"name":"lang","total_count":3,"children":[{"name":"es","total_count":3,"children":[{"name":"auth.php","total_count":1,"children":[]},{"name":"passwords.php","total_count":1,"children":[]},{"name":"validation.php","total_count":1,"children":[]}]}]},{"name":"package.json","total_count":25,"children":[{"name":"$schema","total_count":1,"children":[]},{"name":"@tailwindcss/forms","total_count":1,"children":[]},{"name":"@tailwindcss/forms","total_count":1,"children":[]},{"name":"@tailwindcss/vite","total_count":1,"children":[]},{"name":"@tailwindcss/vite","total_count":1,"children":[]},{"name":"autoprefixer","total_count":1,"children":[]},{"name":"autoprefixer","total_count":1,"children":[]},{"name":"axios","total_count":1,"children":[]},{"name":"axios","total_count":1,"children":[]},{"name":"build","total_count":1,"children":[]},{"name":"concurrently","total_count":1,"children":[]},{"name":"concurrently","total_count":1,"children":[]},{"name":"dev","total_count":1,"children":[]},{"name":"devDependencies","total_count":1,"children":[]},{"name":"laravel-vite-plugin","total_count":1,"children":[]},{"name":"laravel-vite-plugin","total_count":1,"children":[]},{"name":"postcss","total_count":1,"children":[]},{"name":"postcss","total_count":1,"children":[]},{"name":"private","total_count":1,"children":[]},{"name":"scripts","total_count":1,"children":[]},{"name":"tailwindcss","total_count":1,"children":[]},{"name":"tailwindcss","total_count":1,"children":[]},{"name":"type","total_count":1,"children":[]},{"name":"vite","total_count":1,"children":[]},{"name":"vite","total_count":1,"children":[]}]},{"name":"public","total_count":1,"children":[{"name":"index.php","total_count":1,"children":[]}]},{"name":"resources","total_count":52,"children":[{"name":"js","total_count":2,"children":[{"name":"app.js","total_count":1,"children":[]},{"name":"bootstrap.js","total_count":1,"children":[]}]},{"name":"views","total_count":50,"children":[{"name":"components","total_count":15,"children":[{"name":"action-message.blade.php","total_count":1,"children":[]},{"name":"application-logo.blade.php","total_count":1,"children":[]},{"name":"auth-session-status.blade.php","total_count":1,"children":[]},{"name":"danger-button.blade.php","total_count":1,"children":[]},{"name":"dropdown-link.blade.php","total_count":1,"children":[]},{"name":"dropdown.blade.php","total_count":1,"children":[]},{"name":"input-error.blade.php","total_count":1,"children":[]},{"name":"input-label.blade.php","total_count":1,"children":[]},{"name":"modal.blade.php","total_count":1,"children":[]},{"name":"nav-link.blade.php","total_count":1,"children":[]},{"name":"primary-button.blade.php","total_count":1,"children":[]},{"name":"responsive-nav-link.blade.php","total_count":1,"children":[]},{"name":"secondary-button.blade.php","total_count":1,"children":[]},{"name":"text-input.blade.php","total_count":1,"children":[]},{"name":"venexpress-logo.blade.php","total_count":1,"children":[]}]},{"name":"layouts","total_count":3,"children":[{"name":"app.blade.php","total_count":1,"children":[{"name":"layout.navigation","total_count":1,"children":[]}]},{"name":"admin.blade.php","total_count":1,"children":[]},{"name":"guest.blade.php","total_count":1,"children":[]}]},{"name":"Livewire","total_count":25,"children":[{"name":"Admin","total_count":9,"children":[{"name":"bcv-rate-manager.blade.php","total_count":3,"children":[{"name":"cancelEdit","total_count":1,"children":[]},{"name":"delete({{ $item->id }})","total_count":1,"children":[]},{"name":"edit({{ $item->id }})","total_count":1,"children":[]}]},{"name":"city-distance-manager.blade.php","total_count":4,"children":[{"name":"cancelEdit","total_count":1,"children":[]},{"name":"create","total_count":1,"children":[]},{"name":"delete({{ $distance->id }})","total_count":1,"children":[]},{"name":"edit({{ $distance->id }})","total_count":1,"children":[]}]},{"name":"dashboard.blade.php","total_count":1,"children":[]},{"name":"rate-matrix-manager.blade.php","total_count":1,"children":[]}]},{"name":"Ally","total_count":2,"children":[{"name":"package-create.blade.php","total_count":1,"children":[{"name":"$set(","total_count":1,"children":[]}]},{"name":"daily-cash-cut.blade.php","total_count":1,"children":[]}]},{"name":"Driver","total_count":1,"children":[{"name":"field-scanner.blade.php","total_count":1,"children":[]}]},{"name":"layout","total_count":1,"children":[{"name":"navigation.blade.php","total_count":1,"children":[{"name":"logout","total_count":1,"children":[]}]}]},{"name":"pages","total_count":7,"children":[{"name":"auth","total_count":7,"children":[{"name":"verify-email.blade.php","total_count":2,"children":[{"name":"logout","total_count":1,"children":[]},{"name":"sendVerification","total_count":1,"children":[]}]},{"name":"confirm-password.blade.php","total_count":1,"children":[]},{"name":"forgot-password.blade.php","total_count":1,"children":[]},{"name":"login.blade.php","total_count":1,"children":[]},{"name":"register.blade.php","total_count":1,"children":[]},{"name":"reset-password.blade.php","total_count":1,"children":[]}]}]},{"name":"profile","total_count":3,"children":[{"name":"delete-user-form.blade.php","total_count":1,"children":[]},{"name":"update-password-form.blade.php","total_count":1,"children":[]},{"name":"update-profile-information-form.blade.php","total_count":1,"children":[]}]},{"name":"Tracking","total_count":1,"children":[{"name":"public-tracking.blade.php","total_count":1,"children":[]}]},{"name":"welcome","total_count":1,"children":[{"name":"navigation.blade.php","total_count":1,"children":[]}]}]},{"name":"profile.blade.php","total_count":3,"children":[{"name":"profile.delete-user-form","total_count":1,"children":[]},{"name":"profile.update-password-form","total_count":1,"children":[]},{"name":"profile.update-profile-information-form","total_count":1,"children":[]}]},{"name":"tracking","total_count":1,"children":[{"name":"tracking-show.blade.php","total_count":1,"children":[]}]},{"name":"dashboard.blade.php","total_count":1,"children":[]},{"name":"welc1ome.blade.php","total_count":1,"children":[]},{"name":"welcome.blade.php","total_count":1,"children":[]}]}]},{"name":"routes","total_count":3,"children":[{"name":"auth.php","total_count":1,"children":[]},{"name":"console.php","total_count":1,"children":[]},{"name":"web.php","total_count":1,"children":[]}]},{"name":"tests","total_count":36,"children":[{"name":"Feature","total_count":33,"children":[{"name":"Auth","total_count":25,"children":[{"name":"AuthenticationTest.php","total_count":6,"children":[{"name":".test_login_screen_can_be_rendered()","total_count":1,"children":[]},{"name":".test_navigation_menu_can_be_rendered()","total_count":1,"children":[]},{"name":".test_users_can_authenticate_using_the_login_screen()","total_count":1,"children":[]},{"name":".test_users_can_logout()","total_count":1,"children":[]},{"name":".test_users_can_not_authenticate_with_invalid_password()","total_count":1,"children":[]},{"name":"AuthenticationTest","total_count":1,"children":[]}]},{"name":"EmailVerificationTest.php","total_count":4,"children":[{"name":".test_email_can_be_verified()","total_count":1,"children":[]},{"name":".test_email_is_not_verified_with_invalid_hash()","total_count":1,"children":[]},{"name":".test_email_verification_screen_can_be_rendered()","total_count":1,"children":[]},{"name":"EmailVerificationTest","total_count":1,"children":[]}]},{"name":"PasswordConfirmationTest.php","total_count":4,"children":[{"name":".test_confirm_password_screen_can_be_rendered()","total_count":1,"children":[]},{"name":".test_password_can_be_confirmed()","total_count":1,"children":[]},{"name":".test_password_is_not_confirmed_with_invalid_password()","total_count":1,"children":[]},{"name":"PasswordConfirmationTest","total_count":1,"children":[]}]},{"name":"PasswordResetTest.php","total_count":5,"children":[{"name":".test_password_can_be_reset_with_valid_token()","total_count":1,"children":[]},{"name":".test_reset_password_link_can_be_requested()","total_count":1,"children":[]},{"name":".test_reset_password_link_screen_can_be_rendered()","total_count":1,"children":[]},{"name":".test_reset_password_screen_can_be_rendered()","total_count":1,"children":[]},{"name":"PasswordResetTest","total_count":1,"children":[]}]},{"name":"PasswordUpdateTest.php","total_count":3,"children":[{"name":".test_correct_password_must_be_provided_to_update_password()","total_count":1,"children":[]},{"name":".test_password_can_be_updated()","total_count":1,"children":[]},{"name":"PasswordUpdateTest","total_count":1,"children":[]}]},{"name":"RegistrationTest.php","total_count":3,"children":[{"name":".test_new_users_can_register()","total_count":1,"children":[]},{"name":".test_registration_screen_can_be_rendered()","total_count":1,"children":[]},{"name":"RegistrationTest","total_count":1,"children":[]}]}]},{"name":"ExampleTest.php","total_count":2,"children":[{"name":".test_the_application_returns_a_successful_response()","total_count":1,"children":[]},{"name":"ExampleTest","total_count":1,"children":[]}]},{"name":"ProfileTest.php","total_count":6,"children":[{"name":".test_correct_password_must_be_provided_to_delete_account()","total_count":1,"children":[]},{"name":".test_email_verification_status_is_unchanged_when_the_email_address_is_unchanged()","total_count":1,"children":[]},{"name":".test_profile_information_can_be_updated()","total_count":1,"children":[]},{"name":".test_profile_page_is_displayed()","total_count":1,"children":[]},{"name":".test_user_can_delete_their_account()","total_count":1,"children":[]},{"name":"ProfileTest","total_count":1,"children":[]}]}]},{"name":"TestCase.php","total_count":1,"children":[{"name":"TestCase","total_count":1,"children":[]}]},{"name":"Unit","total_count":2,"children":[{"name":"ExampleTest.php","total_count":2,"children":[{"name":".test_that_true_is_true()","total_count":1,"children":[]},{"name":"ExampleTest","total_count":1,"children":[]}]}]}]},{"name":"artisan","total_count":1,"children":[]},{"name":"postcss.config.js","total_count":1,"children":[]},{"name":"tailwind.config.js","total_count":1,"children":[]},{"name":"vite.config.js","total_count":1,"children":[]}]};
+
+    function transformData(jsonData) {
+        // Helper function to recursively build the children structure
+        function processNode(node, parentL1StageName) {
+            let displayName = node.name;
+            // Append total_count if it exists and is not already in the name
+            if (node.total_count !== undefined) {
+                if (!/\(Total Count: \d+\)$/.test(displayName)) {
+                    displayName += ` (Total Count: ${node.total_count})`;
+                }
+            }
+
+            const newNode = { name: displayName };
+
+            if (parentL1StageName === "Root") {
+                 newNode.originalStageName = node.name;
+            } else {
+                newNode.originalStageName = parentL1StageName;
+            }
+
+            if (node.children && node.children.length > 0) {
+                const stageNameToPass = (parentL1StageName === "Root") ? node.name : parentL1StageName;
+                newNode.children = node.children.map(child => processNode(child, stageNameToPass));
+            }
+
+            return newNode;
+        }
+
+        let rootDisplayName = jsonData.name;
+        if (jsonData.total_count !== undefined && !/\(Total Count: \d+\)$/.test(rootDisplayName)) {
+            rootDisplayName += ` (Total Count: ${jsonData.total_count})`;
+        }
+
+        return {
+            name: rootDisplayName,
+            originalStageName: "Root",
+            children: (jsonData.children || []).map(child => processNode(child, "Root"))
+        };
+    }
+
+    const treeData = transformData(initialJsonData);
+
+    // Auto-populated phaseColors: every depth-1 child of the root gets
+    // a stable colour from a bigger palette so all top-level dirs are
+    // distinguishable.
+    const PALETTE = [
+      ["#3498DB","#2980B9","#AED6F1"], ["#2ECC71","#27AE60","#A9DFBF"],
+      ["#E74C3C","#C0392B","#F5B7B1"], ["#9B59B6","#8E44AD","#D7BDE2"],
+      ["#F39C12","#D68910","#FAD7A0"], ["#1ABC9C","#117864","#A2D9CE"],
+      ["#34495E","#1B2631","#ABB2B9"], ["#E67E22","#BA4A00","#F5CBA7"],
+      ["#16A085","#0E6655","#A2D9CE"], ["#D35400","#A04000","#EDBB99"],
+      ["#7F8C8D","#566573","#D5DBDB"], ["#C0392B","#7B241C","#F5B7B1"],
+      ["#2E86C1","#1B4F72","#A9CCE3"], ["#28B463","#196F3D","#A9DFBF"],
+      ["#AF7AC5","#6C3483","#D2B4DE"],
+    ];
+    const phaseColors = { "Root": { fill: "#4A4A4A", stroke: "#333333", collapsedFill: "#6C757D" },
+                          "Default": { fill: "#BDC3C7", stroke: "#95A5A6", collapsedFill: "#ECF0F1" } };
+    (initialJsonData.children || []).forEach((c, i) => {
+      const pal = PALETTE[i % PALETTE.length];
+      phaseColors[c.name] = { fill: pal[0], stroke: pal[1], collapsedFill: pal[2] };
+    });
+
+    const levelSpecificPalettes = {
+      0: { fill: "#4A4A4A", stroke: "#333333", collapsedFill: "#6C757D" },
+      2: { fill: "#6ab04c", stroke: "#508a38", collapsedFill: "#a3d391" },
+      3: { fill: "#f0932b", stroke: "#d0730f", collapsedFill: "#f6c07e" },
+      4: { fill: "#be2edd", stroke: "#a01cb3", collapsedFill: "#e08bf2" },
+      5: { fill: "#00a8ff", stroke: "#007ac1", collapsedFill: "#74d2ff" },
+      6: { fill: "#e55039", stroke: "#c23620", collapsedFill: "#f09a8d" },
+      default: { fill: "#747d8c", stroke: "#57606f", collapsedFill: "#a4b0be" }
+    };
+
+    const svgElement = d3.select("#tree-svg");
+    const initialSvgWidth = +svgElement.attr("width");
+    const initialSvgHeight = +svgElement.attr("height");
+    const margin = { top: 40, right: 120, bottom: 80, left: 450 };
+    let width = initialSvgWidth - margin.left - margin.right;
+    let height = initialSvgHeight - margin.top - margin.bottom;
+    const duration = 500;
+    let nodeCounter = 0;
+    const g = svgElement.append("g").attr("transform", `translate(${margin.left},${margin.top})`);
+    const treemap = d3.tree().nodeSize([40, 0]);
+    let rootNode = d3.hierarchy(treeData, d => d.children);
+    rootNode.x0 = 0;
+    rootNode.y0 = 0;
+
+    if (rootNode.children) {
+      rootNode.children.forEach(d_child => {
+        if (d_child.children) { collapseBranch(d_child); }
+      });
+    }
+    updateTree(rootNode);
+
+    function collapseBranch(d) { if (d.children) { d._children = d.children; d._children.forEach(collapseBranch); d.children = null; } }
+    function expandBranch(d) { if (d._children) { d.children = d._children; d._children = null; } if (d.children) { d.children.forEach(expandBranch); } }
+    window.expandAll = () => { expandBranch(rootNode); updateTree(rootNode); };
+    window.collapseAll = () => { if (rootNode.children) { rootNode.children.forEach(collapseBranch); } updateTree(rootNode); };
+    window.resetView = () => { if (rootNode.children) { rootNode.children.forEach(d_child => { if (d_child.children || d_child._children) { collapseBranch(d_child); } }); } if (rootNode._children && !rootNode.children) { rootNode.children = rootNode._children; rootNode._children = null; } updateTree(rootNode); };
+
+    function updateTree(source) {
+      const treeLayoutData = treemap(rootNode);
+      let nodes = treeLayoutData.descendants();
+      let links = treeLayoutData.descendants().slice(1);
+
+      let minX = 0;
+      let maxX = 0;
+      if (nodes.length > 0) {
+        minX = d3.min(nodes, d => d.x);
+        maxX = d3.max(nodes, d => d.x);
+      }
+
+      let neededHeight = Math.max(initialSvgHeight, maxX - minX + margin.top + margin.bottom + 100);
+      svgElement.transition().duration(duration / 2).attr("height", neededHeight);
+      g.transition().duration(duration / 2).attr("transform", `translate(${margin.left},${margin.top - minX + 40})`);
+
+      nodes.forEach(d => { d.y = d.depth * 400; }); // Adjust horizontal separation if needed
+
+      const node = g.selectAll('g.node').data(nodes, d => d.id || (d.id = ++nodeCounter));
+      const nodeEnter = node.enter().append('g')
+        .attr('class', d => "node" + (d.children || d._children ? " node--internal" : " node--leaf") + (d._children ? " _children" : ""))
+        .attr('transform', d => `translate(${source.y0},${source.x0})`)
+        .on('click', (event, d) => { if (d.children) { d._children = d.children; d.children = null; } else if (d._children) { d.children = d._children; d._children = null; } updateTree(d); })
+        .style('cursor', d => (d.children || d._children) ? 'pointer' : 'default');
+
+      nodeEnter.append('circle').attr('r', 1e-6);
+
+      nodeEnter.append('text')
+        .attr('dy', '.35em')
+        .attr('x', d => d.children || d._children ? -14 : 14)
+        .attr('text-anchor', d => d.children || d._children ? 'end' : 'start')
+        .style("fill-opacity", 1e-6)
+        .call(wrapText, 380);
+
+      const nodeUpdate = nodeEnter.merge(node);
+      nodeUpdate.transition().duration(duration)
+        .attr('transform', d => `translate(${d.y},${d.x})`)
+        .attr('class', d => "node" + (d.children ? " node--internal" : " node--leaf") + (d._children ? " node--internal _children" : ""));
+
+      nodeUpdate.select('circle').attr('r', 8.5)
+        .style('fill', d => {
+            let palette;
+            if (d.depth === 0) {
+                palette = levelSpecificPalettes[0];
+            } else if (d.depth === 1) {
+                palette = phaseColors[d.data.originalStageName] || phaseColors.Default;
+            } else {
+                palette = levelSpecificPalettes[d.depth] || levelSpecificPalettes.default;
+            }
+            if (d._children) return palette.collapsedFill;
+            if (d.children) return palette.fill;
+            return "#fff";
+        })
+        .style('stroke', d => {
+            let palette;
+            if (d.depth === 0) {
+                palette = levelSpecificPalettes[0];
+            } else if (d.depth === 1) {
+                palette = phaseColors[d.data.originalStageName] || phaseColors.Default;
+            } else {
+                palette = levelSpecificPalettes[d.depth] || levelSpecificPalettes.default;
+            }
+            return palette.stroke;
+        });
+      nodeUpdate.select('text').style("fill-opacity", 1).call(wrapText, 380);
+
+      const nodeExit = node.exit().transition().duration(duration).attr('transform', d => `translate(${source.y},${source.x})`).remove();
+      nodeExit.select('circle').attr('r', 1e-6);
+      nodeExit.select('text').style('fill-opacity', 1e-6);
+
+      const link = g.selectAll('path.link').data(links, d => d.id);
+      const linkEnter = link.enter().insert('path', "g").attr('class', 'link').attr('d', d => { const o = { x: source.x0, y: source.y0 }; return diagonal(o, o); });
+
+      linkEnter.merge(link).transition().duration(duration).attr('d', d => diagonal(d, d.parent))
+        .style('stroke', d => {
+            const sourceNode = d.parent;
+            if (!sourceNode) return phaseColors.Default.stroke;
+            const l1AncestorName = sourceNode.data.originalStageName;
+            const colorPalette = phaseColors[l1AncestorName] || phaseColors.Default;
+            return colorPalette.stroke;
+        });
+      link.exit().transition().duration(duration).attr('d', d => { const o = { x: source.x, y: source.y }; return diagonal(o, o); }).remove();
+      nodes.forEach(d => { d.x0 = d.x; d.y0 = d.y; });
+    }
+
+    function diagonal(s, d) { return `M ${s.y} ${s.x} C ${(s.y + d.y) / 2} ${s.x}, ${(s.y + d.y) / 2} ${d.x}, ${d.y} ${d.x}`; }
+
+    function wrapText(textElements, maxWidth) {
+        const textPartColors = {
+            name: '#343a40',
+            count: '#0056b3'
+        };
+        const countRegex = /(\s\(Total Count: \d+\))$/;
+
+        textElements.each(function () {
+            const textD3 = d3.select(this);
+            const originalNodeText = textD3.datum().data.name;
+            const x = parseFloat(textD3.attr("x") || 0);
+            const initialDy = textD3.attr("dy");
+            const textAnchor = textD3.attr("text-anchor");
+            const lineHeight = 1.1;
+
+            textD3.text(null);
+
+            let namePart = originalNodeText;
+            let countPartText = "";
+
+            const countMatch = originalNodeText.match(countRegex);
+            if (countMatch && originalNodeText.endsWith(countMatch[0])) {
+                namePart = originalNodeText.substring(0, originalNodeText.length - countMatch[0].length).trim();
+                countPartText = countMatch[0].trim();
+            }
+
+            const tokens = [];
+            namePart.split(/\s+/).filter(Boolean).forEach(word => {
+                tokens.push({ text: word, type: 'name' });
+            });
+            if (countPartText) {
+                tokens.push({ text: countPartText, type: 'count' });
+            }
+
+            if (tokens.length === 0 && originalNodeText) {
+                tokens.push({ text: originalNodeText, type: 'name' });
+            }
+
+            let currentTspan = textD3.append("tspan").attr("x", x).attr("dy", initialDy);
+            if (textAnchor === "end") currentTspan.attr("text-anchor", "end");
+
+            let lineTokens = [];
+
+            for (let i = 0; i < tokens.length; i++) {
+                const tokenObj = tokens[i];
+
+                lineTokens.push(tokenObj);
+                currentTspan.text(lineTokens.map(t => t.text).join(" "));
+
+                if (currentTspan.node().getComputedTextLength() > maxWidth && lineTokens.length > 1) {
+                    lineTokens.pop();
+
+                    currentTspan.text(null);
+                    lineTokens.forEach((prevToken, idx) => {
+                        currentTspan.append("tspan")
+                            .text((idx > 0 ? " " : "") + prevToken.text)
+                            .style("fill", textPartColors[prevToken.type] || textPartColors.name)
+                            .style("font-weight", prevToken.type === 'count' ? "bold" : "normal");
+                    });
+
+                    lineTokens = [tokenObj];
+                    currentTspan = textD3.append("tspan").attr("x", x).attr("dy", lineHeight + "em");
+                    if (textAnchor === "end") currentTspan.attr("text-anchor", "end");
+                }
+            }
+
+            currentTspan.text(null);
+            lineTokens.forEach((token, idx) => {
+                currentTspan.append("tspan")
+                    .text((idx > 0 ? " " : "") + token.text)
+                    .style("fill", textPartColors[token.type] || textPartColors.name)
+                    .style("font-weight", token.type === 'count' ? "bold" : "normal");
+            });
+
+            if (textD3.selectAll("tspan > tspan").empty() && textD3.select("tspan").text().length === 0 && originalNodeText) {
+                let t = textD3.select("tspan");
+                let displayText = originalNodeText;
+                t.text(displayText).style("fill", textPartColors.name);
+                if (t.node() && t.node().getComputedTextLength() > maxWidth && displayText.length > 20) {
+                    let estimatedChars = Math.floor(maxWidth / (t.node().getComputedTextLength()/displayText.length) );
+                    displayText = displayText.substring(0, Math.max(0, estimatedChars - 3)) + "...";
+                    t.text(displayText);
+                }
+            }
+        });
+    }
+  </script>
+</body>
+</html>
