@@ -1,53 +1,38 @@
 <?php
 
-use App\Livewire\Ally\CreatePackage;
-use App\Livewire\Admin\Dashboard;
-use App\Livewire\Admin\BcvRateManager;
-use App\Livewire\Admin\RateMatrixManager;
-use App\Livewire\Admin\CityDistanceManager;
 use Illuminate\Support\Facades\Route;
 
-Route::view('/', 'welcome');
-
-Route::get('/rastreo', [App\Http\Controllers\TrackingController::class, 'index'])->name('tracking.index');
-
-Route::view('dashboard', 'dashboard')
-    ->middleware(['auth', 'verified'])
-    ->name('dashboard');
-
-Route::view('profile', 'profile')
-    ->middleware(['auth'])
-    ->name('profile');
-
 /*
 |--------------------------------------------------------------------------
-| Taquilla Aliada
-|--------------------------------------------------------------------------
-|
-| Protegidas con 'auth'. El middleware de rol 'role:aliado' se agregará
-| cuando se defina formalmente el flujo de permisos del aliado.
-|
-*/
-Route::middleware(['auth'])->prefix('aliado')->name('ally.')->group(function () {
-    Route::get('/guias/nueva', CreatePackage::class)->name('packages.create');
-});
-
-/*
-|--------------------------------------------------------------------------
-| Panel Administrativo
+| Web Routes
 |--------------------------------------------------------------------------
 */
-Route::middleware(['auth', 'role:admin'])
-    ->prefix('admin')
-    ->name('admin.')
-    ->group(function () {
-        Route::get('/', Dashboard::class)->name('dashboard');
 
-        // Fase 5 — Tasa BCV y matrices de tarifas
-        Route::get('/tasa-bcv', BcvRateManager::class)->name('bcv-rates');
-        Route::get('/tarifas', RateMatrixManager::class)->name('rate-matrices');
-        Route::get('/distancias', CityDistanceManager::class)->name('city-distances');
-    });
+Route::get('/', function () {
+    return view('welcome');
+})->name('home');
 
-require __DIR__.'/auth.php';
+// Rastreo público
+Route::get('/rastreo', function () {
+    return view('tracking.index');
+})->name('tracking.index');
 
+Route::get('/rastreo/resultado', function () {
+    $guia = request('guia');
+
+    // TODO: reemplazar por tu lógica real, ej:
+    // $package = \App\Models\Package::where('tracking_number', $guia)->firstOrFail();
+
+    return view('tracking.show', [
+        'guia' => $guia,
+    ]);
+})->name('tracking.show');
+
+// Si usas Laravel Breeze/Fortify para auth, esas rutas ya vienen incluidas
+// desde routes/auth.php y no hace falta declarar 'login' aquí.
+// Si NO tienes auth instalado todavía, comenta el enlace de "Iniciar sesión"
+// en welcome.blade.php o crea una ruta temporal:
+//
+// Route::get('/login', function () {
+//     return view('auth.login');
+// })->name('login');

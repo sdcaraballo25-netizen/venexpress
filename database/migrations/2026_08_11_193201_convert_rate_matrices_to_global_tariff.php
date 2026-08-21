@@ -20,12 +20,33 @@ return new class extends Migration
     public function up(): void
     {
         Schema::table('rate_matrices', function (Blueprint $table) {
-            $table->dropUnique(['origin_city', 'destination_city']);
-            $table->dropIndex(['origin_city']);
-            $table->dropIndex(['destination_city']);
-            $table->dropColumn(['origin_city', 'destination_city']);
+            /**
+             * Cada paso se verifica antes de ejecutarse porque
+             * intentos previos de esta migración pudieron quedar
+             * aplicados a medias (SQLite no revirtió la transacción
+             * al fallar). Así, esta migración corre igual de bien
+             * sobre una tabla nueva que sobre una parcialmente
+             * migrada.
+             */
+            if (Schema::hasIndex('rate_matrices', ['destination_city'], 'index')) {
+                $table->dropIndex(['destination_city']);
+            }
 
-            $table->decimal('price_per_km_usd', 12, 2)->default(0)->after('price_per_kg_usd');
+            // El unique compuesto (origin_city, destination_city) es un
+            // autoindex interno en SQLite: se elimina solo al borrar
+            // las columnas, no hace falta (ni se puede) dropUnique() por nombre.
+
+            if (Schema::hasColumn('rate_matrices', 'origin_city')) {
+                $table->dropColumn('origin_city');
+            }
+
+            if (Schema::hasColumn('rate_matrices', 'destination_city')) {
+                $table->dropColumn('destination_city');
+            }
+
+            if (! Schema::hasColumn('rate_matrices', 'price_per_km_usd')) {
+                $table->decimal('price_per_km_usd', 12, 2)->default(0)->after('price_per_kg_usd');
+            }
         });
     }
 
