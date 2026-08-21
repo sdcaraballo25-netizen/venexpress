@@ -1,6 +1,7 @@
 <?php
 
 use Illuminate\Support\Facades\Route;
+use App\Models\Package;
 
 /*
 |--------------------------------------------------------------------------
@@ -18,21 +19,53 @@ Route::get('/rastreo', function () {
 })->name('tracking.index');
 
 Route::get('/rastreo/resultado', function () {
-    $guia = request('guia');
+    $guia = trim((string) request('guia'));
 
-    // TODO: reemplazar por tu lógica real, ej:
-    // $package = \App\Models\Package::where('tracking_number', $guia)->firstOrFail();
+    $package = Package::where('tracking_number', $guia)->first();
+
+    $statusOrder = [
+        'RECIBIDO_AGENCIA'        => ['label' => 'Recibido en Agencia Aliada', 'icon' => 'fa-warehouse'],
+        'RECOLECTADO_VENEXPRESS'  => ['label' => 'Recolectado por Venexpress', 'icon' => 'fa-truck'],
+        'EN_HUB'                  => ['label' => 'En Hub de Clasificación', 'icon' => 'fa-warehouse'],
+        'EN_TRANSITO_NACIONAL'    => ['label' => 'En Tránsito Nacional', 'icon' => 'fa-truck-fast'],
+        'LISTO_RETIRO'            => ['label' => 'Listo para Retiro en Agencia Destino', 'icon' => 'fa-truck-ramp-box'],
+        'ENTREGADO'               => ['label' => 'Entregado al Cliente', 'icon' => 'fa-house-circle-check'],
+    ];
+
+    $statusSteps = [];
+    $progressPercent = 0;
+
+    if ($package) {
+        $keys = array_keys($statusOrder);
+        $currentIndex = array_search($package->status, $keys, true);
+        $currentIndex = $currentIndex === false ? 0 : $currentIndex;
+
+        // Historial de timestamps por estado, si tienes la tabla package_histories
+        $history = $package->histories()
+            ->pluck('created_at', 'status')
+            ?? collect();
+
+        foreach ($keys as $i => $key) {
+            $statusSteps[] = [
+                'label'     => $statusOrder[$key]['label'],
+                'icon'      => $statusOrder[$key]['icon'],
+                'done'      => $i < $currentIndex,
+                'current'   => $i === $currentIndex,
+                'timestamp' => isset($history[$key])
+                    ? \Carbon\Carbon::parse($history[$key])->format('d/m/Y') . '<br>' . \Carbon\Carbon::parse($history[$key])->format('h:i a')
+                    : null,
+            ];
+        }
+
+        $progressPercent = $currentIndex === 0 ? 8 : ($currentIndex / (count($keys) - 1)) * 100;
+    }
 
     return view('tracking.show', [
-        'guia' => $guia,
+        'guia'             => $guia,
+        'package'          => $package,
+        'statusSteps'      => $statusSteps,
+        'progressPercent'  => $progressPercent,
     ]);
 })->name('tracking.show');
 
-// Si usas Laravel Breeze/Fortify para auth, esas rutas ya vienen incluidas
-// desde routes/auth.php y no hace falta declarar 'login' aquí.
-// Si NO tienes auth instalado todavía, comenta el enlace de "Iniciar sesión"
-// en welcome.blade.php o crea una ruta temporal:
-//
-// Route::get('/login', function () {
-//     return view('auth.login');
-// })->name('login');
+require __DIR__.'/auth.php';
