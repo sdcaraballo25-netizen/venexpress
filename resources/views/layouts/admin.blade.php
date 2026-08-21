@@ -21,47 +21,71 @@
 <body class="bg-[#F3F5F7] text-[#0B1220] antialiased">
     <div class="min-h-screen flex">
         {{-- Sidebar --}}
-        <aside
-            class="fixed inset-y-0 left-0 z-30 w-64 bg-[#0B1220] text-white transform transition-transform lg:translate-x-0 lg:static"
-            :class="sidebarOpen ? 'translate-x-0' : '-translate-x-full'"
-        >
-            <div class="h-16 flex items-center gap-2.5 px-6 border-b border-white/10">
-                <span class="flex h-7 w-7 items-center justify-center rounded-md bg-[#FF6A1A] text-white text-sm font-bold font-display">V</span>
-                <span class="font-display font-semibold text-[15px] tracking-tight">Venexpress</span>
+        <aside class="w-64 border-r border-[#E2E8F0] px-5 py-8 flex flex-col justify-between hidden md:flex bg-white h-screen sticky top-0">
+            <div>
+                {{-- Logo --}}
+                <div class="flex items-center gap-3 px-2 mb-10">
+                    <div class="bg-blue-900 text-white p-2 rounded-xl">
+                        <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m5.618-4.016A11.955 11.955 0 0112 2.944a11.955 11.955 0 01-8.618 3.04A12.02 12.02 0 003 9c0 5.591 3.824 10.29 9 11.622 5.176-1.332 9-6.03 9-11.622 0-1.042-.133-2.052-.382-3.016z"></path>
+                        </svg>
+                    </div>
+                    <span class="font-display font-bold text-xl text-[#0F172A]">Venexpress</span>
+                </div>
+
+                {{-- Menú de Navegación --}}
+                <nav class="space-y-1">
+                    <p class="px-2 text-xs font-semibold text-[#94A3B8] uppercase tracking-wider mb-3">Principal</p>
+
+                    {{-- Enlace Activo (Resumen) --}}
+                    {{-- Nota: Puedes cambiar la clase condicionalmente usando request()->routeIs('nombre.ruta') --}}
+                    <a href="#" class="flex items-center gap-3 px-4 py-3 bg-blue-50 text-blue-900 rounded-xl font-medium transition-colors">
+                        <svg class="w-5 h-5 text-blue-700" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 6a2 2 0 012-2h2a2 2 0 012 2v2a2 2 0 01-2 2H6a2 2 0 01-2-2V6zM14 6a2 2 0 012-2h2a2 2 0 012 2v2a2 2 0 01-2 2h-2a2 2 0 01-2-2V6zM4 16a2 2 0 012-2h2a2 2 0 012 2v2a2 2 0 01-2 2H6a2 2 0 01-2-2v-2zM14 16a2 2 0 012-2h2a2 2 0 012 2v2a2 2 0 01-2 2h-2a2 2 0 01-2-2v-2z"></path></svg>
+                        Resumen
+                    </a>
+
+                    {{-- Enlace Inactivo (Aliados) --}}
+                    <a href="#" class="flex items-center gap-3 px-4 py-3 text-[#64748B] hover:bg-slate-50 hover:text-[#0F172A] rounded-xl font-medium transition-colors">
+                        <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 20h5v-2a3 3 0 00-5.356-1.857M17 20H7m10 0v-2c0-.656-.126-1.283-.356-1.857M7 20H2v-2a3 3 0 015.356-1.857M7 20v-2c0-.656.126-1.283.356-1.857m0 0a5.002 5.002 0 019.288 0M15 7a3 3 0 11-6 0 3 3 0 016 0zm6 3a2 2 0 11-4 0 2 2 0 014 0zM7 10a2 2 0 11-4 0 2 2 0 014 0z"></path></svg>
+                        Aliados
+                    </a>
+
+                    {{-- Enlace Inactivo (Precios de envío) --}}
+                    <a href="#" class="flex items-center gap-3 px-4 py-3 text-[#64748B] hover:bg-slate-50 hover:text-[#0F172A] rounded-xl font-medium transition-colors">
+                        <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8c-1.657 0-3 .895-3 2s1.343 2 3 2 3 .895 3 2-1.343 2-3 2m0-8c1.11 0 2.08.402 2.599 1M12 8V7m0 1v8m0 0v1m0-1c-1.11 0-2.08-.402-2.599-1M21 12a9 9 0 11-18 0 9 9 0 0118 0z"></path></svg>
+                        Precios de envío
+                    </a>
+
+                    <p class="px-2 text-xs font-semibold text-[#94A3B8] uppercase tracking-wider mb-3 mt-6">Administración</p>
+
+                    {{-- Enlace Inactivo (Generar usuarios) --}}
+                    <a href="#" class="flex items-center gap-3 px-4 py-3 text-[#64748B] hover:bg-slate-50 hover:text-[#0F172A] rounded-xl font-medium transition-colors">
+                        <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M18 9v3m0 0v3m0-3h3m-3 0h-3m-2-5a4 4 0 11-8 0 4 4 0 018 0zM3 20a6 6 0 0112 0v1H3v-1z"></path></svg>
+                        Generar usuarios
+                    </a>
+                </nav>
             </div>
 
-            <nav class="px-3 py-4 space-y-1">
-                <a href="{{ route('admin.dashboard') }}"
-                   class="flex items-center gap-2.5 px-3 py-2 rounded-lg text-sm font-medium transition-colors
-                          {{ request()->routeIs('admin.dashboard') ? 'bg-white/10 text-white' : 'text-white/60 hover:bg-white/5 hover:text-white' }}">
-                    <span class="h-1.5 w-1.5 rounded-full {{ request()->routeIs('admin.dashboard') ? 'bg-[#FF6A1A]' : 'bg-white/20' }}"></span>
-                    Dashboard
-                </a>
-
-                <a href="{{ route('admin.bcv-rates') }}"
-                   class="flex items-center gap-2.5 px-3 py-2 rounded-lg text-sm font-medium transition-colors
-                          {{ request()->routeIs('admin.bcv-rates') ? 'bg-white/10 text-white' : 'text-white/60 hover:bg-white/5 hover:text-white' }}">
-                    <span class="h-1.5 w-1.5 rounded-full {{ request()->routeIs('admin.bcv-rates') ? 'bg-[#FF6A1A]' : 'bg-white/20' }}"></span>
-                    Tasa BCV
-                </a>
-
-                <a href="{{ route('admin.rate-matrices') }}"
-                   class="flex items-center gap-2.5 px-3 py-2 rounded-lg text-sm font-medium transition-colors
-                          {{ request()->routeIs('admin.rate-matrices') ? 'bg-white/10 text-white' : 'text-white/60 hover:bg-white/5 hover:text-white' }}">
-                    <span class="h-1.5 w-1.5 rounded-full {{ request()->routeIs('admin.rate-matrices') ? 'bg-[#FF6A1A]' : 'bg-white/20' }}"></span>
-                    Matrices de tarifas
-                </a>
-
-                <div class="pt-4 mt-4 border-t border-white/10">
-                    <p class="px-3 text-[11px] uppercase tracking-wider text-white/30 font-medium mb-1">Próximamente</p>
-                    @foreach (['Paquetes', 'Aliados', 'Choferes'] as $item)
-                        <span class="flex items-center gap-2.5 px-3 py-2 rounded-lg text-sm text-white/25 cursor-default">
-                            <span class="h-1.5 w-1.5 rounded-full bg-white/10"></span>
-                            {{ $item }}
-                        </span>
-                    @endforeach
+            {{-- Perfil del Admin --}}
+            <div class="mt-auto pt-8 border-t border-[#E2E8F0]">
+                <div class="flex items-center gap-3 px-2">
+                    <div class="w-10 h-10 rounded-full bg-blue-900 flex items-center justify-center text-white font-bold uppercase">
+                        {{ substr(Auth::user()->name ?? 'A', 0, 1) }}
+                    </div>
+                    <div class="overflow-hidden">
+                        <p class="text-sm font-semibold text-[#0F172A] truncate">{{ Auth::user()->name ?? 'Administrador' }}</p>
+                        <p class="text-xs text-[#64748B] truncate">{{ Auth::user()->email ?? 'admin@venexpress.com' }}</p>
+                    </div>
                 </div>
-            </nav>
+
+                {{-- Botón de Cerrar Sesión con formulario para Laravel --}}
+                <form method="POST" action="{{ route('logout') }}" class="w-full mt-4">
+                    @csrf
+                    <button type="submit" class="w-full text-left px-2 text-sm text-red-500 font-medium hover:text-red-700 transition-colors">
+                        Cerrar Sesión
+                    </button>
+                </form>
+            </div>
         </aside>
 
         {{-- Overlay móvil --}}
