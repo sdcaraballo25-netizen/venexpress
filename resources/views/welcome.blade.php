@@ -4,7 +4,7 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Venexpress - Rastrea tu envío</title>
-    <link rel="icon" href="{{ asset('images/venexpress-logo.svg') }}">
+    <link rel="icon" href="{{ asset('images/venexpress-logo-solo.png') }}">
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;500;600;700;800&display=swap" rel="stylesheet">
@@ -20,7 +20,7 @@
     <nav class="bg-white border-b border-gray-100 sticky top-0 z-50">
         <div class="max-w-7xl mx-auto px-6 py-4 flex items-center justify-between">
             <a href="{{ route('home') }}">
-                <img src="{{ asset('images/venexpress-logo.svg') }}" alt="Venexpress" class="h-9">
+                <img src="{{ asset('images/venexpress-logo.png') }}" alt="Venexpress" class="h-9">
             </a>
             <div class="hidden md:flex items-center gap-9 text-sm font-medium text-gray-500">
                 <a href="{{ route('home') }}" class="text-blue-950 font-semibold">Inicio</a>
@@ -230,8 +230,8 @@
     <footer id="ayuda" class="bg-blue-950">
         <div class="max-w-7xl mx-auto px-6 py-14 grid md:grid-cols-5 gap-10">
             <div>
-                <img src="{{ asset('images/venexpress-logo.svg') }}" alt="Venexpress" class="h-8 mb-4 brightness-0 invert">
-                <p class="text-sm text-blue-200">Conectamos a Venezuela con soluciones de envío rápidas, seguras y confiables.</p>
+                <img src="{{ asset('images/venexpress-logo-white.png') }}" alt="Venexpress" class="h-8 mb-4>
+                <p class="text-sm" style="color: #ffffff !important;">Conectamos a Venezuela con soluciones de envío rápidas, seguras y confiables.</p>
                 <div class="flex items-center gap-3 mt-5">
                     <a href="#" class="w-8 h-8 rounded-full bg-white/10 flex items-center justify-center hover:bg-white/20 transition">
                         <i class="fa-brands fa-facebook-f text-white text-sm"></i>
