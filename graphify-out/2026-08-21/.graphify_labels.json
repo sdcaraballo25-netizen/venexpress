@@ -3,7 +3,7 @@
   "1": "Illuminate\\Database\\Migrations\\Migration",
   "2": "Package",
   "3": "composer.json",
-  "4": "CityDistance",
+  "4": "CityDistanceManager",
   "5": "What You Must Do When Invoked",
   "6": "devDependencies",
   "7": "scripts",
@@ -13,9 +13,9 @@
   "11": "AppServiceProvider",
   "12": "Illuminate\\View\\Component",
   "13": "logging.php",
-  "14": "city-distance-manager.blade.php",
+  "14": "BcvRate",
   "15": "graphify reference: extra exports and benchmark",
-  "16": "bcv-rate-manager.blade.php",
+  "16": "README.md",
   "17": "ExampleTest",
   "18": "profile.blade.php",
   "19": "console.php",
@@ -57,7 +57,7 @@
   "55": "admin.blade.php",
   "56": "guest.blade.php",
   "57": "Admin/dashboard.blade.php",
-  "58": "rate-matrix-manager.blade.php",
+  "58": "tarifas.blade.php",
   "59": "daily-cash-cut.blade.php",
   "60": "field-scanner.blade.php",
   "61": "confirm-password.blade.php",
@@ -84,5 +84,7 @@
   "82": "CLAUDE.md",
   "83": "extraction-spec.md",
   "84": "TariffService",
-  "85": "copilot-instructions.md"
+  "85": "copilot-instructions.md",
+  "86": "rate-matrix-manager.blade.php",
+  "87": "self"
 }

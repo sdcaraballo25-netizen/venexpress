@@ -199,26 +199,13 @@
       "source_location": "L8"
     },
     {
-      "id": "tests_unit_exampletest_exampletest",
-      "label": "ExampleTest",
-      "_callable": true,
-      "_callable_class": true,
-      "_origin": "ast",
-      "community": 17,
-      "community_name": "ExampleTest",
-      "file_type": "code",
-      "norm_label": "exampletest",
-      "source_file": "tests/Unit/ExampleTest.php",
-      "source_location": "L7"
-    },
-    {
       "id": "app_livewire_admin_bcvratemanager_bcvratemanager",
       "label": "BcvRateManager",
       "_callable": true,
       "_callable_class": true,
       "_origin": "ast",
-      "community": 2,
-      "community_name": "Package",
+      "community": 14,
+      "community_name": "BcvRate",
       "file_type": "code",
       "norm_label": "bcvratemanager",
       "source_file": "app/Livewire/Admin/BcvRateManager.php",
@@ -230,25 +217,51 @@
       "_callable": true,
       "_callable_class": true,
       "_origin": "ast",
-      "community": 2,
-      "community_name": "Package",
+      "community": 14,
+      "community_name": "BcvRate",
       "file_type": "code",
       "norm_label": "dashboard",
       "source_file": "app/Livewire/Admin/Dashboard.php",
       "source_location": "L13"
     },
     {
-      "id": "app_livewire_admin_ratematrixmanager_ratematrixmanager",
-      "label": "RateMatrixManager",
+      "id": "app_models_bcvrate_bcvrate",
+      "label": "BcvRate",
       "_callable": true,
       "_callable_class": true,
       "_origin": "ast",
-      "community": 2,
-      "community_name": "Package",
+      "community": 14,
+      "community_name": "BcvRate",
       "file_type": "code",
-      "norm_label": "ratematrixmanager",
-      "source_file": "app/Livewire/Admin/RateMatrixManager.php",
-      "source_location": "L17"
+      "norm_label": "bcvrate",
+      "source_file": "app/Models/BcvRate.php",
+      "source_location": "L8"
+    },
+    {
+      "id": "app_services_bcvrateservice_bcvrateservice",
+      "label": "BcvRateService",
+      "_callable": true,
+      "_callable_class": true,
+      "_origin": "ast",
+      "community": 14,
+      "community_name": "BcvRate",
+      "file_type": "code",
+      "norm_label": "bcvrateservice",
+      "source_file": "app/Services/BcvRateService.php",
+      "source_location": "L9"
+    },
+    {
+      "id": "tests_unit_exampletest_exampletest",
+      "label": "ExampleTest",
+      "_callable": true,
+      "_callable_class": true,
+      "_origin": "ast",
+      "community": 17,
+      "community_name": "ExampleTest",
+      "file_type": "code",
+      "norm_label": "exampletest",
+      "source_file": "tests/Unit/ExampleTest.php",
+      "source_location": "L7"
     },
     {
       "id": "app_livewire_ally_createpackage_createpackage",
@@ -275,19 +288,6 @@
       "norm_label": "ally",
       "source_file": "app/Models/Ally.php",
       "source_location": "L10"
-    },
-    {
-      "id": "app_models_bcvrate_bcvrate",
-      "label": "BcvRate",
-      "_callable": true,
-      "_callable_class": true,
-      "_origin": "ast",
-      "community": 2,
-      "community_name": "Package",
-      "file_type": "code",
-      "norm_label": "bcvrate",
-      "source_file": "app/Models/BcvRate.php",
-      "source_location": "L8"
     },
     {
       "id": "app_models_driver_driver",
@@ -329,19 +329,6 @@
       "source_location": "L9"
     },
     {
-      "id": "app_models_ratematrix_ratematrix",
-      "label": "RateMatrix",
-      "_callable": true,
-      "_callable_class": true,
-      "_origin": "ast",
-      "community": 2,
-      "community_name": "Package",
-      "file_type": "code",
-      "norm_label": "ratematrix",
-      "source_file": "app/Models/RateMatrix.php",
-      "source_location": "L8"
-    },
-    {
       "id": "app_services_packageservice_packageservice",
       "label": "PackageService",
       "_callable": true,
@@ -361,7 +348,7 @@
       "_callable_class": true,
       "_origin": "ast",
       "community": 4,
-      "community_name": "CityDistance",
+      "community_name": "CityDistanceManager",
       "file_type": "code",
       "norm_label": "citydistancemanager",
       "source_file": "app/Livewire/Admin/CityDistanceManager.php",
@@ -374,7 +361,7 @@
       "_callable_class": true,
       "_origin": "ast",
       "community": 4,
-      "community_name": "CityDistance",
+      "community_name": "CityDistanceManager",
       "file_type": "code",
       "norm_label": "citydistance",
       "source_file": "app/Models/CityDistance.php",
@@ -387,7 +374,7 @@
       "_callable_class": true,
       "_origin": "ast",
       "community": 4,
-      "community_name": "CityDistance",
+      "community_name": "CityDistanceManager",
       "file_type": "code",
       "norm_label": "userfactory",
       "source_file": "database/factories/UserFactory.php",
@@ -446,17 +433,30 @@
       "source_location": "L9"
     },
     {
-      "id": "app_services_bcvrateservice_bcvrateservice",
-      "label": "BcvRateService",
+      "id": "app_livewire_admin_ratematrixmanager_ratematrixmanager",
+      "label": "RateMatrixManager",
       "_callable": true,
       "_callable_class": true,
       "_origin": "ast",
       "community": 84,
       "community_name": "TariffService",
       "file_type": "code",
-      "norm_label": "bcvrateservice",
-      "source_file": "app/Services/BcvRateService.php",
-      "source_location": "L9"
+      "norm_label": "ratematrixmanager",
+      "source_file": "app/Livewire/Admin/RateMatrixManager.php",
+      "source_location": "L22"
+    },
+    {
+      "id": "app_models_ratematrix_ratematrix",
+      "label": "RateMatrix",
+      "_callable": true,
+      "_callable_class": true,
+      "_origin": "ast",
+      "community": 84,
+      "community_name": "TariffService",
+      "file_type": "code",
+      "norm_label": "ratematrix",
+      "source_file": "app/Models/RateMatrix.php",
+      "source_location": "L8"
     },
     {
       "id": "app_services_tariffservice_tariffservice",
@@ -469,7 +469,7 @@
       "file_type": "code",
       "norm_label": "tariffservice",
       "source_file": "app/Services/TariffService.php",
-      "source_location": "L9"
+      "source_location": "L10"
     },
     {
       "id": "app_livewire_actions_logout_logout",
@@ -1242,6 +1242,54 @@
       "source_location": "L16"
     },
     {
+      "id": "database_migrations_2026_08_21_000001_add_extra_pricing_fields_to_rate_matrices_table_down",
+      "label": "down()",
+      "_callable": true,
+      "_origin": "ast",
+      "community": 1,
+      "community_name": "Illuminate\\Database\\Migrations\\Migration",
+      "file_type": "code",
+      "norm_label": "down()",
+      "source_file": "database/migrations/2026_08_21_000001_add_extra_pricing_fields_to_rate_matrices_table.php",
+      "source_location": "L46"
+    },
+    {
+      "id": "database_migrations_2026_08_21_000001_add_extra_pricing_fields_to_rate_matrices_table_up",
+      "label": "up()",
+      "_callable": true,
+      "_origin": "ast",
+      "community": 1,
+      "community_name": "Illuminate\\Database\\Migrations\\Migration",
+      "file_type": "code",
+      "norm_label": "up()",
+      "source_file": "database/migrations/2026_08_21_000001_add_extra_pricing_fields_to_rate_matrices_table.php",
+      "source_location": "L17"
+    },
+    {
+      "id": "database_migrations_2026_08_21_000002_add_extra_pricing_fields_to_packages_table_down",
+      "label": "down()",
+      "_callable": true,
+      "_origin": "ast",
+      "community": 1,
+      "community_name": "Illuminate\\Database\\Migrations\\Migration",
+      "file_type": "code",
+      "norm_label": "down()",
+      "source_file": "database/migrations/2026_08_21_000002_add_extra_pricing_fields_to_packages_table.php",
+      "source_location": "L40"
+    },
+    {
+      "id": "database_migrations_2026_08_21_000002_add_extra_pricing_fields_to_packages_table_up",
+      "label": "up()",
+      "_callable": true,
+      "_origin": "ast",
+      "community": 1,
+      "community_name": "Illuminate\\Database\\Migrations\\Migration",
+      "file_type": "code",
+      "norm_label": "up()",
+      "source_file": "database/migrations/2026_08_21_000002_add_extra_pricing_fields_to_packages_table.php",
+      "source_location": "L17"
+    },
+    {
       "id": "app_providers_appserviceprovider_appserviceprovider_boot",
       "label": ".boot()",
       "_callable": true,
@@ -1314,6 +1362,150 @@
       "source_location": "L13"
     },
     {
+      "id": "app_livewire_admin_bcvratemanager_bcvratemanager_canceledit",
+      "label": ".cancelEdit()",
+      "_callable": true,
+      "_origin": "ast",
+      "community": 14,
+      "community_name": "BcvRate",
+      "file_type": "code",
+      "norm_label": ".canceledit()",
+      "source_file": "app/Livewire/Admin/BcvRateManager.php",
+      "source_location": "L82"
+    },
+    {
+      "id": "app_livewire_admin_bcvratemanager_bcvratemanager_delete",
+      "label": ".delete()",
+      "_callable": true,
+      "_origin": "ast",
+      "community": 14,
+      "community_name": "BcvRate",
+      "file_type": "code",
+      "norm_label": ".delete()",
+      "source_file": "app/Livewire/Admin/BcvRateManager.php",
+      "source_location": "L87"
+    },
+    {
+      "id": "app_livewire_admin_bcvratemanager_bcvratemanager_edit",
+      "label": ".edit()",
+      "_callable": true,
+      "_origin": "ast",
+      "community": 14,
+      "community_name": "BcvRate",
+      "file_type": "code",
+      "norm_label": ".edit()",
+      "source_file": "app/Livewire/Admin/BcvRateManager.php",
+      "source_location": "L73"
+    },
+    {
+      "id": "app_livewire_admin_bcvratemanager_bcvratemanager_mount",
+      "label": ".mount()",
+      "_callable": true,
+      "_origin": "ast",
+      "community": 14,
+      "community_name": "BcvRate",
+      "file_type": "code",
+      "norm_label": ".mount()",
+      "source_file": "app/Livewire/Admin/BcvRateManager.php",
+      "source_location": "L46"
+    },
+    {
+      "id": "app_livewire_admin_bcvratemanager_bcvratemanager_render",
+      "label": ".render()",
+      "_callable": true,
+      "_origin": "ast",
+      "community": 14,
+      "community_name": "BcvRate",
+      "file_type": "code",
+      "norm_label": ".render()",
+      "source_file": "app/Livewire/Admin/BcvRateManager.php",
+      "source_location": "L107"
+    },
+    {
+      "id": "app_livewire_admin_bcvratemanager_bcvratemanager_resetform",
+      "label": ".resetForm()",
+      "_callable": true,
+      "_origin": "ast",
+      "community": 14,
+      "community_name": "BcvRate",
+      "file_type": "code",
+      "norm_label": ".resetform()",
+      "source_file": "app/Livewire/Admin/BcvRateManager.php",
+      "source_location": "L100"
+    },
+    {
+      "id": "app_livewire_admin_bcvratemanager_bcvratemanager_rules",
+      "label": ".rules()",
+      "_callable": true,
+      "_origin": "ast",
+      "community": 14,
+      "community_name": "BcvRate",
+      "file_type": "code",
+      "norm_label": ".rules()",
+      "source_file": "app/Livewire/Admin/BcvRateManager.php",
+      "source_location": "L24"
+    },
+    {
+      "id": "app_livewire_admin_bcvratemanager_bcvratemanager_save",
+      "label": ".save()",
+      "_callable": true,
+      "_origin": "ast",
+      "community": 14,
+      "community_name": "BcvRate",
+      "file_type": "code",
+      "norm_label": ".save()",
+      "source_file": "app/Livewire/Admin/BcvRateManager.php",
+      "source_location": "L51"
+    },
+    {
+      "id": "app_models_bcvrate_bcvrate_casts",
+      "label": ".casts()",
+      "_callable": true,
+      "_origin": "ast",
+      "community": 14,
+      "community_name": "BcvRate",
+      "file_type": "code",
+      "norm_label": ".casts()",
+      "source_file": "app/Models/BcvRate.php",
+      "source_location": "L27"
+    },
+    {
+      "id": "app_services_bcvrateservice_bcvrateservice_convertusdtoves",
+      "label": ".convertUsdToVes()",
+      "_callable": true,
+      "_origin": "ast",
+      "community": 14,
+      "community_name": "BcvRate",
+      "file_type": "code",
+      "norm_label": ".convertusdtoves()",
+      "source_file": "app/Services/BcvRateService.php",
+      "source_location": "L45"
+    },
+    {
+      "id": "app_services_bcvrateservice_bcvrateservice_getcurrentrate",
+      "label": ".getCurrentRate()",
+      "_callable": true,
+      "_origin": "ast",
+      "community": 14,
+      "community_name": "BcvRate",
+      "file_type": "code",
+      "norm_label": ".getcurrentrate()",
+      "source_file": "app/Services/BcvRateService.php",
+      "source_location": "L16"
+    },
+    {
+      "id": "app_services_bcvrateservice_bcvrateservice_setrate",
+      "label": ".setRate()",
+      "_callable": true,
+      "_origin": "ast",
+      "community": 14,
+      "community_name": "BcvRate",
+      "file_type": "code",
+      "norm_label": ".setrate()",
+      "source_file": "app/Services/BcvRateService.php",
+      "source_location": "L31"
+    },
+    {
       "id": "tests_unit_exampletest_exampletest_test_that_true_is_true",
       "label": ".test_that_true_is_true()",
       "_callable": true,
@@ -1326,102 +1518,6 @@
       "source_location": "L12"
     },
     {
-      "id": "app_livewire_admin_bcvratemanager_bcvratemanager_canceledit",
-      "label": ".cancelEdit()",
-      "_callable": true,
-      "_origin": "ast",
-      "community": 2,
-      "community_name": "Package",
-      "file_type": "code",
-      "norm_label": ".canceledit()",
-      "source_file": "app/Livewire/Admin/BcvRateManager.php",
-      "source_location": "L82"
-    },
-    {
-      "id": "app_livewire_admin_bcvratemanager_bcvratemanager_delete",
-      "label": ".delete()",
-      "_callable": true,
-      "_origin": "ast",
-      "community": 2,
-      "community_name": "Package",
-      "file_type": "code",
-      "norm_label": ".delete()",
-      "source_file": "app/Livewire/Admin/BcvRateManager.php",
-      "source_location": "L87"
-    },
-    {
-      "id": "app_livewire_admin_bcvratemanager_bcvratemanager_edit",
-      "label": ".edit()",
-      "_callable": true,
-      "_origin": "ast",
-      "community": 2,
-      "community_name": "Package",
-      "file_type": "code",
-      "norm_label": ".edit()",
-      "source_file": "app/Livewire/Admin/BcvRateManager.php",
-      "source_location": "L73"
-    },
-    {
-      "id": "app_livewire_admin_bcvratemanager_bcvratemanager_mount",
-      "label": ".mount()",
-      "_callable": true,
-      "_origin": "ast",
-      "community": 2,
-      "community_name": "Package",
-      "file_type": "code",
-      "norm_label": ".mount()",
-      "source_file": "app/Livewire/Admin/BcvRateManager.php",
-      "source_location": "L46"
-    },
-    {
-      "id": "app_livewire_admin_bcvratemanager_bcvratemanager_render",
-      "label": ".render()",
-      "_callable": true,
-      "_origin": "ast",
-      "community": 2,
-      "community_name": "Package",
-      "file_type": "code",
-      "norm_label": ".render()",
-      "source_file": "app/Livewire/Admin/BcvRateManager.php",
-      "source_location": "L107"
-    },
-    {
-      "id": "app_livewire_admin_bcvratemanager_bcvratemanager_resetform",
-      "label": ".resetForm()",
-      "_callable": true,
-      "_origin": "ast",
-      "community": 2,
-      "community_name": "Package",
-      "file_type": "code",
-      "norm_label": ".resetform()",
-      "source_file": "app/Livewire/Admin/BcvRateManager.php",
-      "source_location": "L100"
-    },
-    {
-      "id": "app_livewire_admin_bcvratemanager_bcvratemanager_rules",
-      "label": ".rules()",
-      "_callable": true,
-      "_origin": "ast",
-      "community": 2,
-      "community_name": "Package",
-      "file_type": "code",
-      "norm_label": ".rules()",
-      "source_file": "app/Livewire/Admin/BcvRateManager.php",
-      "source_location": "L24"
-    },
-    {
-      "id": "app_livewire_admin_bcvratemanager_bcvratemanager_save",
-      "label": ".save()",
-      "_callable": true,
-      "_origin": "ast",
-      "community": 2,
-      "community_name": "Package",
-      "file_type": "code",
-      "norm_label": ".save()",
-      "source_file": "app/Livewire/Admin/BcvRateManager.php",
-      "source_location": "L51"
-    },
-    {
       "id": "app_livewire_admin_dashboard_dashboard_render",
       "label": ".render()",
       "_callable": true,
@@ -1432,54 +1528,6 @@
       "norm_label": ".render()",
       "source_file": "app/Livewire/Admin/Dashboard.php",
       "source_location": "L17"
-    },
-    {
-      "id": "app_livewire_admin_ratematrixmanager_ratematrixmanager_mount",
-      "label": ".mount()",
-      "_callable": true,
-      "_origin": "ast",
-      "community": 2,
-      "community_name": "Package",
-      "file_type": "code",
-      "norm_label": ".mount()",
-      "source_file": "app/Livewire/Admin/RateMatrixManager.php",
-      "source_location": "L44"
-    },
-    {
-      "id": "app_livewire_admin_ratematrixmanager_ratematrixmanager_render",
-      "label": ".render()",
-      "_callable": true,
-      "_origin": "ast",
-      "community": 2,
-      "community_name": "Package",
-      "file_type": "code",
-      "norm_label": ".render()",
-      "source_file": "app/Livewire/Admin/RateMatrixManager.php",
-      "source_location": "L76"
-    },
-    {
-      "id": "app_livewire_admin_ratematrixmanager_ratematrixmanager_rules",
-      "label": ".rules()",
-      "_callable": true,
-      "_origin": "ast",
-      "community": 2,
-      "community_name": "Package",
-      "file_type": "code",
-      "norm_label": ".rules()",
-      "source_file": "app/Livewire/Admin/RateMatrixManager.php",
-      "source_location": "L29"
-    },
-    {
-      "id": "app_livewire_admin_ratematrixmanager_ratematrixmanager_save",
-      "label": ".save()",
-      "_callable": true,
-      "_origin": "ast",
-      "community": 2,
-      "community_name": "Package",
-      "file_type": "code",
-      "norm_label": ".save()",
-      "source_file": "app/Livewire/Admin/RateMatrixManager.php",
-      "source_location": "L56"
     },
     {
       "id": "app_livewire_ally_createpackage_createpackage_pricingpreview",
@@ -1566,18 +1614,6 @@
       "source_location": "L49"
     },
     {
-      "id": "app_models_bcvrate_bcvrate_casts",
-      "label": ".casts()",
-      "_callable": true,
-      "_origin": "ast",
-      "community": 2,
-      "community_name": "Package",
-      "file_type": "code",
-      "norm_label": ".casts()",
-      "source_file": "app/Models/BcvRate.php",
-      "source_location": "L27"
-    },
-    {
       "id": "app_models_driver_driver_packages",
       "label": ".packages()",
       "_callable": true,
@@ -1611,7 +1647,7 @@
       "file_type": "code",
       "norm_label": ".ally()",
       "source_file": "app/Models/Package.php",
-      "source_location": "L95"
+      "source_location": "L110"
     },
     {
       "id": "app_models_package_package_casts",
@@ -1623,7 +1659,7 @@
       "file_type": "code",
       "norm_label": ".casts()",
       "source_file": "app/Models/Package.php",
-      "source_location": "L71"
+      "source_location": "L81"
     },
     {
       "id": "app_models_package_package_driver",
@@ -1635,7 +1671,7 @@
       "file_type": "code",
       "norm_label": ".driver()",
       "source_file": "app/Models/Package.php",
-      "source_location": "L103"
+      "source_location": "L118"
     },
     {
       "id": "app_models_package_package_histories",
@@ -1647,7 +1683,7 @@
       "file_type": "code",
       "norm_label": ".histories()",
       "source_file": "app/Models/Package.php",
-      "source_location": "L111"
+      "source_location": "L126"
     },
     {
       "id": "app_models_package_package_isdelivered",
@@ -1659,7 +1695,19 @@
       "file_type": "code",
       "norm_label": ".isdelivered()",
       "source_file": "app/Models/Package.php",
-      "source_location": "L122"
+      "source_location": "L137"
+    },
+    {
+      "id": "app_models_package_package_issobre",
+      "label": ".isSobre()",
+      "_callable": true,
+      "_origin": "ast",
+      "community": 2,
+      "community_name": "Package",
+      "file_type": "code",
+      "norm_label": ".issobre()",
+      "source_file": "app/Models/Package.php",
+      "source_location": "L142"
     },
     {
       "id": "app_models_packagehistory_packagehistory_package",
@@ -1686,18 +1734,6 @@
       "source_location": "L42"
     },
     {
-      "id": "app_models_ratematrix_ratematrix_casts",
-      "label": ".casts()",
-      "_callable": true,
-      "_origin": "ast",
-      "community": 2,
-      "community_name": "Package",
-      "file_type": "code",
-      "norm_label": ".casts()",
-      "source_file": "app/Models/RateMatrix.php",
-      "source_location": "L28"
-    },
-    {
       "id": "app_models_user_user_packagehistories",
       "label": ".packageHistories()",
       "_callable": true,
@@ -1719,7 +1755,7 @@
       "file_type": "code",
       "norm_label": ".assigndriver()",
       "source_file": "app/Services/PackageService.php",
-      "source_location": "L90"
+      "source_location": "L104"
     },
     {
       "id": "app_services_packageservice_packageservice_changestatus",
@@ -1731,7 +1767,19 @@
       "file_type": "code",
       "norm_label": ".changestatus()",
       "source_file": "app/Services/PackageService.php",
-      "source_location": "L68"
+      "source_location": "L82"
+    },
+    {
+      "id": "app_services_packageservice_packageservice_construct",
+      "label": ".__construct()",
+      "_callable": true,
+      "_origin": "ast",
+      "community": 2,
+      "community_name": "Package",
+      "file_type": "code",
+      "norm_label": ".__construct()",
+      "source_file": "app/Services/PackageService.php",
+      "source_location": "L13"
     },
     {
       "id": "app_services_packageservice_packageservice_createpackage",
@@ -1743,7 +1791,7 @@
       "file_type": "code",
       "norm_label": ".createpackage()",
       "source_file": "app/Services/PackageService.php",
-      "source_location": "L29"
+      "source_location": "L30"
     },
     {
       "id": "app_services_packageservice_packageservice_generatetrackingnumber",
@@ -1755,7 +1803,7 @@
       "file_type": "code",
       "norm_label": ".generatetrackingnumber()",
       "source_file": "app/Services/PackageService.php",
-      "source_location": "L100"
+      "source_location": "L114"
     },
     {
       "id": "app_services_packageservice_packageservice_recordhistory",
@@ -1767,7 +1815,7 @@
       "file_type": "code",
       "norm_label": ".recordhistory()",
       "source_file": "app/Services/PackageService.php",
-      "source_location": "L111"
+      "source_location": "L125"
     },
     {
       "id": "app_livewire_admin_citydistancemanager_citydistancemanager_canceledit",
@@ -1775,7 +1823,7 @@
       "_callable": true,
       "_origin": "ast",
       "community": 4,
-      "community_name": "CityDistance",
+      "community_name": "CityDistanceManager",
       "file_type": "code",
       "norm_label": ".canceledit()",
       "source_file": "app/Livewire/Admin/CityDistanceManager.php",
@@ -1787,7 +1835,7 @@
       "_callable": true,
       "_origin": "ast",
       "community": 4,
-      "community_name": "CityDistance",
+      "community_name": "CityDistanceManager",
       "file_type": "code",
       "norm_label": ".create()",
       "source_file": "app/Livewire/Admin/CityDistanceManager.php",
@@ -1799,7 +1847,7 @@
       "_callable": true,
       "_origin": "ast",
       "community": 4,
-      "community_name": "CityDistance",
+      "community_name": "CityDistanceManager",
       "file_type": "code",
       "norm_label": ".delete()",
       "source_file": "app/Livewire/Admin/CityDistanceManager.php",
@@ -1811,7 +1859,7 @@
       "_callable": true,
       "_origin": "ast",
       "community": 4,
-      "community_name": "CityDistance",
+      "community_name": "CityDistanceManager",
       "file_type": "code",
       "norm_label": ".edit()",
       "source_file": "app/Livewire/Admin/CityDistanceManager.php",
@@ -1823,7 +1871,7 @@
       "_callable": true,
       "_origin": "ast",
       "community": 4,
-      "community_name": "CityDistance",
+      "community_name": "CityDistanceManager",
       "file_type": "code",
       "norm_label": ".render()",
       "source_file": "app/Livewire/Admin/CityDistanceManager.php",
@@ -1835,7 +1883,7 @@
       "_callable": true,
       "_origin": "ast",
       "community": 4,
-      "community_name": "CityDistance",
+      "community_name": "CityDistanceManager",
       "file_type": "code",
       "norm_label": ".resetform()",
       "source_file": "app/Livewire/Admin/CityDistanceManager.php",
@@ -1847,7 +1895,7 @@
       "_callable": true,
       "_origin": "ast",
       "community": 4,
-      "community_name": "CityDistance",
+      "community_name": "CityDistanceManager",
       "file_type": "code",
       "norm_label": ".rules()",
       "source_file": "app/Livewire/Admin/CityDistanceManager.php",
@@ -1859,7 +1907,7 @@
       "_callable": true,
       "_origin": "ast",
       "community": 4,
-      "community_name": "CityDistance",
+      "community_name": "CityDistanceManager",
       "file_type": "code",
       "norm_label": ".save()",
       "source_file": "app/Livewire/Admin/CityDistanceManager.php",
@@ -1871,7 +1919,7 @@
       "_callable": true,
       "_origin": "ast",
       "community": 4,
-      "community_name": "CityDistance",
+      "community_name": "CityDistanceManager",
       "file_type": "code",
       "norm_label": ".current()",
       "source_file": "app/Models/BcvRate.php",
@@ -1883,7 +1931,7 @@
       "_callable": true,
       "_origin": "ast",
       "community": 4,
-      "community_name": "CityDistance",
+      "community_name": "CityDistanceManager",
       "file_type": "code",
       "norm_label": ".between()",
       "source_file": "app/Models/CityDistance.php",
@@ -1895,7 +1943,7 @@
       "_callable": true,
       "_origin": "ast",
       "community": 4,
-      "community_name": "CityDistance",
+      "community_name": "CityDistanceManager",
       "file_type": "code",
       "norm_label": ".casts()",
       "source_file": "app/Models/CityDistance.php",
@@ -1907,7 +1955,7 @@
       "_callable": true,
       "_origin": "ast",
       "community": 4,
-      "community_name": "CityDistance",
+      "community_name": "CityDistanceManager",
       "file_type": "code",
       "norm_label": ".normalizepair()",
       "source_file": "app/Models/CityDistance.php",
@@ -1919,23 +1967,11 @@
       "_callable": true,
       "_origin": "ast",
       "community": 4,
-      "community_name": "CityDistance",
+      "community_name": "CityDistanceManager",
       "file_type": "code",
       "norm_label": ".setdistance()",
       "source_file": "app/Models/CityDistance.php",
       "source_location": "L56"
-    },
-    {
-      "id": "app_models_ratematrix_ratematrix_current",
-      "label": ".current()",
-      "_callable": true,
-      "_origin": "ast",
-      "community": 4,
-      "community_name": "CityDistance",
-      "file_type": "code",
-      "norm_label": ".current()",
-      "source_file": "app/Models/RateMatrix.php",
-      "source_location": "L43"
     },
     {
       "id": "database_factories_userfactory_userfactory_definition",
@@ -1943,7 +1979,7 @@
       "_callable": true,
       "_origin": "ast",
       "community": 4,
-      "community_name": "CityDistance",
+      "community_name": "CityDistanceManager",
       "file_type": "code",
       "norm_label": ".definition()",
       "source_file": "database/factories/UserFactory.php",
@@ -1955,7 +1991,7 @@
       "_callable": true,
       "_origin": "ast",
       "community": 4,
-      "community_name": "CityDistance",
+      "community_name": "CityDistanceManager",
       "file_type": "code",
       "norm_label": ".unverified()",
       "source_file": "database/factories/UserFactory.php",
@@ -1986,52 +2022,124 @@
       "source_location": "L16"
     },
     {
-      "id": "app_services_bcvrateservice_bcvrateservice_convertusdtoves",
-      "label": ".convertUsdToVes()",
+      "id": "app_livewire_admin_ratematrixmanager_ratematrixmanager_cancelediting",
+      "label": ".cancelEditing()",
       "_callable": true,
       "_origin": "ast",
       "community": 84,
       "community_name": "TariffService",
       "file_type": "code",
-      "norm_label": ".convertusdtoves()",
-      "source_file": "app/Services/BcvRateService.php",
-      "source_location": "L45"
+      "norm_label": ".cancelediting()",
+      "source_file": "app/Livewire/Admin/RateMatrixManager.php",
+      "source_location": "L123"
     },
     {
-      "id": "app_services_bcvrateservice_bcvrateservice_getcurrentrate",
-      "label": ".getCurrentRate()",
+      "id": "app_livewire_admin_ratematrixmanager_ratematrixmanager_mount",
+      "label": ".mount()",
       "_callable": true,
       "_origin": "ast",
       "community": 84,
       "community_name": "TariffService",
       "file_type": "code",
-      "norm_label": ".getcurrentrate()",
-      "source_file": "app/Services/BcvRateService.php",
-      "source_location": "L16"
+      "norm_label": ".mount()",
+      "source_file": "app/Livewire/Admin/RateMatrixManager.php",
+      "source_location": "L101"
     },
     {
-      "id": "app_services_bcvrateservice_bcvrateservice_setrate",
-      "label": ".setRate()",
+      "id": "app_livewire_admin_ratematrixmanager_ratematrixmanager_render",
+      "label": ".render()",
       "_callable": true,
       "_origin": "ast",
       "community": 84,
       "community_name": "TariffService",
       "file_type": "code",
-      "norm_label": ".setrate()",
-      "source_file": "app/Services/BcvRateService.php",
+      "norm_label": ".render()",
+      "source_file": "app/Livewire/Admin/RateMatrixManager.php",
+      "source_location": "L214"
+    },
+    {
+      "id": "app_livewire_admin_ratematrixmanager_ratematrixmanager_resetsimulation",
+      "label": ".resetSimulation()",
+      "_callable": true,
+      "_origin": "ast",
+      "community": 84,
+      "community_name": "TariffService",
+      "file_type": "code",
+      "norm_label": ".resetsimulation()",
+      "source_file": "app/Livewire/Admin/RateMatrixManager.php",
+      "source_location": "L195"
+    },
+    {
+      "id": "app_livewire_admin_ratematrixmanager_ratematrixmanager_rules",
+      "label": ".rules()",
+      "_callable": true,
+      "_origin": "ast",
+      "community": 84,
+      "community_name": "TariffService",
+      "file_type": "code",
+      "norm_label": ".rules()",
+      "source_file": "app/Livewire/Admin/RateMatrixManager.php",
+      "source_location": "L75"
+    },
+    {
+      "id": "app_livewire_admin_ratematrixmanager_ratematrixmanager_save",
+      "label": ".save()",
+      "_callable": true,
+      "_origin": "ast",
+      "community": 84,
+      "community_name": "TariffService",
+      "file_type": "code",
+      "norm_label": ".save()",
+      "source_file": "app/Livewire/Admin/RateMatrixManager.php",
+      "source_location": "L131"
+    },
+    {
+      "id": "app_livewire_admin_ratematrixmanager_ratematrixmanager_simulate",
+      "label": ".simulate()",
+      "_callable": true,
+      "_origin": "ast",
+      "community": 84,
+      "community_name": "TariffService",
+      "file_type": "code",
+      "norm_label": ".simulate()",
+      "source_file": "app/Livewire/Admin/RateMatrixManager.php",
+      "source_location": "L161"
+    },
+    {
+      "id": "app_livewire_admin_ratematrixmanager_ratematrixmanager_startediting",
+      "label": ".startEditing()",
+      "_callable": true,
+      "_origin": "ast",
+      "community": 84,
+      "community_name": "TariffService",
+      "file_type": "code",
+      "norm_label": ".startediting()",
+      "source_file": "app/Livewire/Admin/RateMatrixManager.php",
+      "source_location": "L116"
+    },
+    {
+      "id": "app_models_ratematrix_ratematrix_casts",
+      "label": ".casts()",
+      "_callable": true,
+      "_origin": "ast",
+      "community": 84,
+      "community_name": "TariffService",
+      "file_type": "code",
+      "norm_label": ".casts()",
+      "source_file": "app/Models/RateMatrix.php",
       "source_location": "L31"
     },
     {
-      "id": "app_services_packageservice_packageservice_construct",
-      "label": ".__construct()",
+      "id": "app_models_ratematrix_ratematrix_current",
+      "label": ".current()",
       "_callable": true,
       "_origin": "ast",
       "community": 84,
       "community_name": "TariffService",
       "file_type": "code",
-      "norm_label": ".__construct()",
-      "source_file": "app/Services/PackageService.php",
-      "source_location": "L13"
+      "norm_label": ".current()",
+      "source_file": "app/Models/RateMatrix.php",
+      "source_location": "L49"
     },
     {
       "id": "app_services_tariffservice_tariffservice_calculate",
@@ -2043,7 +2151,7 @@
       "file_type": "code",
       "norm_label": ".calculate()",
       "source_file": "app/Services/TariffService.php",
-      "source_location": "L99"
+      "source_location": "L149"
     },
     {
       "id": "app_services_tariffservice_tariffservice_calculatebillableweight",
@@ -2055,19 +2163,55 @@
       "file_type": "code",
       "norm_label": ".calculatebillableweight()",
       "source_file": "app/Services/TariffService.php",
-      "source_location": "L32"
+      "source_location": "L33"
     },
     {
-      "id": "app_services_tariffservice_tariffservice_calculatetotalusd",
-      "label": ".calculateTotalUsd()",
+      "id": "app_services_tariffservice_tariffservice_calculateenvelopesubtotalusd",
+      "label": ".calculateEnvelopeSubtotalUsd()",
       "_callable": true,
       "_origin": "ast",
       "community": 84,
       "community_name": "TariffService",
       "file_type": "code",
-      "norm_label": ".calculatetotalusd()",
+      "norm_label": ".calculateenvelopesubtotalusd()",
       "source_file": "app/Services/TariffService.php",
-      "source_location": "L76"
+      "source_location": "L94"
+    },
+    {
+      "id": "app_services_tariffservice_tariffservice_calculatefragilesurcharge",
+      "label": ".calculateFragileSurcharge()",
+      "_callable": true,
+      "_origin": "ast",
+      "community": 84,
+      "community_name": "TariffService",
+      "file_type": "code",
+      "norm_label": ".calculatefragilesurcharge()",
+      "source_file": "app/Services/TariffService.php",
+      "source_location": "L106"
+    },
+    {
+      "id": "app_services_tariffservice_tariffservice_calculateinsuranceprice",
+      "label": ".calculateInsurancePrice()",
+      "_callable": true,
+      "_origin": "ast",
+      "community": 84,
+      "community_name": "TariffService",
+      "file_type": "code",
+      "norm_label": ".calculateinsuranceprice()",
+      "source_file": "app/Services/TariffService.php",
+      "source_location": "L116"
+    },
+    {
+      "id": "app_services_tariffservice_tariffservice_calculatepackagesubtotalusd",
+      "label": ".calculatePackageSubtotalUsd()",
+      "_callable": true,
+      "_origin": "ast",
+      "community": 84,
+      "community_name": "TariffService",
+      "file_type": "code",
+      "norm_label": ".calculatepackagesubtotalusd()",
+      "source_file": "app/Services/TariffService.php",
+      "source_location": "L80"
     },
     {
       "id": "app_services_tariffservice_tariffservice_calculatevolumetricweight",
@@ -2079,7 +2223,7 @@
       "file_type": "code",
       "norm_label": ".calculatevolumetricweight()",
       "source_file": "app/Services/TariffService.php",
-      "source_location": "L20"
+      "source_location": "L21"
     },
     {
       "id": "app_services_tariffservice_tariffservice_construct",
@@ -2091,7 +2235,7 @@
       "file_type": "code",
       "norm_label": ".__construct()",
       "source_file": "app/Services/TariffService.php",
-      "source_location": "L11"
+      "source_location": "L12"
     },
     {
       "id": "app_services_tariffservice_tariffservice_finddistance",
@@ -2103,7 +2247,7 @@
       "file_type": "code",
       "norm_label": ".finddistance()",
       "source_file": "app/Services/TariffService.php",
-      "source_location": "L58"
+      "source_location": "L63"
     },
     {
       "id": "app_services_tariffservice_tariffservice_findrate",
@@ -2115,7 +2259,7 @@
       "file_type": "code",
       "norm_label": ".findrate()",
       "source_file": "app/Services/TariffService.php",
-      "source_location": "L42"
+      "source_location": "L43"
     },
     {
       "id": "app_livewire_actions_logout_logout_invoke",
@@ -2606,6 +2750,28 @@
       "source_location": "L1"
     },
     {
+      "id": "database_migrations_2026_08_21_000001_add_extra_pricing_fields_to_rate_matrices_table",
+      "label": "2026_08_21_000001_add_extra_pricing_fields_to_rate_matrices_table.php",
+      "_origin": "ast",
+      "community": 1,
+      "community_name": "Illuminate\\Database\\Migrations\\Migration",
+      "file_type": "code",
+      "norm_label": "2026_08_21_000001_add_extra_pricing_fields_to_rate_matrices_table.php",
+      "source_file": "database/migrations/2026_08_21_000001_add_extra_pricing_fields_to_rate_matrices_table.php",
+      "source_location": "L1"
+    },
+    {
+      "id": "database_migrations_2026_08_21_000002_add_extra_pricing_fields_to_packages_table",
+      "label": "2026_08_21_000002_add_extra_pricing_fields_to_packages_table.php",
+      "_origin": "ast",
+      "community": 1,
+      "community_name": "Illuminate\\Database\\Migrations\\Migration",
+      "file_type": "code",
+      "norm_label": "2026_08_21_000002_add_extra_pricing_fields_to_packages_table.php",
+      "source_file": "database/migrations/2026_08_21_000002_add_extra_pricing_fields_to_packages_table.php",
+      "source_location": "L1"
+    },
+    {
       "id": "illuminate_database_migrations_migration",
       "label": "Illuminate\\Database\\Migrations\\Migration",
       "_origin": "ast",
@@ -2951,59 +3117,158 @@
       "source_location": ""
     },
     {
-      "id": "create",
-      "label": "create",
+      "id": "app_livewire_admin_bcvratemanager",
+      "label": "BcvRateManager.php",
       "_origin": "ast",
       "community": 14,
-      "community_name": "city-distance-manager.blade.php",
+      "community_name": "BcvRate",
       "file_type": "code",
-      "norm_label": "create",
-      "source_file": "resources/views/Livewire/Admin/city-distance-manager.blade.php",
-      "source_location": null
+      "norm_label": "bcvratemanager.php",
+      "source_file": "app/Livewire/Admin/BcvRateManager.php",
+      "source_location": "L1"
     },
     {
-      "id": "delete_distance_id",
-      "label": "delete({{ $distance->id }})",
+      "id": "app_livewire_admin_citydistancemanager",
+      "label": "CityDistanceManager.php",
       "_origin": "ast",
       "community": 14,
-      "community_name": "city-distance-manager.blade.php",
+      "community_name": "BcvRate",
       "file_type": "code",
-      "norm_label": "delete({{ $distance->id }})",
-      "source_file": "resources/views/Livewire/Admin/city-distance-manager.blade.php",
-      "source_location": null
+      "norm_label": "citydistancemanager.php",
+      "source_file": "app/Livewire/Admin/CityDistanceManager.php",
+      "source_location": "L1"
     },
     {
-      "id": "edit_distance_id",
-      "label": "edit({{ $distance->id }})",
+      "id": "app_livewire_admin_dashboard",
+      "label": "Dashboard.php",
       "_origin": "ast",
       "community": 14,
-      "community_name": "city-distance-manager.blade.php",
+      "community_name": "BcvRate",
       "file_type": "code",
-      "norm_label": "edit({{ $distance->id }})",
-      "source_file": "resources/views/Livewire/Admin/city-distance-manager.blade.php",
-      "source_location": null
+      "norm_label": "dashboard.php",
+      "source_file": "app/Livewire/Admin/Dashboard.php",
+      "source_location": "L1"
     },
     {
-      "id": "resources_views_livewire_admin_city_distance_manager_blade",
-      "label": "city-distance-manager.blade.php",
+      "id": "app_livewire_admin_ratematrixmanager",
+      "label": "RateMatrixManager.php",
       "_origin": "ast",
       "community": 14,
-      "community_name": "city-distance-manager.blade.php",
+      "community_name": "BcvRate",
       "file_type": "code",
-      "norm_label": "city-distance-manager.blade.php",
-      "source_file": "resources/views/Livewire/Admin/city-distance-manager.blade.php",
-      "source_location": null
+      "norm_label": "ratematrixmanager.php",
+      "source_file": "app/Livewire/Admin/RateMatrixManager.php",
+      "source_location": "L1"
     },
     {
-      "id": "resources_views_livewire_admin_city_distance_manager_blade_php_canceledit",
-      "label": "cancelEdit",
+      "id": "app_services_bcvrateservice",
+      "label": "BcvRateService.php",
       "_origin": "ast",
       "community": 14,
-      "community_name": "city-distance-manager.blade.php",
+      "community_name": "BcvRate",
       "file_type": "code",
-      "norm_label": "canceledit",
-      "source_file": "resources/views/Livewire/Admin/city-distance-manager.blade.php",
-      "source_location": null
+      "norm_label": "bcvrateservice.php",
+      "source_file": "app/Services/BcvRateService.php",
+      "source_location": "L1"
+    },
+    {
+      "id": "carbon",
+      "label": "Carbon",
+      "_origin": "ast",
+      "community": 14,
+      "community_name": "BcvRate",
+      "file_type": "code",
+      "norm_label": "carbon",
+      "source_file": "",
+      "source_location": ""
+    },
+    {
+      "id": "carbon_carbon",
+      "label": "Carbon\\Carbon",
+      "_origin": "ast",
+      "community": 14,
+      "community_name": "BcvRate",
+      "file_type": "code",
+      "norm_label": "carbon\\carbon",
+      "source_file": "",
+      "source_location": ""
+    },
+    {
+      "id": "illuminate_support_facades_route",
+      "label": "Illuminate\\Support\\Facades\\Route",
+      "_origin": "ast",
+      "community": 14,
+      "community_name": "BcvRate",
+      "file_type": "code",
+      "norm_label": "illuminate\\support\\facades\\route",
+      "source_file": "",
+      "source_location": ""
+    },
+    {
+      "id": "livewire_attributes_layout",
+      "label": "Livewire\\Attributes\\Layout",
+      "_origin": "ast",
+      "community": 14,
+      "community_name": "BcvRate",
+      "file_type": "code",
+      "norm_label": "livewire\\attributes\\layout",
+      "source_file": "",
+      "source_location": ""
+    },
+    {
+      "id": "livewire_attributes_title",
+      "label": "Livewire\\Attributes\\Title",
+      "_origin": "ast",
+      "community": 14,
+      "community_name": "BcvRate",
+      "file_type": "code",
+      "norm_label": "livewire\\attributes\\title",
+      "source_file": "",
+      "source_location": ""
+    },
+    {
+      "id": "livewire_component",
+      "label": "Livewire\\Component",
+      "_origin": "ast",
+      "community": 14,
+      "community_name": "BcvRate",
+      "file_type": "code",
+      "norm_label": "livewire\\component",
+      "source_file": "",
+      "source_location": ""
+    },
+    {
+      "id": "livewire_withpagination",
+      "label": "Livewire\\WithPagination",
+      "_origin": "ast",
+      "community": 14,
+      "community_name": "BcvRate",
+      "file_type": "code",
+      "norm_label": "livewire\\withpagination",
+      "source_file": "",
+      "source_location": ""
+    },
+    {
+      "id": "routes_web",
+      "label": "web.php",
+      "_origin": "ast",
+      "community": 14,
+      "community_name": "BcvRate",
+      "file_type": "code",
+      "norm_label": "web.php",
+      "source_file": "routes/web.php",
+      "source_location": "L1"
+    },
+    {
+      "id": "runtimeexception",
+      "label": "RuntimeException",
+      "_origin": "ast",
+      "community": 14,
+      "community_name": "BcvRate",
+      "file_type": "code",
+      "norm_label": "runtimeexception",
+      "source_file": "",
+      "source_location": ""
     },
     {
       "id": "claude_skills_graphify_references_exports",
@@ -3114,48 +3379,112 @@
       "source_location": "L79"
     },
     {
-      "id": "delete_item_id",
-      "label": "delete({{ $item->id }})",
+      "id": "readme",
+      "label": "README.md",
       "_origin": "ast",
       "community": 16,
-      "community_name": "bcv-rate-manager.blade.php",
-      "file_type": "code",
-      "norm_label": "delete({{ $item->id }})",
-      "source_file": "resources/views/Livewire/Admin/bcv-rate-manager.blade.php",
-      "source_location": null
+      "community_name": "README.md",
+      "file_type": "document",
+      "node_kind": "page",
+      "norm_label": "readme.md",
+      "source_file": "README.md",
+      "source_location": "L1"
     },
     {
-      "id": "edit_item_id",
-      "label": "edit({{ $item->id }})",
+      "id": "readme_about_laravel",
+      "label": "About Laravel",
       "_origin": "ast",
       "community": 16,
-      "community_name": "bcv-rate-manager.blade.php",
-      "file_type": "code",
-      "norm_label": "edit({{ $item->id }})",
-      "source_file": "resources/views/Livewire/Admin/bcv-rate-manager.blade.php",
-      "source_location": null
+      "community_name": "README.md",
+      "file_type": "document",
+      "node_kind": "heading",
+      "norm_label": "about laravel",
+      "source_file": "README.md",
+      "source_location": "L10"
     },
     {
-      "id": "resources_views_livewire_admin_bcv_rate_manager_blade",
-      "label": "bcv-rate-manager.blade.php",
+      "id": "readme_code_of_conduct",
+      "label": "Code of Conduct",
       "_origin": "ast",
       "community": 16,
-      "community_name": "bcv-rate-manager.blade.php",
-      "file_type": "code",
-      "norm_label": "bcv-rate-manager.blade.php",
-      "source_file": "resources/views/Livewire/Admin/bcv-rate-manager.blade.php",
-      "source_location": null
+      "community_name": "README.md",
+      "file_type": "document",
+      "node_kind": "heading",
+      "norm_label": "code of conduct",
+      "source_file": "README.md",
+      "source_location": "L49"
     },
     {
-      "id": "resources_views_livewire_admin_bcv_rate_manager_blade_php_canceledit",
-      "label": "cancelEdit",
+      "id": "readme_contributing",
+      "label": "Contributing",
       "_origin": "ast",
       "community": 16,
-      "community_name": "bcv-rate-manager.blade.php",
-      "file_type": "code",
-      "norm_label": "canceledit",
-      "source_file": "resources/views/Livewire/Admin/bcv-rate-manager.blade.php",
-      "source_location": null
+      "community_name": "README.md",
+      "file_type": "document",
+      "node_kind": "heading",
+      "norm_label": "contributing",
+      "source_file": "README.md",
+      "source_location": "L45"
+    },
+    {
+      "id": "readme_laravel_sponsors",
+      "label": "Laravel Sponsors",
+      "_origin": "ast",
+      "community": 16,
+      "community_name": "README.md",
+      "file_type": "document",
+      "node_kind": "heading",
+      "norm_label": "laravel sponsors",
+      "source_file": "README.md",
+      "source_location": "L30"
+    },
+    {
+      "id": "readme_learning_laravel",
+      "label": "Learning Laravel",
+      "_origin": "ast",
+      "community": 16,
+      "community_name": "README.md",
+      "file_type": "document",
+      "node_kind": "heading",
+      "norm_label": "learning laravel",
+      "source_file": "README.md",
+      "source_location": "L24"
+    },
+    {
+      "id": "readme_license",
+      "label": "License",
+      "_origin": "ast",
+      "community": 16,
+      "community_name": "README.md",
+      "file_type": "document",
+      "node_kind": "heading",
+      "norm_label": "license",
+      "source_file": "README.md",
+      "source_location": "L57"
+    },
+    {
+      "id": "readme_premium_partners",
+      "label": "Premium Partners",
+      "_origin": "ast",
+      "community": 16,
+      "community_name": "README.md",
+      "file_type": "document",
+      "node_kind": "heading",
+      "norm_label": "premium partners",
+      "source_file": "README.md",
+      "source_location": "L34"
+    },
+    {
+      "id": "readme_security_vulnerabilities",
+      "label": "Security Vulnerabilities",
+      "_origin": "ast",
+      "community": 16,
+      "community_name": "README.md",
+      "file_type": "document",
+      "node_kind": "heading",
+      "norm_label": "security vulnerabilities",
+      "source_file": "README.md",
+      "source_location": "L53"
     },
     {
       "id": "phpunit_framework_testcase",
@@ -3257,50 +3586,6 @@
       "source_location": "L1"
     },
     {
-      "id": "app_livewire_admin_bcvratemanager",
-      "label": "App\\Livewire\\Admin\\BcvRateManager",
-      "_origin": "ast",
-      "community": 2,
-      "community_name": "Package",
-      "file_type": "code",
-      "norm_label": "app\\livewire\\admin\\bcvratemanager",
-      "source_file": "",
-      "source_location": ""
-    },
-    {
-      "id": "app_livewire_admin_citydistancemanager",
-      "label": "App\\Livewire\\Admin\\CityDistanceManager",
-      "_origin": "ast",
-      "community": 2,
-      "community_name": "Package",
-      "file_type": "code",
-      "norm_label": "app\\livewire\\admin\\citydistancemanager",
-      "source_file": "",
-      "source_location": ""
-    },
-    {
-      "id": "app_livewire_admin_dashboard",
-      "label": "Dashboard.php",
-      "_origin": "ast",
-      "community": 2,
-      "community_name": "Package",
-      "file_type": "code",
-      "norm_label": "dashboard.php",
-      "source_file": "app/Livewire/Admin/Dashboard.php",
-      "source_location": "L1"
-    },
-    {
-      "id": "app_livewire_admin_ratematrixmanager",
-      "label": "App\\Livewire\\Admin\\RateMatrixManager",
-      "_origin": "ast",
-      "community": 2,
-      "community_name": "Package",
-      "file_type": "code",
-      "norm_label": "app\\livewire\\admin\\ratematrixmanager",
-      "source_file": "",
-      "source_location": ""
-    },
-    {
       "id": "app_livewire_ally_createpackage",
       "label": "CreatePackage.php",
       "_origin": "ast",
@@ -3334,48 +3619,37 @@
       "source_location": "L1"
     },
     {
-      "id": "app_models_citydistance",
-      "label": "CityDistance.php",
-      "_origin": "ast",
-      "community": 2,
-      "community_name": "Package",
-      "file_type": "code",
-      "norm_label": "citydistance.php",
-      "source_file": "app/Models/CityDistance.php",
-      "source_location": "L1"
-    },
-    {
       "id": "app_models_driver",
-      "label": "Driver.php",
+      "label": "App\\Models\\Driver",
       "_origin": "ast",
       "community": 2,
       "community_name": "Package",
       "file_type": "code",
-      "norm_label": "driver.php",
-      "source_file": "app/Models/Driver.php",
-      "source_location": "L1"
-    },
-    {
-      "id": "app_models_package",
-      "label": "App\\Models\\Package",
-      "_origin": "ast",
-      "community": 2,
-      "community_name": "Package",
-      "file_type": "code",
-      "norm_label": "app\\models\\package",
+      "norm_label": "app\\models\\driver",
       "source_file": "",
       "source_location": ""
     },
     {
-      "id": "app_models_packagehistory",
-      "label": "PackageHistory.php",
+      "id": "app_models_package",
+      "label": "Package.php",
       "_origin": "ast",
       "community": 2,
       "community_name": "Package",
       "file_type": "code",
-      "norm_label": "packagehistory.php",
-      "source_file": "app/Models/PackageHistory.php",
+      "norm_label": "package.php",
+      "source_file": "app/Models/Package.php",
       "source_location": "L1"
+    },
+    {
+      "id": "app_models_packagehistory",
+      "label": "App\\Models\\PackageHistory",
+      "_origin": "ast",
+      "community": 2,
+      "community_name": "Package",
+      "file_type": "code",
+      "norm_label": "app\\models\\packagehistory",
+      "source_file": "",
+      "source_location": ""
     },
     {
       "id": "app_models_ratematrix",
@@ -3397,17 +3671,6 @@
       "file_type": "code",
       "norm_label": "packageservice.php",
       "source_file": "app/Services/PackageService.php",
-      "source_location": "L1"
-    },
-    {
-      "id": "app_services_tariffservice",
-      "label": "TariffService.php",
-      "_origin": "ast",
-      "community": 2,
-      "community_name": "Package",
-      "file_type": "code",
-      "norm_label": "tariffservice.php",
-      "source_file": "app/Services/TariffService.php",
       "source_location": "L1"
     },
     {
@@ -3473,72 +3736,6 @@
       "community_name": "Package",
       "file_type": "code",
       "norm_label": "livewire\\attributes\\computed",
-      "source_file": "",
-      "source_location": ""
-    },
-    {
-      "id": "livewire_attributes_layout",
-      "label": "Livewire\\Attributes\\Layout",
-      "_origin": "ast",
-      "community": 2,
-      "community_name": "Package",
-      "file_type": "code",
-      "norm_label": "livewire\\attributes\\layout",
-      "source_file": "",
-      "source_location": ""
-    },
-    {
-      "id": "livewire_attributes_title",
-      "label": "Livewire\\Attributes\\Title",
-      "_origin": "ast",
-      "community": 2,
-      "community_name": "Package",
-      "file_type": "code",
-      "norm_label": "livewire\\attributes\\title",
-      "source_file": "",
-      "source_location": ""
-    },
-    {
-      "id": "livewire_component",
-      "label": "Livewire\\Component",
-      "_origin": "ast",
-      "community": 2,
-      "community_name": "Package",
-      "file_type": "code",
-      "norm_label": "livewire\\component",
-      "source_file": "",
-      "source_location": ""
-    },
-    {
-      "id": "livewire_withpagination",
-      "label": "Livewire\\WithPagination",
-      "_origin": "ast",
-      "community": 2,
-      "community_name": "Package",
-      "file_type": "code",
-      "norm_label": "livewire\\withpagination",
-      "source_file": "",
-      "source_location": ""
-    },
-    {
-      "id": "routes_web",
-      "label": "web.php",
-      "_origin": "ast",
-      "community": 2,
-      "community_name": "Package",
-      "file_type": "code",
-      "norm_label": "web.php",
-      "source_file": "routes/web.php",
-      "source_location": "L1"
-    },
-    {
-      "id": "runtimeexception",
-      "label": "RuntimeException",
-      "_origin": "ast",
-      "community": 2,
-      "community_name": "Package",
-      "file_type": "code",
-      "norm_label": "runtimeexception",
       "source_file": "",
       "source_location": ""
     },
@@ -4317,7 +4514,7 @@
       "label": "self",
       "_origin": "ast",
       "community": 4,
-      "community_name": "CityDistance",
+      "community_name": "CityDistanceManager",
       "file_type": "code",
       "norm_label": "self",
       "source_file": "",
@@ -4328,18 +4525,7 @@
       "label": "self",
       "_origin": "ast",
       "community": 4,
-      "community_name": "CityDistance",
-      "file_type": "code",
-      "norm_label": "self",
-      "source_file": "",
-      "source_location": ""
-    },
-    {
-      "id": "app_models_ratematrix_php_self",
-      "label": "self",
-      "_origin": "ast",
-      "community": 4,
-      "community_name": "CityDistance",
+      "community_name": "CityDistanceManager",
       "file_type": "code",
       "norm_label": "self",
       "source_file": "",
@@ -4350,7 +4536,7 @@
       "label": "UserFactory.php",
       "_origin": "ast",
       "community": 4,
-      "community_name": "CityDistance",
+      "community_name": "CityDistanceManager",
       "file_type": "code",
       "norm_label": "userfactory.php",
       "source_file": "database/factories/UserFactory.php",
@@ -4361,7 +4547,7 @@
       "label": "Illuminate\\Database\\Eloquent\\Factories\\Factory",
       "_origin": "ast",
       "community": 4,
-      "community_name": "CityDistance",
+      "community_name": "CityDistanceManager",
       "file_type": "code",
       "norm_label": "illuminate\\database\\eloquent\\factories\\factory",
       "source_file": "",
@@ -4372,7 +4558,7 @@
       "label": "static",
       "_origin": "ast",
       "community": 4,
-      "community_name": "CityDistance",
+      "community_name": "CityDistanceManager",
       "file_type": "code",
       "norm_label": "static",
       "source_file": "",
@@ -4905,14 +5091,14 @@
       "source_location": null
     },
     {
-      "id": "resources_views_livewire_admin_rate_matrix_manager_blade",
-      "label": "rate-matrix-manager.blade.php",
+      "id": "resources_views_livewire_admin_tarifas_blade",
+      "label": "tarifas.blade.php",
       "_origin": "ast",
       "community": 58,
-      "community_name": "rate-matrix-manager.blade.php",
+      "community_name": "tarifas.blade.php",
       "file_type": "code",
-      "norm_label": "rate-matrix-manager.blade.php",
-      "source_file": "resources/views/Livewire/Admin/rate-matrix-manager.blade.php",
+      "norm_label": "tarifas.blade.php",
+      "source_file": "resources/views/Livewire/Admin/tarifas.blade.php",
       "source_location": null
     },
     {
@@ -6176,35 +6362,57 @@
       "source_location": "L1"
     },
     {
-      "id": "app_services_bcvrateservice",
-      "label": "BcvRateService.php",
+      "id": "app_models_citydistance",
+      "label": "App\\Models\\CityDistance",
       "_origin": "ast",
       "community": 84,
       "community_name": "TariffService",
       "file_type": "code",
-      "norm_label": "bcvrateservice.php",
-      "source_file": "app/Services/BcvRateService.php",
-      "source_location": "L1"
-    },
-    {
-      "id": "carbon",
-      "label": "Carbon",
-      "_origin": "ast",
-      "community": 84,
-      "community_name": "TariffService",
-      "file_type": "code",
-      "norm_label": "carbon",
+      "norm_label": "app\\models\\citydistance",
       "source_file": "",
       "source_location": ""
     },
     {
-      "id": "carbon_carbon",
-      "label": "Carbon\\Carbon",
+      "id": "app_services_tariffservice",
+      "label": "TariffService.php",
       "_origin": "ast",
       "community": 84,
       "community_name": "TariffService",
       "file_type": "code",
-      "norm_label": "carbon\\carbon",
+      "norm_label": "tariffservice.php",
+      "source_file": "app/Services/TariffService.php",
+      "source_location": "L1"
+    },
+    {
+      "id": "bcvrateservice",
+      "label": "BcvRateService",
+      "_origin": "ast",
+      "community": 84,
+      "community_name": "TariffService",
+      "file_type": "code",
+      "norm_label": "bcvrateservice",
+      "source_file": "",
+      "source_location": ""
+    },
+    {
+      "id": "citydistance",
+      "label": "CityDistance",
+      "_origin": "ast",
+      "community": 84,
+      "community_name": "TariffService",
+      "file_type": "code",
+      "norm_label": "citydistance",
+      "source_file": "",
+      "source_location": ""
+    },
+    {
+      "id": "self",
+      "label": "self",
+      "_origin": "ast",
+      "community": 84,
+      "community_name": "TariffService",
+      "file_type": "code",
+      "norm_label": "self",
       "source_file": "",
       "source_location": ""
     },
@@ -6231,6 +6439,61 @@
       "norm_label": "graphify",
       "source_file": ".github/copilot-instructions.md",
       "source_location": "L1"
+    },
+    {
+      "id": "cancelediting",
+      "label": "cancelEditing",
+      "_origin": "ast",
+      "community": 86,
+      "community_name": "rate-matrix-manager.blade.php",
+      "file_type": "code",
+      "norm_label": "cancelediting",
+      "source_file": "resources/views/Livewire/Admin/rate-matrix-manager.blade.php",
+      "source_location": null
+    },
+    {
+      "id": "resetsimulation",
+      "label": "resetSimulation",
+      "_origin": "ast",
+      "community": 86,
+      "community_name": "rate-matrix-manager.blade.php",
+      "file_type": "code",
+      "norm_label": "resetsimulation",
+      "source_file": "resources/views/Livewire/Admin/rate-matrix-manager.blade.php",
+      "source_location": null
+    },
+    {
+      "id": "resources_views_livewire_admin_rate_matrix_manager_blade",
+      "label": "rate-matrix-manager.blade.php",
+      "_origin": "ast",
+      "community": 86,
+      "community_name": "rate-matrix-manager.blade.php",
+      "file_type": "code",
+      "norm_label": "rate-matrix-manager.blade.php",
+      "source_file": "resources/views/Livewire/Admin/rate-matrix-manager.blade.php",
+      "source_location": null
+    },
+    {
+      "id": "startediting",
+      "label": "startEditing",
+      "_origin": "ast",
+      "community": 86,
+      "community_name": "rate-matrix-manager.blade.php",
+      "file_type": "code",
+      "norm_label": "startediting",
+      "source_file": "resources/views/Livewire/Admin/rate-matrix-manager.blade.php",
+      "source_location": null
+    },
+    {
+      "id": "app_models_ratematrix_php_self",
+      "label": "self",
+      "_origin": "ast",
+      "community": 87,
+      "community_name": "self",
+      "file_type": "code",
+      "norm_label": "self",
+      "source_file": "",
+      "source_location": ""
     },
     {
       "id": "app_livewire_actions_logout",
@@ -6317,17 +6580,6 @@
       "community_name": "LoginForm.php",
       "file_type": "code",
       "norm_label": "illuminate\\support\\facades\\ratelimiter",
-      "source_file": "",
-      "source_location": ""
-    },
-    {
-      "id": "illuminate_support_facades_route",
-      "label": "Illuminate\\Support\\Facades\\Route",
-      "_origin": "ast",
-      "community": 9,
-      "community_name": "LoginForm.php",
-      "file_type": "code",
-      "norm_label": "illuminate\\support\\facades\\route",
       "source_file": "",
       "source_location": ""
     },
@@ -6615,6 +6867,18 @@
       "weight": 1.0
     },
     {
+      "source": "app_livewire_admin_ratematrixmanager_ratematrixmanager_cancelediting",
+      "target": "app_livewire_admin_ratematrixmanager_ratematrixmanager_mount",
+      "relation": "calls",
+      "_origin": "ast",
+      "confidence": "EXTRACTED",
+      "confidence_score": 1.0,
+      "context": "call",
+      "source_file": "app/Livewire/Admin/RateMatrixManager.php",
+      "source_location": "L125",
+      "weight": 1.0
+    },
+    {
       "source": "app_livewire_admin_ratematrixmanager_ratematrixmanager_mount",
       "target": "app_models_ratematrix_ratematrix",
       "relation": "calls",
@@ -6623,7 +6887,7 @@
       "confidence_score": 1.0,
       "context": "call",
       "source_file": "app/Livewire/Admin/RateMatrixManager.php",
-      "source_location": "L46",
+      "source_location": "L103",
       "weight": 1.0
     },
     {
@@ -6635,7 +6899,7 @@
       "confidence_score": 1.0,
       "context": "call",
       "source_file": "app/Livewire/Admin/RateMatrixManager.php",
-      "source_location": "L67",
+      "source_location": "L145",
       "weight": 1.0
     },
     {
@@ -6755,7 +7019,7 @@
       "confidence_score": 1.0,
       "context": "call",
       "source_file": "app/Services/PackageService.php",
-      "source_location": "L81",
+      "source_location": "L95",
       "weight": 1.0
     },
     {
@@ -6767,7 +7031,7 @@
       "confidence_score": 1.0,
       "context": "call",
       "source_file": "app/Services/PackageService.php",
-      "source_location": "L43",
+      "source_location": "L52",
       "weight": 1.0
     },
     {
@@ -6779,7 +7043,7 @@
       "confidence_score": 1.0,
       "context": "call",
       "source_file": "app/Services/PackageService.php",
-      "source_location": "L52",
+      "source_location": "L66",
       "weight": 1.0
     },
     {
@@ -6791,7 +7055,7 @@
       "confidence_score": 1.0,
       "context": "call",
       "source_file": "app/Services/PackageService.php",
-      "source_location": "L106",
+      "source_location": "L120",
       "weight": 1.0
     },
     {
@@ -6803,7 +7067,7 @@
       "confidence_score": 1.0,
       "context": "call",
       "source_file": "app/Services/TariffService.php",
-      "source_location": "L107",
+      "source_location": "L161",
       "weight": 1.0
     },
     {
@@ -6815,7 +7079,7 @@
       "confidence_score": 1.0,
       "context": "call",
       "source_file": "app/Services/TariffService.php",
-      "source_location": "L108",
+      "source_location": "L162",
       "weight": 1.0
     },
     {
@@ -6827,7 +7091,7 @@
       "confidence_score": 1.0,
       "context": "call",
       "source_file": "app/Services/TariffService.php",
-      "source_location": "L111",
+      "source_location": "L165",
       "weight": 1.0
     },
     {
@@ -6839,31 +7103,67 @@
       "confidence_score": 1.0,
       "context": "call",
       "source_file": "app/Services/TariffService.php",
-      "source_location": "L112",
+      "source_location": "L166",
       "weight": 1.0
     },
     {
       "source": "app_services_tariffservice_tariffservice_calculate",
-      "target": "app_services_tariffservice_tariffservice_calculatetotalusd",
+      "target": "app_services_tariffservice_tariffservice_calculateenvelopesubtotalusd",
       "relation": "calls",
       "_origin": "ast",
       "confidence": "EXTRACTED",
       "confidence_score": 1.0,
       "context": "call",
       "source_file": "app/Services/TariffService.php",
-      "source_location": "L113",
+      "source_location": "L169",
+      "weight": 1.0
+    },
+    {
+      "source": "app_services_tariffservice_tariffservice_calculate",
+      "target": "app_services_tariffservice_tariffservice_calculatepackagesubtotalusd",
+      "relation": "calls",
+      "_origin": "ast",
+      "confidence": "EXTRACTED",
+      "confidence_score": 1.0,
+      "context": "call",
+      "source_file": "app/Services/TariffService.php",
+      "source_location": "L170",
+      "weight": 1.0
+    },
+    {
+      "source": "app_services_tariffservice_tariffservice_calculate",
+      "target": "app_services_tariffservice_tariffservice_calculatefragilesurcharge",
+      "relation": "calls",
+      "_origin": "ast",
+      "confidence": "EXTRACTED",
+      "confidence_score": 1.0,
+      "context": "call",
+      "source_file": "app/Services/TariffService.php",
+      "source_location": "L172",
+      "weight": 1.0
+    },
+    {
+      "source": "app_services_tariffservice_tariffservice_calculate",
+      "target": "app_services_tariffservice_tariffservice_calculateinsuranceprice",
+      "relation": "calls",
+      "_origin": "ast",
+      "confidence": "EXTRACTED",
+      "confidence_score": 1.0,
+      "context": "call",
+      "source_file": "app/Services/TariffService.php",
+      "source_location": "L173",
       "weight": 1.0
     },
     {
       "source": "app_services_tariffservice_tariffservice_finddistance",
-      "target": "app_models_citydistance_citydistance",
+      "target": "citydistance",
       "relation": "calls",
       "_origin": "ast",
       "confidence": "EXTRACTED",
       "confidence_score": 1.0,
       "context": "call",
       "source_file": "app/Services/TariffService.php",
-      "source_location": "L60",
+      "source_location": "L65",
       "weight": 1.0
     },
     {
@@ -6875,7 +7175,7 @@
       "confidence_score": 1.0,
       "context": "call",
       "source_file": "app/Services/TariffService.php",
-      "source_location": "L44",
+      "source_location": "L45",
       "weight": 1.0
     },
     {
@@ -7139,7 +7439,7 @@
       "confidence_score": 1.0,
       "context": "call",
       "source_file": "app/Services/PackageService.php",
-      "source_location": "L49",
+      "source_location": "L63",
       "weight": 1.0
     },
     {
@@ -7156,14 +7456,14 @@
     },
     {
       "source": "app_services_tariffservice_tariffservice",
-      "target": "app_services_bcvrateservice_bcvrateservice",
+      "target": "bcvrateservice",
       "relation": "references",
       "_origin": "ast",
       "confidence": "EXTRACTED",
       "confidence_score": 1.0,
       "context": "field",
       "source_file": "app/Services/TariffService.php",
-      "source_location": "L11",
+      "source_location": "L12",
       "weight": 1.0
     },
     {
@@ -7744,7 +8044,31 @@
     },
     {
       "source": "app_livewire_admin_ratematrixmanager",
-      "target": "app_models_ratematrix_ratematrix",
+      "target": "livewire_component",
+      "relation": "imports",
+      "_origin": "ast",
+      "confidence": "EXTRACTED",
+      "confidence_score": 1.0,
+      "context": "import",
+      "source_file": "app/Livewire/Admin/RateMatrixManager.php",
+      "source_location": "L10",
+      "weight": 1.0
+    },
+    {
+      "source": "app_livewire_admin_ratematrixmanager",
+      "target": "runtimeexception",
+      "relation": "imports",
+      "_origin": "ast",
+      "confidence": "EXTRACTED",
+      "confidence_score": 1.0,
+      "context": "import",
+      "source_file": "app/Livewire/Admin/RateMatrixManager.php",
+      "source_location": "L11",
+      "weight": 1.0
+    },
+    {
+      "source": "app_livewire_admin_ratematrixmanager",
+      "target": "app_models_package_package",
       "relation": "imports",
       "_origin": "ast",
       "confidence": "EXTRACTED",
@@ -7756,7 +8080,7 @@
     },
     {
       "source": "app_livewire_admin_ratematrixmanager",
-      "target": "livewire_attributes_layout",
+      "target": "app_models_ratematrix_ratematrix",
       "relation": "imports",
       "_origin": "ast",
       "confidence": "EXTRACTED",
@@ -7768,7 +8092,7 @@
     },
     {
       "source": "app_livewire_admin_ratematrixmanager",
-      "target": "livewire_attributes_title",
+      "target": "app_services_tariffservice_tariffservice",
       "relation": "imports",
       "_origin": "ast",
       "confidence": "EXTRACTED",
@@ -7780,7 +8104,7 @@
     },
     {
       "source": "app_livewire_admin_ratematrixmanager",
-      "target": "livewire_component",
+      "target": "livewire_attributes_layout",
       "relation": "imports",
       "_origin": "ast",
       "confidence": "EXTRACTED",
@@ -7788,6 +8112,18 @@
       "context": "import",
       "source_file": "app/Livewire/Admin/RateMatrixManager.php",
       "source_location": "L8",
+      "weight": 1.0
+    },
+    {
+      "source": "app_livewire_admin_ratematrixmanager",
+      "target": "livewire_attributes_title",
+      "relation": "imports",
+      "_origin": "ast",
+      "confidence": "EXTRACTED",
+      "confidence_score": 1.0,
+      "context": "import",
+      "source_file": "app/Livewire/Admin/RateMatrixManager.php",
+      "source_location": "L9",
       "weight": 1.0
     },
     {
@@ -8320,7 +8656,7 @@
     },
     {
       "source": "app_services_packageservice",
-      "target": "app_models_driver_driver",
+      "target": "app_models_driver",
       "relation": "imports",
       "_origin": "ast",
       "confidence": "EXTRACTED",
@@ -8344,7 +8680,7 @@
     },
     {
       "source": "app_services_packageservice",
-      "target": "app_models_packagehistory_packagehistory",
+      "target": "app_models_packagehistory",
       "relation": "imports",
       "_origin": "ast",
       "confidence": "EXTRACTED",
@@ -8380,7 +8716,7 @@
     },
     {
       "source": "app_services_tariffservice",
-      "target": "app_models_citydistance_citydistance",
+      "target": "app_models_citydistance",
       "relation": "imports",
       "_origin": "ast",
       "confidence": "EXTRACTED",
@@ -8392,7 +8728,7 @@
     },
     {
       "source": "app_services_tariffservice",
-      "target": "app_models_ratematrix_ratematrix",
+      "target": "app_models_package_package",
       "relation": "imports",
       "_origin": "ast",
       "confidence": "EXTRACTED",
@@ -8404,7 +8740,7 @@
     },
     {
       "source": "app_services_tariffservice",
-      "target": "runtimeexception",
+      "target": "app_models_ratematrix_ratematrix",
       "relation": "imports",
       "_origin": "ast",
       "confidence": "EXTRACTED",
@@ -8412,6 +8748,18 @@
       "context": "import",
       "source_file": "app/Services/TariffService.php",
       "source_location": "L7",
+      "weight": 1.0
+    },
+    {
+      "source": "app_services_tariffservice",
+      "target": "runtimeexception",
+      "relation": "imports",
+      "_origin": "ast",
+      "confidence": "EXTRACTED",
+      "confidence_score": 1.0,
+      "context": "import",
+      "source_file": "app/Services/TariffService.php",
+      "source_location": "L8",
       "weight": 1.0
     },
     {
@@ -9207,6 +9555,78 @@
       "weight": 1.0
     },
     {
+      "source": "database_migrations_2026_08_21_000001_add_extra_pricing_fields_to_rate_matrices_table",
+      "target": "illuminate_database_migrations_migration",
+      "relation": "imports",
+      "_origin": "ast",
+      "confidence": "EXTRACTED",
+      "confidence_score": 1.0,
+      "context": "import",
+      "source_file": "database/migrations/2026_08_21_000001_add_extra_pricing_fields_to_rate_matrices_table.php",
+      "source_location": "L3",
+      "weight": 1.0
+    },
+    {
+      "source": "database_migrations_2026_08_21_000001_add_extra_pricing_fields_to_rate_matrices_table",
+      "target": "illuminate_database_schema_blueprint",
+      "relation": "imports",
+      "_origin": "ast",
+      "confidence": "EXTRACTED",
+      "confidence_score": 1.0,
+      "context": "import",
+      "source_file": "database/migrations/2026_08_21_000001_add_extra_pricing_fields_to_rate_matrices_table.php",
+      "source_location": "L4",
+      "weight": 1.0
+    },
+    {
+      "source": "database_migrations_2026_08_21_000001_add_extra_pricing_fields_to_rate_matrices_table",
+      "target": "illuminate_support_facades_schema",
+      "relation": "imports",
+      "_origin": "ast",
+      "confidence": "EXTRACTED",
+      "confidence_score": 1.0,
+      "context": "import",
+      "source_file": "database/migrations/2026_08_21_000001_add_extra_pricing_fields_to_rate_matrices_table.php",
+      "source_location": "L5",
+      "weight": 1.0
+    },
+    {
+      "source": "database_migrations_2026_08_21_000002_add_extra_pricing_fields_to_packages_table",
+      "target": "illuminate_database_migrations_migration",
+      "relation": "imports",
+      "_origin": "ast",
+      "confidence": "EXTRACTED",
+      "confidence_score": 1.0,
+      "context": "import",
+      "source_file": "database/migrations/2026_08_21_000002_add_extra_pricing_fields_to_packages_table.php",
+      "source_location": "L3",
+      "weight": 1.0
+    },
+    {
+      "source": "database_migrations_2026_08_21_000002_add_extra_pricing_fields_to_packages_table",
+      "target": "illuminate_database_schema_blueprint",
+      "relation": "imports",
+      "_origin": "ast",
+      "confidence": "EXTRACTED",
+      "confidence_score": 1.0,
+      "context": "import",
+      "source_file": "database/migrations/2026_08_21_000002_add_extra_pricing_fields_to_packages_table.php",
+      "source_location": "L4",
+      "weight": 1.0
+    },
+    {
+      "source": "database_migrations_2026_08_21_000002_add_extra_pricing_fields_to_packages_table",
+      "target": "illuminate_support_facades_schema",
+      "relation": "imports",
+      "_origin": "ast",
+      "confidence": "EXTRACTED",
+      "confidence_score": 1.0,
+      "context": "import",
+      "source_file": "database/migrations/2026_08_21_000002_add_extra_pricing_fields_to_packages_table.php",
+      "source_location": "L5",
+      "weight": 1.0
+    },
+    {
       "source": "database_seeders_databaseseeder",
       "target": "app_models_user_user",
       "relation": "imports",
@@ -9460,7 +9880,7 @@
     },
     {
       "source": "routes_web",
-      "target": "app_models_package",
+      "target": "app_models_package_package",
       "relation": "imports",
       "_origin": "ast",
       "confidence": "EXTRACTED",
@@ -9484,7 +9904,7 @@
     },
     {
       "source": "routes_web",
-      "target": "app_livewire_admin_bcvratemanager",
+      "target": "app_livewire_admin_bcvratemanager_bcvratemanager",
       "relation": "imports",
       "_origin": "ast",
       "confidence": "EXTRACTED",
@@ -9496,7 +9916,7 @@
     },
     {
       "source": "routes_web",
-      "target": "app_livewire_admin_ratematrixmanager",
+      "target": "app_livewire_admin_ratematrixmanager_ratematrixmanager",
       "relation": "imports",
       "_origin": "ast",
       "confidence": "EXTRACTED",
@@ -9508,7 +9928,7 @@
     },
     {
       "source": "routes_web",
-      "target": "app_livewire_admin_citydistancemanager",
+      "target": "app_livewire_admin_citydistancemanager_citydistancemanager",
       "relation": "imports",
       "_origin": "ast",
       "confidence": "EXTRACTED",
@@ -9987,6 +10407,18 @@
       "weight": 1.0
     },
     {
+      "source": "app_livewire_admin_ratematrixmanager_ratematrixmanager_simulate",
+      "target": "app_services_tariffservice_tariffservice",
+      "relation": "references",
+      "_origin": "ast",
+      "confidence": "EXTRACTED",
+      "confidence_score": 1.0,
+      "context": "parameter_type",
+      "source_file": "app/Livewire/Admin/RateMatrixManager.php",
+      "source_location": "L161",
+      "weight": 1.0
+    },
+    {
       "source": "app_livewire_ally_createpackage_createpackage_save",
       "target": "app_services_packageservice_packageservice",
       "relation": "references",
@@ -10024,14 +10456,14 @@
     },
     {
       "source": "app_services_packageservice_packageservice_assigndriver",
-      "target": "app_models_driver_driver",
+      "target": "app_models_driver",
       "relation": "references",
       "_origin": "ast",
       "confidence": "EXTRACTED",
       "confidence_score": 1.0,
       "context": "parameter_type",
       "source_file": "app/Services/PackageService.php",
-      "source_location": "L90",
+      "source_location": "L104",
       "weight": 1.0
     },
     {
@@ -10055,11 +10487,11 @@
       "confidence_score": 1.0,
       "context": "parameter_type",
       "source_file": "app/Services/PackageService.php",
-      "source_location": "L111",
+      "source_location": "L125",
       "weight": 1.0
     },
     {
-      "source": "app_services_tariffservice_tariffservice_calculatetotalusd",
+      "source": "app_services_tariffservice_tariffservice_calculateenvelopesubtotalusd",
       "target": "app_models_ratematrix_ratematrix",
       "relation": "references",
       "_origin": "ast",
@@ -10067,19 +10499,55 @@
       "confidence_score": 1.0,
       "context": "parameter_type",
       "source_file": "app/Services/TariffService.php",
-      "source_location": "L76",
+      "source_location": "L94",
       "weight": 1.0
     },
     {
-      "source": "app_services_tariffservice_tariffservice_construct",
-      "target": "app_services_bcvrateservice_bcvrateservice",
+      "source": "app_services_tariffservice_tariffservice_calculatefragilesurcharge",
+      "target": "app_models_ratematrix_ratematrix",
       "relation": "references",
       "_origin": "ast",
       "confidence": "EXTRACTED",
       "confidence_score": 1.0,
       "context": "parameter_type",
       "source_file": "app/Services/TariffService.php",
-      "source_location": "L11",
+      "source_location": "L106",
+      "weight": 1.0
+    },
+    {
+      "source": "app_services_tariffservice_tariffservice_calculateinsuranceprice",
+      "target": "app_models_ratematrix_ratematrix",
+      "relation": "references",
+      "_origin": "ast",
+      "confidence": "EXTRACTED",
+      "confidence_score": 1.0,
+      "context": "parameter_type",
+      "source_file": "app/Services/TariffService.php",
+      "source_location": "L116",
+      "weight": 1.0
+    },
+    {
+      "source": "app_services_tariffservice_tariffservice_calculatepackagesubtotalusd",
+      "target": "app_models_ratematrix_ratematrix",
+      "relation": "references",
+      "_origin": "ast",
+      "confidence": "EXTRACTED",
+      "confidence_score": 1.0,
+      "context": "parameter_type",
+      "source_file": "app/Services/TariffService.php",
+      "source_location": "L80",
+      "weight": 1.0
+    },
+    {
+      "source": "app_services_tariffservice_tariffservice_construct",
+      "target": "bcvrateservice",
+      "relation": "references",
+      "_origin": "ast",
+      "confidence": "EXTRACTED",
+      "confidence_score": 1.0,
+      "context": "parameter_type",
+      "source_file": "app/Services/TariffService.php",
+      "source_location": "L12",
       "weight": 1.0
     },
     {
@@ -10175,7 +10643,7 @@
       "confidence_score": 1.0,
       "context": "return_type",
       "source_file": "app/Models/Package.php",
-      "source_location": "L95",
+      "source_location": "L110",
       "weight": 1.0
     },
     {
@@ -10187,7 +10655,7 @@
       "confidence_score": 1.0,
       "context": "return_type",
       "source_file": "app/Models/Package.php",
-      "source_location": "L103",
+      "source_location": "L118",
       "weight": 1.0
     },
     {
@@ -10199,7 +10667,7 @@
       "confidence_score": 1.0,
       "context": "return_type",
       "source_file": "app/Models/Package.php",
-      "source_location": "L111",
+      "source_location": "L126",
       "weight": 1.0
     },
     {
@@ -10228,14 +10696,14 @@
     },
     {
       "source": "app_models_ratematrix_ratematrix_current",
-      "target": "app_models_ratematrix_php_self",
+      "target": "self",
       "relation": "references",
       "_origin": "ast",
       "confidence": "EXTRACTED",
       "confidence_score": 1.0,
       "context": "return_type",
       "source_file": "app/Models/RateMatrix.php",
-      "source_location": "L43",
+      "source_location": "L49",
       "weight": 1.0
     },
     {
@@ -10283,19 +10751,31 @@
       "confidence_score": 1.0,
       "context": "return_type",
       "source_file": "app/Services/PackageService.php",
-      "source_location": "L90",
+      "source_location": "L104",
       "weight": 1.0
     },
     {
       "source": "app_services_packageservice_packageservice_recordhistory",
-      "target": "app_models_packagehistory_packagehistory",
+      "target": "app_models_packagehistory",
       "relation": "references",
       "_origin": "ast",
       "confidence": "EXTRACTED",
       "confidence_score": 1.0,
       "context": "return_type",
       "source_file": "app/Services/PackageService.php",
-      "source_location": "L111",
+      "source_location": "L125",
+      "weight": 1.0
+    },
+    {
+      "source": "app_services_tariffservice_tariffservice_finddistance",
+      "target": "app_models_citydistance",
+      "relation": "references",
+      "_origin": "ast",
+      "confidence": "EXTRACTED",
+      "confidence_score": 1.0,
+      "context": "return_type",
+      "source_file": "app/Services/TariffService.php",
+      "source_location": "L63",
       "weight": 1.0
     },
     {
@@ -10343,83 +10823,39 @@
       "confidence_score": 1.0,
       "context": "return_type",
       "source_file": "app/Services/PackageService.php",
-      "source_location": "L74",
+      "source_location": "L88",
       "weight": 1.0
     },
     {
-      "source": "resources_views_livewire_admin_bcv_rate_manager_blade",
-      "target": "delete_item_id",
+      "source": "resources_views_livewire_admin_rate_matrix_manager_blade",
+      "target": "cancelediting",
       "relation": "binds_method",
       "_origin": "ast",
       "confidence": "EXTRACTED",
       "confidence_score": 1.0,
-      "source_file": "resources/views/Livewire/Admin/bcv-rate-manager.blade.php",
+      "source_file": "resources/views/Livewire/Admin/rate-matrix-manager.blade.php",
       "source_location": null,
       "weight": 1.0
     },
     {
-      "source": "resources_views_livewire_admin_bcv_rate_manager_blade",
-      "target": "edit_item_id",
+      "source": "resources_views_livewire_admin_rate_matrix_manager_blade",
+      "target": "resetsimulation",
       "relation": "binds_method",
       "_origin": "ast",
       "confidence": "EXTRACTED",
       "confidence_score": 1.0,
-      "source_file": "resources/views/Livewire/Admin/bcv-rate-manager.blade.php",
+      "source_file": "resources/views/Livewire/Admin/rate-matrix-manager.blade.php",
       "source_location": null,
       "weight": 1.0
     },
     {
-      "source": "resources_views_livewire_admin_bcv_rate_manager_blade",
-      "target": "resources_views_livewire_admin_bcv_rate_manager_blade_php_canceledit",
+      "source": "resources_views_livewire_admin_rate_matrix_manager_blade",
+      "target": "startediting",
       "relation": "binds_method",
       "_origin": "ast",
       "confidence": "EXTRACTED",
       "confidence_score": 1.0,
-      "source_file": "resources/views/Livewire/Admin/bcv-rate-manager.blade.php",
-      "source_location": null,
-      "weight": 1.0
-    },
-    {
-      "source": "resources_views_livewire_admin_city_distance_manager_blade",
-      "target": "create",
-      "relation": "binds_method",
-      "_origin": "ast",
-      "confidence": "EXTRACTED",
-      "confidence_score": 1.0,
-      "source_file": "resources/views/Livewire/Admin/city-distance-manager.blade.php",
-      "source_location": null,
-      "weight": 1.0
-    },
-    {
-      "source": "resources_views_livewire_admin_city_distance_manager_blade",
-      "target": "delete_distance_id",
-      "relation": "binds_method",
-      "_origin": "ast",
-      "confidence": "EXTRACTED",
-      "confidence_score": 1.0,
-      "source_file": "resources/views/Livewire/Admin/city-distance-manager.blade.php",
-      "source_location": null,
-      "weight": 1.0
-    },
-    {
-      "source": "resources_views_livewire_admin_city_distance_manager_blade",
-      "target": "edit_distance_id",
-      "relation": "binds_method",
-      "_origin": "ast",
-      "confidence": "EXTRACTED",
-      "confidence_score": 1.0,
-      "source_file": "resources/views/Livewire/Admin/city-distance-manager.blade.php",
-      "source_location": null,
-      "weight": 1.0
-    },
-    {
-      "source": "resources_views_livewire_admin_city_distance_manager_blade",
-      "target": "resources_views_livewire_admin_city_distance_manager_blade_php_canceledit",
-      "relation": "binds_method",
-      "_origin": "ast",
-      "confidence": "EXTRACTED",
-      "confidence_score": 1.0,
-      "source_file": "resources/views/Livewire/Admin/city-distance-manager.blade.php",
+      "source_file": "resources/views/Livewire/Admin/rate-matrix-manager.blade.php",
       "source_location": null,
       "weight": 1.0
     },
@@ -10563,7 +10999,7 @@
       "confidence": "EXTRACTED",
       "confidence_score": 1.0,
       "source_file": "app/Livewire/Admin/RateMatrixManager.php",
-      "source_location": "L17",
+      "source_location": "L22",
       "weight": 1.0
     },
     {
@@ -10728,7 +11164,7 @@
       "confidence": "EXTRACTED",
       "confidence_score": 1.0,
       "source_file": "app/Services/TariffService.php",
-      "source_location": "L9",
+      "source_location": "L10",
       "weight": 1.0
     },
     {
@@ -12393,6 +12829,50 @@
       "weight": 1.0
     },
     {
+      "source": "database_migrations_2026_08_21_000001_add_extra_pricing_fields_to_rate_matrices_table",
+      "target": "database_migrations_2026_08_21_000001_add_extra_pricing_fields_to_rate_matrices_table_up",
+      "relation": "contains",
+      "_origin": "ast",
+      "confidence": "EXTRACTED",
+      "confidence_score": 1.0,
+      "source_file": "database/migrations/2026_08_21_000001_add_extra_pricing_fields_to_rate_matrices_table.php",
+      "source_location": "L17",
+      "weight": 1.0
+    },
+    {
+      "source": "database_migrations_2026_08_21_000001_add_extra_pricing_fields_to_rate_matrices_table",
+      "target": "database_migrations_2026_08_21_000001_add_extra_pricing_fields_to_rate_matrices_table_down",
+      "relation": "contains",
+      "_origin": "ast",
+      "confidence": "EXTRACTED",
+      "confidence_score": 1.0,
+      "source_file": "database/migrations/2026_08_21_000001_add_extra_pricing_fields_to_rate_matrices_table.php",
+      "source_location": "L46",
+      "weight": 1.0
+    },
+    {
+      "source": "database_migrations_2026_08_21_000002_add_extra_pricing_fields_to_packages_table",
+      "target": "database_migrations_2026_08_21_000002_add_extra_pricing_fields_to_packages_table_up",
+      "relation": "contains",
+      "_origin": "ast",
+      "confidence": "EXTRACTED",
+      "confidence_score": 1.0,
+      "source_file": "database/migrations/2026_08_21_000002_add_extra_pricing_fields_to_packages_table.php",
+      "source_location": "L17",
+      "weight": 1.0
+    },
+    {
+      "source": "database_migrations_2026_08_21_000002_add_extra_pricing_fields_to_packages_table",
+      "target": "database_migrations_2026_08_21_000002_add_extra_pricing_fields_to_packages_table_down",
+      "relation": "contains",
+      "_origin": "ast",
+      "confidence": "EXTRACTED",
+      "confidence_score": 1.0,
+      "source_file": "database/migrations/2026_08_21_000002_add_extra_pricing_fields_to_packages_table.php",
+      "source_location": "L40",
+      "weight": 1.0
+    },
+    {
       "source": "database_seeders_databaseseeder",
       "target": "database_seeders_databaseseeder_databaseseeder",
       "relation": "contains",
@@ -12591,6 +13071,94 @@
       "weight": 1.0
     },
     {
+      "source": "readme",
+      "target": "readme_about_laravel",
+      "relation": "contains",
+      "_origin": "ast",
+      "confidence": "EXTRACTED",
+      "confidence_score": 1.0,
+      "source_file": "README.md",
+      "source_location": "L10",
+      "weight": 1.0
+    },
+    {
+      "source": "readme",
+      "target": "readme_learning_laravel",
+      "relation": "contains",
+      "_origin": "ast",
+      "confidence": "EXTRACTED",
+      "confidence_score": 1.0,
+      "source_file": "README.md",
+      "source_location": "L24",
+      "weight": 1.0
+    },
+    {
+      "source": "readme",
+      "target": "readme_laravel_sponsors",
+      "relation": "contains",
+      "_origin": "ast",
+      "confidence": "EXTRACTED",
+      "confidence_score": 1.0,
+      "source_file": "README.md",
+      "source_location": "L30",
+      "weight": 1.0
+    },
+    {
+      "source": "readme",
+      "target": "readme_contributing",
+      "relation": "contains",
+      "_origin": "ast",
+      "confidence": "EXTRACTED",
+      "confidence_score": 1.0,
+      "source_file": "README.md",
+      "source_location": "L45",
+      "weight": 1.0
+    },
+    {
+      "source": "readme",
+      "target": "readme_code_of_conduct",
+      "relation": "contains",
+      "_origin": "ast",
+      "confidence": "EXTRACTED",
+      "confidence_score": 1.0,
+      "source_file": "README.md",
+      "source_location": "L49",
+      "weight": 1.0
+    },
+    {
+      "source": "readme",
+      "target": "readme_security_vulnerabilities",
+      "relation": "contains",
+      "_origin": "ast",
+      "confidence": "EXTRACTED",
+      "confidence_score": 1.0,
+      "source_file": "README.md",
+      "source_location": "L53",
+      "weight": 1.0
+    },
+    {
+      "source": "readme",
+      "target": "readme_license",
+      "relation": "contains",
+      "_origin": "ast",
+      "confidence": "EXTRACTED",
+      "confidence_score": 1.0,
+      "source_file": "README.md",
+      "source_location": "L57",
+      "weight": 1.0
+    },
+    {
+      "source": "readme_laravel_sponsors",
+      "target": "readme_premium_partners",
+      "relation": "contains",
+      "_origin": "ast",
+      "confidence": "EXTRACTED",
+      "confidence_score": 1.0,
+      "source_file": "README.md",
+      "source_location": "L34",
+      "weight": 1.0
+    },
+    {
       "source": "tests_feature_auth_authenticationtest",
       "target": "tests_feature_auth_authenticationtest_authenticationtest",
       "relation": "contains",
@@ -12752,7 +13320,7 @@
       "confidence": "EXTRACTED",
       "confidence_score": 1.0,
       "source_file": "app/Livewire/Admin/RateMatrixManager.php",
-      "source_location": "L19",
+      "source_location": "L24",
       "weight": 1.0
     },
     {
@@ -13263,24 +13831,35 @@
     },
     {
       "source": "app_livewire_admin_ratematrixmanager_ratematrixmanager",
-      "target": "app_livewire_admin_ratematrixmanager_ratematrixmanager_rules",
-      "relation": "method",
-      "_origin": "ast",
-      "confidence": "EXTRACTED",
-      "confidence_score": 1.0,
-      "source_file": "app/Livewire/Admin/RateMatrixManager.php",
-      "source_location": "L29",
-      "weight": 1.0
-    },
-    {
-      "source": "app_livewire_admin_ratematrixmanager_ratematrixmanager",
       "target": "app_livewire_admin_ratematrixmanager_ratematrixmanager_mount",
       "relation": "method",
       "_origin": "ast",
       "confidence": "EXTRACTED",
       "confidence_score": 1.0,
       "source_file": "app/Livewire/Admin/RateMatrixManager.php",
-      "source_location": "L44",
+      "source_location": "L101",
+      "weight": 1.0
+    },
+    {
+      "source": "app_livewire_admin_ratematrixmanager_ratematrixmanager",
+      "target": "app_livewire_admin_ratematrixmanager_ratematrixmanager_startediting",
+      "relation": "method",
+      "_origin": "ast",
+      "confidence": "EXTRACTED",
+      "confidence_score": 1.0,
+      "source_file": "app/Livewire/Admin/RateMatrixManager.php",
+      "source_location": "L116",
+      "weight": 1.0
+    },
+    {
+      "source": "app_livewire_admin_ratematrixmanager_ratematrixmanager",
+      "target": "app_livewire_admin_ratematrixmanager_ratematrixmanager_cancelediting",
+      "relation": "method",
+      "_origin": "ast",
+      "confidence": "EXTRACTED",
+      "confidence_score": 1.0,
+      "source_file": "app/Livewire/Admin/RateMatrixManager.php",
+      "source_location": "L123",
       "weight": 1.0
     },
     {
@@ -13291,7 +13870,29 @@
       "confidence": "EXTRACTED",
       "confidence_score": 1.0,
       "source_file": "app/Livewire/Admin/RateMatrixManager.php",
-      "source_location": "L56",
+      "source_location": "L131",
+      "weight": 1.0
+    },
+    {
+      "source": "app_livewire_admin_ratematrixmanager_ratematrixmanager",
+      "target": "app_livewire_admin_ratematrixmanager_ratematrixmanager_simulate",
+      "relation": "method",
+      "_origin": "ast",
+      "confidence": "EXTRACTED",
+      "confidence_score": 1.0,
+      "source_file": "app/Livewire/Admin/RateMatrixManager.php",
+      "source_location": "L161",
+      "weight": 1.0
+    },
+    {
+      "source": "app_livewire_admin_ratematrixmanager_ratematrixmanager",
+      "target": "app_livewire_admin_ratematrixmanager_ratematrixmanager_resetsimulation",
+      "relation": "method",
+      "_origin": "ast",
+      "confidence": "EXTRACTED",
+      "confidence_score": 1.0,
+      "source_file": "app/Livewire/Admin/RateMatrixManager.php",
+      "source_location": "L195",
       "weight": 1.0
     },
     {
@@ -13302,7 +13903,18 @@
       "confidence": "EXTRACTED",
       "confidence_score": 1.0,
       "source_file": "app/Livewire/Admin/RateMatrixManager.php",
-      "source_location": "L76",
+      "source_location": "L214",
+      "weight": 1.0
+    },
+    {
+      "source": "app_livewire_admin_ratematrixmanager_ratematrixmanager",
+      "target": "app_livewire_admin_ratematrixmanager_ratematrixmanager_rules",
+      "relation": "method",
+      "_origin": "ast",
+      "confidence": "EXTRACTED",
+      "confidence_score": 1.0,
+      "source_file": "app/Livewire/Admin/RateMatrixManager.php",
+      "source_location": "L75",
       "weight": 1.0
     },
     {
@@ -13505,13 +14117,24 @@
     },
     {
       "source": "app_models_package_package",
+      "target": "app_models_package_package_ally",
+      "relation": "method",
+      "_origin": "ast",
+      "confidence": "EXTRACTED",
+      "confidence_score": 1.0,
+      "source_file": "app/Models/Package.php",
+      "source_location": "L110",
+      "weight": 1.0
+    },
+    {
+      "source": "app_models_package_package",
       "target": "app_models_package_package_driver",
       "relation": "method",
       "_origin": "ast",
       "confidence": "EXTRACTED",
       "confidence_score": 1.0,
       "source_file": "app/Models/Package.php",
-      "source_location": "L103",
+      "source_location": "L118",
       "weight": 1.0
     },
     {
@@ -13522,7 +14145,7 @@
       "confidence": "EXTRACTED",
       "confidence_score": 1.0,
       "source_file": "app/Models/Package.php",
-      "source_location": "L111",
+      "source_location": "L126",
       "weight": 1.0
     },
     {
@@ -13533,7 +14156,18 @@
       "confidence": "EXTRACTED",
       "confidence_score": 1.0,
       "source_file": "app/Models/Package.php",
-      "source_location": "L122",
+      "source_location": "L137",
+      "weight": 1.0
+    },
+    {
+      "source": "app_models_package_package",
+      "target": "app_models_package_package_issobre",
+      "relation": "method",
+      "_origin": "ast",
+      "confidence": "EXTRACTED",
+      "confidence_score": 1.0,
+      "source_file": "app/Models/Package.php",
+      "source_location": "L142",
       "weight": 1.0
     },
     {
@@ -13544,18 +14178,7 @@
       "confidence": "EXTRACTED",
       "confidence_score": 1.0,
       "source_file": "app/Models/Package.php",
-      "source_location": "L71",
-      "weight": 1.0
-    },
-    {
-      "source": "app_models_package_package",
-      "target": "app_models_package_package_ally",
-      "relation": "method",
-      "_origin": "ast",
-      "confidence": "EXTRACTED",
-      "confidence_score": 1.0,
-      "source_file": "app/Models/Package.php",
-      "source_location": "L95",
+      "source_location": "L81",
       "weight": 1.0
     },
     {
@@ -13588,7 +14211,7 @@
       "confidence": "EXTRACTED",
       "confidence_score": 1.0,
       "source_file": "app/Models/RateMatrix.php",
-      "source_location": "L28",
+      "source_location": "L31",
       "weight": 1.0
     },
     {
@@ -13599,7 +14222,7 @@
       "confidence": "EXTRACTED",
       "confidence_score": 1.0,
       "source_file": "app/Models/RateMatrix.php",
-      "source_location": "L43",
+      "source_location": "L49",
       "weight": 1.0
     },
     {
@@ -13758,13 +14381,24 @@
     },
     {
       "source": "app_services_packageservice_packageservice",
+      "target": "app_services_packageservice_packageservice_assigndriver",
+      "relation": "method",
+      "_origin": "ast",
+      "confidence": "EXTRACTED",
+      "confidence_score": 1.0,
+      "source_file": "app/Services/PackageService.php",
+      "source_location": "L104",
+      "weight": 1.0
+    },
+    {
+      "source": "app_services_packageservice_packageservice",
       "target": "app_services_packageservice_packageservice_generatetrackingnumber",
       "relation": "method",
       "_origin": "ast",
       "confidence": "EXTRACTED",
       "confidence_score": 1.0,
       "source_file": "app/Services/PackageService.php",
-      "source_location": "L100",
+      "source_location": "L114",
       "weight": 1.0
     },
     {
@@ -13775,7 +14409,7 @@
       "confidence": "EXTRACTED",
       "confidence_score": 1.0,
       "source_file": "app/Services/PackageService.php",
-      "source_location": "L111",
+      "source_location": "L125",
       "weight": 1.0
     },
     {
@@ -13797,7 +14431,7 @@
       "confidence": "EXTRACTED",
       "confidence_score": 1.0,
       "source_file": "app/Services/PackageService.php",
-      "source_location": "L29",
+      "source_location": "L30",
       "weight": 1.0
     },
     {
@@ -13808,18 +14442,29 @@
       "confidence": "EXTRACTED",
       "confidence_score": 1.0,
       "source_file": "app/Services/PackageService.php",
-      "source_location": "L68",
+      "source_location": "L82",
       "weight": 1.0
     },
     {
-      "source": "app_services_packageservice_packageservice",
-      "target": "app_services_packageservice_packageservice_assigndriver",
+      "source": "app_services_tariffservice_tariffservice",
+      "target": "app_services_tariffservice_tariffservice_calculatefragilesurcharge",
       "relation": "method",
       "_origin": "ast",
       "confidence": "EXTRACTED",
       "confidence_score": 1.0,
-      "source_file": "app/Services/PackageService.php",
-      "source_location": "L90",
+      "source_file": "app/Services/TariffService.php",
+      "source_location": "L106",
+      "weight": 1.0
+    },
+    {
+      "source": "app_services_tariffservice_tariffservice",
+      "target": "app_services_tariffservice_tariffservice_calculateinsuranceprice",
+      "relation": "method",
+      "_origin": "ast",
+      "confidence": "EXTRACTED",
+      "confidence_score": 1.0,
+      "source_file": "app/Services/TariffService.php",
+      "source_location": "L116",
       "weight": 1.0
     },
     {
@@ -13830,62 +14475,7 @@
       "confidence": "EXTRACTED",
       "confidence_score": 1.0,
       "source_file": "app/Services/TariffService.php",
-      "source_location": "L11",
-      "weight": 1.0
-    },
-    {
-      "source": "app_services_tariffservice_tariffservice",
-      "target": "app_services_tariffservice_tariffservice_calculatevolumetricweight",
-      "relation": "method",
-      "_origin": "ast",
-      "confidence": "EXTRACTED",
-      "confidence_score": 1.0,
-      "source_file": "app/Services/TariffService.php",
-      "source_location": "L20",
-      "weight": 1.0
-    },
-    {
-      "source": "app_services_tariffservice_tariffservice",
-      "target": "app_services_tariffservice_tariffservice_calculatebillableweight",
-      "relation": "method",
-      "_origin": "ast",
-      "confidence": "EXTRACTED",
-      "confidence_score": 1.0,
-      "source_file": "app/Services/TariffService.php",
-      "source_location": "L32",
-      "weight": 1.0
-    },
-    {
-      "source": "app_services_tariffservice_tariffservice",
-      "target": "app_services_tariffservice_tariffservice_findrate",
-      "relation": "method",
-      "_origin": "ast",
-      "confidence": "EXTRACTED",
-      "confidence_score": 1.0,
-      "source_file": "app/Services/TariffService.php",
-      "source_location": "L42",
-      "weight": 1.0
-    },
-    {
-      "source": "app_services_tariffservice_tariffservice",
-      "target": "app_services_tariffservice_tariffservice_finddistance",
-      "relation": "method",
-      "_origin": "ast",
-      "confidence": "EXTRACTED",
-      "confidence_score": 1.0,
-      "source_file": "app/Services/TariffService.php",
-      "source_location": "L58",
-      "weight": 1.0
-    },
-    {
-      "source": "app_services_tariffservice_tariffservice",
-      "target": "app_services_tariffservice_tariffservice_calculatetotalusd",
-      "relation": "method",
-      "_origin": "ast",
-      "confidence": "EXTRACTED",
-      "confidence_score": 1.0,
-      "source_file": "app/Services/TariffService.php",
-      "source_location": "L76",
+      "source_location": "L12",
       "weight": 1.0
     },
     {
@@ -13896,7 +14486,73 @@
       "confidence": "EXTRACTED",
       "confidence_score": 1.0,
       "source_file": "app/Services/TariffService.php",
-      "source_location": "L99",
+      "source_location": "L149",
+      "weight": 1.0
+    },
+    {
+      "source": "app_services_tariffservice_tariffservice",
+      "target": "app_services_tariffservice_tariffservice_calculatevolumetricweight",
+      "relation": "method",
+      "_origin": "ast",
+      "confidence": "EXTRACTED",
+      "confidence_score": 1.0,
+      "source_file": "app/Services/TariffService.php",
+      "source_location": "L21",
+      "weight": 1.0
+    },
+    {
+      "source": "app_services_tariffservice_tariffservice",
+      "target": "app_services_tariffservice_tariffservice_calculatebillableweight",
+      "relation": "method",
+      "_origin": "ast",
+      "confidence": "EXTRACTED",
+      "confidence_score": 1.0,
+      "source_file": "app/Services/TariffService.php",
+      "source_location": "L33",
+      "weight": 1.0
+    },
+    {
+      "source": "app_services_tariffservice_tariffservice",
+      "target": "app_services_tariffservice_tariffservice_findrate",
+      "relation": "method",
+      "_origin": "ast",
+      "confidence": "EXTRACTED",
+      "confidence_score": 1.0,
+      "source_file": "app/Services/TariffService.php",
+      "source_location": "L43",
+      "weight": 1.0
+    },
+    {
+      "source": "app_services_tariffservice_tariffservice",
+      "target": "app_services_tariffservice_tariffservice_finddistance",
+      "relation": "method",
+      "_origin": "ast",
+      "confidence": "EXTRACTED",
+      "confidence_score": 1.0,
+      "source_file": "app/Services/TariffService.php",
+      "source_location": "L63",
+      "weight": 1.0
+    },
+    {
+      "source": "app_services_tariffservice_tariffservice",
+      "target": "app_services_tariffservice_tariffservice_calculatepackagesubtotalusd",
+      "relation": "method",
+      "_origin": "ast",
+      "confidence": "EXTRACTED",
+      "confidence_score": 1.0,
+      "source_file": "app/Services/TariffService.php",
+      "source_location": "L80",
+      "weight": 1.0
+    },
+    {
+      "source": "app_services_tariffservice_tariffservice",
+      "target": "app_services_tariffservice_tariffservice_calculateenvelopesubtotalusd",
+      "relation": "method",
+      "_origin": "ast",
+      "confidence": "EXTRACTED",
+      "confidence_score": 1.0,
+      "source_file": "app/Services/TariffService.php",
+      "source_location": "L94",
       "weight": 1.0
     },
     {
@@ -14539,20 +15195,8 @@
       "source_file": "app/Models/CityDistance.php",
       "source_location": "L60",
       "weight": 1.0
-    },
-    {
-      "source": "app_models_ratematrix_ratematrix_current",
-      "target": "static",
-      "relation": "calls",
-      "_origin": "ast",
-      "confidence": "INFERRED",
-      "confidence_score": 0.85,
-      "context": "call",
-      "source_file": "app/Models/RateMatrix.php",
-      "source_location": "L45",
-      "weight": 1.0
     }
   ],
   "hyperedges": [],
-  "built_at_commit": "3e0e2ddb5d83fb8ea2f556b548f0a57c68b66b1a"
+  "built_at_commit": "f36a987eb07720ef60f61477936b591109e5a018"
 }

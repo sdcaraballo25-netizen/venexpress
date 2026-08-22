@@ -54,10 +54,10 @@
     "semantic_hash": "73b9295138c47d8adc0ae978a42f29af"
   },
   "app/Livewire/Admin/RateMatrixManager.php": {
-    "mtime": 1787275504.301595,
-    "seen": 1787328126.928309,
-    "ast_hash": "5259db0b9faddc639ce4cce021c850af",
-    "semantic_hash": "5259db0b9faddc639ce4cce021c850af"
+    "mtime": 1787381936.0,
+    "seen": 1787368036.8265421,
+    "ast_hash": "a5ff3c77df8605b89e3f82fe244331eb",
+    "semantic_hash": ""
   },
   "app/Livewire/Ally/CreatePackage.php": {
     "mtime": 1787275504.301595,
@@ -114,10 +114,10 @@
     "semantic_hash": "515317a6d9fb4a7094e2319da448632d"
   },
   "app/Models/Package.php": {
-    "mtime": 1787275504.3035884,
-    "seen": 1787328126.9283164,
-    "ast_hash": "9c3bccefb6fff6bea0dbeb679c4da337",
-    "semantic_hash": "9c3bccefb6fff6bea0dbeb679c4da337"
+    "mtime": 1787381936.0,
+    "seen": 1787368036.826552,
+    "ast_hash": "b1250a9a234c323ec3b2600f73a21947",
+    "semantic_hash": ""
   },
   "app/Models/PackageHistory.php": {
     "mtime": 1787275504.3035884,
@@ -126,10 +126,10 @@
     "semantic_hash": "668783b2dad9334d042735533e0fe431"
   },
   "app/Models/RateMatrix.php": {
-    "mtime": 1787275504.3035884,
-    "seen": 1787328126.9283178,
-    "ast_hash": "0036e264b1bae3657803f9e127f440a9",
-    "semantic_hash": "0036e264b1bae3657803f9e127f440a9"
+    "mtime": 1787381936.0,
+    "seen": 1787368036.8265536,
+    "ast_hash": "028ede7d743566eb21f33c1a86d62dde",
+    "semantic_hash": ""
   },
   "app/Models/User.php": {
     "mtime": 1787275504.3035884,
@@ -156,16 +156,16 @@
     "semantic_hash": "6e7bae0b51da2a942cb5ddce99ed162a"
   },
   "app/Services/PackageService.php": {
-    "mtime": 1787275504.304908,
-    "seen": 1787328126.9283211,
-    "ast_hash": "62bdf6f5b8392accb3d064ac68a9a157",
-    "semantic_hash": "62bdf6f5b8392accb3d064ac68a9a157"
+    "mtime": 1787381936.0,
+    "seen": 1787368036.8265576,
+    "ast_hash": "2b5103a33a02eca5f3ee4d1637f5bf3b",
+    "semantic_hash": ""
   },
   "app/Services/TariffService.php": {
-    "mtime": 1787275504.3059068,
-    "seen": 1787328126.9283218,
-    "ast_hash": "067dffc68c97bda82da2dc2ed1b9e399",
-    "semantic_hash": "067dffc68c97bda82da2dc2ed1b9e399"
+    "mtime": 1787381936.0,
+    "seen": 1787368036.8265588,
+    "ast_hash": "4ac99537acae6c061e853a98b1e163e7",
+    "semantic_hash": ""
   },
   "app/View/Components/AppLayout.php": {
     "mtime": 1787275504.3059068,
@@ -606,9 +606,9 @@
     "semantic_hash": "e1790b7d0d6e0f4a34bb7497b14eeace"
   },
   "resources/views/layouts/admin.blade.php": {
-    "mtime": 1787362032.6614199,
-    "seen": 1787363014.4728456,
-    "ast_hash": "624d297dc34dbba14106bb6aa4c03364",
+    "mtime": 1787368266.7942765,
+    "seen": 1787368745.3693705,
+    "ast_hash": "102b7308df46abdd45eacf097ae3f2c9",
     "semantic_hash": ""
   },
   "resources/views/layouts/app.blade.php": {
@@ -864,9 +864,27 @@
     "semantic_hash": ""
   },
   "resources/views/Livewire/Admin/tarifas.blade.php": {
-    "mtime": 1787362517.1719162,
-    "seen": 1787363014.4728148,
+    "mtime": 1787363860.9875937,
+    "seen": 1787368036.826599,
     "ast_hash": "d41d8cd98f00b204e9800998ecf8427e",
+    "semantic_hash": ""
+  },
+  "database/migrations/2026_08_21_000001_add_extra_pricing_fields_to_rate_matrices_table.php": {
+    "mtime": 1787381936.0,
+    "seen": 1787368036.826587,
+    "ast_hash": "4222cd9e9e8711dd599498763b3e6d51",
+    "semantic_hash": ""
+  },
+  "database/migrations/2026_08_21_000002_add_extra_pricing_fields_to_packages_table.php": {
+    "mtime": 1787381936.0,
+    "seen": 1787368036.826588,
+    "ast_hash": "d28c108b4aecf43eda24e6bee735fb29",
+    "semantic_hash": ""
+  },
+  "resources/views/Livewire/Admin/rate-matrix-manager.blade.php": {
+    "mtime": 1787381936.0,
+    "seen": 1787368036.826598,
+    "ast_hash": "d486c1ad8102abe8643087015a49c332",
     "semantic_hash": ""
   }
 }
