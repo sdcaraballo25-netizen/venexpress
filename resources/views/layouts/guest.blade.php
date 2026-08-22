@@ -58,7 +58,7 @@
                         @if (request()->routeIs('admin.login'))
                             Panel privado — solo personal administrativo VenExpress
                         @else
-                            Acceso exclusivo para aliados y choferes VenExpress
+                            Clientes, repartidores y puntos aliados, todo en un solo lugar.
                         @endif
                     </p>
                 </div>

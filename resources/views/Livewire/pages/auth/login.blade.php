@@ -34,7 +34,22 @@ new #[Layout('layouts.guest')] class extends Component
 
         Session::regenerate();
 
-        $this->redirectIntended(default: route('dashboard', absolute: false), navigate: true);
+        if ($user->isCliente()) {
+    $this->redirect(route('cliente.dashboard', absolute: false), navigate: true);
+    return;
+}
+
+if ($user->isChofer()) {
+    $this->redirect(route('repartidor.dashboard', absolute: false), navigate: true);
+    return;
+}
+
+if ($user->isAliado()) {
+    $this->redirect(route('aliado.dashboard', absolute: false), navigate: true);
+    return;
+}
+
+$this->redirect(route('dashboard', absolute: false), navigate: true);
     }
 }; ?>
 

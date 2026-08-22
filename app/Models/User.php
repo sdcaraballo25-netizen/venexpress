@@ -18,6 +18,7 @@ class User extends Authenticatable
      */
     public const ROLE_ADMIN = 'admin';
     public const ROLE_ALIADO = 'aliado';
+    public const ROLE_CLIENTE = 'cliente';
     public const ROLE_CHOFER = 'chofer';
 
     /**
@@ -104,5 +105,10 @@ class User extends Authenticatable
     public function isChofer(): bool
     {
         return $this->role === self::ROLE_CHOFER;
+    }
+
+    public function isCliente(): bool
+    {
+        return $this->role === self::ROLE_CLIENTE;
     }
 }

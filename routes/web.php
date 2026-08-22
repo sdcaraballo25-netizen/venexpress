@@ -27,6 +27,26 @@ Route::view('profile', 'profile')
     ->middleware(['auth'])
     ->name('profile');
 
+    Route::get('/cliente/dashboard', function () {
+    return view('cliente.dashboard');
+})
+    ->middleware(['auth', 'verified', 'role:cliente'])
+    ->name('cliente.dashboard');
+
+
+Route::get('/repartidor/dashboard', function () {
+    return view('repartidor.dashboard');
+})
+    ->middleware(['auth', 'verified', 'role:chofer'])
+    ->name('repartidor.dashboard');
+
+
+Route::get('/aliado/dashboard', function () {
+    return view('aliado.dashboard');
+})
+    ->middleware(['auth', 'verified', 'role:aliado'])
+    ->name('aliado.dashboard');
+
 // Rastreo público
 Route::get('/rastreo', function () {
     return view('tracking.index');

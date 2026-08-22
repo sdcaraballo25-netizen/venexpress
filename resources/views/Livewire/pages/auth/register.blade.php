@@ -14,6 +14,7 @@ new #[Layout('layouts.guest')] class extends Component
     public string $email = '';
     public string $password = '';
     public string $password_confirmation = '';
+    public string $role = 'cliente';
 
     /**
      * Handle an incoming registration request.
@@ -23,6 +24,7 @@ new #[Layout('layouts.guest')] class extends Component
         $validated = $this->validate([
             'name' => ['required', 'string', 'max:255'],
             'email' => ['required', 'string', 'lowercase', 'email', 'max:255', 'unique:'.User::class],
+            'role' => ['required', 'in:cliente,chofer,aliado'],
             'password' => ['required', 'string', 'confirmed', Rules\Password::defaults()],
         ]);
 
@@ -32,7 +34,22 @@ new #[Layout('layouts.guest')] class extends Component
 
         Auth::login($user);
 
-        $this->redirect(route('dashboard', absolute: false), navigate: true);
+        if ($user->isCliente()) {
+    $this->redirect(route('cliente.dashboard', absolute: false), navigate: true);
+    return;
+}
+
+if ($user->isChofer()) {
+    $this->redirect(route('repartidor.dashboard', absolute: false), navigate: true);
+    return;
+}
+
+if ($user->isAliado()) {
+    $this->redirect(route('aliado.dashboard', absolute: false), navigate: true);
+    return;
+}
+
+$this->redirect(route('dashboard', absolute: false), navigate: true);
     }
 }; ?>
 
@@ -58,6 +75,24 @@ new #[Layout('layouts.guest')] class extends Component
             <x-text-input wire:model="email" id="email" class="block mt-1.5 w-full" type="email" name="email" required autocomplete="username" placeholder="tu@correo.com" />
             <x-input-error :messages="$errors->get('email')" class="mt-2" />
         </div>
+
+        <div>
+    <x-input-label for="role" value="Tipo de usuario" />
+
+    <select
+        wire:model="role"
+        id="role"
+        name="role"
+        class="block mt-1.5 w-full rounded-md border-gray-300 shadow-sm focus:border-blue-500 focus:ring-blue-500"
+        required
+    >
+        <option value="cliente">Cliente</option>
+        <option value="chofer">Repartidor</option>
+        <option value="aliado">Punto aliado</option>
+    </select>
+
+    <x-input-error :messages="$errors->get('role')" class="mt-2" />
+</div>
 
         <div>
             <x-input-label for="password" value="Contraseña" />

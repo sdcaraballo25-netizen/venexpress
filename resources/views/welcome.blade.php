@@ -78,8 +78,8 @@
         </div>
 
         <!-- Van -->
-        <div class="relative flex justify-center items-end">
-            <div class="relative w-full max-w-md">
+        <div class="relative flex justify-center md:justify-end items-end">
+            <div class="relative w-full max-w-md md:max-w-xl md:translate-y-12">
                 <img
                     src="{{ asset('images/van-hero.png') }}"
                     alt="Furgoneta Venexpress"
