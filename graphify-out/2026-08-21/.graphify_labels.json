@@ -3,7 +3,7 @@
   "1": "Illuminate\\Database\\Migrations\\Migration",
   "2": "Package",
   "3": "composer.json",
-  "4": "BcvRate",
+  "4": "CityDistance",
   "5": "What You Must Do When Invoked",
   "6": "devDependencies",
   "7": "scripts",
@@ -82,5 +82,7 @@
   "80": "graphify reference: GitHub clone and cross-repo merge",
   "81": "graphify reference: transcribe video and audio",
   "82": "CLAUDE.md",
-  "83": "extraction-spec.md"
+  "83": "extraction-spec.md",
+  "84": "TariffService",
+  "85": "copilot-instructions.md"
 }

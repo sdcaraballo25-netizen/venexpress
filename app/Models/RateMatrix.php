@@ -18,6 +18,9 @@ class RateMatrix extends Model
         'base_price_usd',
         'price_per_kg_usd',
         'price_per_km_usd',
+        'envelope_price_usd',
+        'fragile_surcharge_usd',
+        'insurance_percentage',
     ];
 
     /**
@@ -31,6 +34,9 @@ class RateMatrix extends Model
             'base_price_usd' => 'decimal:2',
             'price_per_kg_usd' => 'decimal:2',
             'price_per_km_usd' => 'decimal:2',
+            'envelope_price_usd' => 'decimal:2',
+            'fragile_surcharge_usd' => 'decimal:2',
+            'insurance_percentage' => 'decimal:2',
         ];
     }
 

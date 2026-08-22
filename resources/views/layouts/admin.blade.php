@@ -50,18 +50,24 @@
                         Aliados
                     </a>
 
-                    {{-- Enlace Inactivo (Precios de envío) --}}
+                    {{-- Enlace Inactivo (Gestión de tarifas) --}}
                     <a href="#" class="flex items-center gap-3 px-4 py-3 text-[#64748B] hover:bg-slate-50 hover:text-[#0F172A] rounded-xl font-medium transition-colors">
                         <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8c-1.657 0-3 .895-3 2s1.343 2 3 2 3 .895 3 2-1.343 2-3 2m0-8c1.11 0 2.08.402 2.599 1M12 8V7m0 1v8m0 0v1m0-1c-1.11 0-2.08-.402-2.599-1M21 12a9 9 0 11-18 0 9 9 0 0118 0z"></path></svg>
-                        Precios de envío
+                        Gestión de tarifas
+                    </a>
+
+                    {{-- NUEVO: Enlace Inactivo (Control de rutas) --}}
+                    <a href="#" class="flex items-center gap-3 px-4 py-3 text-[#64748B] hover:bg-slate-50 hover:text-[#0F172A] rounded-xl font-medium transition-colors">
+                        <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 20l-5.447-2.724A1 1 0 013 16.382V5.618a1 1 0 011.447-.894L9 7l6-2.572 5.447 2.724A1 1 0 0121 8.053v10.764a1 1 0 01-1.447.894L15 17l-6 2.572zM9 7v13M15 4v13"></path></svg>
+                        Control de rutas
                     </a>
 
                     <p class="px-2 text-xs font-semibold text-[#94A3B8] uppercase tracking-wider mb-3 mt-6">Administración</p>
 
-                    {{-- Enlace Inactivo (Generar usuarios) --}}
+                    {{-- Enlace Inactivo (Gestión de usuarios) --}}
                     <a href="#" class="flex items-center gap-3 px-4 py-3 text-[#64748B] hover:bg-slate-50 hover:text-[#0F172A] rounded-xl font-medium transition-colors">
                         <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M18 9v3m0 0v3m0-3h3m-3 0h-3m-2-5a4 4 0 11-8 0 4 4 0 018 0zM3 20a6 6 0 0112 0v1H3v-1z"></path></svg>
-                        Generar usuarios
+                        Gestión de usuarios
                     </a>
                 </nav>
             </div>
@@ -103,7 +109,7 @@
                     ☰
                 </button>
                 <div class="flex items-center gap-4 ml-auto">
-                    <span class="text-sm text-[#64748B]">{{ auth()->user()->name }}</span>
+                    <span class="text-sm text-[#64748B]">{{ auth()->user()->name ?? 'Admin' }}</span>
                     <form method="POST" action="{{ route('logout') }}">
                         @csrf
                         <button type="submit" class="text-sm font-medium text-[#64748B] hover:text-[#FF6A1A] transition-colors">Salir</button>

@@ -426,10 +426,10 @@
     "semantic_hash": "839528c2a25b2e515762c07a0cf447d9"
   },
   "resources/views/Livewire/Admin/dashboard.blade.php": {
-    "mtime": 1787275504.3195925,
-    "seen": 1787328126.928351,
-    "ast_hash": "58bc765455d6603405f3b1ae4599a590",
-    "semantic_hash": "58bc765455d6603405f3b1ae4599a590"
+    "mtime": 1787336976.0840707,
+    "seen": 1787339031.3516264,
+    "ast_hash": "b331a8801d5d038df9c629319d733205",
+    "semantic_hash": ""
   },
   "resources/views/Livewire/Admin/rate-matrix-manager.blade.php": {
     "mtime": 1787275504.3195925,
@@ -624,10 +624,10 @@
     "semantic_hash": "e1790b7d0d6e0f4a34bb7497b14eeace"
   },
   "resources/views/layouts/admin.blade.php": {
-    "mtime": 1787275504.3283155,
-    "seen": 1787328126.928374,
-    "ast_hash": "33310f2d7a66666266053d136433997a",
-    "semantic_hash": "33310f2d7a66666266053d136433997a"
+    "mtime": 1787337287.5947864,
+    "seen": 1787339031.351655,
+    "ast_hash": "a6c058deb6d405bb322e3fb439aa8832",
+    "semantic_hash": ""
   },
   "resources/views/layouts/app.blade.php": {
     "mtime": 1787275504.3283155,

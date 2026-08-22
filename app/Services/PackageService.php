@@ -24,25 +24,39 @@ class PackageService
      *   recipient_name:string, recipient_id_doc:string, recipient_phone:string,
      *   origin_city:string, destination_city:string, package_type:string,
      *   physical_weight_kg:float, length_cm?:float|null, width_cm?:float|null, height_cm?:float|null,
+     *   is_fragile?:bool, has_insurance?:bool, declared_value_usd?:float|null,
      * } $data
      */
     public function createPackage(array $data, ?int $registeredByUserId = null): Package
     {
         return DB::transaction(function () use ($data, $registeredByUserId) {
+            $isFragile = $data['is_fragile'] ?? false;
+            $hasInsurance = $data['has_insurance'] ?? false;
+            $declaredValueUsd = $data['declared_value_usd'] ?? null;
+
             $pricing = $this->tariffService->calculate(
                 originCity: $data['origin_city'],
                 destinationCity: $data['destination_city'],
-                physicalWeightKg: $data['physical_weight_kg'],
+                packageType: $data['package_type'],
+                physicalWeightKg: $data['physical_weight_kg'] ?? 0.0,
                 lengthCm: $data['length_cm'] ?? null,
                 widthCm: $data['width_cm'] ?? null,
                 heightCm: $data['height_cm'] ?? null,
+                isFragile: $isFragile,
+                hasInsurance: $hasInsurance,
+                declaredValueUsd: $declaredValueUsd,
             );
 
             $package = Package::create([
                 ...$data,
                 'tracking_number' => $this->generateTrackingNumber(),
+                'is_fragile' => $isFragile,
+                'has_insurance' => $hasInsurance,
+                'declared_value_usd' => $declaredValueUsd,
                 'volumetric_weight_kg' => $pricing['volumetric_weight_kg'],
                 'billable_weight_kg' => $pricing['billable_weight_kg'],
+                'fragile_surcharge_usd' => $pricing['fragile_surcharge_usd'],
+                'insurance_price_usd' => $pricing['insurance_price_usd'],
                 'total_price_usd' => $pricing['total_price_usd'],
                 'total_price_ves' => $pricing['total_price_ves'],
                 'bcv_rate_used' => $pricing['bcv_rate_used'],

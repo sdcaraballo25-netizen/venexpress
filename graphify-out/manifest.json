@@ -413,29 +413,11 @@
     "ast_hash": "78f909acc19aea4717eddca5a87c1ba3",
     "semantic_hash": "78f909acc19aea4717eddca5a87c1ba3"
   },
-  "resources/views/Livewire/Admin/bcv-rate-manager.blade.php": {
-    "mtime": 1787275504.3185956,
-    "seen": 1787328126.9283497,
-    "ast_hash": "2a4971b1c6be57ea3ee753966ece8243",
-    "semantic_hash": "2a4971b1c6be57ea3ee753966ece8243"
-  },
-  "resources/views/Livewire/Admin/city-distance-manager.blade.php": {
-    "mtime": 1787275504.3195925,
-    "seen": 1787328126.9283502,
-    "ast_hash": "839528c2a25b2e515762c07a0cf447d9",
-    "semantic_hash": "839528c2a25b2e515762c07a0cf447d9"
-  },
   "resources/views/Livewire/Admin/dashboard.blade.php": {
-    "mtime": 1787275504.3195925,
-    "seen": 1787328126.928351,
-    "ast_hash": "58bc765455d6603405f3b1ae4599a590",
-    "semantic_hash": "58bc765455d6603405f3b1ae4599a590"
-  },
-  "resources/views/Livewire/Admin/rate-matrix-manager.blade.php": {
-    "mtime": 1787275504.3195925,
-    "seen": 1787328126.9283516,
-    "ast_hash": "eaaaedf2075714f51c1148faabc173f3",
-    "semantic_hash": "eaaaedf2075714f51c1148faabc173f3"
+    "mtime": 1787336976.0840707,
+    "seen": 1787339031.3516264,
+    "ast_hash": "b331a8801d5d038df9c629319d733205",
+    "semantic_hash": ""
   },
   "resources/views/Livewire/Ally/daily-cash-cut.blade.php": {
     "mtime": 1787275504.3195925,
@@ -624,10 +606,10 @@
     "semantic_hash": "e1790b7d0d6e0f4a34bb7497b14eeace"
   },
   "resources/views/layouts/admin.blade.php": {
-    "mtime": 1787275504.3283155,
-    "seen": 1787328126.928374,
-    "ast_hash": "33310f2d7a66666266053d136433997a",
-    "semantic_hash": "33310f2d7a66666266053d136433997a"
+    "mtime": 1787362032.6614199,
+    "seen": 1787363014.4728456,
+    "ast_hash": "624d297dc34dbba14106bb6aa4c03364",
+    "semantic_hash": ""
   },
   "resources/views/layouts/app.blade.php": {
     "mtime": 1787275504.3283155,
@@ -678,8 +660,8 @@
     "semantic_hash": "3c6ce2e6d16444282b24a9aa63885563"
   },
   "routes/web.php": {
-    "mtime": 1787289199.1437976,
-    "seen": 1787328126.9283805,
+    "mtime": 1787353946.7422724,
+    "seen": 1787363014.4728544,
     "ast_hash": "52e7131cafc3af77988e5ca822a22768",
     "semantic_hash": "52e7131cafc3af77988e5ca822a22768"
   },
@@ -879,6 +861,12 @@
     "mtime": 1787283447.2958407,
     "seen": 1787330583.4103644,
     "ast_hash": "281f016f82be18beb9138ab372d4e35d",
+    "semantic_hash": ""
+  },
+  "resources/views/Livewire/Admin/tarifas.blade.php": {
+    "mtime": 1787362517.1719162,
+    "seen": 1787363014.4728148,
+    "ast_hash": "d41d8cd98f00b204e9800998ecf8427e",
     "semantic_hash": ""
   }
 }

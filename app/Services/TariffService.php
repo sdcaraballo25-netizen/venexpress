@@ -3,6 +3,7 @@
 namespace App\Services;
 
 use App\Models\CityDistance;
+use App\Models\Package;
 use App\Models\RateMatrix;
 use RuntimeException;
 
@@ -35,7 +36,7 @@ class TariffService
     }
 
     /**
-     * Obtiene la tarifa global vigente (base + por kg + por km).
+     * Obtiene la tarifa global vigente.
      *
      * @throws RuntimeException si todavía no se ha configurado ninguna tarifa.
      */
@@ -53,6 +54,10 @@ class TariffService
     /**
      * Busca la distancia registrada entre dos ciudades.
      *
+     * El administrador nunca escribe km a mano: siempre se elige
+     * ciudad de origen y ciudad de destino, y este método resuelve
+     * la distancia a partir de lo configurado en CityDistanceManager.
+     *
      * @throws RuntimeException si la ruta no tiene distancia configurada.
      */
     public function findDistance(string $originCity, string $destinationCity): CityDistance
@@ -69,11 +74,10 @@ class TariffService
     }
 
     /**
-     * Total en USD = precio base
-     *              + (peso facturable × precio por kg)
-     *              + (distancia en km × precio por km).
+     * Subtotal en USD para un PAQUETE (no sobre):
+     * base + (peso facturable × precio por kg) + (distancia en km × precio por km).
      */
-    public function calculateTotalUsd(RateMatrix $rateMatrix, float $billableWeightKg, int $distanceKm): float
+    public function calculatePackageSubtotalUsd(RateMatrix $rateMatrix, float $billableWeightKg, int $distanceKm): float
     {
         return round(
             (float) $rateMatrix->base_price_usd
@@ -84,25 +88,75 @@ class TariffService
     }
 
     /**
-     * Calcula todo lo necesario para facturar un paquete: pesos,
-     * distancia, total en USD/VES y la tasa BCV utilizada.
+     * Subtotal en USD para un SOBRE: precio fijo del sobre, sin
+     * peso ni volumen, pero sigue sumando distancia igual que un paquete.
+     */
+    public function calculateEnvelopeSubtotalUsd(RateMatrix $rateMatrix, int $distanceKm): float
+    {
+        return round(
+            (float) $rateMatrix->envelope_price_usd
+                + ($distanceKm * (float) $rateMatrix->price_per_km_usd),
+            2
+        );
+    }
+
+    /**
+     * Recargo fijo por envío frágil (aplica a sobre y a paquete por igual).
+     */
+    public function calculateFragileSurcharge(RateMatrix $rateMatrix, bool $isFragile): float
+    {
+        return $isFragile ? round((float) $rateMatrix->fragile_surcharge_usd, 2) : 0.0;
+    }
+
+    /**
+     * Precio del seguro = valor declarado × porcentaje de seguro configurado.
+     *
+     * @throws RuntimeException si se pide seguro sin indicar valor declarado.
+     */
+    public function calculateInsurancePrice(RateMatrix $rateMatrix, bool $hasInsurance, ?float $declaredValueUsd): float
+    {
+        if (! $hasInsurance) {
+            return 0.0;
+        }
+
+        if ($declaredValueUsd === null || $declaredValueUsd <= 0) {
+            throw new RuntimeException('Debes indicar el valor declarado del paquete para calcular el seguro.');
+        }
+
+        return round($declaredValueUsd * ((float) $rateMatrix->insurance_percentage / 100), 2);
+    }
+
+    /**
+     * Calcula todo lo necesario para facturar un envío: pesos,
+     * distancia, subtotal según tipo, recargos, total en USD/VES
+     * y la tasa BCV utilizada.
      *
      * @return array{
+     *   package_type: string,
      *   volumetric_weight_kg: float,
      *   billable_weight_kg: float,
      *   distance_km: int,
+     *   subtotal_price_usd: float,
+     *   fragile_surcharge_usd: float,
+     *   insurance_price_usd: float,
      *   total_price_usd: float,
      *   total_price_ves: float,
      *   bcv_rate_used: float,
      * }
+     *
+     * @throws RuntimeException si falta tarifa, distancia, o valor declarado con seguro activo.
      */
     public function calculate(
         string $originCity,
         string $destinationCity,
-        float $physicalWeightKg,
+        string $packageType = Package::TYPE_PAQUETE,
+        float $physicalWeightKg = 0.0,
         ?float $lengthCm = null,
         ?float $widthCm = null,
         ?float $heightCm = null,
+        bool $isFragile = false,
+        bool $hasInsurance = false,
+        ?float $declaredValueUsd = null,
     ): array {
         $rateMatrix = $this->findRate();
         $cityDistance = $this->findDistance($originCity, $destinationCity);
@@ -110,13 +164,25 @@ class TariffService
 
         $volumetricWeight = $this->calculateVolumetricWeight($lengthCm, $widthCm, $heightCm);
         $billableWeight = $this->calculateBillableWeight($physicalWeightKg, $volumetricWeight);
-        $totalUsd = $this->calculateTotalUsd($rateMatrix, $billableWeight, $cityDistance->distance_km);
+
+        $subtotalUsd = $packageType === Package::TYPE_SOBRE
+            ? $this->calculateEnvelopeSubtotalUsd($rateMatrix, $cityDistance->distance_km)
+            : $this->calculatePackageSubtotalUsd($rateMatrix, $billableWeight, $cityDistance->distance_km);
+
+        $fragileSurchargeUsd = $this->calculateFragileSurcharge($rateMatrix, $isFragile);
+        $insurancePriceUsd = $this->calculateInsurancePrice($rateMatrix, $hasInsurance, $declaredValueUsd);
+
+        $totalUsd = round($subtotalUsd + $fragileSurchargeUsd + $insurancePriceUsd, 2);
         $totalVes = $this->bcvRateService->convertUsdToVes($totalUsd, $bcvRate);
 
         return [
+            'package_type' => $packageType,
             'volumetric_weight_kg' => $volumetricWeight,
             'billable_weight_kg' => $billableWeight,
             'distance_km' => $cityDistance->distance_km,
+            'subtotal_price_usd' => $subtotalUsd,
+            'fragile_surcharge_usd' => $fragileSurchargeUsd,
+            'insurance_price_usd' => $insurancePriceUsd,
             'total_price_usd' => $totalUsd,
             'total_price_ves' => $totalVes,
             'bcv_rate_used' => (float) $bcvRate->rate,

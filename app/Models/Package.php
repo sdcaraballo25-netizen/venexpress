@@ -33,6 +33,11 @@ class Package extends Model
     public const TYPE_SOBRE = 'sobre';
     public const TYPE_PAQUETE = 'paquete';
 
+    public const TYPES = [
+        self::TYPE_SOBRE,
+        self::TYPE_PAQUETE,
+    ];
+
     /**
      * Los atributos que se pueden asignar de forma masiva.
      *
@@ -51,12 +56,17 @@ class Package extends Model
         'origin_city',
         'destination_city',
         'package_type',
+        'is_fragile',
+        'has_insurance',
+        'declared_value_usd',
         'physical_weight_kg',
         'length_cm',
         'width_cm',
         'height_cm',
         'volumetric_weight_kg',
         'billable_weight_kg',
+        'fragile_surcharge_usd',
+        'insurance_price_usd',
         'total_price_usd',
         'total_price_ves',
         'bcv_rate_used',
@@ -71,12 +81,17 @@ class Package extends Model
     protected function casts(): array
     {
         return [
+            'is_fragile' => 'boolean',
+            'has_insurance' => 'boolean',
+            'declared_value_usd' => 'decimal:2',
             'physical_weight_kg' => 'decimal:3',
             'length_cm' => 'decimal:2',
             'width_cm' => 'decimal:2',
             'height_cm' => 'decimal:2',
             'volumetric_weight_kg' => 'decimal:3',
             'billable_weight_kg' => 'decimal:3',
+            'fragile_surcharge_usd' => 'decimal:2',
+            'insurance_price_usd' => 'decimal:2',
             'total_price_usd' => 'decimal:2',
             'total_price_ves' => 'decimal:2',
             'bcv_rate_used' => 'decimal:6',
@@ -122,5 +137,10 @@ class Package extends Model
     public function isDelivered(): bool
     {
         return $this->current_status === self::STATUS_ENTREGADO;
+    }
+
+    public function isSobre(): bool
+    {
+        return $this->package_type === self::TYPE_SOBRE;
     }
 }
