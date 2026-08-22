@@ -40,8 +40,8 @@ new #[Layout('layouts.guest')] class extends Component
         <x-venexpress-logo size="md" />
     </div>
 
-    <h1 class="font-display text-2xl font-bold text-navy-900">Verifica tu correo</h1>
-    <p class="mt-3 text-sm leading-relaxed text-slate-500">
+    <h1 class="font-display text-2xl font-bold text-blue-950">Verifica tu correo</h1>
+    <p class="mt-3 text-sm leading-relaxed text-gray-500">
         Gracias por registrarte. Antes de comenzar, confirma tu correo electrónico haciendo clic en el enlace que te acabamos de enviar. Si no lo recibiste, con gusto te enviamos otro.
     </p>
 
@@ -57,7 +57,7 @@ new #[Layout('layouts.guest')] class extends Component
             Reenviar correo de verificación
         </x-primary-button>
 
-        <button wire:click="logout" type="submit" class="text-sm font-medium text-slate-500 hover:text-navy-900">
+        <button wire:click="logout" type="submit" class="text-sm font-medium text-gray-500 hover:text-blue-950">
             Cerrar sesión
         </button>
     </div>

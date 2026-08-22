@@ -38,8 +38,8 @@ new #[Layout('layouts.guest')] class extends Component
         <x-venexpress-logo size="md" />
     </div>
 
-    <h1 class="font-display text-2xl font-bold text-navy-900">Recuperar contraseña</h1>
-    <p class="mt-1.5 text-sm text-slate-500">
+    <h1 class="font-display text-2xl font-bold text-blue-950">Recuperar contraseña</h1>
+    <p class="mt-1.5 text-sm text-gray-500">
         Ingresa tu correo y te enviaremos un enlace para elegir una nueva contraseña.
     </p>
 
@@ -57,8 +57,8 @@ new #[Layout('layouts.guest')] class extends Component
         </x-primary-button>
     </form>
 
-    <p class="mt-8 text-center text-sm text-slate-500">
+    <p class="mt-8 text-center text-sm text-gray-500">
         ¿Recordaste tu contraseña?
-        <a href="{{ route('login') }}" class="font-semibold text-navy-700 hover:text-navy-900" wire:navigate>Inicia sesión</a>
+        <a href="{{ route('login') }}" class="font-semibold text-blue-700 hover:text-blue-950" wire:navigate>Inicia sesión</a>
     </p>
 </div>

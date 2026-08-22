@@ -12,6 +12,11 @@ Route::middleware('guest')->group(function () {
     Volt::route('login', 'pages.auth.login')
         ->name('login');
 
+    // Acceso exclusivo de administradores. No se enlaza desde ninguna
+    // vista pública: solo se llega escribiendo esta URL directamente.
+    Volt::route('admin/login', 'pages.auth.admin-login')
+        ->name('admin.login');
+
     Volt::route('forgot-password', 'pages.auth.forgot-password')
         ->name('password.request');
 

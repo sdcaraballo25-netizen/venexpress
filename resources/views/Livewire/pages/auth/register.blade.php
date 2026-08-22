@@ -41,8 +41,8 @@ new #[Layout('layouts.guest')] class extends Component
         <x-venexpress-logo size="md" />
     </div>
 
-    <h1 class="font-display text-2xl font-bold text-navy-900">Crea tu cuenta</h1>
-    <p class="mt-1.5 text-sm text-slate-500">
+    <h1 class="font-display text-2xl font-bold text-blue-950">Crea tu cuenta</h1>
+    <p class="mt-1.5 text-sm text-gray-500">
         Regístrate para gestionar tus guías, tarifas o entregas en VenExpress.
     </p>
 
@@ -61,8 +61,7 @@ new #[Layout('layouts.guest')] class extends Component
 
         <div>
             <x-input-label for="password" value="Contraseña" />
-            <x-text-input wire:model="password" id="password" class="block mt-1.5 w-full"
-                            type="password"
+            <x-password-input wire:model="password" id="password" class="block mt-1.5"
                             name="password"
                             required autocomplete="new-password" placeholder="••••••••" />
             <x-input-error :messages="$errors->get('password')" class="mt-2" />
@@ -70,8 +69,7 @@ new #[Layout('layouts.guest')] class extends Component
 
         <div>
             <x-input-label for="password_confirmation" value="Confirmar contraseña" />
-            <x-text-input wire:model="password_confirmation" id="password_confirmation" class="block mt-1.5 w-full"
-                            type="password"
+            <x-password-input wire:model="password_confirmation" id="password_confirmation" class="block mt-1.5"
                             name="password_confirmation" required autocomplete="new-password" placeholder="••••••••" />
             <x-input-error :messages="$errors->get('password_confirmation')" class="mt-2" />
         </div>
@@ -81,8 +79,8 @@ new #[Layout('layouts.guest')] class extends Component
         </x-primary-button>
     </form>
 
-    <p class="mt-8 text-center text-sm text-slate-500">
+    <p class="mt-8 text-center text-sm text-gray-500">
         ¿Ya tienes una cuenta?
-        <a href="{{ route('login') }}" class="font-semibold text-navy-700 hover:text-navy-900" wire:navigate>Inicia sesión</a>
+        <a href="{{ route('login') }}" class="font-semibold text-blue-700 hover:text-blue-950" wire:navigate>Inicia sesión</a>
     </p>
 </div>

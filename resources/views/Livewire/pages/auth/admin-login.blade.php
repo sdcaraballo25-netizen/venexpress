@@ -12,7 +12,10 @@ new #[Layout('layouts.guest')] class extends Component
     public LoginForm $form;
 
     /**
-     * Handle an incoming authentication request.
+     * Handle an incoming authentication request for the admin panel.
+     *
+     * Esta página no se enlaza desde ningún lugar de la UI pública:
+     * solo se accede escribiendo /admin/login directamente.
      */
     public function login(): void
     {
@@ -20,21 +23,18 @@ new #[Layout('layouts.guest')] class extends Component
 
         $this->form->authenticate();
 
-        $user = Auth::user();
-
-        // Los administradores no inician sesión por aquí: deben usar
-        // el acceso privado (/admin/login).
-        if ($user->isAdmin()) {
+        // Solo cuentas con role = admin pueden entrar por esta puerta.
+        if (! Auth::user()->isAdmin()) {
             Auth::logout();
 
             throw ValidationException::withMessages([
-                'form.email' => 'Los administradores deben ingresar por el acceso correspondiente.',
+                'form.email' => 'Estas credenciales no corresponden a una cuenta de administrador.',
             ]);
         }
 
         Session::regenerate();
 
-        $this->redirectIntended(default: route('dashboard', absolute: false), navigate: true);
+        $this->redirectIntended(default: route('admin.dashboard', absolute: false), navigate: true);
     }
 }; ?>
 
@@ -43,9 +43,9 @@ new #[Layout('layouts.guest')] class extends Component
         <x-venexpress-logo size="md" />
     </div>
 
-    <h1 class="font-display text-2xl font-bold text-blue-950">Iniciar sesión</h1>
+    <h1 class="font-display text-2xl font-bold text-blue-950">Acceso administrador</h1>
     <p class="mt-1.5 text-sm text-gray-500">
-        Ingresa tus credenciales para acceder a tu panel.
+        Panel exclusivo para el equipo VenExpress.
     </p>
 
     <x-auth-session-status class="mt-6" :status="session('status')" />
@@ -53,24 +53,15 @@ new #[Layout('layouts.guest')] class extends Component
     <form wire:submit="login" class="mt-8 space-y-5">
         <div>
             <x-input-label for="email" value="Correo electrónico" />
-            <x-text-input wire:model="form.email" id="email" class="block mt-1.5 w-full" type="email" name="email" required autofocus autocomplete="username" placeholder="tu@correo.com" />
+            <x-text-input wire:model="form.email" id="email" class="block mt-1.5 w-full" type="email" name="email" required autofocus autocomplete="username" placeholder="admin@venexpress.com" />
             <x-input-error :messages="$errors->get('form.email')" class="mt-2" />
         </div>
 
         <div>
-            <div class="flex items-center justify-between">
-                <x-input-label for="password" value="Contraseña" />
-                @if (Route::has('password.request'))
-                    <a class="text-xs font-medium text-blue-700 hover:text-blue-950" href="{{ route('password.request') }}" wire:navigate>
-                        ¿Olvidaste tu contraseña?
-                    </a>
-                @endif
-            </div>
-
+            <x-input-label for="password" value="Contraseña" />
             <x-password-input wire:model="form.password" id="password" class="block mt-1.5"
                             name="password"
                             required autocomplete="current-password" placeholder="••••••••" />
-
             <x-input-error :messages="$errors->get('form.password')" class="mt-2" />
         </div>
 
@@ -80,14 +71,7 @@ new #[Layout('layouts.guest')] class extends Component
         </label>
 
         <x-primary-button class="w-full py-3">
-            Iniciar sesión
+            Entrar al panel
         </x-primary-button>
     </form>
-
-    @if (Route::has('register'))
-        <p class="mt-8 text-center text-sm text-gray-500">
-            ¿Todavía no tienes cuenta?
-            <a href="{{ route('register') }}" class="font-semibold text-blue-700 hover:text-blue-950" wire:navigate>Regístrate</a>
-        </p>
-    @endif
 </div>

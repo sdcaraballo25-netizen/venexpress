@@ -38,18 +38,17 @@ new #[Layout('layouts.guest')] class extends Component
         <x-venexpress-logo size="md" />
     </div>
 
-    <h1 class="font-display text-2xl font-bold text-navy-900">Confirma tu contraseña</h1>
-    <p class="mt-1.5 text-sm text-slate-500">
+    <h1 class="font-display text-2xl font-bold text-blue-950">Confirma tu contraseña</h1>
+    <p class="mt-1.5 text-sm text-gray-500">
         Esta es un área protegida. Confirma tu contraseña antes de continuar.
     </p>
 
     <form wire:submit="confirmPassword" class="mt-8 space-y-5">
         <div>
             <x-input-label for="password" value="Contraseña" />
-            <x-text-input wire:model="password"
+            <x-password-input wire:model="password"
                           id="password"
-                          class="block mt-1.5 w-full"
-                          type="password"
+                          class="block mt-1.5"
                           name="password"
                           required autocomplete="current-password" placeholder="••••••••" />
             <x-input-error :messages="$errors->get('password')" class="mt-2" />

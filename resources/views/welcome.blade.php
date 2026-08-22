@@ -78,12 +78,15 @@
         </div>
 
         <!-- Van -->
-        <div class="relative flex justify-center items-end pb-16">
-            <img
-                src="{{ asset('images/van-hero.png') }}"
-                alt="Furgoneta Venexpress"
-                class="w-full max-w-md relative z-10"
-            >
+        <div class="relative flex justify-center items-end">
+            <div class="relative w-full max-w-md">
+                <img
+                    src="{{ asset('images/van-hero.png') }}"
+                    alt="Furgoneta Venexpress"
+                    class="w-full relative z-10 drop-shadow-[0_30px_25px_rgba(15,23,55,0.25)]"
+                >
+                <div class="absolute left-1/2 bottom-1 -translate-x-1/2 w-[65%] h-5 bg-blue-950/25 rounded-full blur-md"></div>
+            </div>
         </div>
 
     </div>

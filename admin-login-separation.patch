@@ -1,0 +1,150 @@
+diff --git a/bootstrap/app.php b/bootstrap/app.php
+index 69c12d2..d06d482 100644
+--- a/bootstrap/app.php
++++ b/bootstrap/app.php
+@@ -15,6 +15,12 @@
+         $middleware->alias([
+             'role' => EnsureUserHasRole::class,
+         ]);
++
++        // Si un invitado intenta entrar a /admin/* sin sesión, lo mandamos
++        // al login privado de admin en vez del login público general.
++        $middleware->redirectGuestsTo(fn ($request) => $request->is('admin*')
++            ? route('admin.login')
++            : route('login'));
+     })
+     ->withExceptions(function (Exceptions $exceptions): void {
+         //
+diff --git a/resources/views/Livewire/pages/auth/admin-login.blade.php b/resources/views/Livewire/pages/auth/admin-login.blade.php
+new file mode 100644
+index 0000000..5feca94
+--- /dev/null
++++ b/resources/views/Livewire/pages/auth/admin-login.blade.php
+@@ -0,0 +1,78 @@
++<?php
++
++use App\Livewire\Forms\LoginForm;
++use Illuminate\Support\Facades\Auth;
++use Illuminate\Support\Facades\Session;
++use Illuminate\Validation\ValidationException;
++use Livewire\Attributes\Layout;
++use Livewire\Volt\Component;
++
++new #[Layout('layouts.guest')] class extends Component
++{
++    public LoginForm $form;
++
++    /**
++     * Handle an incoming authentication request for the admin panel.
++     *
++     * Esta página no se enlaza desde ningún lugar de la UI pública:
++     * solo se accede escribiendo /admin/login directamente.
++     */
++    public function login(): void
++    {
++        $this->validate();
++
++        $this->form->authenticate();
++
++        // Solo cuentas con role = admin pueden entrar por esta puerta.
++        if (! Auth::user()->isAdmin()) {
++            Auth::logout();
++
++            throw ValidationException::withMessages([
++                'form.email' => 'Estas credenciales no corresponden a una cuenta de administrador.',
++            ]);
++        }
++
++        Session::regenerate();
++
++        $this->redirectIntended(default: route('admin.dashboard', absolute: false), navigate: true);
++    }
++}; ?>
++
++<div>
++    <div class="mb-8 lg:hidden">
++        <x-venexpress-logo size="md" />
++    </div>
++
++    <h1 class="font-display text-2xl font-bold text-navy-900">Acceso administrador</h1>
++    <p class="mt-1.5 text-sm text-slate-500">
++        Panel exclusivo para el equipo VenExpress.
++    </p>
++
++    <x-auth-session-status class="mt-6" :status="session('status')" />
++
++    <form wire:submit="login" class="mt-8 space-y-5">
++        <div>
++            <x-input-label for="email" value="Correo electrónico" />
++            <x-text-input wire:model="form.email" id="email" class="block mt-1.5 w-full" type="email" name="email" required autofocus autocomplete="username" placeholder="admin@venexpress.com" />
++            <x-input-error :messages="$errors->get('form.email')" class="mt-2" />
++        </div>
++
++        <div>
++            <x-input-label for="password" value="Contraseña" />
++            <x-text-input wire:model="form.password" id="password" class="block mt-1.5 w-full"
++                            type="password"
++                            name="password"
++                            required autocomplete="current-password" placeholder="••••••••" />
++            <x-input-error :messages="$errors->get('form.password')" class="mt-2" />
++        </div>
++
++        <label for="remember" class="flex items-center gap-2 text-sm text-slate-600">
++            <input wire:model="form.remember" id="remember" type="checkbox" class="rounded border-navy-200 text-navy-600 shadow-sm focus:ring-navy-400" name="remember">
++            Recordarme en este dispositivo
++        </label>
++
++        <x-primary-button class="w-full py-3">
++            Entrar al panel
++        </x-primary-button>
++    </form>
++</div>
+diff --git a/resources/views/Livewire/pages/auth/login.blade.php b/resources/views/Livewire/pages/auth/login.blade.php
+index c11bc2c..e296a66 100644
+--- a/resources/views/Livewire/pages/auth/login.blade.php
++++ b/resources/views/Livewire/pages/auth/login.blade.php
+@@ -1,7 +1,9 @@
+ <?php
+ 
+ use App\Livewire\Forms\LoginForm;
++use Illuminate\Support\Facades\Auth;
+ use Illuminate\Support\Facades\Session;
++use Illuminate\Validation\ValidationException;
+ use Livewire\Attributes\Layout;
+ use Livewire\Volt\Component;
+ 
+@@ -18,6 +20,18 @@ public function login(): void
+ 
+         $this->form->authenticate();
+ 
++        $user = Auth::user();
++
++        // Los administradores no inician sesión por aquí: deben usar
++        // el acceso privado (/admin/login).
++        if ($user->isAdmin()) {
++            Auth::logout();
++
++            throw ValidationException::withMessages([
++                'form.email' => 'Los administradores deben ingresar por el acceso correspondiente.',
++            ]);
++        }
++
+         Session::regenerate();
+ 
+         $this->redirectIntended(default: route('dashboard', absolute: false), navigate: true);
+diff --git a/routes/auth.php b/routes/auth.php
+index 6ae7f1b..ec5a584 100644
+--- a/routes/auth.php
++++ b/routes/auth.php
+@@ -12,6 +12,11 @@
+     Volt::route('login', 'pages.auth.login')
+         ->name('login');
+ 
++    // Acceso exclusivo de administradores. No se enlaza desde ninguna
++    // vista pública: solo se llega escribiendo esta URL directamente.
++    Volt::route('admin/login', 'pages.auth.admin-login')
++        ->name('admin.login');
++
+     Volt::route('forgot-password', 'pages.auth.forgot-password')
+         ->name('password.request');
+ 

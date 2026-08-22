@@ -68,8 +68,8 @@ new #[Layout('layouts.guest')] class extends Component
         <x-venexpress-logo size="md" />
     </div>
 
-    <h1 class="font-display text-2xl font-bold text-navy-900">Restablecer contraseña</h1>
-    <p class="mt-1.5 text-sm text-slate-500">
+    <h1 class="font-display text-2xl font-bold text-blue-950">Restablecer contraseña</h1>
+    <p class="mt-1.5 text-sm text-gray-500">
         Elige una nueva contraseña para tu cuenta.
     </p>
 
@@ -82,14 +82,13 @@ new #[Layout('layouts.guest')] class extends Component
 
         <div>
             <x-input-label for="password" value="Nueva contraseña" />
-            <x-text-input wire:model="password" id="password" class="block mt-1.5 w-full" type="password" name="password" required autocomplete="new-password" placeholder="••••••••" />
+            <x-password-input wire:model="password" id="password" class="block mt-1.5" name="password" required autocomplete="new-password" placeholder="••••••••" />
             <x-input-error :messages="$errors->get('password')" class="mt-2" />
         </div>
 
         <div>
             <x-input-label for="password_confirmation" value="Confirmar nueva contraseña" />
-            <x-text-input wire:model="password_confirmation" id="password_confirmation" class="block mt-1.5 w-full"
-                          type="password"
+            <x-password-input wire:model="password_confirmation" id="password_confirmation" class="block mt-1.5"
                           name="password_confirmation" required autocomplete="new-password" placeholder="••••••••" />
             <x-input-error :messages="$errors->get('password_confirmation')" class="mt-2" />
         </div>
