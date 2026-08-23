@@ -74,8 +74,10 @@
 
                     <p class="px-2 text-xs font-semibold text-[#94A3B8] uppercase tracking-wider mb-3 mt-6">Administración</p>
 
-                    {{-- Enlace Inactivo (Gestión de usuarios) --}}
-                    <a href="#" class="flex items-center gap-3 px-4 py-3 text-[#64748B] hover:bg-slate-50 hover:text-[#0F172A] rounded-xl font-medium transition-colors">
+                    {{-- Gestión de usuarios --}}
+                    <a href="{{ route('admin.users') }}"
+                       class="flex items-center gap-3 px-4 py-3 rounded-xl font-medium transition-colors
+                              {{ request()->routeIs('admin.users') ? 'bg-blue-50 text-blue-900' : 'text-[#64748B] hover:bg-slate-50 hover:text-[#0F172A]' }}">
                         <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M18 9v3m0 0v3m0-3h3m-3 0h-3m-2-5a4 4 0 11-8 0 4 4 0 018 0zM3 20a6 6 0 0112 0v1H3v-1z"></path></svg>
                         Gestión de usuarios
                     </a>

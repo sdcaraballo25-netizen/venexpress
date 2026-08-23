@@ -52,7 +52,7 @@ new #[Layout('layouts.guest')] class extends Component
 
             'role' => [
                 'required',
-                'in:cliente,chofer,aliado',
+                'in:cliente,repartidor,aliado',
             ],
 
             'password' => [
@@ -104,7 +104,7 @@ new #[Layout('layouts.guest')] class extends Component
         |--------------------------------------------------------------------------
         */
 
-        if ($this->role === User::ROLE_CHOFER) {
+        if ($this->role === User::ROLE_REPARTIDOR) {
             $rules = array_merge($rules, [
                 'vehicle_plate' => [
                     'required',
@@ -298,7 +298,7 @@ new #[Layout('layouts.guest')] class extends Component
                     Cliente
                 </option>
 
-                <option value="chofer">
+                <option value="repartidor">
                     Repartidor
                 </option>
 
@@ -421,7 +421,7 @@ new #[Layout('layouts.guest')] class extends Component
         {{-- DATOS DEL CHOFER --}}
         {{-- ====================================================== --}}
 
-        @if ($role === 'chofer')
+        @if ($role === 'repartidor')
 
             <div class="border-t border-gray-200 pt-5">
 

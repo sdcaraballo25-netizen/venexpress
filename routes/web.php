@@ -7,6 +7,7 @@ use App\Livewire\Admin\BcvRateManager;
 use App\Livewire\Admin\RateMatrixManager;
 use App\Livewire\Admin\CityDistanceManager;
 use App\Livewire\Admin\AlliesManager;
+use App\Livewire\Admin\UsersManager;
 
 /*
 |--------------------------------------------------------------------------
@@ -103,9 +104,9 @@ Route::get('/rastreo/resultado', function () {
     ]);
 })->name('tracking.show');
 
-// Panel administrativo (solo usuarios con role = admin)
+// Panel administrativo para Administrador Principal y Administrador Operativo
 Route::prefix('admin')
-    ->middleware(['auth', 'role:admin'])
+    ->middleware(['auth', 'role:admin_principal,admin_operativo'])
     ->name('admin.')
     ->group(function () {
         Route::get('/', AdminDashboard::class)->name('dashboard');
@@ -113,6 +114,7 @@ Route::prefix('admin')
         Route::get('/bcv-rates', BcvRateManager::class)->name('bcv-rates');
         Route::get('/rate-matrices', RateMatrixManager::class)->name('rate-matrices');
         Route::get('/city-distances', CityDistanceManager::class)->name('city-distances');
+        Route::get('/users', UsersManager::class)->name('users');
     });
 
 require __DIR__.'/auth.php';

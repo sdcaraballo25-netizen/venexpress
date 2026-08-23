@@ -38,6 +38,14 @@ class LoginForm extends Form
             ]);
         }
 
+        if (method_exists(Auth::user(), 'isActive') && ! Auth::user()->isActive()) {
+            Auth::logout();
+
+            throw ValidationException::withMessages([
+                'form.email' => 'Esta cuenta está inactiva. Contacta a un administrador.',
+            ]);
+        }
+
         RateLimiter::clear($this->throttleKey());
     }
 

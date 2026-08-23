@@ -17,6 +17,19 @@
       "source_location": "L11"
     },
     {
+      "id": "database_seeders_databaseseeder_databaseseeder",
+      "label": "DatabaseSeeder",
+      "_callable": true,
+      "_callable_class": true,
+      "_origin": "ast",
+      "community": 0,
+      "community_name": "User",
+      "file_type": "code",
+      "norm_label": "databaseseeder",
+      "source_file": "database/seeders/DatabaseSeeder.php",
+      "source_location": "L9"
+    },
+    {
       "id": "tests_feature_auth_authenticationtest_authenticationtest",
       "label": "AuthenticationTest",
       "_callable": true,
@@ -186,19 +199,6 @@
       "source_location": "L8"
     },
     {
-      "id": "app_livewire_admin_bcvratemanager_bcvratemanager",
-      "label": "BcvRateManager",
-      "_callable": true,
-      "_callable_class": true,
-      "_origin": "ast",
-      "community": 14,
-      "community_name": "CityDistance",
-      "file_type": "code",
-      "norm_label": "bcvratemanager",
-      "source_file": "app/Livewire/Admin/BcvRateManager.php",
-      "source_location": "L12"
-    },
-    {
       "id": "app_livewire_admin_citydistancemanager_citydistancemanager",
       "label": "CityDistanceManager",
       "_callable": true,
@@ -210,19 +210,6 @@
       "norm_label": "citydistancemanager",
       "source_file": "app/Livewire/Admin/CityDistanceManager.php",
       "source_location": "L18"
-    },
-    {
-      "id": "app_livewire_admin_dashboard_dashboard",
-      "label": "Dashboard",
-      "_callable": true,
-      "_callable_class": true,
-      "_origin": "ast",
-      "community": 14,
-      "community_name": "CityDistance",
-      "file_type": "code",
-      "norm_label": "dashboard",
-      "source_file": "app/Livewire/Admin/Dashboard.php",
-      "source_location": "L13"
     },
     {
       "id": "app_models_citydistance_citydistance",
@@ -238,6 +225,19 @@
       "source_location": "L8"
     },
     {
+      "id": "database_factories_userfactory_userfactory",
+      "label": "UserFactory",
+      "_callable": true,
+      "_callable_class": true,
+      "_origin": "ast",
+      "community": 14,
+      "community_name": "CityDistance",
+      "file_type": "code",
+      "norm_label": "userfactory",
+      "source_file": "database/factories/UserFactory.php",
+      "source_location": "L13"
+    },
+    {
       "id": "tests_unit_exampletest_exampletest",
       "label": "ExampleTest",
       "_callable": true,
@@ -249,6 +249,45 @@
       "norm_label": "exampletest",
       "source_file": "tests/Unit/ExampleTest.php",
       "source_location": "L7"
+    },
+    {
+      "id": "app_livewire_admin_alliesmanager_alliesmanager",
+      "label": "AlliesManager",
+      "_callable": true,
+      "_callable_class": true,
+      "_origin": "ast",
+      "community": 2,
+      "community_name": "Package",
+      "file_type": "code",
+      "norm_label": "alliesmanager",
+      "source_file": "app/Livewire/Admin/AlliesManager.php",
+      "source_location": "L11"
+    },
+    {
+      "id": "app_livewire_admin_bcvratemanager_bcvratemanager",
+      "label": "BcvRateManager",
+      "_callable": true,
+      "_callable_class": true,
+      "_origin": "ast",
+      "community": 2,
+      "community_name": "Package",
+      "file_type": "code",
+      "norm_label": "bcvratemanager",
+      "source_file": "app/Livewire/Admin/BcvRateManager.php",
+      "source_location": "L12"
+    },
+    {
+      "id": "app_livewire_admin_dashboard_dashboard",
+      "label": "Dashboard",
+      "_callable": true,
+      "_callable_class": true,
+      "_origin": "ast",
+      "community": 2,
+      "community_name": "Package",
+      "file_type": "code",
+      "norm_label": "dashboard",
+      "source_file": "app/Livewire/Admin/Dashboard.php",
+      "source_location": "L14"
     },
     {
       "id": "app_livewire_ally_createpackage_createpackage",
@@ -329,19 +368,6 @@
       "source_location": "L9"
     },
     {
-      "id": "app_services_bcvrateservice_bcvrateservice",
-      "label": "BcvRateService",
-      "_callable": true,
-      "_callable_class": true,
-      "_origin": "ast",
-      "community": 2,
-      "community_name": "Package",
-      "file_type": "code",
-      "norm_label": "bcvrateservice",
-      "source_file": "app/Services/BcvRateService.php",
-      "source_location": "L9"
-    },
-    {
       "id": "app_services_packageservice_packageservice",
       "label": "PackageService",
       "_callable": true,
@@ -353,19 +379,6 @@
       "norm_label": "packageservice",
       "source_file": "app/Services/PackageService.php",
       "source_location": "L11"
-    },
-    {
-      "id": "database_seeders_databaseseeder_databaseseeder",
-      "label": "DatabaseSeeder",
-      "_callable": true,
-      "_callable_class": true,
-      "_origin": "ast",
-      "community": 4,
-      "community_name": "DatabaseSeeder.php",
-      "file_type": "code",
-      "norm_label": "databaseseeder",
-      "source_file": "database/seeders/DatabaseSeeder.php",
-      "source_location": "L9"
     },
     {
       "id": "app_http_controllers_auth_verifyemailcontroller_verifyemailcontroller",
@@ -420,19 +433,6 @@
       "source_location": "L9"
     },
     {
-      "id": "app_livewire_actions_logout_logout",
-      "label": "Logout",
-      "_callable": true,
-      "_callable_class": true,
-      "_origin": "ast",
-      "community": 8,
-      "community_name": "VerifyEmailController.php",
-      "file_type": "code",
-      "norm_label": "logout",
-      "source_file": "app/Livewire/Actions/Logout.php",
-      "source_location": "L8"
-    },
-    {
       "id": "app_livewire_admin_ratematrixmanager_ratematrixmanager",
       "label": "RateMatrixManager",
       "_callable": true,
@@ -459,6 +459,19 @@
       "source_location": "L8"
     },
     {
+      "id": "app_services_bcvrateservice_bcvrateservice",
+      "label": "BcvRateService",
+      "_callable": true,
+      "_callable_class": true,
+      "_origin": "ast",
+      "community": 84,
+      "community_name": "TariffService",
+      "file_type": "code",
+      "norm_label": "bcvrateservice",
+      "source_file": "app/Services/BcvRateService.php",
+      "source_location": "L9"
+    },
+    {
       "id": "app_services_tariffservice_tariffservice",
       "label": "TariffService",
       "_callable": true,
@@ -470,6 +483,19 @@
       "norm_label": "tariffservice",
       "source_file": "app/Services/TariffService.php",
       "source_location": "L10"
+    },
+    {
+      "id": "app_livewire_actions_logout_logout",
+      "label": "Logout",
+      "_callable": true,
+      "_callable_class": true,
+      "_origin": "ast",
+      "community": 9,
+      "community_name": "LoginForm.php",
+      "file_type": "code",
+      "norm_label": "logout",
+      "source_file": "app/Livewire/Actions/Logout.php",
+      "source_location": "L8"
     },
     {
       "id": "app_livewire_forms_loginform_loginform",
@@ -485,19 +511,6 @@
       "source_location": "L13"
     },
     {
-      "id": "database_factories_userfactory_userfactory",
-      "label": "UserFactory",
-      "_callable": true,
-      "_callable_class": true,
-      "_origin": "ast",
-      "community": 9,
-      "community_name": "LoginForm.php",
-      "file_type": "code",
-      "norm_label": "userfactory",
-      "source_file": "database/factories/UserFactory.php",
-      "source_location": "L13"
-    },
-    {
       "id": "app_models_user_user_ally",
       "label": ".ally()",
       "_callable": true,
@@ -507,7 +520,7 @@
       "file_type": "code",
       "norm_label": ".ally()",
       "source_file": "app/Models/User.php",
-      "source_location": "L67"
+      "source_location": "L68"
     },
     {
       "id": "app_models_user_user_casts",
@@ -519,7 +532,7 @@
       "file_type": "code",
       "norm_label": ".casts()",
       "source_file": "app/Models/User.php",
-      "source_location": "L50"
+      "source_location": "L51"
     },
     {
       "id": "app_models_user_user_driver",
@@ -531,7 +544,7 @@
       "file_type": "code",
       "norm_label": ".driver()",
       "source_file": "app/Models/User.php",
-      "source_location": "L75"
+      "source_location": "L76"
     },
     {
       "id": "app_models_user_user_isadmin",
@@ -543,7 +556,7 @@
       "file_type": "code",
       "norm_label": ".isadmin()",
       "source_file": "app/Models/User.php",
-      "source_location": "L94"
+      "source_location": "L95"
     },
     {
       "id": "app_models_user_user_isaliado",
@@ -555,7 +568,7 @@
       "file_type": "code",
       "norm_label": ".isaliado()",
       "source_file": "app/Models/User.php",
-      "source_location": "L99"
+      "source_location": "L100"
     },
     {
       "id": "app_models_user_user_ischofer",
@@ -567,7 +580,31 @@
       "file_type": "code",
       "norm_label": ".ischofer()",
       "source_file": "app/Models/User.php",
-      "source_location": "L104"
+      "source_location": "L105"
+    },
+    {
+      "id": "app_models_user_user_iscliente",
+      "label": ".isCliente()",
+      "_callable": true,
+      "_origin": "ast",
+      "community": 0,
+      "community_name": "User",
+      "file_type": "code",
+      "norm_label": ".iscliente()",
+      "source_file": "app/Models/User.php",
+      "source_location": "L110"
+    },
+    {
+      "id": "database_seeders_databaseseeder_databaseseeder_run",
+      "label": ".run()",
+      "_callable": true,
+      "_origin": "ast",
+      "community": 0,
+      "community_name": "User",
+      "file_type": "code",
+      "norm_label": ".run()",
+      "source_file": "database/seeders/DatabaseSeeder.php",
+      "source_location": "L16"
     },
     {
       "id": "tests_feature_auth_authenticationtest_authenticationtest_test_login_screen_can_be_rendered",
@@ -1191,7 +1228,7 @@
       "file_type": "code",
       "norm_label": "down()",
       "source_file": "database/migrations/2026_08_11_193201_convert_rate_matrices_to_global_tariff.php",
-      "source_location": "L56"
+      "source_location": "L64"
     },
     {
       "id": "database_migrations_2026_08_11_193201_convert_rate_matrices_to_global_tariff_up",
@@ -1278,6 +1315,78 @@
       "source_location": "L17"
     },
     {
+      "id": "database_migrations_2026_08_22_195324_add_cliente_role_to_users_table_down",
+      "label": "down()",
+      "_callable": true,
+      "_origin": "ast",
+      "community": 1,
+      "community_name": "Illuminate\\Database\\Migrations\\Migration",
+      "file_type": "code",
+      "norm_label": "down()",
+      "source_file": "database/migrations/2026_08_22_195324_add_cliente_role_to_users_table.php",
+      "source_location": "L27"
+    },
+    {
+      "id": "database_migrations_2026_08_22_195324_add_cliente_role_to_users_table_up",
+      "label": "up()",
+      "_callable": true,
+      "_origin": "ast",
+      "community": 1,
+      "community_name": "Illuminate\\Database\\Migrations\\Migration",
+      "file_type": "code",
+      "norm_label": "up()",
+      "source_file": "database/migrations/2026_08_22_195324_add_cliente_role_to_users_table.php",
+      "source_location": "L12"
+    },
+    {
+      "id": "database_migrations_2026_08_22_213928_add_status_to_allies_table_down",
+      "label": "down()",
+      "_callable": true,
+      "_origin": "ast",
+      "community": 1,
+      "community_name": "Illuminate\\Database\\Migrations\\Migration",
+      "file_type": "code",
+      "norm_label": "down()",
+      "source_file": "database/migrations/2026_08_22_213928_add_status_to_allies_table.php",
+      "source_location": "L24"
+    },
+    {
+      "id": "database_migrations_2026_08_22_213928_add_status_to_allies_table_up",
+      "label": "up()",
+      "_callable": true,
+      "_origin": "ast",
+      "community": 1,
+      "community_name": "Illuminate\\Database\\Migrations\\Migration",
+      "file_type": "code",
+      "norm_label": "up()",
+      "source_file": "database/migrations/2026_08_22_213928_add_status_to_allies_table.php",
+      "source_location": "L9"
+    },
+    {
+      "id": "database_migrations_2026_08_22_213952_add_status_to_drivers_table_down",
+      "label": "down()",
+      "_callable": true,
+      "_origin": "ast",
+      "community": 1,
+      "community_name": "Illuminate\\Database\\Migrations\\Migration",
+      "file_type": "code",
+      "norm_label": "down()",
+      "source_file": "database/migrations/2026_08_22_213952_add_status_to_drivers_table.php",
+      "source_location": "L24"
+    },
+    {
+      "id": "database_migrations_2026_08_22_213952_add_status_to_drivers_table_up",
+      "label": "up()",
+      "_callable": true,
+      "_origin": "ast",
+      "community": 1,
+      "community_name": "Illuminate\\Database\\Migrations\\Migration",
+      "file_type": "code",
+      "norm_label": "up()",
+      "source_file": "database/migrations/2026_08_22_213952_add_status_to_drivers_table.php",
+      "source_location": "L9"
+    },
+    {
       "id": "app_providers_appserviceprovider_appserviceprovider_boot",
       "label": ".boot()",
       "_callable": true,
@@ -1348,102 +1457,6 @@
       "norm_label": ".render()",
       "source_file": "app/View/Components/GuestLayout.php",
       "source_location": "L13"
-    },
-    {
-      "id": "app_livewire_admin_bcvratemanager_bcvratemanager_canceledit",
-      "label": ".cancelEdit()",
-      "_callable": true,
-      "_origin": "ast",
-      "community": 14,
-      "community_name": "CityDistance",
-      "file_type": "code",
-      "norm_label": ".canceledit()",
-      "source_file": "app/Livewire/Admin/BcvRateManager.php",
-      "source_location": "L82"
-    },
-    {
-      "id": "app_livewire_admin_bcvratemanager_bcvratemanager_delete",
-      "label": ".delete()",
-      "_callable": true,
-      "_origin": "ast",
-      "community": 14,
-      "community_name": "CityDistance",
-      "file_type": "code",
-      "norm_label": ".delete()",
-      "source_file": "app/Livewire/Admin/BcvRateManager.php",
-      "source_location": "L87"
-    },
-    {
-      "id": "app_livewire_admin_bcvratemanager_bcvratemanager_edit",
-      "label": ".edit()",
-      "_callable": true,
-      "_origin": "ast",
-      "community": 14,
-      "community_name": "CityDistance",
-      "file_type": "code",
-      "norm_label": ".edit()",
-      "source_file": "app/Livewire/Admin/BcvRateManager.php",
-      "source_location": "L73"
-    },
-    {
-      "id": "app_livewire_admin_bcvratemanager_bcvratemanager_mount",
-      "label": ".mount()",
-      "_callable": true,
-      "_origin": "ast",
-      "community": 14,
-      "community_name": "CityDistance",
-      "file_type": "code",
-      "norm_label": ".mount()",
-      "source_file": "app/Livewire/Admin/BcvRateManager.php",
-      "source_location": "L46"
-    },
-    {
-      "id": "app_livewire_admin_bcvratemanager_bcvratemanager_render",
-      "label": ".render()",
-      "_callable": true,
-      "_origin": "ast",
-      "community": 14,
-      "community_name": "CityDistance",
-      "file_type": "code",
-      "norm_label": ".render()",
-      "source_file": "app/Livewire/Admin/BcvRateManager.php",
-      "source_location": "L107"
-    },
-    {
-      "id": "app_livewire_admin_bcvratemanager_bcvratemanager_resetform",
-      "label": ".resetForm()",
-      "_callable": true,
-      "_origin": "ast",
-      "community": 14,
-      "community_name": "CityDistance",
-      "file_type": "code",
-      "norm_label": ".resetform()",
-      "source_file": "app/Livewire/Admin/BcvRateManager.php",
-      "source_location": "L100"
-    },
-    {
-      "id": "app_livewire_admin_bcvratemanager_bcvratemanager_rules",
-      "label": ".rules()",
-      "_callable": true,
-      "_origin": "ast",
-      "community": 14,
-      "community_name": "CityDistance",
-      "file_type": "code",
-      "norm_label": ".rules()",
-      "source_file": "app/Livewire/Admin/BcvRateManager.php",
-      "source_location": "L24"
-    },
-    {
-      "id": "app_livewire_admin_bcvratemanager_bcvratemanager_save",
-      "label": ".save()",
-      "_callable": true,
-      "_origin": "ast",
-      "community": 14,
-      "community_name": "CityDistance",
-      "file_type": "code",
-      "norm_label": ".save()",
-      "source_file": "app/Livewire/Admin/BcvRateManager.php",
-      "source_location": "L51"
     },
     {
       "id": "app_livewire_admin_citydistancemanager_citydistancemanager_canceledit",
@@ -1542,6 +1555,30 @@
       "source_location": "L57"
     },
     {
+      "id": "app_models_bcvrate_bcvrate_current",
+      "label": ".current()",
+      "_callable": true,
+      "_origin": "ast",
+      "community": 14,
+      "community_name": "CityDistance",
+      "file_type": "code",
+      "norm_label": ".current()",
+      "source_file": "app/Models/BcvRate.php",
+      "source_location": "L38"
+    },
+    {
+      "id": "app_models_citydistance_citydistance_between",
+      "label": ".between()",
+      "_callable": true,
+      "_origin": "ast",
+      "community": 14,
+      "community_name": "CityDistance",
+      "file_type": "code",
+      "norm_label": ".between()",
+      "source_file": "app/Models/CityDistance.php",
+      "source_location": "L42"
+    },
+    {
       "id": "app_models_citydistance_citydistance_casts",
       "label": ".casts()",
       "_callable": true,
@@ -1566,6 +1603,54 @@
       "source_location": "L72"
     },
     {
+      "id": "app_models_citydistance_citydistance_setdistance",
+      "label": ".setDistance()",
+      "_callable": true,
+      "_origin": "ast",
+      "community": 14,
+      "community_name": "CityDistance",
+      "file_type": "code",
+      "norm_label": ".setdistance()",
+      "source_file": "app/Models/CityDistance.php",
+      "source_location": "L56"
+    },
+    {
+      "id": "app_models_ratematrix_ratematrix_current",
+      "label": ".current()",
+      "_callable": true,
+      "_origin": "ast",
+      "community": 14,
+      "community_name": "CityDistance",
+      "file_type": "code",
+      "norm_label": ".current()",
+      "source_file": "app/Models/RateMatrix.php",
+      "source_location": "L49"
+    },
+    {
+      "id": "database_factories_userfactory_userfactory_definition",
+      "label": ".definition()",
+      "_callable": true,
+      "_origin": "ast",
+      "community": 14,
+      "community_name": "CityDistance",
+      "file_type": "code",
+      "norm_label": ".definition()",
+      "source_file": "database/factories/UserFactory.php",
+      "source_location": "L25"
+    },
+    {
+      "id": "database_factories_userfactory_userfactory_unverified",
+      "label": ".unverified()",
+      "_callable": true,
+      "_origin": "ast",
+      "community": 14,
+      "community_name": "CityDistance",
+      "file_type": "code",
+      "norm_label": ".unverified()",
+      "source_file": "database/factories/UserFactory.php",
+      "source_location": "L39"
+    },
+    {
       "id": "tests_unit_exampletest_exampletest_test_that_true_is_true",
       "label": ".test_that_true_is_true()",
       "_callable": true,
@@ -1578,6 +1663,174 @@
       "source_location": "L12"
     },
     {
+      "id": "app_livewire_admin_alliesmanager_alliesmanager_activate",
+      "label": ".activate()",
+      "_callable": true,
+      "_origin": "ast",
+      "community": 2,
+      "community_name": "Package",
+      "file_type": "code",
+      "norm_label": ".activate()",
+      "source_file": "app/Livewire/Admin/AlliesManager.php",
+      "source_location": "L64"
+    },
+    {
+      "id": "app_livewire_admin_alliesmanager_alliesmanager_approve",
+      "label": ".approve()",
+      "_callable": true,
+      "_origin": "ast",
+      "community": 2,
+      "community_name": "Package",
+      "file_type": "code",
+      "norm_label": ".approve()",
+      "source_file": "app/Livewire/Admin/AlliesManager.php",
+      "source_location": "L22"
+    },
+    {
+      "id": "app_livewire_admin_alliesmanager_alliesmanager_reject",
+      "label": ".reject()",
+      "_callable": true,
+      "_origin": "ast",
+      "community": 2,
+      "community_name": "Package",
+      "file_type": "code",
+      "norm_label": ".reject()",
+      "source_file": "app/Livewire/Admin/AlliesManager.php",
+      "source_location": "L36"
+    },
+    {
+      "id": "app_livewire_admin_alliesmanager_alliesmanager_render",
+      "label": ".render()",
+      "_callable": true,
+      "_origin": "ast",
+      "community": 2,
+      "community_name": "Package",
+      "file_type": "code",
+      "norm_label": ".render()",
+      "source_file": "app/Livewire/Admin/AlliesManager.php",
+      "source_location": "L83"
+    },
+    {
+      "id": "app_livewire_admin_alliesmanager_alliesmanager_suspend",
+      "label": ".suspend()",
+      "_callable": true,
+      "_origin": "ast",
+      "community": 2,
+      "community_name": "Package",
+      "file_type": "code",
+      "norm_label": ".suspend()",
+      "source_file": "app/Livewire/Admin/AlliesManager.php",
+      "source_location": "L50"
+    },
+    {
+      "id": "app_livewire_admin_alliesmanager_alliesmanager_updatingsearch",
+      "label": ".updatingSearch()",
+      "_callable": true,
+      "_origin": "ast",
+      "community": 2,
+      "community_name": "Package",
+      "file_type": "code",
+      "norm_label": ".updatingsearch()",
+      "source_file": "app/Livewire/Admin/AlliesManager.php",
+      "source_location": "L78"
+    },
+    {
+      "id": "app_livewire_admin_bcvratemanager_bcvratemanager_canceledit",
+      "label": ".cancelEdit()",
+      "_callable": true,
+      "_origin": "ast",
+      "community": 2,
+      "community_name": "Package",
+      "file_type": "code",
+      "norm_label": ".canceledit()",
+      "source_file": "app/Livewire/Admin/BcvRateManager.php",
+      "source_location": "L82"
+    },
+    {
+      "id": "app_livewire_admin_bcvratemanager_bcvratemanager_delete",
+      "label": ".delete()",
+      "_callable": true,
+      "_origin": "ast",
+      "community": 2,
+      "community_name": "Package",
+      "file_type": "code",
+      "norm_label": ".delete()",
+      "source_file": "app/Livewire/Admin/BcvRateManager.php",
+      "source_location": "L87"
+    },
+    {
+      "id": "app_livewire_admin_bcvratemanager_bcvratemanager_edit",
+      "label": ".edit()",
+      "_callable": true,
+      "_origin": "ast",
+      "community": 2,
+      "community_name": "Package",
+      "file_type": "code",
+      "norm_label": ".edit()",
+      "source_file": "app/Livewire/Admin/BcvRateManager.php",
+      "source_location": "L73"
+    },
+    {
+      "id": "app_livewire_admin_bcvratemanager_bcvratemanager_mount",
+      "label": ".mount()",
+      "_callable": true,
+      "_origin": "ast",
+      "community": 2,
+      "community_name": "Package",
+      "file_type": "code",
+      "norm_label": ".mount()",
+      "source_file": "app/Livewire/Admin/BcvRateManager.php",
+      "source_location": "L46"
+    },
+    {
+      "id": "app_livewire_admin_bcvratemanager_bcvratemanager_render",
+      "label": ".render()",
+      "_callable": true,
+      "_origin": "ast",
+      "community": 2,
+      "community_name": "Package",
+      "file_type": "code",
+      "norm_label": ".render()",
+      "source_file": "app/Livewire/Admin/BcvRateManager.php",
+      "source_location": "L107"
+    },
+    {
+      "id": "app_livewire_admin_bcvratemanager_bcvratemanager_resetform",
+      "label": ".resetForm()",
+      "_callable": true,
+      "_origin": "ast",
+      "community": 2,
+      "community_name": "Package",
+      "file_type": "code",
+      "norm_label": ".resetform()",
+      "source_file": "app/Livewire/Admin/BcvRateManager.php",
+      "source_location": "L100"
+    },
+    {
+      "id": "app_livewire_admin_bcvratemanager_bcvratemanager_rules",
+      "label": ".rules()",
+      "_callable": true,
+      "_origin": "ast",
+      "community": 2,
+      "community_name": "Package",
+      "file_type": "code",
+      "norm_label": ".rules()",
+      "source_file": "app/Livewire/Admin/BcvRateManager.php",
+      "source_location": "L24"
+    },
+    {
+      "id": "app_livewire_admin_bcvratemanager_bcvratemanager_save",
+      "label": ".save()",
+      "_callable": true,
+      "_origin": "ast",
+      "community": 2,
+      "community_name": "Package",
+      "file_type": "code",
+      "norm_label": ".save()",
+      "source_file": "app/Livewire/Admin/BcvRateManager.php",
+      "source_location": "L51"
+    },
+    {
       "id": "app_livewire_admin_dashboard_dashboard_render",
       "label": ".render()",
       "_callable": true,
@@ -1587,7 +1840,7 @@
       "file_type": "code",
       "norm_label": ".render()",
       "source_file": "app/Livewire/Admin/Dashboard.php",
-      "source_location": "L17"
+      "source_location": "L18"
     },
     {
       "id": "app_livewire_ally_createpackage_createpackage_pricingpreview",
@@ -1647,7 +1900,7 @@
       "file_type": "code",
       "norm_label": ".casts()",
       "source_file": "app/Models/Ally.php",
-      "source_location": "L33"
+      "source_location": "L39"
     },
     {
       "id": "app_models_ally_ally_packages",
@@ -1659,7 +1912,7 @@
       "file_type": "code",
       "norm_label": ".packages()",
       "source_file": "app/Models/Ally.php",
-      "source_location": "L57"
+      "source_location": "L63"
     },
     {
       "id": "app_models_ally_ally_user",
@@ -1671,7 +1924,7 @@
       "file_type": "code",
       "norm_label": ".user()",
       "source_file": "app/Models/Ally.php",
-      "source_location": "L49"
+      "source_location": "L55"
     },
     {
       "id": "app_models_bcvrate_bcvrate_casts",
@@ -1695,7 +1948,7 @@
       "file_type": "code",
       "norm_label": ".packages()",
       "source_file": "app/Models/Driver.php",
-      "source_location": "L43"
+      "source_location": "L50"
     },
     {
       "id": "app_models_driver_driver_user",
@@ -1707,7 +1960,7 @@
       "file_type": "code",
       "norm_label": ".user()",
       "source_file": "app/Models/Driver.php",
-      "source_location": "L35"
+      "source_location": "L42"
     },
     {
       "id": "app_models_package_package_ally",
@@ -1815,43 +2068,7 @@
       "file_type": "code",
       "norm_label": ".packagehistories()",
       "source_file": "app/Models/User.php",
-      "source_location": "L83"
-    },
-    {
-      "id": "app_services_bcvrateservice_bcvrateservice_convertusdtoves",
-      "label": ".convertUsdToVes()",
-      "_callable": true,
-      "_origin": "ast",
-      "community": 2,
-      "community_name": "Package",
-      "file_type": "code",
-      "norm_label": ".convertusdtoves()",
-      "source_file": "app/Services/BcvRateService.php",
-      "source_location": "L45"
-    },
-    {
-      "id": "app_services_bcvrateservice_bcvrateservice_getcurrentrate",
-      "label": ".getCurrentRate()",
-      "_callable": true,
-      "_origin": "ast",
-      "community": 2,
-      "community_name": "Package",
-      "file_type": "code",
-      "norm_label": ".getcurrentrate()",
-      "source_file": "app/Services/BcvRateService.php",
-      "source_location": "L16"
-    },
-    {
-      "id": "app_services_bcvrateservice_bcvrateservice_setrate",
-      "label": ".setRate()",
-      "_callable": true,
-      "_origin": "ast",
-      "community": 2,
-      "community_name": "Package",
-      "file_type": "code",
-      "norm_label": ".setrate()",
-      "source_file": "app/Services/BcvRateService.php",
-      "source_location": "L31"
+      "source_location": "L84"
     },
     {
       "id": "app_services_packageservice_packageservice_assigndriver",
@@ -1914,30 +2131,6 @@
       "source_location": "L125"
     },
     {
-      "id": "app_services_tariffservice_tariffservice_construct",
-      "label": ".__construct()",
-      "_callable": true,
-      "_origin": "ast",
-      "community": 2,
-      "community_name": "Package",
-      "file_type": "code",
-      "norm_label": ".__construct()",
-      "source_file": "app/Services/TariffService.php",
-      "source_location": "L12"
-    },
-    {
-      "id": "database_seeders_databaseseeder_databaseseeder_run",
-      "label": ".run()",
-      "_callable": true,
-      "_origin": "ast",
-      "community": 4,
-      "community_name": "DatabaseSeeder.php",
-      "file_type": "code",
-      "norm_label": ".run()",
-      "source_file": "database/seeders/DatabaseSeeder.php",
-      "source_location": "L16"
-    },
-    {
       "id": "app_http_controllers_auth_verifyemailcontroller_verifyemailcontroller_invoke",
       "label": ".__invoke()",
       "_callable": true,
@@ -1960,18 +2153,6 @@
       "norm_label": ".handle()",
       "source_file": "app/Http/Middleware/EnsureUserHasRole.php",
       "source_location": "L16"
-    },
-    {
-      "id": "app_livewire_actions_logout_logout_invoke",
-      "label": ".__invoke()",
-      "_callable": true,
-      "_origin": "ast",
-      "community": 8,
-      "community_name": "VerifyEmailController.php",
-      "file_type": "code",
-      "norm_label": ".__invoke()",
-      "source_file": "app/Livewire/Actions/Logout.php",
-      "source_location": "L13"
     },
     {
       "id": "app_livewire_admin_ratematrixmanager_ratematrixmanager_cancelediting",
@@ -2082,6 +2263,42 @@
       "source_location": "L31"
     },
     {
+      "id": "app_services_bcvrateservice_bcvrateservice_convertusdtoves",
+      "label": ".convertUsdToVes()",
+      "_callable": true,
+      "_origin": "ast",
+      "community": 84,
+      "community_name": "TariffService",
+      "file_type": "code",
+      "norm_label": ".convertusdtoves()",
+      "source_file": "app/Services/BcvRateService.php",
+      "source_location": "L45"
+    },
+    {
+      "id": "app_services_bcvrateservice_bcvrateservice_getcurrentrate",
+      "label": ".getCurrentRate()",
+      "_callable": true,
+      "_origin": "ast",
+      "community": 84,
+      "community_name": "TariffService",
+      "file_type": "code",
+      "norm_label": ".getcurrentrate()",
+      "source_file": "app/Services/BcvRateService.php",
+      "source_location": "L16"
+    },
+    {
+      "id": "app_services_bcvrateservice_bcvrateservice_setrate",
+      "label": ".setRate()",
+      "_callable": true,
+      "_origin": "ast",
+      "community": 84,
+      "community_name": "TariffService",
+      "file_type": "code",
+      "norm_label": ".setrate()",
+      "source_file": "app/Services/BcvRateService.php",
+      "source_location": "L31"
+    },
+    {
       "id": "app_services_packageservice_packageservice_construct",
       "label": ".__construct()",
       "_callable": true,
@@ -2178,6 +2395,18 @@
       "source_location": "L21"
     },
     {
+      "id": "app_services_tariffservice_tariffservice_construct",
+      "label": ".__construct()",
+      "_callable": true,
+      "_origin": "ast",
+      "community": 84,
+      "community_name": "TariffService",
+      "file_type": "code",
+      "norm_label": ".__construct()",
+      "source_file": "app/Services/TariffService.php",
+      "source_location": "L12"
+    },
+    {
       "id": "app_services_tariffservice_tariffservice_finddistance",
       "label": ".findDistance()",
       "_callable": true,
@@ -2200,6 +2429,18 @@
       "norm_label": ".findrate()",
       "source_file": "app/Services/TariffService.php",
       "source_location": "L43"
+    },
+    {
+      "id": "app_livewire_actions_logout_logout_invoke",
+      "label": ".__invoke()",
+      "_callable": true,
+      "_origin": "ast",
+      "community": 9,
+      "community_name": "LoginForm.php",
+      "file_type": "code",
+      "norm_label": ".__invoke()",
+      "source_file": "app/Livewire/Actions/Logout.php",
+      "source_location": "L13"
     },
     {
       "id": "app_livewire_forms_loginform_loginform_authenticate",
@@ -2238,78 +2479,6 @@
       "source_location": "L68"
     },
     {
-      "id": "app_models_bcvrate_bcvrate_current",
-      "label": ".current()",
-      "_callable": true,
-      "_origin": "ast",
-      "community": 9,
-      "community_name": "LoginForm.php",
-      "file_type": "code",
-      "norm_label": ".current()",
-      "source_file": "app/Models/BcvRate.php",
-      "source_location": "L38"
-    },
-    {
-      "id": "app_models_citydistance_citydistance_between",
-      "label": ".between()",
-      "_callable": true,
-      "_origin": "ast",
-      "community": 9,
-      "community_name": "LoginForm.php",
-      "file_type": "code",
-      "norm_label": ".between()",
-      "source_file": "app/Models/CityDistance.php",
-      "source_location": "L42"
-    },
-    {
-      "id": "app_models_citydistance_citydistance_setdistance",
-      "label": ".setDistance()",
-      "_callable": true,
-      "_origin": "ast",
-      "community": 9,
-      "community_name": "LoginForm.php",
-      "file_type": "code",
-      "norm_label": ".setdistance()",
-      "source_file": "app/Models/CityDistance.php",
-      "source_location": "L56"
-    },
-    {
-      "id": "app_models_ratematrix_ratematrix_current",
-      "label": ".current()",
-      "_callable": true,
-      "_origin": "ast",
-      "community": 9,
-      "community_name": "LoginForm.php",
-      "file_type": "code",
-      "norm_label": ".current()",
-      "source_file": "app/Models/RateMatrix.php",
-      "source_location": "L49"
-    },
-    {
-      "id": "database_factories_userfactory_userfactory_definition",
-      "label": ".definition()",
-      "_callable": true,
-      "_origin": "ast",
-      "community": 9,
-      "community_name": "LoginForm.php",
-      "file_type": "code",
-      "norm_label": ".definition()",
-      "source_file": "database/factories/UserFactory.php",
-      "source_location": "L25"
-    },
-    {
-      "id": "database_factories_userfactory_userfactory_unverified",
-      "label": ".unverified()",
-      "_callable": true,
-      "_origin": "ast",
-      "community": 9,
-      "community_name": "LoginForm.php",
-      "file_type": "code",
-      "norm_label": ".unverified()",
-      "source_file": "database/factories/UserFactory.php",
-      "source_location": "L39"
-    },
-    {
       "id": "app_models_user",
       "label": "User.php",
       "_origin": "ast",
@@ -2332,6 +2501,28 @@
       "source_location": "L1"
     },
     {
+      "id": "database_seeders_databaseseeder",
+      "label": "DatabaseSeeder.php",
+      "_origin": "ast",
+      "community": 0,
+      "community_name": "User",
+      "file_type": "code",
+      "norm_label": "databaseseeder.php",
+      "source_file": "database/seeders/DatabaseSeeder.php",
+      "source_location": "L1"
+    },
+    {
+      "id": "illuminate_auth_events_verified",
+      "label": "Illuminate\\Auth\\Events\\Verified",
+      "_origin": "ast",
+      "community": 0,
+      "community_name": "User",
+      "file_type": "code",
+      "norm_label": "illuminate\\auth\\events\\verified",
+      "source_file": "",
+      "source_location": ""
+    },
+    {
       "id": "illuminate_auth_notifications_resetpassword",
       "label": "Illuminate\\Auth\\Notifications\\ResetPassword",
       "_origin": "ast",
@@ -2343,6 +2534,17 @@
       "source_location": ""
     },
     {
+      "id": "illuminate_database_console_seeds_withoutmodelevents",
+      "label": "Illuminate\\Database\\Console\\Seeds\\WithoutModelEvents",
+      "_origin": "ast",
+      "community": 0,
+      "community_name": "User",
+      "file_type": "code",
+      "norm_label": "illuminate\\database\\console\\seeds\\withoutmodelevents",
+      "source_file": "",
+      "source_location": ""
+    },
+    {
       "id": "illuminate_database_eloquent_relations_hasone",
       "label": "Illuminate\\Database\\Eloquent\\Relations\\HasOne",
       "_origin": "ast",
@@ -2350,6 +2552,17 @@
       "community_name": "User",
       "file_type": "code",
       "norm_label": "illuminate\\database\\eloquent\\relations\\hasone",
+      "source_file": "",
+      "source_location": ""
+    },
+    {
+      "id": "illuminate_database_seeder",
+      "label": "Illuminate\\Database\\Seeder",
+      "_origin": "ast",
+      "community": 0,
+      "community_name": "User",
+      "file_type": "code",
+      "norm_label": "illuminate\\database\\seeder",
       "source_file": "",
       "source_location": ""
     },
@@ -2739,6 +2952,39 @@
       "source_location": "L1"
     },
     {
+      "id": "database_migrations_2026_08_22_195324_add_cliente_role_to_users_table",
+      "label": "2026_08_22_195324_add_cliente_role_to_users_table.php",
+      "_origin": "ast",
+      "community": 1,
+      "community_name": "Illuminate\\Database\\Migrations\\Migration",
+      "file_type": "code",
+      "norm_label": "2026_08_22_195324_add_cliente_role_to_users_table.php",
+      "source_file": "database/migrations/2026_08_22_195324_add_cliente_role_to_users_table.php",
+      "source_location": "L1"
+    },
+    {
+      "id": "database_migrations_2026_08_22_213928_add_status_to_allies_table",
+      "label": "2026_08_22_213928_add_status_to_allies_table.php",
+      "_origin": "ast",
+      "community": 1,
+      "community_name": "Illuminate\\Database\\Migrations\\Migration",
+      "file_type": "code",
+      "norm_label": "2026_08_22_213928_add_status_to_allies_table.php",
+      "source_file": "database/migrations/2026_08_22_213928_add_status_to_allies_table.php",
+      "source_location": "L1"
+    },
+    {
+      "id": "database_migrations_2026_08_22_213952_add_status_to_drivers_table",
+      "label": "2026_08_22_213952_add_status_to_drivers_table.php",
+      "_origin": "ast",
+      "community": 1,
+      "community_name": "Illuminate\\Database\\Migrations\\Migration",
+      "file_type": "code",
+      "norm_label": "2026_08_22_213952_add_status_to_drivers_table.php",
+      "source_file": "database/migrations/2026_08_22_213952_add_status_to_drivers_table.php",
+      "source_location": "L1"
+    },
+    {
       "id": "illuminate_database_migrations_migration",
       "label": "Illuminate\\Database\\Migrations\\Migration",
       "_origin": "ast",
@@ -3084,125 +3330,70 @@
       "source_location": ""
     },
     {
-      "id": "app_livewire_admin_bcvratemanager",
-      "label": "BcvRateManager.php",
+      "id": "app_models_bcvrate_php_self",
+      "label": "self",
       "_origin": "ast",
       "community": 14,
       "community_name": "CityDistance",
       "file_type": "code",
-      "norm_label": "bcvratemanager.php",
-      "source_file": "app/Livewire/Admin/BcvRateManager.php",
+      "norm_label": "self",
+      "source_file": "",
+      "source_location": ""
+    },
+    {
+      "id": "app_models_citydistance_php_self",
+      "label": "self",
+      "_origin": "ast",
+      "community": 14,
+      "community_name": "CityDistance",
+      "file_type": "code",
+      "norm_label": "self",
+      "source_file": "",
+      "source_location": ""
+    },
+    {
+      "id": "app_models_ratematrix_php_self",
+      "label": "self",
+      "_origin": "ast",
+      "community": 14,
+      "community_name": "CityDistance",
+      "file_type": "code",
+      "norm_label": "self",
+      "source_file": "",
+      "source_location": ""
+    },
+    {
+      "id": "database_factories_userfactory",
+      "label": "UserFactory.php",
+      "_origin": "ast",
+      "community": 14,
+      "community_name": "CityDistance",
+      "file_type": "code",
+      "norm_label": "userfactory.php",
+      "source_file": "database/factories/UserFactory.php",
       "source_location": "L1"
     },
     {
-      "id": "app_livewire_admin_citydistancemanager",
-      "label": "CityDistanceManager.php",
+      "id": "illuminate_database_eloquent_factories_factory",
+      "label": "Illuminate\\Database\\Eloquent\\Factories\\Factory",
       "_origin": "ast",
       "community": 14,
       "community_name": "CityDistance",
       "file_type": "code",
-      "norm_label": "citydistancemanager.php",
-      "source_file": "app/Livewire/Admin/CityDistanceManager.php",
-      "source_location": "L1"
-    },
-    {
-      "id": "app_livewire_admin_dashboard",
-      "label": "Dashboard.php",
-      "_origin": "ast",
-      "community": 14,
-      "community_name": "CityDistance",
-      "file_type": "code",
-      "norm_label": "dashboard.php",
-      "source_file": "app/Livewire/Admin/Dashboard.php",
-      "source_location": "L1"
-    },
-    {
-      "id": "app_livewire_admin_ratematrixmanager",
-      "label": "RateMatrixManager.php",
-      "_origin": "ast",
-      "community": 14,
-      "community_name": "CityDistance",
-      "file_type": "code",
-      "norm_label": "ratematrixmanager.php",
-      "source_file": "app/Livewire/Admin/RateMatrixManager.php",
-      "source_location": "L1"
-    },
-    {
-      "id": "illuminate_support_facades_db",
-      "label": "Illuminate\\Support\\Facades\\DB",
-      "_origin": "ast",
-      "community": 14,
-      "community_name": "CityDistance",
-      "file_type": "code",
-      "norm_label": "illuminate\\support\\facades\\db",
+      "norm_label": "illuminate\\database\\eloquent\\factories\\factory",
       "source_file": "",
       "source_location": ""
     },
     {
-      "id": "illuminate_support_facades_route",
-      "label": "Illuminate\\Support\\Facades\\Route",
+      "id": "static",
+      "label": "static",
       "_origin": "ast",
       "community": 14,
       "community_name": "CityDistance",
       "file_type": "code",
-      "norm_label": "illuminate\\support\\facades\\route",
+      "norm_label": "static",
       "source_file": "",
       "source_location": ""
-    },
-    {
-      "id": "livewire_attributes_layout",
-      "label": "Livewire\\Attributes\\Layout",
-      "_origin": "ast",
-      "community": 14,
-      "community_name": "CityDistance",
-      "file_type": "code",
-      "norm_label": "livewire\\attributes\\layout",
-      "source_file": "",
-      "source_location": ""
-    },
-    {
-      "id": "livewire_attributes_title",
-      "label": "Livewire\\Attributes\\Title",
-      "_origin": "ast",
-      "community": 14,
-      "community_name": "CityDistance",
-      "file_type": "code",
-      "norm_label": "livewire\\attributes\\title",
-      "source_file": "",
-      "source_location": ""
-    },
-    {
-      "id": "livewire_component",
-      "label": "Livewire\\Component",
-      "_origin": "ast",
-      "community": 14,
-      "community_name": "CityDistance",
-      "file_type": "code",
-      "norm_label": "livewire\\component",
-      "source_file": "",
-      "source_location": ""
-    },
-    {
-      "id": "livewire_withpagination",
-      "label": "Livewire\\WithPagination",
-      "_origin": "ast",
-      "community": 14,
-      "community_name": "CityDistance",
-      "file_type": "code",
-      "norm_label": "livewire\\withpagination",
-      "source_file": "",
-      "source_location": ""
-    },
-    {
-      "id": "routes_web",
-      "label": "web.php",
-      "_origin": "ast",
-      "community": 14,
-      "community_name": "CityDistance",
-      "file_type": "code",
-      "norm_label": "web.php",
-      "source_file": "routes/web.php",
-      "source_location": "L1"
     },
     {
       "id": "claude_skills_graphify_references_exports",
@@ -3520,6 +3711,61 @@
       "source_location": "L1"
     },
     {
+      "id": "app_livewire_admin_alliesmanager",
+      "label": "AlliesManager.php",
+      "_origin": "ast",
+      "community": 2,
+      "community_name": "Package",
+      "file_type": "code",
+      "norm_label": "alliesmanager.php",
+      "source_file": "app/Livewire/Admin/AlliesManager.php",
+      "source_location": "L1"
+    },
+    {
+      "id": "app_livewire_admin_bcvratemanager",
+      "label": "BcvRateManager.php",
+      "_origin": "ast",
+      "community": 2,
+      "community_name": "Package",
+      "file_type": "code",
+      "norm_label": "bcvratemanager.php",
+      "source_file": "app/Livewire/Admin/BcvRateManager.php",
+      "source_location": "L1"
+    },
+    {
+      "id": "app_livewire_admin_citydistancemanager",
+      "label": "CityDistanceManager.php",
+      "_origin": "ast",
+      "community": 2,
+      "community_name": "Package",
+      "file_type": "code",
+      "norm_label": "citydistancemanager.php",
+      "source_file": "app/Livewire/Admin/CityDistanceManager.php",
+      "source_location": "L1"
+    },
+    {
+      "id": "app_livewire_admin_dashboard",
+      "label": "Dashboard.php",
+      "_origin": "ast",
+      "community": 2,
+      "community_name": "Package",
+      "file_type": "code",
+      "norm_label": "dashboard.php",
+      "source_file": "app/Livewire/Admin/Dashboard.php",
+      "source_location": "L1"
+    },
+    {
+      "id": "app_livewire_admin_ratematrixmanager",
+      "label": "RateMatrixManager.php",
+      "_origin": "ast",
+      "community": 2,
+      "community_name": "Package",
+      "file_type": "code",
+      "norm_label": "ratematrixmanager.php",
+      "source_file": "app/Livewire/Admin/RateMatrixManager.php",
+      "source_location": "L1"
+    },
+    {
       "id": "app_livewire_ally_createpackage",
       "label": "CreatePackage.php",
       "_origin": "ast",
@@ -3608,17 +3854,6 @@
       "source_location": "L1"
     },
     {
-      "id": "app_services_bcvrateservice",
-      "label": "BcvRateService.php",
-      "_origin": "ast",
-      "community": 2,
-      "community_name": "Package",
-      "file_type": "code",
-      "norm_label": "bcvrateservice.php",
-      "source_file": "app/Services/BcvRateService.php",
-      "source_location": "L1"
-    },
-    {
       "id": "app_services_packageservice",
       "label": "PackageService.php",
       "_origin": "ast",
@@ -3628,28 +3863,6 @@
       "norm_label": "packageservice.php",
       "source_file": "app/Services/PackageService.php",
       "source_location": "L1"
-    },
-    {
-      "id": "carbon",
-      "label": "Carbon",
-      "_origin": "ast",
-      "community": 2,
-      "community_name": "Package",
-      "file_type": "code",
-      "norm_label": "carbon",
-      "source_file": "",
-      "source_location": ""
-    },
-    {
-      "id": "carbon_carbon",
-      "label": "Carbon\\Carbon",
-      "_origin": "ast",
-      "community": 2,
-      "community_name": "Package",
-      "file_type": "code",
-      "norm_label": "carbon\\carbon",
-      "source_file": "",
-      "source_location": ""
     },
     {
       "id": "illuminate_database_eloquent_factories_hasfactory",
@@ -3696,6 +3909,17 @@
       "source_location": ""
     },
     {
+      "id": "illuminate_support_facades_db",
+      "label": "Illuminate\\Support\\Facades\\DB",
+      "_origin": "ast",
+      "community": 2,
+      "community_name": "Package",
+      "file_type": "code",
+      "norm_label": "illuminate\\support\\facades\\db",
+      "source_file": "",
+      "source_location": ""
+    },
+    {
       "id": "livewire_attributes_computed",
       "label": "Livewire\\Attributes\\Computed",
       "_origin": "ast",
@@ -3705,6 +3929,61 @@
       "norm_label": "livewire\\attributes\\computed",
       "source_file": "",
       "source_location": ""
+    },
+    {
+      "id": "livewire_attributes_layout",
+      "label": "Livewire\\Attributes\\Layout",
+      "_origin": "ast",
+      "community": 2,
+      "community_name": "Package",
+      "file_type": "code",
+      "norm_label": "livewire\\attributes\\layout",
+      "source_file": "",
+      "source_location": ""
+    },
+    {
+      "id": "livewire_attributes_title",
+      "label": "Livewire\\Attributes\\Title",
+      "_origin": "ast",
+      "community": 2,
+      "community_name": "Package",
+      "file_type": "code",
+      "norm_label": "livewire\\attributes\\title",
+      "source_file": "",
+      "source_location": ""
+    },
+    {
+      "id": "livewire_component",
+      "label": "Livewire\\Component",
+      "_origin": "ast",
+      "community": 2,
+      "community_name": "Package",
+      "file_type": "code",
+      "norm_label": "livewire\\component",
+      "source_file": "",
+      "source_location": ""
+    },
+    {
+      "id": "livewire_withpagination",
+      "label": "Livewire\\WithPagination",
+      "_origin": "ast",
+      "community": 2,
+      "community_name": "Package",
+      "file_type": "code",
+      "norm_label": "livewire\\withpagination",
+      "source_file": "",
+      "source_location": ""
+    },
+    {
+      "id": "routes_web",
+      "label": "web.php",
+      "_origin": "ast",
+      "community": 2,
+      "community_name": "Package",
+      "file_type": "code",
+      "norm_label": "web.php",
+      "source_file": "routes/web.php",
+      "source_location": "L1"
     },
     {
       "id": "runtimeexception",
@@ -4488,37 +4767,59 @@
       "source_location": null
     },
     {
-      "id": "database_seeders_databaseseeder",
-      "label": "DatabaseSeeder.php",
+      "id": "activate_ally_id",
+      "label": "activate({{ $ally->id }})",
       "_origin": "ast",
       "community": 4,
-      "community_name": "DatabaseSeeder.php",
+      "community_name": "allies-manager.blade.php",
       "file_type": "code",
-      "norm_label": "databaseseeder.php",
-      "source_file": "database/seeders/DatabaseSeeder.php",
-      "source_location": "L1"
+      "norm_label": "activate({{ $ally->id }})",
+      "source_file": "resources/views/Livewire/Admin/allies-manager.blade.php",
+      "source_location": null
     },
     {
-      "id": "illuminate_database_console_seeds_withoutmodelevents",
-      "label": "Illuminate\\Database\\Console\\Seeds\\WithoutModelEvents",
+      "id": "approve_ally_id",
+      "label": "approve({{ $ally->id }})",
       "_origin": "ast",
       "community": 4,
-      "community_name": "DatabaseSeeder.php",
+      "community_name": "allies-manager.blade.php",
       "file_type": "code",
-      "norm_label": "illuminate\\database\\console\\seeds\\withoutmodelevents",
-      "source_file": "",
-      "source_location": ""
+      "norm_label": "approve({{ $ally->id }})",
+      "source_file": "resources/views/Livewire/Admin/allies-manager.blade.php",
+      "source_location": null
     },
     {
-      "id": "illuminate_database_seeder",
-      "label": "Illuminate\\Database\\Seeder",
+      "id": "reject_ally_id",
+      "label": "reject({{ $ally->id }})",
       "_origin": "ast",
       "community": 4,
-      "community_name": "DatabaseSeeder.php",
+      "community_name": "allies-manager.blade.php",
       "file_type": "code",
-      "norm_label": "illuminate\\database\\seeder",
-      "source_file": "",
-      "source_location": ""
+      "norm_label": "reject({{ $ally->id }})",
+      "source_file": "resources/views/Livewire/Admin/allies-manager.blade.php",
+      "source_location": null
+    },
+    {
+      "id": "resources_views_livewire_admin_allies_manager_blade",
+      "label": "allies-manager.blade.php",
+      "_origin": "ast",
+      "community": 4,
+      "community_name": "allies-manager.blade.php",
+      "file_type": "code",
+      "norm_label": "allies-manager.blade.php",
+      "source_file": "resources/views/Livewire/Admin/allies-manager.blade.php",
+      "source_location": null
+    },
+    {
+      "id": "suspend_ally_id",
+      "label": "suspend({{ $ally->id }})",
+      "_origin": "ast",
+      "community": 4,
+      "community_name": "allies-manager.blade.php",
+      "file_type": "code",
+      "norm_label": "suspend({{ $ally->id }})",
+      "source_file": "resources/views/Livewire/Admin/allies-manager.blade.php",
+      "source_location": null
     },
     {
       "id": "resources_views_components_application_logo_blade",
@@ -5773,14 +6074,14 @@
       "source_location": null
     },
     {
-      "id": "resources_views_welc1ome_blade",
-      "label": "welc1ome.blade.php",
+      "id": "resources_views_aliado_dashboard_blade",
+      "label": "aliado/dashboard.blade.php",
       "_origin": "ast",
       "community": 72,
-      "community_name": "welc1ome.blade.php",
+      "community_name": "aliado/dashboard.blade.php",
       "file_type": "code",
-      "norm_label": "welc1ome.blade.php",
-      "source_file": "resources/views/welc1ome.blade.php",
+      "norm_label": "aliado/dashboard.blade.php",
+      "source_file": "resources/views/aliado/dashboard.blade.php",
       "source_location": null
     },
     {
@@ -6077,17 +6378,6 @@
       "source_location": "L1"
     },
     {
-      "id": "app_livewire_actions_logout",
-      "label": "Logout.php",
-      "_origin": "ast",
-      "community": 8,
-      "community_name": "VerifyEmailController.php",
-      "file_type": "code",
-      "norm_label": "logout.php",
-      "source_file": "app/Livewire/Actions/Logout.php",
-      "source_location": "L1"
-    },
-    {
       "id": "bootstrap_app",
       "label": "bootstrap/app.php",
       "_origin": "ast",
@@ -6106,17 +6396,6 @@
       "community_name": "VerifyEmailController.php",
       "file_type": "code",
       "norm_label": "closure",
-      "source_file": "",
-      "source_location": ""
-    },
-    {
-      "id": "illuminate_auth_events_verified",
-      "label": "Illuminate\\Auth\\Events\\Verified",
-      "_origin": "ast",
-      "community": 8,
-      "community_name": "VerifyEmailController.php",
-      "file_type": "code",
-      "norm_label": "illuminate\\auth\\events\\verified",
       "source_file": "",
       "source_location": ""
     },
@@ -6187,28 +6466,6 @@
       "source_location": ""
     },
     {
-      "id": "illuminate_support_facades_auth",
-      "label": "Illuminate\\Support\\Facades\\Auth",
-      "_origin": "ast",
-      "community": 8,
-      "community_name": "VerifyEmailController.php",
-      "file_type": "code",
-      "norm_label": "illuminate\\support\\facades\\auth",
-      "source_file": "",
-      "source_location": ""
-    },
-    {
-      "id": "illuminate_support_facades_session",
-      "label": "Illuminate\\Support\\Facades\\Session",
-      "_origin": "ast",
-      "community": 8,
-      "community_name": "VerifyEmailController.php",
-      "file_type": "code",
-      "norm_label": "illuminate\\support\\facades\\session",
-      "source_file": "",
-      "source_location": ""
-    },
-    {
       "id": "public_index",
       "label": "index.php",
       "_origin": "ast",
@@ -6217,17 +6474,6 @@
       "file_type": "code",
       "norm_label": "index.php",
       "source_file": "public/index.php",
-      "source_location": "L1"
-    },
-    {
-      "id": "routes_auth",
-      "label": "routes/auth.php",
-      "_origin": "ast",
-      "community": 8,
-      "community_name": "VerifyEmailController.php",
-      "file_type": "code",
-      "norm_label": "routes/auth.php",
-      "source_file": "routes/auth.php",
       "source_location": "L1"
     },
     {
@@ -6362,6 +6608,17 @@
       "source_location": "L1"
     },
     {
+      "id": "app_services_bcvrateservice",
+      "label": "BcvRateService.php",
+      "_origin": "ast",
+      "community": 84,
+      "community_name": "TariffService",
+      "file_type": "code",
+      "norm_label": "bcvrateservice.php",
+      "source_file": "app/Services/BcvRateService.php",
+      "source_location": "L1"
+    },
+    {
       "id": "app_services_tariffservice",
       "label": "TariffService.php",
       "_origin": "ast",
@@ -6371,6 +6628,28 @@
       "norm_label": "tariffservice.php",
       "source_file": "app/Services/TariffService.php",
       "source_location": "L1"
+    },
+    {
+      "id": "carbon",
+      "label": "Carbon",
+      "_origin": "ast",
+      "community": 84,
+      "community_name": "TariffService",
+      "file_type": "code",
+      "norm_label": "carbon",
+      "source_file": "",
+      "source_location": ""
+    },
+    {
+      "id": "carbon_carbon",
+      "label": "Carbon\\Carbon",
+      "_origin": "ast",
+      "community": 84,
+      "community_name": "TariffService",
+      "file_type": "code",
+      "norm_label": "carbon\\carbon",
+      "source_file": "",
+      "source_location": ""
     },
     {
       "id": "github_copilot_instructions",
@@ -6441,6 +6720,50 @@
       "source_location": null
     },
     {
+      "id": "resources_views_cliente_dashboard_blade",
+      "label": "cliente/dashboard.blade.php",
+      "_origin": "ast",
+      "community": 87,
+      "community_name": "cliente/dashboard.blade.php",
+      "file_type": "code",
+      "norm_label": "cliente/dashboard.blade.php",
+      "source_file": "resources/views/cliente/dashboard.blade.php",
+      "source_location": null
+    },
+    {
+      "id": "resources_views_components_password_input_blade",
+      "label": "password-input.blade.php",
+      "_origin": "ast",
+      "community": 88,
+      "community_name": "password-input.blade.php",
+      "file_type": "code",
+      "norm_label": "password-input.blade.php",
+      "source_file": "resources/views/components/password-input.blade.php",
+      "source_location": null
+    },
+    {
+      "id": "resources_views_livewire_pages_auth_admin_login_blade",
+      "label": "admin-login.blade.php",
+      "_origin": "ast",
+      "community": 89,
+      "community_name": "admin-login.blade.php",
+      "file_type": "code",
+      "norm_label": "admin-login.blade.php",
+      "source_file": "resources/views/Livewire/pages/auth/admin-login.blade.php",
+      "source_location": null
+    },
+    {
+      "id": "app_livewire_actions_logout",
+      "label": "Logout.php",
+      "_origin": "ast",
+      "community": 9,
+      "community_name": "LoginForm.php",
+      "file_type": "code",
+      "norm_label": "logout.php",
+      "source_file": "app/Livewire/Actions/Logout.php",
+      "source_location": "L1"
+    },
+    {
       "id": "app_livewire_forms_loginform",
       "label": "LoginForm.php",
       "_origin": "ast",
@@ -6450,39 +6773,6 @@
       "norm_label": "loginform.php",
       "source_file": "app/Livewire/Forms/LoginForm.php",
       "source_location": "L1"
-    },
-    {
-      "id": "app_models_bcvrate_php_self",
-      "label": "self",
-      "_origin": "ast",
-      "community": 9,
-      "community_name": "LoginForm.php",
-      "file_type": "code",
-      "norm_label": "self",
-      "source_file": "",
-      "source_location": ""
-    },
-    {
-      "id": "app_models_citydistance_php_self",
-      "label": "self",
-      "_origin": "ast",
-      "community": 9,
-      "community_name": "LoginForm.php",
-      "file_type": "code",
-      "norm_label": "self",
-      "source_file": "",
-      "source_location": ""
-    },
-    {
-      "id": "app_models_ratematrix_php_self",
-      "label": "self",
-      "_origin": "ast",
-      "community": 9,
-      "community_name": "LoginForm.php",
-      "file_type": "code",
-      "norm_label": "self",
-      "source_file": "",
-      "source_location": ""
     },
     {
       "id": "config_cache",
@@ -6518,17 +6808,6 @@
       "source_location": "L1"
     },
     {
-      "id": "database_factories_userfactory",
-      "label": "UserFactory.php",
-      "_origin": "ast",
-      "community": 9,
-      "community_name": "LoginForm.php",
-      "file_type": "code",
-      "norm_label": "userfactory.php",
-      "source_file": "database/factories/UserFactory.php",
-      "source_location": "L1"
-    },
-    {
       "id": "illuminate_auth_events_lockout",
       "label": "Illuminate\\Auth\\Events\\Lockout",
       "_origin": "ast",
@@ -6540,13 +6819,13 @@
       "source_location": ""
     },
     {
-      "id": "illuminate_database_eloquent_factories_factory",
-      "label": "Illuminate\\Database\\Eloquent\\Factories\\Factory",
+      "id": "illuminate_support_facades_auth",
+      "label": "Illuminate\\Support\\Facades\\Auth",
       "_origin": "ast",
       "community": 9,
       "community_name": "LoginForm.php",
       "file_type": "code",
-      "norm_label": "illuminate\\database\\eloquent\\factories\\factory",
+      "norm_label": "illuminate\\support\\facades\\auth",
       "source_file": "",
       "source_location": ""
     },
@@ -6558,6 +6837,28 @@
       "community_name": "LoginForm.php",
       "file_type": "code",
       "norm_label": "illuminate\\support\\facades\\ratelimiter",
+      "source_file": "",
+      "source_location": ""
+    },
+    {
+      "id": "illuminate_support_facades_route",
+      "label": "Illuminate\\Support\\Facades\\Route",
+      "_origin": "ast",
+      "community": 9,
+      "community_name": "LoginForm.php",
+      "file_type": "code",
+      "norm_label": "illuminate\\support\\facades\\route",
+      "source_file": "",
+      "source_location": ""
+    },
+    {
+      "id": "illuminate_support_facades_session",
+      "label": "Illuminate\\Support\\Facades\\Session",
+      "_origin": "ast",
+      "community": 9,
+      "community_name": "LoginForm.php",
+      "file_type": "code",
+      "norm_label": "illuminate\\support\\facades\\session",
       "source_file": "",
       "source_location": ""
     },
@@ -6617,18 +6918,89 @@
       "source_location": ""
     },
     {
-      "id": "static",
-      "label": "static",
+      "id": "routes_auth",
+      "label": "routes/auth.php",
       "_origin": "ast",
       "community": 9,
       "community_name": "LoginForm.php",
       "file_type": "code",
-      "norm_label": "static",
-      "source_file": "",
-      "source_location": ""
+      "norm_label": "routes/auth.php",
+      "source_file": "routes/auth.php",
+      "source_location": "L1"
+    },
+    {
+      "id": "resources_views_repartidor_dashboard_blade",
+      "label": "repartidor/dashboard.blade.php",
+      "_origin": "ast",
+      "community": 90,
+      "community_name": "repartidor/dashboard.blade.php",
+      "file_type": "code",
+      "norm_label": "repartidor/dashboard.blade.php",
+      "source_file": "resources/views/repartidor/dashboard.blade.php",
+      "source_location": null
     }
   ],
   "links": [
+    {
+      "source": "app_livewire_admin_alliesmanager_alliesmanager_activate",
+      "target": "app_models_ally_ally",
+      "relation": "calls",
+      "_origin": "ast",
+      "confidence": "EXTRACTED",
+      "confidence_score": 1.0,
+      "context": "call",
+      "source_file": "app/Livewire/Admin/AlliesManager.php",
+      "source_location": "L66",
+      "weight": 1.0
+    },
+    {
+      "source": "app_livewire_admin_alliesmanager_alliesmanager_approve",
+      "target": "app_models_ally_ally",
+      "relation": "calls",
+      "_origin": "ast",
+      "confidence": "EXTRACTED",
+      "confidence_score": 1.0,
+      "context": "call",
+      "source_file": "app/Livewire/Admin/AlliesManager.php",
+      "source_location": "L24",
+      "weight": 1.0
+    },
+    {
+      "source": "app_livewire_admin_alliesmanager_alliesmanager_reject",
+      "target": "app_models_ally_ally",
+      "relation": "calls",
+      "_origin": "ast",
+      "confidence": "EXTRACTED",
+      "confidence_score": 1.0,
+      "context": "call",
+      "source_file": "app/Livewire/Admin/AlliesManager.php",
+      "source_location": "L38",
+      "weight": 1.0
+    },
+    {
+      "source": "app_livewire_admin_alliesmanager_alliesmanager_render",
+      "target": "app_models_ally_ally",
+      "relation": "calls",
+      "_origin": "ast",
+      "confidence": "EXTRACTED",
+      "confidence_score": 1.0,
+      "context": "call",
+      "source_file": "app/Livewire/Admin/AlliesManager.php",
+      "source_location": "L85",
+      "weight": 1.0
+    },
+    {
+      "source": "app_livewire_admin_alliesmanager_alliesmanager_suspend",
+      "target": "app_models_ally_ally",
+      "relation": "calls",
+      "_origin": "ast",
+      "confidence": "EXTRACTED",
+      "confidence_score": 1.0,
+      "context": "call",
+      "source_file": "app/Livewire/Admin/AlliesManager.php",
+      "source_location": "L52",
+      "weight": 1.0
+    },
     {
       "source": "app_livewire_admin_bcvratemanager_bcvratemanager_canceledit",
       "target": "app_livewire_admin_bcvratemanager_bcvratemanager_resetform",
@@ -6794,19 +7166,7 @@
       "confidence_score": 1.0,
       "context": "call",
       "source_file": "app/Livewire/Admin/Dashboard.php",
-      "source_location": "L19",
-      "weight": 1.0
-    },
-    {
-      "source": "app_livewire_admin_dashboard_dashboard_render",
-      "target": "app_models_bcvrate_bcvrate",
-      "relation": "calls",
-      "_origin": "ast",
-      "confidence": "EXTRACTED",
-      "confidence_score": 1.0,
-      "context": "call",
-      "source_file": "app/Livewire/Admin/Dashboard.php",
-      "source_location": "L33",
+      "source_location": "L26",
       "weight": 1.0
     },
     {
@@ -6818,7 +7178,7 @@
       "confidence_score": 1.0,
       "context": "call",
       "source_file": "app/Livewire/Admin/Dashboard.php",
-      "source_location": "L34",
+      "source_location": "L44",
       "weight": 1.0
     },
     {
@@ -6830,7 +7190,31 @@
       "confidence_score": 1.0,
       "context": "call",
       "source_file": "app/Livewire/Admin/Dashboard.php",
-      "source_location": "L35",
+      "source_location": "L67",
+      "weight": 1.0
+    },
+    {
+      "source": "app_livewire_admin_dashboard_dashboard_render",
+      "target": "app_models_user_user",
+      "relation": "calls",
+      "_origin": "ast",
+      "confidence": "EXTRACTED",
+      "confidence_score": 1.0,
+      "context": "call",
+      "source_file": "app/Livewire/Admin/Dashboard.php",
+      "source_location": "L76",
+      "weight": 1.0
+    },
+    {
+      "source": "app_livewire_admin_dashboard_dashboard_render",
+      "target": "app_models_bcvrate_bcvrate",
+      "relation": "calls",
+      "_origin": "ast",
+      "confidence": "EXTRACTED",
+      "confidence_score": 1.0,
+      "context": "call",
+      "source_file": "app/Livewire/Admin/Dashboard.php",
+      "source_location": "L93",
       "weight": 1.0
     },
     {
@@ -7794,6 +8178,66 @@
       "weight": 1.0
     },
     {
+      "source": "app_livewire_admin_alliesmanager",
+      "target": "app_models_ally_ally",
+      "relation": "imports",
+      "_origin": "ast",
+      "confidence": "EXTRACTED",
+      "confidence_score": 1.0,
+      "context": "import",
+      "source_file": "app/Livewire/Admin/AlliesManager.php",
+      "source_location": "L5",
+      "weight": 1.0
+    },
+    {
+      "source": "app_livewire_admin_alliesmanager",
+      "target": "livewire_attributes_layout",
+      "relation": "imports",
+      "_origin": "ast",
+      "confidence": "EXTRACTED",
+      "confidence_score": 1.0,
+      "context": "import",
+      "source_file": "app/Livewire/Admin/AlliesManager.php",
+      "source_location": "L6",
+      "weight": 1.0
+    },
+    {
+      "source": "app_livewire_admin_alliesmanager",
+      "target": "livewire_attributes_title",
+      "relation": "imports",
+      "_origin": "ast",
+      "confidence": "EXTRACTED",
+      "confidence_score": 1.0,
+      "context": "import",
+      "source_file": "app/Livewire/Admin/AlliesManager.php",
+      "source_location": "L7",
+      "weight": 1.0
+    },
+    {
+      "source": "app_livewire_admin_alliesmanager",
+      "target": "livewire_component",
+      "relation": "imports",
+      "_origin": "ast",
+      "confidence": "EXTRACTED",
+      "confidence_score": 1.0,
+      "context": "import",
+      "source_file": "app/Livewire/Admin/AlliesManager.php",
+      "source_location": "L8",
+      "weight": 1.0
+    },
+    {
+      "source": "app_livewire_admin_alliesmanager",
+      "target": "livewire_withpagination",
+      "relation": "imports",
+      "_origin": "ast",
+      "confidence": "EXTRACTED",
+      "confidence_score": 1.0,
+      "context": "import",
+      "source_file": "app/Livewire/Admin/AlliesManager.php",
+      "source_location": "L9",
+      "weight": 1.0
+    },
+    {
       "source": "app_livewire_admin_bcvratemanager",
       "target": "livewire_withpagination",
       "relation": "imports",
@@ -7927,7 +8371,7 @@
     },
     {
       "source": "app_livewire_admin_dashboard",
-      "target": "livewire_attributes_title",
+      "target": "livewire_attributes_layout",
       "relation": "imports",
       "_origin": "ast",
       "confidence": "EXTRACTED",
@@ -7939,7 +8383,7 @@
     },
     {
       "source": "app_livewire_admin_dashboard",
-      "target": "livewire_component",
+      "target": "livewire_attributes_title",
       "relation": "imports",
       "_origin": "ast",
       "confidence": "EXTRACTED",
@@ -7947,6 +8391,18 @@
       "context": "import",
       "source_file": "app/Livewire/Admin/Dashboard.php",
       "source_location": "L11",
+      "weight": 1.0
+    },
+    {
+      "source": "app_livewire_admin_dashboard",
+      "target": "livewire_component",
+      "relation": "imports",
+      "_origin": "ast",
+      "confidence": "EXTRACTED",
+      "confidence_score": 1.0,
+      "context": "import",
+      "source_file": "app/Livewire/Admin/Dashboard.php",
+      "source_location": "L12",
       "weight": 1.0
     },
     {
@@ -7999,7 +8455,7 @@
     },
     {
       "source": "app_livewire_admin_dashboard",
-      "target": "livewire_attributes_layout",
+      "target": "app_models_user_user",
       "relation": "imports",
       "_origin": "ast",
       "confidence": "EXTRACTED",
@@ -9594,6 +10050,114 @@
       "weight": 1.0
     },
     {
+      "source": "database_migrations_2026_08_22_195324_add_cliente_role_to_users_table",
+      "target": "illuminate_database_migrations_migration",
+      "relation": "imports",
+      "_origin": "ast",
+      "confidence": "EXTRACTED",
+      "confidence_score": 1.0,
+      "context": "import",
+      "source_file": "database/migrations/2026_08_22_195324_add_cliente_role_to_users_table.php",
+      "source_location": "L3",
+      "weight": 1.0
+    },
+    {
+      "source": "database_migrations_2026_08_22_195324_add_cliente_role_to_users_table",
+      "target": "illuminate_database_schema_blueprint",
+      "relation": "imports",
+      "_origin": "ast",
+      "confidence": "EXTRACTED",
+      "confidence_score": 1.0,
+      "context": "import",
+      "source_file": "database/migrations/2026_08_22_195324_add_cliente_role_to_users_table.php",
+      "source_location": "L4",
+      "weight": 1.0
+    },
+    {
+      "source": "database_migrations_2026_08_22_195324_add_cliente_role_to_users_table",
+      "target": "illuminate_support_facades_schema",
+      "relation": "imports",
+      "_origin": "ast",
+      "confidence": "EXTRACTED",
+      "confidence_score": 1.0,
+      "context": "import",
+      "source_file": "database/migrations/2026_08_22_195324_add_cliente_role_to_users_table.php",
+      "source_location": "L5",
+      "weight": 1.0
+    },
+    {
+      "source": "database_migrations_2026_08_22_213928_add_status_to_allies_table",
+      "target": "illuminate_database_migrations_migration",
+      "relation": "imports",
+      "_origin": "ast",
+      "confidence": "EXTRACTED",
+      "confidence_score": 1.0,
+      "context": "import",
+      "source_file": "database/migrations/2026_08_22_213928_add_status_to_allies_table.php",
+      "source_location": "L3",
+      "weight": 1.0
+    },
+    {
+      "source": "database_migrations_2026_08_22_213928_add_status_to_allies_table",
+      "target": "illuminate_database_schema_blueprint",
+      "relation": "imports",
+      "_origin": "ast",
+      "confidence": "EXTRACTED",
+      "confidence_score": 1.0,
+      "context": "import",
+      "source_file": "database/migrations/2026_08_22_213928_add_status_to_allies_table.php",
+      "source_location": "L4",
+      "weight": 1.0
+    },
+    {
+      "source": "database_migrations_2026_08_22_213928_add_status_to_allies_table",
+      "target": "illuminate_support_facades_schema",
+      "relation": "imports",
+      "_origin": "ast",
+      "confidence": "EXTRACTED",
+      "confidence_score": 1.0,
+      "context": "import",
+      "source_file": "database/migrations/2026_08_22_213928_add_status_to_allies_table.php",
+      "source_location": "L5",
+      "weight": 1.0
+    },
+    {
+      "source": "database_migrations_2026_08_22_213952_add_status_to_drivers_table",
+      "target": "illuminate_database_migrations_migration",
+      "relation": "imports",
+      "_origin": "ast",
+      "confidence": "EXTRACTED",
+      "confidence_score": 1.0,
+      "context": "import",
+      "source_file": "database/migrations/2026_08_22_213952_add_status_to_drivers_table.php",
+      "source_location": "L3",
+      "weight": 1.0
+    },
+    {
+      "source": "database_migrations_2026_08_22_213952_add_status_to_drivers_table",
+      "target": "illuminate_database_schema_blueprint",
+      "relation": "imports",
+      "_origin": "ast",
+      "confidence": "EXTRACTED",
+      "confidence_score": 1.0,
+      "context": "import",
+      "source_file": "database/migrations/2026_08_22_213952_add_status_to_drivers_table.php",
+      "source_location": "L4",
+      "weight": 1.0
+    },
+    {
+      "source": "database_migrations_2026_08_22_213952_add_status_to_drivers_table",
+      "target": "illuminate_support_facades_schema",
+      "relation": "imports",
+      "_origin": "ast",
+      "confidence": "EXTRACTED",
+      "confidence_score": 1.0,
+      "context": "import",
+      "source_file": "database/migrations/2026_08_22_213952_add_status_to_drivers_table.php",
+      "source_location": "L5",
+      "weight": 1.0
+    },
+    {
       "source": "database_seeders_databaseseeder",
       "target": "app_models_user_user",
       "relation": "imports",
@@ -9903,6 +10467,18 @@
       "context": "import",
       "source_file": "routes/web.php",
       "source_location": "L8",
+      "weight": 1.0
+    },
+    {
+      "source": "routes_web",
+      "target": "app_livewire_admin_alliesmanager_alliesmanager",
+      "relation": "imports",
+      "_origin": "ast",
+      "confidence": "EXTRACTED",
+      "confidence_score": 1.0,
+      "context": "import",
+      "source_file": "routes/web.php",
+      "source_location": "L9",
       "weight": 1.0
     },
     {
@@ -10550,7 +11126,7 @@
       "confidence_score": 1.0,
       "context": "return_type",
       "source_file": "app/Models/Ally.php",
-      "source_location": "L57",
+      "source_location": "L63",
       "weight": 1.0
     },
     {
@@ -10562,7 +11138,7 @@
       "confidence_score": 1.0,
       "context": "return_type",
       "source_file": "app/Models/Ally.php",
-      "source_location": "L49",
+      "source_location": "L55",
       "weight": 1.0
     },
     {
@@ -10586,7 +11162,7 @@
       "confidence_score": 1.0,
       "context": "return_type",
       "source_file": "app/Models/Driver.php",
-      "source_location": "L43",
+      "source_location": "L50",
       "weight": 1.0
     },
     {
@@ -10598,7 +11174,7 @@
       "confidence_score": 1.0,
       "context": "return_type",
       "source_file": "app/Models/Driver.php",
-      "source_location": "L35",
+      "source_location": "L42",
       "weight": 1.0
     },
     {
@@ -10682,7 +11258,7 @@
       "confidence_score": 1.0,
       "context": "return_type",
       "source_file": "app/Models/User.php",
-      "source_location": "L67",
+      "source_location": "L68",
       "weight": 1.0
     },
     {
@@ -10694,7 +11270,7 @@
       "confidence_score": 1.0,
       "context": "return_type",
       "source_file": "app/Models/User.php",
-      "source_location": "L75",
+      "source_location": "L76",
       "weight": 1.0
     },
     {
@@ -10706,7 +11282,7 @@
       "confidence_score": 1.0,
       "context": "return_type",
       "source_file": "app/Models/User.php",
-      "source_location": "L83",
+      "source_location": "L84",
       "weight": 1.0
     },
     {
@@ -10779,6 +11355,50 @@
       "context": "return_type",
       "source_file": "app/Services/PackageService.php",
       "source_location": "L88",
+      "weight": 1.0
+    },
+    {
+      "source": "resources_views_livewire_admin_allies_manager_blade",
+      "target": "activate_ally_id",
+      "relation": "binds_method",
+      "_origin": "ast",
+      "confidence": "EXTRACTED",
+      "confidence_score": 1.0,
+      "source_file": "resources/views/Livewire/Admin/allies-manager.blade.php",
+      "source_location": null,
+      "weight": 1.0
+    },
+    {
+      "source": "resources_views_livewire_admin_allies_manager_blade",
+      "target": "approve_ally_id",
+      "relation": "binds_method",
+      "_origin": "ast",
+      "confidence": "EXTRACTED",
+      "confidence_score": 1.0,
+      "source_file": "resources/views/Livewire/Admin/allies-manager.blade.php",
+      "source_location": null,
+      "weight": 1.0
+    },
+    {
+      "source": "resources_views_livewire_admin_allies_manager_blade",
+      "target": "reject_ally_id",
+      "relation": "binds_method",
+      "_origin": "ast",
+      "confidence": "EXTRACTED",
+      "confidence_score": 1.0,
+      "source_file": "resources/views/Livewire/Admin/allies-manager.blade.php",
+      "source_location": null,
+      "weight": 1.0
+    },
+    {
+      "source": "resources_views_livewire_admin_allies_manager_blade",
+      "target": "suspend_ally_id",
+      "relation": "binds_method",
+      "_origin": "ast",
+      "confidence": "EXTRACTED",
+      "confidence_score": 1.0,
+      "source_file": "resources/views/Livewire/Admin/allies-manager.blade.php",
+      "source_location": null,
       "weight": 1.0
     },
     {
@@ -10914,6 +11534,17 @@
       "weight": 1.0
     },
     {
+      "source": "app_livewire_admin_alliesmanager",
+      "target": "app_livewire_admin_alliesmanager_alliesmanager",
+      "relation": "contains",
+      "_origin": "ast",
+      "confidence": "EXTRACTED",
+      "confidence_score": 1.0,
+      "source_file": "app/Livewire/Admin/AlliesManager.php",
+      "source_location": "L11",
+      "weight": 1.0
+    },
+    {
       "source": "app_livewire_admin_bcvratemanager",
       "target": "app_livewire_admin_bcvratemanager_bcvratemanager",
       "relation": "contains",
@@ -10943,7 +11574,7 @@
       "confidence": "EXTRACTED",
       "confidence_score": 1.0,
       "source_file": "app/Livewire/Admin/Dashboard.php",
-      "source_location": "L13",
+      "source_location": "L14",
       "weight": 1.0
     },
     {
@@ -12758,7 +13389,7 @@
       "confidence": "EXTRACTED",
       "confidence_score": 1.0,
       "source_file": "database/migrations/2026_08_11_193201_convert_rate_matrices_to_global_tariff.php",
-      "source_location": "L56",
+      "source_location": "L64",
       "weight": 1.0
     },
     {
@@ -12825,6 +13456,72 @@
       "confidence_score": 1.0,
       "source_file": "database/migrations/2026_08_21_000002_add_extra_pricing_fields_to_packages_table.php",
       "source_location": "L40",
+      "weight": 1.0
+    },
+    {
+      "source": "database_migrations_2026_08_22_195324_add_cliente_role_to_users_table",
+      "target": "database_migrations_2026_08_22_195324_add_cliente_role_to_users_table_up",
+      "relation": "contains",
+      "_origin": "ast",
+      "confidence": "EXTRACTED",
+      "confidence_score": 1.0,
+      "source_file": "database/migrations/2026_08_22_195324_add_cliente_role_to_users_table.php",
+      "source_location": "L12",
+      "weight": 1.0
+    },
+    {
+      "source": "database_migrations_2026_08_22_195324_add_cliente_role_to_users_table",
+      "target": "database_migrations_2026_08_22_195324_add_cliente_role_to_users_table_down",
+      "relation": "contains",
+      "_origin": "ast",
+      "confidence": "EXTRACTED",
+      "confidence_score": 1.0,
+      "source_file": "database/migrations/2026_08_22_195324_add_cliente_role_to_users_table.php",
+      "source_location": "L27",
+      "weight": 1.0
+    },
+    {
+      "source": "database_migrations_2026_08_22_213928_add_status_to_allies_table",
+      "target": "database_migrations_2026_08_22_213928_add_status_to_allies_table_down",
+      "relation": "contains",
+      "_origin": "ast",
+      "confidence": "EXTRACTED",
+      "confidence_score": 1.0,
+      "source_file": "database/migrations/2026_08_22_213928_add_status_to_allies_table.php",
+      "source_location": "L24",
+      "weight": 1.0
+    },
+    {
+      "source": "database_migrations_2026_08_22_213928_add_status_to_allies_table",
+      "target": "database_migrations_2026_08_22_213928_add_status_to_allies_table_up",
+      "relation": "contains",
+      "_origin": "ast",
+      "confidence": "EXTRACTED",
+      "confidence_score": 1.0,
+      "source_file": "database/migrations/2026_08_22_213928_add_status_to_allies_table.php",
+      "source_location": "L9",
+      "weight": 1.0
+    },
+    {
+      "source": "database_migrations_2026_08_22_213952_add_status_to_drivers_table",
+      "target": "database_migrations_2026_08_22_213952_add_status_to_drivers_table_down",
+      "relation": "contains",
+      "_origin": "ast",
+      "confidence": "EXTRACTED",
+      "confidence_score": 1.0,
+      "source_file": "database/migrations/2026_08_22_213952_add_status_to_drivers_table.php",
+      "source_location": "L24",
+      "weight": 1.0
+    },
+    {
+      "source": "database_migrations_2026_08_22_213952_add_status_to_drivers_table",
+      "target": "database_migrations_2026_08_22_213952_add_status_to_drivers_table_up",
+      "relation": "contains",
+      "_origin": "ast",
+      "confidence": "EXTRACTED",
+      "confidence_score": 1.0,
+      "source_file": "database/migrations/2026_08_22_213952_add_status_to_drivers_table.php",
+      "source_location": "L9",
       "weight": 1.0
     },
     {
@@ -13235,6 +13932,17 @@
       "weight": 1.0
     },
     {
+      "source": "app_livewire_admin_alliesmanager_alliesmanager",
+      "target": "livewire_component",
+      "relation": "inherits",
+      "_origin": "ast",
+      "confidence": "EXTRACTED",
+      "confidence_score": 1.0,
+      "source_file": "app/Livewire/Admin/AlliesManager.php",
+      "source_location": "L13",
+      "weight": 1.0
+    },
+    {
       "source": "app_livewire_admin_bcvratemanager_bcvratemanager",
       "target": "livewire_component",
       "relation": "inherits",
@@ -13264,7 +13972,7 @@
       "confidence": "EXTRACTED",
       "confidence_score": 1.0,
       "source_file": "app/Livewire/Admin/Dashboard.php",
-      "source_location": "L15",
+      "source_location": "L16",
       "weight": 1.0
     },
     {
@@ -13598,6 +14306,72 @@
       "weight": 1.0
     },
     {
+      "source": "app_livewire_admin_alliesmanager_alliesmanager",
+      "target": "app_livewire_admin_alliesmanager_alliesmanager_approve",
+      "relation": "method",
+      "_origin": "ast",
+      "confidence": "EXTRACTED",
+      "confidence_score": 1.0,
+      "source_file": "app/Livewire/Admin/AlliesManager.php",
+      "source_location": "L22",
+      "weight": 1.0
+    },
+    {
+      "source": "app_livewire_admin_alliesmanager_alliesmanager",
+      "target": "app_livewire_admin_alliesmanager_alliesmanager_reject",
+      "relation": "method",
+      "_origin": "ast",
+      "confidence": "EXTRACTED",
+      "confidence_score": 1.0,
+      "source_file": "app/Livewire/Admin/AlliesManager.php",
+      "source_location": "L36",
+      "weight": 1.0
+    },
+    {
+      "source": "app_livewire_admin_alliesmanager_alliesmanager",
+      "target": "app_livewire_admin_alliesmanager_alliesmanager_suspend",
+      "relation": "method",
+      "_origin": "ast",
+      "confidence": "EXTRACTED",
+      "confidence_score": 1.0,
+      "source_file": "app/Livewire/Admin/AlliesManager.php",
+      "source_location": "L50",
+      "weight": 1.0
+    },
+    {
+      "source": "app_livewire_admin_alliesmanager_alliesmanager",
+      "target": "app_livewire_admin_alliesmanager_alliesmanager_activate",
+      "relation": "method",
+      "_origin": "ast",
+      "confidence": "EXTRACTED",
+      "confidence_score": 1.0,
+      "source_file": "app/Livewire/Admin/AlliesManager.php",
+      "source_location": "L64",
+      "weight": 1.0
+    },
+    {
+      "source": "app_livewire_admin_alliesmanager_alliesmanager",
+      "target": "app_livewire_admin_alliesmanager_alliesmanager_updatingsearch",
+      "relation": "method",
+      "_origin": "ast",
+      "confidence": "EXTRACTED",
+      "confidence_score": 1.0,
+      "source_file": "app/Livewire/Admin/AlliesManager.php",
+      "source_location": "L78",
+      "weight": 1.0
+    },
+    {
+      "source": "app_livewire_admin_alliesmanager_alliesmanager",
+      "target": "app_livewire_admin_alliesmanager_alliesmanager_render",
+      "relation": "method",
+      "_origin": "ast",
+      "confidence": "EXTRACTED",
+      "confidence_score": 1.0,
+      "source_file": "app/Livewire/Admin/AlliesManager.php",
+      "source_location": "L83",
+      "weight": 1.0
+    },
+    {
       "source": "app_livewire_admin_bcvratemanager_bcvratemanager",
       "target": "app_livewire_admin_bcvratemanager_bcvratemanager_resetform",
       "relation": "method",
@@ -13781,7 +14555,7 @@
       "confidence": "EXTRACTED",
       "confidence_score": 1.0,
       "source_file": "app/Livewire/Admin/Dashboard.php",
-      "source_location": "L17",
+      "source_location": "L18",
       "weight": 1.0
     },
     {
@@ -13957,7 +14731,7 @@
       "confidence": "EXTRACTED",
       "confidence_score": 1.0,
       "source_file": "app/Models/Ally.php",
-      "source_location": "L33",
+      "source_location": "L39",
       "weight": 1.0
     },
     {
@@ -13968,7 +14742,7 @@
       "confidence": "EXTRACTED",
       "confidence_score": 1.0,
       "source_file": "app/Models/Ally.php",
-      "source_location": "L49",
+      "source_location": "L55",
       "weight": 1.0
     },
     {
@@ -13979,7 +14753,7 @@
       "confidence": "EXTRACTED",
       "confidence_score": 1.0,
       "source_file": "app/Models/Ally.php",
-      "source_location": "L57",
+      "source_location": "L63",
       "weight": 1.0
     },
     {
@@ -14056,7 +14830,7 @@
       "confidence": "EXTRACTED",
       "confidence_score": 1.0,
       "source_file": "app/Models/Driver.php",
-      "source_location": "L35",
+      "source_location": "L42",
       "weight": 1.0
     },
     {
@@ -14067,7 +14841,7 @@
       "confidence": "EXTRACTED",
       "confidence_score": 1.0,
       "source_file": "app/Models/Driver.php",
-      "source_location": "L43",
+      "source_location": "L50",
       "weight": 1.0
     },
     {
@@ -14182,13 +14956,35 @@
     },
     {
       "source": "app_models_user_user",
+      "target": "app_models_user_user_isaliado",
+      "relation": "method",
+      "_origin": "ast",
+      "confidence": "EXTRACTED",
+      "confidence_score": 1.0,
+      "source_file": "app/Models/User.php",
+      "source_location": "L100",
+      "weight": 1.0
+    },
+    {
+      "source": "app_models_user_user",
       "target": "app_models_user_user_ischofer",
       "relation": "method",
       "_origin": "ast",
       "confidence": "EXTRACTED",
       "confidence_score": 1.0,
       "source_file": "app/Models/User.php",
-      "source_location": "L104",
+      "source_location": "L105",
+      "weight": 1.0
+    },
+    {
+      "source": "app_models_user_user",
+      "target": "app_models_user_user_iscliente",
+      "relation": "method",
+      "_origin": "ast",
+      "confidence": "EXTRACTED",
+      "confidence_score": 1.0,
+      "source_file": "app/Models/User.php",
+      "source_location": "L110",
       "weight": 1.0
     },
     {
@@ -14199,7 +14995,7 @@
       "confidence": "EXTRACTED",
       "confidence_score": 1.0,
       "source_file": "app/Models/User.php",
-      "source_location": "L50",
+      "source_location": "L51",
       "weight": 1.0
     },
     {
@@ -14210,7 +15006,7 @@
       "confidence": "EXTRACTED",
       "confidence_score": 1.0,
       "source_file": "app/Models/User.php",
-      "source_location": "L67",
+      "source_location": "L68",
       "weight": 1.0
     },
     {
@@ -14221,7 +15017,7 @@
       "confidence": "EXTRACTED",
       "confidence_score": 1.0,
       "source_file": "app/Models/User.php",
-      "source_location": "L75",
+      "source_location": "L76",
       "weight": 1.0
     },
     {
@@ -14232,7 +15028,7 @@
       "confidence": "EXTRACTED",
       "confidence_score": 1.0,
       "source_file": "app/Models/User.php",
-      "source_location": "L83",
+      "source_location": "L84",
       "weight": 1.0
     },
     {
@@ -14243,18 +15039,7 @@
       "confidence": "EXTRACTED",
       "confidence_score": 1.0,
       "source_file": "app/Models/User.php",
-      "source_location": "L94",
-      "weight": 1.0
-    },
-    {
-      "source": "app_models_user_user",
-      "target": "app_models_user_user_isaliado",
-      "relation": "method",
-      "_origin": "ast",
-      "confidence": "EXTRACTED",
-      "confidence_score": 1.0,
-      "source_file": "app/Models/User.php",
-      "source_location": "L99",
+      "source_location": "L95",
       "weight": 1.0
     },
     {
@@ -14852,6 +15637,17 @@
       "weight": 1.0
     },
     {
+      "source": "app_livewire_admin_alliesmanager_alliesmanager",
+      "target": "livewire_withpagination",
+      "relation": "mixes_in",
+      "_origin": "ast",
+      "confidence": "EXTRACTED",
+      "confidence_score": 1.0,
+      "source_file": "app/Livewire/Admin/AlliesManager.php",
+      "source_location": "L15",
+      "weight": 1.0
+    },
+    {
       "source": "app_livewire_admin_bcvratemanager_bcvratemanager",
       "target": "livewire_withpagination",
       "relation": "mixes_in",
@@ -15165,5 +15961,5 @@
     }
   ],
   "hyperedges": [],
-  "built_at_commit": "df12b5b0aaf39a33c27a5525e05bfd6c6959e23c"
+  "built_at_commit": "61b6c312d1abe3548341deb3eab66336dfb9f868"
 }

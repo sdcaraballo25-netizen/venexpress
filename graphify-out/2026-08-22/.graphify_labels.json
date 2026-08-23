@@ -3,7 +3,7 @@
   "1": "Illuminate\\Database\\Migrations\\Migration",
   "2": "Package",
   "3": "composer.json",
-  "4": "DatabaseSeeder.php",
+  "4": "allies-manager.blade.php",
   "5": "What You Must Do When Invoked",
   "6": "devDependencies",
   "7": "scripts",
@@ -71,7 +71,7 @@
   "69": "public-tracking.blade.php",
   "70": "welcome/navigation.blade.php",
   "71": "tracking-show.blade.php",
-  "72": "welc1ome.blade.php",
+  "72": "aliado/dashboard.blade.php",
   "73": "welcome.blade.php",
   "74": "tailwind.config.js",
   "75": "vite.config.js",
@@ -85,5 +85,9 @@
   "83": "extraction-spec.md",
   "84": "TariffService",
   "85": "copilot-instructions.md",
-  "86": "rate-matrix-manager.blade.php"
+  "86": "rate-matrix-manager.blade.php",
+  "87": "cliente/dashboard.blade.php",
+  "88": "password-input.blade.php",
+  "89": "admin-login.blade.php",
+  "90": "repartidor/dashboard.blade.php"
 }
