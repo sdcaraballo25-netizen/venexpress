@@ -10,7 +10,7 @@
       "_callable_class": true,
       "_origin": "ast",
       "community": 0,
-      "community_name": "Illuminate\\Foundation\\Testing\\RefreshDatabase",
+      "community_name": "TestCase",
       "file_type": "code",
       "norm_label": "passwordconfirmationtest",
       "source_file": "tests/Feature/Auth/PasswordConfirmationTest.php",
@@ -23,7 +23,7 @@
       "_callable_class": true,
       "_origin": "ast",
       "community": 0,
-      "community_name": "Illuminate\\Foundation\\Testing\\RefreshDatabase",
+      "community_name": "TestCase",
       "file_type": "code",
       "norm_label": "passwordupdatetest",
       "source_file": "tests/Feature/Auth/PasswordUpdateTest.php",
@@ -36,7 +36,7 @@
       "_callable_class": true,
       "_origin": "ast",
       "community": 0,
-      "community_name": "Illuminate\\Foundation\\Testing\\RefreshDatabase",
+      "community_name": "TestCase",
       "file_type": "code",
       "norm_label": "registrationtest",
       "source_file": "tests/Feature/Auth/RegistrationTest.php",
@@ -48,7 +48,7 @@
       "_callable": true,
       "_callable_class": true,
       "_origin": "ast",
-      "community": 100,
+      "community": 0,
       "community_name": "TestCase",
       "file_type": "code",
       "norm_label": "exampletest",
@@ -61,7 +61,7 @@
       "_callable": true,
       "_callable_class": true,
       "_origin": "ast",
-      "community": 100,
+      "community": 0,
       "community_name": "TestCase",
       "file_type": "code",
       "norm_label": "testcase",
@@ -75,7 +75,7 @@
       "_callable_class": true,
       "_origin": "ast",
       "community": 100,
-      "community_name": "TestCase",
+      "community_name": "UserAuthorizationTest",
       "file_type": "code",
       "norm_label": "userauthorizationtest",
       "source_file": "tests/Unit/UserAuthorizationTest.php",
@@ -459,19 +459,6 @@
       "source_location": "L11"
     },
     {
-      "id": "tests_feature_auth_authenticationtest_authenticationtest",
-      "label": "AuthenticationTest",
-      "_callable": true,
-      "_callable_class": true,
-      "_origin": "ast",
-      "community": 92,
-      "community_name": "User",
-      "file_type": "code",
-      "norm_label": "authenticationtest",
-      "source_file": "tests/Feature/Auth/AuthenticationTest.php",
-      "source_location": "L10"
-    },
-    {
       "id": "app_livewire_admin_bcvratemanager_bcvratemanager",
       "label": "BcvRateManager",
       "_callable": true,
@@ -537,6 +524,19 @@
       "source_location": "L12"
     },
     {
+      "id": "tests_feature_auth_authenticationtest_authenticationtest",
+      "label": "AuthenticationTest",
+      "_callable": true,
+      "_callable_class": true,
+      "_origin": "ast",
+      "community": 98,
+      "community_name": "AuthenticationTest",
+      "file_type": "code",
+      "norm_label": "authenticationtest",
+      "source_file": "tests/Feature/Auth/AuthenticationTest.php",
+      "source_location": "L10"
+    },
+    {
       "id": "tests_feature_profiletest_profiletest",
       "label": "ProfileTest",
       "_callable": true,
@@ -555,7 +555,7 @@
       "_callable": true,
       "_origin": "ast",
       "community": 0,
-      "community_name": "Illuminate\\Foundation\\Testing\\RefreshDatabase",
+      "community_name": "TestCase",
       "file_type": "code",
       "norm_label": ".test_confirm_password_screen_can_be_rendered()",
       "source_file": "tests/Feature/Auth/PasswordConfirmationTest.php",
@@ -567,7 +567,7 @@
       "_callable": true,
       "_origin": "ast",
       "community": 0,
-      "community_name": "Illuminate\\Foundation\\Testing\\RefreshDatabase",
+      "community_name": "TestCase",
       "file_type": "code",
       "norm_label": ".test_password_can_be_confirmed()",
       "source_file": "tests/Feature/Auth/PasswordConfirmationTest.php",
@@ -579,7 +579,7 @@
       "_callable": true,
       "_origin": "ast",
       "community": 0,
-      "community_name": "Illuminate\\Foundation\\Testing\\RefreshDatabase",
+      "community_name": "TestCase",
       "file_type": "code",
       "norm_label": ".test_password_is_not_confirmed_with_invalid_password()",
       "source_file": "tests/Feature/Auth/PasswordConfirmationTest.php",
@@ -591,7 +591,7 @@
       "_callable": true,
       "_origin": "ast",
       "community": 0,
-      "community_name": "Illuminate\\Foundation\\Testing\\RefreshDatabase",
+      "community_name": "TestCase",
       "file_type": "code",
       "norm_label": ".test_correct_password_must_be_provided_to_update_password()",
       "source_file": "tests/Feature/Auth/PasswordUpdateTest.php",
@@ -603,7 +603,7 @@
       "_callable": true,
       "_origin": "ast",
       "community": 0,
-      "community_name": "Illuminate\\Foundation\\Testing\\RefreshDatabase",
+      "community_name": "TestCase",
       "file_type": "code",
       "norm_label": ".test_password_can_be_updated()",
       "source_file": "tests/Feature/Auth/PasswordUpdateTest.php",
@@ -615,7 +615,7 @@
       "_callable": true,
       "_origin": "ast",
       "community": 0,
-      "community_name": "Illuminate\\Foundation\\Testing\\RefreshDatabase",
+      "community_name": "TestCase",
       "file_type": "code",
       "norm_label": ".test_new_users_can_register()",
       "source_file": "tests/Feature/Auth/RegistrationTest.php",
@@ -627,10 +627,22 @@
       "_callable": true,
       "_origin": "ast",
       "community": 0,
-      "community_name": "Illuminate\\Foundation\\Testing\\RefreshDatabase",
+      "community_name": "TestCase",
       "file_type": "code",
       "norm_label": ".test_registration_screen_can_be_rendered()",
       "source_file": "tests/Feature/Auth/RegistrationTest.php",
+      "source_location": "L13"
+    },
+    {
+      "id": "tests_feature_exampletest_exampletest_test_the_application_returns_a_successful_response",
+      "label": ".test_the_application_returns_a_successful_response()",
+      "_callable": true,
+      "_origin": "ast",
+      "community": 0,
+      "community_name": "TestCase",
+      "file_type": "code",
+      "norm_label": ".test_the_application_returns_a_successful_response()",
+      "source_file": "tests/Feature/ExampleTest.php",
       "source_location": "L13"
     },
     {
@@ -682,24 +694,12 @@
       "source_location": "L12"
     },
     {
-      "id": "tests_feature_exampletest_exampletest_test_the_application_returns_a_successful_response",
-      "label": ".test_the_application_returns_a_successful_response()",
-      "_callable": true,
-      "_origin": "ast",
-      "community": 100,
-      "community_name": "TestCase",
-      "file_type": "code",
-      "norm_label": ".test_the_application_returns_a_successful_response()",
-      "source_file": "tests/Feature/ExampleTest.php",
-      "source_location": "L13"
-    },
-    {
       "id": "tests_unit_userauthorizationtest_userauthorizationtest_test_admin_cannot_deactivate_or_delete_itself",
       "label": ".test_admin_cannot_deactivate_or_delete_itself()",
       "_callable": true,
       "_origin": "ast",
       "community": 100,
-      "community_name": "TestCase",
+      "community_name": "UserAuthorizationTest",
       "file_type": "code",
       "norm_label": ".test_admin_cannot_deactivate_or_delete_itself()",
       "source_file": "tests/Unit/UserAuthorizationTest.php",
@@ -711,7 +711,7 @@
       "_callable": true,
       "_origin": "ast",
       "community": 100,
-      "community_name": "TestCase",
+      "community_name": "UserAuthorizationTest",
       "file_type": "code",
       "norm_label": ".test_operativo_cannot_create_principal_or_manage_admins()",
       "source_file": "tests/Unit/UserAuthorizationTest.php",
@@ -723,7 +723,7 @@
       "_callable": true,
       "_origin": "ast",
       "community": 100,
-      "community_name": "TestCase",
+      "community_name": "UserAuthorizationTest",
       "file_type": "code",
       "norm_label": ".test_principal_can_create_every_supported_role()",
       "source_file": "tests/Unit/UserAuthorizationTest.php",
@@ -1402,18 +1402,6 @@
       "source_location": "L12"
     },
     {
-      "id": "app_livewire_admin_dashboard_dashboard_render",
-      "label": ".render()",
-      "_callable": true,
-      "_origin": "ast",
-      "community": 2,
-      "community_name": "Package",
-      "file_type": "code",
-      "norm_label": ".render()",
-      "source_file": "app/Livewire/Admin/Dashboard.php",
-      "source_location": "L18"
-    },
-    {
       "id": "app_livewire_ally_createpackage_createpackage_pricingpreview",
       "label": ".pricingPreview()",
       "_callable": true,
@@ -1654,18 +1642,6 @@
       "source_location": "L82"
     },
     {
-      "id": "app_services_packageservice_packageservice_construct",
-      "label": ".__construct()",
-      "_callable": true,
-      "_origin": "ast",
-      "community": 2,
-      "community_name": "Package",
-      "file_type": "code",
-      "norm_label": ".__construct()",
-      "source_file": "app/Services/PackageService.php",
-      "source_location": "L13"
-    },
-    {
       "id": "app_services_packageservice_packageservice_createpackage",
       "label": ".createPackage()",
       "_callable": true,
@@ -1832,6 +1808,18 @@
       "norm_label": ".casts()",
       "source_file": "app/Models/RateMatrix.php",
       "source_location": "L31"
+    },
+    {
+      "id": "app_services_packageservice_packageservice_construct",
+      "label": ".__construct()",
+      "_callable": true,
+      "_origin": "ast",
+      "community": 84,
+      "community_name": "TariffService",
+      "file_type": "code",
+      "norm_label": ".__construct()",
+      "source_file": "app/Services/PackageService.php",
+      "source_location": "L13"
     },
     {
       "id": "app_services_tariffservice_tariffservice_calculate",
@@ -2062,6 +2050,18 @@
       "source_location": "L78"
     },
     {
+      "id": "app_livewire_admin_dashboard_dashboard_render",
+      "label": ".render()",
+      "_callable": true,
+      "_origin": "ast",
+      "community": 91,
+      "community_name": "UsersManager",
+      "file_type": "code",
+      "norm_label": ".render()",
+      "source_file": "app/Livewire/Admin/Dashboard.php",
+      "source_location": "L18"
+    },
+    {
       "id": "app_livewire_admin_usersmanager_usersmanager_closecreatemodal",
       "label": ".closeCreateModal()",
       "_callable": true,
@@ -2266,6 +2266,66 @@
       "source_location": "L50"
     },
     {
+      "id": "app_models_user_user_cancreaterole",
+      "label": ".canCreateRole()",
+      "_callable": true,
+      "_origin": "ast",
+      "community": 92,
+      "community_name": "User",
+      "file_type": "code",
+      "norm_label": ".cancreaterole()",
+      "source_file": "app/Models/User.php",
+      "source_location": "L115"
+    },
+    {
+      "id": "app_models_user_user_candeactivateuser",
+      "label": ".canDeactivateUser()",
+      "_callable": true,
+      "_origin": "ast",
+      "community": 92,
+      "community_name": "User",
+      "file_type": "code",
+      "norm_label": ".candeactivateuser()",
+      "source_file": "app/Models/User.php",
+      "source_location": "L152"
+    },
+    {
+      "id": "app_models_user_user_candeleteuser",
+      "label": ".canDeleteUser()",
+      "_callable": true,
+      "_origin": "ast",
+      "community": 92,
+      "community_name": "User",
+      "file_type": "code",
+      "norm_label": ".candeleteuser()",
+      "source_file": "app/Models/User.php",
+      "source_location": "L165"
+    },
+    {
+      "id": "app_models_user_user_canedituser",
+      "label": ".canEditUser()",
+      "_callable": true,
+      "_origin": "ast",
+      "community": 92,
+      "community_name": "User",
+      "file_type": "code",
+      "norm_label": ".canedituser()",
+      "source_file": "app/Models/User.php",
+      "source_location": "L139"
+    },
+    {
+      "id": "app_models_user_user_canmanageusers",
+      "label": ".canManageUsers()",
+      "_callable": true,
+      "_origin": "ast",
+      "community": 92,
+      "community_name": "User",
+      "file_type": "code",
+      "norm_label": ".canmanageusers()",
+      "source_file": "app/Models/User.php",
+      "source_location": "L110"
+    },
+    {
       "id": "app_models_user_user_casts",
       "label": ".casts()",
       "_callable": true,
@@ -2300,6 +2360,42 @@
       "norm_label": ".isactive()",
       "source_file": "app/Models/User.php",
       "source_location": "L105"
+    },
+    {
+      "id": "app_models_user_user_isadmin",
+      "label": ".isAdmin()",
+      "_callable": true,
+      "_origin": "ast",
+      "community": 92,
+      "community_name": "User",
+      "file_type": "code",
+      "norm_label": ".isadmin()",
+      "source_file": "app/Models/User.php",
+      "source_location": "L80"
+    },
+    {
+      "id": "app_models_user_user_isadminoperativo",
+      "label": ".isAdminOperativo()",
+      "_callable": true,
+      "_origin": "ast",
+      "community": 92,
+      "community_name": "User",
+      "file_type": "code",
+      "norm_label": ".isadminoperativo()",
+      "source_file": "app/Models/User.php",
+      "source_location": "L75"
+    },
+    {
+      "id": "app_models_user_user_isadminprincipal",
+      "label": ".isAdminPrincipal()",
+      "_callable": true,
+      "_origin": "ast",
+      "community": 92,
+      "community_name": "User",
+      "file_type": "code",
+      "norm_label": ".isadminprincipal()",
+      "source_file": "app/Models/User.php",
+      "source_location": "L70"
     },
     {
       "id": "app_models_user_user_isaliado",
@@ -2360,66 +2456,6 @@
       "norm_label": ".rolelabels()",
       "source_file": "app/Models/User.php",
       "source_location": "L171"
-    },
-    {
-      "id": "tests_feature_auth_authenticationtest_authenticationtest_test_login_screen_can_be_rendered",
-      "label": ".test_login_screen_can_be_rendered()",
-      "_callable": true,
-      "_origin": "ast",
-      "community": 92,
-      "community_name": "User",
-      "file_type": "code",
-      "norm_label": ".test_login_screen_can_be_rendered()",
-      "source_file": "tests/Feature/Auth/AuthenticationTest.php",
-      "source_location": "L14"
-    },
-    {
-      "id": "tests_feature_auth_authenticationtest_authenticationtest_test_navigation_menu_can_be_rendered",
-      "label": ".test_navigation_menu_can_be_rendered()",
-      "_callable": true,
-      "_origin": "ast",
-      "community": 92,
-      "community_name": "User",
-      "file_type": "code",
-      "norm_label": ".test_navigation_menu_can_be_rendered()",
-      "source_file": "tests/Feature/Auth/AuthenticationTest.php",
-      "source_location": "L57"
-    },
-    {
-      "id": "tests_feature_auth_authenticationtest_authenticationtest_test_users_can_authenticate_using_the_login_screen",
-      "label": ".test_users_can_authenticate_using_the_login_screen()",
-      "_callable": true,
-      "_origin": "ast",
-      "community": 92,
-      "community_name": "User",
-      "file_type": "code",
-      "norm_label": ".test_users_can_authenticate_using_the_login_screen()",
-      "source_file": "tests/Feature/Auth/AuthenticationTest.php",
-      "source_location": "L23"
-    },
-    {
-      "id": "tests_feature_auth_authenticationtest_authenticationtest_test_users_can_logout",
-      "label": ".test_users_can_logout()",
-      "_callable": true,
-      "_origin": "ast",
-      "community": 92,
-      "community_name": "User",
-      "file_type": "code",
-      "norm_label": ".test_users_can_logout()",
-      "source_file": "tests/Feature/Auth/AuthenticationTest.php",
-      "source_location": "L70"
-    },
-    {
-      "id": "tests_feature_auth_authenticationtest_authenticationtest_test_users_can_not_authenticate_with_invalid_password",
-      "label": ".test_users_can_not_authenticate_with_invalid_password()",
-      "_callable": true,
-      "_origin": "ast",
-      "community": 92,
-      "community_name": "User",
-      "file_type": "code",
-      "norm_label": ".test_users_can_not_authenticate_with_invalid_password()",
-      "source_file": "tests/Feature/Auth/AuthenticationTest.php",
-      "source_location": "L40"
     },
     {
       "id": "app_livewire_admin_bcvratemanager_bcvratemanager_canceledit",
@@ -2758,100 +2794,64 @@
       "source_location": "L17"
     },
     {
-      "id": "app_models_user_user_cancreaterole",
-      "label": ".canCreateRole()",
+      "id": "tests_feature_auth_authenticationtest_authenticationtest_test_login_screen_can_be_rendered",
+      "label": ".test_login_screen_can_be_rendered()",
       "_callable": true,
       "_origin": "ast",
       "community": 98,
-      "community_name": ".isAdmin",
+      "community_name": "AuthenticationTest",
       "file_type": "code",
-      "norm_label": ".cancreaterole()",
-      "source_file": "app/Models/User.php",
-      "source_location": "L115"
+      "norm_label": ".test_login_screen_can_be_rendered()",
+      "source_file": "tests/Feature/Auth/AuthenticationTest.php",
+      "source_location": "L14"
     },
     {
-      "id": "app_models_user_user_candeactivateuser",
-      "label": ".canDeactivateUser()",
+      "id": "tests_feature_auth_authenticationtest_authenticationtest_test_navigation_menu_can_be_rendered",
+      "label": ".test_navigation_menu_can_be_rendered()",
       "_callable": true,
       "_origin": "ast",
       "community": 98,
-      "community_name": ".isAdmin",
+      "community_name": "AuthenticationTest",
       "file_type": "code",
-      "norm_label": ".candeactivateuser()",
-      "source_file": "app/Models/User.php",
-      "source_location": "L152"
+      "norm_label": ".test_navigation_menu_can_be_rendered()",
+      "source_file": "tests/Feature/Auth/AuthenticationTest.php",
+      "source_location": "L57"
     },
     {
-      "id": "app_models_user_user_candeleteuser",
-      "label": ".canDeleteUser()",
+      "id": "tests_feature_auth_authenticationtest_authenticationtest_test_users_can_authenticate_using_the_login_screen",
+      "label": ".test_users_can_authenticate_using_the_login_screen()",
       "_callable": true,
       "_origin": "ast",
       "community": 98,
-      "community_name": ".isAdmin",
+      "community_name": "AuthenticationTest",
       "file_type": "code",
-      "norm_label": ".candeleteuser()",
-      "source_file": "app/Models/User.php",
-      "source_location": "L165"
+      "norm_label": ".test_users_can_authenticate_using_the_login_screen()",
+      "source_file": "tests/Feature/Auth/AuthenticationTest.php",
+      "source_location": "L23"
     },
     {
-      "id": "app_models_user_user_canedituser",
-      "label": ".canEditUser()",
+      "id": "tests_feature_auth_authenticationtest_authenticationtest_test_users_can_logout",
+      "label": ".test_users_can_logout()",
       "_callable": true,
       "_origin": "ast",
       "community": 98,
-      "community_name": ".isAdmin",
+      "community_name": "AuthenticationTest",
       "file_type": "code",
-      "norm_label": ".canedituser()",
-      "source_file": "app/Models/User.php",
-      "source_location": "L139"
-    },
-    {
-      "id": "app_models_user_user_canmanageusers",
-      "label": ".canManageUsers()",
-      "_callable": true,
-      "_origin": "ast",
-      "community": 98,
-      "community_name": ".isAdmin",
-      "file_type": "code",
-      "norm_label": ".canmanageusers()",
-      "source_file": "app/Models/User.php",
-      "source_location": "L110"
-    },
-    {
-      "id": "app_models_user_user_isadmin",
-      "label": ".isAdmin()",
-      "_callable": true,
-      "_origin": "ast",
-      "community": 98,
-      "community_name": ".isAdmin",
-      "file_type": "code",
-      "norm_label": ".isadmin()",
-      "source_file": "app/Models/User.php",
-      "source_location": "L80"
-    },
-    {
-      "id": "app_models_user_user_isadminoperativo",
-      "label": ".isAdminOperativo()",
-      "_callable": true,
-      "_origin": "ast",
-      "community": 98,
-      "community_name": ".isAdmin",
-      "file_type": "code",
-      "norm_label": ".isadminoperativo()",
-      "source_file": "app/Models/User.php",
-      "source_location": "L75"
-    },
-    {
-      "id": "app_models_user_user_isadminprincipal",
-      "label": ".isAdminPrincipal()",
-      "_callable": true,
-      "_origin": "ast",
-      "community": 98,
-      "community_name": ".isAdmin",
-      "file_type": "code",
-      "norm_label": ".isadminprincipal()",
-      "source_file": "app/Models/User.php",
+      "norm_label": ".test_users_can_logout()",
+      "source_file": "tests/Feature/Auth/AuthenticationTest.php",
       "source_location": "L70"
+    },
+    {
+      "id": "tests_feature_auth_authenticationtest_authenticationtest_test_users_can_not_authenticate_with_invalid_password",
+      "label": ".test_users_can_not_authenticate_with_invalid_password()",
+      "_callable": true,
+      "_origin": "ast",
+      "community": 98,
+      "community_name": "AuthenticationTest",
+      "file_type": "code",
+      "norm_label": ".test_users_can_not_authenticate_with_invalid_password()",
+      "source_file": "tests/Feature/Auth/AuthenticationTest.php",
+      "source_location": "L40"
     },
     {
       "id": "tests_feature_profiletest_profiletest_test_correct_password_must_be_provided_to_delete_account",
@@ -2918,20 +2918,20 @@
       "label": "Illuminate\\Foundation\\Testing\\RefreshDatabase",
       "_origin": "ast",
       "community": 0,
-      "community_name": "Illuminate\\Foundation\\Testing\\RefreshDatabase",
+      "community_name": "TestCase",
       "file_type": "code",
       "norm_label": "illuminate\\foundation\\testing\\refreshdatabase",
       "source_file": "",
       "source_location": ""
     },
     {
-      "id": "illuminate_support_facades_hash",
-      "label": "Illuminate\\Support\\Facades\\Hash",
+      "id": "illuminate_foundation_testing_testcase",
+      "label": "Illuminate\\Foundation\\Testing\\TestCase",
       "_origin": "ast",
       "community": 0,
-      "community_name": "Illuminate\\Foundation\\Testing\\RefreshDatabase",
+      "community_name": "TestCase",
       "file_type": "code",
-      "norm_label": "illuminate\\support\\facades\\hash",
+      "norm_label": "illuminate\\foundation\\testing\\testcase",
       "source_file": "",
       "source_location": ""
     },
@@ -2940,7 +2940,7 @@
       "label": "Livewire\\Volt\\Volt",
       "_origin": "ast",
       "community": 0,
-      "community_name": "Illuminate\\Foundation\\Testing\\RefreshDatabase",
+      "community_name": "TestCase",
       "file_type": "code",
       "norm_label": "livewire\\volt\\volt",
       "source_file": "",
@@ -2951,7 +2951,7 @@
       "label": "AuthenticationTest.php",
       "_origin": "ast",
       "community": 0,
-      "community_name": "Illuminate\\Foundation\\Testing\\RefreshDatabase",
+      "community_name": "TestCase",
       "file_type": "code",
       "norm_label": "authenticationtest.php",
       "source_file": "tests/Feature/Auth/AuthenticationTest.php",
@@ -2962,7 +2962,7 @@
       "label": "PasswordConfirmationTest.php",
       "_origin": "ast",
       "community": 0,
-      "community_name": "Illuminate\\Foundation\\Testing\\RefreshDatabase",
+      "community_name": "TestCase",
       "file_type": "code",
       "norm_label": "passwordconfirmationtest.php",
       "source_file": "tests/Feature/Auth/PasswordConfirmationTest.php",
@@ -2973,7 +2973,7 @@
       "label": "PasswordUpdateTest.php",
       "_origin": "ast",
       "community": 0,
-      "community_name": "Illuminate\\Foundation\\Testing\\RefreshDatabase",
+      "community_name": "TestCase",
       "file_type": "code",
       "norm_label": "passwordupdatetest.php",
       "source_file": "tests/Feature/Auth/PasswordUpdateTest.php",
@@ -2984,10 +2984,21 @@
       "label": "RegistrationTest.php",
       "_origin": "ast",
       "community": 0,
-      "community_name": "Illuminate\\Foundation\\Testing\\RefreshDatabase",
+      "community_name": "TestCase",
       "file_type": "code",
       "norm_label": "registrationtest.php",
       "source_file": "tests/Feature/Auth/RegistrationTest.php",
+      "source_location": "L1"
+    },
+    {
+      "id": "tests_feature_exampletest",
+      "label": "Feature/ExampleTest.php",
+      "_origin": "ast",
+      "community": 0,
+      "community_name": "TestCase",
+      "file_type": "code",
+      "norm_label": "feature/exampletest.php",
+      "source_file": "tests/Feature/ExampleTest.php",
       "source_location": "L1"
     },
     {
@@ -2995,7 +3006,7 @@
       "label": "ProfileTest.php",
       "_origin": "ast",
       "community": 0,
-      "community_name": "Illuminate\\Foundation\\Testing\\RefreshDatabase",
+      "community_name": "TestCase",
       "file_type": "code",
       "norm_label": "profiletest.php",
       "source_file": "tests/Feature/ProfileTest.php",
@@ -3215,44 +3226,22 @@
       "source_location": "L126"
     },
     {
-      "id": "illuminate_foundation_testing_testcase",
-      "label": "Illuminate\\Foundation\\Testing\\TestCase",
+      "id": "tests_testcase",
+      "label": "Tests\\TestCase",
       "_origin": "ast",
       "community": 100,
-      "community_name": "TestCase",
+      "community_name": "UserAuthorizationTest",
       "file_type": "code",
-      "norm_label": "illuminate\\foundation\\testing\\testcase",
+      "norm_label": "tests\\testcase",
       "source_file": "",
       "source_location": ""
-    },
-    {
-      "id": "tests_feature_exampletest",
-      "label": "Feature/ExampleTest.php",
-      "_origin": "ast",
-      "community": 100,
-      "community_name": "TestCase",
-      "file_type": "code",
-      "norm_label": "feature/exampletest.php",
-      "source_file": "tests/Feature/ExampleTest.php",
-      "source_location": "L1"
-    },
-    {
-      "id": "tests_testcase",
-      "label": "TestCase.php",
-      "_origin": "ast",
-      "community": 100,
-      "community_name": "TestCase",
-      "file_type": "code",
-      "norm_label": "testcase.php",
-      "source_file": "tests/TestCase.php",
-      "source_location": "L1"
     },
     {
       "id": "tests_unit_userauthorizationtest",
       "label": "UserAuthorizationTest.php",
       "_origin": "ast",
       "community": 100,
-      "community_name": "TestCase",
+      "community_name": "UserAuthorizationTest",
       "file_type": "code",
       "norm_label": "userauthorizationtest.php",
       "source_file": "tests/Unit/UserAuthorizationTest.php",
@@ -3501,39 +3490,6 @@
       "source_location": "L1"
     },
     {
-      "id": "resources_views_livewire_ally_package_create_blade",
-      "label": "package-create.blade.php",
-      "_origin": "ast",
-      "community": 118,
-      "community_name": "package-create.blade.php",
-      "file_type": "code",
-      "norm_label": "package-create.blade.php",
-      "source_file": "resources/views/Livewire/Ally/package-create.blade.php",
-      "source_location": null
-    },
-    {
-      "id": "resources_views_livewire_ally_package_create_blade_php_set",
-      "label": "$set(",
-      "_origin": "ast",
-      "community": 118,
-      "community_name": "package-create.blade.php",
-      "file_type": "code",
-      "norm_label": "$set(",
-      "source_file": "resources/views/Livewire/Ally/package-create.blade.php",
-      "source_location": null
-    },
-    {
-      "id": "tailwindcss_tailwindcss",
-      "label": "tailwindcss",
-      "_origin": "ast",
-      "community": 119,
-      "community_name": "tailwindcss",
-      "confidence": "EXTRACTED",
-      "file_type": "code",
-      "norm_label": "tailwindcss",
-      "source_file": "tailwindcss"
-    },
-    {
       "id": "app_view_components_applayout",
       "label": "AppLayout.php",
       "_origin": "ast",
@@ -3684,6 +3640,17 @@
       "community_name": "CityDistance",
       "file_type": "code",
       "norm_label": "illuminate\\database\\eloquent\\factories\\factory",
+      "source_file": "",
+      "source_location": ""
+    },
+    {
+      "id": "illuminate_support_facades_hash",
+      "label": "Illuminate\\Support\\Facades\\Hash",
+      "_origin": "ast",
+      "community": 14,
+      "community_name": "CityDistance",
+      "file_type": "code",
+      "norm_label": "illuminate\\support\\facades\\hash",
       "source_file": "",
       "source_location": ""
     },
@@ -4026,14 +3993,14 @@
     },
     {
       "id": "app_models_ally",
-      "label": "Ally.php",
+      "label": "App\\Models\\Ally",
       "_origin": "ast",
       "community": 2,
       "community_name": "Package",
       "file_type": "code",
-      "norm_label": "ally.php",
-      "source_file": "app/Models/Ally.php",
-      "source_location": "L1"
+      "norm_label": "app\\models\\ally",
+      "source_file": "",
+      "source_location": ""
     },
     {
       "id": "app_models_auditlog",
@@ -4070,25 +4037,25 @@
     },
     {
       "id": "app_models_driver",
-      "label": "Driver.php",
+      "label": "App\\Models\\Driver",
       "_origin": "ast",
       "community": 2,
       "community_name": "Package",
       "file_type": "code",
-      "norm_label": "driver.php",
-      "source_file": "app/Models/Driver.php",
-      "source_location": "L1"
+      "norm_label": "app\\models\\driver",
+      "source_file": "",
+      "source_location": ""
     },
     {
       "id": "app_models_package",
-      "label": "Package.php",
+      "label": "App\\Models\\Package",
       "_origin": "ast",
       "community": 2,
       "community_name": "Package",
       "file_type": "code",
-      "norm_label": "package.php",
-      "source_file": "app/Models/Package.php",
-      "source_location": "L1"
+      "norm_label": "app\\models\\package",
+      "source_file": "",
+      "source_location": ""
     },
     {
       "id": "app_models_packagehistory",
@@ -4333,7 +4300,18 @@
       "source_location": null
     },
     {
-      "id": "resources_views_livewire_admin_users_manager_blade_php_set",
+      "id": "resources_views_livewire_ally_package_create_blade",
+      "label": "package-create.blade.php",
+      "_origin": "ast",
+      "community": 23,
+      "community_name": "users-manager.blade.php",
+      "file_type": "code",
+      "norm_label": "package-create.blade.php",
+      "source_file": "resources/views/Livewire/Ally/package-create.blade.php",
+      "source_location": null
+    },
+    {
+      "id": "set",
       "label": "$set(",
       "_origin": "ast",
       "community": 23,
@@ -6659,17 +6637,6 @@
       "source_location": ""
     },
     {
-      "id": "illuminate_auth_events_verified",
-      "label": "Illuminate\\Auth\\Events\\Verified",
-      "_origin": "ast",
-      "community": 8,
-      "community_name": "VerifyEmailController.php",
-      "file_type": "code",
-      "norm_label": "illuminate\\auth\\events\\verified",
-      "source_file": "",
-      "source_location": ""
-    },
-    {
       "id": "illuminate_foundation_application",
       "label": "Illuminate\\Foundation\\Application",
       "_origin": "ast",
@@ -7078,6 +7045,17 @@
       "source_location": ""
     },
     {
+      "id": "illuminate_support_facades_route",
+      "label": "Illuminate\\Support\\Facades\\Route",
+      "_origin": "ast",
+      "community": 9,
+      "community_name": "LoginForm.php",
+      "file_type": "code",
+      "norm_label": "illuminate\\support\\facades\\route",
+      "source_file": "",
+      "source_location": ""
+    },
+    {
       "id": "illuminate_support_facades_session",
       "label": "Illuminate\\Support\\Facades\\Session",
       "_origin": "ast",
@@ -7167,36 +7145,36 @@
     },
     {
       "id": "app_livewire_admin_alliesmanager",
-      "label": "AlliesManager.php",
+      "label": "App\\Livewire\\Admin\\AlliesManager",
       "_origin": "ast",
       "community": 91,
       "community_name": "UsersManager",
       "file_type": "code",
-      "norm_label": "alliesmanager.php",
-      "source_file": "app/Livewire/Admin/AlliesManager.php",
-      "source_location": "L1"
+      "norm_label": "app\\livewire\\admin\\alliesmanager",
+      "source_file": "",
+      "source_location": ""
     },
     {
       "id": "app_livewire_admin_bcvratemanager",
-      "label": "BcvRateManager.php",
+      "label": "App\\Livewire\\Admin\\BcvRateManager",
       "_origin": "ast",
       "community": 91,
       "community_name": "UsersManager",
       "file_type": "code",
-      "norm_label": "bcvratemanager.php",
-      "source_file": "app/Livewire/Admin/BcvRateManager.php",
-      "source_location": "L1"
+      "norm_label": "app\\livewire\\admin\\bcvratemanager",
+      "source_file": "",
+      "source_location": ""
     },
     {
       "id": "app_livewire_admin_citydistancemanager",
-      "label": "CityDistanceManager.php",
+      "label": "App\\Livewire\\Admin\\CityDistanceManager",
       "_origin": "ast",
       "community": 91,
       "community_name": "UsersManager",
       "file_type": "code",
-      "norm_label": "citydistancemanager.php",
-      "source_file": "app/Livewire/Admin/CityDistanceManager.php",
-      "source_location": "L1"
+      "norm_label": "app\\livewire\\admin\\citydistancemanager",
+      "source_file": "",
+      "source_location": ""
     },
     {
       "id": "app_livewire_admin_dashboard",
@@ -7211,14 +7189,14 @@
     },
     {
       "id": "app_livewire_admin_ratematrixmanager",
-      "label": "RateMatrixManager.php",
+      "label": "App\\Livewire\\Admin\\RateMatrixManager",
       "_origin": "ast",
       "community": 91,
       "community_name": "UsersManager",
       "file_type": "code",
-      "norm_label": "ratematrixmanager.php",
-      "source_file": "app/Livewire/Admin/RateMatrixManager.php",
-      "source_location": "L1"
+      "norm_label": "app\\livewire\\admin\\ratematrixmanager",
+      "source_file": "",
+      "source_location": ""
     },
     {
       "id": "app_livewire_admin_usersmanager",
@@ -7239,17 +7217,6 @@
       "community_name": "UsersManager",
       "file_type": "code",
       "norm_label": "illuminate\\support\\facades\\db",
-      "source_file": "",
-      "source_location": ""
-    },
-    {
-      "id": "illuminate_support_facades_route",
-      "label": "Illuminate\\Support\\Facades\\Route",
-      "_origin": "ast",
-      "community": 91,
-      "community_name": "UsersManager",
-      "file_type": "code",
-      "norm_label": "illuminate\\support\\facades\\route",
       "source_file": "",
       "source_location": ""
     },
@@ -7404,6 +7371,17 @@
       "community_name": "BcvRate",
       "file_type": "code",
       "norm_label": "carbon\\carbon",
+      "source_file": "",
+      "source_location": ""
+    },
+    {
+      "id": "illuminate_auth_events_verified",
+      "label": "Illuminate\\Auth\\Events\\Verified",
+      "_origin": "ast",
+      "community": 94,
+      "community_name": "EmailVerificationTest.php",
+      "file_type": "code",
+      "norm_label": "illuminate\\auth\\events\\verified",
       "source_file": "",
       "source_location": ""
     },
@@ -7863,30 +7841,6 @@
       "context": "call",
       "source_file": "app/Livewire/Admin/UsersManager.php",
       "source_location": "L121",
-      "weight": 1.0
-    },
-    {
-      "source": "app_livewire_admin_usersmanager_usersmanager_createuser",
-      "target": "app_models_ally_ally",
-      "relation": "calls",
-      "_origin": "ast",
-      "confidence": "EXTRACTED",
-      "confidence_score": 1.0,
-      "context": "call",
-      "source_file": "app/Livewire/Admin/UsersManager.php",
-      "source_location": "L131",
-      "weight": 1.0
-    },
-    {
-      "source": "app_livewire_admin_usersmanager_usersmanager_createuser",
-      "target": "app_models_driver_driver",
-      "relation": "calls",
-      "_origin": "ast",
-      "confidence": "EXTRACTED",
-      "confidence_score": 1.0,
-      "context": "call",
-      "source_file": "app/Livewire/Admin/UsersManager.php",
-      "source_location": "L143",
       "weight": 1.0
     },
     {
@@ -9583,7 +9537,7 @@
     },
     {
       "source": "app_livewire_admin_usersmanager",
-      "target": "app_models_ally_ally",
+      "target": "app_models_ally",
       "relation": "imports",
       "_origin": "ast",
       "confidence": "EXTRACTED",
@@ -9595,7 +9549,7 @@
     },
     {
       "source": "app_livewire_admin_usersmanager",
-      "target": "app_models_driver_driver",
+      "target": "app_models_driver",
       "relation": "imports",
       "_origin": "ast",
       "confidence": "EXTRACTED",
@@ -11623,7 +11577,7 @@
     },
     {
       "source": "routes_web",
-      "target": "app_models_package_package",
+      "target": "app_models_package",
       "relation": "imports",
       "_origin": "ast",
       "confidence": "EXTRACTED",
@@ -11647,7 +11601,7 @@
     },
     {
       "source": "routes_web",
-      "target": "app_livewire_admin_bcvratemanager_bcvratemanager",
+      "target": "app_livewire_admin_bcvratemanager",
       "relation": "imports",
       "_origin": "ast",
       "confidence": "EXTRACTED",
@@ -11659,7 +11613,7 @@
     },
     {
       "source": "routes_web",
-      "target": "app_livewire_admin_ratematrixmanager_ratematrixmanager",
+      "target": "app_livewire_admin_ratematrixmanager",
       "relation": "imports",
       "_origin": "ast",
       "confidence": "EXTRACTED",
@@ -11671,7 +11625,7 @@
     },
     {
       "source": "routes_web",
-      "target": "app_livewire_admin_citydistancemanager_citydistancemanager",
+      "target": "app_livewire_admin_citydistancemanager",
       "relation": "imports",
       "_origin": "ast",
       "confidence": "EXTRACTED",
@@ -11683,7 +11637,7 @@
     },
     {
       "source": "routes_web",
-      "target": "app_livewire_admin_alliesmanager_alliesmanager",
+      "target": "app_livewire_admin_alliesmanager",
       "relation": "imports",
       "_origin": "ast",
       "confidence": "EXTRACTED",
@@ -12127,7 +12081,7 @@
     },
     {
       "source": "tests_unit_userauthorizationtest",
-      "target": "tests_testcase_testcase",
+      "target": "tests_testcase",
       "relation": "imports",
       "_origin": "ast",
       "confidence": "EXTRACTED",
@@ -12751,7 +12705,7 @@
     },
     {
       "source": "resources_views_livewire_admin_users_manager_blade",
-      "target": "resources_views_livewire_admin_users_manager_blade_php_set",
+      "target": "set",
       "relation": "binds_method",
       "_origin": "ast",
       "confidence": "EXTRACTED",
@@ -12773,7 +12727,7 @@
     },
     {
       "source": "resources_views_livewire_ally_package_create_blade",
-      "target": "resources_views_livewire_ally_package_create_blade_php_set",
+      "target": "set",
       "relation": "binds_method",
       "_origin": "ast",
       "confidence": "EXTRACTED",
@@ -15710,7 +15664,7 @@
     },
     {
       "source": "tests_unit_userauthorizationtest_userauthorizationtest",
-      "target": "tests_testcase_testcase",
+      "target": "tests_testcase",
       "relation": "inherits",
       "_origin": "ast",
       "confidence": "EXTRACTED",
@@ -17697,6 +17651,30 @@
       "confidence_score": 1.0,
       "source_file": "database/factories/UserFactory.php",
       "source_location": "L31",
+      "weight": 1.0
+    },
+    {
+      "source": "app_livewire_admin_usersmanager_usersmanager_createuser",
+      "target": "app_models_ally_ally",
+      "relation": "calls",
+      "_origin": "ast",
+      "confidence": "INFERRED",
+      "confidence_score": 0.85,
+      "context": "call",
+      "source_file": "app/Livewire/Admin/UsersManager.php",
+      "source_location": "L131",
+      "weight": 1.0
+    },
+    {
+      "source": "app_livewire_admin_usersmanager_usersmanager_createuser",
+      "target": "app_models_driver_driver",
+      "relation": "calls",
+      "_origin": "ast",
+      "confidence": "INFERRED",
+      "confidence_score": 0.85,
+      "context": "call",
+      "source_file": "app/Livewire/Admin/UsersManager.php",
+      "source_location": "L143",
       "weight": 1.0
     },
     {

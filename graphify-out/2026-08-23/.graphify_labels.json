@@ -1,5 +1,5 @@
 {
-  "0": "Illuminate\\Foundation\\Testing\\RefreshDatabase",
+  "0": "TestCase",
   "1": "Illuminate\\Database\\Migrations\\Migration",
   "2": "Package",
   "3": "composer.json",
@@ -97,9 +97,9 @@
   "95": "PasswordResetTest.php",
   "96": "Illuminate\\Support\\Facades\\Schema",
   "97": "Illuminate\\Database\\Schema\\Blueprint",
-  "98": ".isAdmin",
+  "98": "AuthenticationTest",
   "99": "ProfileTest",
-  "100": "TestCase",
+  "100": "UserAuthorizationTest",
   "101": "DatabaseSeeder.php",
   "102": "2026_08_08_232920_create_drivers_table.php",
   "103": "2026_08_08_232921_create_bcv_rates_table.php",
@@ -116,7 +116,5 @@
   "114": "2026_08_22_195324_add_cliente_role_to_users_table.php",
   "115": "2026_08_22_213928_add_status_to_allies_table.php",
   "116": "2026_08_22_230000_update_user_roles_and_add_status.php",
-  "117": "2026_08_22_230001_create_audit_logs_table.php",
-  "118": "package-create.blade.php",
-  "119": "tailwindcss"
+  "117": "2026_08_22_230001_create_audit_logs_table.php"
 }

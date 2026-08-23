@@ -7,53 +7,38 @@ use Illuminate\Support\Facades\Schema;
 return new class extends Migration
 {
     /**
-     * Ejecuta la migración.
+     * Convierte rate_matrices de una matriz por ruta a una tarifa global.
      *
-     * Antes: cada fila de rate_matrices representaba una ruta
-     * específica (origin_city → destination_city).
+     * La tabla originalmente tenía:
+     * - origin_city
+     * - destination_city
+     * - price_per_kg_usd
+     * - base_price_usd
      *
-     * Ahora: la diferencia de precio entre rutas la aporta
-     * city_distances (price_per_km_usd × distancia_km), así que
-     * rate_matrices deja de tener columnas de ruta y pasa a ser
-     * una tarifa única global (base + por kg + por km).
+     * La tarifa global conserva los precios y agrega posteriormente
+     * price_per_km_usd. Las ciudades pasan a gestionarse mediante
+     * city_distances.
      */
     public function up(): void
     {
+        // IMPORTANTE para SQLite: antes de eliminar columnas debemos eliminar
+        // todos los índices que dependen de ellas. Si SQLite reconstruye la
+        // tabla mientras esos índices siguen registrados, falla con:
+        // "error in index ... after drop column".
         Schema::table('rate_matrices', function (Blueprint $table) {
-            /**
-             * Cada paso se verifica antes de ejecutarse porque
-             * intentos previos de esta migración pudieron quedar
-             * aplicados a medias (SQLite no revirtió la transacción
-             * al fallar). Así, esta migración corre igual de bien
-             * sobre una tabla nueva que sobre una parcialmente
-             * migrada.
-             */
-            if (Schema::hasIndex('rate_matrices', ['destination_city'], 'index')) {
-                $table->dropIndex(['destination_city']);
-            }
+            $table->dropIndex('rate_matrices_destination_city_index');
+            $table->dropUnique('rate_matrices_origin_city_destination_city_unique');
+        });
 
-            /**
-             * CORRECCIÓN: el unique compuesto (origin_city, destination_city)
-             * NO se elimina solo al borrar las columnas en esta versión de
-             * SQLite. Si no se elimina explícitamente aquí, la reconstrucción
-             * del índice falla después porque las columnas ya no existen
-             * ("no such column: origin_city"). Se elimina por columnas
-             * (no por nombre) para no depender del nombre autogenerado.
-             */
-            if (Schema::hasIndex('rate_matrices', ['origin_city', 'destination_city'], 'unique')) {
-                $table->dropUnique(['origin_city', 'destination_city']);
-            }
+        Schema::table('rate_matrices', function (Blueprint $table) {
+            $table->dropColumn(['origin_city', 'destination_city']);
+        });
 
-            if (Schema::hasColumn('rate_matrices', 'origin_city')) {
-                $table->dropColumn('origin_city');
-            }
-
-            if (Schema::hasColumn('rate_matrices', 'destination_city')) {
-                $table->dropColumn('destination_city');
-            }
-
+        Schema::table('rate_matrices', function (Blueprint $table) {
             if (! Schema::hasColumn('rate_matrices', 'price_per_km_usd')) {
-                $table->decimal('price_per_km_usd', 12, 2)->default(0)->after('price_per_kg_usd');
+                $table->decimal('price_per_km_usd', 12, 2)
+                    ->default(0)
+                    ->after('price_per_kg_usd');
             }
         });
     }
