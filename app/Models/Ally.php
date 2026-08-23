@@ -11,18 +11,24 @@ class Ally extends Model
 {
     use HasFactory;
 
+    public const STATUS_PENDING = 'PENDIENTE';
+    public const STATUS_ACTIVE = 'ACTIVO';
+    public const STATUS_REJECTED = 'RECHAZADO';
+    public const STATUS_SUSPENDED = 'SUSPENDIDO';
+
     /**
      * Los atributos que se pueden asignar de forma masiva.
      *
      * @var list<string>
      */
     protected $fillable = [
-        'user_id',
-        'business_name',
-        'rif',
-        'city',
-        'address',
-        'commission_percentage',
+    'user_id',
+    'business_name',
+    'rif',
+    'city',
+    'address',
+    'commission_percentage',
+    'status',
     ];
 
     /**

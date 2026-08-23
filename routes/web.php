@@ -6,6 +6,7 @@ use App\Livewire\Admin\Dashboard as AdminDashboard;
 use App\Livewire\Admin\BcvRateManager;
 use App\Livewire\Admin\RateMatrixManager;
 use App\Livewire\Admin\CityDistanceManager;
+use App\Livewire\Admin\AlliesManager;
 
 /*
 |--------------------------------------------------------------------------
@@ -108,6 +109,7 @@ Route::prefix('admin')
     ->name('admin.')
     ->group(function () {
         Route::get('/', AdminDashboard::class)->name('dashboard');
+        Route::get('/allies', AlliesManager::class)->name('allies');
         Route::get('/bcv-rates', BcvRateManager::class)->name('bcv-rates');
         Route::get('/rate-matrices', RateMatrixManager::class)->name('rate-matrices');
         Route::get('/city-distances', CityDistanceManager::class)->name('city-distances');

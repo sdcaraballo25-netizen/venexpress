@@ -16,11 +16,18 @@ class Driver extends Model
      *
      * @var list<string>
      */
+
+    public const STATUS_PENDING = 'PENDIENTE';
+    public const STATUS_ACTIVE = 'ACTIVO';
+    public const STATUS_REJECTED = 'RECHAZADO';
+    public const STATUS_SUSPENDED = 'SUSPENDIDO';
+
     protected $fillable = [
-        'user_id',
-        'vehicle_plate',
-        'vehicle_type',
-        'phone',
+    'user_id',
+    'vehicle_plate',
+    'vehicle_type',
+    'phone',
+    'status',
     ];
 
     /*
