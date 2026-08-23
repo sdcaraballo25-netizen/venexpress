@@ -77,6 +77,14 @@ class PackageService
     /**
      * Cambia el estado de un paquete y deja constancia en su historial.
      *
+     * @param int|null $routeStopId Si el cambio ocurre durante una parada
+     *                              del módulo de Gestión de Rutas (por
+     *                              ejemplo, al pasar a RECOLECTADO_VENEXPRESS
+     *                              en la agencia), se etiqueta el evento del
+     *                              historial con esa parada. Opcional y null
+     *                              por defecto: no rompe ningún llamado
+     *                              existente que no lo pase.
+     *
      * @throws RuntimeException si el estado no es válido.
      */
     public function changeStatus(
@@ -84,15 +92,16 @@ class PackageService
         string $newStatus,
         ?int $userId = null,
         ?string $locationDescription = null,
+        ?int $routeStopId = null,
     ): Package {
         if (! in_array($newStatus, Package::STATUSES, true)) {
             throw new RuntimeException("Estado inválido: {$newStatus}");
         }
 
-        return DB::transaction(function () use ($package, $newStatus, $userId, $locationDescription) {
+        return DB::transaction(function () use ($package, $newStatus, $userId, $locationDescription, $routeStopId) {
             $package->update(['current_status' => $newStatus]);
 
-            $this->recordHistory($package, $newStatus, $userId, $locationDescription);
+            $this->recordHistory($package, $newStatus, $userId, $locationDescription, $routeStopId);
 
             return $package->fresh();
         });
@@ -127,11 +136,13 @@ class PackageService
         string $status,
         ?int $userId,
         ?string $locationDescription,
+        ?int $routeStopId = null,
     ): PackageHistory {
         return $package->histories()->create([
             'status' => $status,
             'location_description' => $locationDescription,
             'scanned_by_user_id' => $userId,
+            'route_stop_id' => $routeStopId,
         ]);
     }
 }

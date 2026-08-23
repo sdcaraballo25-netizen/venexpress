@@ -8,6 +8,8 @@ use App\Livewire\Admin\RateMatrixManager;
 use App\Livewire\Admin\CityDistanceManager;
 use App\Livewire\Admin\AlliesManager;
 use App\Livewire\Admin\UsersManager;
+use App\Livewire\Admin\RoutesManager;
+use App\Livewire\Admin\RoutesDashboard;
 
 /*
 |--------------------------------------------------------------------------
@@ -115,6 +117,8 @@ Route::prefix('admin')
         Route::get('/rate-matrices', RateMatrixManager::class)->name('rate-matrices');
         Route::get('/city-distances', CityDistanceManager::class)->name('city-distances');
         Route::get('/users', UsersManager::class)->name('users');
+        Route::get('/rutas', RoutesManager::class)->name('routes');
+        Route::get('/rutas/dashboard', RoutesDashboard::class)->name('routes.dashboard');
     });
 
 require __DIR__.'/auth.php';

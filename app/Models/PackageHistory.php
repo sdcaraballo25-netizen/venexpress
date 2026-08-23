@@ -17,6 +17,7 @@ class PackageHistory extends Model
      */
     protected $fillable = [
         'package_id',
+        'route_stop_id',
         'status',
         'location_description',
         'scanned_by_user_id',
@@ -34,6 +35,16 @@ class PackageHistory extends Model
     public function package(): BelongsTo
     {
         return $this->belongsTo(Package::class);
+    }
+
+    /**
+     * Parada de ruta en la que ocurrió este evento (nullable: eventos
+     * que no pasan por el módulo de rutas, como EN_HUB o ENTREGADO,
+     * no tienen parada asociada).
+     */
+    public function routeStop(): BelongsTo
+    {
+        return $this->belongsTo(RouteStop::class);
     }
 
     /**

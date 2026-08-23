@@ -66,9 +66,24 @@
                         Gestión de tarifas
                     </a>
 
-                    <a href="{{ route('admin.routes') }}" class="flex items-center gap-3 px-4 py-3 text-[#64748B] hover:bg-slate-50 hover:text-[#0F172A] rounded-xl font-medium transition-colors">
-                        <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 20l-5.447-2.724A1 1 0 013 16.382V5.618a1 1 0 011.447-.894L9 7l6-2.572 5.447 2.724A1 1 0 0121 8.053v10.764a1 1 0 01-1.447.894L15 17l-6 2.572zM9 7v13M15 4v13"></path></svg>
+                    {{-- Gestión de Rutas --}}
+                    <a href="{{ route('admin.routes') }}"
+                       class="flex items-center gap-3 px-4 py-3 rounded-xl font-medium transition-colors
+                              {{ request()->routeIs('admin.routes')
+                                  ? 'bg-blue-50 text-blue-900'
+                                  : 'text-[#64748B] hover:bg-slate-50 hover:text-[#0F172A]' }}">
+                        <svg class="w-5 h-5 {{ request()->routeIs('admin.routes') ? 'text-blue-700' : '' }}" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 20l-5.447-2.724A1 1 0 013 16.382V5.618a1 1 0 011.447-.894L9 7l6-2.572 5.447 2.724A1 1 0 0121 8.053v10.764a1 1 0 01-1.447.894L15 17l-6 2.572zM9 7v13M15 4v13"></path></svg>
                         Control de rutas
+                    </a>
+
+                    {{-- Dashboard de Rutas --}}
+                    <a href="{{ route('admin.routes.dashboard') }}"
+                       class="flex items-center gap-3 px-4 py-3 rounded-xl font-medium transition-colors
+                              {{ request()->routeIs('admin.routes.dashboard')
+                                  ? 'bg-blue-50 text-blue-900'
+                                  : 'text-[#64748B] hover:bg-slate-50 hover:text-[#0F172A]' }}">
+                        <svg class="w-5 h-5 {{ request()->routeIs('admin.routes.dashboard') ? 'text-blue-700' : '' }}" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 6a2 2 0 012-2h2a2 2 0 012 2v2a2 2 0 01-2 2H6a2 2 0 01-2-2V6zM14 6a2 2 0 012-2h2a2 2 0 012 2v2a2 2 0 01-2 2h-2a2 2 0 01-2-2V6zM4 16a2 2 0 012-2h2a2 2 0 012 2v2a2 2 0 01-2 2H6a2 2 0 01-2-2v-2zM14 16a2 2 0 012-2h2a2 2 0 012 2v2a2 2 0 01-2 2h-2a2 2 0 01-2-2v-2z"></path></svg>
+                        Dashboard de Rutas
                     </a>
 
                     <p class="px-2 text-xs font-semibold text-[#94A3B8] uppercase tracking-wider mb-3 mt-6">Administración</p>
