@@ -32,9 +32,17 @@ return new class extends Migration
                 $table->dropIndex(['destination_city']);
             }
 
-            // El unique compuesto (origin_city, destination_city) es un
-            // autoindex interno en SQLite: se elimina solo al borrar
-            // las columnas, no hace falta (ni se puede) dropUnique() por nombre.
+            /**
+             * CORRECCIÓN: el unique compuesto (origin_city, destination_city)
+             * NO se elimina solo al borrar las columnas en esta versión de
+             * SQLite. Si no se elimina explícitamente aquí, la reconstrucción
+             * del índice falla después porque las columnas ya no existen
+             * ("no such column: origin_city"). Se elimina por columnas
+             * (no por nombre) para no depender del nombre autogenerado.
+             */
+            if (Schema::hasIndex('rate_matrices', ['origin_city', 'destination_city'], 'unique')) {
+                $table->dropUnique(['origin_city', 'destination_city']);
+            }
 
             if (Schema::hasColumn('rate_matrices', 'origin_city')) {
                 $table->dropColumn('origin_city');

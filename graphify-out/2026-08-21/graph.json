@@ -348,7 +348,7 @@
       "_callable_class": true,
       "_origin": "ast",
       "community": 4,
-      "community_name": "CityDistanceManager",
+      "community_name": "CityDistance",
       "file_type": "code",
       "norm_label": "citydistancemanager",
       "source_file": "app/Livewire/Admin/CityDistanceManager.php",
@@ -361,7 +361,7 @@
       "_callable_class": true,
       "_origin": "ast",
       "community": 4,
-      "community_name": "CityDistanceManager",
+      "community_name": "CityDistance",
       "file_type": "code",
       "norm_label": "citydistance",
       "source_file": "app/Models/CityDistance.php",
@@ -374,7 +374,7 @@
       "_callable_class": true,
       "_origin": "ast",
       "community": 4,
-      "community_name": "CityDistanceManager",
+      "community_name": "CityDistance",
       "file_type": "code",
       "norm_label": "userfactory",
       "source_file": "database/factories/UserFactory.php",
@@ -1506,6 +1506,18 @@
       "source_location": "L31"
     },
     {
+      "id": "app_services_tariffservice_tariffservice_construct",
+      "label": ".__construct()",
+      "_callable": true,
+      "_origin": "ast",
+      "community": 14,
+      "community_name": "BcvRate",
+      "file_type": "code",
+      "norm_label": ".__construct()",
+      "source_file": "app/Services/TariffService.php",
+      "source_location": "L12"
+    },
+    {
       "id": "tests_unit_exampletest_exampletest_test_that_true_is_true",
       "label": ".test_that_true_is_true()",
       "_callable": true,
@@ -1770,18 +1782,6 @@
       "source_location": "L82"
     },
     {
-      "id": "app_services_packageservice_packageservice_construct",
-      "label": ".__construct()",
-      "_callable": true,
-      "_origin": "ast",
-      "community": 2,
-      "community_name": "Package",
-      "file_type": "code",
-      "norm_label": ".__construct()",
-      "source_file": "app/Services/PackageService.php",
-      "source_location": "L13"
-    },
-    {
       "id": "app_services_packageservice_packageservice_createpackage",
       "label": ".createPackage()",
       "_callable": true,
@@ -1823,7 +1823,7 @@
       "_callable": true,
       "_origin": "ast",
       "community": 4,
-      "community_name": "CityDistanceManager",
+      "community_name": "CityDistance",
       "file_type": "code",
       "norm_label": ".canceledit()",
       "source_file": "app/Livewire/Admin/CityDistanceManager.php",
@@ -1835,7 +1835,7 @@
       "_callable": true,
       "_origin": "ast",
       "community": 4,
-      "community_name": "CityDistanceManager",
+      "community_name": "CityDistance",
       "file_type": "code",
       "norm_label": ".create()",
       "source_file": "app/Livewire/Admin/CityDistanceManager.php",
@@ -1847,7 +1847,7 @@
       "_callable": true,
       "_origin": "ast",
       "community": 4,
-      "community_name": "CityDistanceManager",
+      "community_name": "CityDistance",
       "file_type": "code",
       "norm_label": ".delete()",
       "source_file": "app/Livewire/Admin/CityDistanceManager.php",
@@ -1859,7 +1859,7 @@
       "_callable": true,
       "_origin": "ast",
       "community": 4,
-      "community_name": "CityDistanceManager",
+      "community_name": "CityDistance",
       "file_type": "code",
       "norm_label": ".edit()",
       "source_file": "app/Livewire/Admin/CityDistanceManager.php",
@@ -1871,7 +1871,7 @@
       "_callable": true,
       "_origin": "ast",
       "community": 4,
-      "community_name": "CityDistanceManager",
+      "community_name": "CityDistance",
       "file_type": "code",
       "norm_label": ".render()",
       "source_file": "app/Livewire/Admin/CityDistanceManager.php",
@@ -1883,7 +1883,7 @@
       "_callable": true,
       "_origin": "ast",
       "community": 4,
-      "community_name": "CityDistanceManager",
+      "community_name": "CityDistance",
       "file_type": "code",
       "norm_label": ".resetform()",
       "source_file": "app/Livewire/Admin/CityDistanceManager.php",
@@ -1895,7 +1895,7 @@
       "_callable": true,
       "_origin": "ast",
       "community": 4,
-      "community_name": "CityDistanceManager",
+      "community_name": "CityDistance",
       "file_type": "code",
       "norm_label": ".rules()",
       "source_file": "app/Livewire/Admin/CityDistanceManager.php",
@@ -1907,7 +1907,7 @@
       "_callable": true,
       "_origin": "ast",
       "community": 4,
-      "community_name": "CityDistanceManager",
+      "community_name": "CityDistance",
       "file_type": "code",
       "norm_label": ".save()",
       "source_file": "app/Livewire/Admin/CityDistanceManager.php",
@@ -1919,7 +1919,7 @@
       "_callable": true,
       "_origin": "ast",
       "community": 4,
-      "community_name": "CityDistanceManager",
+      "community_name": "CityDistance",
       "file_type": "code",
       "norm_label": ".current()",
       "source_file": "app/Models/BcvRate.php",
@@ -1931,7 +1931,7 @@
       "_callable": true,
       "_origin": "ast",
       "community": 4,
-      "community_name": "CityDistanceManager",
+      "community_name": "CityDistance",
       "file_type": "code",
       "norm_label": ".between()",
       "source_file": "app/Models/CityDistance.php",
@@ -1943,7 +1943,7 @@
       "_callable": true,
       "_origin": "ast",
       "community": 4,
-      "community_name": "CityDistanceManager",
+      "community_name": "CityDistance",
       "file_type": "code",
       "norm_label": ".casts()",
       "source_file": "app/Models/CityDistance.php",
@@ -1955,7 +1955,7 @@
       "_callable": true,
       "_origin": "ast",
       "community": 4,
-      "community_name": "CityDistanceManager",
+      "community_name": "CityDistance",
       "file_type": "code",
       "norm_label": ".normalizepair()",
       "source_file": "app/Models/CityDistance.php",
@@ -1967,11 +1967,23 @@
       "_callable": true,
       "_origin": "ast",
       "community": 4,
-      "community_name": "CityDistanceManager",
+      "community_name": "CityDistance",
       "file_type": "code",
       "norm_label": ".setdistance()",
       "source_file": "app/Models/CityDistance.php",
       "source_location": "L56"
+    },
+    {
+      "id": "app_models_ratematrix_ratematrix_current",
+      "label": ".current()",
+      "_callable": true,
+      "_origin": "ast",
+      "community": 4,
+      "community_name": "CityDistance",
+      "file_type": "code",
+      "norm_label": ".current()",
+      "source_file": "app/Models/RateMatrix.php",
+      "source_location": "L49"
     },
     {
       "id": "database_factories_userfactory_userfactory_definition",
@@ -1979,7 +1991,7 @@
       "_callable": true,
       "_origin": "ast",
       "community": 4,
-      "community_name": "CityDistanceManager",
+      "community_name": "CityDistance",
       "file_type": "code",
       "norm_label": ".definition()",
       "source_file": "database/factories/UserFactory.php",
@@ -1991,7 +2003,7 @@
       "_callable": true,
       "_origin": "ast",
       "community": 4,
-      "community_name": "CityDistanceManager",
+      "community_name": "CityDistance",
       "file_type": "code",
       "norm_label": ".unverified()",
       "source_file": "database/factories/UserFactory.php",
@@ -2130,16 +2142,16 @@
       "source_location": "L31"
     },
     {
-      "id": "app_models_ratematrix_ratematrix_current",
-      "label": ".current()",
+      "id": "app_services_packageservice_packageservice_construct",
+      "label": ".__construct()",
       "_callable": true,
       "_origin": "ast",
       "community": 84,
       "community_name": "TariffService",
       "file_type": "code",
-      "norm_label": ".current()",
-      "source_file": "app/Models/RateMatrix.php",
-      "source_location": "L49"
+      "norm_label": ".__construct()",
+      "source_file": "app/Services/PackageService.php",
+      "source_location": "L13"
     },
     {
       "id": "app_services_tariffservice_tariffservice_calculate",
@@ -2224,18 +2236,6 @@
       "norm_label": ".calculatevolumetricweight()",
       "source_file": "app/Services/TariffService.php",
       "source_location": "L21"
-    },
-    {
-      "id": "app_services_tariffservice_tariffservice_construct",
-      "label": ".__construct()",
-      "_callable": true,
-      "_origin": "ast",
-      "community": 84,
-      "community_name": "TariffService",
-      "file_type": "code",
-      "norm_label": ".__construct()",
-      "source_file": "app/Services/TariffService.php",
-      "source_location": "L12"
     },
     {
       "id": "app_services_tariffservice_tariffservice_finddistance",
@@ -3194,6 +3194,17 @@
       "source_location": ""
     },
     {
+      "id": "illuminate_support_facades_db",
+      "label": "Illuminate\\Support\\Facades\\DB",
+      "_origin": "ast",
+      "community": 14,
+      "community_name": "BcvRate",
+      "file_type": "code",
+      "norm_label": "illuminate\\support\\facades\\db",
+      "source_file": "",
+      "source_location": ""
+    },
+    {
       "id": "illuminate_support_facades_route",
       "label": "Illuminate\\Support\\Facades\\Route",
       "_origin": "ast",
@@ -3258,17 +3269,6 @@
       "norm_label": "web.php",
       "source_file": "routes/web.php",
       "source_location": "L1"
-    },
-    {
-      "id": "runtimeexception",
-      "label": "RuntimeException",
-      "_origin": "ast",
-      "community": 14,
-      "community_name": "BcvRate",
-      "file_type": "code",
-      "norm_label": "runtimeexception",
-      "source_file": "",
-      "source_location": ""
     },
     {
       "id": "claude_skills_graphify_references_exports",
@@ -3619,15 +3619,26 @@
       "source_location": "L1"
     },
     {
-      "id": "app_models_driver",
-      "label": "App\\Models\\Driver",
+      "id": "app_models_citydistance",
+      "label": "CityDistance.php",
       "_origin": "ast",
       "community": 2,
       "community_name": "Package",
       "file_type": "code",
-      "norm_label": "app\\models\\driver",
-      "source_file": "",
-      "source_location": ""
+      "norm_label": "citydistance.php",
+      "source_file": "app/Models/CityDistance.php",
+      "source_location": "L1"
+    },
+    {
+      "id": "app_models_driver",
+      "label": "Driver.php",
+      "_origin": "ast",
+      "community": 2,
+      "community_name": "Package",
+      "file_type": "code",
+      "norm_label": "driver.php",
+      "source_file": "app/Models/Driver.php",
+      "source_location": "L1"
     },
     {
       "id": "app_models_package",
@@ -3642,14 +3653,14 @@
     },
     {
       "id": "app_models_packagehistory",
-      "label": "App\\Models\\PackageHistory",
+      "label": "PackageHistory.php",
       "_origin": "ast",
       "community": 2,
       "community_name": "Package",
       "file_type": "code",
-      "norm_label": "app\\models\\packagehistory",
-      "source_file": "",
-      "source_location": ""
+      "norm_label": "packagehistory.php",
+      "source_file": "app/Models/PackageHistory.php",
+      "source_location": "L1"
     },
     {
       "id": "app_models_ratematrix",
@@ -3718,17 +3729,6 @@
       "source_location": ""
     },
     {
-      "id": "illuminate_support_facades_db",
-      "label": "Illuminate\\Support\\Facades\\DB",
-      "_origin": "ast",
-      "community": 2,
-      "community_name": "Package",
-      "file_type": "code",
-      "norm_label": "illuminate\\support\\facades\\db",
-      "source_file": "",
-      "source_location": ""
-    },
-    {
       "id": "livewire_attributes_computed",
       "label": "Livewire\\Attributes\\Computed",
       "_origin": "ast",
@@ -3736,6 +3736,17 @@
       "community_name": "Package",
       "file_type": "code",
       "norm_label": "livewire\\attributes\\computed",
+      "source_file": "",
+      "source_location": ""
+    },
+    {
+      "id": "runtimeexception",
+      "label": "RuntimeException",
+      "_origin": "ast",
+      "community": 2,
+      "community_name": "Package",
+      "file_type": "code",
+      "norm_label": "runtimeexception",
       "source_file": "",
       "source_location": ""
     },
@@ -4514,7 +4525,7 @@
       "label": "self",
       "_origin": "ast",
       "community": 4,
-      "community_name": "CityDistanceManager",
+      "community_name": "CityDistance",
       "file_type": "code",
       "norm_label": "self",
       "source_file": "",
@@ -4525,7 +4536,18 @@
       "label": "self",
       "_origin": "ast",
       "community": 4,
-      "community_name": "CityDistanceManager",
+      "community_name": "CityDistance",
+      "file_type": "code",
+      "norm_label": "self",
+      "source_file": "",
+      "source_location": ""
+    },
+    {
+      "id": "app_models_ratematrix_php_self",
+      "label": "self",
+      "_origin": "ast",
+      "community": 4,
+      "community_name": "CityDistance",
       "file_type": "code",
       "norm_label": "self",
       "source_file": "",
@@ -4536,7 +4558,7 @@
       "label": "UserFactory.php",
       "_origin": "ast",
       "community": 4,
-      "community_name": "CityDistanceManager",
+      "community_name": "CityDistance",
       "file_type": "code",
       "norm_label": "userfactory.php",
       "source_file": "database/factories/UserFactory.php",
@@ -4547,7 +4569,7 @@
       "label": "Illuminate\\Database\\Eloquent\\Factories\\Factory",
       "_origin": "ast",
       "community": 4,
-      "community_name": "CityDistanceManager",
+      "community_name": "CityDistance",
       "file_type": "code",
       "norm_label": "illuminate\\database\\eloquent\\factories\\factory",
       "source_file": "",
@@ -4558,7 +4580,7 @@
       "label": "static",
       "_origin": "ast",
       "community": 4,
-      "community_name": "CityDistanceManager",
+      "community_name": "CityDistance",
       "file_type": "code",
       "norm_label": "static",
       "source_file": "",
@@ -6362,17 +6384,6 @@
       "source_location": "L1"
     },
     {
-      "id": "app_models_citydistance",
-      "label": "App\\Models\\CityDistance",
-      "_origin": "ast",
-      "community": 84,
-      "community_name": "TariffService",
-      "file_type": "code",
-      "norm_label": "app\\models\\citydistance",
-      "source_file": "",
-      "source_location": ""
-    },
-    {
       "id": "app_services_tariffservice",
       "label": "TariffService.php",
       "_origin": "ast",
@@ -6382,39 +6393,6 @@
       "norm_label": "tariffservice.php",
       "source_file": "app/Services/TariffService.php",
       "source_location": "L1"
-    },
-    {
-      "id": "bcvrateservice",
-      "label": "BcvRateService",
-      "_origin": "ast",
-      "community": 84,
-      "community_name": "TariffService",
-      "file_type": "code",
-      "norm_label": "bcvrateservice",
-      "source_file": "",
-      "source_location": ""
-    },
-    {
-      "id": "citydistance",
-      "label": "CityDistance",
-      "_origin": "ast",
-      "community": 84,
-      "community_name": "TariffService",
-      "file_type": "code",
-      "norm_label": "citydistance",
-      "source_file": "",
-      "source_location": ""
-    },
-    {
-      "id": "self",
-      "label": "self",
-      "_origin": "ast",
-      "community": 84,
-      "community_name": "TariffService",
-      "file_type": "code",
-      "norm_label": "self",
-      "source_file": "",
-      "source_location": ""
     },
     {
       "id": "github_copilot_instructions",
@@ -6485,15 +6463,15 @@
       "source_location": null
     },
     {
-      "id": "app_models_ratematrix_php_self",
-      "label": "self",
+      "id": "tailwindcss_tailwindcss",
+      "label": "tailwindcss",
       "_origin": "ast",
       "community": 87,
-      "community_name": "self",
+      "community_name": "tailwindcss",
+      "confidence": "EXTRACTED",
       "file_type": "code",
-      "norm_label": "self",
-      "source_file": "",
-      "source_location": ""
+      "norm_label": "tailwindcss",
+      "source_file": "tailwindcss"
     },
     {
       "id": "app_livewire_actions_logout",
@@ -7156,7 +7134,7 @@
     },
     {
       "source": "app_services_tariffservice_tariffservice_finddistance",
-      "target": "citydistance",
+      "target": "app_models_citydistance_citydistance",
       "relation": "calls",
       "_origin": "ast",
       "confidence": "EXTRACTED",
@@ -7456,7 +7434,7 @@
     },
     {
       "source": "app_services_tariffservice_tariffservice",
-      "target": "bcvrateservice",
+      "target": "app_services_bcvrateservice_bcvrateservice",
       "relation": "references",
       "_origin": "ast",
       "confidence": "EXTRACTED",
@@ -8656,7 +8634,7 @@
     },
     {
       "source": "app_services_packageservice",
-      "target": "app_models_driver",
+      "target": "app_models_driver_driver",
       "relation": "imports",
       "_origin": "ast",
       "confidence": "EXTRACTED",
@@ -8680,7 +8658,7 @@
     },
     {
       "source": "app_services_packageservice",
-      "target": "app_models_packagehistory",
+      "target": "app_models_packagehistory_packagehistory",
       "relation": "imports",
       "_origin": "ast",
       "confidence": "EXTRACTED",
@@ -8716,7 +8694,7 @@
     },
     {
       "source": "app_services_tariffservice",
-      "target": "app_models_citydistance",
+      "target": "app_models_citydistance_citydistance",
       "relation": "imports",
       "_origin": "ast",
       "confidence": "EXTRACTED",
@@ -10456,7 +10434,7 @@
     },
     {
       "source": "app_services_packageservice_packageservice_assigndriver",
-      "target": "app_models_driver",
+      "target": "app_models_driver_driver",
       "relation": "references",
       "_origin": "ast",
       "confidence": "EXTRACTED",
@@ -10540,7 +10518,7 @@
     },
     {
       "source": "app_services_tariffservice_tariffservice_construct",
-      "target": "bcvrateservice",
+      "target": "app_services_bcvrateservice_bcvrateservice",
       "relation": "references",
       "_origin": "ast",
       "confidence": "EXTRACTED",
@@ -10696,7 +10674,7 @@
     },
     {
       "source": "app_models_ratematrix_ratematrix_current",
-      "target": "self",
+      "target": "app_models_ratematrix_php_self",
       "relation": "references",
       "_origin": "ast",
       "confidence": "EXTRACTED",
@@ -10756,7 +10734,7 @@
     },
     {
       "source": "app_services_packageservice_packageservice_recordhistory",
-      "target": "app_models_packagehistory",
+      "target": "app_models_packagehistory_packagehistory",
       "relation": "references",
       "_origin": "ast",
       "confidence": "EXTRACTED",
@@ -10764,18 +10742,6 @@
       "context": "return_type",
       "source_file": "app/Services/PackageService.php",
       "source_location": "L125",
-      "weight": 1.0
-    },
-    {
-      "source": "app_services_tariffservice_tariffservice_finddistance",
-      "target": "app_models_citydistance",
-      "relation": "references",
-      "_origin": "ast",
-      "confidence": "EXTRACTED",
-      "confidence_score": 1.0,
-      "context": "return_type",
-      "source_file": "app/Services/TariffService.php",
-      "source_location": "L63",
       "weight": 1.0
     },
     {
@@ -15194,6 +15160,18 @@
       "context": "call",
       "source_file": "app/Models/CityDistance.php",
       "source_location": "L60",
+      "weight": 1.0
+    },
+    {
+      "source": "app_models_ratematrix_ratematrix_current",
+      "target": "static",
+      "relation": "calls",
+      "_origin": "ast",
+      "confidence": "INFERRED",
+      "confidence_score": 0.85,
+      "context": "call",
+      "source_file": "app/Models/RateMatrix.php",
+      "source_location": "L51",
       "weight": 1.0
     }
   ],

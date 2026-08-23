@@ -5,8 +5,8 @@
 - Verdict: corpus is large enough that graph structure adds value.
 
 ## Summary
-- 576 nodes · 744 edges · 88 communities (76 shown, 12 thin omitted)
-- Extraction: 100% EXTRACTED · 0% INFERRED · 0% AMBIGUOUS · INFERRED: 3 edges (avg confidence: 0.85)
+- 574 nodes · 744 edges · 88 communities (77 shown, 11 thin omitted)
+- Extraction: 99% EXTRACTED · 1% INFERRED · 0% AMBIGUOUS · INFERRED: 4 edges (avg confidence: 0.85)
 - Token cost: 0 input · 0 output
 
 ## Graph Freshness
@@ -19,7 +19,7 @@
 - Illuminate\Database\Migrations\Migration
 - Package
 - composer.json
-- CityDistanceManager
+- CityDistance
 - What You Must Do When Invoked
 - devDependencies
 - scripts
@@ -50,7 +50,6 @@
 - TariffService
 - copilot-instructions.md
 - rate-matrix-manager.blade.php
-- self
 
 ## God Nodes (most connected - your core abstractions)
 1. `User` - 41 edges
@@ -58,28 +57,28 @@
 3. `TestCase` - 18 edges
 4. `TariffService` - 17 edges
 5. `BcvRate` - 16 edges
-6. `RateMatrix` - 14 edges
-7. `Venexpress — Project Rules` - 13 edges
-8. `BcvRateManager` - 12 edges
-9. `CityDistanceManager` - 12 edges
-10. `CityDistance` - 12 edges
+6. `CityDistance` - 14 edges
+7. `RateMatrix` - 14 edges
+8. `Venexpress — Project Rules` - 13 edges
+9. `BcvRateManager` - 12 edges
+10. `CityDistanceManager` - 12 edges
 
 ## Surprising Connections (you probably didn't know these)
+- `TariffService` --references--> `BcvRateService`  [EXTRACTED]
+  app/Services/TariffService.php → app/Services/BcvRateService.php
 - `PackageService` --references--> `TariffService`  [EXTRACTED]
   app/Services/PackageService.php → app/Services/TariffService.php
+- `VerifyEmailController` --inherits--> `Controller`  [EXTRACTED]
+  app/Http/Controllers/Auth/VerifyEmailController.php → app/Http/Controllers/Controller.php
+- `DriverScanController` --inherits--> `Controller`  [EXTRACTED]
+  app/Http/Controllers/DriverScanController.php → app/Http/Controllers/Controller.php
 - `AuthenticationTest` --inherits--> `TestCase`  [EXTRACTED]
   tests/Feature/Auth/AuthenticationTest.php → tests/TestCase.php
-- `EmailVerificationTest` --inherits--> `TestCase`  [EXTRACTED]
-  tests/Feature/Auth/EmailVerificationTest.php → tests/TestCase.php
-- `PasswordConfirmationTest` --inherits--> `TestCase`  [EXTRACTED]
-  tests/Feature/Auth/PasswordConfirmationTest.php → tests/TestCase.php
-- `PasswordResetTest` --inherits--> `TestCase`  [EXTRACTED]
-  tests/Feature/Auth/PasswordResetTest.php → tests/TestCase.php
 
 ## Import Cycles
 - None detected.
 
-## Communities (88 total, 12 thin omitted)
+## Communities (88 total, 11 thin omitted)
 
 ### Community 0 - "User"
 Cohesion: 0.05
@@ -91,15 +90,15 @@ Nodes (3): Illuminate\Database\Migrations\Migration, Illuminate\Database\Schema\
 
 ### Community 2 - "Package"
 Cohesion: 0.09
-Nodes (14): CreatePackage, Ally, App\Models\Driver, Driver, Package, App\Models\PackageHistory, PackageHistory, PackageService (+6 more)
+Nodes (12): CreatePackage, Ally, Driver, Package, PackageHistory, PackageService, Illuminate\Database\Eloquent\Factories\HasFactory, Illuminate\Database\Eloquent\Model (+4 more)
 
 ### Community 3 - "composer.json"
 Cohesion: 0.05
 Nodes (43): pestphp/pest-plugin, php-http/discovery, autoload, autoload-dev, psr-4, psr-4, config, allow-plugins (+35 more)
 
-### Community 4 - "CityDistanceManager"
-Cohesion: 0.13
-Nodes (7): CityDistanceManager, self, CityDistance, self, UserFactory, Illuminate\Database\Eloquent\Factories\Factory, static
+### Community 4 - "CityDistance"
+Cohesion: 0.11
+Nodes (8): CityDistanceManager, self, CityDistance, self, self, UserFactory, Illuminate\Database\Eloquent\Factories\Factory, static
 
 ### Community 5 - "What You Must Do When Invoked"
 Cohesion: 0.07
@@ -138,8 +137,8 @@ Cohesion: 0.40
 Nodes (4): Monolog\Handler\NullHandler, Monolog\Handler\StreamHandler, Monolog\Handler\SyslogUdpHandler, Monolog\Processor\PsrLogMessageProcessor
 
 ### Community 14 - "BcvRate"
-Cohesion: 0.12
-Nodes (12): BcvRateManager, Dashboard, BcvRate, BcvRateService, Carbon, Carbon\Carbon, Illuminate\Support\Facades\Route, Livewire\Attributes\Layout (+4 more)
+Cohesion: 0.11
+Nodes (12): BcvRateManager, Dashboard, BcvRate, BcvRateService, Carbon, Carbon\Carbon, Illuminate\Support\Facades\DB, Illuminate\Support\Facades\Route (+4 more)
 
 ### Community 15 - "graphify reference: extra exports and benchmark"
 Cohesion: 0.22
@@ -170,32 +169,32 @@ Cohesion: 0.50
 Nodes (3): For --cluster-only, For --update (incremental re-extraction), graphify reference: incremental update and cluster-only
 
 ### Community 84 - "TariffService"
-Cohesion: 0.12
-Nodes (7): RateMatrixManager, App\Models\CityDistance, RateMatrix, TariffService, BcvRateService, CityDistance, self
+Cohesion: 0.15
+Nodes (3): RateMatrixManager, RateMatrix, TariffService
 
 ### Community 86 - "rate-matrix-manager.blade.php"
 Cohesion: 0.50
 Nodes (3): cancelEditing, resetSimulation, startEditing
 
 ## Knowledge Gaps
-- **137 isolated node(s):** `startEditing`, `cancelEditing`, `resetSimulation`, `API / Backend`, `Architecture Navigation` (+132 more)
+- **137 isolated node(s):** `$schema`, `name`, `type`, `description`, `laravel` (+132 more)
   These have ≤1 connection - possible missing edges or undocumented components.
-- **12 thin communities (<3 nodes) omitted from report** — run `graphify query` to explore isolated nodes.
+- **11 thin communities (<3 nodes) omitted from report** — run `graphify query` to explore isolated nodes.
 
 ## Suggested Questions
 _Questions this graph is uniquely positioned to answer:_
 
-- **Why does `User` connect `User` to `Package`, `CityDistanceManager`?**
-  _High betweenness centrality (0.092) - this node is a cross-community bridge._
+- **Why does `User` connect `User` to `Package`, `CityDistance`?**
+  _High betweenness centrality (0.091) - this node is a cross-community bridge._
 - **Why does `Package` connect `Package` to `TariffService`, `BcvRate`?**
   _High betweenness centrality (0.028) - this node is a cross-community bridge._
-- **Why does `BcvRate` connect `BcvRate` to `Package`, `CityDistanceManager`?**
-  _High betweenness centrality (0.022) - this node is a cross-community bridge._
-- **What connects `startEditing`, `cancelEditing`, `resetSimulation` to the rest of the system?**
+- **Why does `BcvRate` connect `BcvRate` to `Package`, `CityDistance`?**
+  _High betweenness centrality (0.021) - this node is a cross-community bridge._
+- **What connects `$schema`, `name`, `type` to the rest of the system?**
   _137 weakly-connected nodes found - possible documentation gaps or missing edges._
 - **Should `User` be split into smaller, more focused modules?**
   _Cohesion score 0.05443371378402107 - nodes in this community are weakly interconnected._
 - **Should `Illuminate\Database\Migrations\Migration` be split into smaller, more focused modules?**
   _Cohesion score 0.0593990216631726 - nodes in this community are weakly interconnected._
 - **Should `Package` be split into smaller, more focused modules?**
-  _Cohesion score 0.08787878787878788 - nodes in this community are weakly interconnected._
+  _Cohesion score 0.0898989898989899 - nodes in this community are weakly interconnected._

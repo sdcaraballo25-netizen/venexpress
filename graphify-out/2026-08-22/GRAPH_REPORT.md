@@ -1,16 +1,16 @@
-# Graph Report - venexpress  (2026-08-22)
+# Graph Report - venexpress  (2026-08-21)
 
 ## Corpus Check
-- 149 files · ~193,045 words
+- 140 files · ~191,757 words
 - Verdict: corpus is large enough that graph structure adds value.
 
 ## Summary
-- 601 nodes · 786 edges · 92 communities (81 shown, 11 thin omitted)
+- 573 nodes · 744 edges · 87 communities (76 shown, 11 thin omitted)
 - Extraction: 99% EXTRACTED · 1% INFERRED · 0% AMBIGUOUS · INFERRED: 4 edges (avg confidence: 0.85)
 - Token cost: 0 input · 0 output
 
 ## Graph Freshness
-- Built from commit: `1defa4c5`
+- Built from commit: `df12b5b0`
 - Run `git rev-parse HEAD` and compare to check if the graph is stale.
 - Run `graphify update .` after code changes (no API cost).
 
@@ -19,7 +19,7 @@
 - Illuminate\Database\Migrations\Migration
 - Package
 - composer.json
-- allies-manager.blade.php
+- DatabaseSeeder.php
 - What You Must Do When Invoked
 - devDependencies
 - scripts
@@ -52,53 +52,53 @@
 - rate-matrix-manager.blade.php
 
 ## God Nodes (most connected - your core abstractions)
-1. `User` - 44 edges
+1. `User` - 41 edges
 2. `Package` - 21 edges
 3. `TestCase` - 18 edges
 4. `TariffService` - 17 edges
 5. `BcvRate` - 16 edges
-6. `Ally` - 14 edges
-7. `CityDistance` - 14 edges
-8. `RateMatrix` - 14 edges
-9. `Venexpress — Project Rules` - 13 edges
-10. `BcvRateManager` - 12 edges
+6. `CityDistance` - 14 edges
+7. `RateMatrix` - 14 edges
+8. `Venexpress — Project Rules` - 13 edges
+9. `BcvRateManager` - 12 edges
+10. `CityDistanceManager` - 12 edges
 
 ## Surprising Connections (you probably didn't know these)
-- `PackageService` --references--> `TariffService`  [EXTRACTED]
-  app/Services/PackageService.php → app/Services/TariffService.php
-- `VerifyEmailController` --inherits--> `Controller`  [EXTRACTED]
-  app/Http/Controllers/Auth/VerifyEmailController.php → app/Http/Controllers/Controller.php
-- `DriverScanController` --inherits--> `Controller`  [EXTRACTED]
-  app/Http/Controllers/DriverScanController.php → app/Http/Controllers/Controller.php
 - `TariffService` --references--> `BcvRateService`  [EXTRACTED]
   app/Services/TariffService.php → app/Services/BcvRateService.php
+- `PackageService` --references--> `TariffService`  [EXTRACTED]
+  app/Services/PackageService.php → app/Services/TariffService.php
 - `AuthenticationTest` --inherits--> `TestCase`  [EXTRACTED]
   tests/Feature/Auth/AuthenticationTest.php → tests/TestCase.php
+- `EmailVerificationTest` --inherits--> `TestCase`  [EXTRACTED]
+  tests/Feature/Auth/EmailVerificationTest.php → tests/TestCase.php
+- `PasswordConfirmationTest` --inherits--> `TestCase`  [EXTRACTED]
+  tests/Feature/Auth/PasswordConfirmationTest.php → tests/TestCase.php
 
 ## Import Cycles
 - None detected.
 
-## Communities (92 total, 11 thin omitted)
+## Communities (87 total, 11 thin omitted)
 
 ### Community 0 - "User"
-Cohesion: 0.05
-Nodes (25): User, DatabaseSeeder, Illuminate\Auth\Events\Verified, Illuminate\Auth\Notifications\ResetPassword, Illuminate\Database\Console\Seeds\WithoutModelEvents, Illuminate\Database\Eloquent\Relations\HasOne, Illuminate\Database\Seeder, Illuminate\Foundation\Auth\User (+17 more)
+Cohesion: 0.06
+Nodes (21): User, Illuminate\Auth\Notifications\ResetPassword, Illuminate\Database\Eloquent\Relations\HasOne, Illuminate\Foundation\Auth\User, Illuminate\Foundation\Testing\RefreshDatabase, Illuminate\Foundation\Testing\TestCase, Illuminate\Notifications\Notifiable, Illuminate\Support\Facades\Event (+13 more)
 
 ### Community 1 - "Illuminate\Database\Migrations\Migration"
-Cohesion: 0.05
+Cohesion: 0.06
 Nodes (3): Illuminate\Database\Migrations\Migration, Illuminate\Database\Schema\Blueprint, Illuminate\Support\Facades\Schema
 
 ### Community 2 - "Package"
-Cohesion: 0.06
-Nodes (21): AlliesManager, BcvRateManager, Dashboard, CreatePackage, Ally, BcvRate, Driver, Package (+13 more)
+Cohesion: 0.07
+Nodes (16): CreatePackage, Ally, BcvRate, Driver, Package, PackageHistory, BcvRateService, PackageService (+8 more)
 
 ### Community 3 - "composer.json"
 Cohesion: 0.05
 Nodes (43): pestphp/pest-plugin, php-http/discovery, autoload, autoload-dev, psr-4, psr-4, config, allow-plugins (+35 more)
 
-### Community 4 - "allies-manager.blade.php"
-Cohesion: 0.40
-Nodes (4): activate({{ $ally->id }}), approve({{ $ally->id }}), reject({{ $ally->id }}), suspend({{ $ally->id }})
+### Community 4 - "DatabaseSeeder.php"
+Cohesion: 0.60
+Nodes (3): DatabaseSeeder, Illuminate\Database\Console\Seeds\WithoutModelEvents, Illuminate\Database\Seeder
 
 ### Community 5 - "What You Must Do When Invoked"
 Cohesion: 0.07
@@ -113,12 +113,12 @@ Cohesion: 0.08
 Nodes (26): scripts, dev, post-autoload-dump, post-create-project-cmd, post-root-package-install, post-update-cmd, pre-package-uninstall, setup (+18 more)
 
 ### Community 8 - "VerifyEmailController.php"
-Cohesion: 0.14
-Nodes (12): VerifyEmailController, Controller, DriverScanController, EnsureUserHasRole, Closure, Illuminate\Foundation\Application, Illuminate\Foundation\Auth\EmailVerificationRequest, Illuminate\Foundation\Configuration\Exceptions (+4 more)
+Cohesion: 0.09
+Nodes (16): VerifyEmailController, Controller, DriverScanController, EnsureUserHasRole, Logout, Closure, Illuminate\Auth\Events\Verified, Illuminate\Foundation\Application (+8 more)
 
 ### Community 9 - "LoginForm.php"
-Cohesion: 0.11
-Nodes (12): Logout, LoginForm, Illuminate\Auth\Events\Lockout, Illuminate\Support\Facades\Auth, Illuminate\Support\Facades\RateLimiter, Illuminate\Support\Facades\Route, Illuminate\Support\Facades\Session, Illuminate\Support\Str (+4 more)
+Cohesion: 0.09
+Nodes (14): LoginForm, self, self, self, UserFactory, Illuminate\Auth\Events\Lockout, Illuminate\Database\Eloquent\Factories\Factory, Illuminate\Support\Facades\RateLimiter (+6 more)
 
 ### Community 10 - "Venexpress — Project Rules"
 Cohesion: 0.13
@@ -137,8 +137,8 @@ Cohesion: 0.40
 Nodes (4): Monolog\Handler\NullHandler, Monolog\Handler\StreamHandler, Monolog\Handler\SyslogUdpHandler, Monolog\Processor\PsrLogMessageProcessor
 
 ### Community 14 - "CityDistance"
-Cohesion: 0.11
-Nodes (8): CityDistanceManager, self, CityDistance, self, self, UserFactory, Illuminate\Database\Eloquent\Factories\Factory, static
+Cohesion: 0.10
+Nodes (10): BcvRateManager, CityDistanceManager, Dashboard, CityDistance, Illuminate\Support\Facades\DB, Illuminate\Support\Facades\Route, Livewire\Attributes\Layout, Livewire\Attributes\Title (+2 more)
 
 ### Community 15 - "graphify reference: extra exports and benchmark"
 Cohesion: 0.22
@@ -169,32 +169,32 @@ Cohesion: 0.50
 Nodes (3): For --cluster-only, For --update (incremental re-extraction), graphify reference: incremental update and cluster-only
 
 ### Community 84 - "TariffService"
-Cohesion: 0.11
-Nodes (6): RateMatrixManager, RateMatrix, BcvRateService, TariffService, Carbon, Carbon\Carbon
+Cohesion: 0.15
+Nodes (3): RateMatrixManager, RateMatrix, TariffService
 
 ### Community 86 - "rate-matrix-manager.blade.php"
 Cohesion: 0.50
 Nodes (3): cancelEditing, resetSimulation, startEditing
 
 ## Knowledge Gaps
-- **141 isolated node(s):** `$schema`, `name`, `type`, `description`, `laravel` (+136 more)
+- **137 isolated node(s):** `API / Backend`, `Architecture Navigation`, `Authentication and Authorization`, `Changes`, `Database` (+132 more)
   These have ≤1 connection - possible missing edges or undocumented components.
 - **11 thin communities (<3 nodes) omitted from report** — run `graphify query` to explore isolated nodes.
 
 ## Suggested Questions
 _Questions this graph is uniquely positioned to answer:_
 
-- **Why does `User` connect `User` to `Package`, `CityDistance`?**
-  _High betweenness centrality (0.092) - this node is a cross-community bridge._
-- **Why does `Package` connect `Package` to `TariffService`?**
-  _High betweenness centrality (0.022) - this node is a cross-community bridge._
-- **What connects `$schema`, `name`, `type` to the rest of the system?**
-  _141 weakly-connected nodes found - possible documentation gaps or missing edges._
+- **Why does `User` connect `User` to `LoginForm.php`, `Package`, `DatabaseSeeder.php`?**
+  _High betweenness centrality (0.091) - this node is a cross-community bridge._
+- **Why does `Package` connect `Package` to `TariffService`, `CityDistance`?**
+  _High betweenness centrality (0.028) - this node is a cross-community bridge._
+- **Why does `BcvRate` connect `Package` to `LoginForm.php`, `CityDistance`?**
+  _High betweenness centrality (0.021) - this node is a cross-community bridge._
+- **What connects `API / Backend`, `Architecture Navigation`, `Authentication and Authorization` to the rest of the system?**
+  _137 weakly-connected nodes found - possible documentation gaps or missing edges._
 - **Should `User` be split into smaller, more focused modules?**
-  _Cohesion score 0.05217391304347826 - nodes in this community are weakly interconnected._
+  _Cohesion score 0.059395801331285206 - nodes in this community are weakly interconnected._
 - **Should `Illuminate\Database\Migrations\Migration` be split into smaller, more focused modules?**
-  _Cohesion score 0.051203277009728626 - nodes in this community are weakly interconnected._
+  _Cohesion score 0.0593990216631726 - nodes in this community are weakly interconnected._
 - **Should `Package` be split into smaller, more focused modules?**
-  _Cohesion score 0.05837837837837838 - nodes in this community are weakly interconnected._
-- **Should `composer.json` be split into smaller, more focused modules?**
-  _Cohesion score 0.045454545454545456 - nodes in this community are weakly interconnected._
+  _Cohesion score 0.07272727272727272 - nodes in this community are weakly interconnected._

@@ -3,7 +3,7 @@
   "1": "Illuminate\\Database\\Migrations\\Migration",
   "2": "Package",
   "3": "composer.json",
-  "4": "CityDistanceManager",
+  "4": "CityDistance",
   "5": "What You Must Do When Invoked",
   "6": "devDependencies",
   "7": "scripts",
@@ -86,5 +86,5 @@
   "84": "TariffService",
   "85": "copilot-instructions.md",
   "86": "rate-matrix-manager.blade.php",
-  "87": "self"
+  "87": "tailwindcss"
 }
