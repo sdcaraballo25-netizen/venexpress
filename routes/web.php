@@ -33,16 +33,16 @@ Route::view('profile', 'profile')
     ->name('profile');
 
     Route::get('/cliente/dashboard', function () {
-    return view('cliente.dashboard');
+    return view('livewire.client.dashboard');
 })
     ->middleware(['auth', 'verified', 'role:cliente'])
     ->name('cliente.dashboard');
 
 
 Route::get('/repartidor/dashboard', function () {
-    return view('repartidor.dashboard');
+    return view('livewire.driver.dashboard');
 })
-    ->middleware(['auth', 'verified', 'role:chofer'])
+    ->middleware(['auth', 'verified', 'role:repartidor'])
     ->name('repartidor.dashboard');
 
 
