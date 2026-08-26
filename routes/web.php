@@ -10,7 +10,8 @@ use App\Livewire\Admin\AlliesManager;
 use App\Livewire\Admin\UsersManager;
 use App\Livewire\Admin\RoutesManager;
 use App\Livewire\Admin\RoutesDashboard;
-
+use App\Livewire\Ally\Dashboard as AllyDashboard;
+use App\Livewire\Ally\CreatePackage;
 /*
 |--------------------------------------------------------------------------
 | Web Routes
@@ -45,11 +46,19 @@ Route::get('/repartidor/dashboard', function () {
     ->name('repartidor.dashboard');
 
 
-use App\Livewire\Ally\Dashboard as AllyDashboard;
 
-Route::get('/ally/dashboard', AllyDashboard::class)
-    ->middleware(['auth', 'verified', 'role:aliado'])
-    ->name('ally.dashboard');
+
+Route::prefix('ally')
+    ->middleware(['auth', 'verified', 'role:aliado,aliado_taquilla'])
+    ->name('ally.')
+    ->group(function () {
+
+        Route::get('/dashboard', AllyDashboard::class)
+            ->name('dashboard');
+
+        Route::get('/paquetes/crear', CreatePackage::class)
+            ->name('packages.create');
+    });
 
 // Rastreo público
 Route::get('/rastreo', function () {

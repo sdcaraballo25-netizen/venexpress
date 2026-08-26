@@ -972,9 +972,9 @@
     "semantic_hash": ""
   },
   "app/Livewire/Admin/RoutesManager.php": {
-    "mtime": 1787701454.6169384,
-    "seen": 1787703151.1657755,
-    "ast_hash": "ef7dd172be58ddb6a63894ca8dda8348",
+    "mtime": 1787703774.3092468,
+    "seen": 1787704061.2387946,
+    "ast_hash": "d1a54fad03a162cf9824e25931dfd3ad",
     "semantic_hash": ""
   },
   "app/Models/Route.php": {

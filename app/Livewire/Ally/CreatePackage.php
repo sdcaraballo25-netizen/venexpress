@@ -91,7 +91,7 @@ class CreatePackage extends Component
         $this->resetErrorBag();
         $data = $this->validate();
 
-        $ally = auth()->user()->ally;
+        $ally = auth()->user()->resolveAlly();
 
         if (! $ally) {
             $this->addError('ally', 'Tu usuario no tiene una taquilla aliada asociada.');
