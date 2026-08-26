@@ -2,6 +2,10 @@
 
 return [
 
+    'bcv_api' => [
+        'url' => env('BCV_API_URL', 'https://ve.dolarapi.com/v1/dolares/oficial'),
+    ],
+
     /*
     |--------------------------------------------------------------------------
     | Third Party Services

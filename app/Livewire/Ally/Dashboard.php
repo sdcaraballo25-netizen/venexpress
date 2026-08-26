@@ -3,10 +3,10 @@
 namespace App\Livewire\Ally;
 
 use App\Models\Package;
-use Livewire\Component;
 use Livewire\Attributes\Layout;
+use Livewire\Component;
 
-#[Layout('layouts.app')]
+#[Layout('layouts.ally')]
 class Dashboard extends Component
 {
     /**
@@ -61,7 +61,7 @@ class Dashboard extends Component
             ->where('ally_id', $ally->id)
             ->sum('commission_amount_usd');
 
-        return view('Livewire.ally.dashboard', [
+        return view('livewire.ally.dashboard', [
             'ally' => $ally,
             'totalBilledUsd' => $totalBilledUsd,
             'processedCount' => $processedCount,

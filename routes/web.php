@@ -12,6 +12,10 @@ use App\Livewire\Admin\RoutesManager;
 use App\Livewire\Admin\RoutesDashboard;
 use App\Livewire\Ally\Dashboard as AllyDashboard;
 use App\Livewire\Ally\CreatePackage;
+use App\Livewire\Ally\PackageCreate as AllyPackageCreate;
+
+
+
 /*
 |--------------------------------------------------------------------------
 | Web Routes
@@ -46,19 +50,23 @@ Route::get('/repartidor/dashboard', function () {
     ->name('repartidor.dashboard');
 
 
-
-
 Route::prefix('ally')
     ->middleware(['auth', 'verified', 'role:aliado,aliado_taquilla'])
     ->name('ally.')
     ->group(function () {
+        Route::get('/dashboard', AllyDashboard::class)->name('dashboard');
+        Route::get('/pedidos/nuevo', AllyPackageCreate::class)->name('packages.create');
 
-        Route::get('/dashboard', AllyDashboard::class)
-            ->name('dashboard');
-
-        Route::get('/paquetes/crear', CreatePackage::class)
-            ->name('packages.create');
+        // Próximas pantallas se agregan aquí:
+        // Route::get('/paquetes/recepcion', ...)->name('packages.receive');
+        // Route::get('/seguimiento', ...)->name('tracking');
+        // Route::get('/taquillas', ...)->name('staff'); // solo Administrador
+        // Route::get('/cod', ...)->name('cod');           // solo Administrador
+        // Route::get('/incidencias', ...)->name('incidents'); // solo Administrador
+        // Route::get('/comisiones', ...)->name('commissions'); // solo Administrador
+        // Route::get('/historial-financiero', ...)->name('financial-history'); // solo Administrador
     });
+
 
 // Rastreo público
 Route::get('/rastreo', function () {

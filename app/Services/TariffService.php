@@ -11,6 +11,7 @@ class TariffService
 {
     public function __construct(
         protected BcvRateService $bcvRateService,
+        protected DistanceApiService $distanceApiService,
     ) {
     }
 
@@ -52,25 +53,45 @@ class TariffService
     }
 
     /**
-     * Busca la distancia registrada entre dos ciudades.
+     * Obtiene la distancia por carretera entre las ciudades.
      *
-     * El administrador nunca escribe km a mano: siempre se elige
-     * ciudad de origen y ciudad de destino, y este método resuelve
-     * la distancia a partir de lo configurado en CityDistanceManager.
-     *
-     * @throws RuntimeException si la ruta no tiene distancia configurada.
+     * Primero se usa una distancia ya almacenada en city_distances.
+     * Si no existe, se consulta la API Nominatim + OSRM y se guarda
+     * el resultado para reutilizarlo posteriormente.
      */
-    public function findDistance(string $originCity, string $destinationCity): CityDistance
-    {
-        $distance = CityDistance::between($originCity, $destinationCity);
+    public function findDistanceKm(
+        string $originCity,
+        ?string $originState,
+        string $destinationCity,
+        ?string $destinationState,
+    ): int {
+        try {
+            // La API es la fuente principal: distancia real por carretera.
+            $distanceKm = $this->distanceApiService->drivingDistanceKm(
+                originCity: $originCity,
+                originState: $originState,
+                destinationCity: $destinationCity,
+                destinationState: $destinationState,
+            );
 
-        if (! $distance) {
+            // Guardamos una copia local para respaldo y consultas futuras.
+            CityDistance::setDistance($originCity, $destinationCity, $distanceKm);
+
+            return $distanceKm;
+        } catch (\Throwable $e) {
+            // Si la API no responde, usamos una distancia previamente
+            // almacenada para no bloquear el registro de la guía.
+            $stored = CityDistance::between($originCity, $destinationCity);
+
+            if ($stored) {
+                return (int) $stored->distance_km;
+            }
+
             throw new RuntimeException(
-                "No existe una distancia configurada para la ruta {$originCity} → {$destinationCity}."
+                $e->getMessage(),
+                previous: $e,
             );
         }
-
-        return $distance;
     }
 
     /**
@@ -138,7 +159,7 @@ class TariffService
      *   distance_km: int,
      *   subtotal_price_usd: float,
      *   fragile_surcharge_usd: float,
-     *   insurance_price_usd: float,
+     *   insurance_price_usd: float, delivery_fee_usd: float,
      *   total_price_usd: float,
      *   total_price_ves: float,
      *   bcv_rate_used: float,
@@ -157,29 +178,48 @@ class TariffService
         bool $isFragile = false,
         bool $hasInsurance = false,
         ?float $declaredValueUsd = null,
+        ?string $originState = null,
+        ?string $destinationState = null,
+        bool $requiresDelivery = false,
     ): array {
         $rateMatrix = $this->findRate();
-        $cityDistance = $this->findDistance($originCity, $destinationCity);
+        $distanceKm = $this->findDistanceKm(
+            originCity: $originCity,
+            originState: $originState,
+            destinationCity: $destinationCity,
+            destinationState: $destinationState,
+        );
         $bcvRate = $this->bcvRateService->getCurrentRate();
 
         $volumetricWeight = $this->calculateVolumetricWeight($lengthCm, $widthCm, $heightCm);
         $billableWeight = $this->calculateBillableWeight($physicalWeightKg, $volumetricWeight);
 
         $subtotalUsd = $packageType === Package::TYPE_SOBRE
-            ? $this->calculateEnvelopeSubtotalUsd($rateMatrix, $cityDistance->distance_km)
-            : $this->calculatePackageSubtotalUsd($rateMatrix, $billableWeight, $cityDistance->distance_km);
+            ? $this->calculateEnvelopeSubtotalUsd($rateMatrix, $distanceKm)
+            : $this->calculatePackageSubtotalUsd($rateMatrix, $billableWeight, $distanceKm);
 
         $fragileSurchargeUsd = $this->calculateFragileSurcharge($rateMatrix, $isFragile);
         $insurancePriceUsd = $this->calculateInsurancePrice($rateMatrix, $hasInsurance, $declaredValueUsd);
+        $deliveryFeeUsd = $requiresDelivery
+            ? round((float) $rateMatrix->delivery_price_usd, 2)
+            : 0.0;
 
-        $totalUsd = round($subtotalUsd + $fragileSurchargeUsd + $insurancePriceUsd, 2);
+        $totalUsd = round(
+            $subtotalUsd
+                + $fragileSurchargeUsd
+                + $insurancePriceUsd
+                + $deliveryFeeUsd,
+            2
+        );
         $totalVes = $this->bcvRateService->convertUsdToVes($totalUsd, $bcvRate);
 
         return [
             'package_type' => $packageType,
             'volumetric_weight_kg' => $volumetricWeight,
             'billable_weight_kg' => $billableWeight,
-            'distance_km' => $cityDistance->distance_km,
+            'distance_km' => $distanceKm,
+            'delivery_fee_usd' => $deliveryFeeUsd,
+            'requires_delivery' => $requiresDelivery,
             'subtotal_price_usd' => $subtotalUsd,
             'fragile_surcharge_usd' => $fragileSurchargeUsd,
             'insurance_price_usd' => $insurancePriceUsd,

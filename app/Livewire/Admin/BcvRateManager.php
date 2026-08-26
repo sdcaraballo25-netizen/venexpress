@@ -28,9 +28,6 @@ class BcvRateManager extends Component
             'effective_date' => [
                 'required',
                 'date',
-                $this->editingId
-                    ? 'unique:bcv_rates,effective_date,' . $this->editingId
-                    : 'unique:bcv_rates,effective_date',
             ],
         ];
     }
@@ -57,12 +54,16 @@ class BcvRateManager extends Component
             $bcvRate->update([
                 'rate' => $this->rate,
                 'effective_date' => $this->effective_date,
+                'effective_at' => now(),
+                'source' => 'manual',
             ]);
             session()->flash('success', 'Tasa actualizada correctamente.');
         } else {
             BcvRate::create([
                 'rate' => $this->rate,
                 'effective_date' => $this->effective_date,
+                'effective_at' => now(),
+                'source' => 'manual',
             ]);
             session()->flash('success', 'Nueva tasa registrada correctamente.');
         }

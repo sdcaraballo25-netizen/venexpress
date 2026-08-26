@@ -9,36 +9,33 @@ class BcvRate extends Model
 {
     use HasFactory;
 
-    /**
-     * Los atributos que se pueden asignar de forma masiva.
-     *
-     * @var list<string>
-     */
     protected $fillable = [
         'rate',
         'effective_date',
+        'effective_at',
+        'source',
+        'api_updated_at',
     ];
 
-    /**
-     * Obtiene los atributos que deben convertirse.
-     *
-     * @return array<string, string>
-     */
     protected function casts(): array
     {
         return [
             'rate' => 'decimal:6',
             'effective_date' => 'date',
+            'effective_at' => 'datetime',
         ];
     }
 
     /**
-     * Obtiene la tasa BCV vigente más reciente.
+     * Obtiene la última tasa registrada, incluyendo las dos tasas
+     * que el BCV puede publicar durante un mismo día.
      */
     public static function current(): ?self
     {
         return static::query()
+            ->orderByDesc('effective_at')
             ->orderByDesc('effective_date')
+            ->orderByDesc('id')
             ->first();
     }
 }

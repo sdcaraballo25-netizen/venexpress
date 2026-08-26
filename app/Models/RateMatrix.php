@@ -21,6 +21,7 @@ class RateMatrix extends Model
         'envelope_price_usd',
         'fragile_surcharge_usd',
         'insurance_percentage',
+        'delivery_price_usd',
     ];
 
     /**
@@ -37,6 +38,7 @@ class RateMatrix extends Model
             'envelope_price_usd' => 'decimal:2',
             'fragile_surcharge_usd' => 'decimal:2',
             'insurance_percentage' => 'decimal:2',
+            'delivery_price_usd' => 'decimal:2',
         ];
     }
 

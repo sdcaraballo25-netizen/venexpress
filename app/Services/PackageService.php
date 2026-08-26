@@ -23,9 +23,12 @@ class PackageService
      * @param array{
      *   ally_id:int, sender_name:string, sender_id_doc:string, sender_phone:string,
      *   recipient_name:string, recipient_id_doc:string, recipient_phone:string,
-     *   origin_city:string, destination_city:string, package_type:string,
+     *   origin_city:string, origin_state?:string|null, destination_city:string,
+     *   destination_state?:string|null, package_type:string,
      *   physical_weight_kg:float, length_cm?:float|null, width_cm?:float|null, height_cm?:float|null,
      *   is_fragile?:bool, has_insurance?:bool, declared_value_usd?:float|null,
+     *   requires_delivery?:bool, delivery_address?:string|null, delivery_sector?:string|null,
+     *   delivery_reference?:string|null,
      *   is_cod?:bool, cod_amount_usd?:float|null, payment_method?:string|null,
      * } $data
      */
@@ -37,6 +40,7 @@ class PackageService
             $declaredValueUsd = $data['declared_value_usd'] ?? null;
             $isCod = $data['is_cod'] ?? false;
             $codAmountUsd = $isCod ? ($data['cod_amount_usd'] ?? null) : null;
+            $requiresDelivery = $data['requires_delivery'] ?? false;
 
             $pricing = $this->tariffService->calculate(
                 originCity: $data['origin_city'],
@@ -49,6 +53,9 @@ class PackageService
                 isFragile: $isFragile,
                 hasInsurance: $hasInsurance,
                 declaredValueUsd: $declaredValueUsd,
+                originState: $data['origin_state'] ?? null,
+                destinationState: $data['destination_state'] ?? null,
+                requiresDelivery: $requiresDelivery,
             );
 
             $commission = $this->calculateCommission($data['ally_id'], $pricing['total_price_usd']);
@@ -67,6 +74,12 @@ class PackageService
                 'total_price_ves' => $pricing['total_price_ves'],
                 'bcv_rate_used' => $pricing['bcv_rate_used'],
                 'current_status' => Package::STATUS_RECIBIDO_AGENCIA,
+                'distance_km' => $pricing['distance_km'],
+                'requires_delivery' => $requiresDelivery,
+                'delivery_fee_usd' => $pricing['delivery_fee_usd'],
+                'delivery_address' => $requiresDelivery ? ($data['delivery_address'] ?? null) : null,
+                'delivery_sector' => $requiresDelivery ? ($data['delivery_sector'] ?? null) : null,
+                'delivery_reference' => $requiresDelivery ? ($data['delivery_reference'] ?? null) : null,
                 'is_cod' => $isCod,
                 'payment_method' => $data['payment_method'] ?? null,
                 'cod_amount_usd' => $codAmountUsd,

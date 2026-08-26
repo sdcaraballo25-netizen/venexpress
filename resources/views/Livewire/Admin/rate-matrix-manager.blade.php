@@ -56,6 +56,10 @@
                             <p class="text-xs font-bold text-[#64748B] uppercase tracking-wider">Seguro</p>
                             <p class="font-display text-xl font-bold text-[#0F172A] mt-1">{{ number_format((float) $insurance_percentage, 2) }}%</p>
                         </div>
+                        <div class="bg-[#F8FAFC] rounded-xl p-4">
+                            <p class="text-xs font-bold text-[#64748B] uppercase tracking-wider">Delivery</p>
+                            <p class="font-display text-xl font-bold text-[#0F172A] mt-1">${{ number_format((float) $delivery_price_usd, 2) }}</p>
+                        </div>
                     </div>
                 @else
                     {{-- Formulario de edición --}}
@@ -96,6 +100,12 @@
                                 <input type="number" step="0.01" wire:model="insurance_percentage"
                                        class="w-full rounded-xl border-[#E2E8F0] focus:border-blue-500 focus:ring-blue-500 text-sm">
                                 @error('insurance_percentage') <p class="text-red-600 text-xs mt-1">{{ $message }}</p> @enderror
+                            </div>
+                            <div>
+                                <label class="block text-xs font-bold text-[#64748B] uppercase tracking-wider mb-1">Delivery fijo (USD)</label>
+                                <input type="number" step="0.01" wire:model="delivery_price_usd"
+                                       class="w-full rounded-xl border-[#E2E8F0] focus:border-blue-500 focus:ring-blue-500 text-sm">
+                                @error('delivery_price_usd') <p class="text-red-600 text-xs mt-1">{{ $message }}</p> @enderror
                             </div>
                         </div>
 
