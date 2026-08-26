@@ -1,23 +1,22 @@
-# Graph Report - venexpress  (2026-08-23)
+# Graph Report - venexpress  (2026-08-25)
 
 ## Corpus Check
-- 155 files · ~195,305 words
+- 183 files · ~211,046 words
 - Verdict: corpus is large enough that graph structure adds value.
 
 ## Summary
-- 651 nodes · 889 edges · 120 communities (105 shown, 15 thin omitted)
-- Extraction: 100% EXTRACTED · 0% INFERRED · 0% AMBIGUOUS · INFERRED: 4 edges (avg confidence: 0.85)
+- 823 nodes · 1266 edges · 135 communities (115 shown, 20 thin omitted)
+- Extraction: 99% EXTRACTED · 1% INFERRED · 0% AMBIGUOUS · INFERRED: 8 edges (avg confidence: 0.85)
 - Token cost: 0 input · 0 output
 
 ## Graph Freshness
-- Built from commit: `7b5a907b`
+- Built from commit: `5360c2e4`
 - Run `git rev-parse HEAD` and compare to check if the graph is stale.
 - Run `graphify update .` after code changes (no API cost).
 
 ## Community Hubs (Navigation)
-- Illuminate\Foundation\Testing\RefreshDatabase
-- Illuminate\Database\Migrations\Migration
-- Package
+- TestCase
+- Illuminate\Database\Eloquent\Relations\BelongsTo
 - composer.json
 - allies-manager.blade.php
 - What You Must Do When Invoked
@@ -39,6 +38,7 @@
 - layout.navigation
 - users-manager.blade.php
 - layout/navigation.blade.php
+- TariffService
 - graphify reference: query, path, explain
 - graphify reference: add a URL and watch a folder
 - graphify reference: commit hook and native CLAUDE.md integration
@@ -47,57 +47,62 @@
 - graphify reference: transcribe video and audio
 - CLAUDE.md
 - extraction-spec.md
-- TariffService
+- Ally
 - copilot-instructions.md
 - rate-matrix-manager.blade.php
 - UsersManager
-- User
 - BcvRate
+- User
+- AuthenticationTest
 - EmailVerificationTest.php
-- PasswordResetTest.php
-- Illuminate\Support\Facades\Schema
-- Illuminate\Database\Schema\Blueprint
-- ProfileTest
-- TestCase
+- PasswordResetTest
+- AllyStaffService
 - DatabaseSeeder.php
+- Illuminate\Database\Migrations\Migration
+- Illuminate\Database\Schema\Blueprint
+- Illuminate\Support\Facades\Schema
+- UserAuthorizationTest
+- Route
+- routes-manager.blade.php
 - package-create.blade.php
+- Ally/dashboard.blade.php
 
 ## God Nodes (most connected - your core abstractions)
-1. `User` - 66 edges
-2. `Package` - 21 edges
-3. `TestCase` - 20 edges
-4. `UsersManager` - 17 edges
-5. `TariffService` - 17 edges
-6. `Ally` - 16 edges
-7. `BcvRate` - 16 edges
-8. `CityDistance` - 14 edges
-9. `RateMatrix` - 14 edges
-10. `Venexpress — Project Rules` - 13 edges
+1. `User` - 76 edges
+2. `Route` - 35 edges
+3. `Ally` - 31 edges
+4. `Package` - 31 edges
+5. `RouteService` - 29 edges
+6. `RoutesManager` - 23 edges
+7. `TestCase` - 20 edges
+8. `RouteStop` - 18 edges
+9. `UsersManager` - 17 edges
+10. `TariffService` - 17 edges
 
 ## Surprising Connections (you probably didn't know these)
 - `TariffService` --references--> `BcvRateService`  [EXTRACTED]
   app/Services/TariffService.php → app/Services/BcvRateService.php
 - `PackageService` --references--> `TariffService`  [EXTRACTED]
   app/Services/PackageService.php → app/Services/TariffService.php
+- `RouteService` --references--> `PackageService`  [EXTRACTED]
+  app/Services/RouteService.php → app/Services/PackageService.php
 - `AuthenticationTest` --inherits--> `TestCase`  [EXTRACTED]
   tests/Feature/Auth/AuthenticationTest.php → tests/TestCase.php
 - `EmailVerificationTest` --inherits--> `TestCase`  [EXTRACTED]
   tests/Feature/Auth/EmailVerificationTest.php → tests/TestCase.php
-- `PasswordConfirmationTest` --inherits--> `TestCase`  [EXTRACTED]
-  tests/Feature/Auth/PasswordConfirmationTest.php → tests/TestCase.php
 
 ## Import Cycles
 - None detected.
 
-## Communities (120 total, 15 thin omitted)
+## Communities (135 total, 20 thin omitted)
 
-### Community 0 - "Illuminate\Foundation\Testing\RefreshDatabase"
-Cohesion: 0.16
-Nodes (6): Illuminate\Foundation\Testing\RefreshDatabase, Illuminate\Support\Facades\Hash, Livewire\Volt\Volt, PasswordConfirmationTest, PasswordUpdateTest, RegistrationTest
+### Community 0 - "TestCase"
+Cohesion: 0.15
+Nodes (10): Illuminate\Auth\Notifications\ResetPassword, Illuminate\Foundation\Testing\RefreshDatabase, Illuminate\Foundation\Testing\TestCase, Illuminate\Support\Facades\Hash, Illuminate\Support\Facades\Notification, Livewire\Volt\Volt, PasswordUpdateTest, RegistrationTest (+2 more)
 
-### Community 2 - "Package"
+### Community 2 - "Illuminate\Database\Eloquent\Relations\BelongsTo"
 Cohesion: 0.08
-Nodes (11): CreatePackage, Driver, Package, PackageHistory, PackageService, Illuminate\Database\Eloquent\Factories\HasFactory, Illuminate\Database\Eloquent\Model, Illuminate\Database\Eloquent\Relations\BelongsTo (+3 more)
+Nodes (12): AllyUser, Driver, Incident, PackageHistory, AllyUserService, IncidentService, Illuminate\Database\Eloquent\Factories\HasFactory, Illuminate\Database\Eloquent\Model (+4 more)
 
 ### Community 3 - "composer.json"
 Cohesion: 0.05
@@ -120,8 +125,8 @@ Cohesion: 0.08
 Nodes (26): scripts, dev, post-autoload-dump, post-create-project-cmd, post-root-package-install, post-update-cmd, pre-package-uninstall, setup (+18 more)
 
 ### Community 8 - "VerifyEmailController.php"
-Cohesion: 0.13
-Nodes (13): VerifyEmailController, Controller, DriverScanController, EnsureUserHasRole, Closure, Illuminate\Auth\Events\Verified, Illuminate\Foundation\Application, Illuminate\Foundation\Auth\EmailVerificationRequest (+5 more)
+Cohesion: 0.14
+Nodes (12): VerifyEmailController, Controller, DriverScanController, EnsureUserHasRole, Closure, Illuminate\Foundation\Application, Illuminate\Foundation\Auth\EmailVerificationRequest, Illuminate\Foundation\Configuration\Exceptions (+4 more)
 
 ### Community 9 - "LoginForm.php"
 Cohesion: 0.11
@@ -163,6 +168,10 @@ Nodes (3): profile.delete-user-form, profile.update-password-form, profile.updat
 Cohesion: 0.25
 Nodes (7): closeCreateModal, createUser, deleteUser, openCreateModal, requestDelete({{ $user->id }}), $set(, toggleStatus({{ $user->id }})
 
+### Community 72 - "TariffService"
+Cohesion: 0.16
+Nodes (3): RateMatrixManager, RateMatrix, TariffService
+
 ### Community 76 - "graphify reference: query, path, explain"
 Cohesion: 0.33
 Nodes (5): For /graphify explain, For /graphify path, graphify reference: query, path, explain, Step 0 — Constrained query expansion (REQUIRED before traversal), Step 1 — Traversal
@@ -179,61 +188,57 @@ Nodes (3): For git commit hook, For native CLAUDE.md integration, graphify refer
 Cohesion: 0.50
 Nodes (3): For --cluster-only, For --update (incremental re-extraction), graphify reference: incremental update and cluster-only
 
-### Community 84 - "TariffService"
-Cohesion: 0.16
-Nodes (3): RateMatrixManager, RateMatrix, TariffService
+### Community 84 - "Ally"
+Cohesion: 0.06
+Nodes (18): AlliesManager, Dashboard, RoutesDashboard, CreatePackage, Dashboard, Ally, Package, PackageService (+10 more)
 
 ### Community 86 - "rate-matrix-manager.blade.php"
 Cohesion: 0.50
 Nodes (3): cancelEditing, resetSimulation, startEditing
 
-### Community 91 - "UsersManager"
-Cohesion: 0.09
-Nodes (12): AlliesManager, Dashboard, UsersManager, Ally, AuditLog, Illuminate\Support\Facades\DB, Illuminate\Support\Facades\Route, Illuminate\Validation\Rules (+4 more)
-
-### Community 92 - "User"
-Cohesion: 0.13
-Nodes (5): User, Illuminate\Database\Eloquent\Relations\HasOne, Illuminate\Foundation\Auth\User, Illuminate\Notifications\Notifiable, AuthenticationTest
-
-### Community 93 - "BcvRate"
+### Community 91 - "BcvRate"
 Cohesion: 0.16
 Nodes (5): BcvRateManager, BcvRate, BcvRateService, Carbon, Carbon\Carbon
 
+### Community 92 - "User"
+Cohesion: 0.12
+Nodes (4): User, Illuminate\Database\Eloquent\Relations\HasOne, PasswordConfirmationTest, ProfileTest
+
 ### Community 94 - "EmailVerificationTest.php"
 Cohesion: 0.29
-Nodes (3): Illuminate\Support\Facades\Event, Illuminate\Support\Facades\URL, EmailVerificationTest
-
-### Community 95 - "PasswordResetTest.php"
-Cohesion: 0.25
-Nodes (3): Illuminate\Auth\Notifications\ResetPassword, Illuminate\Support\Facades\Notification, PasswordResetTest
-
-### Community 100 - "TestCase"
-Cohesion: 0.22
-Nodes (4): Illuminate\Foundation\Testing\TestCase, ExampleTest, TestCase, UserAuthorizationTest
+Nodes (4): Illuminate\Auth\Events\Verified, Illuminate\Support\Facades\Event, Illuminate\Support\Facades\URL, EmailVerificationTest
 
 ### Community 101 - "DatabaseSeeder.php"
 Cohesion: 0.60
 Nodes (3): DatabaseSeeder, Illuminate\Database\Console\Seeds\WithoutModelEvents, Illuminate\Database\Seeder
 
+### Community 113 - "Route"
+Cohesion: 0.07
+Nodes (6): RoutesManager, Route, RouteStop, RouteService, VenezuelaLocationService, Illuminate\Database\Eloquent\Collection
+
+### Community 115 - "routes-manager.blade.php"
+Cohesion: 0.11
+Nodes (17): assignDriver, cancelBuilder, cancelRoute({{ $route->id }}), completeRoute({{ $route->id }}), duplicateRoute({{ $route->id }}), editRoute({{ $route->id }}), moveStopDown({{ $index }}), moveStopUp({{ $index }}) (+9 more)
+
 ## Knowledge Gaps
-- **148 isolated node(s):** `$schema`, `name`, `type`, `description`, `laravel` (+143 more)
+- **166 isolated node(s):** `$schema`, `name`, `type`, `description`, `laravel` (+161 more)
   These have ≤1 connection - possible missing edges or undocumented components.
-- **15 thin communities (<3 nodes) omitted from report** — run `graphify query` to explore isolated nodes.
+- **20 thin communities (<3 nodes) omitted from report** — run `graphify query` to explore isolated nodes.
 
 ## Suggested Questions
 _Questions this graph is uniquely positioned to answer:_
 
-- **Why does `User` connect `User` to `Illuminate\Foundation\Testing\RefreshDatabase`, `Package`, `.isAdmin`, `ProfileTest`, `DatabaseSeeder.php`, `TestCase`, `CityDistance`, `UsersManager`, `EmailVerificationTest.php`, `PasswordResetTest.php`?**
-  _High betweenness centrality (0.151) - this node is a cross-community bridge._
-- **Why does `Package` connect `Package` to `UsersManager`, `TariffService`?**
-  _High betweenness centrality (0.024) - this node is a cross-community bridge._
+- **Why does `User` connect `User` to `TestCase`, `Illuminate\Database\Eloquent\Relations\BelongsTo`, `.isAdmin`, `AllyStaffService`, `DatabaseSeeder.php`, `CityDistance`, `UserAuthorizationTest`, `Ally`, `UsersManager`, `AuthenticationTest`, `EmailVerificationTest.php`, `PasswordResetTest`?**
+  _High betweenness centrality (0.134) - this node is a cross-community bridge._
+- **Why does `Ally` connect `Ally` to `TestCase`, `Illuminate\Database\Eloquent\Relations\BelongsTo`, `.isAdmin`, `AllyStaffService`, `Route`, `UsersManager`, `User`?**
+  _High betweenness centrality (0.034) - this node is a cross-community bridge._
+- **Why does `Route` connect `Route` to `Illuminate\Database\Eloquent\Relations\BelongsTo`, `Ally`?**
+  _High betweenness centrality (0.029) - this node is a cross-community bridge._
 - **What connects `$schema`, `name`, `type` to the rest of the system?**
-  _148 weakly-connected nodes found - possible documentation gaps or missing edges._
-- **Should `Package` be split into smaller, more focused modules?**
-  _Cohesion score 0.08405797101449275 - nodes in this community are weakly interconnected._
+  _166 weakly-connected nodes found - possible documentation gaps or missing edges._
+- **Should `TestCase` be split into smaller, more focused modules?**
+  _Cohesion score 0.1471861471861472 - nodes in this community are weakly interconnected._
+- **Should `Illuminate\Database\Eloquent\Relations\BelongsTo` be split into smaller, more focused modules?**
+  _Cohesion score 0.08081632653061224 - nodes in this community are weakly interconnected._
 - **Should `composer.json` be split into smaller, more focused modules?**
   _Cohesion score 0.045454545454545456 - nodes in this community are weakly interconnected._
-- **Should `What You Must Do When Invoked` be split into smaller, more focused modules?**
-  _Cohesion score 0.07407407407407407 - nodes in this community are weakly interconnected._
-- **Should `devDependencies` be split into smaller, more focused modules?**
-  _Cohesion score 0.07692307692307693 - nodes in this community are weakly interconnected._

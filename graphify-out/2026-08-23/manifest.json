@@ -917,7 +917,7 @@
     "ast_hash": "1a07ac47d7aab4dd0e3efd2bbb125772",
     "semantic_hash": ""
   },
-  "resources/views/aliado/dashboard.blade.php": {
+  "resources/views/ally/dashboard.blade.php": {
     "mtime": 1787443826.5125916,
     "seen": 1787445257.472803,
     "ast_hash": "ffc64923e4b09d346008557b158ee042",

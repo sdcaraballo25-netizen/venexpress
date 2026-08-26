@@ -3,6 +3,7 @@
 namespace App\Models;
 
 use Illuminate\Database\Eloquent\Factories\HasFactory;
+use Illuminate\Database\Eloquent\Relations\BelongsTo;
 use Illuminate\Database\Eloquent\Relations\HasMany;
 use Illuminate\Database\Eloquent\Relations\HasOne;
 use Illuminate\Foundation\Auth\User as Authenticatable;
@@ -15,6 +16,7 @@ class User extends Authenticatable
     public const ROLE_ADMIN_PRINCIPAL = 'admin_principal';
     public const ROLE_ADMIN_OPERATIVO = 'admin_operativo';
     public const ROLE_ALIADO = 'aliado';
+    public const ROLE_ALIADO_TAQUILLA = 'aliado_taquilla';
     public const ROLE_REPARTIDOR = 'repartidor';
     public const ROLE_CLIENTE = 'cliente';
 
@@ -30,6 +32,7 @@ class User extends Authenticatable
         'email',
         'password',
         'role',
+        'ally_id',
         'status',
         'email_verified_at',
     ];
@@ -47,9 +50,23 @@ class User extends Authenticatable
         ];
     }
 
+    /**
+     * Agencia aliada de la que este usuario es dueño (role 'aliado').
+     * Relación inversa de Ally::user() — sin cambios respecto a antes.
+     */
     public function ally(): HasOne
     {
         return $this->hasOne(Ally::class);
+    }
+
+    /**
+     * Agencia aliada a la que pertenece este usuario cuando es
+     * personal de Taquilla (role 'aliado_taquilla'). Usa la columna
+     * users.ally_id, distinta de la relación de dueño de arriba.
+     */
+    public function alliedAgency(): BelongsTo
+    {
+        return $this->belongsTo(Ally::class, 'ally_id');
     }
 
     public function driver(): HasOne
@@ -87,6 +104,20 @@ class User extends Authenticatable
         return $this->role === self::ROLE_ALIADO;
     }
 
+    public function isAliadoTaquilla(): bool
+    {
+        return $this->role === self::ROLE_ALIADO_TAQUILLA;
+    }
+
+    /**
+     * True si el usuario opera dentro del módulo Aliado,
+     * sin importar si es Administrador o Taquilla.
+     */
+    public function isAliadoModule(): bool
+    {
+        return $this->isAliado() || $this->isAliadoTaquilla();
+    }
+
     public function isRepartidor(): bool
     {
         return $this->role === self::ROLE_REPARTIDOR;
@@ -107,6 +138,23 @@ class User extends Authenticatable
         return $this->status === self::STATUS_ACTIVE;
     }
 
+    /**
+     * Resuelve la agencia aliada de este usuario sin importar si es
+     * el dueño (Administrador) o personal de Taquilla.
+     */
+    public function resolveAlly(): ?Ally
+    {
+        if ($this->isAliado()) {
+            return $this->ally;
+        }
+
+        if ($this->isAliadoTaquilla()) {
+            return $this->alliedAgency;
+        }
+
+        return null;
+    }
+
     public function canManageUsers(): bool
     {
         return $this->isAdmin();
@@ -119,6 +167,7 @@ class User extends Authenticatable
                 self::ROLE_ADMIN_PRINCIPAL,
                 self::ROLE_ADMIN_OPERATIVO,
                 self::ROLE_ALIADO,
+                self::ROLE_ALIADO_TAQUILLA,
                 self::ROLE_REPARTIDOR,
                 self::ROLE_CLIENTE,
             ], true);
@@ -128,9 +177,17 @@ class User extends Authenticatable
             return in_array($role, [
                 self::ROLE_ADMIN_OPERATIVO,
                 self::ROLE_ALIADO,
+                self::ROLE_ALIADO_TAQUILLA,
                 self::ROLE_REPARTIDOR,
                 self::ROLE_CLIENTE,
             ], true);
+        }
+
+        // El Aliado Administrador puede crear usuarios de Taquilla
+        // de su propia agencia (RF-ALI-02). El scoping por agencia
+        // se valida en AllyStaffService, no aquí.
+        if ($this->isAliado()) {
+            return $role === self::ROLE_ALIADO_TAQUILLA;
         }
 
         return false;
@@ -138,28 +195,34 @@ class User extends Authenticatable
 
     public function canEditUser(User $target): bool
     {
-        if (! $this->isAdmin()) {
-            return false;
+        if ($this->isAdmin()) {
+            return ! ($this->isAdminOperativo() && $target->isAdmin());
         }
 
-        if ($this->isAdminOperativo() && $target->isAdmin()) {
-            return false;
+        if ($this->isAliado()) {
+            return $target->isAliadoTaquilla()
+                && $target->ally_id === optional($this->ally)->id;
         }
 
-        return true;
+        return false;
     }
 
     public function canDeactivateUser(User $target): bool
     {
-        if (! $this->isAdmin() || $this->is($target)) {
+        if ($this->is($target)) {
             return false;
         }
 
-        if ($this->isAdminOperativo() && $target->isAdmin()) {
-            return false;
+        if ($this->isAdmin()) {
+            return ! ($this->isAdminOperativo() && $target->isAdmin());
         }
 
-        return true;
+        if ($this->isAliado()) {
+            return $target->isAliadoTaquilla()
+                && $target->ally_id === optional($this->ally)->id;
+        }
+
+        return false;
     }
 
     public function canDeleteUser(User $target): bool
@@ -173,7 +236,8 @@ class User extends Authenticatable
         return [
             self::ROLE_ADMIN_PRINCIPAL => 'Administrador Principal',
             self::ROLE_ADMIN_OPERATIVO => 'Administrador Operativo',
-            self::ROLE_ALIADO => 'Aliado',
+            self::ROLE_ALIADO => 'Aliado Administrador',
+            self::ROLE_ALIADO_TAQUILLA => 'Aliado Taquilla',
             self::ROLE_REPARTIDOR => 'Repartidor',
             self::ROLE_CLIENTE => 'Cliente',
         ];

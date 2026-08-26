@@ -2,6 +2,7 @@
 
 namespace App\Services;
 
+use App\Models\Ally;
 use App\Models\Driver;
 use App\Models\Package;
 use App\Models\PackageHistory;
@@ -16,8 +17,8 @@ class PackageService
     }
 
     /**
-     * Crea un nuevo paquete: calcula tarifa, pesos y número de guía,
-     * y registra el primer evento en el historial.
+     * Crea un nuevo paquete: calcula tarifa, pesos, comisión del aliado
+     * y número de guía, y registra el primer evento en el historial.
      *
      * @param array{
      *   ally_id:int, sender_name:string, sender_id_doc:string, sender_phone:string,
@@ -25,6 +26,7 @@ class PackageService
      *   origin_city:string, destination_city:string, package_type:string,
      *   physical_weight_kg:float, length_cm?:float|null, width_cm?:float|null, height_cm?:float|null,
      *   is_fragile?:bool, has_insurance?:bool, declared_value_usd?:float|null,
+     *   is_cod?:bool, cod_amount_usd?:float|null, payment_method?:string|null,
      * } $data
      */
     public function createPackage(array $data, ?int $registeredByUserId = null): Package
@@ -33,6 +35,8 @@ class PackageService
             $isFragile = $data['is_fragile'] ?? false;
             $hasInsurance = $data['has_insurance'] ?? false;
             $declaredValueUsd = $data['declared_value_usd'] ?? null;
+            $isCod = $data['is_cod'] ?? false;
+            $codAmountUsd = $isCod ? ($data['cod_amount_usd'] ?? null) : null;
 
             $pricing = $this->tariffService->calculate(
                 originCity: $data['origin_city'],
@@ -46,6 +50,8 @@ class PackageService
                 hasInsurance: $hasInsurance,
                 declaredValueUsd: $declaredValueUsd,
             );
+
+            $commission = $this->calculateCommission($data['ally_id'], $pricing['total_price_usd']);
 
             $package = Package::create([
                 ...$data,
@@ -61,6 +67,12 @@ class PackageService
                 'total_price_ves' => $pricing['total_price_ves'],
                 'bcv_rate_used' => $pricing['bcv_rate_used'],
                 'current_status' => Package::STATUS_RECIBIDO_AGENCIA,
+                'is_cod' => $isCod,
+                'payment_method' => $data['payment_method'] ?? null,
+                'cod_amount_usd' => $codAmountUsd,
+                'cod_status' => $isCod ? Package::COD_PENDIENTE : null,
+                'commission_percentage_used' => $commission['percentage'],
+                'commission_amount_usd' => $commission['amount'],
             ]);
 
             $this->recordHistory(
@@ -115,6 +127,47 @@ class PackageService
         $package->update(['driver_id' => $driver->id]);
 
         return $package->fresh();
+    }
+
+    /**
+     * Marca el cobro contra entrega (COD) de un paquete como liquidado
+     * (RF-ALI-04: "estado de liquidación").
+     *
+     * @throws RuntimeException si el paquete no tiene COD activo.
+     */
+    public function liquidateCod(Package $package): Package
+    {
+        if (! $package->is_cod) {
+            throw new RuntimeException('Este paquete no tiene cobro en destino (COD) activo.');
+        }
+
+        $package->update([
+            'cod_status' => Package::COD_LIQUIDADO,
+            'cod_liquidated_at' => now(),
+        ]);
+
+        return $package->fresh();
+    }
+
+    /**
+     * Calcula la comisión del aliado sobre el precio del envío, usando
+     * el % vigente de la agencia en el momento de crear la guía. Se
+     * guarda como copia histórica (RF-ALI-08 / RF-ALI-09), igual que
+     * ya se hace con bcv_rate_used.
+     *
+     * @return array{percentage: float, amount: float}
+     */
+    protected function calculateCommission(int $allyId, float $totalPriceUsd): array
+    {
+        $ally = Ally::findOrFail($allyId);
+
+        $percentage = (float) $ally->commission_percentage;
+        $amount = round($totalPriceUsd * ($percentage / 100), 2);
+
+        return [
+            'percentage' => $percentage,
+            'amount' => $amount,
+        ];
     }
 
     /**

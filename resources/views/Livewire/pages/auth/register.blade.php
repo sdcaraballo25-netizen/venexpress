@@ -168,7 +168,7 @@ new #[Layout('layouts.guest')] class extends Component
             Auth::login($user);
 
             $this->redirect(
-                route('aliado.dashboard', absolute: false),
+                route('ally.dashboard', absolute: false),
                 navigate: true
             );
 

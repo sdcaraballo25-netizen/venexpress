@@ -45,7 +45,7 @@ if ($user->isChofer()) {
 }
 
 if ($user->isAliado()) {
-    $this->redirect(route('aliado.dashboard', absolute: false), navigate: true);
+    $this->redirect(route('ally.dashboard', absolute: false), navigate: true);
     return;
 }
 

@@ -1,5 +1,5 @@
 {
-  "0": "TestCase",
+  "0": "Illuminate\\Foundation\\Testing\\RefreshDatabase",
   "1": "Illuminate\\Database\\Migrations\\Migration",
   "2": "Package",
   "3": "composer.json",
@@ -71,7 +71,7 @@
   "69": "public-tracking.blade.php",
   "70": "welcome/navigation.blade.php",
   "71": "tracking-show.blade.php",
-  "72": "aliado/dashboard.blade.php",
+  "72": "ally/dashboard.blade.php",
   "73": "welcome.blade.php",
   "74": "tailwind.config.js",
   "75": "vite.config.js",
@@ -97,9 +97,9 @@
   "95": "PasswordResetTest.php",
   "96": "Illuminate\\Support\\Facades\\Schema",
   "97": "Illuminate\\Database\\Schema\\Blueprint",
-  "98": "AuthenticationTest",
+  "98": ".isAdmin",
   "99": "ProfileTest",
-  "100": "UserAuthorizationTest",
+  "100": "TestCase",
   "101": "DatabaseSeeder.php",
   "102": "2026_08_08_232920_create_drivers_table.php",
   "103": "2026_08_08_232921_create_bcv_rates_table.php",
@@ -116,5 +116,7 @@
   "114": "2026_08_22_195324_add_cliente_role_to_users_table.php",
   "115": "2026_08_22_213928_add_status_to_allies_table.php",
   "116": "2026_08_22_230000_update_user_roles_and_add_status.php",
-  "117": "2026_08_22_230001_create_audit_logs_table.php"
+  "117": "2026_08_22_230001_create_audit_logs_table.php",
+  "118": "package-create.blade.php",
+  "119": "tailwindcss"
 }

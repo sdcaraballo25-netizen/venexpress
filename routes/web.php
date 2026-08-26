@@ -45,11 +45,11 @@ Route::get('/repartidor/dashboard', function () {
     ->name('repartidor.dashboard');
 
 
-Route::get('/aliado/dashboard', function () {
-    return view('aliado.dashboard');
-})
+use App\Livewire\Ally\Dashboard as AllyDashboard;
+
+Route::get('/ally/dashboard', AllyDashboard::class)
     ->middleware(['auth', 'verified', 'role:aliado'])
-    ->name('aliado.dashboard');
+    ->name('ally.dashboard');
 
 // Rastreo público
 Route::get('/rastreo', function () {

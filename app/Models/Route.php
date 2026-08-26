@@ -32,6 +32,7 @@ class Route extends Model
      */
     protected $fillable = [
         'city',
+        'state',
         'name',
         'driver_id',
         'created_by',

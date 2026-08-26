@@ -39,6 +39,12 @@ class Package extends Model
     ];
 
     /**
+     * Estados de liquidación del cobro en destino (COD).
+     */
+    public const COD_PENDIENTE = 'pendiente';
+    public const COD_LIQUIDADO = 'liquidado';
+
+    /**
      * Los atributos que se pueden asignar de forma masiva.
      *
      * @var list<string>
@@ -71,6 +77,13 @@ class Package extends Model
         'total_price_ves',
         'bcv_rate_used',
         'current_status',
+        'is_cod',
+        'payment_method',
+        'cod_amount_usd',
+        'cod_status',
+        'cod_liquidated_at',
+        'commission_percentage_used',
+        'commission_amount_usd',
     ];
 
     /**
@@ -95,6 +108,11 @@ class Package extends Model
             'total_price_usd' => 'decimal:2',
             'total_price_ves' => 'decimal:2',
             'bcv_rate_used' => 'decimal:6',
+            'is_cod' => 'boolean',
+            'cod_amount_usd' => 'decimal:2',
+            'cod_liquidated_at' => 'datetime',
+            'commission_percentage_used' => 'decimal:2',
+            'commission_amount_usd' => 'decimal:2',
         ];
     }
 
@@ -128,6 +146,14 @@ class Package extends Model
         return $this->hasMany(PackageHistory::class);
     }
 
+    /**
+     * Incidencias reportadas sobre este paquete (RF-ALI-06).
+     */
+    public function incidents(): HasMany
+    {
+        return $this->hasMany(Incident::class);
+    }
+
     /*
     |--------------------------------------------------------------------------
     | HELPERS
@@ -142,5 +168,10 @@ class Package extends Model
     public function isSobre(): bool
     {
         return $this->package_type === self::TYPE_SOBRE;
+    }
+
+    public function isCodPending(): bool
+    {
+        return $this->is_cod && $this->cod_status === self::COD_PENDIENTE;
     }
 }

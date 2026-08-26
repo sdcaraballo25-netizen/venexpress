@@ -6075,13 +6075,13 @@
     },
     {
       "id": "resources_views_aliado_dashboard_blade",
-      "label": "aliado/dashboard.blade.php",
+      "label": "ally/dashboard.blade.php",
       "_origin": "ast",
       "community": 72,
-      "community_name": "aliado/dashboard.blade.php",
+      "community_name": "ally/dashboard.blade.php",
       "file_type": "code",
-      "norm_label": "aliado/dashboard.blade.php",
-      "source_file": "resources/views/aliado/dashboard.blade.php",
+      "norm_label": "ally/dashboard.blade.php",
+      "source_file": "resources/views/ally/dashboard.blade.php",
       "source_location": null
     },
     {

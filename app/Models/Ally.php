@@ -50,7 +50,7 @@ class Ally extends Model
     */
 
     /**
-     * Usuario dueño de esta taquilla aliada.
+     * Usuario dueño de esta taquilla aliada (Aliado Administrador).
      */
     public function user(): BelongsTo
     {
@@ -63,5 +63,23 @@ class Ally extends Model
     public function packages(): HasMany
     {
         return $this->hasMany(Package::class);
+    }
+
+    /**
+     * Usuarios de Taquilla de esta agencia (RF-ALI-02).
+     * Son Users normales con role 'aliado_taquilla' y ally_id = este id.
+     */
+    public function staffUsers(): HasMany
+    {
+        return $this->hasMany(User::class, 'ally_id')
+            ->where('role', User::ROLE_ALIADO_TAQUILLA);
+    }
+
+    /**
+     * Incidencias/reclamos de esta agencia (RF-ALI-06).
+     */
+    public function incidents(): HasMany
+    {
+        return $this->hasMany(Incident::class);
     }
 }

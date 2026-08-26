@@ -71,7 +71,7 @@
   "69": "public-tracking.blade.php",
   "70": "welcome/navigation.blade.php",
   "71": "tracking-show.blade.php",
-  "72": "aliado/dashboard.blade.php",
+  "72": "ally/dashboard.blade.php",
   "73": "welcome.blade.php",
   "74": "tailwind.config.js",
   "75": "vite.config.js",
