@@ -30,6 +30,18 @@ class Package extends Model
         self::STATUS_ENTREGADO,
     ];
 
+    /**
+     * Etiquetas legibles en español para cada estado.
+     */
+    public const STATUS_LABELS = [
+        self::STATUS_RECIBIDO_AGENCIA => 'Recibido en Agencia',
+        self::STATUS_RECOLECTADO_VENEXPRESS => 'Recolectado',
+        self::STATUS_EN_HUB => 'En Hub',
+        self::STATUS_EN_TRANSITO_NACIONAL => 'En Tránsito',
+        self::STATUS_LISTO_RETIRO => 'Listo para Retiro',
+        self::STATUS_ENTREGADO => 'Entregado',
+    ];
+
     public const TYPE_SOBRE = 'sobre';
     public const TYPE_PAQUETE = 'paquete';
 
@@ -174,6 +186,14 @@ class Package extends Model
     public function isDelivered(): bool
     {
         return $this->current_status === self::STATUS_ENTREGADO;
+    }
+
+    /**
+     * Etiqueta legible en español del estado actual del paquete.
+     */
+    public function statusLabel(): string
+    {
+        return self::STATUS_LABELS[$this->current_status] ?? $this->current_status;
     }
 
     public function isSobre(): bool

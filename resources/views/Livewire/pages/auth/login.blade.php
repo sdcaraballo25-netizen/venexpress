@@ -44,7 +44,7 @@ if ($user->isChofer()) {
     return;
 }
 
-if ($user->isAliado()) {
+if ($user->isAliadoModule()) {
     $this->redirect(route('ally.dashboard', absolute: false), navigate: true);
     return;
 }
