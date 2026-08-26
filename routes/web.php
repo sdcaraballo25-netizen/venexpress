@@ -12,6 +12,7 @@ use App\Livewire\Admin\RoutesManager;
 use App\Livewire\Admin\RoutesDashboard;
 use App\Livewire\Ally\Dashboard as AllyDashboard;
 use App\Livewire\Ally\CreatePackage;
+use App\Livewire\Driver\Dashboard as DriverDashboard;
 /*
 |--------------------------------------------------------------------------
 | Web Routes
@@ -39,9 +40,7 @@ Route::view('profile', 'profile')
     ->name('cliente.dashboard');
 
 
-Route::get('/repartidor/dashboard', function () {
-    return view('livewire.driver.dashboard');
-})
+Route::get('/repartidor/dashboard', DriverDashboard::class)
     ->middleware(['auth', 'verified', 'role:repartidor'])
     ->name('repartidor.dashboard');
 
@@ -84,7 +83,7 @@ Route::get('/rastreo/resultado', function () {
 
     if ($package) {
         $keys = array_keys($statusOrder);
-        $currentIndex = array_search($package->status, $keys, true);
+        $currentIndex = array_search($package->current_status, $keys, true);
         $currentIndex = $currentIndex === false ? 0 : $currentIndex;
 
         // Historial de timestamps por estado, si tienes la tabla package_histories

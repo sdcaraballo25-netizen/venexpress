@@ -38,14 +38,14 @@
 
 
         {{-- CONTENIDO PRINCIPAL --}}
-        <div class="flex-1 min-w-0 ml-64">
+        <div class="flex-1 min-w-0 @if(auth()->check() && auth()->user()->isAliadoModule()) ml-64 @endif">
 
             {{-- HEADER --}}
             <header class="h-16 bg-white border-b border-[#E2E8F0] flex items-center justify-between px-6 lg:px-8">
 
                 <div>
                     <span class="text-sm text-[#64748B]">
-                        {{ auth()->user()->isAliado() ? 'Aliado Operativo' : 'Taquilla' }}
+                        {{ \App\Models\User::roleLabels()[auth()->user()->role] ?? '' }}
                     </span>
                 </div>
 
