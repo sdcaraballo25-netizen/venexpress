@@ -17,29 +17,23 @@ class PackageService
     }
 
     /**
-     * Crea un nuevo paquete: calcula tarifa, pesos, comisión del aliado
-     * y número de guía, y registra el primer evento en el historial.
-     *
-     * @param array{
-     *   ally_id:int, sender_name:string, sender_id_doc:string, sender_phone:string,
-     *   recipient_name:string, recipient_id_doc:string, recipient_phone:string,
-     *   origin_city:string, origin_state?:string|null, destination_city:string,
-     *   destination_state?:string|null, package_type:string,
-     *   physical_weight_kg:float, length_cm?:float|null, width_cm?:float|null, height_cm?:float|null,
-     *   is_fragile?:bool, has_insurance?:bool, declared_value_usd?:float|null,
-     *   requires_delivery?:bool, delivery_address?:string|null, delivery_sector?:string|null,
-     *   delivery_reference?:string|null,
-     *   is_cod?:bool, cod_amount_usd?:float|null, payment_method?:string|null,
-     * } $data
+     * Crea un nuevo paquete.
      */
-    public function createPackage(array $data, ?int $registeredByUserId = null): Package
-    {
-        return DB::transaction(function () use ($data, $registeredByUserId) {
+    public function createPackage(
+        array $data,
+        ?int $registeredByUserId = null
+    ): Package {
+        return DB::transaction(function () use (
+            $data,
+            $registeredByUserId
+        ) {
             $isFragile = $data['is_fragile'] ?? false;
             $hasInsurance = $data['has_insurance'] ?? false;
             $declaredValueUsd = $data['declared_value_usd'] ?? null;
             $isCod = $data['is_cod'] ?? false;
-            $codAmountUsd = $isCod ? ($data['cod_amount_usd'] ?? null) : null;
+            $codAmountUsd = $isCod
+                ? ($data['cod_amount_usd'] ?? null)
+                : null;
             $requiresDelivery = $data['requires_delivery'] ?? false;
 
             $pricing = $this->tariffService->calculate(
@@ -58,34 +52,99 @@ class PackageService
                 requiresDelivery: $requiresDelivery,
             );
 
-            $commission = $this->calculateCommission($data['ally_id'], $pricing['total_price_usd']);
+            $commission = $this->calculateCommission(
+                $data['ally_id'],
+                $pricing['total_price_usd']
+            );
 
             $package = Package::create([
                 ...$data,
+
                 'tracking_number' => $this->generateTrackingNumber(),
+
                 'is_fragile' => $isFragile,
                 'has_insurance' => $hasInsurance,
                 'declared_value_usd' => $declaredValueUsd,
-                'volumetric_weight_kg' => $pricing['volumetric_weight_kg'],
-                'billable_weight_kg' => $pricing['billable_weight_kg'],
-                'fragile_surcharge_usd' => $pricing['fragile_surcharge_usd'],
-                'insurance_price_usd' => $pricing['insurance_price_usd'],
-                'total_price_usd' => $pricing['total_price_usd'],
-                'total_price_ves' => $pricing['total_price_ves'],
-                'bcv_rate_used' => $pricing['bcv_rate_used'],
-                'current_status' => Package::STATUS_RECIBIDO_AGENCIA,
-                'distance_km' => $pricing['distance_km'],
-                'requires_delivery' => $requiresDelivery,
-                'delivery_fee_usd' => $pricing['delivery_fee_usd'],
-                'delivery_address' => $requiresDelivery ? ($data['delivery_address'] ?? null) : null,
-                'delivery_sector' => $requiresDelivery ? ($data['delivery_sector'] ?? null) : null,
-                'delivery_reference' => $requiresDelivery ? ($data['delivery_reference'] ?? null) : null,
+
+                'volumetric_weight_kg' =>
+                    $pricing['volumetric_weight_kg'],
+
+                'billable_weight_kg' =>
+                    $pricing['billable_weight_kg'],
+
+                'fragile_surcharge_usd' =>
+                    $pricing['fragile_surcharge_usd'],
+
+                'insurance_price_usd' =>
+                    $pricing['insurance_price_usd'],
+
+                'total_price_usd' =>
+                    $pricing['total_price_usd'],
+
+                'total_price_ves' =>
+                    $pricing['total_price_ves'],
+
+                'bcv_rate_used' =>
+                    $pricing['bcv_rate_used'],
+
+                /*
+                 * El paquete entra a la agencia.
+                 */
+                'current_status' =>
+                    Package::STATUS_RECIBIDO_AGENCIA,
+
+                /*
+                 * IMPORTANTE:
+                 * Al crear el paquete NO tiene repartidor.
+                 *
+                 * Aunque venga un driver_id en $data,
+                 * lo dejamos en null porque el repartidor
+                 * se asigna cuando lo escanea.
+                 */
+                'driver_id' => null,
+
+                'distance_km' =>
+                    $pricing['distance_km'],
+
+                'requires_delivery' =>
+                    $requiresDelivery,
+
+                'delivery_fee_usd' =>
+                    $pricing['delivery_fee_usd'],
+
+                'delivery_address' =>
+                    $requiresDelivery
+                        ? ($data['delivery_address'] ?? null)
+                        : null,
+
+                'delivery_sector' =>
+                    $requiresDelivery
+                        ? ($data['delivery_sector'] ?? null)
+                        : null,
+
+                'delivery_reference' =>
+                    $requiresDelivery
+                        ? ($data['delivery_reference'] ?? null)
+                        : null,
+
                 'is_cod' => $isCod,
-                'payment_method' => $data['payment_method'] ?? null,
-                'cod_amount_usd' => $codAmountUsd,
-                'cod_status' => $isCod ? Package::COD_PENDIENTE : null,
-                'commission_percentage_used' => $commission['percentage'],
-                'commission_amount_usd' => $commission['amount'],
+
+                'payment_method' =>
+                    $data['payment_method'] ?? null,
+
+                'cod_amount_usd' =>
+                    $codAmountUsd,
+
+                'cod_status' =>
+                    $isCod
+                        ? Package::COD_PENDIENTE
+                        : null,
+
+                'commission_percentage_used' =>
+                    $commission['percentage'],
+
+                'commission_amount_usd' =>
+                    $commission['amount'],
             ]);
 
             $this->recordHistory(
@@ -100,17 +159,7 @@ class PackageService
     }
 
     /**
-     * Cambia el estado de un paquete y deja constancia en su historial.
-     *
-     * @param int|null $routeStopId Si el cambio ocurre durante una parada
-     *                              del módulo de Gestión de Rutas (por
-     *                              ejemplo, al pasar a RECOLECTADO_VENEXPRESS
-     *                              en la agencia), se etiqueta el evento del
-     *                              historial con esa parada. Opcional y null
-     *                              por defecto: no rompe ningún llamado
-     *                              existente que no lo pase.
-     *
-     * @throws RuntimeException si el estado no es válido.
+     * Cambia el estado de un paquete y registra historial.
      */
     public function changeStatus(
         Package $package,
@@ -120,38 +169,155 @@ class PackageService
         ?int $routeStopId = null,
     ): Package {
         if (! in_array($newStatus, Package::STATUSES, true)) {
-            throw new RuntimeException("Estado inválido: {$newStatus}");
+            throw new RuntimeException(
+                "Estado inválido: {$newStatus}"
+            );
         }
 
-        return DB::transaction(function () use ($package, $newStatus, $userId, $locationDescription, $routeStopId) {
-            $package->update(['current_status' => $newStatus]);
+        return DB::transaction(function () use (
+            $package,
+            $newStatus,
+            $userId,
+            $locationDescription,
+            $routeStopId
+        ) {
+            $package->update([
+                'current_status' => $newStatus,
+            ]);
 
-            $this->recordHistory($package, $newStatus, $userId, $locationDescription, $routeStopId);
+            $this->recordHistory(
+                $package,
+                $newStatus,
+                $userId,
+                $locationDescription,
+                $routeStopId
+            );
 
             return $package->fresh();
         });
     }
 
     /**
-     * Asigna (o reasigna) un chofer a un paquete.
+     * Asignación manual de un repartidor a un paquete.
+     *
+     * Se conserva por compatibilidad con otras partes del sistema.
      */
-    public function assignDriver(Package $package, Driver $driver): Package
-    {
-        $package->update(['driver_id' => $driver->id]);
+    public function assignDriver(
+        Package $package,
+        Driver $driver
+    ): Package {
+        if ($driver->status !== Driver::STATUS_ACTIVE) {
+            throw new RuntimeException(
+                'Solo se pueden asignar paquetes a repartidores activos.'
+            );
+        }
+
+        $package->update([
+            'driver_id' => $driver->id,
+        ]);
 
         return $package->fresh();
     }
 
     /**
-     * Marca el cobro contra entrega (COD) de un paquete como liquidado
-     * (RF-ALI-04: "estado de liquidación").
+     * Asigna un paquete al repartidor que acaba de escanearlo.
      *
-     * @throws RuntimeException si el paquete no tiene COD activo.
+     * ESTA ES LA FUNCIÓN PRINCIPAL DEL NUEVO FLUJO.
+     *
+     * El paquete:
+     *
+     * - debe estar en RECIBIDO_AGENCIA
+     * - no debe tener otro repartidor
+     *
+     * La comprobación de que la agencia pertenece a la ruta
+     * se realiza desde Scanner.php.
      */
-    public function liquidateCod(Package $package): Package
-    {
+    public function assignDriverOnScan(
+        Package $package,
+        Driver $driver
+    ): Package {
+        if ($driver->status !== Driver::STATUS_ACTIVE) {
+            throw new RuntimeException(
+                'Solo un repartidor activo puede escanear paquetes.'
+            );
+        }
+
+        if (
+            $package->current_status
+            !== Package::STATUS_RECIBIDO_AGENCIA
+        ) {
+            throw new RuntimeException(
+                'Este paquete no está disponible para ser asignado.'
+            );
+        }
+
+        /*
+         * Si ya tiene repartidor, no lo sobrescribimos.
+         */
+        if ($package->driver_id !== null) {
+            if ((int) $package->driver_id === (int) $driver->id) {
+                return $package->fresh();
+            }
+
+            throw new RuntimeException(
+                'Este paquete ya está asignado a otro repartidor.'
+            );
+        }
+
+        return DB::transaction(function () use (
+            $package,
+            $driver
+        ) {
+            /*
+             * Bloqueamos el registro para evitar que dos
+             * repartidores puedan escanearlo exactamente
+             * al mismo tiempo.
+             */
+            $lockedPackage = Package::query()
+                ->whereKey($package->id)
+                ->lockForUpdate()
+                ->firstOrFail();
+
+            if (
+                $lockedPackage->current_status
+                !== Package::STATUS_RECIBIDO_AGENCIA
+            ) {
+                throw new RuntimeException(
+                    'Este paquete ya no está disponible para ser asignado.'
+                );
+            }
+
+            if ($lockedPackage->driver_id !== null) {
+                if (
+                    (int) $lockedPackage->driver_id
+                    === (int) $driver->id
+                ) {
+                    return $lockedPackage->fresh();
+                }
+
+                throw new RuntimeException(
+                    'Este paquete ya está asignado a otro repartidor.'
+                );
+            }
+
+            $lockedPackage->update([
+                'driver_id' => $driver->id,
+            ]);
+
+            return $lockedPackage->fresh();
+        });
+    }
+
+    /**
+     * Liquida un cobro contra entrega.
+     */
+    public function liquidateCod(
+        Package $package
+    ): Package {
         if (! $package->is_cod) {
-            throw new RuntimeException('Este paquete no tiene cobro en destino (COD) activo.');
+            throw new RuntimeException(
+                'Este paquete no tiene cobro en destino (COD) activo.'
+            );
         }
 
         $package->update([
@@ -163,19 +329,20 @@ class PackageService
     }
 
     /**
-     * Calcula la comisión del aliado sobre el precio del envío, usando
-     * el % vigente de la agencia en el momento de crear la guía. Se
-     * guarda como copia histórica (RF-ALI-08 / RF-ALI-09), igual que
-     * ya se hace con bcv_rate_used.
-     *
-     * @return array{percentage: float, amount: float}
+     * Calcula la comisión del aliado.
      */
-    protected function calculateCommission(int $allyId, float $totalPriceUsd): array
-    {
+    protected function calculateCommission(
+        int $allyId,
+        float $totalPriceUsd
+    ): array {
         $ally = Ally::findOrFail($allyId);
 
         $percentage = (float) $ally->commission_percentage;
-        $amount = round($totalPriceUsd * ($percentage / 100), 2);
+
+        $amount = round(
+            $totalPriceUsd * ($percentage / 100),
+            2
+        );
 
         return [
             'percentage' => $percentage,
@@ -184,19 +351,33 @@ class PackageService
     }
 
     /**
-     * Genera un número de guía único con formato VEN-YYYYMMDD-NNNNNN.
+     * Genera un número de guía único.
      */
     protected function generateTrackingNumber(): string
     {
         $prefix = 'VEN-' . now()->format('Ymd') . '-';
 
         do {
-            $candidate = $prefix . str_pad((string) random_int(1, 999999), 6, '0', STR_PAD_LEFT);
-        } while (Package::where('tracking_number', $candidate)->exists());
+            $candidate = $prefix
+                . str_pad(
+                    (string) random_int(1, 999999),
+                    6,
+                    '0',
+                    STR_PAD_LEFT
+                );
+        } while (
+            Package::where(
+                'tracking_number',
+                $candidate
+            )->exists()
+        );
 
         return $candidate;
     }
 
+    /**
+     * Registra un evento en el historial.
+     */
     protected function recordHistory(
         Package $package,
         string $status,

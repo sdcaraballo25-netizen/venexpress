@@ -18,13 +18,18 @@ class RouteService
     ) {
     }
 
+    /**
+     * Crea una nueva ruta con sus agencias/paradas.
+     */
     public function createRoute(
         array $data,
         array $allyIdsInOrder,
         int $createdByUserId
     ): Route {
         if (count($allyIdsInOrder) === 0) {
-            throw new RuntimeException('Una ruta necesita al menos una agencia.');
+            throw new RuntimeException(
+                'Una ruta necesita al menos una agencia.'
+            );
         }
 
         return DB::transaction(function () use (
@@ -40,13 +45,17 @@ class RouteService
                 'status' => Route::STATUS_DRAFT,
             ]);
 
-            $this->syncStops($route, $allyIdsInOrder);
+            $this->syncStops(
+                $route,
+                $allyIdsInOrder
+            );
 
             $this->log(
                 $createdByUserId,
                 'route.created',
                 $route,
-                "Creó la ruta \"{$route->name}\" en {$route->city}, {$route->state} con "
+                "Creó la ruta \"{$route->name}\" en {$route->city}, "
+                . "{$route->state} con "
                 . count($allyIdsInOrder)
                 . ' paradas.',
                 [
@@ -60,6 +69,9 @@ class RouteService
         });
     }
 
+    /**
+     * Actualiza los datos y las paradas de una ruta.
+     */
     public function updateRoute(
         int $routeId,
         string $name,
@@ -98,7 +110,10 @@ class RouteService
 
             $route->stops()->delete();
 
-            $this->syncStops($route, $allyIds);
+            $this->syncStops(
+                $route,
+                $allyIds
+            );
 
             $this->log(
                 $actingUserId,
@@ -116,6 +131,9 @@ class RouteService
         });
     }
 
+    /**
+     * Actualiza únicamente el recorrido de la ruta.
+     */
     public function updateStops(
         Route $route,
         array $allyIdsInOrder,
@@ -123,7 +141,14 @@ class RouteService
     ): Route {
         if (! $route->isEditable()) {
             throw new RuntimeException(
-                'Esta ruta ya está en curso o finalizada; no se puede editar su recorrido.'
+                'Esta ruta ya está en curso o finalizada; '
+                . 'no se puede editar su recorrido.'
+            );
+        }
+
+        if (count($allyIdsInOrder) === 0) {
+            throw new RuntimeException(
+                'Una ruta necesita al menos una agencia.'
             );
         }
 
@@ -134,7 +159,10 @@ class RouteService
         ) {
             $route->stops()->delete();
 
-            $this->syncStops($route, $allyIdsInOrder);
+            $this->syncStops(
+                $route,
+                $allyIdsInOrder
+            );
 
             $this->log(
                 $actingUserId,
@@ -152,6 +180,9 @@ class RouteService
         });
     }
 
+    /**
+     * Crea las paradas respetando el orden recibido.
+     */
     protected function syncStops(
         Route $route,
         array $allyIdsInOrder
@@ -166,6 +197,16 @@ class RouteService
         }
     }
 
+    /**
+     * Asigna un repartidor a una ruta.
+     *
+     * IMPORTANTE:
+     *
+     * Esta función NO asigna paquetes.
+     *
+     * Los paquetes permanecen con driver_id = NULL hasta que
+     * el repartidor correspondiente los escanee.
+     */
     public function assignDriver(
         Route $route,
         Driver $driver,
@@ -177,31 +218,84 @@ class RouteService
             );
         }
 
-        $route->update([
-            'driver_id' => $driver->id,
-            'status' => Route::STATUS_ASSIGNED,
-        ]);
+        if ($route->status === Route::STATUS_COMPLETED) {
+            throw new RuntimeException(
+                'No se puede asignar un repartidor a una ruta completada.'
+            );
+        }
 
-        $this->log(
-            $actingUserId,
-            'route.driver_assigned',
+        if ($route->status === Route::STATUS_CANCELLED) {
+            throw new RuntimeException(
+                'No se puede asignar un repartidor a una ruta cancelada.'
+            );
+        }
+
+        if ($route->status === Route::STATUS_IN_PROGRESS) {
+            throw new RuntimeException(
+                'No se puede cambiar el repartidor de una ruta que ya está en curso.'
+            );
+        }
+
+        return DB::transaction(function () use (
             $route,
-            "Asignó a {$driver->user->name} ({$driver->vehicle_plate}) "
-            . "a la ruta \"{$route->name}\".",
-            [
-                'driver_id' => $driver->id,
-            ]
-        );
+            $driver,
+            $actingUserId
+        ) {
+            /*
+             * La ruta debe tener al menos una agencia.
+             */
+            $allyIds = $route->stops()
+                ->pluck('ally_id')
+                ->unique()
+                ->values();
 
-        return $route->fresh();
+            if ($allyIds->isEmpty()) {
+                throw new RuntimeException(
+                    'La ruta no tiene agencias asignadas.'
+                );
+            }
+
+            /*
+             * Asignamos únicamente el repartidor a la ruta.
+             *
+             * NO modificamos ningún paquete.
+             */
+            $route->update([
+                'driver_id' => $driver->id,
+                'status' => Route::STATUS_ASSIGNED,
+            ]);
+
+            /*
+             * Auditoría.
+             */
+            $this->log(
+                $actingUserId,
+                'route.driver_assigned',
+                $route,
+                "Asignó a {$driver->user->name} "
+                . "({$driver->vehicle_plate}) "
+                . "a la ruta \"{$route->name}\".",
+                [
+                    'driver_id' => $driver->id,
+                    'ally_ids' => $allyIds->all(),
+                    'packages_assigned' => 0,
+                ]
+            );
+
+            return $route->fresh('stops');
+        });
     }
 
+    /**
+     * Asigna un repartidor a una ruta por ID.
+     */
     public function assignDriverById(
         int $routeId,
         int $driverId,
         int $actingUserId
     ): Route {
         $route = Route::findOrFail($routeId);
+
         $driver = Driver::findOrFail($driverId);
 
         return $this->assignDriver(
@@ -211,6 +305,9 @@ class RouteService
         );
     }
 
+    /**
+     * Inicia una ruta.
+     */
     public function start(
         Route $route,
         int $actingUserId
@@ -218,6 +315,18 @@ class RouteService
         if (! $route->driver_id) {
             throw new RuntimeException(
                 'La ruta necesita un repartidor asignado antes de iniciar.'
+            );
+        }
+
+        if ($route->status === Route::STATUS_COMPLETED) {
+            throw new RuntimeException(
+                'Esta ruta ya fue finalizada.'
+            );
+        }
+
+        if ($route->status === Route::STATUS_CANCELLED) {
+            throw new RuntimeException(
+                'Esta ruta está cancelada.'
             );
         }
 
@@ -236,6 +345,9 @@ class RouteService
         return $route->fresh();
     }
 
+    /**
+     * Inicia una ruta por ID.
+     */
     public function startRoute(
         int $routeId,
         int $actingUserId
@@ -246,6 +358,12 @@ class RouteService
         );
     }
 
+    /**
+     * Devuelve los paquetes disponibles para recoger
+     * en una determinada parada.
+     *
+     * Solo muestra paquetes que todavía no tienen repartidor.
+     */
     public function collectiblePackagesFor(
         RouteStop $stop
     ): Collection {
@@ -255,10 +373,14 @@ class RouteService
                 'current_status',
                 Package::STATUS_RECIBIDO_AGENCIA
             )
+            ->whereNull('driver_id')
             ->orderBy('created_at')
             ->get();
     }
 
+    /**
+     * Registra la recolección de paquetes de una parada.
+     */
     public function registerCollection(
         Route $route,
         RouteStop $stop,
@@ -283,18 +405,35 @@ class RouteService
             );
         }
 
+        if (! $route->driver_id) {
+            throw new RuntimeException(
+                'La ruta no tiene un repartidor asignado.'
+            );
+        }
+
         return DB::transaction(function () use (
             $route,
             $stop,
             $packageIds,
             $actingUserId
         ) {
+            /*
+             * Solo permitimos recoger paquetes:
+             *
+             * - de esta agencia
+             * - en RECIBIDO_AGENCIA
+             * - asignados al mismo repartidor de la ruta
+             */
             $packages = Package::query()
                 ->whereIn('id', $packageIds)
                 ->where('ally_id', $stop->ally_id)
                 ->where(
                     'current_status',
                     Package::STATUS_RECIBIDO_AGENCIA
+                )
+                ->where(
+                    'driver_id',
+                    $route->driver_id
                 )
                 ->get();
 
@@ -334,6 +473,9 @@ class RouteService
         });
     }
 
+    /**
+     * Finaliza una ruta.
+     */
     public function complete(
         Route $route,
         int $actingUserId
@@ -384,6 +526,9 @@ class RouteService
         });
     }
 
+    /**
+     * Finaliza una ruta por ID.
+     */
     public function completeRoute(
         int $routeId,
         int $actingUserId
@@ -394,6 +539,9 @@ class RouteService
         );
     }
 
+    /**
+     * Cancela una ruta.
+     */
     public function cancel(
         Route $route,
         int $actingUserId
@@ -401,6 +549,12 @@ class RouteService
         if ($route->status === Route::STATUS_COMPLETED) {
             throw new RuntimeException(
                 'Una ruta completada no se puede cancelar.'
+            );
+        }
+
+        if ($route->status === Route::STATUS_CANCELLED) {
+            throw new RuntimeException(
+                'Esta ruta ya está cancelada.'
             );
         }
 
@@ -418,6 +572,9 @@ class RouteService
         return $route->fresh();
     }
 
+    /**
+     * Cancela una ruta por ID.
+     */
     public function cancelRoute(
         int $routeId,
         int $actingUserId
@@ -428,6 +585,9 @@ class RouteService
         );
     }
 
+    /**
+     * Duplica una ruta para un nuevo ciclo.
+     */
     public function duplicate(
         Route $sourceRoute,
         int $actingUserId,
@@ -463,6 +623,9 @@ class RouteService
         return $newRoute;
     }
 
+    /**
+     * Duplica una ruta por ID.
+     */
     public function duplicateRoute(
         int $routeId,
         int $actingUserId,
@@ -475,6 +638,9 @@ class RouteService
         );
     }
 
+    /**
+     * Registra auditoría.
+     */
     protected function log(
         int $actorUserId,
         string $action,

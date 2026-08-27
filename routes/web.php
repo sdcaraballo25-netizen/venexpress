@@ -48,6 +48,10 @@ Route::get('/repartidor/dashboard', DriverDashboard::class)
     ->middleware(['auth', 'verified', 'role:repartidor'])
     ->name('repartidor.dashboard');
 
+Route::get('/repartidor/escanear', \App\Livewire\Driver\Scanner::class)
+    ->middleware(['auth', 'verified', 'role:repartidor'])
+    ->name('repartidor.scanner');
+
 
 Route::prefix('ally')
     ->middleware(['auth', 'verified', 'role:aliado,aliado_taquilla'])

@@ -263,17 +263,17 @@
                 <div class="mt-4 grid grid-cols-2 gap-3">
 
                     <a
-                        href="#"
-                        class="rounded-xl border border-[#E2E8F0] p-4 transition hover:bg-slate-50"
-                    >
-                        <p class="text-sm font-semibold text-[#0F172A]">
-                            Escanear
-                        </p>
+    href="{{ route('repartidor.scanner') }}"
+    class="rounded-xl border border-[#E2E8F0] p-4 transition hover:bg-slate-50"
+>
+    <p class="text-sm font-semibold text-[#0F172A]">
+        Escanear
+    </p>
 
-                        <p class="mt-1 text-xs text-slate-400">
-                            Leer guía
-                        </p>
-                    </a>
+    <p class="mt-1 text-xs text-slate-400">
+        Leer guía
+    </p>
+</a>
 
                     <a
                         href="#"

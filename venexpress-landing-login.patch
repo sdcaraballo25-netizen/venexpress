@@ -952,7 +952,7 @@ index 0464add..f840cec 100644
 -                                </div>
 +                    <form action="{{ route('tracking.index') }}" method="GET" class="mt-8 flex max-w-lg flex-col gap-3 sm:flex-row">
 +                        <label for="tracking_number" class="sr-only">Número de guía</label>
-+                        <input id="tracking_number" name="guia" type="text" placeholder="Ej. VE-2026-0001258"
++                        <input id="tracking_number" name="guia" type="text" placeholder="Ej. VEN-20260808-000001"
 +                               class="flex-1 rounded-lg border border-navy-100 px-4 py-3 text-sm text-navy-900 placeholder:text-slate-400 shadow-sm focus:border-navy-400 focus:outline-none focus:ring-2 focus:ring-navy-400">
 +                        <button type="submit"
 +                                class="inline-flex items-center justify-center gap-2 rounded-lg bg-gold-400 px-6 py-3 text-sm font-semibold text-navy-900 shadow-sm transition hover:bg-gold-300">
@@ -1014,7 +1014,7 @@ index 0464add..f840cec 100644
 +                        <g transform="translate(300,60)">
 +                            <rect x="0" y="0" width="176" height="40" rx="20" fill="white" stroke="#D6DFF0" stroke-width="1.5"/>
 +                            <circle cx="22" cy="20" r="6" fill="#22C55E"/>
-+                            <text x="40" y="25" font-family="Inter, sans-serif" font-weight="600" font-size="13" fill="#16244A">VE-2026-0001258 · En tránsito</text>
++                            <text x="40" y="25" font-family="Inter, sans-serif" font-weight="600" font-size="13" fill="#16244A">VEN-20260808-000001 · En tránsito</text>
 +                        </g>
 +                    </svg>
 +                </div>

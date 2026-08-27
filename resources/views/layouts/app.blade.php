@@ -89,6 +89,10 @@
     </div>
 
     @livewireScripts
+    
+    <script src="https://unpkg.com/html5-qrcode" type="text/javascript"></script>
+
+@stack('scripts')
 
 </body>
 </html>
