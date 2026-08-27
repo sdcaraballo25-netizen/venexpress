@@ -133,7 +133,7 @@
                 </div>
 
                 <a
-                    href="#"
+                    href="{{ route('repartidor.packages') }}"
                     class="text-sm font-medium text-blue-900 hover:underline"
                 >
                     Ver todos
@@ -182,11 +182,11 @@
                                 </span>
 
                                 <a
-                                    href="#"
-                                    class="rounded-xl border border-[#E2E8F0] px-3 py-2 text-xs font-medium text-[#0F172A] transition hover:bg-slate-50"
-                                >
-                                    Ver
-                                </a>
+    href="{{ route('repartidor.package-detail', $package->id) }}"
+    class="rounded-xl border border-[#E2E8F0] px-3 py-2 text-xs font-medium text-[#0F172A] transition hover:bg-slate-50"
+>
+    Ver
+</a>
 
                             </div>
 

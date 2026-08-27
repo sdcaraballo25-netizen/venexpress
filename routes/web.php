@@ -53,6 +53,14 @@ Route::get('/repartidor/escanear', \App\Livewire\Driver\Scanner::class)
     ->middleware(['auth', 'verified', 'role:repartidor'])
     ->name('repartidor.scanner');
 
+Route::get('/repartidor/paquetes', \App\Livewire\Driver\Packages::class)
+    ->middleware(['auth', 'verified', 'role:repartidor'])
+    ->name('repartidor.packages');
+
+Route::get('/repartidor/paquetes/{packageId}', \App\Livewire\Driver\PackageDetail::class)
+    ->middleware(['auth', 'verified', 'role:repartidor'])
+    ->name('repartidor.package-detail');
+
 
 Route::prefix('ally')
     ->middleware(['auth', 'verified', 'role:aliado,aliado_taquilla'])
