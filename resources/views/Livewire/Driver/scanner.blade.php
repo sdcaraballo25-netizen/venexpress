@@ -9,7 +9,7 @@
             </h2>
 
             <p class="text-sm text-slate-500">
-                Escanea el código QR de un paquete asignado a ti.
+                Escanea el código QR de una guía disponible.
             </p>
         </div>
 

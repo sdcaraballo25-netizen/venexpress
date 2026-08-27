@@ -3,9 +3,7 @@
 namespace App\Livewire\Driver;
 
 use App\Models\Package;
-use App\Models\Route;
 use App\Services\PackageService;
-use Illuminate\Support\Facades\DB;
 use Livewire\Attributes\Layout;
 use Livewire\Component;
 use RuntimeException;
@@ -19,14 +17,13 @@ class Scanner extends Component
 
     public ?string $errorMessage = null;
 
-    /**
-     * Busca una guía manualmente.
-     *
-     * Si el paquete no tiene repartidor:
-     * - verifica que la agencia pertenece a una ruta activa
-     *   del repartidor actual
-     * - asigna el paquete al repartidor.
-     */
+   /**
+ * Busca una guía manualmente.
+ *
+ * Si el paquete no tiene repartidor:
+ * - verifica que esté disponible en RECIBIDO_AGENCIA
+ * - asigna el paquete al repartidor activo que lo escaneó.
+ */
     public function searchPackage(): void
     {
         $this->reset([
@@ -135,57 +132,6 @@ class Scanner extends Component
             return;
         }
 
-        /*
-        |--------------------------------------------------------------------------
-        | 4. Buscar una ruta activa del repartidor
-        |--------------------------------------------------------------------------
-        |
-        | La agencia del paquete debe aparecer como una parada
-        | de una ruta que pertenezca al repartidor.
-        |
-        | Aceptamos:
-        |
-        | - assigned
-        | - in_progress
-        |
-        */
-
-        $route = Route::query()
-            ->where(
-                'driver_id',
-                $driver->id
-            )
-            ->whereIn(
-                'status',
-                [
-                    Route::STATUS_ASSIGNED,
-                    Route::STATUS_IN_PROGRESS,
-                ]
-            )
-            ->whereHas(
-                'stops',
-                function ($query) use ($package) {
-                    $query->where(
-                        'ally_id',
-                        $package->ally_id
-                    );
-                }
-            )
-            ->first();
-
-        /*
-        |--------------------------------------------------------------------------
-        | 5. No pertenece a ninguna ruta del repartidor
-        |--------------------------------------------------------------------------
-        */
-
-        if (! $route) {
-            $this->errorMessage =
-                'La guía existe, pero la agencia del paquete '
-                . 'no pertenece a ninguna ruta activa asignada a ti.';
-
-            return;
-        }
 
         /*
         |--------------------------------------------------------------------------

@@ -184,11 +184,12 @@ new #[Layout('layouts.guest')] class extends Component
         if ($user->isChofer()) {
 
             Driver::create([
-                'user_id' => $user->id,
-                'vehicle_plate' => $validated['vehicle_plate'],
-                'vehicle_type' => $validated['vehicle_type'],
-                'phone' => $validated['phone'],
-            ]);
+    'user_id' => $user->id,
+    'vehicle_plate' => $validated['vehicle_plate'],
+    'vehicle_type' => $validated['vehicle_type'],
+    'phone' => $validated['phone'],
+    'status' => Driver::STATUS_ACTIVE,
+]);
 
             Auth::login($user);
 

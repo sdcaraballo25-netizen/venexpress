@@ -176,7 +176,19 @@ class UsersManager extends Component
             ? User::STATUS_INACTIVE
             : User::STATUS_ACTIVE;
 
-        $target->update(['status' => $newStatus]);
+        DB::transaction(function () use ($target, $newStatus) {
+    $target->update([
+        'status' => $newStatus,
+    ]);
+
+    if ($target->isRepartidor()) {
+        $target->driver?->update([
+            'status' => $newStatus === User::STATUS_ACTIVE
+                ? Driver::STATUS_ACTIVE
+                : Driver::STATUS_SUSPENDED,
+        ]);
+    }
+});
 
         AuditLog::create([
             'actor_user_id' => $actor->id,
