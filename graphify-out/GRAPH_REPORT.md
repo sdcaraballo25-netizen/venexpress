@@ -1,22 +1,22 @@
 # Graph Report - venexpress  (2026-08-26)
 
 ## Corpus Check
-- 196 files · ~217,278 words
+- 196 files · ~218,207 words
 - Verdict: corpus is large enough that graph structure adds value.
 
 ## Summary
-- 882 nodes · 1358 edges · 140 communities (122 shown, 18 thin omitted)
-- Extraction: 99% EXTRACTED · 1% INFERRED · 0% AMBIGUOUS · INFERRED: 8 edges (avg confidence: 0.85)
+- 883 nodes · 1364 edges · 141 communities (121 shown, 20 thin omitted)
+- Extraction: 99% EXTRACTED · 1% INFERRED · 0% AMBIGUOUS · INFERRED: 10 edges (avg confidence: 0.85)
 - Token cost: 0 input · 0 output
 
 ## Graph Freshness
-- Built from commit: `2dfe16c0`
+- Built from commit: `4de61d7a`
 - Run `git rev-parse HEAD` and compare to check if the graph is stale.
 - Run `graphify update .` after code changes (no API cost).
 
 ## Community Hubs (Navigation)
 - TestCase
-- Illuminate\Database\Schema\Blueprint
+- Illuminate\Database\Migrations\Migration
 - Illuminate\Database\Eloquent\Factories\HasFactory
 - composer.json
 - allies-manager.blade.php
@@ -57,44 +57,46 @@
 - AuthenticationTest
 - EmailVerificationTest.php
 - PasswordResetTest.php
-- Illuminate\Database\Migrations\Migration
+- Illuminate\Database\Schema\Blueprint
 - DatabaseSeeder.php
+- UsersManager
 - Illuminate\Support\Facades\Schema
 - Ally/navigation.blade.php
 - Route
 - routes-manager.blade.php
 - package-create.blade.php
 - Ally/dashboard.blade.php
+- PackageCreate
 - Driver/dashboard.blade.php
 
 ## God Nodes (most connected - your core abstractions)
 1. `User` - 76 edges
-2. `Package` - 35 edges
-3. `Route` - 35 edges
+2. `Route` - 35 edges
+3. `Package` - 34 edges
 4. `Ally` - 31 edges
 5. `RouteService` - 29 edges
 6. `RoutesManager` - 23 edges
-7. `TariffService` - 21 edges
-8. `TestCase` - 20 edges
-9. `RouteStop` - 18 edges
+7. `TestCase` - 20 edges
+8. `RouteStop` - 18 edges
+9. `TariffService` - 18 edges
 10. `UsersManager` - 17 edges
 
 ## Surprising Connections (you probably didn't know these)
-- `TariffService` --references--> `BcvRateService`  [EXTRACTED]
-  app/Services/TariffService.php → app/Services/BcvRateService.php
-- `TariffService` --references--> `DistanceApiService`  [EXTRACTED]
-  app/Services/TariffService.php → app/Services/DistanceApiService.php
-- `RouteService` --references--> `PackageService`  [EXTRACTED]
-  app/Services/RouteService.php → app/Services/PackageService.php
 - `AuthenticationTest` --inherits--> `TestCase`  [EXTRACTED]
   tests/Feature/Auth/AuthenticationTest.php → tests/TestCase.php
 - `EmailVerificationTest` --inherits--> `TestCase`  [EXTRACTED]
   tests/Feature/Auth/EmailVerificationTest.php → tests/TestCase.php
+- `PasswordResetTest` --inherits--> `TestCase`  [EXTRACTED]
+  tests/Feature/Auth/PasswordResetTest.php → tests/TestCase.php
+- `ProfileTest` --inherits--> `TestCase`  [EXTRACTED]
+  tests/Feature/ProfileTest.php → tests/TestCase.php
+- `UserAuthorizationTest` --inherits--> `TestCase`  [EXTRACTED]
+  tests/Unit/UserAuthorizationTest.php → tests/TestCase.php
 
 ## Import Cycles
 - None detected.
 
-## Communities (140 total, 18 thin omitted)
+## Communities (141 total, 20 thin omitted)
 
 ### Community 0 - "TestCase"
 Cohesion: 0.16
@@ -102,7 +104,7 @@ Nodes (8): Illuminate\Foundation\Testing\RefreshDatabase, Illuminate\Foundation\
 
 ### Community 2 - "Illuminate\Database\Eloquent\Factories\HasFactory"
 Cohesion: 0.06
-Nodes (13): AllyUser, Customer, Incident, PackageHistory, AllyUserService, IncidentService, Illuminate\Database\Eloquent\Factories\HasFactory, Illuminate\Database\Eloquent\Model (+5 more)
+Nodes (15): AllyUser, App\Models\Customer, Customer, Incident, App\Models\Package, PackageHistory, AllyUserService, IncidentService (+7 more)
 
 ### Community 3 - "composer.json"
 Cohesion: 0.05
@@ -169,8 +171,8 @@ Cohesion: 0.25
 Nodes (7): closeCreateModal, createUser, deleteUser, openCreateModal, requestDelete({{ $user->id }}), $set(, toggleStatus({{ $user->id }})
 
 ### Community 72 - "Package"
-Cohesion: 0.05
-Nodes (8): RateMatrixManager, CreatePackage, PackageCreate, Package, RateMatrix, PackageService, TariffService, Livewire\Attributes\Computed
+Cohesion: 0.07
+Nodes (8): RateMatrixManager, CreatePackage, Package, RateMatrix, PackageService, TariffService, Illuminate\Support\Facades\Route, Livewire\Attributes\Computed
 
 ### Community 76 - "graphify reference: query, path, explain"
 Cohesion: 0.33
@@ -189,8 +191,8 @@ Cohesion: 0.50
 Nodes (3): For --cluster-only, For --update (incremental re-extraction), graphify reference: incremental update and cluster-only
 
 ### Community 84 - "Ally"
-Cohesion: 0.06
-Nodes (16): AlliesManager, BcvRateManager, Dashboard, UsersManager, Dashboard, Dashboard, Ally, AuditLog (+8 more)
+Cohesion: 0.08
+Nodes (13): AlliesManager, BcvRateManager, Dashboard, Dashboard, Dashboard, Ally, BcvRate, Illuminate\Support\Facades\Hash (+5 more)
 
 ### Community 86 - "rate-matrix-manager.blade.php"
 Cohesion: 0.50
@@ -222,30 +224,30 @@ Nodes (3): DatabaseSeeder, Illuminate\Database\Console\Seeds\WithoutModelEvents,
 
 ### Community 113 - "Route"
 Cohesion: 0.06
-Nodes (11): RoutesDashboard, RoutesManager, Driver, Route, RouteStop, RouteService, VenezuelaLocationService, Illuminate\Database\Eloquent\Collection (+3 more)
+Nodes (12): RoutesDashboard, RoutesManager, Driver, Route, RouteStop, App\Services\PackageService, RouteService, VenezuelaLocationService (+4 more)
 
 ### Community 115 - "routes-manager.blade.php"
 Cohesion: 0.11
 Nodes (17): assignDriver, cancelBuilder, cancelRoute({{ $route->id }}), completeRoute({{ $route->id }}), duplicateRoute({{ $route->id }}), editRoute({{ $route->id }}), moveStopDown({{ $index }}), moveStopUp({{ $index }}) (+9 more)
 
 ## Knowledge Gaps
-- **173 isolated node(s):** `$schema`, `name`, `type`, `description`, `laravel` (+168 more)
+- **173 isolated node(s):** `registerAnother`, `calculatePrice`, `API / Backend`, `Architecture Navigation`, `Authentication and Authorization` (+168 more)
   These have ≤1 connection - possible missing edges or undocumented components.
-- **18 thin communities (<3 nodes) omitted from report** — run `graphify query` to explore isolated nodes.
+- **20 thin communities (<3 nodes) omitted from report** — run `graphify query` to explore isolated nodes.
 
 ## Suggested Questions
 _Questions this graph is uniquely positioned to answer:_
 
-- **Why does `User` connect `User` to `TestCase`, `Illuminate\Database\Eloquent\Factories\HasFactory`, `.isAdmin`, `DatabaseSeeder.php`, `CityDistance`, `Ally`, `AuthenticationTest`, `EmailVerificationTest.php`, `PasswordResetTest.php`?**
+- **Why does `User` connect `User` to `TestCase`, `Illuminate\Database\Eloquent\Factories\HasFactory`, `.isAdmin`, `DatabaseSeeder.php`, `UsersManager`, `CityDistance`, `Ally`, `AuthenticationTest`, `EmailVerificationTest.php`, `PasswordResetTest.php`?**
   _High betweenness centrality (0.129) - this node is a cross-community bridge._
-- **Why does `Package` connect `Package` to `Route`, `Illuminate\Database\Eloquent\Factories\HasFactory`, `Ally`?**
-  _High betweenness centrality (0.034) - this node is a cross-community bridge._
-- **Why does `Ally` connect `Ally` to `Illuminate\Database\Eloquent\Factories\HasFactory`, `.isAdmin`, `Package`, `Route`, `User`?**
+- **Why does `Ally` connect `Ally` to `Illuminate\Database\Eloquent\Factories\HasFactory`, `.isAdmin`, `UsersManager`, `Package`, `Route`, `User`?**
   _High betweenness centrality (0.033) - this node is a cross-community bridge._
-- **What connects `$schema`, `name`, `type` to the rest of the system?**
+- **Why does `Package` connect `Package` to `Route`, `Illuminate\Database\Eloquent\Factories\HasFactory`, `Ally`, `PackageCreate`?**
+  _High betweenness centrality (0.032) - this node is a cross-community bridge._
+- **What connects `registerAnother`, `calculatePrice`, `API / Backend` to the rest of the system?**
   _173 weakly-connected nodes found - possible documentation gaps or missing edges._
 - **Should `Illuminate\Database\Eloquent\Factories\HasFactory` be split into smaller, more focused modules?**
-  _Cohesion score 0.060109289617486336 - nodes in this community are weakly interconnected._
+  _Cohesion score 0.061581920903954805 - nodes in this community are weakly interconnected._
 - **Should `composer.json` be split into smaller, more focused modules?**
   _Cohesion score 0.045454545454545456 - nodes in this community are weakly interconnected._
 - **Should `What You Must Do When Invoked` be split into smaller, more focused modules?**
