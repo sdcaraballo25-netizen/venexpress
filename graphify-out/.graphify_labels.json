@@ -1,6 +1,6 @@
 {
   "0": "TestCase",
-  "1": "Illuminate\\Database\\Schema\\Blueprint",
+  "1": "Illuminate\\Database\\Migrations\\Migration",
   "2": "Illuminate\\Database\\Eloquent\\Factories\\HasFactory",
   "3": "composer.json",
   "4": "allies-manager.blade.php",
@@ -99,9 +99,9 @@
   "97": "0001_01_01_000002_create_jobs_table.php",
   "98": ".isAdmin",
   "99": "2026_08_21_000002_add_extra_pricing_fields_to_packages_table.php",
-  "100": "Illuminate\\Database\\Migrations\\Migration",
+  "100": "Illuminate\\Database\\Schema\\Blueprint",
   "101": "DatabaseSeeder.php",
-  "102": "2026_08_08_232920_create_drivers_table.php",
+  "102": "UsersManager",
   "103": "2026_08_24_090000_add_latitude_longitude_to_allies_table.php",
   "104": "0001_01_01_000001_create_cache_table.php",
   "105": "2026_08_25_000003_create_incidents_table.php",
@@ -134,9 +134,10 @@
   "132": "layout/admin.blade.php",
   "133": "Ally/dashboard.blade.php",
   "134": "2026_08_26_000003_upgrade_bcv_rates_for_api.php",
-  "135": "tailwindcss",
+  "135": "PackageCreate",
   "136": "2026_08_26_020000_create_customers_table.php",
   "137": "Driver/dashboard.blade.php",
   "138": "venezuela.php",
-  "139": "client/dashboard.blade.php"
+  "139": "client/dashboard.blade.php",
+  "140": "2026_08_08_232921_create_bcv_rates_table.php"
 }

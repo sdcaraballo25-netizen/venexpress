@@ -13,6 +13,7 @@ use App\Livewire\Admin\RoutesDashboard;
 use App\Livewire\Ally\Dashboard as AllyDashboard;
 use App\Livewire\Ally\CreatePackage;
 use App\Livewire\Ally\PackageCreate as AllyPackageCreate;
+use App\Livewire\Ally\Commissions as AllyCommissions;
 use App\Livewire\Driver\Dashboard as DriverDashboard;
 
 
@@ -59,6 +60,9 @@ Route::prefix('ally')
     ->group(function () {
         Route::get('/dashboard', AllyDashboard::class)->name('dashboard');
         Route::get('/pedidos/nuevo', AllyPackageCreate::class)->name('packages.create');
+        Route::get('/comisiones', AllyCommissions::class)
+            ->middleware('role:aliado')
+            ->name('commissions');
 
         // Próximas pantallas se agregan aquí:
         // Route::get('/paquetes/recepcion', ...)->name('packages.receive');
@@ -66,7 +70,6 @@ Route::prefix('ally')
         // Route::get('/taquillas', ...)->name('staff'); // solo Administrador
         // Route::get('/cod', ...)->name('cod');           // solo Administrador
         // Route::get('/incidencias', ...)->name('incidents'); // solo Administrador
-        // Route::get('/comisiones', ...)->name('commissions'); // solo Administrador
         // Route::get('/historial-financiero', ...)->name('financial-history'); // solo Administrador
     });
 
