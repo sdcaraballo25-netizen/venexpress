@@ -2,6 +2,7 @@
 
 namespace App\Livewire\Ally;
 
+use App\Models\Customer;
 use App\Models\Package;
 use App\Services\PackageService;
 use App\Services\TariffService;
@@ -49,12 +50,23 @@ class PackageCreate extends Component
     public bool $is_cod = false;
     public ?float $cod_amount_usd = null;
 
+    // Autocompletado de clientes por cédula/RIF
+    public bool $senderCustomerFound = false;
+    public bool $recipientCustomerFound = false;
+
     // Resultado tras registrar
     public ?string $createdTrackingNumber = null;
     public ?float $createdTotalUsd = null;
     public ?float $createdTotalVes = null;
     public ?float $createdDistanceKm = null;
     public ?float $createdDeliveryFeeUsd = null;
+
+    /**
+     * Copia de todos los datos ingresados, tomada justo antes de
+     * limpiar el formulario (resetForm), para poder imprimir la
+     * guía completa aun después de que el formulario se vacíe.
+     */
+    public array $printSnapshot = [];
 
     /**
      * Vista previa de tarifa, recalculada en vivo mientras se llena
@@ -156,6 +168,52 @@ class PackageCreate extends Component
             // Si es cobro contra entrega, no se define método de pago en taquilla.
             $this->payment_method = $this->is_cod ? '' : $this->payment_method;
         }
+
+        if ($property === 'sender_id_doc') {
+            $this->autofillCustomer('sender');
+        }
+
+        if ($property === 'recipient_id_doc') {
+            $this->autofillCustomer('recipient');
+        }
+    }
+
+    /**
+     * Busca un cliente ya registrado por su cédula/RIF y, si existe,
+     * autocompleta su nombre y teléfono. No sobrescribe nada si la
+     * cédula no coincide con ningún cliente (para permitir clientes
+     * nuevos sin fricción).
+     */
+    protected function autofillCustomer(string $prefix): void
+    {
+        $idDoc = trim($prefix === 'sender' ? $this->sender_id_doc : $this->recipient_id_doc);
+        $foundProperty = $prefix === 'sender' ? 'senderCustomerFound' : 'recipientCustomerFound';
+
+        // Evita consultar la BD con cada tecla cuando aún no hay
+        // suficientes caracteres para una cédula/RIF real.
+        if (strlen($idDoc) < 5) {
+            $this->$foundProperty = false;
+
+            return;
+        }
+
+        $customer = Customer::where('id_doc', $idDoc)->first();
+
+        if (! $customer) {
+            $this->$foundProperty = false;
+
+            return;
+        }
+
+        $this->$foundProperty = true;
+
+        if ($prefix === 'sender') {
+            $this->sender_name = $customer->name;
+            $this->sender_phone = $customer->phone;
+        } else {
+            $this->recipient_name = $customer->name;
+            $this->recipient_phone = $customer->phone;
+        }
     }
 
     public function calculatePrice(TariffService $tariffService): void
@@ -216,6 +274,19 @@ class PackageCreate extends Component
 
         $ally = auth()->user()->resolveAlly();
 
+        // Registramos o actualizamos al remitente y destinatario como
+        // clientes conocidos, para que la próxima vez que se use su
+        // cédula/RIF se autocompleten sus datos.
+        Customer::updateOrCreate(
+            ['id_doc' => $this->sender_id_doc],
+            ['name' => $this->sender_name, 'phone' => $this->sender_phone],
+        );
+
+        Customer::updateOrCreate(
+            ['id_doc' => $this->recipient_id_doc],
+            ['name' => $this->recipient_name, 'phone' => $this->recipient_phone],
+        );
+
         $package = $packageService->createPackage([
             ...$data,
             'ally_id' => $ally->id,
@@ -229,6 +300,36 @@ class PackageCreate extends Component
         $this->createdDistanceKm = isset($package->distance_km) ? (float) $package->distance_km : ($this->pricePreview['distance_km'] ?? null);
         $this->createdDeliveryFeeUsd = isset($package->delivery_fee_usd) ? (float) $package->delivery_fee_usd : ($this->pricePreview['delivery_fee_usd'] ?? 0);
 
+        // Snapshot completo para el comprobante imprimible, tomado
+        // antes de vaciar el formulario en resetForm().
+        $this->printSnapshot = [
+            'sender_name' => $this->sender_name,
+            'sender_id_doc' => $this->sender_id_doc,
+            'sender_phone' => $this->sender_phone,
+            'recipient_name' => $this->recipient_name,
+            'recipient_id_doc' => $this->recipient_id_doc,
+            'recipient_phone' => $this->recipient_phone,
+            'origin_city' => $this->origin_city,
+            'origin_state' => $this->origin_state,
+            'destination_state' => $this->destination_state,
+            'destination_city' => $this->destination_city,
+            'package_type' => $this->package_type,
+            'physical_weight_kg' => $this->physical_weight_kg,
+            'length_cm' => $this->length_cm,
+            'width_cm' => $this->width_cm,
+            'height_cm' => $this->height_cm,
+            'is_fragile' => $this->is_fragile,
+            'has_insurance' => $this->has_insurance,
+            'declared_value_usd' => $this->declared_value_usd,
+            'requires_delivery' => $this->requires_delivery,
+            'delivery_address' => $this->delivery_address,
+            'delivery_sector' => $this->delivery_sector,
+            'delivery_reference' => $this->delivery_reference,
+            'is_cod' => $this->is_cod,
+            'payment_method' => $this->payment_method,
+            'cod_amount_usd' => $this->cod_amount_usd,
+        ];
+
         $this->dispatch('package-created', trackingNumber: $package->tracking_number);
 
         $this->resetForm();
@@ -241,6 +342,24 @@ class PackageCreate extends Component
         $this->createdTotalVes = null;
         $this->createdDistanceKm = null;
         $this->createdDeliveryFeeUsd = null;
+        $this->printSnapshot = [];
+    }
+
+    /**
+     * Etiquetas legibles para los métodos de pago, usadas también
+     * en el comprobante imprimible.
+     *
+     * @return array<string, string>
+     */
+    public static function paymentMethodLabels(): array
+    {
+        return [
+            'efectivo_usd' => 'Efectivo (USD)',
+            'efectivo_ves' => 'Efectivo (VES)',
+            'pago_movil' => 'Pago móvil',
+            'transferencia' => 'Transferencia',
+            'zelle' => 'Zelle',
+        ];
     }
 
     protected function resetForm(): void
@@ -255,6 +374,7 @@ class PackageCreate extends Component
             'physical_weight_kg', 'length_cm', 'width_cm', 'height_cm',
             'is_fragile', 'has_insurance', 'declared_value_usd',
             'payment_method', 'is_cod', 'cod_amount_usd',
+            'senderCustomerFound', 'recipientCustomerFound',
         ]);
 
         $this->package_type = Package::TYPE_PAQUETE;
