@@ -13,6 +13,7 @@ use App\Livewire\Admin\RoutesDashboard;
 use App\Livewire\Ally\Dashboard as AllyDashboard;
 use App\Livewire\Ally\CreatePackage;
 use App\Livewire\Ally\PackageCreate as AllyPackageCreate;
+use App\Livewire\Driver\Dashboard as DriverDashboard;
 
 
 
@@ -37,16 +38,14 @@ Route::view('profile', 'profile')
     ->name('profile');
 
     Route::get('/cliente/dashboard', function () {
-    return view('cliente.dashboard');
+    return view('Livewire.client.dashboard');
 })
     ->middleware(['auth', 'verified', 'role:cliente'])
     ->name('cliente.dashboard');
 
 
-Route::get('/repartidor/dashboard', function () {
-    return view('repartidor.dashboard');
-})
-    ->middleware(['auth', 'verified', 'role:chofer'])
+Route::get('/repartidor/dashboard', DriverDashboard::class)
+    ->middleware(['auth', 'verified', 'role:repartidor'])
     ->name('repartidor.dashboard');
 
 

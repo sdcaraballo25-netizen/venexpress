@@ -58,7 +58,7 @@ class Dashboard extends Component
             ->limit(5)
             ->get();
 
-        return view('Livewire.driver.dashboard', [
+        return view('Livewire.Driver.Dashboard', [
             'assignedCount' => $assignedCount,
             'pendingCount' => $pendingCount,
             'deliveredCount' => $deliveredCount,
