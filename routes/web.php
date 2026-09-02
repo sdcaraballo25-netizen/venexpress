@@ -61,6 +61,10 @@ Route::get('/repartidor/paquetes/{packageId}', \App\Livewire\Driver\PackageDetai
     ->middleware(['auth', 'verified', 'role:repartidor'])
     ->name('repartidor.package-detail');
 
+Route::post('/repartidor/verificar-guia', [\App\Http\Controllers\DriverScanController::class, 'verify'])
+    ->middleware(['auth', 'verified', 'role:repartidor'])
+    ->name('repartidor.scan.verify');
+
 
 Route::prefix('ally')
     ->middleware(['auth', 'verified', 'role:aliado,aliado_taquilla'])

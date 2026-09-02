@@ -17,6 +17,15 @@ class Scanner extends Component
 
     public ?string $errorMessage = null;
 
+    /**
+     * true si la guía tiene código de seguridad pero éste ya no
+     * coincide con los datos actuales (posible alteración en el
+     * sistema). No aplica a guías creadas antes de este campo.
+     */
+    public bool $securityWarning = false;
+
+    public ?string $securityMessage = null;
+
    /**
  * Busca una guía manualmente.
  *
@@ -29,6 +38,8 @@ class Scanner extends Component
         $this->reset([
             'package',
             'errorMessage',
+            'securityWarning',
+            'securityMessage',
         ]);
 
         $this->trackingNumber = trim(
@@ -104,6 +115,7 @@ class Scanner extends Component
              * Si ya pertenece al repartidor actual,
              * simplemente mostramos el paquete.
              */
+            $this->checkSecurity($package);
             $this->package = $package->fresh();
 
             return;
@@ -156,6 +168,7 @@ class Scanner extends Component
                 'ally',
             ]);
 
+            $this->checkSecurity($package);
             $this->package = $package;
 
             $this->errorMessage = null;
@@ -190,6 +203,38 @@ class Scanner extends Component
     }
 
     /**
+     * Verifica el código de seguridad de la guía y actualiza las
+     * propiedades de advertencia. No bloquea el escaneo: solo deja
+     * una alerta visible para que el repartidor/agencia decida si
+     * continúa o reporta una incidencia.
+     *
+     * Las guías creadas antes de este campo (security_hash null)
+     * no se consideran alteradas, simplemente no verificables.
+     */
+    protected function checkSecurity(Package $package): void
+    {
+        if (! $package->security_hash) {
+            $this->securityWarning = false;
+            $this->securityMessage = null;
+
+            return;
+        }
+
+        if ($package->verifySecurityHash()) {
+            $this->securityWarning = false;
+            $this->securityMessage = null;
+
+            return;
+        }
+
+        $this->securityWarning = true;
+        $this->securityMessage =
+            'Los datos de esta guía no coinciden con su código de '
+            . 'seguridad original. Verifica manualmente antes de '
+            . 'continuar (posible alteración o guía duplicada).';
+    }
+
+    /**
      * Limpia la búsqueda actual.
      */
     public function clearSearch(): void
@@ -198,6 +243,8 @@ class Scanner extends Component
             'trackingNumber',
             'package',
             'errorMessage',
+            'securityWarning',
+            'securityMessage',
         ]);
     }
 

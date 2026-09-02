@@ -22,11 +22,17 @@
                         width: 160,
                         height: 160,
                     });
-                    document.getElementById('qr-canvas-print').innerHTML = '';
-                    new QRCode(document.getElementById('qr-canvas-print'), {
+                    document.getElementById('qr-canvas-invoice').innerHTML = '';
+                    new QRCode(document.getElementById('qr-canvas-invoice'), {
                         text: '{{ $createdTrackingNumber }}',
-                        width: 120,
-                        height: 120,
+                        width: 170,
+                        height: 170,
+                    });
+                    document.getElementById('qr-canvas-label').innerHTML = '';
+                    new QRCode(document.getElementById('qr-canvas-label'), {
+                        text: '{{ $createdTrackingNumber }}',
+                        width: 260,
+                        height: 260,
                     });
                 });
             "
@@ -73,10 +79,25 @@
                     <div class="mt-4 flex flex-wrap gap-3 justify-center sm:justify-start">
                         <button
                             type="button"
-                            onclick="window.print()"
+                            onclick="
+                                document.body.setAttribute('data-print-target', 'invoice');
+                                document.getElementById('dynamic-page-size').textContent = '@page { size: 80mm auto; margin: 3mm; }';
+                                window.print();
+                            "
                             class="rounded-xl border border-blue-900 px-4 py-2 text-sm font-medium text-blue-900"
                         >
-                            Imprimir guía
+                            Imprimir factura cliente (tickera 80mm)
+                        </button>
+                        <button
+                            type="button"
+                            onclick="
+                                document.body.setAttribute('data-print-target', 'label');
+                                document.getElementById('dynamic-page-size').textContent = '@page { size: auto; margin: 10mm; }';
+                                window.print();
+                            "
+                            class="rounded-xl border border-blue-900 px-4 py-2 text-sm font-medium text-blue-900"
+                        >
+                            Imprimir etiqueta paquete (impresora normal)
                         </button>
                         <button
                             wire:click="registerAnother"
@@ -85,111 +106,153 @@
                             Registrar otro pedido
                         </button>
                     </div>
+
+                    <style id="dynamic-page-size"></style>
                 </div>
             </div>
         </div>
 
-        {{-- COMPROBANTE IMPRIMIBLE — oculto en pantalla, forzado a visible al imprimir --}}
-        {{-- Usamos display:none inline + CSS puro (no depende de que Tailwind
-             haya compilado las clases print:*), para que funcione aunque los
-             assets no se hayan recompilado todavía. --}}
-        <div id="printable-guide" style="display:none;" wire:key="print-{{ $createdTrackingNumber }}">
-            <div style="display:flex;align-items:flex-start;justify-content:space-between;border-bottom:3px solid #000;padding-bottom:10px;margin-bottom:14px;">
-                <div>
-                    <p style="font-size:20px;font-weight:700;margin:0;">Venexpress</p>
-                    <p style="font-size:11px;margin:2px 0 0;">Comprobante de envío / Guía</p>
-                    @if ($ally = auth()->user()->resolveAlly())
-                        <p style="font-size:11px;margin:2px 0 0;">Agencia: {{ $ally->name ?? '' }}</p>
-                    @endif
-                </div>
-                <div style="text-align:right;">
-                    <p style="font-size:20px;font-weight:700;margin:0;">{{ $createdTrackingNumber }}</p>
-                    <p style="font-size:11px;margin:2px 0 0;">{{ now()->format('d/m/Y H:i') }}</p>
-                </div>
+        {{-- ======================================================= --}}
+        {{-- DOCUMENTO 1: FACTURA / COMPROBANTE PARA EL CLIENTE       --}}
+        {{-- Oculto en pantalla; solo se muestra cuando data-print-target="invoice" --}}
+        {{-- ======================================================= --}}
+        <div id="printable-invoice" style="display:none; width:100%; max-width:76mm; margin:0 auto; font-family: Arial, sans-serif; color:#000;" wire:key="invoice-{{ $createdTrackingNumber }}">
+
+            <div style="text-align:center;border-bottom:1px dashed #000;padding-bottom:8px;margin-bottom:8px;">
+                <p style="font-size:18px;font-weight:700;margin:0;">VENEXPRESS</p>
+                @if ($ally = auth()->user()->resolveAlly())
+                    <p style="font-size:11px;margin:2px 0 0;">{{ $ally->business_name ?? ($ally->name ?? '') }}</p>
+                    <p style="font-size:11px;margin:0;">{{ $ally->address ?? '' }}</p>
+                    <p style="font-size:11px;margin:0;">{{ $ally->city ?? '' }}</p>
+                @endif
             </div>
 
-            <div id="qr-canvas-print" wire:ignore style="margin-bottom:14px;"></div>
-
-            <div style="display:grid;grid-template-columns:1fr 1fr;gap:16px;margin-bottom:14px;">
-                <div>
-                    <p style="font-size:11px;font-weight:700;text-transform:uppercase;border-bottom:1px solid #000;margin:0 0 4px;">Remitente</p>
-                    <p style="margin:0;">{{ $printSnapshot['sender_name'] ?? '' }}</p>
-                    <p style="margin:0;">C.I./RIF: {{ $printSnapshot['sender_id_doc'] ?? '' }}</p>
-                    <p style="margin:0;">Tel: {{ $printSnapshot['sender_phone'] ?? '' }}</p>
-                </div>
-                <div>
-                    <p style="font-size:11px;font-weight:700;text-transform:uppercase;border-bottom:1px solid #000;margin:0 0 4px;">Destinatario</p>
-                    <p style="margin:0;">{{ $printSnapshot['recipient_name'] ?? '' }}</p>
-                    <p style="margin:0;">C.I./RIF: {{ $printSnapshot['recipient_id_doc'] ?? '' }}</p>
-                    <p style="margin:0;">Tel: {{ $printSnapshot['recipient_phone'] ?? '' }}</p>
-                </div>
+            <div style="text-align:center;border-bottom:1px dashed #000;padding-bottom:8px;margin-bottom:8px;">
+                <p style="font-size:13px;font-weight:700;margin:0;">Guía: {{ $createdTrackingNumber }}</p>
+                <p style="font-size:11px;margin:2px 0 0;">{{ now()->format('d/m/Y H:i') }}</p>
             </div>
 
-            <div style="display:grid;grid-template-columns:1fr 1fr;gap:16px;margin-bottom:14px;">
-                <div>
-                    <p style="font-size:11px;font-weight:700;text-transform:uppercase;border-bottom:1px solid #000;margin:0 0 4px;">Origen</p>
-                    <p style="margin:0;">{{ $printSnapshot['origin_city'] ?? '' }}{{ ! empty($printSnapshot['origin_state']) ? ', ' . $printSnapshot['origin_state'] : '' }}</p>
-                </div>
-                <div>
-                    <p style="font-size:11px;font-weight:700;text-transform:uppercase;border-bottom:1px solid #000;margin:0 0 4px;">Destino</p>
-                    <p style="margin:0;">{{ $printSnapshot['destination_city'] ?? '' }}{{ ! empty($printSnapshot['destination_state']) ? ', ' . $printSnapshot['destination_state'] : '' }}</p>
-                </div>
+            <div style="text-align:center;border-bottom:1px dashed #000;padding:8px 0;margin-bottom:10px;">
+                <p style="font-size:16px;font-weight:700;margin:0;text-transform:uppercase;">
+                    Envío {{ ucfirst($printSnapshot['package_type'] ?? '') }}
+                </p>
             </div>
 
-            @if (! empty($printSnapshot['requires_delivery']))
-                <div style="margin-bottom:14px;">
-                    <p style="font-size:11px;font-weight:700;text-transform:uppercase;border-bottom:1px solid #000;margin:0 0 4px;">Entrega a domicilio</p>
-                    <p style="margin:0;">{{ $printSnapshot['delivery_address'] ?? '' }}</p>
-                    <p style="margin:0;">{{ $printSnapshot['delivery_sector'] ?? '' }}</p>
+            <div style="text-align:center;margin-bottom:10px;">
+                <div id="qr-canvas-invoice" wire:ignore style="display:flex;justify-content:center;"></div>
+            </div>
+
+            <div style="text-align:center;border-bottom:1px dashed #000;padding-bottom:10px;margin-bottom:10px;">
+                <p style="font-size:20px;font-weight:700;margin:0;text-transform:uppercase;line-height:1.2;">
+                    {{ $printSnapshot['destination_city'] ?? '' }}
+                </p>
+                <p style="font-size:13px;margin:2px 0 0;">
+                    {{ $printSnapshot['destination_state'] ?? '' }}
+                </p>
+            </div>
+
+            <div style="text-align:center;border-bottom:1px dashed #000;padding:6px 0;margin-bottom:10px;">
+                <p style="font-size:13px;font-weight:700;margin:0;">
+                    {{ ! empty($printSnapshot['requires_delivery']) ? 'ENTREGA A DOMICILIO' : 'RETIRO EN AGENCIA' }}
+                </p>
+            </div>
+
+            <div style="font-size:12px;line-height:1.5;margin-bottom:10px;">
+                @if (! empty($printSnapshot['requires_delivery']))
+                    <p style="margin:2px 0;"><strong>Dirección:</strong> {{ $printSnapshot['delivery_address'] ?? '' }}</p>
+                    <p style="margin:2px 0;"><strong>Sector:</strong> {{ $printSnapshot['delivery_sector'] ?? '' }}</p>
                     @if (! empty($printSnapshot['delivery_reference']))
-                        <p style="margin:0;">Referencia: {{ $printSnapshot['delivery_reference'] }}</p>
+                        <p style="margin:2px 0;"><strong>Referencia:</strong> {{ $printSnapshot['delivery_reference'] }}</p>
                     @endif
-                </div>
-            @else
-                <div style="margin-bottom:14px;">
-                    <p style="font-size:11px;font-weight:700;text-transform:uppercase;border-bottom:1px solid #000;margin:0 0 4px;">Entrega</p>
-                    <p style="margin:0;">Retiro en agencia destino</p>
-                </div>
+                @endif
+
+                <p style="margin:8px 0 2px;">
+                    <strong>Destinatario:</strong> {{ $printSnapshot['recipient_name'] ?? '' }}
+                    ({{ $printSnapshot['recipient_id_doc'] ?? '' }})
+                </p>
+                <p style="margin:2px 0;">
+                    <strong>Teléfono:</strong> {{ $printSnapshot['recipient_phone'] ?? '' }}
+                </p>
+            </div>
+
+            <div style="border-top:1px dashed #000;padding-top:8px;margin-bottom:10px;font-size:13px;text-align:center;">
+                @if (! empty($printSnapshot['is_cod']))
+                    <p style="font-weight:700;margin:0;">
+                        COBRO CONTRA ENTREGA (COD)
+                    </p>
+                    <p style="font-weight:700;margin:2px 0 0;font-size:16px;">
+                        ${{ number_format($printSnapshot['cod_amount_usd'] ?? 0, 2) }}
+                    </p>
+                @else
+                    <p style="font-weight:700;margin:0;">
+                        PAGADO
+                    </p>
+                    <p style="margin:2px 0 0;">
+                        ${{ number_format($createdTotalUsd ?? 0, 2) }} / Bs. {{ number_format($createdTotalVes ?? 0, 2) }}
+                    </p>
+                    <p style="margin:2px 0 0;">
+                        {{ \App\Livewire\Ally\PackageCreate::paymentMethodLabels()[$printSnapshot['payment_method'] ?? ''] ?? '—' }}
+                    </p>
+                @endif
+            </div>
+
+            <div style="text-align:center;font-size:11px;border-top:1px dashed #000;padding-top:8px;">
+                <p style="margin:0;">¡Gracias por preferir Venexpress!</p>
+            </div>
+        </div>
+
+        {{-- ======================================================= --}}
+        {{-- DOCUMENTO 2: ETIQUETA PARA PEGAR EN EL PAQUETE FÍSICO    --}}
+        {{-- Oculto en pantalla; solo se muestra cuando data-print-target="label" --}}
+        {{-- ======================================================= --}}
+        <div id="printable-label" style="display:none;" wire:key="label-{{ $createdTrackingNumber }}">
+            <div style="display:flex;justify-content:space-between;align-items:flex-start;border-bottom:3px solid #000;padding-bottom:6px;margin-bottom:10px;">
+                <p style="font-size:20px;font-weight:700;margin:0;">VENEXPRESS</p>
+                <p style="font-size:20px;font-weight:700;margin:0;">{{ $createdTrackingNumber }}</p>
+            </div>
+
+            <p style="margin:3px 0;font-size:13px;"><strong>Remitente:</strong> {{ $printSnapshot['sender_name'] ?? '' }}</p>
+            <p style="margin:3px 0;font-size:13px;">
+                <strong>Origen:</strong> {{ $printSnapshot['origin_city'] ?? '' }}{{ ! empty($printSnapshot['origin_state']) ? ', ' . $printSnapshot['origin_state'] : '' }}
+            </p>
+            <p style="margin:3px 0;font-size:13px;">
+                <strong>Destinatario:</strong> {{ $printSnapshot['recipient_name'] ?? '' }} (Tel. {{ $printSnapshot['recipient_phone'] ?? '' }})
+            </p>
+            <p style="margin:3px 0;font-size:13px;">
+                <strong>Destino:</strong>
+                @if (! empty($printSnapshot['requires_delivery']))
+                    {{ $printSnapshot['delivery_address'] ?? '' }} — {{ $printSnapshot['delivery_sector'] ?? '' }},
+                @else
+                    Retiro en agencia,
+                @endif
+                {{ $printSnapshot['destination_city'] ?? '' }}{{ ! empty($printSnapshot['destination_state']) ? ', ' . $printSnapshot['destination_state'] : '' }}
+            </p>
+
+            <div style="display:flex;justify-content:center;margin:20px 0;">
+                <div id="qr-canvas-label" wire:ignore style="display:flex;justify-content:center;"></div>
+            </div>
+
+            <div style="display:flex;justify-content:space-between;font-size:13px;border-top:1px solid #000;padding-top:6px;">
+                <span>{{ now()->format('d/m/Y') }}</span>
+                <span>Peso: {{ $printSnapshot['physical_weight_kg'] ?? '' }} Kg.</span>
+                <span style="font-weight:700;text-transform:uppercase;">{{ $printSnapshot['package_type'] ?? '' }}</span>
+            </div>
+
+            @if (! empty($printSnapshot['is_fragile']))
+                <p style="text-align:center;font-weight:700;margin-top:10px;font-size:14px;">⚠ FRÁGIL</p>
             @endif
 
-            <div style="display:grid;grid-template-columns:1fr 1fr;gap:16px;margin-bottom:14px;">
-                <div>
-                    <p style="font-size:11px;font-weight:700;text-transform:uppercase;border-bottom:1px solid #000;margin:0 0 4px;">Paquete</p>
-                    <p style="margin:0;">Tipo: {{ ucfirst($printSnapshot['package_type'] ?? '') }}</p>
-                    <p style="margin:0;">Peso: {{ $printSnapshot['physical_weight_kg'] ?? '' }} kg</p>
-                    @if (($printSnapshot['package_type'] ?? '') !== 'sobre' && ($printSnapshot['length_cm'] || $printSnapshot['width_cm'] || $printSnapshot['height_cm']))
-                        <p style="margin:0;">
-                            Dimensiones: {{ $printSnapshot['length_cm'] ?? '—' }} x {{ $printSnapshot['width_cm'] ?? '—' }} x {{ $printSnapshot['height_cm'] ?? '—' }} cm
-                        </p>
-                    @endif
-                    @if (! empty($printSnapshot['is_fragile']))
-                        <p style="margin:0;font-weight:700;">⚠ FRÁGIL</p>
-                    @endif
-                    @if (! empty($printSnapshot['has_insurance']))
-                        <p style="margin:0;">Asegurado — valor declarado: ${{ number_format($printSnapshot['declared_value_usd'] ?? 0, 2) }}</p>
-                    @endif
-                </div>
-                <div>
-                    <p style="font-size:11px;font-weight:700;text-transform:uppercase;border-bottom:1px solid #000;margin:0 0 4px;">Cobro</p>
-                    @if (! empty($printSnapshot['is_cod']))
-                        <p style="margin:0;font-weight:700;">COBRO CONTRA ENTREGA (COD)</p>
-                        <p style="margin:0;">Monto a cobrar en destino: ${{ number_format($printSnapshot['cod_amount_usd'] ?? 0, 2) }}</p>
-                    @else
-                        <p style="margin:0;font-weight:700;">PAGADO EN AGENCIA DE ORIGEN</p>
-                        <p style="margin:0;">Método: {{ \App\Livewire\Ally\PackageCreate::paymentMethodLabels()[$printSnapshot['payment_method'] ?? ''] ?? '—' }}</p>
-                    @endif
-                </div>
-            </div>
+            @if (! empty($printSnapshot['is_cod']))
+                <p style="text-align:center;font-weight:700;margin-top:10px;font-size:14px;background:#000;color:#fff;padding:6px;">
+                    COD — COBRAR ${{ number_format($printSnapshot['cod_amount_usd'] ?? 0, 2) }} EN DESTINO
+                </p>
+            @endif
 
-            <div style="border-top:3px solid #000;padding-top:8px;margin-top:10px;display:flex;justify-content:space-between;font-weight:700;font-size:15px;">
-                <span>Total USD: ${{ number_format($createdTotalUsd ?? 0, 2) }}</span>
-                <span>Total VES: Bs. {{ number_format($createdTotalVes ?? 0, 2) }}</span>
-            </div>
-
-            <div style="margin-top:36px;display:grid;grid-template-columns:1fr 1fr;gap:40px;font-size:11px;">
-                <div style="border-top:1px solid #000;padding-top:4px;text-align:center;">Firma de quien entrega</div>
-                <div style="border-top:1px solid #000;padding-top:4px;text-align:center;">Firma de quien recibe</div>
-            </div>
+            @if ($createdSecurityHash)
+                <p style="text-align:center;font-size:11px;margin-top:12px;">
+                    Cód. Seg.: {{ $createdSecurityHash }}
+                </p>
+            @endif
         </div>
 
         @once
@@ -198,11 +261,25 @@
                     body * {
                         visibility: hidden !important;
                     }
-                    #printable-guide,
-                    #printable-guide * {
+
+                    body[data-print-target="invoice"] #printable-invoice,
+                    body[data-print-target="invoice"] #printable-invoice * {
                         visibility: visible !important;
                     }
-                    #printable-guide {
+                    body[data-print-target="invoice"] #printable-invoice {
+                        display: block !important;
+                        position: absolute;
+                        top: 0;
+                        left: 0;
+                        width: 100%;
+                        color: #000;
+                    }
+
+                    body[data-print-target="label"] #printable-label,
+                    body[data-print-target="label"] #printable-label * {
+                        visibility: visible !important;
+                    }
+                    body[data-print-target="label"] #printable-label {
                         display: block !important;
                         position: absolute;
                         top: 0;
@@ -224,27 +301,50 @@
                 </h3>
                 <div class="grid grid-cols-1 sm:grid-cols-3 gap-4">
                     <div>
-                        <label class="text-sm text-slate-600">Nombre completo</label>
-                        <input type="text" wire:model="sender_name"
+                        <label class="text-sm text-slate-600">Tipo de documento</label>
+                        <select wire:model.live="sender_doc_type"
                             class="mt-1 w-full rounded-xl border border-slate-300 px-3 py-2 text-sm shadow-sm focus:border-blue-900 focus:ring-blue-900">
-                        @error('sender_name') <p class="text-xs text-red-600 mt-1">{{ $message }}</p> @enderror
+                            @foreach (\App\Livewire\Ally\PackageCreate::DOC_TYPE_LABELS as $value => $label)
+                                <option value="{{ $value }}">{{ $label }}</option>
+                            @endforeach
+                        </select>
                     </div>
-                    <div>
-                        <label class="text-sm text-slate-600">Cédula / RIF</label>
-                        <input type="text" wire:model.live.debounce.500ms="sender_id_doc" placeholder="V-12345678"
+                    <div class="sm:col-span-2">
+                        <label class="text-sm text-slate-600">Número de documento</label>
+                        <input type="text" wire:model.live.debounce.500ms="sender_doc_number" placeholder="12345678"
                             class="mt-1 w-full rounded-xl border border-slate-300 px-3 py-2 text-sm shadow-sm focus:border-blue-900 focus:ring-blue-900">
-                        @if ($senderCustomerFound)
-                            <p class="text-xs text-emerald-600 mt-1">✓ Cliente encontrado — datos autocompletados</p>
-                        @endif
+                        @error('sender_doc_number') <p class="text-xs text-red-600 mt-1">{{ $message }}</p> @enderror
                         @error('sender_id_doc') <p class="text-xs text-red-600 mt-1">{{ $message }}</p> @enderror
                     </div>
-                    <div>
-                        <label class="text-sm text-slate-600">Teléfono</label>
-                        <input type="text" wire:model="sender_phone"
-                            class="mt-1 w-full rounded-xl border border-slate-300 px-3 py-2 text-sm shadow-sm focus:border-blue-900 focus:ring-blue-900">
-                        @error('sender_phone') <p class="text-xs text-red-600 mt-1">{{ $message }}</p> @enderror
-                    </div>
                 </div>
+
+                @if ($senderCustomerFound)
+                    <div class="mt-4 flex items-start justify-between gap-3 rounded-xl bg-emerald-50 px-4 py-3">
+                        <div class="text-sm">
+                            <p class="font-medium text-emerald-700">✓ Cliente encontrado</p>
+                            <p class="mt-1 text-emerald-700">{{ $sender_name }}</p>
+                            <p class="text-emerald-600">{{ $sender_phone }}{{ $sender_email ? ' · '.$sender_email : '' }}</p>
+                        </div>
+                        <button type="button" wire:click="openSenderCustomerModal"
+                            class="shrink-0 text-xs font-medium text-emerald-700 underline hover:text-emerald-900">
+                            Editar
+                        </button>
+                    </div>
+                @elseif ($sender_name)
+                    <div class="mt-4 flex items-start justify-between gap-3 rounded-xl bg-slate-50 px-4 py-3">
+                        <div class="text-sm">
+                            <p class="font-medium text-[#0F172A]">{{ $sender_name }}</p>
+                            <p class="text-slate-500">{{ $sender_phone }}{{ $sender_email ? ' · '.$sender_email : '' }}</p>
+                        </div>
+                        <button type="button" wire:click="openSenderCustomerModal"
+                            class="shrink-0 text-xs font-medium text-blue-900 underline hover:text-blue-700">
+                            Editar
+                        </button>
+                    </div>
+                @endif
+
+                @error('sender_name') <p class="text-xs text-red-600 mt-2">{{ $message }}</p> @enderror
+                @error('sender_phone') <p class="text-xs text-red-600 mt-2">{{ $message }}</p> @enderror
             </div>
 
             {{-- DESTINATARIO --}}
@@ -254,28 +354,153 @@
                 </h3>
                 <div class="grid grid-cols-1 sm:grid-cols-3 gap-4">
                     <div>
-                        <label class="text-sm text-slate-600">Nombre completo</label>
-                        <input type="text" wire:model="recipient_name"
+                        <label class="text-sm text-slate-600">Tipo de documento</label>
+                        <select wire:model.live="recipient_doc_type"
                             class="mt-1 w-full rounded-xl border border-slate-300 px-3 py-2 text-sm shadow-sm focus:border-blue-900 focus:ring-blue-900">
-                        @error('recipient_name') <p class="text-xs text-red-600 mt-1">{{ $message }}</p> @enderror
+                            @foreach (\App\Livewire\Ally\PackageCreate::DOC_TYPE_LABELS as $value => $label)
+                                <option value="{{ $value }}">{{ $label }}</option>
+                            @endforeach
+                        </select>
                     </div>
-                    <div>
-                        <label class="text-sm text-slate-600">Cédula / RIF</label>
-                        <input type="text" wire:model.live.debounce.500ms="recipient_id_doc" placeholder="V-12345678"
+                    <div class="sm:col-span-2">
+                        <label class="text-sm text-slate-600">Número de documento</label>
+                        <input type="text" wire:model.live.debounce.500ms="recipient_doc_number" placeholder="12345678"
                             class="mt-1 w-full rounded-xl border border-slate-300 px-3 py-2 text-sm shadow-sm focus:border-blue-900 focus:ring-blue-900">
-                        @if ($recipientCustomerFound)
-                            <p class="text-xs text-emerald-600 mt-1">✓ Cliente encontrado — datos autocompletados</p>
-                        @endif
+                        @error('recipient_doc_number') <p class="text-xs text-red-600 mt-1">{{ $message }}</p> @enderror
                         @error('recipient_id_doc') <p class="text-xs text-red-600 mt-1">{{ $message }}</p> @enderror
                     </div>
-                    <div>
-                        <label class="text-sm text-slate-600">Teléfono</label>
-                        <input type="text" wire:model="recipient_phone"
-                            class="mt-1 w-full rounded-xl border border-slate-300 px-3 py-2 text-sm shadow-sm focus:border-blue-900 focus:ring-blue-900">
-                        @error('recipient_phone') <p class="text-xs text-red-600 mt-1">{{ $message }}</p> @enderror
+                </div>
+
+                @if ($recipientCustomerFound)
+                    <div class="mt-4 flex items-start justify-between gap-3 rounded-xl bg-emerald-50 px-4 py-3">
+                        <div class="text-sm">
+                            <p class="font-medium text-emerald-700">✓ Cliente encontrado</p>
+                            <p class="mt-1 text-emerald-700">{{ $recipient_name }}</p>
+                            <p class="text-emerald-600">{{ $recipient_phone }}{{ $recipient_email ? ' · '.$recipient_email : '' }}</p>
+                        </div>
+                        <button type="button" wire:click="openRecipientCustomerModal"
+                            class="shrink-0 text-xs font-medium text-emerald-700 underline hover:text-emerald-900">
+                            Editar
+                        </button>
+                    </div>
+                @elseif ($recipient_name)
+                    <div class="mt-4 flex items-start justify-between gap-3 rounded-xl bg-slate-50 px-4 py-3">
+                        <div class="text-sm">
+                            <p class="font-medium text-[#0F172A]">{{ $recipient_name }}</p>
+                            <p class="text-slate-500">{{ $recipient_phone }}{{ $recipient_email ? ' · '.$recipient_email : '' }}</p>
+                        </div>
+                        <button type="button" wire:click="openRecipientCustomerModal"
+                            class="shrink-0 text-xs font-medium text-blue-900 underline hover:text-blue-700">
+                            Editar
+                        </button>
+                    </div>
+                @endif
+
+                @error('recipient_name') <p class="text-xs text-red-600 mt-2">{{ $message }}</p> @enderror
+                @error('recipient_phone') <p class="text-xs text-red-600 mt-2">{{ $message }}</p> @enderror
+            </div>
+
+            {{-- MODAL: DATOS DE CLIENTE NUEVO — REMITENTE --}}
+            @if ($showSenderCustomerModal)
+                <div class="fixed inset-0 z-50 flex items-center justify-center bg-black/40 px-4">
+                    <div class="w-full max-w-md rounded-2xl bg-white p-6 shadow-xl">
+                        <h3 class="font-display text-lg font-semibold text-[#0F172A]">
+                            Registrar datos del remitente
+                        </h3>
+                        <p class="mt-1 text-sm text-slate-500">
+                            No encontramos este documento en el sistema. Completa sus datos para continuar.
+                        </p>
+
+                        <div class="mt-5 space-y-4">
+                            <div>
+                                <label class="text-sm text-slate-600">Nombre completo</label>
+                                <input type="text" wire:model="sender_name" autofocus
+                                    class="mt-1 w-full rounded-xl border border-slate-300 px-3 py-2 text-sm shadow-sm focus:border-blue-900 focus:ring-blue-900">
+                                @error('sender_name') <p class="text-xs text-red-600 mt-1">{{ $message }}</p> @enderror
+                            </div>
+                            <div>
+                                <label class="text-sm text-slate-600">Documento</label>
+                                <input type="text" value="{{ $sender_id_doc }}" disabled
+                                    class="mt-1 w-full rounded-xl border border-slate-200 bg-slate-100 px-3 py-2 text-sm text-slate-500">
+                            </div>
+                            <div>
+                                <label class="text-sm text-slate-600">Teléfono</label>
+                                <input type="text" wire:model="sender_phone"
+                                    class="mt-1 w-full rounded-xl border border-slate-300 px-3 py-2 text-sm shadow-sm focus:border-blue-900 focus:ring-blue-900">
+                                @error('sender_phone') <p class="text-xs text-red-600 mt-1">{{ $message }}</p> @enderror
+                            </div>
+                            <div>
+                                <label class="text-sm text-slate-600">Correo (opcional)</label>
+                                <input type="email" wire:model="sender_email"
+                                    class="mt-1 w-full rounded-xl border border-slate-300 px-3 py-2 text-sm shadow-sm focus:border-blue-900 focus:ring-blue-900">
+                                @error('sender_email') <p class="text-xs text-red-600 mt-1">{{ $message }}</p> @enderror
+                            </div>
+                        </div>
+
+                        <div class="mt-6 flex justify-end gap-3">
+                            <button type="button" wire:click="$set('showSenderCustomerModal', false)"
+                                class="rounded-xl border border-slate-300 px-4 py-2 text-sm font-medium text-slate-600 hover:bg-slate-50">
+                                Cancelar
+                            </button>
+                            <button type="button" wire:click="saveSenderCustomer"
+                                class="rounded-xl bg-blue-900 px-4 py-2 text-sm font-medium text-white hover:bg-blue-800">
+                                Guardar
+                            </button>
+                        </div>
                     </div>
                 </div>
-            </div>
+            @endif
+
+            {{-- MODAL: DATOS DE CLIENTE NUEVO — DESTINATARIO --}}
+            @if ($showRecipientCustomerModal)
+                <div class="fixed inset-0 z-50 flex items-center justify-center bg-black/40 px-4">
+                    <div class="w-full max-w-md rounded-2xl bg-white p-6 shadow-xl">
+                        <h3 class="font-display text-lg font-semibold text-[#0F172A]">
+                            Registrar datos del destinatario
+                        </h3>
+                        <p class="mt-1 text-sm text-slate-500">
+                            No encontramos este documento en el sistema. Completa sus datos para continuar.
+                        </p>
+
+                        <div class="mt-5 space-y-4">
+                            <div>
+                                <label class="text-sm text-slate-600">Nombre completo</label>
+                                <input type="text" wire:model="recipient_name" autofocus
+                                    class="mt-1 w-full rounded-xl border border-slate-300 px-3 py-2 text-sm shadow-sm focus:border-blue-900 focus:ring-blue-900">
+                                @error('recipient_name') <p class="text-xs text-red-600 mt-1">{{ $message }}</p> @enderror
+                            </div>
+                            <div>
+                                <label class="text-sm text-slate-600">Documento</label>
+                                <input type="text" value="{{ $recipient_id_doc }}" disabled
+                                    class="mt-1 w-full rounded-xl border border-slate-200 bg-slate-100 px-3 py-2 text-sm text-slate-500">
+                            </div>
+                            <div>
+                                <label class="text-sm text-slate-600">Teléfono</label>
+                                <input type="text" wire:model="recipient_phone"
+                                    class="mt-1 w-full rounded-xl border border-slate-300 px-3 py-2 text-sm shadow-sm focus:border-blue-900 focus:ring-blue-900">
+                                @error('recipient_phone') <p class="text-xs text-red-600 mt-1">{{ $message }}</p> @enderror
+                            </div>
+                            <div>
+                                <label class="text-sm text-slate-600">Correo (opcional)</label>
+                                <input type="email" wire:model="recipient_email"
+                                    class="mt-1 w-full rounded-xl border border-slate-300 px-3 py-2 text-sm shadow-sm focus:border-blue-900 focus:ring-blue-900">
+                                @error('recipient_email') <p class="text-xs text-red-600 mt-1">{{ $message }}</p> @enderror
+                            </div>
+                        </div>
+
+                        <div class="mt-6 flex justify-end gap-3">
+                            <button type="button" wire:click="$set('showRecipientCustomerModal', false)"
+                                class="rounded-xl border border-slate-300 px-4 py-2 text-sm font-medium text-slate-600 hover:bg-slate-50">
+                                Cancelar
+                            </button>
+                            <button type="button" wire:click="saveRecipientCustomer"
+                                class="rounded-xl bg-blue-900 px-4 py-2 text-sm font-medium text-white hover:bg-blue-800">
+                                Guardar
+                            </button>
+                        </div>
+                    </div>
+                </div>
+            @endif
 
             {{-- PAQUETE --}}
             <div class="rounded-2xl border border-[#E2E8F0] bg-white p-5 shadow-sm">
@@ -538,28 +763,21 @@
                 @endif
             </div>
 
-            <div class="mt-6 flex items-center justify-between gap-3">
-                <button
-                    type="button"
-                    wire:click="calculatePrice"
-                    wire:loading.attr="disabled"
-                    wire:target="calculatePrice"
-                    class="rounded-xl bg-blue-900 px-5 py-3 text-sm font-semibold text-white hover:bg-blue-800 disabled:opacity-50"
+            <div class="mt-6 flex items-center justify-end gap-3">
+                <span
+                    wire:loading
+                    wire:target="destination_state,destination_city,physical_weight_kg,length_cm,width_cm,height_cm,package_type,is_fragile,has_insurance,declared_value_usd,requires_delivery"
+                    class="text-xs text-slate-400"
                 >
-                    <span wire:loading.remove wire:target="calculatePrice">
-                        Calcular precio
-                    </span>
-                    <span wire:loading wire:target="calculatePrice">
-                        Calculando...
-                    </span>
-                </button>
+                    Calculando tarifa...
+                </span>
 
                 <button type="submit"
-                    class="rounded-xl bg-blue-900 px-6 py-3 text-sm font-medium text-white"
+                    class="rounded-xl bg-blue-900 px-6 py-3 text-sm font-medium text-white disabled:opacity-50"
                     wire:loading.attr="disabled"
                 >
-                    <span wire:loading.remove>Registrar guía</span>
-                    <span wire:loading>Calculando tarifa...</span>
+                    <span wire:loading.remove wire:target="save">Registrar guía</span>
+                    <span wire:loading wire:target="save">Registrando...</span>
                 </button>
             </div>
         </form>

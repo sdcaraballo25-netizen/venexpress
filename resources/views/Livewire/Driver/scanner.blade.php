@@ -156,6 +156,34 @@
                 </div>
 
 
+                {{-- ALERTA DE SEGURIDAD --}}
+                @if ($securityWarning)
+
+                    <div class="mt-5 rounded-2xl border-2 border-red-300 bg-red-50 px-4 py-4">
+
+                        <div class="flex gap-3">
+
+                            <div class="flex h-6 w-6 shrink-0 items-center justify-center rounded-full bg-red-600 text-white">
+                                ⚠
+                            </div>
+
+                            <div>
+                                <p class="text-sm font-bold uppercase tracking-wide text-red-700">
+                                    Alerta de integridad
+                                </p>
+
+                                <p class="mt-1 text-sm text-red-700">
+                                    {{ $securityMessage }}
+                                </p>
+                            </div>
+
+                        </div>
+
+                    </div>
+
+                @endif
+
+
                 {{-- ESTADO --}}
                 <div class="mt-5 rounded-2xl bg-amber-50 px-4 py-4">
 
@@ -318,9 +346,15 @@
                 {{-- ACCIÓN --}}
                 <div class="mt-6">
 
+                    @if ($securityWarning)
+                        <p class="mb-2 text-center text-xs font-medium text-red-600">
+                            Hay una alerta de integridad activa en esta guía. Verifica antes de continuar.
+                        </p>
+                    @endif
+
                     <button
                         type="button"
-                        class="w-full rounded-xl bg-blue-900 px-5 py-3 text-sm font-semibold text-white transition hover:bg-blue-800"
+                        class="w-full rounded-xl px-5 py-3 text-sm font-semibold text-white transition {{ $securityWarning ? 'bg-red-600 hover:bg-red-700' : 'bg-blue-900 hover:bg-blue-800' }}"
                     >
                         Iniciar entrega
                     </button>

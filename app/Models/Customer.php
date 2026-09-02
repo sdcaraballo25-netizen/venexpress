@@ -13,11 +13,13 @@ class Customer extends Model
         'id_doc',
         'name',
         'phone',
+        'email',
     ];
 
     protected $casts = [
         'id_doc' => 'string',
         'name' => 'string',
         'phone' => 'string',
+        'email' => 'string',
     ];
 }

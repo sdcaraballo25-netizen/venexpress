@@ -63,6 +63,7 @@ class Package extends Model
      */
     protected $fillable = [
         'tracking_number',
+        'security_hash',
         'ally_id',
         'driver_id',
         'sender_name',
@@ -204,5 +205,66 @@ class Package extends Model
     public function isCodPending(): bool
     {
         return $this->is_cod && $this->cod_status === self::COD_PENDIENTE;
+    }
+
+    /*
+    |--------------------------------------------------------------------------
+    | CÓDIGO DE SEGURIDAD (ANTI-ALTERACIÓN)
+    |--------------------------------------------------------------------------
+    */
+
+    /**
+     * Calcula el código de seguridad de una guía a partir de los
+     * datos que quedan fijos en el momento de su creación (snapshot):
+     * número de guía, agencia, peso físico y fecha de creación.
+     *
+     * Usa HMAC-SHA256 con la app key de Laravel como llave secreta,
+     * para que nadie pueda recalcular un código válido sin acceso al
+     * servidor. Se trunca a 10 caracteres solo para que quepa cómodo
+     * en la etiqueta impresa; la verificación vuelve a calcular el
+     * mismo valor truncado y lo compara.
+     */
+    public static function computeSecurityHash(
+        string $trackingNumber,
+        int $allyId,
+        float $physicalWeightKg,
+        \DateTimeInterface $createdAt
+    ): string {
+        $payload = implode('|', [
+            $trackingNumber,
+            $allyId,
+            number_format($physicalWeightKg, 3, '.', ''),
+            $createdAt->format('Y-m-d H:i:s'),
+        ]);
+
+        $fullHash = hash_hmac('sha256', $payload, config('app.key'));
+
+        return strtoupper(substr($fullHash, -10));
+    }
+
+    /**
+     * Verifica que el código de seguridad guardado siga siendo
+     * consistente con los datos actuales del paquete. Si alguien
+     * modificó el peso, la agencia, o el número de guía después de
+     * haberse generado la etiqueta, esta verificación falla.
+     *
+     * IMPORTANTE: esto detecta alteraciones en el registro dentro
+     * del sistema (base de datos), no alteraciones físicas hechas
+     * directamente sobre el papel de la etiqueta.
+     */
+    public function verifySecurityHash(): bool
+    {
+        if (! $this->security_hash || ! $this->created_at) {
+            return false;
+        }
+
+        $expected = self::computeSecurityHash(
+            $this->tracking_number,
+            (int) $this->ally_id,
+            (float) $this->physical_weight_kg,
+            $this->created_at,
+        );
+
+        return hash_equals($expected, $this->security_hash);
     }
 }

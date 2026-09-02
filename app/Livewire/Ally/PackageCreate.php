@@ -13,15 +13,32 @@ use Illuminate\Validation\Rule;
 #[Layout('layouts.ally')]
 class PackageCreate extends Component
 {
+    /**
+     * Tipos de documento de identidad soportados.
+     */
+    public const DOC_TYPES = ['V', 'E', 'J'];
+
+    public const DOC_TYPE_LABELS = [
+        'V' => 'Cédula (V)',
+        'E' => 'Extranjero (E)',
+        'J' => 'RIF / Empresa (J)',
+    ];
+
     // Remitente
-    public string $sender_name = '';
+    public string $sender_doc_type = 'V';
+    public string $sender_doc_number = '';
     public string $sender_id_doc = '';
+    public string $sender_name = '';
     public string $sender_phone = '';
+    public string $sender_email = '';
 
     // Destinatario
-    public string $recipient_name = '';
+    public string $recipient_doc_type = 'V';
+    public string $recipient_doc_number = '';
     public string $recipient_id_doc = '';
+    public string $recipient_name = '';
     public string $recipient_phone = '';
+    public string $recipient_email = '';
 
     // Ruta
     public string $origin_city = '';
@@ -50,12 +67,15 @@ class PackageCreate extends Component
     public bool $is_cod = false;
     public ?float $cod_amount_usd = null;
 
-    // Autocompletado de clientes por cédula/RIF
+    // Autocompletado / registro de clientes por documento
     public bool $senderCustomerFound = false;
     public bool $recipientCustomerFound = false;
+    public bool $showSenderCustomerModal = false;
+    public bool $showRecipientCustomerModal = false;
 
     // Resultado tras registrar
     public ?string $createdTrackingNumber = null;
+    public ?string $createdSecurityHash = null;
     public ?float $createdTotalUsd = null;
     public ?float $createdTotalVes = null;
     public ?float $createdDistanceKm = null;
@@ -83,6 +103,16 @@ class PackageCreate extends Component
 
     public ?string $pricePreviewError = null;
 
+    /**
+     * Campos que, al cambiar, disparan un recálculo automático de
+     * la tarifa (ya no existe un botón manual "Calcular precio").
+     */
+    protected array $pricingFields = [
+        'destination_state', 'destination_city', 'physical_weight_kg',
+        'length_cm', 'width_cm', 'height_cm', 'package_type',
+        'is_fragile', 'has_insurance', 'declared_value_usd', 'requires_delivery',
+    ];
+
     public function mount(): void
     {
         $ally = auth()->user()->resolveAlly();
@@ -99,13 +129,19 @@ class PackageCreate extends Component
     protected function rules(): array
     {
         return [
-            'sender_name' => ['required', 'string', 'max:150'],
+            'sender_doc_type' => ['required', Rule::in(self::DOC_TYPES)],
+            'sender_doc_number' => ['required', 'string', 'max:20'],
             'sender_id_doc' => ['required', 'string', 'max:30'],
+            'sender_name' => ['required', 'string', 'max:150'],
             'sender_phone' => ['required', 'string', 'max:30'],
+            'sender_email' => ['nullable', 'email', 'max:150'],
 
-            'recipient_name' => ['required', 'string', 'max:150'],
+            'recipient_doc_type' => ['required', Rule::in(self::DOC_TYPES)],
+            'recipient_doc_number' => ['required', 'string', 'max:20'],
             'recipient_id_doc' => ['required', 'string', 'max:30'],
+            'recipient_name' => ['required', 'string', 'max:150'],
             'recipient_phone' => ['required', 'string', 'max:30'],
+            'recipient_email' => ['nullable', 'email', 'max:150'],
 
             'destination_state' => ['required', 'string', Rule::in(array_keys(config('venezuela.states', [])))],
             'destination_city' => [
@@ -139,6 +175,10 @@ class PackageCreate extends Component
     protected function messages(): array
     {
         return [
+            'sender_doc_number.required' => 'Ingresa el número de documento del remitente.',
+            'recipient_doc_number.required' => 'Ingresa el número de documento del destinatario.',
+            'sender_email.email' => 'El correo del remitente no es válido.',
+            'recipient_email.email' => 'El correo del destinatario no es válido.',
             'declared_value_usd.required_if' => 'Indica el valor declarado para asegurar el envío.',
             'cod_amount_usd.required_if' => 'Completa ciudad destino y peso para calcular el monto a cobrar.',
             'destination_state.required' => 'Selecciona el estado destino.',
@@ -150,7 +190,7 @@ class PackageCreate extends Component
 
     /**
      * Livewire llama esto cada vez que cambia una propiedad pública
-     * con wire:model.live. Recalculamos la tarifa en vivo.
+     * con wire:model.live.
      */
     public function updated(string $property): void
     {
@@ -167,62 +207,142 @@ class PackageCreate extends Component
         if ($property === 'is_cod') {
             // Si es cobro contra entrega, no se define método de pago en taquilla.
             $this->payment_method = $this->is_cod ? '' : $this->payment_method;
+
+            // Si el destino y el peso ya estaban completos, el monto
+            // COD debe llenarse de inmediato con la tarifa ya
+            // conocida, sin esperar a que cambie otro campo.
+            $this->refreshPricePreview(app(TariffService::class));
         }
 
-        if ($property === 'sender_id_doc') {
+        if (in_array($property, ['sender_doc_type', 'sender_doc_number'], true)) {
+            $this->refreshDocId('sender');
             $this->autofillCustomer('sender');
         }
 
-        if ($property === 'recipient_id_doc') {
+        if (in_array($property, ['recipient_doc_type', 'recipient_doc_number'], true)) {
+            $this->refreshDocId('recipient');
             $this->autofillCustomer('recipient');
+        }
+
+        // Ya no hay botón "Calcular precio": la tarifa se recalcula
+        // sola apenas cambia cualquier dato que la afecte.
+        if (in_array($property, $this->pricingFields, true)) {
+            $this->refreshPricePreview(app(TariffService::class));
         }
     }
 
     /**
-     * Busca un cliente ya registrado por su cédula/RIF y, si existe,
-     * autocompleta su nombre y teléfono. No sobrescribe nada si la
-     * cédula no coincide con ningún cliente (para permitir clientes
-     * nuevos sin fricción).
+     * Reconstruye el documento completo (ej. "V-12345678") a partir
+     * del tipo seleccionado y el número ingresado.
+     */
+    protected function refreshDocId(string $prefix): void
+    {
+        $type = strtoupper($prefix === 'sender' ? $this->sender_doc_type : $this->recipient_doc_type);
+        $number = trim($prefix === 'sender' ? $this->sender_doc_number : $this->recipient_doc_number);
+
+        $idDoc = $number !== '' ? "{$type}-{$number}" : '';
+
+        if ($prefix === 'sender') {
+            $this->sender_id_doc = $idDoc;
+        } else {
+            $this->recipient_id_doc = $idDoc;
+        }
+    }
+
+    /**
+     * Busca un cliente ya registrado por su documento completo.
+     *
+     * - Si existe: autocompleta nombre, teléfono y correo, y cierra
+     *   el modal de registro si estaba abierto.
+     * - Si no existe (y el número ya tiene longitud razonable):
+     *   limpia los campos y abre el modal para capturar sus datos.
      */
     protected function autofillCustomer(string $prefix): void
     {
-        $idDoc = trim($prefix === 'sender' ? $this->sender_id_doc : $this->recipient_id_doc);
-        $foundProperty = $prefix === 'sender' ? 'senderCustomerFound' : 'recipientCustomerFound';
+        $number = trim($prefix === 'sender' ? $this->sender_doc_number : $this->recipient_doc_number);
+        $idDoc = $prefix === 'sender' ? $this->sender_id_doc : $this->recipient_id_doc;
 
-        // Evita consultar la BD con cada tecla cuando aún no hay
-        // suficientes caracteres para una cédula/RIF real.
-        if (strlen($idDoc) < 5) {
+        $foundProperty = $prefix === 'sender' ? 'senderCustomerFound' : 'recipientCustomerFound';
+        $modalProperty = $prefix === 'sender' ? 'showSenderCustomerModal' : 'showRecipientCustomerModal';
+
+        // Evita consultar la BD o abrir el modal con cada tecla
+        // cuando aún no hay suficientes caracteres para un
+        // documento real.
+        if (strlen($number) < 5) {
             $this->$foundProperty = false;
+            $this->$modalProperty = false;
 
             return;
         }
 
         $customer = Customer::where('id_doc', $idDoc)->first();
 
-        if (! $customer) {
-            $this->$foundProperty = false;
+        if ($customer) {
+            $this->$foundProperty = true;
+            $this->$modalProperty = false;
+
+            if ($prefix === 'sender') {
+                $this->sender_name = $customer->name;
+                $this->sender_phone = $customer->phone;
+                $this->sender_email = (string) ($customer->email ?? '');
+            } else {
+                $this->recipient_name = $customer->name;
+                $this->recipient_phone = $customer->phone;
+                $this->recipient_email = (string) ($customer->email ?? '');
+            }
 
             return;
         }
 
-        $this->$foundProperty = true;
+        // No existe: pedimos sus datos en el modal.
+        $this->$foundProperty = false;
+        $this->$modalProperty = true;
 
         if ($prefix === 'sender') {
-            $this->sender_name = $customer->name;
-            $this->sender_phone = $customer->phone;
+            $this->sender_name = '';
+            $this->sender_phone = '';
+            $this->sender_email = '';
         } else {
-            $this->recipient_name = $customer->name;
-            $this->recipient_phone = $customer->phone;
+            $this->recipient_name = '';
+            $this->recipient_phone = '';
+            $this->recipient_email = '';
         }
     }
 
-    public function calculatePrice(TariffService $tariffService): void
+    /**
+     * Reabre el modal de registro para editar los datos del
+     * remitente (ej. si ya está resuelto pero se equivocaron).
+     */
+    public function openSenderCustomerModal(): void
     {
-        $this->validateOnly('destination_state');
-        $this->validateOnly('destination_city');
-        $this->validateOnly('physical_weight_kg');
+        $this->showSenderCustomerModal = true;
+    }
 
-        $this->refreshPricePreview($tariffService);
+    public function openRecipientCustomerModal(): void
+    {
+        $this->showRecipientCustomerModal = true;
+    }
+
+    public function saveSenderCustomer(): void
+    {
+        $this->validate([
+            'sender_name' => ['required', 'string', 'max:150'],
+            'sender_phone' => ['required', 'string', 'max:30'],
+            'sender_email' => ['nullable', 'email', 'max:150'],
+        ]);
+
+        $this->showSenderCustomerModal = false;
+    }
+
+    public function saveRecipientCustomer(): void
+    {
+        $this->validate([
+            'recipient_name' => ['required', 'string', 'max:150'],
+            'recipient_phone' => ['required', 'string', 'max:30'],
+            'recipient_email' => ['nullable', 'email', 'max:150'],
+        ]);
+
+        $this->showRecipientCustomerModal = false;
     }
 
     protected function refreshPricePreview(TariffService $tariffService): void
@@ -276,15 +396,23 @@ class PackageCreate extends Component
 
         // Registramos o actualizamos al remitente y destinatario como
         // clientes conocidos, para que la próxima vez que se use su
-        // cédula/RIF se autocompleten sus datos.
+        // documento se autocompleten sus datos.
         Customer::updateOrCreate(
             ['id_doc' => $this->sender_id_doc],
-            ['name' => $this->sender_name, 'phone' => $this->sender_phone],
+            [
+                'name' => $this->sender_name,
+                'phone' => $this->sender_phone,
+                'email' => $this->sender_email ?: null,
+            ],
         );
 
         Customer::updateOrCreate(
             ['id_doc' => $this->recipient_id_doc],
-            ['name' => $this->recipient_name, 'phone' => $this->recipient_phone],
+            [
+                'name' => $this->recipient_name,
+                'phone' => $this->recipient_phone,
+                'email' => $this->recipient_email ?: null,
+            ],
         );
 
         $package = $packageService->createPackage([
@@ -295,6 +423,7 @@ class PackageCreate extends Component
         ], auth()->id());
 
         $this->createdTrackingNumber = $package->tracking_number;
+        $this->createdSecurityHash = $package->security_hash;
         $this->createdTotalUsd = (float) $package->total_price_usd;
         $this->createdTotalVes = (float) $package->total_price_ves;
         $this->createdDistanceKm = isset($package->distance_km) ? (float) $package->distance_km : ($this->pricePreview['distance_km'] ?? null);
@@ -306,9 +435,11 @@ class PackageCreate extends Component
             'sender_name' => $this->sender_name,
             'sender_id_doc' => $this->sender_id_doc,
             'sender_phone' => $this->sender_phone,
+            'sender_email' => $this->sender_email,
             'recipient_name' => $this->recipient_name,
             'recipient_id_doc' => $this->recipient_id_doc,
             'recipient_phone' => $this->recipient_phone,
+            'recipient_email' => $this->recipient_email,
             'origin_city' => $this->origin_city,
             'origin_state' => $this->origin_state,
             'destination_state' => $this->destination_state,
@@ -338,6 +469,7 @@ class PackageCreate extends Component
     public function registerAnother(): void
     {
         $this->createdTrackingNumber = null;
+        $this->createdSecurityHash = null;
         $this->createdTotalUsd = null;
         $this->createdTotalVes = null;
         $this->createdDistanceKm = null;
@@ -367,16 +499,21 @@ class PackageCreate extends Component
         $ally = auth()->user()->resolveAlly();
 
         $this->reset([
-            'sender_name', 'sender_id_doc', 'sender_phone',
-            'recipient_name', 'recipient_id_doc', 'recipient_phone',
+            'sender_doc_type', 'sender_doc_number', 'sender_id_doc',
+            'sender_name', 'sender_phone', 'sender_email',
+            'recipient_doc_type', 'recipient_doc_number', 'recipient_id_doc',
+            'recipient_name', 'recipient_phone', 'recipient_email',
             'destination_state', 'destination_city',
             'requires_delivery', 'delivery_address', 'delivery_sector', 'delivery_reference',
             'physical_weight_kg', 'length_cm', 'width_cm', 'height_cm',
             'is_fragile', 'has_insurance', 'declared_value_usd',
             'payment_method', 'is_cod', 'cod_amount_usd',
             'senderCustomerFound', 'recipientCustomerFound',
+            'showSenderCustomerModal', 'showRecipientCustomerModal',
         ]);
 
+        $this->sender_doc_type = 'V';
+        $this->recipient_doc_type = 'V';
         $this->package_type = Package::TYPE_PAQUETE;
         $this->origin_city = $ally->city;
         $this->origin_state = (string) ($ally->state ?? '');

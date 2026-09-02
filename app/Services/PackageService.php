@@ -154,6 +154,19 @@ class PackageService
                 'Guía registrada en taquilla aliada',
             );
 
+            // El hash depende del tracking_number y created_at ya
+            // asignados por la BD, por eso se calcula después de
+            // crear el registro, con un update inmediato dentro de
+            // la misma transacción.
+            $securityHash = Package::computeSecurityHash(
+                $package->tracking_number,
+                (int) $package->ally_id,
+                (float) $package->physical_weight_kg,
+                $package->created_at,
+            );
+
+            $package->forceFill(['security_hash' => $securityHash])->save();
+
             return $package;
         });
     }
