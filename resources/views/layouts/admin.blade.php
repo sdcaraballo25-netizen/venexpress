@@ -66,6 +66,29 @@
                         Gestión de tarifas
                     </a>
 
+                    <a href="{{ route('admin.packages.reception') }}"
+                       class="flex items-center gap-3 px-4 py-3 text-[#64748B] hover:bg-slate-50 hover:text-[#0F172A] rounded-xl font-medium transition-colors
+                              {{ request()->routeIs('admin.packages.reception') ? 'bg-blue-50 text-blue-900' : '' }}">
+                        <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.8" d="M3 7h18M5 7v12h14V7M8 11h8M8 15h5"/>
+                        </svg>
+                        Recepción de paquetes
+                    </a>
+
+                    <a href="{{ route('admin.packages.assignment') }}"
+                       class="flex items-center gap-3 px-4 py-3 rounded-xl font-medium text-[#64748B] hover:bg-slate-50 hover:text-[#0F172A]">
+                        Asignar a reparto
+                    </a>
+
+                    <a href="{{ route('admin.packages.dispatch') }}"
+                       class="flex items-center gap-3 px-4 py-3 text-[#64748B] hover:bg-slate-50 hover:text-[#0F172A] rounded-xl font-medium transition-colors
+                              {{ request()->routeIs('admin.packages.dispatch') ? 'bg-blue-50 text-blue-900' : '' }}">
+                        <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.8" d="M3 12h13m0 0-4-4m4 4-4 4M17 5h4v14h-4"/>
+                        </svg>
+                        Despacho a tránsito
+                    </a>
+
                     <a href="{{ route('admin.routes') }}" class="flex items-center gap-3 px-4 py-3 text-[#64748B] hover:bg-slate-50 hover:text-[#0F172A] rounded-xl font-medium transition-colors">
                         <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 20l-5.447-2.724A1 1 0 013 16.382V5.618a1 1 0 011.447-.894L9 7l6-2.572 5.447 2.724A1 1 0 0121 8.053v10.764a1 1 0 01-1.447.894L15 17l-6 2.572zM9 7v13M15 4v13"></path></svg>
                         Control de rutas
@@ -80,7 +103,10 @@
                         <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M18 9v3m0 0v3m0-3h3m-3 0h-3m-2-5a4 4 0 11-8 0 4 4 0 018 0zM3 20a6 6 0 0112 0v1H3v-1z"></path></svg>
                         Gestión de usuarios
                     </a>
-                </nav>
+                
+                    <a href="{{ route('admin.driver-payments') }}" class="flex items-center gap-3 px-4 py-3 rounded-xl font-medium text-[#64748B] hover:bg-slate-50 hover:text-[#0F172A]">Remuneraciones</a>
+                    <a href="{{ route('admin.incidents') }}" class="flex items-center gap-3 px-4 py-3 rounded-xl font-medium text-[#64748B] hover:bg-slate-50 hover:text-[#0F172A]">Incidencias</a>
+</nav>
             </div>
 
             {{-- Perfil del Admin --}}

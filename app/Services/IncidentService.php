@@ -3,6 +3,7 @@
 namespace App\Services;
 
 use App\Models\Ally;
+use App\Models\AuditLog;
 use App\Models\Incident;
 
 class IncidentService
@@ -32,8 +33,12 @@ class IncidentService
      * Cambia el estado de una incidencia. Marca resolved_at
      * automáticamente al pasar a 'resuelta' o 'cerrada'.
      */
-    public function updateStatus(Incident $incident, string $status, ?string $resolutionNotes = null): Incident
+    public function updateStatus(Incident $incident, string $status, ?string $resolutionNotes = null, ?int $actorUserId = null): Incident
     {
+        if (! in_array($status, Incident::STATUSES, true)) {
+            throw new \RuntimeException('Estado de incidencia inválido.');
+        }
+
         $payload = ['status' => $status];
 
         if (in_array($status, [Incident::STATUS_RESOLVED, Incident::STATUS_CLOSED], true)) {
@@ -45,6 +50,21 @@ class IncidentService
         }
 
         $incident->update($payload);
+
+        if ($actorUserId) {
+            AuditLog::create([
+                'actor_user_id' => $actorUserId,
+                'action' => 'incident.status_updated',
+                'target_type' => Incident::class,
+                'target_id' => $incident->id,
+                'description' => 'Actualizó el estado de una incidencia.',
+                'metadata' => [
+                    'status' => $status,
+                    'package_id' => $incident->package_id,
+                ],
+                'ip_address' => request()?->ip(),
+            ]);
+        }
 
         return $incident->fresh();
     }

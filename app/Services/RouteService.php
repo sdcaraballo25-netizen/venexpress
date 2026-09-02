@@ -443,8 +443,11 @@ class RouteService
                     newStatus: Package::STATUS_RECOLECTADO_VENEXPRESS,
                     userId: $actingUserId,
                     locationDescription:
-                        "Recolectado en {$package->ally->business_name}",
+                        "Salida escaneada desde {$package->ally->business_name}",
                     routeStopId: $stop->id,
+                    eventType: \App\Models\PackageHistory::EVENT_SALIDA,
+                    originLocation: 'Agencia Aliada',
+                    destinationLocation: 'Ruta ' . $route->name,
                 );
             }
 

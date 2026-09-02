@@ -47,8 +47,18 @@ class Driver extends Model
     /**
      * Paquetes actualmente asignados a este chofer.
      */
+    public function payments(): HasMany
+    {
+        return $this->hasMany(DriverPayment::class);
+    }
+
     public function packages(): HasMany
     {
         return $this->hasMany(Package::class);
+    }
+
+    public function routes(): HasMany
+    {
+        return $this->hasMany(Route::class);
     }
 }

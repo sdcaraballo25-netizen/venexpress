@@ -31,14 +31,20 @@
 
     <div class="min-h-screen flex">
 
-        {{-- SIDEBAR ALIADO --}}
+        {{-- NAVEGACIÓN --}}
         @if(auth()->check() && auth()->user()->isAliadoModule())
             <livewire:ally.navigation />
+        @elseif(auth()->check())
+            <livewire:layout.navigation />
         @endif
 
 
         {{-- CONTENIDO PRINCIPAL --}}
-        <div class="flex-1 min-w-0 @if(auth()->check() && auth()->user()->isAliadoModule()) ml-64 @endif">
+        <div class="flex-1 min-w-0
+            @if(auth()->check() && auth()->user()->isAliadoModule())
+                ml-64
+            @endif
+        ">
 
             {{-- HEADER --}}
             <header class="h-16 bg-white border-b border-[#E2E8F0] flex items-center justify-between px-6 lg:px-8">
@@ -89,10 +95,10 @@
     </div>
 
     @livewireScripts
-    
+
     <script src="https://unpkg.com/html5-qrcode" type="text/javascript"></script>
 
-@stack('scripts')
+    @stack('scripts')
 
 </body>
 </html>

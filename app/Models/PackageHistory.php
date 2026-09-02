@@ -10,48 +10,111 @@ class PackageHistory extends Model
 {
     use HasFactory;
 
-    /**
-     * Los atributos que se pueden asignar de forma masiva.
-     *
-     * @var list<string>
-     */
+    public const EVENT_MOVIMIENTO = 'MOVIMIENTO';
+
+    public const EVENT_RECEPCION = 'RECEPCION';
+
+    public const EVENT_SALIDA = 'SALIDA';
+
+    public const EVENT_TRANSFERENCIA = 'TRANSFERENCIA';
+
+    public const EVENT_REPARTO = 'SALIDA_REPARTO';
+
+    public const EVENT_ENTREGA = 'ENTREGA';
+
+    public const EVENT_INCIDENCIA = 'INCIDENCIA';
+
+    public const EVENT_CORRECCION = 'CORRECCION';
+
+    public const EVENTOS = [
+        self::EVENT_MOVIMIENTO,
+        self::EVENT_RECEPCION,
+        self::EVENT_SALIDA,
+        self::EVENT_TRANSFERENCIA,
+        self::EVENT_REPARTO,
+        self::EVENT_ENTREGA,
+        self::EVENT_INCIDENCIA,
+        self::EVENT_CORRECCION,
+    ];
+
     protected $fillable = [
         'package_id',
         'route_stop_id',
         'status',
+        'event_type',
+        'origin_location',
+        'destination_location',
         'location_description',
         'scanned_by_user_id',
     ];
 
-    /*
-    |--------------------------------------------------------------------------
-    | RELACIONES
-    |--------------------------------------------------------------------------
-    */
+    protected static function booted(): void
+    {
+        /*
+         * Los movimientos logísticos son históricos.
+         * No permitimos modificar ni eliminar un registro existente.
+         *
+         * Las correcciones deberán crear un nuevo evento
+         * de tipo CORRECCION.
+         */
+        static::updating(function () {
+            throw new \RuntimeException(
+                'Los movimientos logísticos no pueden modificarse.'
+            );
+        });
 
-    /**
-     * Paquete al que pertenece este evento del historial.
-     */
+        static::deleting(function () {
+            throw new \RuntimeException(
+                'Los movimientos logísticos no pueden eliminarse.'
+            );
+        });
+    }
+
     public function package(): BelongsTo
     {
         return $this->belongsTo(Package::class);
     }
 
-    /**
-     * Parada de ruta en la que ocurrió este evento (nullable: eventos
-     * que no pasan por el módulo de rutas, como EN_HUB o ENTREGADO,
-     * no tienen parada asociada).
-     */
     public function routeStop(): BelongsTo
     {
         return $this->belongsTo(RouteStop::class);
     }
 
-    /**
-     * Usuario que registró/escaneó este evento (puede ser null).
-     */
     public function scannedBy(): BelongsTo
     {
-        return $this->belongsTo(User::class, 'scanned_by_user_id');
+        return $this->belongsTo(
+            User::class,
+            'scanned_by_user_id'
+        );
+    }
+
+    public function eventTypeLabel(): string
+    {
+        return match ($this->event_type) {
+
+            self::EVENT_RECEPCION =>
+                'Recepción',
+
+            self::EVENT_SALIDA =>
+                'Salida',
+
+            self::EVENT_TRANSFERENCIA =>
+                'Transferencia',
+
+            self::EVENT_REPARTO =>
+                'Salida a reparto',
+
+            self::EVENT_ENTREGA =>
+                'Entrega',
+
+            self::EVENT_INCIDENCIA =>
+                'Incidencia',
+
+            self::EVENT_CORRECCION =>
+                'Corrección',
+
+            default =>
+                'Movimiento',
+        };
     }
 }
