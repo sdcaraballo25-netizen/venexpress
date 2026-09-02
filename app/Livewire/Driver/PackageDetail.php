@@ -8,7 +8,7 @@ use Livewire\Attributes\Layout;
 use Livewire\Component;
 use RuntimeException;
 
-#[Layout('layouts.app')]
+#[Layout('layouts.driver')]
 class PackageDetail extends Component
 {
     public int $packageId;
@@ -27,7 +27,10 @@ class PackageDetail extends Component
         }
 
         $this->package = Package::query()
-            ->where('driver_id', $driver->id)
+            ->where(
+                'driver_id',
+                $driver->id
+            )
             ->with([
                 'ally',
                 'driver',
@@ -39,13 +42,12 @@ class PackageDetail extends Component
     }
 
     /**
-     * El repartidor confirma que comienza a trabajar con el paquete.
-     *
-     * El paquete debe haber sido previamente recolectado.
+     * El repartidor inicia el proceso de entrega.
      */
     public function startDelivery(): void
     {
         try {
+
             $driver = auth()->user()->driver;
 
             if (! $driver) {
@@ -66,88 +68,38 @@ class PackageDetail extends Component
                 );
             }
 
-            if ($this->package->current_status !== Package::STATUS_LISTO_RETIRO) {
+            if (
+                $this->package->current_status
+                !== Package::STATUS_RECOLECTADO_VENEXPRESS
+            ) {
                 throw new RuntimeException(
-                    'El paquete debe estar listo para iniciar la entrega.'
+                    'El paquete debe estar recolectado antes de iniciar la entrega.'
                 );
             }
 
-            $this->package = app(
-                PackageService::class
-            )->changeStatus(
-                package: $this->package,
-                newStatus:
-                    Package::STATUS_EN_TRANSITO_NACIONAL,
-                userId: auth()->id(),
-                locationDescription:
-                    'Entrega iniciada por el repartidor',
-                eventType:
-                    \App\Models\PackageHistory::EVENT_REPARTO,
-                originLocation:
-                    'Ruta de recolección',
-                destinationLocation:
-                    'Dirección de entrega',
-            );
+            $this->package =
+                app(PackageService::class)->changeStatus(
+                    package: $this->package,
+                    newStatus:
+                        Package::STATUS_EN_TRANSITO_NACIONAL,
+                    userId:
+                        auth()->id(),
+                    locationDescription:
+                        'Entrega iniciada por el repartidor',
+                );
 
             session()->flash(
                 'success',
                 'La entrega ha sido iniciada correctamente.'
             );
+
         } catch (RuntimeException $e) {
+
             session()->flash(
                 'error',
                 $e->getMessage()
             );
         }
-    }
-
-    /**
-     * El repartidor confirma que realizó la entrega.
-     *
-     * El cliente debe haber aceptado previamente la entrega.
-     */
-    public function completeDelivery(): void
-    {
-        try {
-            $driver = auth()->user()->driver;
-
-            if (! $driver) {
-                abort(
-                    403,
-                    'Tu usuario no tiene un perfil de repartidor asociado.'
-                );
-            }
-
-            $this->package = app(
-                PackageService::class
-            )->completeDelivery(
-                package: $this->package,
-                driver: $driver,
-                locationDescription:
-                    'Entrega completada por el repartidor',
-            );
-
-            session()->flash(
-                'success',
-                'Entrega confirmada correctamente.'
-            );
-        } catch (RuntimeException $e) {
-            session()->flash(
-                'error',
-                $e->getMessage()
-            );
-        }
-    }
-
-    public function collectCod(): void
-    {
-        try {
-            $driver = auth()->user()->driver;
-            if (! $driver) abort(403, 'Tu usuario no tiene un perfil de repartidor asociado.');
-            if ((int) $this->package->driver_id !== (int) $driver->id) throw new RuntimeException('Este paquete no está asignado a tu cuenta.');
-            $this->package = app(PackageService::class)->collectCod($this->package, (int) auth()->id());
-            session()->flash('success', 'Cobro COD registrado correctamente.');
-        } catch (RuntimeException $e) { session()->flash('error', $e->getMessage()); }
     }
 
     public function render()
