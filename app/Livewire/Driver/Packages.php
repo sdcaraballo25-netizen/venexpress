@@ -7,7 +7,7 @@ use Livewire\Attributes\Layout;
 use Livewire\Component;
 use Livewire\WithPagination;
 
-#[Layout('layouts.app')]
+#[Layout('layouts.driver')]
 class Packages extends Component
 {
     use WithPagination;

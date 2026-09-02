@@ -681,6 +681,34 @@
 
                 </div>
 
+
+                <form
+                    method="POST"
+                    action="{{ route('logout') }}"
+                >
+
+                    @csrf
+
+                    <button
+                        type="submit"
+                        class="
+                            h-10
+                            px-4
+                            rounded-xl
+                            text-sm
+                            font-medium
+                            text-red-500
+                            border border-red-200
+                            hover:bg-red-50
+                            hover:text-red-700
+                            transition-colors
+                        "
+                    >
+                        Salir
+                    </button>
+
+                </form>
+
             </div>
 
         </header>

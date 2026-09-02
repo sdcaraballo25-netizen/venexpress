@@ -1,6 +1,6 @@
 <div class="space-y-6">
 
-    {{-- Encabezado + selector de período --}}
+    {{-- Encabezado --}}
     <div class="flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between">
         <div>
             <h2 class="font-display text-2xl font-semibold text-[#0F172A]">
@@ -12,48 +12,12 @@
             </p>
         </div>
 
-        <div class="flex flex-wrap items-center gap-3">
+        <div class="inline-flex items-center gap-2 rounded-2xl border border-emerald-200 bg-emerald-50 px-4 py-2">
+            <span class="h-2.5 w-2.5 rounded-full bg-emerald-500"></span>
 
-            <div class="inline-flex rounded-2xl border border-[#E2E8F0] bg-white p-1">
-                <button
-                    wire:click="setPeriod('today')"
-                    class="rounded-xl px-4 py-1.5 text-sm font-medium transition
-                    {{ $period === 'today'
-                        ? 'bg-blue-900 text-white'
-                        : 'text-slate-500 hover:text-[#0F172A]' }}"
-                >
-                    Hoy
-                </button>
-
-                <button
-                    wire:click="setPeriod('week')"
-                    class="rounded-xl px-4 py-1.5 text-sm font-medium transition
-                    {{ $period === 'week'
-                        ? 'bg-blue-900 text-white'
-                        : 'text-slate-500 hover:text-[#0F172A]' }}"
-                >
-                    Esta semana
-                </button>
-
-                <button
-                    wire:click="setPeriod('month')"
-                    class="rounded-xl px-4 py-1.5 text-sm font-medium transition
-                    {{ $period === 'month'
-                        ? 'bg-blue-900 text-white'
-                        : 'text-slate-500 hover:text-[#0F172A]' }}"
-                >
-                    Este mes
-                </button>
-            </div>
-
-            <div class="inline-flex items-center gap-2 rounded-2xl border border-emerald-200 bg-emerald-50 px-4 py-2">
-                <span class="h-2.5 w-2.5 rounded-full bg-emerald-500"></span>
-
-                <span class="text-sm font-medium text-emerald-700">
-                    Disponible
-                </span>
-            </div>
-
+            <span class="text-sm font-medium text-emerald-700">
+                Disponible
+            </span>
         </div>
     </div>
 
@@ -73,7 +37,7 @@
                 </p>
 
                 <span class="text-xs text-slate-400">
-                    {{ match($period) { 'week' => 'Semana', 'month' => 'Mes', default => 'Hoy' } }}
+                    Total
                 </span>
             </div>
         </div>
@@ -182,11 +146,11 @@
                                 </span>
 
                                 <a
-    href="{{ route('repartidor.package-detail', $package->id) }}"
-    class="rounded-xl border border-[#E2E8F0] px-3 py-2 text-xs font-medium text-[#0F172A] transition hover:bg-slate-50"
->
-    Ver
-</a>
+                                    href="{{ route('repartidor.package-detail', $package->id) }}"
+                                    class="rounded-xl border border-[#E2E8F0] px-3 py-2 text-xs font-medium text-[#0F172A] transition hover:bg-slate-50"
+                                >
+                                    Ver
+                                </a>
 
                             </div>
 
@@ -231,12 +195,13 @@
                             {{ $nextPackage->destination_city ?? 'Destino no disponible' }}
                         </p>
 
-                        <button
-                            type="button"
-                            class="mt-4 w-full rounded-xl bg-blue-900 px-4 py-2.5 text-sm font-medium text-white transition hover:bg-blue-800"
+                        <a
+                            href="{{ route('repartidor.package-detail', $nextPackage->id) }}"
+                            wire:navigate
+                            class="mt-4 block w-full rounded-xl bg-blue-900 px-4 py-2.5 text-center text-sm font-medium text-white transition hover:bg-blue-800"
                         >
                             Iniciar entrega
-                        </button>
+                        </a>
 
                     </div>
 
@@ -263,20 +228,20 @@
                 <div class="mt-4 grid grid-cols-2 gap-3">
 
                     <a
-    href="{{ route('repartidor.scanner') }}"
-    class="rounded-xl border border-[#E2E8F0] p-4 transition hover:bg-slate-50"
->
-    <p class="text-sm font-semibold text-[#0F172A]">
-        Escanear
-    </p>
+                        href="{{ route('repartidor.scanner') }}"
+                        class="rounded-xl border border-[#E2E8F0] p-4 transition hover:bg-slate-50"
+                    >
+                        <p class="text-sm font-semibold text-[#0F172A]">
+                            Escanear
+                        </p>
 
-    <p class="mt-1 text-xs text-slate-400">
-        Leer guía
-    </p>
-</a>
+                        <p class="mt-1 text-xs text-slate-400">
+                            Leer guía
+                        </p>
+                    </a>
 
                     <a
-                        href="#"
+                        href="{{ route('repartidor.packages') }}"
                         class="rounded-xl border border-[#E2E8F0] p-4 transition hover:bg-slate-50"
                     >
                         <p class="text-sm font-semibold text-[#0F172A]">
@@ -313,7 +278,7 @@
             </div>
 
             <a
-                href="#"
+                href="{{ route('repartidor.packages') }}"
                 class="text-sm font-medium text-blue-900 hover:underline"
             >
                 Ver historial

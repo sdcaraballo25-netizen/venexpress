@@ -9,15 +9,6 @@ use Livewire\Component;
 #[Layout('layouts.driver')]
 class Dashboard extends Component
 {
-    public string $period = 'today';
-
-    public function setPeriod(string $period): void
-    {
-        if (in_array($period, ['today', 'week', 'month'], true)) {
-            $this->period = $period;
-        }
-    }
-
     public function render()
     {
         $driver = auth()->user()->driver;
@@ -29,11 +20,8 @@ class Dashboard extends Component
             );
         }
 
-        [$from, $to] = $this->dateRangeForPeriod();
-
         $baseQuery = Package::query()
-            ->where('driver_id', $driver->id)
-            ->whereBetween('created_at', [$from, $to]);
+            ->where('driver_id', $driver->id);
 
         $assignedCount = (clone $baseQuery)->count();
 
@@ -89,25 +77,5 @@ class Dashboard extends Component
                 'recentDeliveries' => $recentDeliveries,
             ]
         );
-    }
-
-    protected function dateRangeForPeriod(): array
-    {
-        return match ($this->period) {
-            'week' => [
-                now()->startOfWeek(),
-                now()->endOfWeek(),
-            ],
-
-            'month' => [
-                now()->startOfMonth(),
-                now()->endOfMonth(),
-            ],
-
-            default => [
-                now()->startOfDay(),
-                now()->endOfDay(),
-            ],
-        };
     }
 }

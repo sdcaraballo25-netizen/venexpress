@@ -102,6 +102,75 @@ class PackageDetail extends Component
         }
     }
 
+    /**
+     * El repartidor confirma que la entrega a domicilio fue realizada.
+     */
+    public function completeDelivery(): void
+    {
+        try {
+
+            $driver = auth()->user()->driver;
+
+            if (! $driver) {
+                abort(
+                    403,
+                    'Tu usuario no tiene un perfil de repartidor asociado.'
+                );
+            }
+
+            $this->package->refresh();
+
+            $this->package =
+                app(PackageService::class)->completeDelivery(
+                    package: $this->package,
+                    driver: $driver,
+                    locationDescription:
+                        'Entrega confirmada por el repartidor',
+                );
+
+            session()->flash(
+                'success',
+                'La entrega fue confirmada correctamente.'
+            );
+
+        } catch (RuntimeException $e) {
+
+            session()->flash(
+                'error',
+                $e->getMessage()
+            );
+        }
+    }
+
+    /**
+     * El repartidor registra el cobro en destino (COD).
+     */
+    public function collectCod(): void
+    {
+        try {
+
+            $this->package->refresh();
+
+            $this->package =
+                app(PackageService::class)->collectCod(
+                    package: $this->package,
+                    userId: (int) auth()->id(),
+                );
+
+            session()->flash(
+                'success',
+                'El cobro COD fue registrado correctamente.'
+            );
+
+        } catch (RuntimeException $e) {
+
+            session()->flash(
+                'error',
+                $e->getMessage()
+            );
+        }
+    }
+
     public function render()
     {
         return view(
