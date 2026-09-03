@@ -102,10 +102,10 @@
     "semantic_hash": ""
   },
   "app/Models/CityDistance.php": {
-    "mtime": 1787246706.0,
-    "seen": 1788416939.612066,
-    "ast_hash": "5af7e20f2557e578bf5631b755d6540f",
-    "semantic_hash": "5af7e20f2557e578bf5631b755d6540f"
+    "mtime": 1788460311.970595,
+    "seen": 1788460595.5091085,
+    "ast_hash": "600bd122ff14ea5a5d7ef2912723202b",
+    "semantic_hash": ""
   },
   "app/Models/Driver.php": {
     "mtime": 1788334104.0,
@@ -162,9 +162,9 @@
     "semantic_hash": ""
   },
   "app/Services/TariffService.php": {
-    "mtime": 1787703878.0,
-    "seen": 1788416939.6120875,
-    "ast_hash": "d22ed5a9382462559c1f26f4a842359b",
+    "mtime": 1788460354.2894425,
+    "seen": 1788460595.5091343,
+    "ast_hash": "00edf39ca36a95a068e2a5a90674214d",
     "semantic_hash": ""
   },
   "app/View/Components/AppLayout.php": {
@@ -1158,9 +1158,9 @@
     "semantic_hash": ""
   },
   "app/Services/DistanceApiService.php": {
-    "mtime": 1787703816.0,
-    "seen": 1788416939.6120813,
-    "ast_hash": "939e0f1624d3d6775d20ae0b2df116ed",
+    "mtime": 1788460337.266296,
+    "seen": 1788460595.5091271,
+    "ast_hash": "7477f63b17fbfa4e9c68f32399385a57",
     "semantic_hash": ""
   },
   "config/venezuela.php": {
@@ -1563,6 +1563,12 @@
     "mtime": 1788415484.0,
     "seen": 1788416939.6121469,
     "ast_hash": "be9b35cfc8044b44fa3689db1e4282b7",
+    "semantic_hash": ""
+  },
+  "database/migrations/2026_09_03_000001_add_states_to_city_distances_table.php": {
+    "mtime": 1788460393.4927597,
+    "seen": 1788460595.509197,
+    "ast_hash": "a40dd564ed1432fcf6f9294767677db9",
     "semantic_hash": ""
   }
 }

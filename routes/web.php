@@ -15,7 +15,10 @@ use App\Livewire\Admin\DriverPayments;
 use App\Livewire\Admin\IncidentsManager;
 use App\Livewire\Admin\DriverAssignment;
 use App\Livewire\Admin\AuditLogViewer;
+use App\Livewire\Admin\AllyFinance;
+
 use App\Livewire\Client\Dashboard as ClientDashboard;
+
 use App\Livewire\Ally\Dashboard as AllyDashboard;
 use App\Livewire\Ally\PackageCreate as AllyPackageCreate;
 use App\Livewire\Ally\Commissions as AllyCommissions;
@@ -36,9 +39,12 @@ use App\Livewire\Public\OfficeLocator;
 |--------------------------------------------------------------------------
 */
 
-use App\Livewire\Ally\PackageReception as AllyPackageReception;
 
-
+/*
+|--------------------------------------------------------------------------
+| Aliados
+|--------------------------------------------------------------------------
+*/
 
 Route::prefix('ally')
     ->middleware([
@@ -74,25 +80,36 @@ Route::prefix('ally')
         Route::get('/paquetes/recepcion', PackageReception::class)
             ->middleware('role:aliado,aliado_taquilla')
             ->name('packages.reception');
-
-        // Próximas pantallas:
-        // Route::get('/paquetes/recepcion', ...)->name('packages.receive');
-        // Route::get('/seguimiento', ...)->name('tracking');
-        // Route::get('/taquillas', ...)->name('staff');
-        // Route::get('/cod', ...)->name('cod');
-        // Route::get('/incidencias', ...)->name('incidents');
-        // Route::get('/historial-financiero', ...)->name('financial-history');
     });
+
+
+/*
+|--------------------------------------------------------------------------
+| Página principal
+|--------------------------------------------------------------------------
+*/
 
 Route::get('/', function () {
     return view('welcome');
 })->name('home');
 
 
+/*
+|--------------------------------------------------------------------------
+| Dashboard genérico
+|--------------------------------------------------------------------------
+*/
+
 Route::view('dashboard', 'dashboard')
     ->middleware(['auth', 'verified'])
     ->name('dashboard');
 
+
+/*
+|--------------------------------------------------------------------------
+| Perfil
+|--------------------------------------------------------------------------
+*/
 
 Route::view('profile', 'profile')
     ->middleware(['auth'])
@@ -121,17 +138,26 @@ Route::get('/repartidor/dashboard', DriverDashboard::class)
     ->name('repartidor.dashboard');
 
 
-Route::get('/repartidor/escanear', \App\Livewire\Driver\Scanner::class)
+Route::get(
+    '/repartidor/escanear',
+    \App\Livewire\Driver\Scanner::class
+)
     ->middleware(['auth', 'verified', 'role:repartidor'])
     ->name('repartidor.scanner');
 
 
-Route::get('/repartidor/paquetes', \App\Livewire\Driver\Packages::class)
+Route::get(
+    '/repartidor/paquetes',
+    \App\Livewire\Driver\Packages::class
+)
     ->middleware(['auth', 'verified', 'role:repartidor'])
     ->name('repartidor.packages');
 
 
-Route::get('/repartidor/paquetes/{packageId}', \App\Livewire\Driver\PackageDetail::class)
+Route::get(
+    '/repartidor/paquetes/{packageId}',
+    \App\Livewire\Driver\PackageDetail::class
+)
     ->middleware(['auth', 'verified', 'role:repartidor'])
     ->name('repartidor.package-detail');
 
@@ -144,8 +170,6 @@ Route::post(
     ->name('repartidor.scan.verify');
 
 
-
-
 /*
 |--------------------------------------------------------------------------
 | Rastreo público
@@ -154,7 +178,8 @@ Route::post(
 
 Route::get('/rastreo', function () {
     return view('tracking.index');
-})->name('tracking.index');
+})
+    ->name('tracking.index');
 
 
 Route::get('/rastreo/resultado', function () {
@@ -205,9 +230,6 @@ Route::get('/rastreo/resultado', function () {
 
         $keys = array_keys($statusOrder);
 
-        /*
-         * El modelo Package utiliza current_status.
-         */
         $currentIndex = array_search(
             $package->current_status,
             $keys,
@@ -220,20 +242,41 @@ Route::get('/rastreo/resultado', function () {
 
 
         /*
-         * Historial de estados.
+         * Historial ordenado cronológicamente.
+         *
+         * No usamos pluck('created_at', 'status') porque
+         * eso elimina estados repetidos.
          */
         $history = $package->histories()
-            ->pluck('created_at', 'status');
+            ->orderBy('created_at')
+            ->orderBy('id')
+            ->get();
+
+
+        /*
+         * Para la línea de progreso utilizamos la última
+         * ocurrencia conocida de cada estado.
+         */
+        $latestHistoryByStatus = $history
+            ->groupBy('status')
+            ->map(function ($events) {
+                return $events->sortBy([
+                    ['created_at', 'desc'],
+                    ['id', 'desc'],
+                ])->first();
+            });
 
 
         foreach ($keys as $i => $key) {
 
             $timestamp = null;
 
-            if (isset($history[$key])) {
+            $event = $latestHistoryByStatus->get($key);
+
+            if ($event) {
 
                 $date = \Carbon\Carbon::parse(
-                    $history[$key]
+                    $event->created_at
                 );
 
                 $timestamp =
@@ -278,12 +321,14 @@ Route::get('/rastreo/resultado', function () {
         'progressPercent' => $progressPercent,
     ]);
 
-})->name('tracking.show');
+})
+    ->middleware('throttle:60,1')
+    ->name('tracking.show');
 
 
 /*
 |--------------------------------------------------------------------------
-| Calculadora de precio pública
+| Calculadora pública
 |--------------------------------------------------------------------------
 */
 
@@ -293,7 +338,7 @@ Route::get('/calcular-precio', PriceCalculator::class)
 
 /*
 |--------------------------------------------------------------------------
-| Localizador público de agencias aliadas
+| Localizador público de agencias
 |--------------------------------------------------------------------------
 */
 
@@ -310,16 +355,46 @@ Route::get('/agencias', OfficeLocator::class)
 Route::prefix('admin')
     ->middleware([
         'auth',
-        'role:admin_principal,admin_operativo'
+        'role:admin_principal,admin_operativo',
     ])
     ->name('admin.')
     ->group(function () {
 
+        /*
+        |--------------------------------------------------------------------------
+        | Dashboard
+        |--------------------------------------------------------------------------
+        */
+
         Route::get('/', AdminDashboard::class)
             ->name('dashboard');
 
+
+        /*
+        |--------------------------------------------------------------------------
+        | Aliados
+        |--------------------------------------------------------------------------
+        */
+
         Route::get('/allies', AlliesManager::class)
             ->name('allies');
+
+
+        /*
+        |--------------------------------------------------------------------------
+        | Finanzas de aliados
+        |--------------------------------------------------------------------------
+        */
+
+        Route::get('/finanzas-aliados', AllyFinance::class)
+            ->name('ally-finance');
+
+
+        /*
+        |--------------------------------------------------------------------------
+        | Tarifas
+        |--------------------------------------------------------------------------
+        */
 
         Route::get('/bcv-rates', BcvRateManager::class)
             ->name('bcv-rates');
@@ -330,8 +405,22 @@ Route::prefix('admin')
         Route::get('/city-distances', CityDistanceManager::class)
             ->name('city-distances');
 
+
+        /*
+        |--------------------------------------------------------------------------
+        | Usuarios
+        |--------------------------------------------------------------------------
+        */
+
         Route::get('/users', UsersManager::class)
             ->name('users');
+
+
+        /*
+        |--------------------------------------------------------------------------
+        | Rutas
+        |--------------------------------------------------------------------------
+        */
 
         Route::get('/rutas', RoutesManager::class)
             ->name('routes');
@@ -339,20 +428,59 @@ Route::prefix('admin')
         Route::get('/rutas/dashboard', RoutesDashboard::class)
             ->name('routes.dashboard');
 
-        Route::get('/paquetes/recepcion', \App\Livewire\Admin\PackageReception::class)
+
+        /*
+        |--------------------------------------------------------------------------
+        | Paquetes
+        |--------------------------------------------------------------------------
+        */
+
+        Route::get(
+            '/paquetes/recepcion',
+            \App\Livewire\Admin\PackageReception::class
+        )
             ->name('packages.reception');
 
-        Route::get('/paquetes/despacho', \App\Livewire\Admin\PackageDispatch::class)
+
+        Route::get(
+            '/paquetes/despacho',
+            \App\Livewire\Admin\PackageDispatch::class
+        )
             ->name('packages.dispatch');
 
-        Route::get('/paquetes/asignar-repartidor', DriverAssignment::class)
+
+        Route::get(
+            '/paquetes/asignar-repartidor',
+            DriverAssignment::class
+        )
             ->name('packages.assignment');
+
+
+        /*
+        |--------------------------------------------------------------------------
+        | Repartidores
+        |--------------------------------------------------------------------------
+        */
 
         Route::get('/remuneraciones', DriverPayments::class)
             ->name('driver-payments');
 
+
+        /*
+        |--------------------------------------------------------------------------
+        | Incidencias
+        |--------------------------------------------------------------------------
+        */
+
         Route::get('/incidencias', IncidentsManager::class)
             ->name('incidents');
+
+
+        /*
+        |--------------------------------------------------------------------------
+        | Auditoría
+        |--------------------------------------------------------------------------
+        */
 
         Route::get('/bitacora', AuditLogViewer::class)
             ->middleware('role:admin_principal')
@@ -362,11 +490,12 @@ Route::prefix('admin')
 
 /*
 |--------------------------------------------------------------------------
-| Guía / etiqueta en PDF
+| Guía / etiqueta PDF
 |--------------------------------------------------------------------------
-| Accesible por admin, el aliado dueño del paquete o el repartidor
-| asignado. La autorización fina se hace dentro del controlador
-| porque involucra varios roles distintos (ver PackageLabelController).
+|
+| La autorización fina se realiza dentro de
+| PackageLabelController.
+|
 */
 
 Route::get(
@@ -377,4 +506,10 @@ Route::get(
     ->name('packages.label');
 
 
-require __DIR__.'/auth.php';
+/*
+|--------------------------------------------------------------------------
+| Autenticación
+|--------------------------------------------------------------------------
+*/
+
+require __DIR__ . '/auth.php';
