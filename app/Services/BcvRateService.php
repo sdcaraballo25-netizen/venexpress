@@ -83,8 +83,17 @@ class BcvRateService
 
         $current = BcvRate::current();
 
-        if ($current && (float) $current->rate === (float) $data['rate']) {
-            return null;
+        if ($current) {
+            // Comparación de floats con tolerancia: nunca comparar
+            // decimales con === porque la representación en coma
+            // flotante puede diferir en el último dígito aunque el
+            // valor "real" sea el mismo, generando registros
+            // duplicados en cada sincronización.
+            $diff = abs((float) $current->rate - (float) $data['rate']);
+
+            if ($diff < 0.005) {
+                return null;
+            }
         }
 
         return BcvRate::create([

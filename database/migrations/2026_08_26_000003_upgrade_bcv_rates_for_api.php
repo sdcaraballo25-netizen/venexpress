@@ -25,17 +25,35 @@ return new class extends Migration
         // Ya no puede existir una sola tasa por día: el BCV puede cambiar
         // dos veces el mismo día.
         Schema::table('bcv_rates', function (Blueprint $table) {
-            $table->dropUnique('bcv_rates_effective_date_unique');
-            $table->index('effective_at');
+            if (Schema::hasIndex('bcv_rates', 'bcv_rates_effective_date_unique')) {
+                $table->dropUnique('bcv_rates_effective_date_unique');
+            }
+
+            if (! Schema::hasIndex('bcv_rates', 'bcv_rates_effective_at_index')) {
+                $table->index('effective_at');
+            }
         });
     }
 
     public function down(): void
     {
         Schema::table('bcv_rates', function (Blueprint $table) {
-            $table->dropIndex(['effective_at']);
-            $table->dropColumn(['effective_at', 'source', 'api_updated_at']);
-            $table->unique('effective_date');
+            if (Schema::hasIndex('bcv_rates', 'bcv_rates_effective_at_index')) {
+                $table->dropIndex(['effective_at']);
+            }
+
+            $columnsToDrop = array_filter(
+                ['effective_at', 'source', 'api_updated_at'],
+                fn (string $column) => Schema::hasColumn('bcv_rates', $column)
+            );
+
+            if ($columnsToDrop !== []) {
+                $table->dropColumn($columnsToDrop);
+            }
+
+            if (! Schema::hasIndex('bcv_rates', 'bcv_rates_effective_date_unique')) {
+                $table->unique('effective_date');
+            }
         });
     }
 };

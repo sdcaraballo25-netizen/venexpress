@@ -387,6 +387,11 @@ class RouteService
         array $packageIds,
         int $actingUserId
     ): RouteStop {
+        // Validaciones rápidas "optimistas" antes de abrir la
+        // transacción, solo para fallar temprano en el caso común.
+        // La validación que realmente importa (contra condiciones
+        // de carrera) se repite DENTRO de la transacción con el
+        // registro bloqueado.
         if (! $route->isInProgress()) {
             throw new RuntimeException(
                 'La ruta debe estar en curso para registrar recolecciones.'
@@ -396,12 +401,6 @@ class RouteService
         if ($stop->route_id !== $route->id) {
             throw new RuntimeException(
                 'Esta parada no pertenece a la ruta indicada.'
-            );
-        }
-
-        if ($stop->status !== RouteStop::STATUS_PENDING) {
-            throw new RuntimeException(
-                'Esta parada ya fue marcada como visitada u omitida.'
             );
         }
 
@@ -417,6 +416,23 @@ class RouteService
             $packageIds,
             $actingUserId
         ) {
+            // Bloqueamos la fila de la parada para que dos
+            // solicitudes concurrentes (doble tap, dos pestañas,
+            // reintento de red) no puedan procesar la misma
+            // recolección dos veces.
+            $lockedStop = RouteStop::query()
+                ->whereKey($stop->id)
+                ->lockForUpdate()
+                ->firstOrFail();
+
+            if ($lockedStop->status !== RouteStop::STATUS_PENDING) {
+                throw new RuntimeException(
+                    'Esta parada ya fue marcada como visitada u omitida.'
+                );
+            }
+
+            $stop = $lockedStop;
+
             /*
              * Solo permitimos recoger paquetes:
              *

@@ -16,7 +16,6 @@ use App\Livewire\Admin\IncidentsManager;
 use App\Livewire\Admin\DriverAssignment;
 use App\Livewire\Client\Dashboard as ClientDashboard;
 use App\Livewire\Ally\Dashboard as AllyDashboard;
-use App\Livewire\Ally\CreatePackage;
 use App\Livewire\Ally\PackageCreate as AllyPackageCreate;
 use App\Livewire\Ally\Commissions as AllyCommissions;
 use App\Livewire\Ally\Cod as AllyCod;
@@ -38,7 +37,6 @@ use App\Livewire\Public\OfficeLocator;
 
 use App\Livewire\Ally\PackageReception as AllyPackageReception;
 
-use App\Livewire\Ally\DailyCashCut as AllyDailyCashCut;
 
 
 Route::prefix('ally')
@@ -355,6 +353,23 @@ Route::prefix('admin')
         Route::get('/incidencias', IncidentsManager::class)
             ->name('incidents');
     });
+
+
+/*
+|--------------------------------------------------------------------------
+| Guía / etiqueta en PDF
+|--------------------------------------------------------------------------
+| Accesible por admin, el aliado dueño del paquete o el repartidor
+| asignado. La autorización fina se hace dentro del controlador
+| porque involucra varios roles distintos (ver PackageLabelController).
+*/
+
+Route::get(
+    '/paquetes/{package}/guia',
+    [\App\Http\Controllers\PackageLabelController::class, 'pdf']
+)
+    ->middleware(['auth'])
+    ->name('packages.label');
 
 
 require __DIR__.'/auth.php';

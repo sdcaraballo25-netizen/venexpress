@@ -24,6 +24,14 @@
             <span class="inline-flex rounded-full bg-blue-50 px-3 py-1 text-sm font-medium text-blue-700">
                 {{ $package->statusLabel() }}
             </span>
+
+            <a
+                href="{{ route('packages.label', $package->id) }}"
+                target="_blank"
+                class="ml-2 inline-flex rounded-full border border-blue-700 px-3 py-1 text-sm font-medium text-blue-700"
+            >
+                Ver guía (PDF)
+            </a>
         </div>
 
     </div>

@@ -99,6 +99,15 @@
                         >
                             Imprimir etiqueta paquete (impresora normal)
                         </button>
+                        @if ($createdPackageId)
+                            <a
+                                href="{{ route('packages.label', $createdPackageId) }}"
+                                target="_blank"
+                                class="rounded-xl border border-blue-900 px-4 py-2 text-sm font-medium text-blue-900"
+                            >
+                                Descargar guía (PDF)
+                            </a>
+                        @endif
                         <button
                             wire:click="registerAnother"
                             class="rounded-xl bg-blue-900 px-4 py-2 text-sm font-medium text-white"

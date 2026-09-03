@@ -231,6 +231,31 @@ class User extends Authenticatable
             && ! $this->is($target);
     }
 
+    /**
+     * True si este usuario tiene historial operativo que impide
+     * borrarlo de forma segura sin romper integridad referencial:
+     *
+     * - Un Aliado (dueño o taquilla) con guías registradas en su agencia.
+     * - Un Repartidor con pagos ya generados.
+     *
+     * Se usa para bloquear el borrado desde la UI antes de intentar
+     * el delete, en vez de dejar que la excepción de FK la detenga.
+     */
+    public function hasOperationalHistory(): bool
+    {
+        $ally = $this->resolveAlly();
+
+        if ($ally && $ally->packages()->exists()) {
+            return true;
+        }
+
+        if ($this->isRepartidor() && $this->driver?->payments()->exists()) {
+            return true;
+        }
+
+        return false;
+    }
+
     public static function roleLabels(): array
     {
         return [

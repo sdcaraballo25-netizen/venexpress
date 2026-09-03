@@ -6,6 +6,7 @@ use App\Models\AuditLog;
 use App\Models\Ally;
 use App\Models\Driver;
 use App\Models\User;
+use Illuminate\Database\QueryException;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Hash;
 use Illuminate\Validation\Rules;
@@ -212,6 +213,16 @@ class UsersManager extends Component
 
         abort_unless($actor?->canDeleteUser($target), 403);
 
+        if ($target->hasOperationalHistory()) {
+            session()->flash(
+                'error',
+                "No puedes eliminar a {$target->name}: tiene guías o pagos registrados en el sistema. "
+                . 'Desactiva la cuenta en su lugar para conservar el historial.'
+            );
+
+            return;
+        }
+
         $this->pendingUserId = $target->id;
         $this->adminPassword = '';
         $this->showDeleteModal = true;
@@ -235,22 +246,55 @@ class UsersManager extends Component
             return;
         }
 
-        DB::transaction(function () use ($actor, $target) {
-            $name = $target->name;
-            $role = $target->role;
+        // Bloqueo explícito por si el historial operativo cambió entre
+        // requestDelete() y este submit (p. ej. se le asignó una guía
+        // mientras el modal estaba abierto).
+        if ($target->hasOperationalHistory()) {
+            $this->showDeleteModal = false;
+            $this->pendingUserId = null;
+            $this->adminPassword = '';
 
-            $target->delete();
+            session()->flash(
+                'error',
+                "No puedes eliminar a {$target->name}: tiene guías o pagos registrados en el sistema. "
+                . 'Desactiva la cuenta en su lugar para conservar el historial.'
+            );
 
-            AuditLog::create([
-                'actor_user_id' => $actor->id,
-                'action' => 'user.deleted',
-                'target_type' => User::class,
-                'target_id' => $target->id,
-                'description' => "Eliminó al usuario {$name} con rol {$role}.",
-                'metadata' => ['role' => $role],
-                'ip_address' => request()->ip(),
-            ]);
-        });
+            return;
+        }
+
+        try {
+            DB::transaction(function () use ($actor, $target) {
+                $name = $target->name;
+                $role = $target->role;
+
+                $target->delete();
+
+                AuditLog::create([
+                    'actor_user_id' => $actor->id,
+                    'action' => 'user.deleted',
+                    'target_type' => User::class,
+                    'target_id' => $target->id,
+                    'description' => "Eliminó al usuario {$name} con rol {$role}.",
+                    'metadata' => ['role' => $role],
+                    'ip_address' => request()->ip(),
+                ]);
+            });
+        } catch (QueryException $e) {
+            // Red de seguridad: alguna relación protegida por FK que
+            // hasOperationalHistory() no cubre explícitamente (p. ej.
+            // route_stops u otra tabla nueva) impidió el borrado.
+            $this->showDeleteModal = false;
+            $this->pendingUserId = null;
+            $this->adminPassword = '';
+
+            session()->flash(
+                'error',
+                "No se pudo eliminar a {$target->name} porque todavía tiene registros asociados en el sistema."
+            );
+
+            return;
+        }
 
         $this->showDeleteModal = false;
         $this->pendingUserId = null;

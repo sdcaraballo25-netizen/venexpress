@@ -19,6 +19,13 @@
         </div>
     @endif
 
+    @if (session()->has('error'))
+        <div class="mb-6 flex items-center gap-3 rounded-xl border border-red-200 bg-red-50 px-4 py-3 text-sm text-red-700">
+            <div class="flex h-7 w-7 items-center justify-center rounded-full bg-red-100">!</div>
+            <span>{{ session('error') }}</span>
+        </div>
+    @endif
+
     <div class="mb-6 rounded-2xl border border-[#E2E8F0] bg-white p-5 shadow-sm">
         <div class="grid gap-4 md:grid-cols-[1fr_220px_180px]">
             <div>

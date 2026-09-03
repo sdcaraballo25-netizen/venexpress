@@ -74,6 +74,7 @@ class PackageCreate extends Component
     public bool $showRecipientCustomerModal = false;
 
     // Resultado tras registrar
+    public ?int $createdPackageId = null;
     public ?string $createdTrackingNumber = null;
     public ?string $createdSecurityHash = null;
     public ?float $createdTotalUsd = null;
@@ -422,6 +423,7 @@ class PackageCreate extends Component
             'origin_state' => $this->origin_state ?: null,
         ], auth()->id());
 
+        $this->createdPackageId = $package->id;
         $this->createdTrackingNumber = $package->tracking_number;
         $this->createdSecurityHash = $package->security_hash;
         $this->createdTotalUsd = (float) $package->total_price_usd;
@@ -468,6 +470,7 @@ class PackageCreate extends Component
 
     public function registerAnother(): void
     {
+        $this->createdPackageId = null;
         $this->createdTrackingNumber = null;
         $this->createdSecurityHash = null;
         $this->createdTotalUsd = null;

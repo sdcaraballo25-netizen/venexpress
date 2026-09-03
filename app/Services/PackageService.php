@@ -4,11 +4,17 @@ namespace App\Services;
 
 use App\Models\Ally;
 use App\Models\AuditLog;
+use App\Models\Customer;
 use App\Models\Driver;
 use App\Models\Package;
 use App\Models\PackageHistory;
+use App\Notifications\PackageStatusUpdated;
+use Illuminate\Database\QueryException;
 use Illuminate\Support\Facades\DB;
+use Illuminate\Support\Facades\Log;
+use Illuminate\Support\Facades\Notification;
 use RuntimeException;
+use Throwable;
 
 class PackageService
 {
@@ -17,11 +23,85 @@ class PackageService
     ) {
     }
 
+    /**
+     * Avisa por correo al destinatario que el estado de su guía
+     * cambió. El destinatario se resuelve por recipient_id_doc contra
+     * la tabla customers (el mismo vínculo que usa el panel de
+     * Cliente), así que si nadie con ese documento se ha registrado
+     * o registrado como destinatario con correo, simplemente no se
+     * envía nada — no es un error, es un envío sin cliente asociado.
+     *
+     * Nunca se deja que un fallo de correo (SMTP caído, red, etc.)
+     * interrumpa una operación de guía ya confirmada en base de
+     * datos: por eso todo el envío queda protegido en un try/catch.
+     */
+    protected function notifyStatusChange(Package $package, string $status): void
+    {
+        try {
+            $customer = Customer::query()
+                ->where('id_doc', $package->recipient_id_doc)
+                ->whereNotNull('email')
+                ->first();
+
+            if (! $customer || ! $customer->email) {
+                return;
+            }
+
+            Notification::route('mail', $customer->email)
+                ->notify(new PackageStatusUpdated($package, $status));
+        } catch (Throwable $e) {
+            Log::warning(
+                'No se pudo enviar la notificación de cambio de estado.',
+                [
+                    'package_id' => $package->id,
+                    'status' => $status,
+                    'error' => $e->getMessage(),
+                ]
+            );
+        }
+    }
+
     public function createPackage(
         array $data,
         ?int $registeredByUserId = null
     ): Package {
-        return DB::transaction(function () use (
+        $maxAttempts = 5;
+
+        for ($attempt = 1; $attempt <= $maxAttempts; $attempt++) {
+            try {
+                return $this->attemptCreatePackage(
+                    $data,
+                    $registeredByUserId
+                );
+            } catch (QueryException $e) {
+                $isUniqueViolation =
+                    (int) $e->getCode() === 23000
+                    || str_contains(
+                        strtolower($e->getMessage()),
+                        'tracking_number'
+                    );
+
+                if (! $isUniqueViolation || $attempt === $maxAttempts) {
+                    throw $e;
+                }
+
+                // Colisión de índice único en tracking_number:
+                // se reintenta con un número nuevo.
+                continue;
+            }
+        }
+
+        // Nunca debería llegar aquí, pero PHP exige un retorno.
+        throw new RuntimeException(
+            'No se pudo generar la guía tras varios intentos.'
+        );
+    }
+
+    protected function attemptCreatePackage(
+        array $data,
+        ?int $registeredByUserId
+    ): Package {
+        $package = DB::transaction(function () use (
             $data,
             $registeredByUserId
         ) {
@@ -177,6 +257,10 @@ class PackageService
 
             return $package;
         });
+
+        $this->notifyStatusChange($package, Package::STATUS_RECIBIDO_AGENCIA);
+
+        return $package;
     }
 
     /*
@@ -210,7 +294,7 @@ class PackageService
             $newStatus
         );
 
-        return DB::transaction(
+        $updatedPackage = DB::transaction(
             function () use (
                 $package,
                 $newStatus,
@@ -263,6 +347,10 @@ class PackageService
                 return $lockedPackage->fresh();
             }
         );
+
+        $this->notifyStatusChange($updatedPackage, $newStatus);
+
+        return $updatedPackage;
     }
 
     /*
@@ -524,7 +612,7 @@ class PackageService
         Driver $driver,
         ?string $locationDescription = null
     ): Package {
-        return DB::transaction(function () use (
+        $updatedPackage = DB::transaction(function () use (
             $package,
             $driver,
             $locationDescription
@@ -597,6 +685,10 @@ class PackageService
 
             return $lockedPackage->fresh();
         });
+
+        $this->notifyStatusChange($updatedPackage, Package::STATUS_ENTREGADO);
+
+        return $updatedPackage;
     }
 
     /**
@@ -609,7 +701,7 @@ class PackageService
         string $recipientIdDoc,
         ?string $locationDescription = null
     ): Package {
-        return DB::transaction(function () use (
+        $updatedPackage = DB::transaction(function () use (
             $package,
             $userId,
             $recipientIdDoc,
@@ -656,6 +748,10 @@ class PackageService
 
             return $locked->fresh();
         });
+
+        $this->notifyStatusChange($updatedPackage, Package::STATUS_ENTREGADO);
+
+        return $updatedPackage;
     }
 
     /*
