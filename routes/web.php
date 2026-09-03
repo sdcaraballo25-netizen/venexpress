@@ -26,6 +26,9 @@ use App\Livewire\Ally\PackageReception;
 
 use App\Livewire\Driver\Dashboard as DriverDashboard;
 
+use App\Livewire\Public\PriceCalculator;
+use App\Livewire\Public\OfficeLocator;
+
 
 /*
 |--------------------------------------------------------------------------
@@ -277,6 +280,26 @@ Route::get('/rastreo/resultado', function () {
     ]);
 
 })->name('tracking.show');
+
+
+/*
+|--------------------------------------------------------------------------
+| Calculadora de precio pública
+|--------------------------------------------------------------------------
+*/
+
+Route::get('/calcular-precio', PriceCalculator::class)
+    ->name('public.calculator');
+
+
+/*
+|--------------------------------------------------------------------------
+| Localizador público de agencias aliadas
+|--------------------------------------------------------------------------
+*/
+
+Route::get('/agencias', OfficeLocator::class)
+    ->name('public.offices');
 
 
 /*

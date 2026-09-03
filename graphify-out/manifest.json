@@ -1230,9 +1230,9 @@
     "semantic_hash": ""
   },
   "app/Livewire/Driver/PackageDetail.php": {
-    "mtime": 1788362973.0,
-    "seen": 1788365846.586598,
-    "ast_hash": "35d392188d34873f167bf68479ab2d82",
+    "mtime": 1788366598.8829408,
+    "seen": 1788366923.526224,
+    "ast_hash": "53b611633ec5279e694d4e1465d478f3",
     "semantic_hash": ""
   },
   "app/Livewire/Driver/Packages.php": {
@@ -1338,9 +1338,9 @@
     "semantic_hash": ""
   },
   "app/Livewire/Driver/Dashboard.php": {
-    "mtime": 1788344032.0,
-    "seen": 1788365846.5865955,
-    "ast_hash": "1a540fd49162b6d55d59a1bad1cae745",
+    "mtime": 1788366841.1706133,
+    "seen": 1788366923.5262215,
+    "ast_hash": "04b939de79520af7e76044ecd52d03c2",
     "semantic_hash": ""
   },
   "app/Models/DriverPayment.php": {
@@ -1473,6 +1473,12 @@
     "mtime": 1788325280.1160421,
     "seen": 1788365846.586751,
     "ast_hash": "3c1c9c1d365ab5eefc69ecd47f72d734",
+    "semantic_hash": ""
+  },
+  "resources/views/layouts/driver.blade.php": {
+    "mtime": 1788366814.0723765,
+    "seen": 1788366923.5263803,
+    "ast_hash": "75e9c9c590ffc0945d4d71e3bea7e7c1",
     "semantic_hash": ""
   }
 }

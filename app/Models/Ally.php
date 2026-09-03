@@ -26,7 +26,10 @@ class Ally extends Model
     'business_name',
     'rif',
     'city',
+    'state',
     'address',
+    'latitude',
+    'longitude',
     'commission_percentage',
     'status',
     ];
@@ -40,7 +43,20 @@ class Ally extends Model
     {
         return [
             'commission_percentage' => 'decimal:2',
+            'latitude' => 'decimal:7',
+            'longitude' => 'decimal:7',
         ];
+    }
+
+    /**
+     * Agencias activas y con coordenadas cargadas: las únicas que
+     * tiene sentido mostrar en el localizador público de oficinas.
+     */
+    public function scopePubliclyVisible($query)
+    {
+        return $query->where('status', self::STATUS_ACTIVE)
+            ->whereNotNull('latitude')
+            ->whereNotNull('longitude');
     }
 
     /*

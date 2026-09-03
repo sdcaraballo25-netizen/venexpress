@@ -226,6 +226,23 @@
 
                                 <div class="flex justify-end items-center gap-2">
 
+                                    {{-- =========================================
+                                         UBICACIÓN (para el localizador público)
+                                    ========================================== --}}
+                                    @if($ally->status !== Ally::STATUS_REJECTED)
+                                        <button
+                                            wire:click="editLocation({{ $ally->id }})"
+                                            class="px-3 py-2 rounded-lg
+                                                   bg-slate-50 text-slate-600
+                                                   hover:bg-slate-100
+                                                   text-xs font-semibold
+                                                   transition inline-flex items-center gap-1.5"
+                                        >
+                                            <i class="fa-solid fa-location-dot"></i>
+                                            {{ $ally->latitude ? 'Editar ubicación' : 'Fijar ubicación' }}
+                                        </button>
+                                    @endif
+
 
                                     {{-- =========================================
                                          PENDIENTE
@@ -369,5 +386,126 @@
         @endif
 
     </div>
+
+
+    {{-- =========================================================
+         MODAL: UBICACIÓN DE LA AGENCIA (para el localizador público)
+    ========================================================== --}}
+    @once
+        <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/leaflet/1.9.4/leaflet.min.css">
+        <script src="https://cdnjs.cloudflare.com/ajax/libs/leaflet/1.9.4/leaflet.min.js"></script>
+    @endonce
+
+    @if($showLocationModal)
+
+        <div
+            class="fixed inset-0 z-50 flex items-center justify-center bg-black/40 px-4"
+            wire:key="location-modal-{{ $editingAllyId }}"
+        >
+
+            <div class="bg-white rounded-2xl shadow-xl w-full max-w-lg p-6">
+
+                <div class="flex items-center justify-between mb-4">
+                    <h3 class="font-display text-lg font-bold text-[#0F172A]">
+                        Ubicación de la agencia
+                    </h3>
+                    <button wire:click="$set('showLocationModal', false)" class="text-slate-400 hover:text-slate-600">
+                        ✕
+                    </button>
+                </div>
+
+                <p class="text-xs text-[#64748B] mb-3">
+                    Haz clic en el mapa sobre la ubicación exacta de la agencia. Estas coordenadas
+                    son las que se muestran a los clientes en el localizador público de oficinas.
+                </p>
+
+                <div
+                    x-data="allyLocationMap({
+                        lat: @js($location_latitude ?? 10.4806),
+                        lng: @js($location_longitude ?? -66.9036),
+                        hasPoint: @js((bool) $location_latitude),
+                    })"
+                    x-init="init($el)"
+                    wire:ignore
+                    class="rounded-xl overflow-hidden border border-[#E2E8F0] mb-4"
+                    style="height: 280px;"
+                ></div>
+
+                <div class="grid grid-cols-2 gap-3 mb-4">
+                    <div>
+                        <label class="block text-xs font-medium text-[#64748B] mb-1">Estado</label>
+                        <select wire:model="location_state" class="w-full rounded-lg border-[#E2E8F0] text-sm focus:ring-blue-500 focus:border-blue-500">
+                            <option value="">Selecciona...</option>
+                            @foreach (array_keys(config('venezuela.states', [])) as $state)
+                                <option value="{{ $state }}">{{ $state }}</option>
+                            @endforeach
+                        </select>
+                        @error('location_state') <p class="text-xs text-red-600 mt-1">{{ $message }}</p> @enderror
+                    </div>
+                    <div class="grid grid-cols-2 gap-2">
+                        <div>
+                            <label class="block text-xs font-medium text-[#64748B] mb-1">Latitud</label>
+                            <input type="text" wire:model="location_latitude" readonly
+                                class="w-full rounded-lg border-[#E2E8F0] text-sm bg-slate-50 text-slate-500">
+                        </div>
+                        <div>
+                            <label class="block text-xs font-medium text-[#64748B] mb-1">Longitud</label>
+                            <input type="text" wire:model="location_longitude" readonly
+                                class="w-full rounded-lg border-[#E2E8F0] text-sm bg-slate-50 text-slate-500">
+                        </div>
+                    </div>
+                </div>
+                @error('location_latitude') <p class="text-xs text-red-600 -mt-2 mb-3">{{ $message }}</p> @enderror
+
+                <div class="flex justify-end gap-2">
+                    <button wire:click="$set('showLocationModal', false)"
+                        class="px-4 py-2 rounded-lg text-sm font-semibold text-slate-600 hover:bg-slate-50">
+                        Cancelar
+                    </button>
+                    <button wire:click="saveLocation"
+                        class="px-4 py-2 rounded-lg text-sm font-semibold bg-blue-600 text-white hover:bg-blue-700">
+                        Guardar ubicación
+                    </button>
+                </div>
+
+            </div>
+
+        </div>
+
+        <script>
+            function allyLocationMap({ lat, lng, hasPoint }) {
+                return {
+                    map: null,
+                    marker: null,
+                    init(el) {
+                        this.map = L.map(el).setView([lat, lng], hasPoint ? 14 : 6);
+
+                        L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
+                            attribution: '&copy; OpenStreetMap contributors',
+                        }).addTo(this.map);
+
+                        if (hasPoint) {
+                            this.marker = L.marker([lat, lng]).addTo(this.map);
+                        }
+
+                        this.map.on('click', (e) => {
+                            const { lat, lng } = e.latlng;
+
+                            if (this.marker) {
+                                this.marker.setLatLng([lat, lng]);
+                            } else {
+                                this.marker = L.marker([lat, lng]).addTo(this.map);
+                            }
+
+                            @this.call('setLocationFromMap', lat, lng);
+                        });
+
+                        setTimeout(() => this.map.invalidateSize(), 150);
+                    },
+                }
+            }
+        </script>
+
+    @endif
 
 </div>

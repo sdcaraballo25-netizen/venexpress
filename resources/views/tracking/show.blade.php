@@ -64,10 +64,17 @@
                 </a>
 
                 <a
-                    href="{{ route('home') }}#aliados"
+                    href="{{ route('public.calculator') }}"
                     class="hover:text-blue-950 transition"
                 >
-                    Aliados
+                    Calcular precio
+                </a>
+
+                <a
+                    href="{{ route('public.offices') }}"
+                    class="hover:text-blue-950 transition"
+                >
+                    Agencias aliadas
                 </a>
 
                 <a

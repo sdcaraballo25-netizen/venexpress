@@ -25,7 +25,8 @@
             <div class="hidden md:flex items-center gap-9 text-sm font-medium text-gray-500">
                 <a href="{{ route('home') }}" class="text-blue-950 font-semibold">Inicio</a>
                 <a href="#servicios" class="hover:text-blue-950 transition">Servicios</a>
-                <a href="#aliados" class="hover:text-blue-950 transition">Aliados</a>
+                <a href="{{ route('public.calculator') }}" class="hover:text-blue-950 transition">Calcular precio</a>
+                <a href="{{ route('public.offices') }}" class="hover:text-blue-950 transition">Agencias aliadas</a>
                 <a href="{{ route('tracking.index') }}" class="hover:text-blue-950 transition">Rastreo</a>
                 <a href="#ayuda" class="hover:text-blue-950 transition">Ayuda</a>
             </div>

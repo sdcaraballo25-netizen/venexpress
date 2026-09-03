@@ -309,9 +309,9 @@
       VEN<span class="express">EXPRESS</span>
     </a>
     <nav class="main-nav">
-      <a href="#" class="nav-link">Tarifas</a>
+      <a href="{{ route('public.calculator') }}" class="nav-link">Calcular precio</a>
       <a href="#flow" class="nav-link">Cómo viaja</a>
-      <a href="#" class="nav-link">Aliados</a>
+      <a href="{{ route('public.offices') }}" class="nav-link">Agencias aliadas</a>
       <a href="#track" class="nav-track-btn">Rastrear envío</a>
     </nav>
   </div>
@@ -340,23 +340,11 @@
     <h1 class="hero-title">¿Dónde está<br>tu paquete?</h1>
     <p class="hero-sub">Escribe tu número de guía y sigue su ruta real: desde la agencia donde lo entregaste hasta la puerta de quien lo recibe.</p>
 
-    <form class="ticket" id="track-form">
-      <input type="text" id="guide-input" placeholder="VX-00000" aria-label="Número de guía" autocomplete="off">
+    <form class="ticket" id="track-form" action="{{ route('tracking.show') }}" method="GET">
+      <input type="text" id="guide-input" name="guia" placeholder="VX-00000" aria-label="Número de guía" autocomplete="off" required>
       <span class="ticket-divider"></span>
       <button type="submit">Buscar</button>
     </form>
-
-    <div class="try-row">
-      <span class="try-label">Probar con:</span>
-      <button type="button" class="chip" data-code="VX-83920">VX-83920</button>
-      <button type="button" class="chip" data-code="VX-11204">VX-11204</button>
-      <button type="button" class="chip" data-code="VX-77310">VX-77310</button>
-    </div>
-
-    <div class="result-panel" id="result-panel">
-      <div class="rp-top"><span>GUÍA <span id="rp-code">VX-83920</span></span><span id="rp-eta">Entrega estimada: hoy</span></div>
-      <div class="rp-status" id="rp-status">EN TRÁNSITO NACIONAL — Hub Valencia → Hub Maracaibo</div>
-    </div>
 
   </div>
 </section>
@@ -428,43 +416,6 @@
     <p>Servicio nacional de encomiendas · Venezuela</p>
   </div>
 </footer>
-
-<script>
-  const form = document.getElementById('track-form');
-  const input = document.getElementById('guide-input');
-  const panel = document.getElementById('result-panel');
-  const rpCode = document.getElementById('rp-code');
-  const rpStatus = document.getElementById('rp-status');
-  const rpEta = document.getElementById('rp-eta');
-
-  const demoData = {
-    'VX-83920': { status: 'EN TRÁNSITO NACIONAL — Hub Valencia → Hub Maracaibo', eta: 'Entrega estimada: hoy' },
-    'VX-11204': { status: 'LISTO PARA RETIRO — Agencia Barquisimeto Centro', eta: 'Retiro habilitado' },
-    'VX-77310': { status: 'ENTREGADO — Recibido por destinatario', eta: 'Entregado ayer, 4:12 p.m.' }
-  };
-
-  function showResult(code){
-    const data = demoData[code] || { status: 'RECIBIDO EN AGENCIA — Esperando recolección', eta: 'Aún sin ruta asignada' };
-    rpCode.textContent = code;
-    rpStatus.textContent = data.status;
-    rpEta.textContent = data.eta;
-    panel.classList.add('show');
-  }
-
-  document.querySelectorAll('.chip').forEach(chip=>{
-    chip.addEventListener('click', ()=>{
-      const code = chip.dataset.code;
-      input.value = code;
-      showResult(code);
-    });
-  });
-
-  form.addEventListener('submit', (e)=>{
-    e.preventDefault();
-    const code = input.value.trim().toUpperCase() || 'VX-00000';
-    showResult(code);
-  });
-</script>
 
 </body>
 </html>
