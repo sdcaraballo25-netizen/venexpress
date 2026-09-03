@@ -7,6 +7,7 @@ use App\Services\PackageService;
 use Livewire\Attributes\Layout;
 use Livewire\Component;
 use RuntimeException;
+use Illuminate\Support\Facades\Auth;
 
 #[Layout('layouts.driver')]
 class PackageDetail extends Component
@@ -17,7 +18,9 @@ class PackageDetail extends Component
 
     public function mount(int $packageId): void
     {
-        $driver = auth()->user()->driver;
+        $user = Auth::user();
+
+$driver = $user?->driver;
 
         if (! $driver) {
             abort(
@@ -48,7 +51,9 @@ class PackageDetail extends Component
     {
         try {
 
-            $driver = auth()->user()->driver;
+            $user = Auth::user();
+
+$driver = $user?->driver;
 
             if (! $driver) {
                 abort(
@@ -83,7 +88,7 @@ class PackageDetail extends Component
                     newStatus:
                         Package::STATUS_EN_TRANSITO_NACIONAL,
                     userId:
-                        auth()->id(),
+                        Auth::id(),
                     locationDescription:
                         'Entrega iniciada por el repartidor',
                 );
@@ -109,7 +114,9 @@ class PackageDetail extends Component
     {
         try {
 
-            $driver = auth()->user()->driver;
+            $user = Auth::user();
+
+$driver = $user?->driver;
 
             if (! $driver) {
                 abort(
@@ -152,10 +159,10 @@ class PackageDetail extends Component
             $this->package->refresh();
 
             $this->package =
-                app(PackageService::class)->collectCod(
-                    package: $this->package,
-                    userId: (int) auth()->id(),
-                );
+    app(PackageService::class)->collectCod(
+        package: $this->package,
+        userId: (int) Auth::id(),
+    );
 
             session()->flash(
                 'success',

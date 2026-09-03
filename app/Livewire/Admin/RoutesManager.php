@@ -166,7 +166,7 @@ class RoutesManager extends Component
         $this->city = $route->city ?? '';
 
         $this->selectedStops = $route->stops
-            ->sortBy('stop_order')
+            ->sortBy('sequence')
             ->pluck('ally_id')
             ->map(fn ($id) => (int) $id)
             ->values()
@@ -292,12 +292,14 @@ class RoutesManager extends Component
                 );
             } else {
                 $routeService->createRoute(
-                    name: $this->name,
-                    state: $this->state,
-                    city: $this->city,
-                    allyIds: $this->selectedStops,
-                    actingUserId: Auth::id(),
-                );
+    data: [
+        'name' => $this->name,
+        'state' => $this->state,
+        'city' => $this->city,
+    ],
+    allyIdsInOrder: $this->selectedStops,
+    createdByUserId: Auth::id(),
+);
 
                 session()->flash(
                     'success',
@@ -335,11 +337,11 @@ class RoutesManager extends Component
         ]);
 
         try {
-            $routeService->assignDriver(
-                routeId: $this->assigningRouteId,
-                driverId: $this->selectedDriverId,
-                actingUserId: Auth::id(),
-            );
+            $routeService->assignDriverById(
+    routeId: $this->assigningRouteId,
+    driverId: $this->selectedDriverId,
+    actingUserId: Auth::id(),
+);
 
             session()->flash(
                 'success',

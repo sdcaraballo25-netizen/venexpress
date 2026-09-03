@@ -60,14 +60,17 @@
                     </label>
 
                     <select
-                        wire:model.live="filterStatus"
-                        class="w-full rounded-xl border-[#E2E8F0] text-sm focus:border-blue-500 focus:ring-blue-500">
-                        <option value="">Todos los estados</option>
-                        <option value="pending">Pendiente</option>
-                        <option value="active">En curso</option>
-                        <option value="completed">Completada</option>
-                        <option value="cancelled">Cancelada</option>
-                    </select>
+    wire:model.live="filterStatus"
+    class="w-full rounded-xl border-[#E2E8F0] text-sm focus:border-blue-500 focus:ring-blue-500">
+    
+    <option value="">Todos los estados</option>
+    <option value="draft">Borrador</option>
+    <option value="assigned">Asignada</option>
+    <option value="in_progress">En curso</option>
+    <option value="completed">Completada</option>
+    <option value="cancelled">Cancelada</option>
+
+</select>
                 </div>
 
             </div>
@@ -93,18 +96,30 @@
                                         {{ $route->name }}
                                     </h2>
 
-                                    <span class="px-3 py-1 rounded-full text-xs font-semibold
-                                        @if($route->status === 'active')
-                                            bg-blue-50 text-blue-700
-                                        @elseif($route->status === 'completed')
-                                            bg-emerald-50 text-emerald-700
-                                        @elseif($route->status === 'cancelled')
-                                            bg-red-50 text-red-700
-                                        @else
-                                            bg-amber-50 text-amber-700
-                                        @endif">
-                                        {{ ucfirst($route->status) }}
-                                    </span>
+                                    @php
+    $statusLabels = [
+        'draft' => 'Borrador',
+        'assigned' => 'Asignada',
+        'in_progress' => 'En curso',
+        'completed' => 'Completada',
+        'cancelled' => 'Cancelada',
+    ];
+@endphp
+
+<span class="px-3 py-1 rounded-full text-xs font-semibold
+    @if($route->status === 'in_progress')
+        bg-blue-50 text-blue-700
+    @elseif($route->status === 'assigned')
+        bg-violet-50 text-violet-700
+    @elseif($route->status === 'completed')
+        bg-emerald-50 text-emerald-700
+    @elseif($route->status === 'cancelled')
+        bg-red-50 text-red-700
+    @else
+        bg-amber-50 text-amber-700
+    @endif">
+    {{ $statusLabels[$route->status] ?? $route->status }}
+</span>
                                 </div>
 
                                 <p class="text-sm text-[#64748B] mt-1">
@@ -126,7 +141,7 @@
                                     Repartidor
                                 </button>
 
-                                @if ($route->status === 'pending')
+                                @if ($route->status === 'assigned')
                                     <button
                                         wire:click="startRoute({{ $route->id }})"
                                         class="px-3 py-2 rounded-lg bg-blue-600 text-white text-sm hover:bg-blue-700">
@@ -134,7 +149,7 @@
                                     </button>
                                 @endif
 
-                                @if ($route->status === 'active')
+                                @if ($route->status === 'in_progress')
                                     <button
                                         wire:click="completeRoute({{ $route->id }})"
                                         wire:confirm="¿Quieres finalizar esta ruta?"
@@ -225,7 +240,7 @@
 
                                     </div>
 
-                                    @if ($route->status === 'active')
+                                    @if ($route->status === 'in_progress')
                                         <button
                                             wire:click="openCollectionModal({{ $route->id }}, {{ $stop->id }})"
                                             class="px-3 py-2 rounded-lg bg-slate-100 hover:bg-slate-200 text-xs font-semibold text-slate-700">
@@ -301,112 +316,87 @@
                 <div class="p-6 space-y-6">
 
                     {{-- DATOS --}}
-                    <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+<div class="grid grid-cols-1 md:grid-cols-3 gap-4">
 
-                        <div>
-                            <label class="block text-xs font-bold text-[#64748B] uppercase mb-2">
-                                Ciudad
-                            </label>
+    {{-- ESTADO --}}
+    <div>
+        <label class="block text-xs font-bold text-[#64748B] uppercase mb-2">
+            Estado
+        </label>
 
-                            <select
-                                wire:model.live="city"
-                                class="w-full rounded-xl border-[#E2E8F0]">
-                                <option value="">Seleccionar ciudad</option>
+        <select
+            wire:model.live="state"
+            class="w-full rounded-xl border-[#E2E8F0]">
 
-                                @foreach ($citiesWithAllies as $cityOption)
-                                    <option value="{{ $cityOption }}">
-                                        {{ $cityOption }}
-                                    </option>
-                                @endforeach
-                            </select>
+            <option value="">Seleccionar estado</option>
 
-                            @error('city')
-                                <p class="text-xs text-red-600 mt-1">{{ $message }}</p>
-                            @enderror
-                        </div>
+            @foreach ($states as $stateOption)
+                <option value="{{ $stateOption }}">
+                    {{ $stateOption }}
+                </option>
+            @endforeach
 
-                        <div>
-                            <label class="block text-xs font-bold text-[#64748B] uppercase mb-2">
-                                Nombre de la ruta
-                            </label>
+        </select>
 
-                            <input
-                                type="text"
-                                wire:model="name"
-                                placeholder="Ej. Ruta Caracas Centro"
-                                class="w-full rounded-xl border-[#E2E8F0]">
+        @error('state')
+            <p class="text-xs text-red-600 mt-1">
+                {{ $message }}
+            </p>
+        @enderror
+    </div>
 
-                            @error('name')
-                                <p class="text-xs text-red-600 mt-1">{{ $message }}</p>
-                            @enderror
-                        </div>
+    {{-- CIUDAD --}}
+    <div>
+        <label class="block text-xs font-bold text-[#64748B] uppercase mb-2">
+            Ciudad
+        </label>
 
-                    </div>
+        <select
+            wire:model.live="city"
+            @disabled($state === '')
+            class="w-full rounded-xl border-[#E2E8F0]">
 
-                    {{-- AGENCIAS --}}
-                    <div>
+            <option value="">
+                {{ $state === ''
+                    ? 'Primero selecciona un estado'
+                    : 'Seleccionar ciudad' }}
+            </option>
 
-                        <p class="text-xs font-bold text-[#64748B] uppercase mb-3">
-                            Agencias disponibles
-                        </p>
+            @foreach ($cities as $cityOption)
+                <option value="{{ $cityOption }}">
+                    {{ $cityOption }}
+                </option>
+            @endforeach
 
-                        @if ($city === '')
+        </select>
 
-                            <div class="rounded-xl bg-slate-50 p-5 text-sm text-[#64748B]">
-                                Selecciona una ciudad para ver las agencias disponibles.
-                            </div>
+        @error('city')
+            <p class="text-xs text-red-600 mt-1">
+                {{ $message }}
+            </p>
+        @enderror
+    </div>
 
-                        @elseif ($availableAllies->isEmpty())
+    {{-- NOMBRE --}}
+    <div>
+        <label class="block text-xs font-bold text-[#64748B] uppercase mb-2">
+            Nombre de la ruta
+        </label>
 
-                            <div class="rounded-xl bg-amber-50 p-5 text-sm text-amber-700">
-                                No hay agencias activas en esta ciudad.
-                            </div>
+        <input
+            type="text"
+            wire:model="name"
+            placeholder="Ej. Ruta Caracas Centro"
+            class="w-full rounded-xl border-[#E2E8F0]">
 
-                        @else
+        @error('name')
+            <p class="text-xs text-red-600 mt-1">
+                {{ $message }}
+            </p>
+        @enderror
+    </div>
 
-                            <div class="grid grid-cols-1 md:grid-cols-2 gap-3">
-
-                                @foreach ($availableAllies as $ally)
-
-                                    <button
-                                        type="button"
-                                        wire:click="toggleStop({{ $ally->id }})"
-                                        class="text-left rounded-xl border p-4 transition
-                                        {{ in_array($ally->id, $selectedStops, true)
-                                            ? 'border-blue-500 bg-blue-50'
-                                            : 'border-[#E2E8F0] hover:bg-slate-50' }}">
-
-                                        <div class="flex items-center justify-between">
-
-                                            <div>
-                                                <p class="font-semibold text-sm text-[#0F172A]">
-                                                    {{ $ally->business_name }}
-                                                </p>
-
-                                                <p class="text-xs text-[#64748B] mt-1">
-                                                    {{ $ally->city }}
-                                                </p>
-                                            </div>
-
-                                            @if (in_array($ally->id, $selectedStops, true))
-                                                <span class="text-blue-600 font-bold">✓</span>
-                                            @endif
-
-                                        </div>
-
-                                    </button>
-
-                                @endforeach
-
-                            </div>
-
-                        @endif
-
-                        @error('selectedStops')
-                            <p class="text-xs text-red-600 mt-2">{{ $message }}</p>
-                        @enderror
-
-                    </div>
+</div>
 
                     {{-- ORDEN --}}
                     <div>

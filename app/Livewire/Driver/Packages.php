@@ -6,6 +6,7 @@ use App\Models\Package;
 use Livewire\Attributes\Layout;
 use Livewire\Component;
 use Livewire\WithPagination;
+use Illuminate\Support\Facades\Auth;
 
 #[Layout('layouts.driver')]
 class Packages extends Component
@@ -40,7 +41,9 @@ class Packages extends Component
 
     public function render()
     {
-        $driver = auth()->user()->driver;
+        $user = Auth::user();
+
+$driver = $user?->driver;
 
         if (! $driver) {
             abort(403, 'Tu usuario no tiene un perfil de repartidor asociado.');

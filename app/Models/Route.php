@@ -89,7 +89,19 @@ class Route extends Model
 
     public function isEditable(): bool
     {
-        return in_array($this->status, [self::STATUS_DRAFT, self::STATUS_ASSIGNED], true);
+        return in_array(
+            $this->status,
+            [
+                self::STATUS_DRAFT,
+                self::STATUS_ASSIGNED,
+            ],
+            true
+        );
+    }
+
+    public function isAssigned(): bool
+    {
+        return $this->status === self::STATUS_ASSIGNED;
     }
 
     public function isInProgress(): bool
@@ -97,13 +109,44 @@ class Route extends Model
         return $this->status === self::STATUS_IN_PROGRESS;
     }
 
+    public function isCompleted(): bool
+    {
+        return $this->status === self::STATUS_COMPLETED;
+    }
+
+    public function isCancelled(): bool
+    {
+        return $this->status === self::STATUS_CANCELLED;
+    }
+
+    public function nextPendingStop(): ?RouteStop
+    {
+        return $this->stops()
+            ->where(
+                'status',
+                RouteStop::STATUS_PENDING
+            )
+            ->orderBy('sequence')
+            ->first();
+    }
+
     public function pendingStopsCount(): int
     {
-        return $this->stops()->where('status', RouteStop::STATUS_PENDING)->count();
+        return $this->stops()
+            ->where(
+                'status',
+                RouteStop::STATUS_PENDING
+            )
+            ->count();
     }
 
     public function visitedStopsCount(): int
     {
-        return $this->stops()->where('status', RouteStop::STATUS_VISITED)->count();
+        return $this->stops()
+            ->where(
+                'status',
+                RouteStop::STATUS_VISITED
+            )
+            ->count();
     }
 }

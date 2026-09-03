@@ -4,6 +4,7 @@ namespace App\Livewire\Driver;
 
 use App\Models\Package;
 use App\Services\LogisticsScanService;
+use Illuminate\Support\Facades\Auth;
 use Livewire\Attributes\Layout;
 use Livewire\Component;
 use RuntimeException;
@@ -40,20 +41,30 @@ class Scanner extends Component
             return;
         }
 
-        $driver = auth()->user()?->driver;
+        $user = Auth::user();
+
+        $driver = $user?->driver;
 
         if (! $driver) {
-            abort(403, 'Tu usuario no tiene un perfil de repartidor asociado.');
+            abort(
+                403,
+                'Tu usuario no tiene un perfil de repartidor asociado.'
+            );
         }
 
         $package = Package::query()
             ->where('tracking_number', $this->trackingNumber)
-            ->with(['ally', 'driver', 'histories'])
+            ->with([
+                'ally',
+                'driver',
+                'histories',
+            ])
             ->first();
 
         if (! $package) {
             $this->errorMessage =
                 "No existe una guía con número: {$this->trackingNumber}";
+
             return;
         }
 
@@ -63,10 +74,11 @@ class Scanner extends Component
             $package = app(LogisticsScanService::class)->scanCollection(
                 package: $package,
                 driver: $driver,
-                userId: (int) auth()->id(),
+                userId: (int) $user->id,
             );
 
             $this->package = $package;
+
             $this->successMessage =
                 'Salida registrada correctamente. El paquete quedó recolectado por Venexpress.';
         } catch (RuntimeException $e) {
@@ -80,6 +92,7 @@ class Scanner extends Component
             ) {
                 $this->package = $package;
                 $this->errorMessage = $e->getMessage();
+
                 return;
             }
 
@@ -104,16 +117,19 @@ class Scanner extends Component
         if (! $package->security_hash) {
             $this->securityWarning = false;
             $this->securityMessage = null;
+
             return;
         }
 
         if ($package->verifySecurityHash()) {
             $this->securityWarning = false;
             $this->securityMessage = null;
+
             return;
         }
 
         $this->securityWarning = true;
+
         $this->securityMessage =
             'Los datos de esta guía no coinciden con su código de seguridad original. '
             . 'Verifica manualmente antes de continuar.';
@@ -136,3 +152,4 @@ class Scanner extends Component
         return view('livewire.driver.scanner');
     }
 }
+

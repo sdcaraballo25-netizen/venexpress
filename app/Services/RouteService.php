@@ -425,17 +425,14 @@ class RouteService
              * - asignados al mismo repartidor de la ruta
              */
             $packages = Package::query()
-                ->whereIn('id', $packageIds)
-                ->where('ally_id', $stop->ally_id)
-                ->where(
-                    'current_status',
-                    Package::STATUS_RECIBIDO_AGENCIA
-                )
-                ->where(
-                    'driver_id',
-                    $route->driver_id
-                )
-                ->get();
+    ->whereIn('id', $packageIds)
+    ->where('ally_id', $stop->ally_id)
+    ->where(
+        'current_status',
+        Package::STATUS_RECIBIDO_AGENCIA
+    )
+    ->whereNull('driver_id')
+    ->get();
 
             foreach ($packages as $package) {
                 $this->packageService->changeStatus(

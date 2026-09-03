@@ -5,13 +5,16 @@ namespace App\Livewire\Driver;
 use App\Models\Package;
 use Livewire\Attributes\Layout;
 use Livewire\Component;
+use Illuminate\Support\Facades\Auth;
 
 #[Layout('layouts.driver')]
 class Dashboard extends Component
 {
     public function render()
     {
-        $driver = auth()->user()->driver;
+       $user = \Illuminate\Support\Facades\Auth::user();
+
+$driver = $user?->driver;
 
         if (! $driver) {
             abort(
