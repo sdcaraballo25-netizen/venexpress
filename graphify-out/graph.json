@@ -4,6 +4,19 @@
   "graph": {},
   "nodes": [
     {
+      "id": "tests_feature_auth_authenticationtest_authenticationtest",
+      "label": "AuthenticationTest",
+      "_callable": true,
+      "_callable_class": true,
+      "_origin": "ast",
+      "community": 0,
+      "community_name": "TestCase",
+      "file_type": "code",
+      "norm_label": "authenticationtest",
+      "source_file": "tests/Feature/Auth/AuthenticationTest.php",
+      "source_location": "L10"
+    },
+    {
       "id": "tests_feature_auth_passwordconfirmationtest_passwordconfirmationtest",
       "label": "PasswordConfirmationTest",
       "_callable": true,
@@ -134,17 +147,17 @@
       "source_location": "L8"
     },
     {
-      "id": "app_livewire_driver_scanner_scanner",
-      "label": "Scanner",
+      "id": "app_livewire_ally_packagepickup_packagepickup",
+      "label": "PackagePickup",
       "_callable": true,
       "_callable_class": true,
       "_origin": "ast",
       "community": 111,
-      "community_name": "Scanner",
+      "community_name": "PackagePickup.php",
       "file_type": "code",
-      "norm_label": "scanner",
-      "source_file": "app/Livewire/Driver/Scanner.php",
-      "source_location": "L11"
+      "norm_label": "packagepickup",
+      "source_file": "app/Livewire/Ally/PackagePickup.php",
+      "source_location": "L10"
     },
     {
       "id": "app_livewire_admin_routesmanager_routesmanager",
@@ -277,6 +290,19 @@
       "source_location": "L12"
     },
     {
+      "id": "app_livewire_ally_cod_cod",
+      "label": "Cod",
+      "_callable": true,
+      "_callable_class": true,
+      "_origin": "ast",
+      "community": 126,
+      "community_name": "Livewire\\Component",
+      "file_type": "code",
+      "norm_label": "cod",
+      "source_file": "app/Livewire/Ally/Cod.php",
+      "source_location": "L9"
+    },
+    {
       "id": "app_livewire_ally_incidents_incidents",
       "label": "Incidents",
       "_callable": true,
@@ -288,19 +314,6 @@
       "norm_label": "incidents",
       "source_file": "app/Livewire/Ally/Incidents.php",
       "source_location": "L8"
-    },
-    {
-      "id": "tests_feature_auth_emailverificationtest_emailverificationtest",
-      "label": "EmailVerificationTest",
-      "_callable": true,
-      "_callable_class": true,
-      "_origin": "ast",
-      "community": 128,
-      "community_name": "EmailVerificationTest.php",
-      "file_type": "code",
-      "norm_label": "emailverificationtest",
-      "source_file": "tests/Feature/Auth/EmailVerificationTest.php",
-      "source_location": "L12"
     },
     {
       "id": "app_console_commands_syncbcvrate_syncbcvrate",
@@ -407,6 +420,19 @@
       "source_location": "L16"
     },
     {
+      "id": "app_livewire_admin_incidentsmanager_incidentsmanager",
+      "label": "IncidentsManager",
+      "_callable": true,
+      "_callable_class": true,
+      "_origin": "ast",
+      "community": 14,
+      "community_name": "Illuminate\\Database\\Eloquent\\Relations\\BelongsTo",
+      "file_type": "code",
+      "norm_label": "incidentsmanager",
+      "source_file": "app/Livewire/Admin/IncidentsManager.php",
+      "source_location": "L11"
+    },
+    {
       "id": "app_models_citydistance_citydistance",
       "label": "CityDistance",
       "_callable": true,
@@ -485,19 +511,6 @@
       "source_location": "L9"
     },
     {
-      "id": "database_seeders_databaseseeder_databaseseeder",
-      "label": "DatabaseSeeder",
-      "_callable": true,
-      "_callable_class": true,
-      "_origin": "ast",
-      "community": 14,
-      "community_name": "Illuminate\\Database\\Eloquent\\Relations\\BelongsTo",
-      "file_type": "code",
-      "norm_label": "databaseseeder",
-      "source_file": "database/seeders/DatabaseSeeder.php",
-      "source_location": "L15"
-    },
-    {
       "id": "app_livewire_admin_driverassignment_driverassignment",
       "label": "DriverAssignment",
       "_callable": true,
@@ -524,32 +537,6 @@
       "source_location": "L11"
     },
     {
-      "id": "app_livewire_ally_cod_cod",
-      "label": "Cod",
-      "_callable": true,
-      "_callable_class": true,
-      "_origin": "ast",
-      "community": 141,
-      "community_name": "Package",
-      "file_type": "code",
-      "norm_label": "cod",
-      "source_file": "app/Livewire/Ally/Cod.php",
-      "source_location": "L9"
-    },
-    {
-      "id": "app_livewire_ally_commissions_commissions",
-      "label": "Commissions",
-      "_callable": true,
-      "_callable_class": true,
-      "_origin": "ast",
-      "community": 141,
-      "community_name": "Package",
-      "file_type": "code",
-      "norm_label": "commissions",
-      "source_file": "app/Livewire/Ally/Commissions.php",
-      "source_location": "L10"
-    },
-    {
       "id": "app_livewire_ally_packagereception_packagereception",
       "label": "PackageReception",
       "_callable": true,
@@ -560,6 +547,19 @@
       "file_type": "code",
       "norm_label": "packagereception",
       "source_file": "app/Livewire/Ally/PackageReception.php",
+      "source_location": "L11"
+    },
+    {
+      "id": "app_livewire_driver_scanner_scanner",
+      "label": "Scanner",
+      "_callable": true,
+      "_callable_class": true,
+      "_origin": "ast",
+      "community": 141,
+      "community_name": "Package",
+      "file_type": "code",
+      "norm_label": "scanner",
+      "source_file": "app/Livewire/Driver/Scanner.php",
       "source_location": "L11"
     },
     {
@@ -719,19 +719,6 @@
       "source_location": "L9"
     },
     {
-      "id": "app_livewire_ally_packagepickup_packagepickup",
-      "label": "PackagePickup",
-      "_callable": true,
-      "_callable_class": true,
-      "_origin": "ast",
-      "community": 25,
-      "community_name": "RuntimeException",
-      "file_type": "code",
-      "norm_label": "packagepickup",
-      "source_file": "app/Livewire/Ally/PackagePickup.php",
-      "source_location": "L10"
-    },
-    {
       "id": "app_models_packagehistory_packagehistory",
       "label": "PackageHistory",
       "_callable": true,
@@ -810,17 +797,17 @@
       "source_location": "L14"
     },
     {
-      "id": "app_livewire_admin_incidentsmanager_incidentsmanager",
-      "label": "IncidentsManager",
+      "id": "database_seeders_databaseseeder_databaseseeder",
+      "label": "DatabaseSeeder",
       "_callable": true,
       "_callable_class": true,
       "_origin": "ast",
       "community": 72,
-      "community_name": "IncidentsManager",
+      "community_name": "DatabaseSeeder",
       "file_type": "code",
-      "norm_label": "incidentsmanager",
-      "source_file": "app/Livewire/Admin/IncidentsManager.php",
-      "source_location": "L11"
+      "norm_label": "databaseseeder",
+      "source_file": "database/seeders/DatabaseSeeder.php",
+      "source_location": "L15"
     },
     {
       "id": "app_http_controllers_driverscancontroller_driverscancontroller",
@@ -868,7 +855,7 @@
       "_callable_class": true,
       "_origin": "ast",
       "community": 84,
-      "community_name": "Client/Dashboard.php",
+      "community_name": "Dashboard",
       "file_type": "code",
       "norm_label": "dashboard",
       "source_file": "app/Livewire/Client/Dashboard.php",
@@ -1037,7 +1024,7 @@
       "_callable_class": true,
       "_origin": "ast",
       "community": 94,
-      "community_name": "VerifyEmailController.php",
+      "community_name": ".route",
       "file_type": "code",
       "norm_label": "verifyemailcontroller",
       "source_file": "app/Http/Controllers/Auth/VerifyEmailController.php",
@@ -1050,11 +1037,24 @@
       "_callable_class": true,
       "_origin": "ast",
       "community": 94,
-      "community_name": "VerifyEmailController.php",
+      "community_name": ".route",
       "file_type": "code",
       "norm_label": "controller",
       "source_file": "app/Http/Controllers/Controller.php",
       "source_location": "L5"
+    },
+    {
+      "id": "tests_feature_auth_emailverificationtest_emailverificationtest",
+      "label": "EmailVerificationTest",
+      "_callable": true,
+      "_callable_class": true,
+      "_origin": "ast",
+      "community": 94,
+      "community_name": ".route",
+      "file_type": "code",
+      "norm_label": "emailverificationtest",
+      "source_file": "tests/Feature/Auth/EmailVerificationTest.php",
+      "source_location": "L12"
     },
     {
       "id": "app_livewire_driver_dashboard_dashboard",
@@ -1083,17 +1083,65 @@
       "source_location": "L13"
     },
     {
-      "id": "tests_feature_auth_authenticationtest_authenticationtest",
-      "label": "AuthenticationTest",
+      "id": "app_livewire_ally_commissions_commissions",
+      "label": "Commissions",
       "_callable": true,
       "_callable_class": true,
       "_origin": "ast",
       "community": 98,
-      "community_name": "AuthenticationTest",
+      "community_name": "Commissions.php",
       "file_type": "code",
-      "norm_label": "authenticationtest",
-      "source_file": "tests/Feature/Auth/AuthenticationTest.php",
+      "norm_label": "commissions",
+      "source_file": "app/Livewire/Ally/Commissions.php",
       "source_location": "L10"
+    },
+    {
+      "id": "tests_feature_auth_authenticationtest_authenticationtest_test_login_screen_can_be_rendered",
+      "label": ".test_login_screen_can_be_rendered()",
+      "_callable": true,
+      "_origin": "ast",
+      "community": 0,
+      "community_name": "TestCase",
+      "file_type": "code",
+      "norm_label": ".test_login_screen_can_be_rendered()",
+      "source_file": "tests/Feature/Auth/AuthenticationTest.php",
+      "source_location": "L14"
+    },
+    {
+      "id": "tests_feature_auth_authenticationtest_authenticationtest_test_navigation_menu_can_be_rendered",
+      "label": ".test_navigation_menu_can_be_rendered()",
+      "_callable": true,
+      "_origin": "ast",
+      "community": 0,
+      "community_name": "TestCase",
+      "file_type": "code",
+      "norm_label": ".test_navigation_menu_can_be_rendered()",
+      "source_file": "tests/Feature/Auth/AuthenticationTest.php",
+      "source_location": "L57"
+    },
+    {
+      "id": "tests_feature_auth_authenticationtest_authenticationtest_test_users_can_logout",
+      "label": ".test_users_can_logout()",
+      "_callable": true,
+      "_origin": "ast",
+      "community": 0,
+      "community_name": "TestCase",
+      "file_type": "code",
+      "norm_label": ".test_users_can_logout()",
+      "source_file": "tests/Feature/Auth/AuthenticationTest.php",
+      "source_location": "L70"
+    },
+    {
+      "id": "tests_feature_auth_authenticationtest_authenticationtest_test_users_can_not_authenticate_with_invalid_password",
+      "label": ".test_users_can_not_authenticate_with_invalid_password()",
+      "_callable": true,
+      "_origin": "ast",
+      "community": 0,
+      "community_name": "TestCase",
+      "file_type": "code",
+      "norm_label": ".test_users_can_not_authenticate_with_invalid_password()",
+      "source_file": "tests/Feature/Auth/AuthenticationTest.php",
+      "source_location": "L40"
     },
     {
       "id": "tests_feature_auth_passwordconfirmationtest_passwordconfirmationtest_test_confirm_password_screen_can_be_rendered",
@@ -1828,64 +1876,40 @@
       "source_location": "L12"
     },
     {
-      "id": "app_livewire_driver_scanner_scanner_checksecurity",
-      "label": ".checkSecurity()",
+      "id": "app_livewire_ally_packagepickup_packagepickup_deliver",
+      "label": ".deliver()",
       "_callable": true,
       "_origin": "ast",
       "community": 111,
-      "community_name": "Scanner",
+      "community_name": "PackagePickup.php",
       "file_type": "code",
-      "norm_label": ".checksecurity()",
-      "source_file": "app/Livewire/Driver/Scanner.php",
-      "source_location": "L102"
+      "norm_label": ".deliver()",
+      "source_file": "app/Livewire/Ally/PackagePickup.php",
+      "source_location": "L14"
     },
     {
-      "id": "app_livewire_driver_scanner_scanner_clearsearch",
-      "label": ".clearSearch()",
-      "_callable": true,
-      "_origin": "ast",
-      "community": 111,
-      "community_name": "Scanner",
-      "file_type": "code",
-      "norm_label": ".clearsearch()",
-      "source_file": "app/Livewire/Driver/Scanner.php",
-      "source_location": "L122"
-    },
-    {
-      "id": "app_livewire_driver_scanner_scanner_render",
+      "id": "app_livewire_ally_packagepickup_packagepickup_render",
       "label": ".render()",
       "_callable": true,
       "_origin": "ast",
       "community": 111,
-      "community_name": "Scanner",
+      "community_name": "PackagePickup.php",
       "file_type": "code",
       "norm_label": ".render()",
-      "source_file": "app/Livewire/Driver/Scanner.php",
-      "source_location": "L134"
+      "source_file": "app/Livewire/Ally/PackagePickup.php",
+      "source_location": "L15"
     },
     {
-      "id": "app_livewire_driver_scanner_scanner_scan",
-      "label": ".scan()",
+      "id": "app_livewire_ally_packagepickup_packagepickup_search",
+      "label": ".search()",
       "_callable": true,
       "_origin": "ast",
       "community": 111,
-      "community_name": "Scanner",
+      "community_name": "PackagePickup.php",
       "file_type": "code",
-      "norm_label": ".scan()",
-      "source_file": "app/Livewire/Driver/Scanner.php",
-      "source_location": "L91"
-    },
-    {
-      "id": "app_livewire_driver_scanner_scanner_searchpackage",
-      "label": ".searchPackage()",
-      "_callable": true,
-      "_origin": "ast",
-      "community": 111,
-      "community_name": "Scanner",
-      "file_type": "code",
-      "norm_label": ".searchpackage()",
-      "source_file": "app/Livewire/Driver/Scanner.php",
-      "source_location": "L26"
+      "norm_label": ".search()",
+      "source_file": "app/Livewire/Ally/PackagePickup.php",
+      "source_location": "L13"
     },
     {
       "id": "app_livewire_admin_routesdashboard_routesdashboard_render",
@@ -2680,6 +2704,30 @@
       "source_location": "L18"
     },
     {
+      "id": "app_livewire_ally_cod_cod_liquidate",
+      "label": ".liquidate()",
+      "_callable": true,
+      "_origin": "ast",
+      "community": 126,
+      "community_name": "Livewire\\Component",
+      "file_type": "code",
+      "norm_label": ".liquidate()",
+      "source_file": "app/Livewire/Ally/Cod.php",
+      "source_location": "L12"
+    },
+    {
+      "id": "app_livewire_ally_cod_cod_render",
+      "label": ".render()",
+      "_callable": true,
+      "_origin": "ast",
+      "community": 126,
+      "community_name": "Livewire\\Component",
+      "file_type": "code",
+      "norm_label": ".render()",
+      "source_file": "app/Livewire/Ally/Cod.php",
+      "source_location": "L13"
+    },
+    {
       "id": "app_livewire_ally_incidents_incidents_create",
       "label": ".create()",
       "_callable": true,
@@ -2726,30 +2774,6 @@
       "norm_label": "up()",
       "source_file": "database/migrations/2026_08_22_213952_add_status_to_drivers_table.php",
       "source_location": "L9"
-    },
-    {
-      "id": "tests_feature_auth_emailverificationtest_emailverificationtest_test_email_is_not_verified_with_invalid_hash",
-      "label": ".test_email_is_not_verified_with_invalid_hash()",
-      "_callable": true,
-      "_origin": "ast",
-      "community": 128,
-      "community_name": "EmailVerificationTest.php",
-      "file_type": "code",
-      "norm_label": ".test_email_is_not_verified_with_invalid_hash()",
-      "source_file": "tests/Feature/Auth/EmailVerificationTest.php",
-      "source_location": "L46"
-    },
-    {
-      "id": "tests_feature_auth_emailverificationtest_emailverificationtest_test_email_verification_screen_can_be_rendered",
-      "label": ".test_email_verification_screen_can_be_rendered()",
-      "_callable": true,
-      "_origin": "ast",
-      "community": 128,
-      "community_name": "EmailVerificationTest.php",
-      "file_type": "code",
-      "norm_label": ".test_email_verification_screen_can_be_rendered()",
-      "source_file": "tests/Feature/Auth/EmailVerificationTest.php",
-      "source_location": "L16"
     },
     {
       "id": "database_migrations_2026_08_24_090002_create_route_stops_table_down",
@@ -2810,6 +2834,18 @@
       "norm_label": ".handle()",
       "source_file": "app/Console/Commands/SyncBcvRate.php",
       "source_location": "L14"
+    },
+    {
+      "id": "app_livewire_admin_bcvratemanager_bcvratemanager_syncnow",
+      "label": ".syncNow()",
+      "_callable": true,
+      "_origin": "ast",
+      "community": 135,
+      "community_name": "TariffService",
+      "file_type": "code",
+      "norm_label": ".syncnow()",
+      "source_file": "app/Livewire/Admin/BcvRateManager.php",
+      "source_location": "L94"
     },
     {
       "id": "app_livewire_admin_ratematrixmanager_ratematrixmanager_cancelediting",
@@ -3256,6 +3292,54 @@
       "source_location": "L23"
     },
     {
+      "id": "app_livewire_admin_incidentsmanager_incidentsmanager_render",
+      "label": ".render()",
+      "_callable": true,
+      "_origin": "ast",
+      "community": 14,
+      "community_name": "Illuminate\\Database\\Eloquent\\Relations\\BelongsTo",
+      "file_type": "code",
+      "norm_label": ".render()",
+      "source_file": "app/Livewire/Admin/IncidentsManager.php",
+      "source_location": "L58"
+    },
+    {
+      "id": "app_livewire_admin_incidentsmanager_incidentsmanager_updatestatus",
+      "label": ".updateStatus()",
+      "_callable": true,
+      "_origin": "ast",
+      "community": 14,
+      "community_name": "Illuminate\\Database\\Eloquent\\Relations\\BelongsTo",
+      "file_type": "code",
+      "norm_label": ".updatestatus()",
+      "source_file": "app/Livewire/Admin/IncidentsManager.php",
+      "source_location": "L38"
+    },
+    {
+      "id": "app_livewire_admin_incidentsmanager_incidentsmanager_updatingsearch",
+      "label": ".updatingSearch()",
+      "_callable": true,
+      "_origin": "ast",
+      "community": 14,
+      "community_name": "Illuminate\\Database\\Eloquent\\Relations\\BelongsTo",
+      "file_type": "code",
+      "norm_label": ".updatingsearch()",
+      "source_file": "app/Livewire/Admin/IncidentsManager.php",
+      "source_location": "L28"
+    },
+    {
+      "id": "app_livewire_admin_incidentsmanager_incidentsmanager_updatingstatus",
+      "label": ".updatingStatus()",
+      "_callable": true,
+      "_origin": "ast",
+      "community": 14,
+      "community_name": "Illuminate\\Database\\Eloquent\\Relations\\BelongsTo",
+      "file_type": "code",
+      "norm_label": ".updatingstatus()",
+      "source_file": "app/Livewire/Admin/IncidentsManager.php",
+      "source_location": "L33"
+    },
+    {
       "id": "app_models_ally_ally_incidents",
       "label": ".incidents()",
       "_callable": true,
@@ -3544,90 +3628,6 @@
       "source_location": "L36"
     },
     {
-      "id": "database_seeders_databaseseeder_databaseseeder_run",
-      "label": ".run()",
-      "_callable": true,
-      "_origin": "ast",
-      "community": 14,
-      "community_name": "Illuminate\\Database\\Eloquent\\Relations\\BelongsTo",
-      "file_type": "code",
-      "norm_label": ".run()",
-      "source_file": "database/seeders/DatabaseSeeder.php",
-      "source_location": "L34"
-    },
-    {
-      "id": "database_seeders_databaseseeder_databaseseeder_seedadmins",
-      "label": ".seedAdmins()",
-      "_callable": true,
-      "_origin": "ast",
-      "community": 14,
-      "community_name": "Illuminate\\Database\\Eloquent\\Relations\\BelongsTo",
-      "file_type": "code",
-      "norm_label": ".seedadmins()",
-      "source_file": "database/seeders/DatabaseSeeder.php",
-      "source_location": "L44"
-    },
-    {
-      "id": "database_seeders_databaseseeder_databaseseeder_seedallywithstaff",
-      "label": ".seedAllyWithStaff()",
-      "_callable": true,
-      "_origin": "ast",
-      "community": 14,
-      "community_name": "Illuminate\\Database\\Eloquent\\Relations\\BelongsTo",
-      "file_type": "code",
-      "norm_label": ".seedallywithstaff()",
-      "source_file": "database/seeders/DatabaseSeeder.php",
-      "source_location": "L65"
-    },
-    {
-      "id": "database_seeders_databaseseeder_databaseseeder_seedbcvrate",
-      "label": ".seedBcvRate()",
-      "_callable": true,
-      "_origin": "ast",
-      "community": 14,
-      "community_name": "Illuminate\\Database\\Eloquent\\Relations\\BelongsTo",
-      "file_type": "code",
-      "norm_label": ".seedbcvrate()",
-      "source_file": "database/seeders/DatabaseSeeder.php",
-      "source_location": "L163"
-    },
-    {
-      "id": "database_seeders_databaseseeder_databaseseeder_seedclient",
-      "label": ".seedClient()",
-      "_callable": true,
-      "_origin": "ast",
-      "community": 14,
-      "community_name": "Illuminate\\Database\\Eloquent\\Relations\\BelongsTo",
-      "file_type": "code",
-      "norm_label": ".seedclient()",
-      "source_file": "database/seeders/DatabaseSeeder.php",
-      "source_location": "L122"
-    },
-    {
-      "id": "database_seeders_databaseseeder_databaseseeder_seeddriver",
-      "label": ".seedDriver()",
-      "_callable": true,
-      "_origin": "ast",
-      "community": 14,
-      "community_name": "Illuminate\\Database\\Eloquent\\Relations\\BelongsTo",
-      "file_type": "code",
-      "norm_label": ".seeddriver()",
-      "source_file": "database/seeders/DatabaseSeeder.php",
-      "source_location": "L102"
-    },
-    {
-      "id": "database_seeders_databaseseeder_databaseseeder_seedratematrix",
-      "label": ".seedRateMatrix()",
-      "_callable": true,
-      "_origin": "ast",
-      "community": 14,
-      "community_name": "Illuminate\\Database\\Eloquent\\Relations\\BelongsTo",
-      "file_type": "code",
-      "norm_label": ".seedratematrix()",
-      "source_file": "database/seeders/DatabaseSeeder.php",
-      "source_location": "L146"
-    },
-    {
       "id": "database_migrations_2026_08_08_232921_create_bcv_rates_table_down",
       "label": "down()",
       "_callable": true,
@@ -3736,66 +3736,6 @@
       "source_location": "L24"
     },
     {
-      "id": "app_livewire_ally_cod_cod_liquidate",
-      "label": ".liquidate()",
-      "_callable": true,
-      "_origin": "ast",
-      "community": 141,
-      "community_name": "Package",
-      "file_type": "code",
-      "norm_label": ".liquidate()",
-      "source_file": "app/Livewire/Ally/Cod.php",
-      "source_location": "L12"
-    },
-    {
-      "id": "app_livewire_ally_cod_cod_render",
-      "label": ".render()",
-      "_callable": true,
-      "_origin": "ast",
-      "community": 141,
-      "community_name": "Package",
-      "file_type": "code",
-      "norm_label": ".render()",
-      "source_file": "app/Livewire/Ally/Cod.php",
-      "source_location": "L13"
-    },
-    {
-      "id": "app_livewire_ally_commissions_commissions_monthlybreakdown",
-      "label": ".monthlyBreakdown()",
-      "_callable": true,
-      "_origin": "ast",
-      "community": 141,
-      "community_name": "Package",
-      "file_type": "code",
-      "norm_label": ".monthlybreakdown()",
-      "source_file": "app/Livewire/Ally/Commissions.php",
-      "source_location": "L26"
-    },
-    {
-      "id": "app_livewire_ally_commissions_commissions_mount",
-      "label": ".mount()",
-      "_callable": true,
-      "_origin": "ast",
-      "community": 141,
-      "community_name": "Package",
-      "file_type": "code",
-      "norm_label": ".mount()",
-      "source_file": "app/Livewire/Ally/Commissions.php",
-      "source_location": "L13"
-    },
-    {
-      "id": "app_livewire_ally_commissions_commissions_render",
-      "label": ".render()",
-      "_callable": true,
-      "_origin": "ast",
-      "community": 141,
-      "community_name": "Package",
-      "file_type": "code",
-      "norm_label": ".render()",
-      "source_file": "app/Livewire/Ally/Commissions.php",
-      "source_location": "L47"
-    },
-    {
       "id": "app_livewire_ally_packagereception_packagereception_receive",
       "label": ".receive()",
       "_callable": true,
@@ -3830,6 +3770,66 @@
       "norm_label": ".search()",
       "source_file": "app/Livewire/Ally/PackageReception.php",
       "source_location": "L19"
+    },
+    {
+      "id": "app_livewire_driver_scanner_scanner_checksecurity",
+      "label": ".checkSecurity()",
+      "_callable": true,
+      "_origin": "ast",
+      "community": 141,
+      "community_name": "Package",
+      "file_type": "code",
+      "norm_label": ".checksecurity()",
+      "source_file": "app/Livewire/Driver/Scanner.php",
+      "source_location": "L102"
+    },
+    {
+      "id": "app_livewire_driver_scanner_scanner_clearsearch",
+      "label": ".clearSearch()",
+      "_callable": true,
+      "_origin": "ast",
+      "community": 141,
+      "community_name": "Package",
+      "file_type": "code",
+      "norm_label": ".clearsearch()",
+      "source_file": "app/Livewire/Driver/Scanner.php",
+      "source_location": "L122"
+    },
+    {
+      "id": "app_livewire_driver_scanner_scanner_render",
+      "label": ".render()",
+      "_callable": true,
+      "_origin": "ast",
+      "community": 141,
+      "community_name": "Package",
+      "file_type": "code",
+      "norm_label": ".render()",
+      "source_file": "app/Livewire/Driver/Scanner.php",
+      "source_location": "L134"
+    },
+    {
+      "id": "app_livewire_driver_scanner_scanner_scan",
+      "label": ".scan()",
+      "_callable": true,
+      "_origin": "ast",
+      "community": 141,
+      "community_name": "Package",
+      "file_type": "code",
+      "norm_label": ".scan()",
+      "source_file": "app/Livewire/Driver/Scanner.php",
+      "source_location": "L91"
+    },
+    {
+      "id": "app_livewire_driver_scanner_scanner_searchpackage",
+      "label": ".searchPackage()",
+      "_callable": true,
+      "_origin": "ast",
+      "community": 141,
+      "community_name": "Package",
+      "file_type": "code",
+      "norm_label": ".searchpackage()",
+      "source_file": "app/Livewire/Driver/Scanner.php",
+      "source_location": "L26"
     },
     {
       "id": "app_models_package_package_ally",
@@ -4864,42 +4864,6 @@
       "source_location": "L32"
     },
     {
-      "id": "app_livewire_ally_packagepickup_packagepickup_deliver",
-      "label": ".deliver()",
-      "_callable": true,
-      "_origin": "ast",
-      "community": 25,
-      "community_name": "RuntimeException",
-      "file_type": "code",
-      "norm_label": ".deliver()",
-      "source_file": "app/Livewire/Ally/PackagePickup.php",
-      "source_location": "L14"
-    },
-    {
-      "id": "app_livewire_ally_packagepickup_packagepickup_render",
-      "label": ".render()",
-      "_callable": true,
-      "_origin": "ast",
-      "community": 25,
-      "community_name": "RuntimeException",
-      "file_type": "code",
-      "norm_label": ".render()",
-      "source_file": "app/Livewire/Ally/PackagePickup.php",
-      "source_location": "L15"
-    },
-    {
-      "id": "app_livewire_ally_packagepickup_packagepickup_search",
-      "label": ".search()",
-      "_callable": true,
-      "_origin": "ast",
-      "community": 25,
-      "community_name": "RuntimeException",
-      "file_type": "code",
-      "norm_label": ".search()",
-      "source_file": "app/Livewire/Ally/PackagePickup.php",
-      "source_location": "L13"
-    },
-    {
       "id": "app_models_packagehistory_packagehistory_booted",
       "label": ".booted()",
       "_callable": true,
@@ -5212,52 +5176,88 @@
       "source_location": "L137"
     },
     {
-      "id": "app_livewire_admin_incidentsmanager_incidentsmanager_render",
-      "label": ".render()",
+      "id": "database_seeders_databaseseeder_databaseseeder_run",
+      "label": ".run()",
       "_callable": true,
       "_origin": "ast",
       "community": 72,
-      "community_name": "IncidentsManager",
+      "community_name": "DatabaseSeeder",
       "file_type": "code",
-      "norm_label": ".render()",
-      "source_file": "app/Livewire/Admin/IncidentsManager.php",
-      "source_location": "L58"
+      "norm_label": ".run()",
+      "source_file": "database/seeders/DatabaseSeeder.php",
+      "source_location": "L34"
     },
     {
-      "id": "app_livewire_admin_incidentsmanager_incidentsmanager_updatestatus",
-      "label": ".updateStatus()",
+      "id": "database_seeders_databaseseeder_databaseseeder_seedadmins",
+      "label": ".seedAdmins()",
       "_callable": true,
       "_origin": "ast",
       "community": 72,
-      "community_name": "IncidentsManager",
+      "community_name": "DatabaseSeeder",
       "file_type": "code",
-      "norm_label": ".updatestatus()",
-      "source_file": "app/Livewire/Admin/IncidentsManager.php",
-      "source_location": "L38"
+      "norm_label": ".seedadmins()",
+      "source_file": "database/seeders/DatabaseSeeder.php",
+      "source_location": "L44"
     },
     {
-      "id": "app_livewire_admin_incidentsmanager_incidentsmanager_updatingsearch",
-      "label": ".updatingSearch()",
+      "id": "database_seeders_databaseseeder_databaseseeder_seedallywithstaff",
+      "label": ".seedAllyWithStaff()",
       "_callable": true,
       "_origin": "ast",
       "community": 72,
-      "community_name": "IncidentsManager",
+      "community_name": "DatabaseSeeder",
       "file_type": "code",
-      "norm_label": ".updatingsearch()",
-      "source_file": "app/Livewire/Admin/IncidentsManager.php",
-      "source_location": "L28"
+      "norm_label": ".seedallywithstaff()",
+      "source_file": "database/seeders/DatabaseSeeder.php",
+      "source_location": "L65"
     },
     {
-      "id": "app_livewire_admin_incidentsmanager_incidentsmanager_updatingstatus",
-      "label": ".updatingStatus()",
+      "id": "database_seeders_databaseseeder_databaseseeder_seedbcvrate",
+      "label": ".seedBcvRate()",
       "_callable": true,
       "_origin": "ast",
       "community": 72,
-      "community_name": "IncidentsManager",
+      "community_name": "DatabaseSeeder",
       "file_type": "code",
-      "norm_label": ".updatingstatus()",
-      "source_file": "app/Livewire/Admin/IncidentsManager.php",
-      "source_location": "L33"
+      "norm_label": ".seedbcvrate()",
+      "source_file": "database/seeders/DatabaseSeeder.php",
+      "source_location": "L163"
+    },
+    {
+      "id": "database_seeders_databaseseeder_databaseseeder_seedclient",
+      "label": ".seedClient()",
+      "_callable": true,
+      "_origin": "ast",
+      "community": 72,
+      "community_name": "DatabaseSeeder",
+      "file_type": "code",
+      "norm_label": ".seedclient()",
+      "source_file": "database/seeders/DatabaseSeeder.php",
+      "source_location": "L122"
+    },
+    {
+      "id": "database_seeders_databaseseeder_databaseseeder_seeddriver",
+      "label": ".seedDriver()",
+      "_callable": true,
+      "_origin": "ast",
+      "community": 72,
+      "community_name": "DatabaseSeeder",
+      "file_type": "code",
+      "norm_label": ".seeddriver()",
+      "source_file": "database/seeders/DatabaseSeeder.php",
+      "source_location": "L102"
+    },
+    {
+      "id": "database_seeders_databaseseeder_databaseseeder_seedratematrix",
+      "label": ".seedRateMatrix()",
+      "_callable": true,
+      "_origin": "ast",
+      "community": 72,
+      "community_name": "DatabaseSeeder",
+      "file_type": "code",
+      "norm_label": ".seedratematrix()",
+      "source_file": "database/seeders/DatabaseSeeder.php",
+      "source_location": "L146"
     },
     {
       "id": "app_http_controllers_driverscancontroller_driverscancontroller_verify",
@@ -5313,7 +5313,7 @@
       "_callable": true,
       "_origin": "ast",
       "community": 84,
-      "community_name": "Client/Dashboard.php",
+      "community_name": "Dashboard",
       "file_type": "code",
       "norm_label": ".acceptdelivery()",
       "source_file": "app/Livewire/Client/Dashboard.php",
@@ -5325,7 +5325,7 @@
       "_callable": true,
       "_origin": "ast",
       "community": 84,
-      "community_name": "Client/Dashboard.php",
+      "community_name": "Dashboard",
       "file_type": "code",
       "norm_label": ".cancelrejectdelivery()",
       "source_file": "app/Livewire/Client/Dashboard.php",
@@ -5337,7 +5337,7 @@
       "_callable": true,
       "_origin": "ast",
       "community": 84,
-      "community_name": "Client/Dashboard.php",
+      "community_name": "Dashboard",
       "file_type": "code",
       "norm_label": ".clientpackage()",
       "source_file": "app/Livewire/Client/Dashboard.php",
@@ -5349,7 +5349,7 @@
       "_callable": true,
       "_origin": "ast",
       "community": 84,
-      "community_name": "Client/Dashboard.php",
+      "community_name": "Dashboard",
       "file_type": "code",
       "norm_label": ".rejectdelivery()",
       "source_file": "app/Livewire/Client/Dashboard.php",
@@ -5361,7 +5361,7 @@
       "_callable": true,
       "_origin": "ast",
       "community": 84,
-      "community_name": "Client/Dashboard.php",
+      "community_name": "Dashboard",
       "file_type": "code",
       "norm_label": ".render()",
       "source_file": "app/Livewire/Client/Dashboard.php",
@@ -5373,7 +5373,7 @@
       "_callable": true,
       "_origin": "ast",
       "community": 84,
-      "community_name": "Client/Dashboard.php",
+      "community_name": "Dashboard",
       "file_type": "code",
       "norm_label": ".startrejectdelivery()",
       "source_file": "app/Livewire/Client/Dashboard.php",
@@ -5474,18 +5474,6 @@
       "norm_label": ".save()",
       "source_file": "app/Livewire/Admin/BcvRateManager.php",
       "source_location": "L50"
-    },
-    {
-      "id": "app_livewire_admin_bcvratemanager_bcvratemanager_syncnow",
-      "label": ".syncNow()",
-      "_callable": true,
-      "_origin": "ast",
-      "community": 9,
-      "community_name": "BcvRateManager",
-      "file_type": "code",
-      "norm_label": ".syncnow()",
-      "source_file": "app/Livewire/Admin/BcvRateManager.php",
-      "source_location": "L94"
     },
     {
       "id": "app_livewire_forms_loginform_loginform_authenticate",
@@ -6333,11 +6321,83 @@
       "_callable": true,
       "_origin": "ast",
       "community": 94,
-      "community_name": "VerifyEmailController.php",
+      "community_name": ".route",
       "file_type": "code",
       "norm_label": ".__invoke()",
       "source_file": "app/Http/Controllers/Auth/VerifyEmailController.php",
       "source_location": "L15"
+    },
+    {
+      "id": "app_models_routestop_routestop_route",
+      "label": ".route()",
+      "_callable": true,
+      "_origin": "ast",
+      "community": 94,
+      "community_name": ".route",
+      "file_type": "code",
+      "norm_label": ".route()",
+      "source_file": "app/Models/RouteStop.php",
+      "source_location": "L69"
+    },
+    {
+      "id": "tests_feature_auth_authenticationtest_authenticationtest_test_users_can_authenticate_using_the_login_screen",
+      "label": ".test_users_can_authenticate_using_the_login_screen()",
+      "_callable": true,
+      "_origin": "ast",
+      "community": 94,
+      "community_name": ".route",
+      "file_type": "code",
+      "norm_label": ".test_users_can_authenticate_using_the_login_screen()",
+      "source_file": "tests/Feature/Auth/AuthenticationTest.php",
+      "source_location": "L23"
+    },
+    {
+      "id": "tests_feature_auth_emailverificationtest_emailverificationtest_test_email_can_be_verified",
+      "label": ".test_email_can_be_verified()",
+      "_callable": true,
+      "_origin": "ast",
+      "community": 94,
+      "community_name": ".route",
+      "file_type": "code",
+      "norm_label": ".test_email_can_be_verified()",
+      "source_file": "tests/Feature/Auth/EmailVerificationTest.php",
+      "source_location": "L27"
+    },
+    {
+      "id": "tests_feature_auth_emailverificationtest_emailverificationtest_test_email_is_not_verified_with_invalid_hash",
+      "label": ".test_email_is_not_verified_with_invalid_hash()",
+      "_callable": true,
+      "_origin": "ast",
+      "community": 94,
+      "community_name": ".route",
+      "file_type": "code",
+      "norm_label": ".test_email_is_not_verified_with_invalid_hash()",
+      "source_file": "tests/Feature/Auth/EmailVerificationTest.php",
+      "source_location": "L46"
+    },
+    {
+      "id": "tests_feature_auth_emailverificationtest_emailverificationtest_test_email_verification_screen_can_be_rendered",
+      "label": ".test_email_verification_screen_can_be_rendered()",
+      "_callable": true,
+      "_origin": "ast",
+      "community": 94,
+      "community_name": ".route",
+      "file_type": "code",
+      "norm_label": ".test_email_verification_screen_can_be_rendered()",
+      "source_file": "tests/Feature/Auth/EmailVerificationTest.php",
+      "source_location": "L16"
+    },
+    {
+      "id": "tests_feature_auth_registrationtest_registrationtest_test_new_users_can_register",
+      "label": ".test_new_users_can_register()",
+      "_callable": true,
+      "_origin": "ast",
+      "community": 94,
+      "community_name": ".route",
+      "file_type": "code",
+      "norm_label": ".test_new_users_can_register()",
+      "source_file": "tests/Feature/Auth/RegistrationTest.php",
+      "source_location": "L22"
     },
     {
       "id": "app_livewire_driver_dashboard_dashboard_daterangeforperiod",
@@ -6604,100 +6664,40 @@
       "source_location": "L196"
     },
     {
-      "id": "app_models_routestop_routestop_route",
-      "label": ".route()",
+      "id": "app_livewire_ally_commissions_commissions_monthlybreakdown",
+      "label": ".monthlyBreakdown()",
       "_callable": true,
       "_origin": "ast",
       "community": 98,
-      "community_name": "AuthenticationTest",
+      "community_name": "Commissions.php",
       "file_type": "code",
-      "norm_label": ".route()",
-      "source_file": "app/Models/RouteStop.php",
-      "source_location": "L69"
+      "norm_label": ".monthlybreakdown()",
+      "source_file": "app/Livewire/Ally/Commissions.php",
+      "source_location": "L26"
     },
     {
-      "id": "tests_feature_auth_authenticationtest_authenticationtest_test_login_screen_can_be_rendered",
-      "label": ".test_login_screen_can_be_rendered()",
+      "id": "app_livewire_ally_commissions_commissions_mount",
+      "label": ".mount()",
       "_callable": true,
       "_origin": "ast",
       "community": 98,
-      "community_name": "AuthenticationTest",
+      "community_name": "Commissions.php",
       "file_type": "code",
-      "norm_label": ".test_login_screen_can_be_rendered()",
-      "source_file": "tests/Feature/Auth/AuthenticationTest.php",
-      "source_location": "L14"
+      "norm_label": ".mount()",
+      "source_file": "app/Livewire/Ally/Commissions.php",
+      "source_location": "L13"
     },
     {
-      "id": "tests_feature_auth_authenticationtest_authenticationtest_test_navigation_menu_can_be_rendered",
-      "label": ".test_navigation_menu_can_be_rendered()",
+      "id": "app_livewire_ally_commissions_commissions_render",
+      "label": ".render()",
       "_callable": true,
       "_origin": "ast",
       "community": 98,
-      "community_name": "AuthenticationTest",
+      "community_name": "Commissions.php",
       "file_type": "code",
-      "norm_label": ".test_navigation_menu_can_be_rendered()",
-      "source_file": "tests/Feature/Auth/AuthenticationTest.php",
-      "source_location": "L57"
-    },
-    {
-      "id": "tests_feature_auth_authenticationtest_authenticationtest_test_users_can_authenticate_using_the_login_screen",
-      "label": ".test_users_can_authenticate_using_the_login_screen()",
-      "_callable": true,
-      "_origin": "ast",
-      "community": 98,
-      "community_name": "AuthenticationTest",
-      "file_type": "code",
-      "norm_label": ".test_users_can_authenticate_using_the_login_screen()",
-      "source_file": "tests/Feature/Auth/AuthenticationTest.php",
-      "source_location": "L23"
-    },
-    {
-      "id": "tests_feature_auth_authenticationtest_authenticationtest_test_users_can_logout",
-      "label": ".test_users_can_logout()",
-      "_callable": true,
-      "_origin": "ast",
-      "community": 98,
-      "community_name": "AuthenticationTest",
-      "file_type": "code",
-      "norm_label": ".test_users_can_logout()",
-      "source_file": "tests/Feature/Auth/AuthenticationTest.php",
-      "source_location": "L70"
-    },
-    {
-      "id": "tests_feature_auth_authenticationtest_authenticationtest_test_users_can_not_authenticate_with_invalid_password",
-      "label": ".test_users_can_not_authenticate_with_invalid_password()",
-      "_callable": true,
-      "_origin": "ast",
-      "community": 98,
-      "community_name": "AuthenticationTest",
-      "file_type": "code",
-      "norm_label": ".test_users_can_not_authenticate_with_invalid_password()",
-      "source_file": "tests/Feature/Auth/AuthenticationTest.php",
-      "source_location": "L40"
-    },
-    {
-      "id": "tests_feature_auth_emailverificationtest_emailverificationtest_test_email_can_be_verified",
-      "label": ".test_email_can_be_verified()",
-      "_callable": true,
-      "_origin": "ast",
-      "community": 98,
-      "community_name": "AuthenticationTest",
-      "file_type": "code",
-      "norm_label": ".test_email_can_be_verified()",
-      "source_file": "tests/Feature/Auth/EmailVerificationTest.php",
-      "source_location": "L27"
-    },
-    {
-      "id": "tests_feature_auth_registrationtest_registrationtest_test_new_users_can_register",
-      "label": ".test_new_users_can_register()",
-      "_callable": true,
-      "_origin": "ast",
-      "community": 98,
-      "community_name": "AuthenticationTest",
-      "file_type": "code",
-      "norm_label": ".test_new_users_can_register()",
-      "source_file": "tests/Feature/Auth/RegistrationTest.php",
-      "source_location": "L22"
+      "norm_label": ".render()",
+      "source_file": "app/Livewire/Ally/Commissions.php",
+      "source_location": "L47"
     },
     {
       "id": "database_migrations_2026_08_21_000002_add_extra_pricing_fields_to_packages_table_down",
@@ -6776,6 +6776,17 @@
       "file_type": "code",
       "norm_label": "routes/auth.php",
       "source_file": "routes/auth.php",
+      "source_location": "L1"
+    },
+    {
+      "id": "tests_feature_auth_authenticationtest",
+      "label": "AuthenticationTest.php",
+      "_origin": "ast",
+      "community": 0,
+      "community_name": "TestCase",
+      "file_type": "code",
+      "norm_label": "authenticationtest.php",
+      "source_file": "tests/Feature/Auth/AuthenticationTest.php",
       "source_location": "L1"
     },
     {
@@ -7245,14 +7256,14 @@
       "source_location": "L1"
     },
     {
-      "id": "app_livewire_driver_scanner",
-      "label": "Scanner.php",
+      "id": "app_livewire_ally_packagepickup",
+      "label": "PackagePickup.php",
       "_origin": "ast",
       "community": 111,
-      "community_name": "Scanner",
+      "community_name": "PackagePickup.php",
       "file_type": "code",
-      "norm_label": "scanner.php",
-      "source_file": "app/Livewire/Driver/Scanner.php",
+      "norm_label": "packagepickup.php",
+      "source_file": "app/Livewire/Ally/PackagePickup.php",
       "source_location": "L1"
     },
     {
@@ -7773,17 +7784,6 @@
       "source_location": "L1"
     },
     {
-      "id": "app_livewire_admin_bcvratemanager",
-      "label": "BcvRateManager.php",
-      "_origin": "ast",
-      "community": 126,
-      "community_name": "Livewire\\Component",
-      "file_type": "code",
-      "norm_label": "bcvratemanager.php",
-      "source_file": "app/Livewire/Admin/BcvRateManager.php",
-      "source_location": "L1"
-    },
-    {
       "id": "app_livewire_admin_citydistancemanager",
       "label": "App\\Livewire\\Admin\\CityDistanceManager",
       "_origin": "ast",
@@ -7793,17 +7793,6 @@
       "norm_label": "app\\livewire\\admin\\citydistancemanager",
       "source_file": "",
       "source_location": ""
-    },
-    {
-      "id": "app_livewire_admin_driverpayments",
-      "label": "DriverPayments.php",
-      "_origin": "ast",
-      "community": 126,
-      "community_name": "Livewire\\Component",
-      "file_type": "code",
-      "norm_label": "driverpayments.php",
-      "source_file": "app/Livewire/Admin/DriverPayments.php",
-      "source_location": "L1"
     },
     {
       "id": "app_livewire_admin_incidentsmanager",
@@ -7872,17 +7861,6 @@
       "source_location": "L1"
     },
     {
-      "id": "app_livewire_ally_commissions",
-      "label": "Commissions.php",
-      "_origin": "ast",
-      "community": 126,
-      "community_name": "Livewire\\Component",
-      "file_type": "code",
-      "norm_label": "commissions.php",
-      "source_file": "app/Livewire/Ally/Commissions.php",
-      "source_location": "L1"
-    },
-    {
       "id": "app_livewire_ally_createpackage",
       "label": "App\\Livewire\\Ally\\CreatePackage",
       "_origin": "ast",
@@ -7905,25 +7883,14 @@
       "source_location": "L1"
     },
     {
-      "id": "app_livewire_driver_dashboard",
-      "label": "dashboard.php",
+      "id": "app_livewire_client_dashboard",
+      "label": "Client/Dashboard.php",
       "_origin": "ast",
       "community": 126,
       "community_name": "Livewire\\Component",
       "file_type": "code",
-      "norm_label": "dashboard.php",
-      "source_file": "app/Livewire/Driver/dashboard.php",
-      "source_location": "L1"
-    },
-    {
-      "id": "app_livewire_driver_packagedetail",
-      "label": "PackageDetail.php",
-      "_origin": "ast",
-      "community": 126,
-      "community_name": "Livewire\\Component",
-      "file_type": "code",
-      "norm_label": "packagedetail.php",
-      "source_file": "app/Livewire/Driver/PackageDetail.php",
+      "norm_label": "client/dashboard.php",
+      "source_file": "app/Livewire/Client/Dashboard.php",
       "source_location": "L1"
     },
     {
@@ -7949,13 +7916,13 @@
       "source_location": ""
     },
     {
-      "id": "illuminate_support_carbon",
-      "label": "Illuminate\\Support\\Carbon",
+      "id": "illuminate_support_facades_auth",
+      "label": "Illuminate\\Support\\Facades\\Auth",
       "_origin": "ast",
       "community": 126,
       "community_name": "Livewire\\Component",
       "file_type": "code",
-      "norm_label": "illuminate\\support\\carbon",
+      "norm_label": "illuminate\\support\\facades\\auth",
       "source_file": "",
       "source_location": ""
     },
@@ -8045,50 +8012,6 @@
       "file_type": "code",
       "norm_label": "2026_08_22_213952_add_status_to_drivers_table.php",
       "source_file": "database/migrations/2026_08_22_213952_add_status_to_drivers_table.php",
-      "source_location": "L1"
-    },
-    {
-      "id": "illuminate_auth_events_verified",
-      "label": "Illuminate\\Auth\\Events\\Verified",
-      "_origin": "ast",
-      "community": 128,
-      "community_name": "EmailVerificationTest.php",
-      "file_type": "code",
-      "norm_label": "illuminate\\auth\\events\\verified",
-      "source_file": "",
-      "source_location": ""
-    },
-    {
-      "id": "illuminate_support_facades_event",
-      "label": "Illuminate\\Support\\Facades\\Event",
-      "_origin": "ast",
-      "community": 128,
-      "community_name": "EmailVerificationTest.php",
-      "file_type": "code",
-      "norm_label": "illuminate\\support\\facades\\event",
-      "source_file": "",
-      "source_location": ""
-    },
-    {
-      "id": "illuminate_support_facades_url",
-      "label": "Illuminate\\Support\\Facades\\URL",
-      "_origin": "ast",
-      "community": 128,
-      "community_name": "EmailVerificationTest.php",
-      "file_type": "code",
-      "norm_label": "illuminate\\support\\facades\\url",
-      "source_file": "",
-      "source_location": ""
-    },
-    {
-      "id": "tests_feature_auth_emailverificationtest",
-      "label": "EmailVerificationTest.php",
-      "_origin": "ast",
-      "community": 128,
-      "community_name": "EmailVerificationTest.php",
-      "file_type": "code",
-      "norm_label": "emailverificationtest.php",
-      "source_file": "tests/Feature/Auth/EmailVerificationTest.php",
       "source_location": "L1"
     },
     {
@@ -8609,17 +8532,6 @@
       "source_location": "L1"
     },
     {
-      "id": "illuminate_database_console_seeds_withoutmodelevents",
-      "label": "Illuminate\\Database\\Console\\Seeds\\WithoutModelEvents",
-      "_origin": "ast",
-      "community": 14,
-      "community_name": "Illuminate\\Database\\Eloquent\\Relations\\BelongsTo",
-      "file_type": "code",
-      "norm_label": "illuminate\\database\\console\\seeds\\withoutmodelevents",
-      "source_file": "",
-      "source_location": ""
-    },
-    {
       "id": "illuminate_database_eloquent_factories_hasfactory",
       "label": "Illuminate\\Database\\Eloquent\\Factories\\HasFactory",
       "_origin": "ast",
@@ -8671,17 +8583,6 @@
       "community_name": "Illuminate\\Database\\Eloquent\\Relations\\BelongsTo",
       "file_type": "code",
       "norm_label": "illuminate\\database\\queryexception",
-      "source_file": "",
-      "source_location": ""
-    },
-    {
-      "id": "illuminate_database_seeder",
-      "label": "Illuminate\\Database\\Seeder",
-      "_origin": "ast",
-      "community": 14,
-      "community_name": "Illuminate\\Database\\Eloquent\\Relations\\BelongsTo",
-      "file_type": "code",
-      "norm_label": "illuminate\\database\\seeder",
       "source_file": "",
       "source_location": ""
     },
@@ -8750,6 +8651,17 @@
       "norm_label": "app\\livewire\\ally\\packagereception",
       "source_file": "",
       "source_location": ""
+    },
+    {
+      "id": "app_livewire_driver_scanner",
+      "label": "Scanner.php",
+      "_origin": "ast",
+      "community": 141,
+      "community_name": "Package",
+      "file_type": "code",
+      "norm_label": "scanner.php",
+      "source_file": "app/Livewire/Driver/Scanner.php",
+      "source_location": "L1"
     },
     {
       "id": "datetimeinterface",
@@ -9272,18 +9184,18 @@
       "community_name": "receive",
       "file_type": "code",
       "norm_label": "receive",
-      "source_file": "resources/views/Livewire/Ally/package-reception.blade.php",
+      "source_file": "resources/views/livewire/ally/package-reception.blade.php",
       "source_location": null
     },
     {
       "id": "resources_views_livewire_ally_package_reception_blade",
-      "label": "Ally/package-reception.blade.php",
+      "label": "ally/package-reception.blade.php",
       "_origin": "ast",
       "community": 162,
       "community_name": "receive",
       "file_type": "code",
       "norm_label": "ally/package-reception.blade.php",
-      "source_file": "resources/views/Livewire/Ally/package-reception.blade.php",
+      "source_file": "resources/views/livewire/ally/package-reception.blade.php",
       "source_location": null
     },
     {
@@ -9481,7 +9393,7 @@
       "community_name": "package-pickup.blade.php",
       "file_type": "code",
       "norm_label": "package-pickup.blade.php",
-      "source_file": "resources/views/Livewire/Ally/package-pickup.blade.php",
+      "source_file": "resources/views/livewire/ally/package-pickup.blade.php",
       "source_location": null
     },
     {
@@ -10101,6 +10013,17 @@
       "source_location": null
     },
     {
+      "id": "app_livewire_admin_bcvratemanager",
+      "label": "BcvRateManager.php",
+      "_origin": "ast",
+      "community": 25,
+      "community_name": "RuntimeException",
+      "file_type": "code",
+      "norm_label": "bcvratemanager.php",
+      "source_file": "app/Livewire/Admin/BcvRateManager.php",
+      "source_location": "L1"
+    },
+    {
       "id": "app_livewire_admin_driverassignment",
       "label": "App\\Livewire\\Admin\\DriverAssignment",
       "_origin": "ast",
@@ -10110,6 +10033,17 @@
       "norm_label": "app\\livewire\\admin\\driverassignment",
       "source_file": "",
       "source_location": ""
+    },
+    {
+      "id": "app_livewire_admin_driverpayments",
+      "label": "DriverPayments.php",
+      "_origin": "ast",
+      "community": 25,
+      "community_name": "RuntimeException",
+      "file_type": "code",
+      "norm_label": "driverpayments.php",
+      "source_file": "app/Livewire/Admin/DriverPayments.php",
+      "source_location": "L1"
     },
     {
       "id": "app_livewire_admin_packagedispatch",
@@ -10134,14 +10068,14 @@
       "source_location": "L1"
     },
     {
-      "id": "app_livewire_ally_packagepickup",
-      "label": "PackagePickup.php",
+      "id": "app_livewire_driver_packagedetail",
+      "label": "PackageDetail.php",
       "_origin": "ast",
       "community": 25,
       "community_name": "RuntimeException",
       "file_type": "code",
-      "norm_label": "packagepickup.php",
-      "source_file": "app/Livewire/Ally/PackagePickup.php",
+      "norm_label": "packagedetail.php",
+      "source_file": "app/Livewire/Driver/PackageDetail.php",
       "source_location": "L1"
     },
     {
@@ -12288,6 +12222,28 @@
       "source_location": ""
     },
     {
+      "id": "illuminate_database_console_seeds_withoutmodelevents",
+      "label": "Illuminate\\Database\\Console\\Seeds\\WithoutModelEvents",
+      "_origin": "ast",
+      "community": 72,
+      "community_name": "DatabaseSeeder",
+      "file_type": "code",
+      "norm_label": "illuminate\\database\\console\\seeds\\withoutmodelevents",
+      "source_file": "",
+      "source_location": ""
+    },
+    {
+      "id": "illuminate_database_seeder",
+      "label": "Illuminate\\Database\\Seeder",
+      "_origin": "ast",
+      "community": 72,
+      "community_name": "DatabaseSeeder",
+      "file_type": "code",
+      "norm_label": "illuminate\\database\\seeder",
+      "source_file": "",
+      "source_location": ""
+    },
+    {
       "id": "resources_views_welcome_blade",
       "label": "welcome.blade.php",
       "_origin": "ast",
@@ -12844,28 +12800,6 @@
       "source_location": "L1"
     },
     {
-      "id": "app_livewire_client_dashboard",
-      "label": "Client/Dashboard.php",
-      "_origin": "ast",
-      "community": 84,
-      "community_name": "Client/Dashboard.php",
-      "file_type": "code",
-      "norm_label": "client/dashboard.php",
-      "source_file": "app/Livewire/Client/Dashboard.php",
-      "source_location": "L1"
-    },
-    {
-      "id": "illuminate_support_facades_auth",
-      "label": "Illuminate\\Support\\Facades\\Auth",
-      "_origin": "ast",
-      "community": 84,
-      "community_name": "Client/Dashboard.php",
-      "file_type": "code",
-      "norm_label": "illuminate\\support\\facades\\auth",
-      "source_file": "",
-      "source_location": ""
-    },
-    {
       "id": "github_copilot_instructions",
       "label": "copilot-instructions.md",
       "_origin": "ast",
@@ -13406,7 +13340,7 @@
       "label": "VerifyEmailController.php",
       "_origin": "ast",
       "community": 94,
-      "community_name": "VerifyEmailController.php",
+      "community_name": ".route",
       "file_type": "code",
       "norm_label": "verifyemailcontroller.php",
       "source_file": "app/Http/Controllers/Auth/VerifyEmailController.php",
@@ -13417,18 +13351,29 @@
       "label": "Controller.php",
       "_origin": "ast",
       "community": 94,
-      "community_name": "VerifyEmailController.php",
+      "community_name": ".route",
       "file_type": "code",
       "norm_label": "controller.php",
       "source_file": "app/Http/Controllers/Controller.php",
       "source_location": "L1"
     },
     {
+      "id": "illuminate_auth_events_verified",
+      "label": "Illuminate\\Auth\\Events\\Verified",
+      "_origin": "ast",
+      "community": 94,
+      "community_name": ".route",
+      "file_type": "code",
+      "norm_label": "illuminate\\auth\\events\\verified",
+      "source_file": "",
+      "source_location": ""
+    },
+    {
       "id": "illuminate_foundation_auth_emailverificationrequest",
       "label": "Illuminate\\Foundation\\Auth\\EmailVerificationRequest",
       "_origin": "ast",
       "community": 94,
-      "community_name": "VerifyEmailController.php",
+      "community_name": ".route",
       "file_type": "code",
       "norm_label": "illuminate\\foundation\\auth\\emailverificationrequest",
       "source_file": "",
@@ -13439,11 +13384,55 @@
       "label": "Illuminate\\Http\\RedirectResponse",
       "_origin": "ast",
       "community": 94,
-      "community_name": "VerifyEmailController.php",
+      "community_name": ".route",
       "file_type": "code",
       "norm_label": "illuminate\\http\\redirectresponse",
       "source_file": "",
       "source_location": ""
+    },
+    {
+      "id": "illuminate_support_facades_event",
+      "label": "Illuminate\\Support\\Facades\\Event",
+      "_origin": "ast",
+      "community": 94,
+      "community_name": ".route",
+      "file_type": "code",
+      "norm_label": "illuminate\\support\\facades\\event",
+      "source_file": "",
+      "source_location": ""
+    },
+    {
+      "id": "illuminate_support_facades_url",
+      "label": "Illuminate\\Support\\Facades\\URL",
+      "_origin": "ast",
+      "community": 94,
+      "community_name": ".route",
+      "file_type": "code",
+      "norm_label": "illuminate\\support\\facades\\url",
+      "source_file": "",
+      "source_location": ""
+    },
+    {
+      "id": "tests_feature_auth_emailverificationtest",
+      "label": "EmailVerificationTest.php",
+      "_origin": "ast",
+      "community": 94,
+      "community_name": ".route",
+      "file_type": "code",
+      "norm_label": "emailverificationtest.php",
+      "source_file": "tests/Feature/Auth/EmailVerificationTest.php",
+      "source_location": "L1"
+    },
+    {
+      "id": "app_livewire_driver_dashboard",
+      "label": "dashboard.php",
+      "_origin": "ast",
+      "community": 95,
+      "community_name": "Dashboard",
+      "file_type": "code",
+      "norm_label": "dashboard.php",
+      "source_file": "app/Livewire/Driver/dashboard.php",
+      "source_location": "L1"
     },
     {
       "id": "database_migrations_2026_08_20_000000_create_sessions_table",
@@ -13468,15 +13457,26 @@
       "source_location": ""
     },
     {
-      "id": "tests_feature_auth_authenticationtest",
-      "label": "AuthenticationTest.php",
+      "id": "app_livewire_ally_commissions",
+      "label": "Commissions.php",
       "_origin": "ast",
       "community": 98,
-      "community_name": "AuthenticationTest",
+      "community_name": "Commissions.php",
       "file_type": "code",
-      "norm_label": "authenticationtest.php",
-      "source_file": "tests/Feature/Auth/AuthenticationTest.php",
+      "norm_label": "commissions.php",
+      "source_file": "app/Livewire/Ally/Commissions.php",
       "source_location": "L1"
+    },
+    {
+      "id": "illuminate_support_carbon",
+      "label": "Illuminate\\Support\\Carbon",
+      "_origin": "ast",
+      "community": 98,
+      "community_name": "Commissions.php",
+      "file_type": "code",
+      "norm_label": "illuminate\\support\\carbon",
+      "source_file": "",
+      "source_location": ""
     },
     {
       "id": "database_migrations_2026_08_21_000002_add_extra_pricing_fields_to_packages_table",
@@ -35721,5 +35721,5 @@
     }
   ],
   "hyperedges": [],
-  "built_at_commit": "eb1a46ca67db511538a40e66d635a8ac85278f6b"
+  "built_at_commit": "acc8e47321299d4c5faeabb416ed3f70ac375bdc"
 }
