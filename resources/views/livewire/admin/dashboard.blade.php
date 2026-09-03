@@ -23,9 +23,7 @@
     ];
 @endphp
 
-<div class="min-h-screen bg-white flex font-sans">
-
-    <main class="flex-1 p-8 lg:p-10 overflow-y-auto">
+<div class="space-y-8 font-sans">
 
         {{-- =========================================================
              HEADER
@@ -66,12 +64,14 @@
                 </p>
             </div>
 
-            <button
-                type="button"
-                class="bg-blue-600 hover:bg-blue-500 px-6 py-3 rounded-xl font-medium transition-colors whitespace-nowrap shadow-sm"
-            >
-                Generar Reporte Global
-            </button>
+            @if (auth()->user()?->isAdminPrincipal())
+                <a
+                    href="{{ route('admin.audit-log') }}"
+                    class="bg-blue-600 hover:bg-blue-500 px-6 py-3 rounded-xl font-medium transition-colors whitespace-nowrap shadow-sm"
+                >
+                    Ver bitácora de auditoría
+                </a>
+            @endif
 
         </div>
 
@@ -184,6 +184,115 @@
 
             </div>
 
+        </div>
+
+
+        {{-- =========================================================
+             REPORTES
+        ========================================================== --}}
+        <div>
+            <h2 class="font-display text-lg font-bold text-[#0F172A] mb-4">
+                Reportes
+            </h2>
+
+            <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-5">
+
+                {{-- INGRESOS HOY --}}
+                <div class="bg-white rounded-2xl border border-[#E2E8F0] p-6 shadow-sm">
+                    <div class="flex justify-between items-start">
+                        <p class="text-xs font-bold text-[#64748B] uppercase tracking-wider">Ingresos hoy</p>
+                        <div class="p-2 bg-emerald-50 rounded-lg text-emerald-700">💵</div>
+                    </div>
+                    <p class="font-display text-3xl font-bold mt-4 text-[#0F172A]">
+                        ${{ number_format((float) $revenueToday, 2) }}
+                    </p>
+                    <p class="text-xs text-[#64748B] mt-2">Envíos entregados hoy</p>
+                </div>
+
+                {{-- INGRESOS DEL MES --}}
+                <div class="bg-white rounded-2xl border border-[#E2E8F0] p-6 shadow-sm">
+                    <div class="flex justify-between items-start">
+                        <p class="text-xs font-bold text-[#64748B] uppercase tracking-wider">Ingresos del mes</p>
+                        <div class="p-2 bg-emerald-50 rounded-lg text-emerald-700">📈</div>
+                    </div>
+                    <p class="font-display text-3xl font-bold mt-4 text-[#0F172A]">
+                        ${{ number_format((float) $revenueThisMonth, 2) }}
+                    </p>
+                    <p class="text-xs text-[#64748B] mt-2">Envíos entregados en {{ now()->translatedFormat('F') }}</p>
+                </div>
+
+                {{-- COMISIONES A ALIADOS --}}
+                <div class="bg-white rounded-2xl border border-[#E2E8F0] p-6 shadow-sm">
+                    <div class="flex justify-between items-start">
+                        <p class="text-xs font-bold text-[#64748B] uppercase tracking-wider">Comisiones del mes</p>
+                        <div class="p-2 bg-blue-50 rounded-lg text-blue-700">🏢</div>
+                    </div>
+                    <p class="font-display text-3xl font-bold mt-4 text-[#0F172A]">
+                        ${{ number_format((float) $commissionsThisMonth, 2) }}
+                    </p>
+                    <p class="text-xs text-[#64748B] mt-2">Generadas a favor de agencias aliadas</p>
+                </div>
+
+                {{-- COD PENDIENTE --}}
+                <a href="{{ route('admin.allies') }}" class="bg-white rounded-2xl border border-[#E2E8F0] p-6 shadow-sm hover:border-amber-300 transition-colors">
+                    <div class="flex justify-between items-start">
+                        <p class="text-xs font-bold text-[#64748B] uppercase tracking-wider">COD por liquidar</p>
+                        <div class="p-2 bg-amber-50 rounded-lg text-amber-600">📭</div>
+                    </div>
+                    <p class="font-display text-3xl font-bold mt-4 text-[#0F172A]">
+                        ${{ number_format((float) $codPendingTotal, 2) }}
+                    </p>
+                    <p class="text-xs text-[#64748B] mt-2">{{ number_format($codPendingCount) }} guías contra-entrega sin remitir</p>
+                </a>
+
+                {{-- REMUNERACIONES PENDIENTES --}}
+                <a href="{{ route('admin.driver-payments') }}" class="bg-white rounded-2xl border border-[#E2E8F0] p-6 shadow-sm hover:border-blue-300 transition-colors">
+                    <div class="flex justify-between items-start">
+                        <p class="text-xs font-bold text-[#64748B] uppercase tracking-wider">Remuneraciones pendientes</p>
+                        <div class="p-2 bg-orange-50 rounded-lg text-orange-600">🚚</div>
+                    </div>
+                    <p class="font-display text-3xl font-bold mt-4 text-[#0F172A]">
+                        ${{ number_format((float) $pendingPaymentsTotal, 2) }}
+                    </p>
+                    <p class="text-xs text-[#64748B] mt-2">{{ number_format($pendingPaymentsCount) }} pagos por generar a repartidores</p>
+                </a>
+
+                {{-- INCIDENCIAS ABIERTAS --}}
+                <a href="{{ route('admin.incidents') }}" class="bg-white rounded-2xl border border-[#E2E8F0] p-6 shadow-sm hover:border-red-300 transition-colors">
+                    <div class="flex justify-between items-start">
+                        <p class="text-xs font-bold text-[#64748B] uppercase tracking-wider">Incidencias abiertas</p>
+                        <div class="p-2 bg-red-50 rounded-lg text-red-600">⚠️</div>
+                    </div>
+                    <p class="font-display text-3xl font-bold mt-4 text-[#0F172A]">
+                        {{ number_format($openIncidentsCount) }}
+                    </p>
+                    <p class="text-xs text-[#64748B] mt-2">Abiertas o en proceso</p>
+                </a>
+
+                {{-- TOP ALIADOS --}}
+                <div class="bg-white rounded-2xl border border-[#E2E8F0] p-6 shadow-sm sm:col-span-2 lg:col-span-2">
+                    <p class="text-xs font-bold text-[#64748B] uppercase tracking-wider mb-4">Aliados con más volumen</p>
+
+                    @if($topAllies->count())
+                        <div class="space-y-3">
+                            @foreach($topAllies as $ally)
+                                <div class="flex items-center justify-between">
+                                    <div>
+                                        <p class="text-sm font-medium text-[#0F172A]">{{ $ally->business_name }}</p>
+                                        <p class="text-xs text-[#64748B]">{{ $ally->city }}</p>
+                                    </div>
+                                    <span class="text-sm font-semibold text-[#0F172A]">
+                                        {{ number_format($ally->packages_count) }} guías
+                                    </span>
+                                </div>
+                            @endforeach
+                        </div>
+                    @else
+                        <p class="text-sm text-[#64748B]">Todavía no hay suficiente actividad para mostrar un ranking.</p>
+                    @endif
+                </div>
+
+            </div>
         </div>
 
 
@@ -463,7 +572,5 @@
             </div>
 
         </div>
-
-    </main>
 
 </div>

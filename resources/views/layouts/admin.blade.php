@@ -89,9 +89,18 @@
                         Despacho a tránsito
                     </a>
 
-                    <a href="{{ route('admin.routes') }}" class="flex items-center gap-3 px-4 py-3 text-[#64748B] hover:bg-slate-50 hover:text-[#0F172A] rounded-xl font-medium transition-colors">
+                    <a href="{{ route('admin.routes') }}"
+                       class="flex items-center gap-3 px-4 py-3 rounded-xl font-medium transition-colors
+                              {{ request()->routeIs('admin.routes') ? 'bg-blue-50 text-blue-900' : 'text-[#64748B] hover:bg-slate-50 hover:text-[#0F172A]' }}">
                         <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 20l-5.447-2.724A1 1 0 013 16.382V5.618a1 1 0 011.447-.894L9 7l6-2.572 5.447 2.724A1 1 0 0121 8.053v10.764a1 1 0 01-1.447.894L15 17l-6 2.572zM9 7v13M15 4v13"></path></svg>
                         Control de rutas
+                    </a>
+
+                    <a href="{{ route('admin.routes.dashboard') }}"
+                       class="flex items-center gap-3 px-4 py-3 rounded-xl font-medium transition-colors
+                              {{ request()->routeIs('admin.routes.dashboard') ? 'bg-blue-50 text-blue-900' : 'text-[#64748B] hover:bg-slate-50 hover:text-[#0F172A]' }}">
+                        <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 19v-6a2 2 0 012-2h2a2 2 0 012 2v6m-9 0h10a2 2 0 002-2V9.5a1 1 0 00-.4-.8l-5-3.75a1 1 0 00-1.2 0l-5 3.75a1 1 0 00-.4.8V17a2 2 0 002 2z"></path></svg>
+                        Dashboard de rutas
                     </a>
 
                     <p class="px-2 text-xs font-semibold text-[#94A3B8] uppercase tracking-wider mb-3 mt-6">Administración</p>
@@ -104,8 +113,17 @@
                         Gestión de usuarios
                     </a>
                 
-                    <a href="{{ route('admin.driver-payments') }}" class="flex items-center gap-3 px-4 py-3 rounded-xl font-medium text-[#64748B] hover:bg-slate-50 hover:text-[#0F172A]">Remuneraciones</a>
-                    <a href="{{ route('admin.incidents') }}" class="flex items-center gap-3 px-4 py-3 rounded-xl font-medium text-[#64748B] hover:bg-slate-50 hover:text-[#0F172A]">Incidencias</a>
+                    <a href="{{ route('admin.driver-payments') }}"
+                       class="flex items-center gap-3 px-4 py-3 rounded-xl font-medium transition-colors
+                              {{ request()->routeIs('admin.driver-payments') ? 'bg-blue-50 text-blue-900' : 'text-[#64748B] hover:bg-slate-50 hover:text-[#0F172A]' }}">Remuneraciones</a>
+                    <a href="{{ route('admin.incidents') }}"
+                       class="flex items-center gap-3 px-4 py-3 rounded-xl font-medium transition-colors
+                              {{ request()->routeIs('admin.incidents') ? 'bg-blue-50 text-blue-900' : 'text-[#64748B] hover:bg-slate-50 hover:text-[#0F172A]' }}">Incidencias</a>
+                    @if (Auth::user()?->isAdminPrincipal())
+                        <a href="{{ route('admin.audit-log') }}"
+                           class="flex items-center gap-3 px-4 py-3 rounded-xl font-medium transition-colors
+                                  {{ request()->routeIs('admin.audit-log') ? 'bg-blue-50 text-blue-900' : 'text-[#64748B] hover:bg-slate-50 hover:text-[#0F172A]' }}">Bitácora de auditoría</a>
+                    @endif
 </nav>
             </div>
 

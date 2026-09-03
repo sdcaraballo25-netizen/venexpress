@@ -9,7 +9,7 @@ use Livewire\Component;
 use Livewire\WithPagination;
 use RuntimeException;
 
-#[Layout('layouts.app')]
+#[Layout('layouts.admin')]
 class DriverPayments extends Component
 {
     use WithPagination;

@@ -1,5 +1,4 @@
-<div class="min-h-screen bg-white flex font-sans">
-    <main class="flex-1 p-8 lg:p-10 overflow-y-auto">
+<div class="space-y-6 font-sans">
 
         {{-- HEADER --}}
         <div class="flex flex-col md:flex-row justify-between items-start md:items-center mb-8 gap-4">
@@ -283,8 +282,6 @@
         <div class="mt-6">
             {{ $routes->links() }}
         </div>
-
-    </main>
 
     {{-- =========================================================
          MODAL CREAR / EDITAR RUTA

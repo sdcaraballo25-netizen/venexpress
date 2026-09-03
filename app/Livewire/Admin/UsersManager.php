@@ -28,6 +28,13 @@ class UsersManager extends Component
     public bool $showCreateModal = false;
     public bool $showConfirmModal = false;
     public bool $showDeleteModal = false;
+    public bool $showEditModal = false;
+
+    public ?int $editingUserId = null;
+    public string $edit_name = '';
+    public string $edit_email = '';
+    public string $edit_password = '';
+    public string $edit_password_confirmation = '';
 
     public string $name = '';
     public string $email = '';
@@ -164,6 +171,86 @@ class UsersManager extends Component
         $this->closeCreateModal();
         session()->flash('success', 'Usuario creado correctamente.');
         $this->resetPage();
+    }
+
+    /**
+     * Abre el modal de edición con los datos actuales del usuario.
+     */
+    public function openEditModal(int $userId): void
+    {
+        $target = User::findOrFail($userId);
+
+        abort_unless(auth()->user()?->canEditUser($target), 403);
+
+        $this->editingUserId = $target->id;
+        $this->edit_name = $target->name;
+        $this->edit_email = $target->email;
+        $this->edit_password = '';
+        $this->edit_password_confirmation = '';
+        $this->resetValidation();
+        $this->showEditModal = true;
+    }
+
+    public function closeEditModal(): void
+    {
+        $this->showEditModal = false;
+        $this->editingUserId = null;
+        $this->reset(['edit_name', 'edit_email', 'edit_password', 'edit_password_confirmation']);
+        $this->resetValidation();
+    }
+
+    /**
+     * Actualiza nombre, correo y opcionalmente la contraseña de un usuario.
+     * La contraseña nueva es opcional: si se deja en blanco, se conserva la actual.
+     */
+    public function updateUser(): void
+    {
+        $actor = auth()->user();
+        $target = $this->editingUserId ? User::find($this->editingUserId) : null;
+
+        abort_unless($target && $actor?->canEditUser($target), 403);
+
+        $rules = [
+            'edit_name' => ['required', 'string', 'max:255'],
+            'edit_email' => ['required', 'string', 'email', 'max:255', 'unique:users,email,' . $target->id],
+        ];
+
+        if ($this->edit_password !== '') {
+            $rules['edit_password'] = ['string', 'confirmed', Rules\Password::defaults()];
+        }
+
+        $validated = $this->validate($rules, [], [
+            'edit_name' => 'nombre',
+            'edit_email' => 'correo electrónico',
+            'edit_password' => 'contraseña',
+        ]);
+
+        $data = [
+            'name' => $validated['edit_name'],
+            'email' => strtolower($validated['edit_email']),
+        ];
+
+        if ($this->edit_password !== '') {
+            $data['password'] = $validated['edit_password'];
+        }
+
+        DB::transaction(function () use ($actor, $target, $data) {
+            $target->update($data);
+
+            AuditLog::create([
+                'actor_user_id' => $actor->id,
+                'action' => 'user.updated',
+                'target_type' => User::class,
+                'target_id' => $target->id,
+                'description' => "Editó los datos del usuario {$target->name}."
+                    . (isset($data['password']) ? ' Se restableció su contraseña.' : ''),
+                'metadata' => ['fields' => array_keys($data)],
+                'ip_address' => request()->ip(),
+            ]);
+        });
+
+        $this->closeEditModal();
+        session()->flash('success', 'Usuario actualizado correctamente.');
     }
 
     public function toggleStatus(int $userId): void

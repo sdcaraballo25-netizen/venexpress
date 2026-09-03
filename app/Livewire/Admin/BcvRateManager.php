@@ -3,11 +3,13 @@
 namespace App\Livewire\Admin;
 
 use App\Models\BcvRate;
+use App\Services\BcvRateService;
 use Illuminate\Support\Facades\DB;
 use Livewire\Attributes\Layout;
 use Livewire\Attributes\Title;
 use Livewire\Component;
 use Livewire\WithPagination;
+use RuntimeException;
 
 #[Layout('layouts.admin')]
 #[Title('Tasa BCV')]
@@ -83,6 +85,29 @@ class BcvRateManager extends Component
     public function cancelEdit(): void
     {
         $this->resetForm();
+    }
+
+    /**
+     * Consulta la API oficial ahora mismo, sin esperar al cron/scheduler.
+     * Usa el mismo servicio que el comando `bcv:sync`.
+     */
+    public function syncNow(BcvRateService $service): void
+    {
+        try {
+            $rate = $service->syncFromApi();
+
+            session()->flash(
+                'success',
+                $rate
+                    ? 'Tasa sincronizada: ' . number_format((float) $rate->rate, 2) . ' Bs. por USD.'
+                    : 'Ya estás al día: la tasa oficial no ha cambiado desde la última sincronización.'
+            );
+        } catch (\Throwable $e) {
+            session()->flash(
+                'error',
+                'No se pudo consultar la tasa oficial. Verifica tu conexión a internet e inténtalo de nuevo. (' . $e->getMessage() . ')'
+            );
+        }
     }
 
     public function delete(int $id): void

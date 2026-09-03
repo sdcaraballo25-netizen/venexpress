@@ -1,7 +1,18 @@
 <div class="min-h-screen">
-    <div class="mb-8">
-        <h1 class="font-display text-3xl font-bold text-[#0F172A]">Tasa BCV</h1>
-        <p class="mt-1 text-sm text-[#64748B]">Consulta la tasa vigente y registra el histórico de tasas del dólar oficial.</p>
+    <div class="mb-8 flex flex-col gap-4 md:flex-row md:items-center md:justify-between">
+        <div>
+            <h1 class="font-display text-3xl font-bold text-[#0F172A]">Tasa BCV</h1>
+            <p class="mt-1 text-sm text-[#64748B]">Consulta la tasa vigente y registra el histórico de tasas del dólar oficial.</p>
+        </div>
+
+        <button
+            wire:click="syncNow"
+            wire:loading.attr="disabled"
+            wire:target="syncNow"
+            class="inline-flex items-center justify-center gap-2 rounded-xl bg-blue-900 px-5 py-3 text-sm font-semibold text-white shadow-sm transition hover:bg-blue-800 disabled:opacity-60">
+            <span wire:loading.remove wire:target="syncNow">Sincronizar ahora</span>
+            <span wire:loading wire:target="syncNow">Consultando…</span>
+        </button>
     </div>
 
     @if (session('success'))

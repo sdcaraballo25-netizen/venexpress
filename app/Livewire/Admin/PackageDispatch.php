@@ -8,7 +8,7 @@ use Livewire\Attributes\Layout;
 use Livewire\Component;
 use RuntimeException;
 
-#[Layout('layouts.app')]
+#[Layout('layouts.admin')]
 class PackageDispatch extends Component
 {
     public string $trackingNumber = '';

@@ -107,6 +107,13 @@
                             </td>
                             <td class="px-6 py-4">
                                 <div class="flex items-center justify-end gap-2">
+                                    @if (auth()->user()->canEditUser($user))
+                                        <button wire:click="openEditModal({{ $user->id }})"
+                                                class="rounded-lg border border-[#E2E8F0] px-3 py-2 text-xs font-semibold text-[#475569] hover:bg-slate-50">
+                                            Editar
+                                        </button>
+                                    @endif
+
                                     @if (auth()->user()->canDeactivateUser($user))
                                         <button wire:click="toggleStatus({{ $user->id }})"
                                                 class="rounded-lg border border-[#E2E8F0] px-3 py-2 text-xs font-semibold text-[#475569] hover:bg-slate-50">
@@ -271,6 +278,52 @@
                     <button wire:click="$set('showConfirmModal', false)" class="rounded-xl border border-[#E2E8F0] px-5 py-3 text-sm font-semibold text-[#475569]">Volver</button>
                     <button wire:click="createUser" class="rounded-xl bg-blue-900 px-5 py-3 text-sm font-semibold text-white hover:bg-blue-800">Confirmar creación</button>
                 </div>
+            </div>
+        </div>
+    @endif
+
+    {{-- Modal editar usuario --}}
+    @if ($showEditModal)
+        <div class="fixed inset-0 z-50 flex items-center justify-center bg-slate-950/50 p-4" wire:click.self="closeEditModal">
+            <div class="max-h-[92vh] w-full max-w-lg overflow-y-auto rounded-2xl bg-white shadow-2xl">
+                <div class="flex items-center justify-between border-b border-[#E2E8F0] px-6 py-5">
+                    <div>
+                        <h2 class="font-display text-xl font-bold text-[#0F172A]">Editar usuario</h2>
+                        <p class="mt-1 text-xs text-[#64748B]">Actualiza los datos de la cuenta. Deja la contraseña en blanco para conservar la actual.</p>
+                    </div>
+                    <button wire:click="closeEditModal" class="text-2xl text-[#64748B]">×</button>
+                </div>
+
+                <form wire:submit="updateUser" class="space-y-6 p-6">
+                    <div>
+                        <x-input-label for="admin-user-edit-name" value="Nombre completo" />
+                        <x-text-input wire:model="edit_name" id="admin-user-edit-name" class="mt-1.5 block w-full" type="text" />
+                        <x-input-error :messages="$errors->get('edit_name')" class="mt-2" />
+                    </div>
+
+                    <div>
+                        <x-input-label for="admin-user-edit-email" value="Correo electrónico" />
+                        <x-text-input wire:model="edit_email" id="admin-user-edit-email" class="mt-1.5 block w-full" type="email" />
+                        <x-input-error :messages="$errors->get('edit_email')" class="mt-2" />
+                    </div>
+
+                    <div class="grid gap-5 md:grid-cols-2">
+                        <div>
+                            <x-input-label for="admin-user-edit-password" value="Nueva contraseña (opcional)" />
+                            <x-password-input wire:model="edit_password" id="admin-user-edit-password" class="mt-1.5 block w-full" />
+                            <x-input-error :messages="$errors->get('edit_password')" class="mt-2" />
+                        </div>
+                        <div>
+                            <x-input-label for="admin-user-edit-password-confirmation" value="Confirmar nueva contraseña" />
+                            <x-password-input wire:model="edit_password_confirmation" id="admin-user-edit-password-confirmation" class="mt-1.5 block w-full" />
+                        </div>
+                    </div>
+
+                    <div class="flex justify-end gap-3 border-t border-[#E2E8F0] pt-5">
+                        <button type="button" wire:click="closeEditModal" class="rounded-xl border border-[#E2E8F0] px-5 py-3 text-sm font-semibold text-[#475569]">Cancelar</button>
+                        <button type="submit" class="rounded-xl bg-blue-900 px-5 py-3 text-sm font-semibold text-white hover:bg-blue-800">Guardar cambios</button>
+                    </div>
+                </form>
             </div>
         </div>
     @endif

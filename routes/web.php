@@ -14,6 +14,7 @@ use App\Livewire\Admin\RoutesDashboard;
 use App\Livewire\Admin\DriverPayments;
 use App\Livewire\Admin\IncidentsManager;
 use App\Livewire\Admin\DriverAssignment;
+use App\Livewire\Admin\AuditLogViewer;
 use App\Livewire\Client\Dashboard as ClientDashboard;
 use App\Livewire\Ally\Dashboard as AllyDashboard;
 use App\Livewire\Ally\PackageCreate as AllyPackageCreate;
@@ -352,6 +353,10 @@ Route::prefix('admin')
 
         Route::get('/incidencias', IncidentsManager::class)
             ->name('incidents');
+
+        Route::get('/bitacora', AuditLogViewer::class)
+            ->middleware('role:admin_principal')
+            ->name('audit-log');
     });
 
 

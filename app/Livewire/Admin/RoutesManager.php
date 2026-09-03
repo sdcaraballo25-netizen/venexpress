@@ -9,10 +9,14 @@ use App\Models\RouteStop;
 use App\Services\RouteService;
 use App\Services\VenezuelaLocationService;
 use Illuminate\Support\Facades\Auth;
+use Livewire\Attributes\Layout;
+use Livewire\Attributes\Title;
 use Livewire\Component;
 use Livewire\WithPagination;
 use RuntimeException;
 
+#[Layout('layouts.admin')]
+#[Title('Control de Rutas')]
 class RoutesManager extends Component
 {
     use WithPagination;
@@ -94,7 +98,24 @@ class RoutesManager extends Component
     {
         $this->states = $locationService->states();
 
-        $this->citiesWithAllies = [];
+        $this->refreshCitiesWithAllies();
+    }
+
+    /**
+     * Ciudades donde hay al menos una agencia aliada activa. Alimenta el
+     * filtro "Ciudad" del listado de rutas.
+     */
+    protected function refreshCitiesWithAllies(): void
+    {
+        $this->citiesWithAllies = Ally::query()
+            ->where('status', Ally::STATUS_ACTIVE)
+            ->whereNotNull('city')
+            ->distinct()
+            ->orderBy('city')
+            ->pluck('city')
+            ->filter(fn ($city) => trim((string) $city) !== '')
+            ->values()
+            ->all();
     }
 
     /*
