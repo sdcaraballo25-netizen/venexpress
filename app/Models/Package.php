@@ -204,6 +204,20 @@ class Package extends Model
             ?? $this->current_status;
     }
 
+    /**
+     * Permite usar:
+     *
+     * {{ $package->status_label }}
+     *
+     * además de:
+     *
+     * $package->statusLabel()
+     */
+    public function getStatusLabelAttribute(): string
+    {
+        return $this->statusLabel();
+    }
+
     public function isSobre(): bool
     {
         return $this->package_type === self::TYPE_SOBRE;

@@ -16,11 +16,6 @@ class TariffService
     ) {
     }
 
-    /**
-     * Peso volumétrico:
-     *
-     * Largo × Ancho × Alto / 5000
-     */
     public function calculateVolumetricWeight(
         ?float $lengthCm,
         ?float $widthCm,
@@ -50,10 +45,6 @@ class TariffService
         );
     }
 
-    /**
-     * Peso facturable:
-     * máximo entre peso físico y volumétrico.
-     */
     public function calculateBillableWeight(
         float $physicalWeightKg,
         float $volumetricWeightKg
@@ -79,9 +70,6 @@ class TariffService
         );
     }
 
-    /**
-     * Obtiene la tarifa vigente.
-     */
     public function findRate(): RateMatrix
     {
         $rate = RateMatrix::current();
@@ -95,15 +83,6 @@ class TariffService
         return $rate;
     }
 
-    /**
-     * Obtiene la distancia por carretera.
-     *
-     * Primero se consulta la API.
-     * Después se guarda el resultado localmente.
-     *
-     * Si la API falla, se utiliza la distancia previamente
-     * almacenada.
-     */
     public function findDistanceKm(
         string $originCity,
         ?string $originState,
@@ -112,6 +91,9 @@ class TariffService
     ): int {
         $originCity = trim($originCity);
         $destinationCity = trim($destinationCity);
+
+        $originState = $this->normalizeState($originState);
+        $destinationState = $this->normalizeState($destinationState);
 
         if ($originCity === '') {
             throw new InvalidArgumentException(
@@ -126,8 +108,22 @@ class TariffService
         }
 
         /*
-         * Misma ciudad y mismo estado = 0 km.
+         * Para una nueva operación comercial exigimos estados.
+         * Esto evita que dos ciudades con el mismo nombre sean
+         * interpretadas como la misma ubicación.
          */
+        if ($originState === null) {
+            throw new InvalidArgumentException(
+                'El estado de origen es obligatorio.'
+            );
+        }
+
+        if ($destinationState === null) {
+            throw new InvalidArgumentException(
+                'El estado de destino es obligatorio.'
+            );
+        }
+
         if (
             $this->sameLocation(
                 $originCity,
@@ -139,12 +135,6 @@ class TariffService
             return 0;
         }
 
-        /*
-         * Primero intentamos la distancia almacenada.
-         *
-         * Esto evita hacer una llamada HTTP innecesaria cada vez
-         * que el usuario consulta una ruta que ya conocemos.
-         */
         $stored = CityDistance::between(
             $originCity,
             $originState,
@@ -159,9 +149,6 @@ class TariffService
             );
         }
 
-        /*
-         * Si no existe localmente, calculamos mediante API.
-         */
         try {
             $distanceKm =
                 $this->distanceApiService->drivingDistanceKm(
@@ -170,6 +157,12 @@ class TariffService
                     destinationCity: $destinationCity,
                     destinationState: $destinationState,
                 );
+
+            if ($distanceKm < 0) {
+                throw new RuntimeException(
+                    'La API devolvió una distancia inválida.'
+                );
+            }
 
             CityDistance::setDistance(
                 cityOne: $originCity,
@@ -182,11 +175,9 @@ class TariffService
             return $distanceKm;
         } catch (\Throwable $e) {
             /*
-             * Segundo intento: buscar cualquier registro antiguo
-             * que solamente tenga ciudades.
+             * Compatibilidad con distancias antiguas.
              *
-             * Esto permite que las distancias existentes antes
-             * de esta actualización no se pierdan.
+             * Solo se usa como fallback cuando la API falla.
              */
             $legacyStored = CityDistance::betweenCities(
                 $originCity,
@@ -200,16 +191,17 @@ class TariffService
                 );
             }
 
+            if ($e instanceof RuntimeException) {
+                throw $e;
+            }
+
             throw new RuntimeException(
-                $e->getMessage(),
+                'No fue posible calcular la distancia entre las ubicaciones seleccionadas.',
                 previous: $e
             );
         }
     }
 
-    /**
-     * Precio de un paquete.
-     */
     public function calculatePackageSubtotalUsd(
         RateMatrix $rateMatrix,
         float $billableWeightKg,
@@ -241,9 +233,6 @@ class TariffService
         );
     }
 
-    /**
-     * Precio de un sobre.
-     */
     public function calculateEnvelopeSubtotalUsd(
         RateMatrix $rateMatrix,
         int $distanceKm
@@ -264,9 +253,6 @@ class TariffService
         );
     }
 
-    /**
-     * Recargo por envío frágil.
-     */
     public function calculateFragileSurcharge(
         RateMatrix $rateMatrix,
         bool $isFragile
@@ -284,14 +270,17 @@ class TariffService
         );
     }
 
-    /**
-     * Calcula el seguro.
-     */
     public function calculateInsurancePrice(
         RateMatrix $rateMatrix,
         bool $hasInsurance,
         ?float $declaredValueUsd
     ): float {
+        if ($declaredValueUsd !== null && $declaredValueUsd <= 0) {
+            throw new InvalidArgumentException(
+                'El valor declarado debe ser mayor que cero.'
+            );
+        }
+
         if (! $hasInsurance) {
             return 0.0;
         }
@@ -318,9 +307,6 @@ class TariffService
         );
     }
 
-    /**
-     * Calcula todos los valores de una guía.
-     */
     public function calculate(
         string $originCity,
         string $destinationCity,
@@ -336,11 +322,11 @@ class TariffService
         ?string $destinationState = null,
         bool $requiresDelivery = false,
     ): array {
-        /*
-         * Validaciones generales.
-         */
         $originCity = trim($originCity);
         $destinationCity = trim($destinationCity);
+
+        $originState = $this->normalizeState($originState);
+        $destinationState = $this->normalizeState($destinationState);
 
         if ($originCity === '') {
             throw new InvalidArgumentException(
@@ -354,24 +340,28 @@ class TariffService
             );
         }
 
-        /*
-         * Solo aceptamos los tipos definidos por Package.
-         */
-        $allowedTypes = [
-            Package::TYPE_PAQUETE,
-            Package::TYPE_SOBRE,
-        ];
+        if ($originState === null) {
+            throw new InvalidArgumentException(
+                'El estado de origen es obligatorio.'
+            );
+        }
 
-        if (! in_array($packageType, $allowedTypes, true)) {
+        if ($destinationState === null) {
+            throw new InvalidArgumentException(
+                'El estado de destino es obligatorio.'
+            );
+        }
+
+        if (! in_array(
+            $packageType,
+            Package::TYPES,
+            true
+        )) {
             throw new InvalidArgumentException(
                 'El tipo de envío seleccionado no es válido.'
             );
         }
 
-        /*
-         * Un paquete requiere peso físico.
-         * Un sobre no necesita peso ni dimensiones.
-         */
         if ($physicalWeightKg < 0) {
             throw new InvalidArgumentException(
                 'El peso físico no puede ser negativo.'
@@ -387,11 +377,11 @@ class TariffService
             );
         }
 
-        /*
-         * Para sobres ignoramos las dimensiones.
-         * Para paquetes validamos que estén completas o ninguna.
-         */
-        if ($packageType === Package::TYPE_PAQUETE) {
+        if ($packageType === Package::TYPE_SOBRE) {
+            $lengthCm = null;
+            $widthCm = null;
+            $heightCm = null;
+        } else {
             $dimensions = [
                 $lengthCm,
                 $widthCm,
@@ -425,6 +415,12 @@ class TariffService
             }
         }
 
+        if ($declaredValueUsd !== null && $declaredValueUsd <= 0) {
+            throw new InvalidArgumentException(
+                'El valor declarado debe ser mayor que cero.'
+            );
+        }
+
         $rateMatrix = $this->findRate();
 
         $distanceKm = $this->findDistanceKm(
@@ -436,22 +432,21 @@ class TariffService
 
         $bcvRate = $this->bcvRateService->getCurrentRate();
 
-        $volumetricWeight = $packageType === Package::TYPE_SOBRE
-            ? 0.0
-            : $this->calculateVolumetricWeight(
-                $lengthCm,
-                $widthCm,
-                $heightCm
+        $volumetricWeight =
+            $packageType === Package::TYPE_SOBRE
+                ? 0.0
+                : $this->calculateVolumetricWeight(
+                    $lengthCm,
+                    $widthCm,
+                    $heightCm
+                );
+
+        $billableWeight =
+            $this->calculateBillableWeight(
+                $physicalWeightKg,
+                $volumetricWeight
             );
 
-        $billableWeight = $this->calculateBillableWeight(
-            $physicalWeightKg,
-            $volumetricWeight
-        );
-
-        /*
-         * El tipo de envío se decide explícitamente.
-         */
         if ($packageType === Package::TYPE_SOBRE) {
             $subtotalUsd =
                 $this->calculateEnvelopeSubtotalUsd(
@@ -498,11 +493,23 @@ class TariffService
             2
         );
 
+        if ($totalUsd < 0) {
+            throw new RuntimeException(
+                'El total calculado no puede ser negativo.'
+            );
+        }
+
         $totalVes =
             $this->bcvRateService->convertUsdToVes(
                 $totalUsd,
                 $bcvRate
             );
+
+        if ($totalVes < 0) {
+            throw new RuntimeException(
+                'El total en bolívares no puede ser negativo.'
+            );
+        }
 
         return [
             'package_type' => $packageType,
@@ -542,9 +549,6 @@ class TariffService
         ];
     }
 
-    /**
-     * Compara dos ubicaciones.
-     */
     protected function sameLocation(
         string $cityOne,
         ?string $stateOne,
@@ -566,7 +570,20 @@ class TariffService
                 === mb_strtolower(trim($stateTwo));
         }
 
-        return $stateOne === null
-            && $stateTwo === null;
+        return false;
+    }
+
+    protected function normalizeState(
+        ?string $state
+    ): ?string {
+        if ($state === null) {
+            return null;
+        }
+
+        $state = trim($state);
+
+        return $state === ''
+            ? null
+            : $state;
     }
 }

@@ -12,8 +12,11 @@ use RuntimeException;
 class PackageReception extends Component
 {
     public string $trackingNumber = '';
+
     public ?Package $package = null;
+
     public ?string $message = null;
+
     public ?string $error = null;
 
     public function search(): void
@@ -21,7 +24,10 @@ class PackageReception extends Component
         $this->package = null;
         $this->message = null;
         $this->error = null;
-        $this->trackingNumber = trim($this->trackingNumber);
+
+        $this->trackingNumber = trim(
+            $this->trackingNumber
+        );
 
         if ($this->trackingNumber === '') {
             $this->error = 'Introduce el número de guía.';
@@ -29,11 +35,23 @@ class PackageReception extends Component
         }
 
         $ally = auth()->user()->resolveAlly();
-        if (! $ally) abort(403);
+
+        if (! $ally) {
+            abort(
+                403,
+                'Tu usuario no tiene una agencia aliada asociada.'
+            );
+        }
 
         $package = Package::query()
-            ->where('tracking_number', $this->trackingNumber)
-            ->with(['ally', 'histories'])
+            ->where(
+                'tracking_number',
+                $this->trackingNumber
+            )
+            ->with([
+                'ally',
+                'histories',
+            ])
             ->first();
 
         if (! $package) {
@@ -41,8 +59,14 @@ class PackageReception extends Component
             return;
         }
 
-        if (mb_strtolower(trim((string) $package->destination_city)) !== mb_strtolower(trim((string) $ally->city))) {
-            $this->error = 'Esta guía no pertenece a la ciudad de destino de tu agencia.';
+        if (! $this->belongsToDestinationAgency(
+            $package,
+            $ally
+        )) {
+            $this->error =
+                'Esta guía no pertenece a la ciudad y estado '
+                . 'de destino de tu agencia.';
+
             return;
         }
 
@@ -53,32 +77,98 @@ class PackageReception extends Component
     {
         $this->message = null;
         $this->error = null;
-        $this->validate(['trackingNumber' => ['required', 'string', 'max:50']]);
+
+        $this->validate([
+            'trackingNumber' => [
+                'required',
+                'string',
+                'max:50',
+            ],
+        ]);
 
         try {
             $ally = auth()->user()->resolveAlly();
-            if (! $ally) abort(403);
 
-            $package = Package::where('tracking_number', trim($this->trackingNumber))->firstOrFail();
-
-            if (mb_strtolower(trim((string) $package->destination_city)) !== mb_strtolower(trim((string) $ally->city))) {
-                throw new RuntimeException('La guía no corresponde a la ciudad de esta agencia.');
+            if (! $ally) {
+                abort(
+                    403,
+                    'Tu usuario no tiene una agencia aliada asociada.'
+                );
             }
 
-            $this->package = app(DestinationReceptionService::class)->receive(
-                package: $package,
-                userId: (int) auth()->id(),
-                destinationLocation: $ally->business_name,
+            $trackingNumber = trim(
+                $this->trackingNumber
             );
 
-            $this->message = 'Recepción registrada. El paquete quedó LISTO_RETIRO.';
+            $package = Package::query()
+                ->where(
+                    'tracking_number',
+                    $trackingNumber
+                )
+                ->firstOrFail();
+
+            if (! $this->belongsToDestinationAgency(
+                $package,
+                $ally
+            )) {
+                throw new RuntimeException(
+                    'La guía no corresponde a la ciudad y estado '
+                    . 'de esta agencia.'
+                );
+            }
+
+            $this->package =
+                app(DestinationReceptionService::class)
+                    ->receive(
+                        package: $package,
+                        userId: (int) auth()->id(),
+                        destinationLocation:
+                            $ally->business_name,
+                    );
+
+            $this->message =
+                'Recepción registrada. El paquete quedó LISTO_RETIRO.';
         } catch (RuntimeException $e) {
             $this->error = $e->getMessage();
         }
     }
 
+    protected function belongsToDestinationAgency(
+        Package $package,
+        $ally
+    ): bool {
+        $packageCity = mb_strtolower(
+            trim((string) $package->destination_city)
+        );
+
+        $allyCity = mb_strtolower(
+            trim((string) $ally->city)
+        );
+
+        $packageState = mb_strtolower(
+            trim((string) $package->destination_state)
+        );
+
+        $allyState = mb_strtolower(
+            trim((string) $ally->state)
+        );
+
+        if ($packageCity === '' || $allyCity === '') {
+            return false;
+        }
+
+        if ($packageState === '' || $allyState === '') {
+            return false;
+        }
+
+        return $packageCity === $allyCity
+            && $packageState === $allyState;
+    }
+
     public function render()
     {
-        return view('livewire.ally.package-reception');
+        return view(
+            'livewire.ally.package-reception'
+        );
     }
 }
