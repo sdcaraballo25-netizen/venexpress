@@ -48,9 +48,9 @@
     "semantic_hash": "481e01a094e51f4ecb177568f14a0d1f"
   },
   "app/Livewire/Admin/Dashboard.php": {
-    "mtime": 1788416181.0,
-    "seen": 1788416939.6120374,
-    "ast_hash": "10bcfe378c55589e1fa0f11bcba4272e",
+    "mtime": 1788544851.0,
+    "seen": 1788549660.074674,
+    "ast_hash": "e4b21de4d69bf11d69735a406cf7f21f",
     "semantic_hash": ""
   },
   "app/Livewire/Admin/RateMatrixManager.php": {
@@ -270,92 +270,92 @@
     "semantic_hash": "1c9f381f9c2bc3027971a3bfdbe99164"
   },
   "database/migrations/0001_01_01_000000_create_users_table.php": {
-    "mtime": 1787246706.0,
-    "seen": 1788416939.6121047,
+    "mtime": 1787232306.0,
+    "seen": 1788549660.0747595,
     "ast_hash": "fc5034ba63ee5d1763faba845bc9ffdd",
     "semantic_hash": "fc5034ba63ee5d1763faba845bc9ffdd"
   },
   "database/migrations/0001_01_01_000001_create_cache_table.php": {
-    "mtime": 1787246706.0,
-    "seen": 1788416939.6121051,
+    "mtime": 1787232306.0,
+    "seen": 1788549660.0747602,
     "ast_hash": "f3f38b41650112a6282c8dd1f635afb0",
     "semantic_hash": "f3f38b41650112a6282c8dd1f635afb0"
   },
   "database/migrations/0001_01_01_000002_create_jobs_table.php": {
-    "mtime": 1787246706.0,
-    "seen": 1788416939.612106,
+    "mtime": 1787232306.0,
+    "seen": 1788549660.0747612,
     "ast_hash": "ead9cce2650b36345454f85e8c0214a0",
     "semantic_hash": "ead9cce2650b36345454f85e8c0214a0"
   },
   "database/migrations/2026_08_08_232920_create_drivers_table.php": {
-    "mtime": 1787246706.0,
-    "seen": 1788416939.6121068,
+    "mtime": 1787232306.0,
+    "seen": 1788549660.0747619,
     "ast_hash": "4ac0d713950fc19d3699b279c5102c1c",
     "semantic_hash": "4ac0d713950fc19d3699b279c5102c1c"
   },
   "database/migrations/2026_08_08_232921_create_bcv_rates_table.php": {
-    "mtime": 1787246706.0,
-    "seen": 1788416939.6121075,
+    "mtime": 1787232306.0,
+    "seen": 1788549660.0747626,
     "ast_hash": "d831730cac9d6efc8818b17036c7fa6e",
     "semantic_hash": "d831730cac9d6efc8818b17036c7fa6e"
   },
   "database/migrations/2026_08_08_232921_create_rate_matrices_table.php": {
-    "mtime": 1787246706.0,
-    "seen": 1788416939.6121082,
+    "mtime": 1787232306.0,
+    "seen": 1788549660.0747635,
     "ast_hash": "26ff71514660308e712013ff722c62aa",
     "semantic_hash": "26ff71514660308e712013ff722c62aa"
   },
   "database/migrations/2026_08_08_232923_create_allies_table.php": {
-    "mtime": 1787246706.0,
-    "seen": 1788416939.612109,
+    "mtime": 1787232306.0,
+    "seen": 1788549660.0747643,
     "ast_hash": "f87b75d80d296ed7e727a56c15cfaac6",
     "semantic_hash": "f87b75d80d296ed7e727a56c15cfaac6"
   },
   "database/migrations/2026_08_08_232924_create_packages_table.php": {
-    "mtime": 1787246706.0,
-    "seen": 1788416939.61211,
+    "mtime": 1787232306.0,
+    "seen": 1788549660.074765,
     "ast_hash": "d79230411d8c0507ee35aa662c58288d",
     "semantic_hash": "d79230411d8c0507ee35aa662c58288d"
   },
   "database/migrations/2026_08_08_232925_create_package_histories.php": {
-    "mtime": 1788298426.0,
-    "seen": 1788416939.6121106,
+    "mtime": 1788284026.0,
+    "seen": 1788549660.074766,
     "ast_hash": "8809ca145d9517555ba6004a037dde36",
     "semantic_hash": ""
   },
   "database/migrations/2026_08_09_000724_add_role_to_users_table.php": {
-    "mtime": 1787246706.0,
-    "seen": 1788416939.6121113,
+    "mtime": 1787232306.0,
+    "seen": 1788549660.0747666,
     "ast_hash": "f11c3e0d7d4b7dc67cae9e7fa5eaea40",
     "semantic_hash": "f11c3e0d7d4b7dc67cae9e7fa5eaea40"
   },
   "database/migrations/2026_08_09_010000_add_driver_id_to_packages_table.php": {
-    "mtime": 1787246706.0,
-    "seen": 1788416939.612112,
+    "mtime": 1787232306.0,
+    "seen": 1788549660.0747676,
     "ast_hash": "f00201bec88c36f67fbd8c22db43f759",
     "semantic_hash": "f00201bec88c36f67fbd8c22db43f759"
   },
   "database/migrations/2026_08_09_010500_drop_redundant_indexes.php": {
-    "mtime": 1788396108.0,
-    "seen": 1788416939.612113,
+    "mtime": 1788381708.0,
+    "seen": 1788549660.0747683,
     "ast_hash": "5e981e22234d70996135e214ac146617",
     "semantic_hash": ""
   },
   "database/migrations/2026_08_11_193200_create_city_distances_table.php": {
-    "mtime": 1787246706.0,
-    "seen": 1788416939.612114,
+    "mtime": 1787232306.0,
+    "seen": 1788549660.0747695,
     "ast_hash": "89d1fe71761660d0668596590fb38b82",
     "semantic_hash": "89d1fe71761660d0668596590fb38b82"
   },
   "database/migrations/2026_08_11_193201_convert_rate_matrices_to_global_tariff.php": {
-    "mtime": 1788396084.0,
-    "seen": 1788416939.6121147,
+    "mtime": 1788381684.0,
+    "seen": 1788549660.0747702,
     "ast_hash": "1571938b05705cc729f6ab3b530492b2",
     "semantic_hash": ""
   },
   "database/migrations/2026_08_20_000000_create_sessions_table.php": {
-    "mtime": 1787246706.0,
-    "seen": 1788416939.6121154,
+    "mtime": 1787232306.0,
+    "seen": 1788549660.0747712,
     "ast_hash": "89a8dd996123468bd60ca62c58d38ff5",
     "semantic_hash": "89a8dd996123468bd60ca62c58d38ff5"
   },
@@ -630,8 +630,8 @@
     "semantic_hash": "3e7def3e407cc6f261a75128a7e11ec8"
   },
   "resources/views/welcome.blade.php": {
-    "mtime": 1788376288.0,
-    "seen": 1788416939.6122055,
+    "mtime": 1788564372.0,
+    "seen": 1788550906.6314025,
     "ast_hash": "234c3c33d0b190373890129b14d7f3f6",
     "semantic_hash": ""
   },
@@ -852,14 +852,14 @@
     "semantic_hash": ""
   },
   "database/migrations/2026_08_21_000001_add_extra_pricing_fields_to_rate_matrices_table.php": {
-    "mtime": 1787353136.0,
-    "seen": 1788416939.6121166,
+    "mtime": 1787338736.0,
+    "seen": 1788549660.0747721,
     "ast_hash": "4222cd9e9e8711dd599498763b3e6d51",
     "semantic_hash": ""
   },
   "database/migrations/2026_08_21_000002_add_extra_pricing_fields_to_packages_table.php": {
-    "mtime": 1787353136.0,
-    "seen": 1788416939.6121175,
+    "mtime": 1787338736.0,
+    "seen": 1788549660.074773,
     "ast_hash": "d28c108b4aecf43eda24e6bee735fb29",
     "semantic_hash": ""
   },
@@ -876,20 +876,20 @@
     "semantic_hash": ""
   },
   "database/migrations/2026_08_22_195324_add_cliente_role_to_users_table.php": {
-    "mtime": 1787415028.0,
-    "seen": 1788416939.6121182,
+    "mtime": 1787400628.0,
+    "seen": 1788549660.074774,
     "ast_hash": "48307ec4c9dcdb73b43d1046e4ef9b8f",
     "semantic_hash": ""
   },
   "database/migrations/2026_08_22_213928_add_status_to_allies_table.php": {
-    "mtime": 1787415028.0,
-    "seen": 1788416939.612119,
+    "mtime": 1787400628.0,
+    "seen": 1788549660.0747747,
     "ast_hash": "19669f1ef908929f57c355d0d936e599",
     "semantic_hash": ""
   },
   "database/migrations/2026_08_22_213952_add_status_to_drivers_table.php": {
-    "mtime": 1787415028.0,
-    "seen": 1788416939.61212,
+    "mtime": 1787400628.0,
+    "seen": 1788549660.0747755,
     "ast_hash": "3aa5e710e95a847003bac291241294e5",
     "semantic_hash": ""
   },
@@ -924,14 +924,14 @@
     "semantic_hash": ""
   },
   "database/migrations/2026_08_22_230000_update_user_roles_and_add_status.php": {
-    "mtime": 1787427272.0,
-    "seen": 1788416939.6121206,
+    "mtime": 1787412872.0,
+    "seen": 1788549660.0747764,
     "ast_hash": "39ffd35ec56f17b3e4c7a84c856686f6",
     "semantic_hash": ""
   },
   "database/migrations/2026_08_22_230001_create_audit_logs_table.php": {
-    "mtime": 1787427272.0,
-    "seen": 1788416939.6121213,
+    "mtime": 1787412872.0,
+    "seen": 1788549660.0747774,
     "ast_hash": "04558a96cea2fac435be038b0ec9c04a",
     "semantic_hash": ""
   },
@@ -948,9 +948,9 @@
     "semantic_hash": ""
   },
   "app/Livewire/Admin/RoutesDashboard.php": {
-    "mtime": 1787475746.0,
-    "seen": 1788416939.6120443,
-    "ast_hash": "ec54d67276359c6ded958e15e15cb928",
+    "mtime": 1788544851.0,
+    "seen": 1788549660.0746825,
+    "ast_hash": "1ec41872209a731fda9ac218583e4677",
     "semantic_hash": ""
   },
   "app/Livewire/Admin/RoutesManager.php": {
@@ -978,32 +978,32 @@
     "semantic_hash": ""
   },
   "database/migrations/2026_08_23_000000_create_password_reset_tokens_table.php": {
-    "mtime": 1787430204.0,
-    "seen": 1788416939.6121223,
+    "mtime": 1787415804.0,
+    "seen": 1788549660.074778,
     "ast_hash": "b71c6d32ca58134434bdfddcaca52885",
     "semantic_hash": ""
   },
   "database/migrations/2026_08_24_090000_add_latitude_longitude_to_allies_table.php": {
-    "mtime": 1787477756.0,
-    "seen": 1788416939.6121233,
+    "mtime": 1787463356.0,
+    "seen": 1788549660.0747788,
     "ast_hash": "bf0e6311e5a03f7313aacfd1393b5bed",
     "semantic_hash": ""
   },
   "database/migrations/2026_08_24_090001_create_routes_table.php": {
-    "mtime": 1787477754.0,
-    "seen": 1788416939.612124,
+    "mtime": 1787463354.0,
+    "seen": 1788549660.07478,
     "ast_hash": "eb72d42053c86f86d67072f5b038c4cd",
     "semantic_hash": ""
   },
   "database/migrations/2026_08_24_090002_create_route_stops_table.php": {
-    "mtime": 1787477754.0,
-    "seen": 1788416939.6121247,
+    "mtime": 1787463354.0,
+    "seen": 1788549660.0747805,
     "ast_hash": "f4af045ecf0c4e2d1d2a4e86b5bd6ee6",
     "semantic_hash": ""
   },
   "database/migrations/2026_08_24_090003_add_route_stop_id_to_package_histories_table.php": {
-    "mtime": 1787477754.0,
-    "seen": 1788416939.6121254,
+    "mtime": 1787463354.0,
+    "seen": 1788549660.0747812,
     "ast_hash": "521b7ecdc5fe27c4b08fa6b2404d7ab9",
     "semantic_hash": ""
   },
@@ -1074,44 +1074,44 @@
     "semantic_hash": ""
   },
   "database/migrations/2026_08_25_000001_create_ally_users_table.php": {
-    "mtime": 1787678812.0,
-    "seen": 1788416939.612126,
+    "mtime": 1787664412.0,
+    "seen": 1788549660.0747821,
     "ast_hash": "8ad27a35d89882ac440066c24a9c8bd1",
     "semantic_hash": ""
   },
   "database/migrations/2026_08_25_000002_add_cod_and_commission_fields_to_packages_table.php": {
-    "mtime": 1787678812.0,
-    "seen": 1788416939.612127,
+    "mtime": 1787664412.0,
+    "seen": 1788549660.074783,
     "ast_hash": "d882cd8af14dcd5f31d310542459d99d",
     "semantic_hash": ""
   },
   "database/migrations/2026_08_25_000003_create_incidents_table.php": {
-    "mtime": 1787680484.0,
-    "seen": 1788416939.6121275,
+    "mtime": 1787666084.0,
+    "seen": 1788549660.0747836,
     "ast_hash": "b5d1cde3b4e942d4224da21bc216aa3f",
     "semantic_hash": ""
   },
   "database/migrations/2026_08_25_000004_add_payment_method_to_packages_table.php": {
-    "mtime": 1787680484.0,
-    "seen": 1788416939.6121285,
+    "mtime": 1787666084.0,
+    "seen": 1788549660.0747845,
     "ast_hash": "90f33ab44133f0cb04fc673abd8f7bbd",
     "semantic_hash": ""
   },
   "database/migrations/2026_08_25_000005_add_ally_id_to_users_table.php": {
-    "mtime": 1787680484.0,
-    "seen": 1788416939.6121292,
+    "mtime": 1787666084.0,
+    "seen": 1788549660.0747852,
     "ast_hash": "da5b307300e1c86c69181d517743c31b",
     "semantic_hash": ""
   },
   "database/migrations/2026_08_25_214614_add_state_to_routes_table.php": {
-    "mtime": 1787665680.0,
-    "seen": 1788416939.6121302,
+    "mtime": 1787651280.0,
+    "seen": 1788549660.074786,
     "ast_hash": "e506444d303fdd7f7c057065c312f032",
     "semantic_hash": ""
   },
   "database/migrations/2026_08_25_214630_add_state_to_allies_table.php": {
-    "mtime": 1787665692.0,
-    "seen": 1788416939.6121309,
+    "mtime": 1787651292.0,
+    "seen": 1788549660.074787,
     "ast_hash": "b02472f0abd3d1b0234c95f2983a70f2",
     "semantic_hash": ""
   },
@@ -1158,9 +1158,9 @@
     "semantic_hash": ""
   },
   "app/Services/DistanceApiService.php": {
-    "mtime": 1788460337.266296,
-    "seen": 1788460595.5091271,
-    "ast_hash": "7477f63b17fbfa4e9c68f32399385a57",
+    "mtime": 1788544851.0,
+    "seen": 1788549660.0747313,
+    "ast_hash": "3d2678f272b8173dcdaddb9f0826b42b",
     "semantic_hash": ""
   },
   "config/venezuela.php": {
@@ -1170,26 +1170,26 @@
     "semantic_hash": ""
   },
   "database/migrations/2026_08_26_000001_add_delivery_price_to_rate_matrices.php": {
-    "mtime": 1787703828.0,
-    "seen": 1788416939.6121316,
+    "mtime": 1787689428.0,
+    "seen": 1788549660.0747876,
     "ast_hash": "80820e9ec364831dbc3d27ebc668a699",
     "semantic_hash": ""
   },
   "database/migrations/2026_08_26_000002_add_destination_delivery_distance_to_packages.php": {
-    "mtime": 1787703836.0,
-    "seen": 1788416939.6121323,
+    "mtime": 1787689436.0,
+    "seen": 1788549660.0747886,
     "ast_hash": "966dfde0413465ad38d004db408aec1a",
     "semantic_hash": ""
   },
   "database/migrations/2026_08_26_000003_upgrade_bcv_rates_for_api.php": {
-    "mtime": 1788396284.0,
-    "seen": 1788416939.612133,
+    "mtime": 1788381884.0,
+    "seen": 1788549660.0747893,
     "ast_hash": "e5ca2862d1550218b522ca92659cc15a",
     "semantic_hash": ""
   },
   "database/migrations/2026_08_26_020000_create_customers_table.php": {
-    "mtime": 1787693694.0,
-    "seen": 1788416939.612134,
+    "mtime": 1787679294.0,
+    "seen": 1788549660.07479,
     "ast_hash": "ae40b99dd6ebb2d21275254f8f06a774",
     "semantic_hash": ""
   },
@@ -1209,12 +1209,6 @@
     "mtime": 1787708256.0,
     "seen": 1788416939.6122289,
     "ast_hash": "6fbfe7f864a431236df52782063b4109",
-    "semantic_hash": ""
-  },
-  "README_DISTANCIA_DELIVERY.txt": {
-    "mtime": 1787708256.0,
-    "seen": 1788416939.6122315,
-    "ast_hash": "dd1eaa2a3b36df7c5184c13950352df4",
     "semantic_hash": ""
   },
   "app/Livewire/Ally/Commissions.php": {
@@ -1248,14 +1242,14 @@
     "semantic_hash": ""
   },
   "database/migrations/2026_08_27_000000_add_security_hash_to_packages_table.php": {
-    "mtime": 1788272542.0,
-    "seen": 1788416939.6121347,
+    "mtime": 1788258142.0,
+    "seen": 1788549660.074791,
     "ast_hash": "eb934813d35b068f61f6a8d6f2a25020",
     "semantic_hash": ""
   },
   "database/migrations/2026_09_01_000000_add_email_to_customers_table.php": {
-    "mtime": 1788291400.0,
-    "seen": 1788416939.6121354,
+    "mtime": 1788277000.0,
+    "seen": 1788549660.0747914,
     "ast_hash": "f67525a682acc33ed67488e826d480e4",
     "semantic_hash": ""
   },
@@ -1392,26 +1386,26 @@
     "semantic_hash": ""
   },
   "database/migrations/2026_09_02_000001_add_delivery_confirmation_to_packages.php": {
-    "mtime": 1788295000.0,
-    "seen": 1788416939.6121361,
+    "mtime": 1788280600.0,
+    "seen": 1788549660.0747921,
     "ast_hash": "8dc41d465fead0dd1954032e1f9a8793",
     "semantic_hash": ""
   },
   "database/migrations/2026_09_02_000003_create_driver_payments_table.php": {
-    "mtime": 1788315088.0,
-    "seen": 1788416939.6121366,
+    "mtime": 1788300688.0,
+    "seen": 1788549660.074793,
     "ast_hash": "6e2bc07344ae6bcb49d0a4a21180e3bf",
     "semantic_hash": ""
   },
   "database/migrations/2026_09_02_000004_add_delivery_started_at_to_packages.php": {
-    "mtime": 1788315194.0,
-    "seen": 1788416939.6121376,
+    "mtime": 1788300794.0,
+    "seen": 1788549660.074794,
     "ast_hash": "a06749b9ad3f0c2d98c07bfea331652c",
     "semantic_hash": ""
   },
   "database/migrations/2026_09_02_000006_add_cod_collection_fields_to_packages.php": {
-    "mtime": 1788332854.0,
-    "seen": 1788416939.6121383,
+    "mtime": 1788318454.0,
+    "seen": 1788549660.0747948,
     "ast_hash": "9657093e17742542fa0e275490f5221f",
     "semantic_hash": ""
   },
@@ -1494,9 +1488,9 @@
     "semantic_hash": ""
   },
   "resources/views/layouts/public.blade.php": {
-    "mtime": 1788376086.0,
-    "seen": 1788416939.6122003,
-    "ast_hash": "6b869cb3adc6a92ea303d8afd72f8a93",
+    "mtime": 1788564372.0,
+    "seen": 1788550906.6313953,
+    "ast_hash": "bcef4fcce4d92cfbe41678736f7338d2",
     "semantic_hash": ""
   },
   "resources/views/public/office-locator.blade.php": {
@@ -1566,8 +1560,8 @@
     "semantic_hash": ""
   },
   "database/migrations/2026_09_03_000001_add_states_to_city_distances_table.php": {
-    "mtime": 1788460393.4927597,
-    "seen": 1788460595.509197,
+    "mtime": 1788445994.0,
+    "seen": 1788549660.0747955,
     "ast_hash": "a40dd564ed1432fcf6f9294767677db9",
     "semantic_hash": ""
   },
@@ -1602,14 +1596,14 @@
     "semantic_hash": ""
   },
   "database/migrations/2026_09_03_000002_create_ally_financial_transactions_table.php": {
-    "mtime": 1788461285.069407,
-    "seen": 1788462629.7471488,
+    "mtime": 1788446886.0,
+    "seen": 1788549660.0747964,
     "ast_hash": "b81ab4ee48723f2d9d4fa057ab4e3e8a",
     "semantic_hash": ""
   },
   "database/migrations/2026_09_03_000003_create_ally_settlements_table.php": {
-    "mtime": 1788461317.2387602,
-    "seen": 1788462629.7471495,
+    "mtime": 1788446918.0,
+    "seen": 1788549660.0747974,
     "ast_hash": "7dce8f41014392757393e6171e61aee1",
     "semantic_hash": ""
   },

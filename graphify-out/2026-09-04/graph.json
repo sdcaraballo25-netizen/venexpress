@@ -6102,7 +6102,7 @@
       "file_type": "code",
       "norm_label": ".calculateroutedistance()",
       "source_file": "app/Services/DistanceApiService.php",
-      "source_location": "L196"
+      "source_location": "L201"
     },
     {
       "id": "app_services_distanceapiservice_distanceapiservice_distancecachekey",
@@ -6114,7 +6114,7 @@
       "file_type": "code",
       "norm_label": ".distancecachekey()",
       "source_file": "app/Services/DistanceApiService.php",
-      "source_location": "L260"
+      "source_location": "L266"
     },
     {
       "id": "app_services_distanceapiservice_distanceapiservice_drivingdistancekm",
@@ -6126,7 +6126,7 @@
       "file_type": "code",
       "norm_label": ".drivingdistancekm()",
       "source_file": "app/Services/DistanceApiService.php",
-      "source_location": "L24"
+      "source_location": "L28"
     },
     {
       "id": "app_services_distanceapiservice_distanceapiservice_geocode",
@@ -6138,7 +6138,7 @@
       "file_type": "code",
       "norm_label": ".geocode()",
       "source_file": "app/Services/DistanceApiService.php",
-      "source_location": "L111"
+      "source_location": "L115"
     },
     {
       "id": "app_services_distanceapiservice_distanceapiservice_normalizestate",
@@ -6150,7 +6150,7 @@
       "file_type": "code",
       "norm_label": ".normalizestate()",
       "source_file": "app/Services/DistanceApiService.php",
-      "source_location": "L320"
+      "source_location": "L326"
     },
     {
       "id": "app_services_distanceapiservice_distanceapiservice_samelocation",
@@ -6162,7 +6162,7 @@
       "file_type": "code",
       "norm_label": ".samelocation()",
       "source_file": "app/Services/DistanceApiService.php",
-      "source_location": "L292"
+      "source_location": "L298"
     },
     {
       "id": "app_models_user_user_alliedagency",
@@ -8722,14 +8722,14 @@
     },
     {
       "id": "app_livewire_admin_routesdashboard",
-      "label": "App\\Livewire\\Admin\\RoutesDashboard",
+      "label": "RoutesDashboard.php",
       "_origin": "ast",
       "community": 126,
       "community_name": "Livewire\\Component",
       "file_type": "code",
-      "norm_label": "app\\livewire\\admin\\routesdashboard",
-      "source_file": "",
-      "source_location": ""
+      "norm_label": "routesdashboard.php",
+      "source_file": "app/Livewire/Admin/RoutesDashboard.php",
+      "source_location": "L1"
     },
     {
       "id": "app_livewire_admin_routesmanager",
@@ -8953,14 +8953,14 @@
     },
     {
       "id": "app_models_ally",
-      "label": "Ally.php",
+      "label": "App\\Models\\Ally",
       "_origin": "ast",
       "community": 128,
       "community_name": "Illuminate\\Database\\Eloquent\\Factories\\HasFactory",
       "file_type": "code",
-      "norm_label": "ally.php",
-      "source_file": "app/Models/Ally.php",
-      "source_location": "L1"
+      "norm_label": "app\\models\\ally",
+      "source_file": "",
+      "source_location": ""
     },
     {
       "id": "app_models_allyfinancialtransaction",
@@ -14928,42 +14928,6 @@
       "weight": 1.0
     },
     {
-      "source": "app_livewire_admin_routesdashboard_routesdashboard_render",
-      "target": "app_models_route_route",
-      "relation": "calls",
-      "_origin": "ast",
-      "confidence": "EXTRACTED",
-      "confidence_score": 1.0,
-      "context": "call",
-      "source_file": "app/Livewire/Admin/RoutesDashboard.php",
-      "source_location": "L18",
-      "weight": 1.0
-    },
-    {
-      "source": "app_livewire_admin_routesdashboard_routesdashboard_render",
-      "target": "app_models_routestop_routestop",
-      "relation": "calls",
-      "_origin": "ast",
-      "confidence": "EXTRACTED",
-      "confidence_score": 1.0,
-      "context": "call",
-      "source_file": "app/Livewire/Admin/RoutesDashboard.php",
-      "source_location": "L22",
-      "weight": 1.0
-    },
-    {
-      "source": "app_livewire_admin_routesdashboard_routesdashboard_render",
-      "target": "app_models_package_package",
-      "relation": "calls",
-      "_origin": "ast",
-      "confidence": "EXTRACTED",
-      "confidence_score": 1.0,
-      "context": "call",
-      "source_file": "app/Livewire/Admin/RoutesDashboard.php",
-      "source_location": "L29",
-      "weight": 1.0
-    },
-    {
       "source": "app_livewire_admin_routesmanager_routesmanager_mount",
       "target": "app_livewire_admin_routesmanager_routesmanager_refreshcitieswithallies",
       "relation": "calls",
@@ -16004,7 +15968,7 @@
       "confidence_score": 1.0,
       "context": "call",
       "source_file": "app/Services/DistanceApiService.php",
-      "source_location": "L33",
+      "source_location": "L37",
       "weight": 1.0
     },
     {
@@ -16016,7 +15980,7 @@
       "confidence_score": 1.0,
       "context": "call",
       "source_file": "app/Services/DistanceApiService.php",
-      "source_location": "L53",
+      "source_location": "L57",
       "weight": 1.0
     },
     {
@@ -16028,7 +15992,7 @@
       "confidence_score": 1.0,
       "context": "call",
       "source_file": "app/Services/DistanceApiService.php",
-      "source_location": "L63",
+      "source_location": "L67",
       "weight": 1.0
     },
     {
@@ -16040,7 +16004,7 @@
       "confidence_score": 1.0,
       "context": "call",
       "source_file": "app/Services/DistanceApiService.php",
-      "source_location": "L79",
+      "source_location": "L83",
       "weight": 1.0
     },
     {
@@ -16052,7 +16016,7 @@
       "confidence_score": 1.0,
       "context": "call",
       "source_file": "app/Services/DistanceApiService.php",
-      "source_location": "L89",
+      "source_location": "L93",
       "weight": 1.0
     },
     {
@@ -16064,7 +16028,7 @@
       "confidence_score": 1.0,
       "context": "call",
       "source_file": "app/Services/DistanceApiService.php",
-      "source_location": "L116",
+      "source_location": "L120",
       "weight": 1.0
     },
     {
@@ -19129,7 +19093,7 @@
     },
     {
       "source": "app_livewire_admin_routesdashboard",
-      "target": "app_models_package_package",
+      "target": "app_models_package",
       "relation": "imports",
       "_origin": "ast",
       "confidence": "EXTRACTED",
@@ -19141,7 +19105,7 @@
     },
     {
       "source": "app_livewire_admin_routesdashboard",
-      "target": "app_models_route_route",
+      "target": "app_models_route",
       "relation": "imports",
       "_origin": "ast",
       "confidence": "EXTRACTED",
@@ -19153,7 +19117,7 @@
     },
     {
       "source": "app_livewire_admin_routesdashboard",
-      "target": "app_models_routestop_routestop",
+      "target": "app_models_routestop",
       "relation": "imports",
       "_origin": "ast",
       "confidence": "EXTRACTED",
@@ -36078,7 +36042,7 @@
       "confidence": "EXTRACTED",
       "confidence_score": 1.0,
       "source_file": "app/Services/DistanceApiService.php",
-      "source_location": "L111",
+      "source_location": "L115",
       "weight": 1.0
     },
     {
@@ -36089,18 +36053,7 @@
       "confidence": "EXTRACTED",
       "confidence_score": 1.0,
       "source_file": "app/Services/DistanceApiService.php",
-      "source_location": "L196",
-      "weight": 1.0
-    },
-    {
-      "source": "app_services_distanceapiservice_distanceapiservice",
-      "target": "app_services_distanceapiservice_distanceapiservice_drivingdistancekm",
-      "relation": "method",
-      "_origin": "ast",
-      "confidence": "EXTRACTED",
-      "confidence_score": 1.0,
-      "source_file": "app/Services/DistanceApiService.php",
-      "source_location": "L24",
+      "source_location": "L201",
       "weight": 1.0
     },
     {
@@ -36111,7 +36064,18 @@
       "confidence": "EXTRACTED",
       "confidence_score": 1.0,
       "source_file": "app/Services/DistanceApiService.php",
-      "source_location": "L260",
+      "source_location": "L266",
+      "weight": 1.0
+    },
+    {
+      "source": "app_services_distanceapiservice_distanceapiservice",
+      "target": "app_services_distanceapiservice_distanceapiservice_drivingdistancekm",
+      "relation": "method",
+      "_origin": "ast",
+      "confidence": "EXTRACTED",
+      "confidence_score": 1.0,
+      "source_file": "app/Services/DistanceApiService.php",
+      "source_location": "L28",
       "weight": 1.0
     },
     {
@@ -36122,7 +36086,7 @@
       "confidence": "EXTRACTED",
       "confidence_score": 1.0,
       "source_file": "app/Services/DistanceApiService.php",
-      "source_location": "L292",
+      "source_location": "L298",
       "weight": 1.0
     },
     {
@@ -36133,7 +36097,7 @@
       "confidence": "EXTRACTED",
       "confidence_score": 1.0,
       "source_file": "app/Services/DistanceApiService.php",
-      "source_location": "L320",
+      "source_location": "L326",
       "weight": 1.0
     },
     {
@@ -38120,7 +38084,7 @@
       "confidence_score": 0.85,
       "context": "call",
       "source_file": "app/Livewire/Admin/Dashboard.php",
-      "source_location": "L143",
+      "source_location": "L145",
       "weight": 1.0
     },
     {
@@ -38132,7 +38096,19 @@
       "confidence_score": 0.85,
       "context": "call",
       "source_file": "app/Livewire/Admin/Dashboard.php",
-      "source_location": "L160",
+      "source_location": "L162",
+      "weight": 1.0
+    },
+    {
+      "source": "app_livewire_admin_dashboard_dashboard_render",
+      "target": "app_models_package_package",
+      "relation": "calls",
+      "_origin": "ast",
+      "confidence": "INFERRED",
+      "confidence_score": 0.85,
+      "context": "call",
+      "source_file": "app/Livewire/Admin/Dashboard.php",
+      "source_location": "L28",
       "weight": 1.0
     },
     {
@@ -38144,7 +38120,7 @@
       "confidence_score": 0.85,
       "context": "call",
       "source_file": "app/Livewire/Admin/Dashboard.php",
-      "source_location": "L46",
+      "source_location": "L48",
       "weight": 1.0
     },
     {
@@ -38156,7 +38132,7 @@
       "confidence_score": 0.85,
       "context": "call",
       "source_file": "app/Livewire/Admin/Dashboard.php",
-      "source_location": "L77",
+      "source_location": "L79",
       "weight": 1.0
     },
     {
@@ -38168,7 +38144,7 @@
       "confidence_score": 0.85,
       "context": "call",
       "source_file": "app/Livewire/Admin/Dashboard.php",
-      "source_location": "L80",
+      "source_location": "L82",
       "weight": 1.0
     },
     {
@@ -38180,7 +38156,7 @@
       "confidence_score": 0.85,
       "context": "call",
       "source_file": "app/Livewire/Admin/Dashboard.php",
-      "source_location": "L95",
+      "source_location": "L97",
       "weight": 1.0
     },
     {
@@ -38229,6 +38205,42 @@
       "context": "call",
       "source_file": "app/Livewire/Admin/IncidentsManager.php",
       "source_location": "L44",
+      "weight": 1.0
+    },
+    {
+      "source": "app_livewire_admin_routesdashboard_routesdashboard_render",
+      "target": "app_models_route_route",
+      "relation": "calls",
+      "_origin": "ast",
+      "confidence": "INFERRED",
+      "confidence_score": 0.85,
+      "context": "call",
+      "source_file": "app/Livewire/Admin/RoutesDashboard.php",
+      "source_location": "L18",
+      "weight": 1.0
+    },
+    {
+      "source": "app_livewire_admin_routesdashboard_routesdashboard_render",
+      "target": "app_models_routestop_routestop",
+      "relation": "calls",
+      "_origin": "ast",
+      "confidence": "INFERRED",
+      "confidence_score": 0.85,
+      "context": "call",
+      "source_file": "app/Livewire/Admin/RoutesDashboard.php",
+      "source_location": "L23",
+      "weight": 1.0
+    },
+    {
+      "source": "app_livewire_admin_routesdashboard_routesdashboard_render",
+      "target": "app_models_package_package",
+      "relation": "calls",
+      "_origin": "ast",
+      "confidence": "INFERRED",
+      "confidence_score": 0.85,
+      "context": "call",
+      "source_file": "app/Livewire/Admin/RoutesDashboard.php",
+      "source_location": "L30",
       "weight": 1.0
     },
     {
@@ -38761,5 +38773,5 @@
     }
   ],
   "hyperedges": [],
-  "built_at_commit": "bf69892c637b32ac3a8fdf37d6fea06205afba22"
+  "built_at_commit": "1ac3c2bb1f56da261d5308f471fbe37db2f47b46"
 }

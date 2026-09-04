@@ -186,78 +186,53 @@ class AllyFinancialService
             );
         }
 
-        return DB::transaction(
-            function () use (
-                $allyId,
-                $amountUsd,
-                $paymentMethod,
-                $reference,
-                $notes,
-                $userId
-            ) {
-                Ally::query()
-                    ->whereKey($allyId)
-                    ->lockForUpdate()
-                    ->firstOrFail();
+        return DB::transaction(function () use (
+            $allyId,
+            $amountUsd,
+            $paymentMethod,
+            $reference,
+            $notes,
+            $userId
+        ) {
+            Ally::query()
+                ->whereKey($allyId)
+                ->lockForUpdate()
+                ->firstOrFail();
 
-                $balance = $this->getBalance($allyId);
+            $balance = $this->getBalance($allyId);
 
-                /*
-                * Las solicitudes pendientes todavía no son débitos,
-                * pero deben reservar el dinero para evitar duplicaciones.
-                */
-                $pendingAmount = AllySettlement::query()
-                    ->where('ally_id', $allyId)
-                    ->where(
-                        'status',
-                        AllySettlement::STATUS_PENDING
+            $pendingAmount = AllySettlement::query()
+                ->where('ally_id', $allyId)
+                ->where('status', AllySettlement::STATUS_PENDING)
+                ->sum('amount_usd');
+
+            $availableBalance = round(
+                $balance - (float) $pendingAmount,
+                2
+            );
+
+            if ($amountUsd > $availableBalance) {
+                throw new RuntimeException(
+                    sprintf(
+                        'Saldo disponible para solicitar: $%.2f.',
+                        $availableBalance
                     )
-                    ->sum('amount_usd');
-
-                $availableBalance = round(
-                    $balance - (float) $pendingAmount,
-                    2
                 );
-
-                if ($amountUsd > $availableBalance) {
-                    throw new RuntimeException(
-                        sprintf(
-                            'Saldo disponible para solicitar: $%.2f.',
-                            $availableBalance
-                        )
-                    );
-                }
-
-                return AllySettlement::create([
-                    'ally_id' => $allyId,
-
-                    'amount_usd' => $amountUsd,
-
-                    'status' =>
-                        AllySettlement::STATUS_PENDING,
-
-                    'payment_method' =>
-                        $paymentMethod,
-
-                    'payment_reference' =>
-                        $reference,
-
-                    'notes' => $notes,
-
-                    'requested_by_user_id' =>
-                        $userId,
-
-                    'requested_at' => now(),
-                ]);
             }
-        );
+
+            return AllySettlement::create([
+                'ally_id' => $allyId,
+                'amount_usd' => $amountUsd,
+                'status' => AllySettlement::STATUS_PENDING,
+                'payment_method' => $paymentMethod,
+                'payment_reference' => $reference,
+                'notes' => $notes,
+                'requested_by_user_id' => $userId,
+                'requested_at' => now(),
+            ]);
+        });
     }
-    /**
-     * Marca una liquidación como pagada y descuenta el saldo.
-     *
-     * Las operaciones están dentro de una misma transacción
-     * y el aliado queda bloqueado durante la operación.
-     */
+
     public function markSettlementPaid(
         int $settlementId,
         int $adminUserId,
