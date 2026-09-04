@@ -201,23 +201,49 @@ new class extends Component
                 <span>Incidencias</span>
             </a>
 
-
             {{-- Comisiones --}}
             <a
-                href="#"
-                class="mb-1 flex items-center gap-3 rounded-xl px-3 py-2.5 text-sm font-medium text-slate-600 transition hover:bg-slate-50"
+                href="{{ route('ally.commissions') }}"
+                wire:navigate
+                class="mb-1 flex items-center gap-3 rounded-xl px-3 py-2.5 text-sm font-medium transition
+                {{ request()->routeIs('ally.commissions')
+                    ? 'bg-blue-50 text-blue-900'
+                    : 'text-slate-600 hover:bg-slate-50' }}"
             >
                 <svg class="h-5 w-5"
-                     fill="none"
-                     stroke="currentColor"
-                     viewBox="0 0 24 24">
+                    fill="none"
+                    stroke="currentColor"
+                    viewBox="0 0 24 24">
                     <path stroke-linecap="round"
-                          stroke-linejoin="round"
-                          stroke-width="2"
-                          d="M12 8c-1.657 0-3 .895-3 2s1.343 2 3 2 3 .895 3 2-1.343 2-3 2m0-8V4m0 16v-4m8-4a8 8 0 11-16 0 8 8 0 0116 0z"/>
+                        stroke-linejoin="round"
+                        stroke-width="2"
+                        d="M12 8c-1.657 0-3 .895-3 2s1.343 2 3 2 3 .895 3 2-1.343 2-3 2m0-8V4m0 16v-4m8-4a8 8 0 11-16 0 8 8 0 0116 0z"/>
                 </svg>
 
                 <span>Comisiones y saldo</span>
+            </a>
+
+
+            {{-- Corte de caja --}}
+            <a
+                href="{{ route('ally.cash-cut') }}"
+                wire:navigate
+                class="mb-1 flex items-center gap-3 rounded-xl px-3 py-2.5 text-sm font-medium transition
+                {{ request()->routeIs('ally.cash-cut')
+                    ? 'bg-blue-50 text-blue-900'
+                    : 'text-slate-600 hover:bg-slate-50' }}"
+            >
+                <svg class="h-5 w-5"
+                    fill="none"
+                    stroke="currentColor"
+                    viewBox="0 0 24 24">
+                    <path stroke-linecap="round"
+                        stroke-linejoin="round"
+                        stroke-width="2"
+                        d="M3 10h18M5 10v8m4-8v8m6-8v8m4-8v8M3 18h18M5 6h14l2 4H3l2-4z"/>
+                </svg>
+
+                <span>Corte de caja</span>
             </a>
 
 

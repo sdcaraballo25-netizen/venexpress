@@ -154,8 +154,8 @@ class AllyFinancialService
     /**
      * Crea una solicitud de liquidación.
      *
-     * Crear la solicitud NO descuenta todavía el saldo.
-     * El descuento ocurre cuando realmente se marca como pagada.
+     * Las solicitudes pendientes reservan saldo.
+     * El descuento financiero ocurre cuando se marca como pagada.
      */
     public function createSettlement(
         int $allyId,
@@ -165,10 +165,7 @@ class AllyFinancialService
         ?string $notes,
         ?int $userId
     ): AllySettlement {
-        $amountUsd = round(
-            $amountUsd,
-            2
-        );
+        $amountUsd = round($amountUsd, 2);
 
         if ($amountUsd <= 0) {
             throw new InvalidArgumentException(
@@ -203,36 +200,58 @@ class AllyFinancialService
                     ->lockForUpdate()
                     ->firstOrFail();
 
-                $balance =
-                    $this->getBalance($allyId);
+                $balance = $this->getBalance($allyId);
 
-                if ($amountUsd > $balance) {
+                /*
+                * Las solicitudes pendientes todavía no son débitos,
+                * pero deben reservar el dinero para evitar duplicaciones.
+                */
+                $pendingAmount = AllySettlement::query()
+                    ->where('ally_id', $allyId)
+                    ->where(
+                        'status',
+                        AllySettlement::STATUS_PENDING
+                    )
+                    ->sum('amount_usd');
+
+                $availableBalance = round(
+                    $balance - (float) $pendingAmount,
+                    2
+                );
+
+                if ($amountUsd > $availableBalance) {
                     throw new RuntimeException(
                         sprintf(
-                            'Saldo insuficiente. Saldo disponible: $%.2f.',
-                            $balance
+                            'Saldo disponible para solicitar: $%.2f.',
+                            $availableBalance
                         )
                     );
                 }
 
                 return AllySettlement::create([
                     'ally_id' => $allyId,
+
                     'amount_usd' => $amountUsd,
+
                     'status' =>
                         AllySettlement::STATUS_PENDING,
+
                     'payment_method' =>
                         $paymentMethod,
+
                     'payment_reference' =>
                         $reference,
+
                     'notes' => $notes,
+
                     'requested_by_user_id' =>
                         $userId,
+
                     'requested_at' => now(),
                 ]);
             }
         );
     }
-
     /**
      * Marca una liquidación como pagada y descuenta el saldo.
      *

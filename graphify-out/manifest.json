@@ -630,8 +630,8 @@
     "semantic_hash": "3e7def3e407cc6f261a75128a7e11ec8"
   },
   "resources/views/welcome.blade.php": {
-    "mtime": 1788376288.0,
-    "seen": 1788416939.6122055,
+    "mtime": 1788564372.0,
+    "seen": 1788550906.6314025,
     "ast_hash": "234c3c33d0b190373890129b14d7f3f6",
     "semantic_hash": ""
   },
@@ -1211,12 +1211,6 @@
     "ast_hash": "6fbfe7f864a431236df52782063b4109",
     "semantic_hash": ""
   },
-  "README_DISTANCIA_DELIVERY.txt": {
-    "mtime": 1787708256.0,
-    "seen": 1788416939.6122315,
-    "ast_hash": "dd1eaa2a3b36df7c5184c13950352df4",
-    "semantic_hash": ""
-  },
   "app/Livewire/Ally/Commissions.php": {
     "mtime": 1788461642.1219783,
     "seen": 1788462629.7470326,
@@ -1494,9 +1488,9 @@
     "semantic_hash": ""
   },
   "resources/views/layouts/public.blade.php": {
-    "mtime": 1788376086.0,
-    "seen": 1788416939.6122003,
-    "ast_hash": "6b869cb3adc6a92ea303d8afd72f8a93",
+    "mtime": 1788564372.0,
+    "seen": 1788550906.6313953,
+    "ast_hash": "bcef4fcce4d92cfbe41678736f7338d2",
     "semantic_hash": ""
   },
   "resources/views/public/office-locator.blade.php": {
@@ -1617,12 +1611,6 @@
     "mtime": 1788461705.1855736,
     "seen": 1788462629.7471592,
     "ast_hash": "93396d4d7b2f77244fceee5dfdbcde00",
-    "semantic_hash": ""
-  },
-  "README.txt": {
-    "mtime": 1788544850.0,
-    "seen": 1788549660.0749042,
-    "ast_hash": "b8e9dcff0a300b0e51bd046887c18bdd",
     "semantic_hash": ""
   }
 }

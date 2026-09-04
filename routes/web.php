@@ -22,6 +22,7 @@ use App\Livewire\Client\Dashboard as ClientDashboard;
 use App\Livewire\Ally\Dashboard as AllyDashboard;
 use App\Livewire\Ally\PackageCreate as AllyPackageCreate;
 use App\Livewire\Ally\Commissions as AllyCommissions;
+use App\Livewire\Ally\DailyCashCut;
 use App\Livewire\Ally\Cod as AllyCod;
 use App\Livewire\Ally\Incidents as AllyIncidents;
 use App\Livewire\Ally\PackagePickup as AllyPackagePickup;
@@ -64,6 +65,16 @@ Route::prefix('ally')
         Route::get('/comisiones', AllyCommissions::class)
             ->middleware('role:aliado')
             ->name('commissions');
+
+        /*
+        |--------------------------------------------------------------------------
+        | Corte de caja
+        |--------------------------------------------------------------------------
+        */
+
+        Route::get('/corte-caja', DailyCashCut::class)
+            ->middleware('role:aliado')
+            ->name('cash-cut');
 
         Route::get('/cod', AllyCod::class)
             ->middleware('role:aliado,aliado_taquilla')
