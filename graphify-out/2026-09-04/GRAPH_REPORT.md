@@ -1,16 +1,16 @@
-# Graph Report - venexpress  (2026-09-04)
+# Graph Report - venexpress  (2026-09-03)
 
 ## Corpus Check
-- 261 files · ~248,434 words
+- 261 files · ~248,360 words
 - Verdict: corpus is large enough that graph structure adds value.
 
 ## Summary
-- 1243 nodes · 2106 edges · 198 communities (158 shown, 40 thin omitted)
-- Extraction: 97% EXTRACTED · 3% INFERRED · 0% AMBIGUOUS · INFERRED: 64 edges (avg confidence: 0.85)
+- 1243 nodes · 2105 edges · 198 communities (158 shown, 40 thin omitted)
+- Extraction: 97% EXTRACTED · 3% INFERRED · 0% AMBIGUOUS · INFERRED: 60 edges (avg confidence: 0.85)
 - Token cost: 0 input · 0 output
 
 ## Graph Freshness
-- Built from commit: `1ac3c2bb`
+- Built from commit: `bf69892c`
 - Run `git rev-parse HEAD` and compare to check if the graph is stale.
 - Run `graphify update .` after code changes (no API cost).
 
@@ -110,10 +110,10 @@
 2. `Package` - 71 edges
 3. `Ally` - 38 edges
 4. `PackageService` - 28 edges
-5. `RoutesManager` - 23 edges
-6. `AllyFinancialService` - 23 edges
-7. `AllySettlement` - 21 edges
-8. `AllyFinancialTransaction` - 21 edges
+5. `AllyFinancialService` - 23 edges
+6. `RoutesManager` - 23 edges
+7. `AllyFinancialTransaction` - 21 edges
+8. `AllySettlement` - 21 edges
 9. `TestCase` - 20 edges
 10. `RouteService` - 20 edges
 
@@ -288,11 +288,11 @@ Nodes (6): openRecipientCustomerModal, openSenderCustomerModal, registerAnother,
 
 ### Community 126 - "Livewire\Component"
 Cohesion: 0.18
-Nodes (21): App\Livewire\Admin\AlliesManager, App\Livewire\Admin\AuditLogViewer, App\Livewire\Admin\BcvRateManager, App\Livewire\Admin\CityDistanceManager, App\Livewire\Admin\DriverPayments, App\Livewire\Admin\IncidentsManager, App\Livewire\Admin\RateMatrixManager, RoutesDashboard (+13 more)
+Nodes (22): App\Livewire\Admin\AlliesManager, App\Livewire\Admin\AuditLogViewer, App\Livewire\Admin\BcvRateManager, App\Livewire\Admin\CityDistanceManager, App\Livewire\Admin\DriverPayments, App\Livewire\Admin\IncidentsManager, App\Livewire\Admin\RateMatrixManager, App\Livewire\Admin\RoutesDashboard (+14 more)
 
 ### Community 128 - "Illuminate\Database\Eloquent\Factories\HasFactory"
 Cohesion: 0.23
-Nodes (15): App\Models\Ally, App\Models\AuditLog, App\Models\BcvRate, App\Models\CityDistance, App\Models\Customer, Customer, App\Models\Driver, App\Models\DriverPayment (+7 more)
+Nodes (14): App\Models\AuditLog, App\Models\BcvRate, App\Models\CityDistance, App\Models\Customer, Customer, App\Models\Driver, App\Models\DriverPayment, App\Models\PackageHistory (+6 more)
 
 ### Community 135 - "TariffService"
 Cohesion: 0.11
@@ -331,24 +331,24 @@ Cohesion: 0.40
 Nodes (4): delete({{ $bcvRate->id }}), edit({{ $bcvRate->id }}), cancelEdit, syncNow
 
 ## Knowledge Gaps
-- **215 isolated node(s):** `API / Backend`, `Architecture Navigation`, `Authentication and Authorization`, `Changes`, `Database` (+210 more)
+- **215 isolated node(s):** `selectAlly({{ $ally->id }})`, `markPaid({{ $settlement->id }})`, `cancelSettlement({{ $settlement->id }})`, `openReversal({{ $settlement->id }})`, `reverseSettlement` (+210 more)
   These have ≤1 connection - possible missing edges or undocumented components.
 - **40 thin communities (<3 nodes) omitted from report** — run `graphify query` to explore isolated nodes.
 
 ## Suggested Questions
 _Questions this graph is uniquely positioned to answer:_
 
+- **Why does `Package` connect `Package` to `Illuminate\Database\Eloquent\Factories\HasFactory`, `Scanner`, `UsersManager`, `Illuminate\Http\Request`, `TariffService`, `RuntimeException`, `RoutesManager`, `Client/Dashboard.php`, `Illuminate\Database\Eloquent\Relations\HasMany`, `App\Models\Package`, `Livewire\Component`?**
+  _High betweenness centrality (0.085) - this node is a cross-community bridge._
 - **Why does `User` connect `User` to `Illuminate\Database\Eloquent\Factories\HasFactory`, `TestCase`, `DatabaseSeeder`, `UsersManager`, `AllyUser`, `DriverPayment`, `BcvRateManager`, `UserAuthorizationTest`, `AllyStaffService`, `PasswordResetTest.php`, `Illuminate\Database\Eloquent\Relations\HasMany`, `ProfileTest`, `.route`?**
-  _High betweenness centrality (0.094) - this node is a cross-community bridge._
-- **Why does `Package` connect `Package` to `Illuminate\Database\Eloquent\Factories\HasFactory`, `Scanner`, `UsersManager`, `Illuminate\Http\Request`, `DriverPayment`, `TariffService`, `RuntimeException`, `RoutesManager`, `Client/Dashboard.php`, `Illuminate\Database\Eloquent\Relations\HasMany`, `App\Models\Package`, `Livewire\Component`?**
-  _High betweenness centrality (0.069) - this node is a cross-community bridge._
-- **Why does `Ally` connect `Ally` to `Illuminate\Database\Eloquent\Factories\HasFactory`, `UsersManager`, `AllyUser`, `DriverPayment`, `AllyStaffService`, `RoutesManager`, `Illuminate\Database\Eloquent\Relations\HasMany`, `Livewire\Component`?**
-  _High betweenness centrality (0.041) - this node is a cross-community bridge._
+  _High betweenness centrality (0.074) - this node is a cross-community bridge._
+- **Why does `AllyUser` connect `AllyUser` to `Illuminate\Database\Eloquent\Factories\HasFactory`?**
+  _High betweenness centrality (0.016) - this node is a cross-community bridge._
 - **Are the 9 inferred relationships involving `User` (e.g. with `.render()` and `.createUser()`) actually correct?**
   _`User` has 9 INFERRED edges - model-reasoned connections that need verification._
-- **Are the 2 inferred relationships involving `Package` (e.g. with `.render()` and `.render()`) actually correct?**
-  _`Package` has 2 INFERRED edges - model-reasoned connections that need verification._
-- **What connects `API / Backend`, `Architecture Navigation`, `Authentication and Authorization` to the rest of the system?**
+- **What connects `selectAlly({{ $ally->id }})`, `markPaid({{ $settlement->id }})`, `cancelSettlement({{ $settlement->id }})` to the rest of the system?**
   _215 weakly-connected nodes found - possible documentation gaps or missing edges._
 - **Should `TestCase` be split into smaller, more focused modules?**
   _Cohesion score 0.11083743842364532 - nodes in this community are weakly interconnected._
+- **Should `Ally` be split into smaller, more focused modules?**
+  _Cohesion score 0.053410893707033315 - nodes in this community are weakly interconnected._

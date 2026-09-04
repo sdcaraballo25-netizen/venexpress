@@ -58,16 +58,16 @@
                 <div>
                     <h4 class="text-white font-semibold text-sm mb-3">Servicios</h4>
                     <ul class="space-y-2 text-sm">
-                        <li><a href="#" class="hover:text-white transition">Envíos nacionales</a></li>
-                        <li><a href="#" class="hover:text-white transition">Sobres</a></li>
-                        <li><a href="#" class="hover:text-white transition">Entrega a domicilio</a></li>
+                        <li><a href="{{ route('home') }}#servicios" class="hover:text-white transition">Envíos nacionales</a></li>
+                        <li><a href="{{ route('home') }}#servicios" class="hover:text-white transition">Sobres</a></li>
+                        <li><a href="{{ route('home') }}#servicios" class="hover:text-white transition">Entrega a domicilio</a></li>
                     </ul>
                 </div>
                 <div>
                     <h4 class="text-white font-semibold text-sm mb-3">Ayuda</h4>
                     <ul class="space-y-2 text-sm">
-                        <li><a href="#" class="hover:text-white transition">Preguntas frecuentes</a></li>
-                        <li><a href="#" class="hover:text-white transition">Contáctanos</a></li>
+                        <li><a href="{{ route('home') }}#ayuda" class="hover:text-white transition">Preguntas frecuentes</a></li>
+                        <li><a href="{{ route('home') }}#ayuda" class="hover:text-white transition">Contáctanos</a></li>
                     </ul>
                 </div>
             </div>
