@@ -3,6 +3,7 @@
 namespace App\Livewire\Admin;
 
 use App\Models\Ally;
+use App\Models\AuditLog;
 use Livewire\Attributes\Layout;
 use Livewire\Attributes\Title;
 use Livewire\Component;
@@ -66,11 +67,33 @@ class AlliesManager extends Component
 
         $ally = Ally::findOrFail($this->editingAllyId);
 
+        $previousState = $ally->state;
+        $previousLat = $ally->latitude;
+        $previousLng = $ally->longitude;
+
         $ally->update([
             'state' => $this->location_state,
             'latitude' => $this->location_latitude,
             'longitude' => $this->location_longitude,
         ]);
+
+        $this->logAllyAction(
+            $ally,
+            'ally.location_updated',
+            "Actualizó la ubicación de la agencia {$ally->business_name}.",
+            [
+                'previous' => [
+                    'state' => $previousState,
+                    'latitude' => $previousLat,
+                    'longitude' => $previousLng,
+                ],
+                'new' => [
+                    'state' => $this->location_state,
+                    'latitude' => $this->location_latitude,
+                    'longitude' => $this->location_longitude,
+                ],
+            ]
+        );
 
         $this->showLocationModal = false;
         $this->editingAllyId = null;
@@ -84,10 +107,18 @@ class AlliesManager extends Component
     public function approve(int $allyId): void
     {
         $ally = Ally::findOrFail($allyId);
+        $previousStatus = $ally->status;
 
         $ally->update([
             'status' => Ally::STATUS_ACTIVE,
         ]);
+
+        $this->logAllyAction(
+            $ally,
+            'ally.approved',
+            "Aprobó al aliado {$ally->business_name}.",
+            ['previous_status' => $previousStatus, 'new_status' => Ally::STATUS_ACTIVE]
+        );
 
         session()->flash('success', 'El aliado fue aprobado correctamente.');
     }
@@ -98,10 +129,18 @@ class AlliesManager extends Component
     public function reject(int $allyId): void
     {
         $ally = Ally::findOrFail($allyId);
+        $previousStatus = $ally->status;
 
         $ally->update([
             'status' => Ally::STATUS_REJECTED,
         ]);
+
+        $this->logAllyAction(
+            $ally,
+            'ally.rejected',
+            "Rechazó al aliado {$ally->business_name}.",
+            ['previous_status' => $previousStatus, 'new_status' => Ally::STATUS_REJECTED]
+        );
 
         session()->flash('success', 'El aliado fue rechazado.');
     }
@@ -112,10 +151,18 @@ class AlliesManager extends Component
     public function suspend(int $allyId): void
     {
         $ally = Ally::findOrFail($allyId);
+        $previousStatus = $ally->status;
 
         $ally->update([
             'status' => Ally::STATUS_SUSPENDED,
         ]);
+
+        $this->logAllyAction(
+            $ally,
+            'ally.suspended',
+            "Suspendió al aliado {$ally->business_name}.",
+            ['previous_status' => $previousStatus, 'new_status' => Ally::STATUS_SUSPENDED]
+        );
 
         session()->flash('success', 'El aliado fue suspendido.');
     }
@@ -126,12 +173,37 @@ class AlliesManager extends Component
     public function activate(int $allyId): void
     {
         $ally = Ally::findOrFail($allyId);
+        $previousStatus = $ally->status;
 
         $ally->update([
             'status' => Ally::STATUS_ACTIVE,
         ]);
 
+        $this->logAllyAction(
+            $ally,
+            'ally.activated',
+            "Reactivó al aliado {$ally->business_name}.",
+            ['previous_status' => $previousStatus, 'new_status' => Ally::STATUS_ACTIVE]
+        );
+
         session()->flash('success', 'El aliado fue activado nuevamente.');
+    }
+
+    /**
+     * Registra en la bitácora de auditoría una acción administrativa
+     * sobre un aliado (cambio de estado o de ubicación).
+     */
+    protected function logAllyAction(Ally $ally, string $action, string $description, array $metadata = []): void
+    {
+        AuditLog::create([
+            'actor_user_id' => auth()->id(),
+            'action' => $action,
+            'target_type' => Ally::class,
+            'target_id' => $ally->id,
+            'description' => $description,
+            'metadata' => $metadata,
+            'ip_address' => request()?->ip(),
+        ]);
     }
 
     /**

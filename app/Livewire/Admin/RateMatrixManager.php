@@ -2,6 +2,7 @@
 
 namespace App\Livewire\Admin;
 
+use App\Models\AuditLog;
 use App\Models\Package;
 use App\Models\RateMatrix;
 use App\Services\TariffService;
@@ -146,16 +147,45 @@ class RateMatrixManager extends Component
             'delivery_price_usd' => $this->delivery_price_usd,
         ];
 
-        if ($this->rateMatrixId) {
-            RateMatrix::findOrFail($this->rateMatrixId)->update($data);
-        } else {
-            $rateMatrix = RateMatrix::create($data);
-            $this->rateMatrixId = $rateMatrix->id;
-        }
+        $previous = $this->rateMatrixId
+            ? RateMatrix::find($this->rateMatrixId)
+            : null;
+
+        /*
+         * Las tarifas se versionan: cada guardado crea una fila nueva
+         * en vez de sobrescribir la vigente. RateMatrix::current()
+         * sigue devolviendo automáticamente la más reciente (por
+         * updated_at), pero así conservamos el historial completo de
+         * qué tarifa estuvo vigente en cada periodo, en vez de perder
+         * los valores anteriores en cada edición.
+         */
+        $rateMatrix = RateMatrix::create($data);
+        $this->rateMatrixId = $rateMatrix->id;
+
+        AuditLog::create([
+            'actor_user_id' => auth()->id(),
+            'action' => 'rate_matrix.updated',
+            'target_type' => RateMatrix::class,
+            'target_id' => $rateMatrix->id,
+            'description' => 'Actualizó las tarifas de la plataforma.',
+            'metadata' => [
+                'previous' => $previous?->only([
+                    'base_price_usd',
+                    'price_per_kg_usd',
+                    'price_per_km_usd',
+                    'envelope_price_usd',
+                    'fragile_surcharge_usd',
+                    'insurance_percentage',
+                    'delivery_price_usd',
+                ]),
+                'new' => $data,
+            ],
+            'ip_address' => request()?->ip(),
+        ]);
 
         $this->confirm_password = '';
         $this->editing = false;
-        session()->flash('success', 'Tarifas actualizadas correctamente.');
+        session()->flash('success', 'Tarifas actualizadas correctamente. Se guardó como una nueva versión de tarifa.');
     }
 
     /**

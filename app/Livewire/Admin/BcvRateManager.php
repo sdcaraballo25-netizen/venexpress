@@ -2,6 +2,7 @@
 
 namespace App\Livewire\Admin;
 
+use App\Models\AuditLog;
 use App\Models\BcvRate;
 use App\Services\BcvRateService;
 use Illuminate\Support\Facades\DB;
@@ -53,20 +54,51 @@ class BcvRateManager extends Component
 
         if ($this->editingId) {
             $bcvRate = BcvRate::findOrFail($this->editingId);
+            $previousRate = (float) $bcvRate->rate;
+
             $bcvRate->update([
                 'rate' => $this->rate,
                 'effective_date' => $this->effective_date,
                 'effective_at' => now(),
                 'source' => 'manual',
             ]);
+
+            AuditLog::create([
+                'actor_user_id' => auth()->id(),
+                'action' => 'bcv_rate.updated',
+                'target_type' => BcvRate::class,
+                'target_id' => $bcvRate->id,
+                'description' => "Editó manualmente la tasa BCV de {$previousRate} a {$this->rate}.",
+                'metadata' => [
+                    'previous_rate' => $previousRate,
+                    'new_rate' => (float) $this->rate,
+                    'effective_date' => $this->effective_date,
+                ],
+                'ip_address' => request()?->ip(),
+            ]);
+
             session()->flash('success', 'Tasa actualizada correctamente.');
         } else {
-            BcvRate::create([
+            $bcvRate = BcvRate::create([
                 'rate' => $this->rate,
                 'effective_date' => $this->effective_date,
                 'effective_at' => now(),
                 'source' => 'manual',
             ]);
+
+            AuditLog::create([
+                'actor_user_id' => auth()->id(),
+                'action' => 'bcv_rate.created',
+                'target_type' => BcvRate::class,
+                'target_id' => $bcvRate->id,
+                'description' => "Registró manualmente una nueva tasa BCV de {$this->rate}.",
+                'metadata' => [
+                    'rate' => (float) $this->rate,
+                    'effective_date' => $this->effective_date,
+                ],
+                'ip_address' => request()?->ip(),
+            ]);
+
             session()->flash('success', 'Nueva tasa registrada correctamente.');
         }
 
@@ -96,6 +128,18 @@ class BcvRateManager extends Component
         try {
             $rate = $service->syncFromApi();
 
+            if ($rate) {
+                AuditLog::create([
+                    'actor_user_id' => auth()->id(),
+                    'action' => 'bcv_rate.synced',
+                    'target_type' => BcvRate::class,
+                    'target_id' => $rate->id,
+                    'description' => "Sincronizó manualmente la tasa BCV desde la API: {$rate->rate}.",
+                    'metadata' => ['rate' => (float) $rate->rate, 'source' => $rate->source],
+                    'ip_address' => request()?->ip(),
+                ]);
+            }
+
             session()->flash(
                 'success',
                 $rate
@@ -119,7 +163,20 @@ class BcvRateManager extends Component
             return;
         }
 
-        BcvRate::findOrFail($id)->delete();
+        $bcvRate = BcvRate::findOrFail($id);
+        $deletedRate = (float) $bcvRate->rate;
+        $bcvRate->delete();
+
+        AuditLog::create([
+            'actor_user_id' => auth()->id(),
+            'action' => 'bcv_rate.deleted',
+            'target_type' => BcvRate::class,
+            'target_id' => $id,
+            'description' => "Eliminó la tasa BCV de {$deletedRate}.",
+            'metadata' => ['rate' => $deletedRate],
+            'ip_address' => request()?->ip(),
+        ]);
+
         session()->flash('success', 'Tasa eliminada.');
     }
 

@@ -9,6 +9,7 @@ use App\Models\DriverPayment;
 use App\Models\Incident;
 use App\Models\Package;
 use App\Models\User;
+use Illuminate\Support\Facades\DB;
 use Livewire\Attributes\Layout;
 use Livewire\Attributes\Title;
 use Livewire\Component;
@@ -106,15 +107,29 @@ class Dashboard extends Component
         */
 
         // Ingresos por envíos entregados: solo lo que ya se cobró de verdad.
+        //
+        // Usamos delivery_completed_at (se fija una sola vez, exactamente
+        // cuando el paquete pasa a ENTREGADO) en vez de updated_at, que
+        // cambia con cualquier edición posterior del paquete (corrección
+        // de dirección, teléfono, etc.) y desplazaría el ingreso hacia
+        // el mes/día en que se hizo esa edición en lugar del mes/día
+        // real de entrega.
+        //
+        // COALESCE con updated_at es solo compatibilidad hacia atrás:
+        // delivery_completed_at se agregó en una migración posterior,
+        // así que guías entregadas antes de esa fecha pueden tenerlo
+        // en NULL aunque su estado ya sea ENTREGADO.
+        $deliveredAtExpression = 'COALESCE(delivery_completed_at, updated_at)';
+
         $revenueToday = Package::query()
             ->where('current_status', Package::STATUS_ENTREGADO)
-            ->whereDate('updated_at', today())
+            ->whereDate(DB::raw($deliveredAtExpression), today())
             ->sum('total_price_usd');
 
         $revenueThisMonth = Package::query()
             ->where('current_status', Package::STATUS_ENTREGADO)
-            ->whereMonth('updated_at', now()->month)
-            ->whereYear('updated_at', now()->year)
+            ->whereMonth(DB::raw($deliveredAtExpression), now()->month)
+            ->whereYear(DB::raw($deliveredAtExpression), now()->year)
             ->sum('total_price_usd');
 
         // Comisiones generadas a favor de los aliados por sus envíos.
