@@ -14,6 +14,10 @@ class DistanceApiService
 
     private const CACHE_DAYS = 30;
 
+    private const HTTP_TIMEOUT_SECONDS = 8;
+
+    private const HTTP_RETRIES = 1;
+
     /**
      * Calcula la distancia real por carretera entre dos ubicaciones.
      *
@@ -140,8 +144,9 @@ class DistanceApiService
                                 'Venexpress/1.0 (shipping application)',
                             'Accept-Language' => 'es',
                         ])
-                            ->timeout(10)
-                            ->retry(2, 300)
+                            ->connectTimeout(3)
+                            ->timeout(self::HTTP_TIMEOUT_SECONDS)
+                            ->retry(self::HTTP_RETRIES, 250)
                             ->get(
                                 self::GEOCODER_URL,
                                 [
@@ -207,8 +212,9 @@ class DistanceApiService
             . $destination['latitude'];
 
         try {
-            $response = Http::timeout(15)
-                ->retry(2, 300)
+            $response = Http::connectTimeout(3)
+                ->timeout(self::HTTP_TIMEOUT_SECONDS)
+                ->retry(self::HTTP_RETRIES, 250)
                 ->get(
                     $url,
                     [

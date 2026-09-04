@@ -15,11 +15,12 @@ class RoutesDashboard extends Component
 {
     public function render()
     {
-        $activeRoutes = Route::with('stops')
+        $activeRoutes = Route::query()->with('stops')
             ->where('status', Route::STATUS_IN_PROGRESS)
             ->get();
 
-        $stopsQuery = RouteStop::whereIn('route_id', $activeRoutes->pluck('id'));
+        $activeRouteIds = $activeRoutes->pluck('id');
+        $stopsQuery = RouteStop::query()->whereIn('route_id', $activeRouteIds);
 
         $metrics = [
             'active_routes' => $activeRoutes->count(),

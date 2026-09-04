@@ -90,9 +90,9 @@
     "semantic_hash": "d41d8cd98f00b204e9800998ecf8427e"
   },
   "app/Models/Ally.php": {
-    "mtime": 1788376140.0,
-    "seen": 1788416939.6120627,
-    "ast_hash": "673e78095b21bb7158efb98f9b915755",
+    "mtime": 1788461402.136996,
+    "seen": 1788462629.7470505,
+    "ast_hash": "79d0abbdf0f63ae466ba283d026ab0bc",
     "semantic_hash": ""
   },
   "app/Models/BcvRate.php": {
@@ -138,10 +138,10 @@
     "semantic_hash": ""
   },
   "app/Providers/AppServiceProvider.php": {
-    "mtime": 1787246706.0,
-    "seen": 1788416939.612076,
-    "ast_hash": "c0094f35cad6bba7636002a62186dae4",
-    "semantic_hash": "c0094f35cad6bba7636002a62186dae4"
+    "mtime": 1788461597.455236,
+    "seen": 1788462629.7470691,
+    "ast_hash": "044d7de2a00d52f7cb9db71b3398b06e",
+    "semantic_hash": ""
   },
   "app/Providers/VoltServiceProvider.php": {
     "mtime": 1787246706.0,
@@ -606,9 +606,9 @@
     "semantic_hash": "e1790b7d0d6e0f4a34bb7497b14eeace"
   },
   "resources/views/layouts/admin.blade.php": {
-    "mtime": 1788415511.0,
-    "seen": 1788416939.6121962,
-    "ast_hash": "aa9b8d1c972236040de59a3e44d32b4e",
+    "mtime": 1788462364.9213753,
+    "seen": 1788462629.7472174,
+    "ast_hash": "8bc624dd7ee88bfbd34ed944f935e01c",
     "semantic_hash": ""
   },
   "resources/views/layouts/app.blade.php": {
@@ -648,9 +648,9 @@
     "semantic_hash": ""
   },
   "routes/web.php": {
-    "mtime": 1788415491.0,
-    "seen": 1788416939.6122077,
-    "ast_hash": "7c3bded65972937a3a084c7b287e2376",
+    "mtime": 1788462117.2290268,
+    "seen": 1788462629.7472308,
+    "ast_hash": "3e534d794dadc8c013ef07e80a87ae7b",
     "semantic_hash": ""
   },
   "tailwind.config.js": {
@@ -1038,9 +1038,9 @@
     "semantic_hash": ""
   },
   "app/Livewire/Ally/Dashboard.php": {
-    "mtime": 1787685476.0,
-    "seen": 1788416939.6120503,
-    "ast_hash": "38530bd411be8d6f67028966661f6a18",
+    "mtime": 1788461622.099927,
+    "seen": 1788462629.7470357,
+    "ast_hash": "605f27f8be0582a5df9204d58367d110",
     "semantic_hash": ""
   },
   "app/Models/AllyUser.php": {
@@ -1218,9 +1218,9 @@
     "semantic_hash": ""
   },
   "app/Livewire/Ally/Commissions.php": {
-    "mtime": 1787766986.0,
-    "seen": 1788416939.6120477,
-    "ast_hash": "9a6da66f31f99931ace7bef939929f99",
+    "mtime": 1788461642.1219783,
+    "seen": 1788462629.7470326,
+    "ast_hash": "697964c8640a66209e72cb3bea4a9c2b",
     "semantic_hash": ""
   },
   "resources/views/Livewire/Ally/commissions.blade.php": {
@@ -1569,6 +1569,54 @@
     "mtime": 1788460393.4927597,
     "seen": 1788460595.509197,
     "ast_hash": "a40dd564ed1432fcf6f9294767677db9",
+    "semantic_hash": ""
+  },
+  "app/Livewire/Admin/AllyFinance.php": {
+    "mtime": 1788461670.380274,
+    "seen": 1788462629.7470138,
+    "ast_hash": "958504de7005e9372717f445223e8d2c",
+    "semantic_hash": ""
+  },
+  "app/Models/AllyFinancialTransaction.php": {
+    "mtime": 1788461364.9947505,
+    "seen": 1788462629.7470515,
+    "ast_hash": "772f390ddf917356384263edaa2b8fb0",
+    "semantic_hash": ""
+  },
+  "app/Models/AllySettlement.php": {
+    "mtime": 1788461387.2688365,
+    "seen": 1788462629.747053,
+    "ast_hash": "d490fa5b8c33378c7a3a4c3c7b702b55",
+    "semantic_hash": ""
+  },
+  "app/Observers/PackageObserver.php": {
+    "mtime": 1788461555.8630953,
+    "seen": 1788462629.7470684,
+    "ast_hash": "04e2d66f603aa530e701ef2384bfcc5c",
+    "semantic_hash": ""
+  },
+  "app/Services/AllyFinancialService.php": {
+    "mtime": 1788461466.2803435,
+    "seen": 1788462629.7470715,
+    "ast_hash": "791aa7255b33087216574ccf27a4dc7f",
+    "semantic_hash": ""
+  },
+  "database/migrations/2026_09_03_000002_create_ally_financial_transactions_table.php": {
+    "mtime": 1788461285.069407,
+    "seen": 1788462629.7471488,
+    "ast_hash": "b81ab4ee48723f2d9d4fa057ab4e3e8a",
+    "semantic_hash": ""
+  },
+  "database/migrations/2026_09_03_000003_create_ally_settlements_table.php": {
+    "mtime": 1788461317.2387602,
+    "seen": 1788462629.7471495,
+    "ast_hash": "7dce8f41014392757393e6171e61aee1",
+    "semantic_hash": ""
+  },
+  "resources/views/Livewire/Admin/ally-finance.blade.php": {
+    "mtime": 1788461705.1855736,
+    "seen": 1788462629.7471592,
+    "ast_hash": "93396d4d7b2f77244fceee5dfdbcde00",
     "semantic_hash": ""
   }
 }

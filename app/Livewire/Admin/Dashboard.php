@@ -43,6 +43,8 @@ class Dashboard extends Component
         */
 
         // Solamente los aliados aprobados/activos.
+        $totalPackages = Package::count();
+
         $alliesCount = Ally::query()
             ->where('status', Ally::STATUS_ACTIVE)
             ->count();
@@ -154,7 +156,7 @@ class Dashboard extends Component
         return view('livewire.admin.dashboard', [
 
             // Paquetes
-            'totalPackages' => Package::count(),
+            'totalPackages' => $totalPackages,
             'statusCounts' => $statusCounts,
             'statuses' => Package::STATUSES,
             'currentRate' => BcvRate::current(),
