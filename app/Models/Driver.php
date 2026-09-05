@@ -12,22 +12,31 @@ class Driver extends Model
     use HasFactory;
 
     /**
-     * Los atributos que se pueden asignar de forma masiva.
-     *
-     * @var list<string>
+     * Tipos de conductor.
      */
+    public const TYPE_HUB = 'hub';
+    public const TYPE_DELIVERY = 'delivery';
 
+    /**
+     * Estados del conductor.
+     */
     public const STATUS_PENDING = 'PENDIENTE';
     public const STATUS_ACTIVE = 'ACTIVO';
     public const STATUS_REJECTED = 'RECHAZADO';
     public const STATUS_SUSPENDED = 'SUSPENDIDO';
 
+    /**
+     * Los atributos que se pueden asignar de forma masiva.
+     *
+     * @var list<string>
+     */
     protected $fillable = [
-    'user_id',
-    'vehicle_plate',
-    'vehicle_type',
-    'phone',
-    'status',
+        'user_id',
+        'vehicle_plate',
+        'vehicle_type',
+        'phone',
+        'status',
+        'driver_type',
     ];
 
     /*
@@ -45,20 +54,27 @@ class Driver extends Model
     }
 
     /**
-     * Paquetes actualmente asignados a este chofer.
+     * Pagos asociados a este chofer.
      */
     public function payments(): HasMany
     {
         return $this->hasMany(DriverPayment::class);
     }
 
+    /**
+     * Paquetes actualmente asignados a este chofer.
+     */
     public function packages(): HasMany
     {
         return $this->hasMany(Package::class);
     }
 
+    /**
+     * Rutas asignadas a este chofer.
+     */
     public function routes(): HasMany
     {
         return $this->hasMany(Route::class);
     }
 }
+

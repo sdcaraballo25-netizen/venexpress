@@ -215,10 +215,55 @@
                                     <x-input-error :messages="$errors->get('rif')" class="mt-2" />
                                 </div>
                                 <div>
-                                    <x-input-label for="city" value="Ciudad" />
-                                    <x-text-input wire:model="city" id="city" class="mt-1.5 block w-full" type="text" />
-                                    <x-input-error :messages="$errors->get('city')" class="mt-2" />
-                                </div>
+    <x-input-label for="state" value="Estado" />
+
+    <select
+        wire:model.live="state"
+        id="state"
+        class="mt-1.5 block w-full rounded-md border-gray-300 shadow-sm focus:border-blue-500 focus:ring-blue-500"
+    >
+        <option value="">Seleccionar estado</option>
+
+        @foreach ($states as $stateOption)
+            <option value="{{ $stateOption }}">
+                {{ $stateOption }}
+            </option>
+        @endforeach
+    </select>
+
+    <x-input-error
+        :messages="$errors->get('state')"
+        class="mt-2"
+    />
+</div>
+
+<div>
+    <x-input-label for="city" value="Ciudad" />
+
+    <select
+        wire:model.live="city"
+        id="city"
+        class="mt-1.5 block w-full rounded-md border-gray-300 shadow-sm focus:border-blue-500 focus:ring-blue-500"
+        @disabled($state === '')
+    >
+        <option value="">
+            {{ $state === ''
+                ? 'Primero selecciona un estado'
+                : 'Seleccionar ciudad' }}
+        </option>
+
+        @foreach ($cities as $cityOption)
+            <option value="{{ $cityOption }}">
+                {{ $cityOption }}
+            </option>
+        @endforeach
+    </select>
+
+    <x-input-error
+        :messages="$errors->get('city')"
+        class="mt-2"
+    />
+</div>
                                 <div>
                                     <x-input-label for="address" value="Dirección" />
                                     <x-text-input wire:model="address" id="address" class="mt-1.5 block w-full" type="text" />

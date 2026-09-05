@@ -11,6 +11,7 @@ use Livewire\Attributes\Title;
 use Livewire\Component;
 use Livewire\WithPagination;
 use RuntimeException;
+use Illuminate\Support\Facades\Auth;
 
 #[Layout('layouts.admin')]
 #[Title('Tasa BCV')]
@@ -64,7 +65,7 @@ class BcvRateManager extends Component
             ]);
 
             AuditLog::create([
-                'actor_user_id' => auth()->id(),
+                'actor_user_id' => Auth::id(),
                 'action' => 'bcv_rate.updated',
                 'target_type' => BcvRate::class,
                 'target_id' => $bcvRate->id,
@@ -87,7 +88,7 @@ class BcvRateManager extends Component
             ]);
 
             AuditLog::create([
-                'actor_user_id' => auth()->id(),
+                'actor_user_id' => Auth::id(),
                 'action' => 'bcv_rate.created',
                 'target_type' => BcvRate::class,
                 'target_id' => $bcvRate->id,
@@ -130,7 +131,7 @@ class BcvRateManager extends Component
 
             if ($rate) {
                 AuditLog::create([
-                    'actor_user_id' => auth()->id(),
+                    'actor_user_id' => Auth::id(),
                     'action' => 'bcv_rate.synced',
                     'target_type' => BcvRate::class,
                     'target_id' => $rate->id,
@@ -168,7 +169,7 @@ class BcvRateManager extends Component
         $bcvRate->delete();
 
         AuditLog::create([
-            'actor_user_id' => auth()->id(),
+            'actor_user_id' => Auth::id(),
             'action' => 'bcv_rate.deleted',
             'target_type' => BcvRate::class,
             'target_id' => $id,

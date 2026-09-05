@@ -497,7 +497,7 @@
                                 this.marker = L.marker([lat, lng]).addTo(this.map);
                             }
 
-                            @this.call('setLocationFromMap', lat, lng);
+                            $wire.call('setLocationFromMap', lat, lng);
                         });
 
                         setTimeout(() => this.map.invalidateSize(), 150);

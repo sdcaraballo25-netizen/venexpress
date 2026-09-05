@@ -167,6 +167,35 @@
 
                 </a>
 
+                {{-- MIS PEDIDOS --}}
+<a
+    href="{{ route('ally.packages.index') }}"
+    wire:navigate
+    @click="sidebarOpen = false"
+    class="flex items-center gap-3 px-4 py-3 rounded-xl font-medium transition-colors
+    {{ request()->routeIs('ally.packages.index')
+        ? 'bg-blue-50 text-blue-900'
+        : 'text-[#64748B] hover:bg-slate-50 hover:text-[#0F172A]' }}"
+>
+    <svg
+        class="w-5 h-5"
+        fill="none"
+        stroke="currentColor"
+        viewBox="0 0 24 24"
+    >
+        <path
+            stroke-linecap="round"
+            stroke-linejoin="round"
+            stroke-width="2"
+            d="M9 5h6m-7 4h8m-9 4h10m-9 4h8M5 3h14a2 2 0 012 2v14a2 2 0 01-2 2H5a2 2 0 01-2-2V5a2 2 0 012-2z"
+        />
+    </svg>
+
+    <span>
+        Mis pedidos
+    </span>
+</a>
+
 
                 {{-- RECEPCIÓN --}}
                 <a

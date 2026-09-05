@@ -6,7 +6,9 @@ use App\Models\AuditLog;
 use App\Models\Ally;
 use App\Models\Driver;
 use App\Models\User;
+use App\Services\VenezuelaLocationService;
 use Illuminate\Database\QueryException;
+use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Hash;
 use Illuminate\Validation\Rules;
@@ -44,8 +46,12 @@ class UsersManager extends Component
 
     public string $business_name = '';
     public string $rif = '';
+    public string $state = '';
     public string $city = '';
     public string $address = '';
+
+    public array $states = [];
+    public array $cities = [];
 
     public string $vehicle_plate = '';
     public string $vehicle_type = '';
@@ -53,6 +59,21 @@ class UsersManager extends Component
 
     public string $adminPassword = '';
     public ?int $pendingUserId = null;
+
+    public function mount(VenezuelaLocationService $locationService): void
+    {
+        $this->states = $locationService->states();
+    }
+
+    public function updatedState(
+        VenezuelaLocationService $locationService
+    ): void {
+        $this->city = '';
+
+        $this->cities = $this->state !== ''
+            ? $locationService->citiesByState($this->state)
+            : [];
+    }
 
     public function updatingSearch(): void
     {
@@ -71,8 +92,13 @@ class UsersManager extends Component
 
     public function openCreateModal(): void
     {
-        abort_unless(auth()->user()?->canManageUsers(), 403);
+        /** @var User|null $actor */
+        $actor = Auth::user();
+
+        abort_unless($actor?->canManageUsers(), 403);
+
         $this->resetForm();
+
         $this->showCreateModal = true;
     }
 
@@ -86,12 +112,19 @@ class UsersManager extends Component
 
     public function requestCreate(): void
     {
-        abort_unless(auth()->user()?->canManageUsers(), 403);
+        /** @var User|null $actor */
+        $actor = Auth::user();
+
+        abort_unless($actor?->canManageUsers(), 403);
 
         $this->validate($this->creationRules());
 
-        if (! auth()->user()->canCreateRole($this->role)) {
-            $this->addError('role', 'No tienes permiso para crear este tipo de usuario.');
+        if (! $actor?->canCreateRole($this->role)) {
+            $this->addError(
+                'role',
+                'No tienes permiso para crear este tipo de usuario.'
+            );
+
             return;
         }
 
@@ -101,25 +134,37 @@ class UsersManager extends Component
 
     public function createUser(): void
     {
-        $actor = auth()->user();
+        /** @var User|null $actor */
+        $actor = Auth::user();
+
         abort_unless($actor?->canManageUsers(), 403);
 
         $this->validate($this->creationRules());
 
-        if (! $actor->canCreateRole($this->role)) {
-            $this->addError('role', 'No tienes permiso para crear este tipo de usuario.');
+        if (! $actor?->canCreateRole($this->role)) {
+            $this->addError(
+                'role',
+                'No tienes permiso para crear este tipo de usuario.'
+            );
+
             $this->showConfirmModal = false;
+
             return;
         }
 
         $this->validate([
             'adminPassword' => ['required', 'string'],
         ], [
-            'adminPassword.required' => 'Debes introducir tu contraseña de administrador.',
+            'adminPassword.required' =>
+                'Debes introducir tu contraseña de administrador.',
         ]);
 
         if (! Hash::check($this->adminPassword, $actor->password)) {
-            $this->addError('adminPassword', 'La contraseña de administrador no es correcta.');
+            $this->addError(
+                'adminPassword',
+                'La contraseña de administrador no es correcta.'
+            );
+
             return;
         }
 
@@ -140,6 +185,7 @@ class UsersManager extends Component
                     'user_id' => $user->id,
                     'business_name' => $validated['business_name'],
                     'rif' => $validated['rif'],
+                    'state' => $validated['state'],
                     'city' => $validated['city'],
                     'address' => $validated['address'],
                     'commission_percentage' => 10.00,
@@ -154,6 +200,7 @@ class UsersManager extends Component
                     'vehicle_type' => $validated['vehicle_type'],
                     'phone' => $validated['phone'],
                     'status' => Driver::STATUS_ACTIVE,
+                    'driver_type' => Driver::TYPE_DELIVERY,
                 ]);
             }
 
@@ -162,14 +209,23 @@ class UsersManager extends Component
                 'action' => 'user.created',
                 'target_type' => User::class,
                 'target_id' => $user->id,
-                'description' => "Creó al usuario {$user->name} con rol {$user->role}.",
-                'metadata' => ['role' => $user->role, 'email' => $user->email],
+                'description' =>
+                    "Creó al usuario {$user->name} con rol {$user->role}.",
+                'metadata' => [
+                    'role' => $user->role,
+                    'email' => $user->email,
+                ],
                 'ip_address' => request()->ip(),
             ]);
         });
 
         $this->closeCreateModal();
-        session()->flash('success', 'Usuario creado correctamente.');
+
+        session()->flash(
+            'success',
+            'Usuario creado correctamente.'
+        );
+
         $this->resetPage();
     }
 
@@ -180,14 +236,22 @@ class UsersManager extends Component
     {
         $target = User::findOrFail($userId);
 
-        abort_unless(auth()->user()?->canEditUser($target), 403);
+        /** @var User|null $actor */
+        $actor = Auth::user();
+
+        abort_unless(
+            $actor?->canEditUser($target),
+            403
+        );
 
         $this->editingUserId = $target->id;
         $this->edit_name = $target->name;
         $this->edit_email = $target->email;
         $this->edit_password = '';
         $this->edit_password_confirmation = '';
+
         $this->resetValidation();
+
         $this->showEditModal = true;
     }
 
@@ -195,35 +259,66 @@ class UsersManager extends Component
     {
         $this->showEditModal = false;
         $this->editingUserId = null;
-        $this->reset(['edit_name', 'edit_email', 'edit_password', 'edit_password_confirmation']);
+
+        $this->reset([
+            'edit_name',
+            'edit_email',
+            'edit_password',
+            'edit_password_confirmation',
+        ]);
+
         $this->resetValidation();
     }
 
     /**
-     * Actualiza nombre, correo y opcionalmente la contraseña de un usuario.
-     * La contraseña nueva es opcional: si se deja en blanco, se conserva la actual.
+     * Actualiza nombre, correo y opcionalmente la contraseña.
      */
     public function updateUser(): void
     {
-        $actor = auth()->user();
-        $target = $this->editingUserId ? User::find($this->editingUserId) : null;
+        /** @var User|null $actor */
+        $actor = Auth::user();
 
-        abort_unless($target && $actor?->canEditUser($target), 403);
+        $target = $this->editingUserId
+            ? User::find($this->editingUserId)
+            : null;
+
+        abort_unless(
+            $target && $actor?->canEditUser($target),
+            403
+        );
 
         $rules = [
-            'edit_name' => ['required', 'string', 'max:255'],
-            'edit_email' => ['required', 'string', 'email', 'max:255', 'unique:users,email,' . $target->id],
+            'edit_name' => [
+                'required',
+                'string',
+                'max:255',
+            ],
+            'edit_email' => [
+                'required',
+                'string',
+                'email',
+                'max:255',
+                'unique:users,email,' . $target->id,
+            ],
         ];
 
         if ($this->edit_password !== '') {
-            $rules['edit_password'] = ['string', 'confirmed', Rules\Password::defaults()];
+            $rules['edit_password'] = [
+                'string',
+                'confirmed',
+                Rules\Password::defaults(),
+            ];
         }
 
-        $validated = $this->validate($rules, [], [
-            'edit_name' => 'nombre',
-            'edit_email' => 'correo electrónico',
-            'edit_password' => 'contraseña',
-        ]);
+        $validated = $this->validate(
+            $rules,
+            [],
+            [
+                'edit_name' => 'nombre',
+                'edit_email' => 'correo electrónico',
+                'edit_password' => 'contraseña',
+            ]
+        );
 
         $data = [
             'name' => $validated['edit_name'],
@@ -242,68 +337,95 @@ class UsersManager extends Component
                 'action' => 'user.updated',
                 'target_type' => User::class,
                 'target_id' => $target->id,
-                'description' => "Editó los datos del usuario {$target->name}."
-                    . (isset($data['password']) ? ' Se restableció su contraseña.' : ''),
-                'metadata' => ['fields' => array_keys($data)],
+                'description' =>
+                    "Editó los datos del usuario {$target->name}."
+                    . (isset($data['password'])
+                        ? ' Se restableció su contraseña.'
+                        : ''),
+                'metadata' => [
+                    'fields' => array_keys($data),
+                ],
                 'ip_address' => request()->ip(),
             ]);
         });
 
         $this->closeEditModal();
-        session()->flash('success', 'Usuario actualizado correctamente.');
+
+        session()->flash(
+            'success',
+            'Usuario actualizado correctamente.'
+        );
     }
 
     public function toggleStatus(int $userId): void
     {
-        $actor = auth()->user();
+        /** @var User|null $actor */
+        $actor = Auth::user();
+
         $target = User::findOrFail($userId);
 
-        abort_unless($actor?->canDeactivateUser($target), 403);
+        abort_unless(
+            $actor?->canDeactivateUser($target),
+            403
+        );
 
         $newStatus = $target->isActive()
             ? User::STATUS_INACTIVE
             : User::STATUS_ACTIVE;
 
         DB::transaction(function () use ($target, $newStatus) {
-    $target->update([
-        'status' => $newStatus,
-    ]);
+            $target->update([
+                'status' => $newStatus,
+            ]);
 
-    if ($target->isRepartidor()) {
-        $target->driver?->update([
-            'status' => $newStatus === User::STATUS_ACTIVE
-                ? Driver::STATUS_ACTIVE
-                : Driver::STATUS_SUSPENDED,
-        ]);
-    }
-});
+            if ($target->isRepartidor()) {
+                $target->driver?->update([
+                    'status' =>
+                        $newStatus === User::STATUS_ACTIVE
+                            ? Driver::STATUS_ACTIVE
+                            : Driver::STATUS_SUSPENDED,
+                ]);
+            }
+        });
 
         AuditLog::create([
             'actor_user_id' => $actor->id,
             'action' => 'user.status_changed',
             'target_type' => User::class,
             'target_id' => $target->id,
-            'description' => "Cambió el estado de {$target->name} a {$newStatus}.",
-            'metadata' => ['status' => $newStatus],
+            'description' =>
+                "Cambió el estado de {$target->name} a {$newStatus}.",
+            'metadata' => [
+                'status' => $newStatus,
+            ],
             'ip_address' => request()->ip(),
         ]);
 
-        session()->flash('success', $newStatus === User::STATUS_ACTIVE
-            ? 'Usuario activado correctamente.'
-            : 'Usuario desactivado correctamente.');
+        session()->flash(
+            'success',
+            $newStatus === User::STATUS_ACTIVE
+                ? 'Usuario activado correctamente.'
+                : 'Usuario desactivado correctamente.'
+        );
     }
 
     public function requestDelete(int $userId): void
     {
-        $actor = auth()->user();
+        /** @var User|null $actor */
+        $actor = Auth::user();
+
         $target = User::findOrFail($userId);
 
-        abort_unless($actor?->canDeleteUser($target), 403);
+        abort_unless(
+            $actor?->canDeleteUser($target),
+            403
+        );
 
         if ($target->hasOperationalHistory()) {
             session()->flash(
                 'error',
-                "No puedes eliminar a {$target->name}: tiene guías o pagos registrados en el sistema. "
+                "No puedes eliminar a {$target->name}: tiene guías "
+                . "o pagos registrados en el sistema. "
                 . 'Desactiva la cuenta en su lugar para conservar el historial.'
             );
 
@@ -317,25 +439,37 @@ class UsersManager extends Component
 
     public function deleteUser(): void
     {
-        $actor = auth()->user();
-        $target = $this->pendingUserId ? User::find($this->pendingUserId) : null;
+        /** @var User|null $actor */
+        $actor = Auth::user();
 
-        abort_unless($target && $actor?->canDeleteUser($target), 403);
+        $target = $this->pendingUserId
+            ? User::find($this->pendingUserId)
+            : null;
+
+        abort_unless(
+            $target && $actor?->canDeleteUser($target),
+            403
+        );
 
         $this->validate([
-            'adminPassword' => ['required', 'string'],
+            'adminPassword' => [
+                'required',
+                'string',
+            ],
         ], [
-            'adminPassword.required' => 'Debes introducir tu contraseña de administrador.',
+            'adminPassword.required' =>
+                'Debes introducir tu contraseña de administrador.',
         ]);
 
         if (! Hash::check($this->adminPassword, $actor->password)) {
-            $this->addError('adminPassword', 'La contraseña de administrador no es correcta.');
+            $this->addError(
+                'adminPassword',
+                'La contraseña de administrador no es correcta.'
+            );
+
             return;
         }
 
-        // Bloqueo explícito por si el historial operativo cambió entre
-        // requestDelete() y este submit (p. ej. se le asignó una guía
-        // mientras el modal estaba abierto).
         if ($target->hasOperationalHistory()) {
             $this->showDeleteModal = false;
             $this->pendingUserId = null;
@@ -343,7 +477,8 @@ class UsersManager extends Component
 
             session()->flash(
                 'error',
-                "No puedes eliminar a {$target->name}: tiene guías o pagos registrados en el sistema. "
+                "No puedes eliminar a {$target->name}: tiene guías "
+                . "o pagos registrados en el sistema. "
                 . 'Desactiva la cuenta en su lugar para conservar el historial.'
             );
 
@@ -362,22 +497,23 @@ class UsersManager extends Component
                     'action' => 'user.deleted',
                     'target_type' => User::class,
                     'target_id' => $target->id,
-                    'description' => "Eliminó al usuario {$name} con rol {$role}.",
-                    'metadata' => ['role' => $role],
+                    'description' =>
+                        "Eliminó al usuario {$name} con rol {$role}.",
+                    'metadata' => [
+                        'role' => $role,
+                    ],
                     'ip_address' => request()->ip(),
                 ]);
             });
         } catch (QueryException $e) {
-            // Red de seguridad: alguna relación protegida por FK que
-            // hasOperationalHistory() no cubre explícitamente (p. ej.
-            // route_stops u otra tabla nueva) impidió el borrado.
             $this->showDeleteModal = false;
             $this->pendingUserId = null;
             $this->adminPassword = '';
 
             session()->flash(
                 'error',
-                "No se pudo eliminar a {$target->name} porque todavía tiene registros asociados en el sistema."
+                "No se pudo eliminar a {$target->name} porque todavía "
+                . 'tiene registros asociados en el sistema.'
             );
 
             return;
@@ -386,53 +522,149 @@ class UsersManager extends Component
         $this->showDeleteModal = false;
         $this->pendingUserId = null;
         $this->adminPassword = '';
-        session()->flash('success', 'Usuario eliminado correctamente.');
+
+        session()->flash(
+            'success',
+            'Usuario eliminado correctamente.'
+        );
     }
 
     public function render()
     {
         $users = User::query()
-            ->when($this->search !== '', function ($query) {
-                $term = '%' . $this->search . '%';
-                $query->where(function ($q) use ($term) {
-                    $q->where('name', 'like', $term)
-                        ->orWhere('email', 'like', $term);
-                });
-            })
-            ->when($this->roleFilter !== '', fn ($query) => $query->where('role', $this->roleFilter))
-            ->when($this->statusFilter !== '', fn ($query) => $query->where('status', $this->statusFilter))
+            ->when(
+                $this->search !== '',
+                function ($query) {
+                    $term = '%' . $this->search . '%';
+
+                    $query->where(function ($q) use ($term) {
+                        $q->where(
+                            'name',
+                            'like',
+                            $term
+                        )->orWhere(
+                            'email',
+                            'like',
+                            $term
+                        );
+                    });
+                }
+            )
+            ->when(
+                $this->roleFilter !== '',
+                fn ($query) =>
+                    $query->where(
+                        'role',
+                        $this->roleFilter
+                    )
+            )
+            ->when(
+                $this->statusFilter !== '',
+                fn ($query) =>
+                    $query->where(
+                        'status',
+                        $this->statusFilter
+                    )
+            )
             ->latest()
             ->paginate(12);
 
-        return view('livewire.admin.users-manager', [
-            'users' => $users,
-            'roleLabels' => User::roleLabels(),
-        ]);
+        return view(
+            'livewire.admin.users-manager',
+            [
+                'users' => $users,
+                'roleLabels' => User::roleLabels(),
+            ]
+        );
     }
 
     protected function creationRules(): array
     {
         $rules = [
-            'name' => ['required', 'string', 'max:255'],
-            'email' => ['required', 'string', 'email', 'max:255', 'unique:users,email'],
-            'password' => ['required', 'string', 'confirmed', Rules\Password::defaults()],
-            'role' => ['required', 'string', 'in:' . implode(',', array_keys(User::roleLabels()))],
+            'name' => [
+                'required',
+                'string',
+                'max:255',
+            ],
+
+            'email' => [
+                'required',
+                'string',
+                'email',
+                'max:255',
+                'unique:users,email',
+            ],
+
+            'password' => [
+                'required',
+                'string',
+                'confirmed',
+                Rules\Password::defaults(),
+            ],
+
+            'role' => [
+                'required',
+                'string',
+                'in:' . implode(
+                    ',',
+                    array_keys(User::roleLabels())
+                ),
+            ],
         ];
 
         if ($this->role === User::ROLE_ALIADO) {
             $rules += [
-                'business_name' => ['required', 'string', 'max:255'],
-                'rif' => ['required', 'string', 'max:20', 'unique:allies,rif'],
-                'city' => ['required', 'string', 'max:255'],
-                'address' => ['required', 'string', 'max:255'],
+                'business_name' => [
+                    'required',
+                    'string',
+                    'max:255',
+                ],
+
+                'rif' => [
+                    'required',
+                    'string',
+                    'max:20',
+                    'unique:allies,rif',
+                ],
+
+                'state' => [
+                    'required',
+                    'string',
+                ],
+
+                'city' => [
+                    'required',
+                    'string',
+                ],
+
+                'address' => [
+                    'required',
+                    'string',
+                    'max:255',
+                ],
             ];
         }
 
         if ($this->role === User::ROLE_REPARTIDOR) {
             $rules += [
-                'vehicle_plate' => ['required', 'string', 'max:20', 'unique:drivers,vehicle_plate'],
-                'vehicle_type' => ['required', 'string', 'max:255'],
-                'phone' => ['required', 'string', 'max:30'],
+                'vehicle_plate' => [
+                    'required',
+                    'string',
+                    'max:20',
+                    'unique:drivers,vehicle_plate',
+                ],
+
+                'vehicle_type' => [
+                    'required',
+                    'string',
+                    'max:255',
+                ],
+
+                'phone' => [
+                    'required',
+                    'string',
+                    'max:30',
+                ],
             ];
         }
 
@@ -442,12 +674,26 @@ class UsersManager extends Component
     protected function resetForm(): void
     {
         $this->reset([
-            'name', 'email', 'password', 'password_confirmation',
-            'business_name', 'rif', 'city', 'address',
-            'vehicle_plate', 'vehicle_type', 'phone',
+            'name',
+            'email',
+            'password',
+            'password_confirmation',
+            'business_name',
+            'rif',
+            'state',
+            'city',
+            'address',
+            'vehicle_plate',
+            'vehicle_type',
+            'phone',
             'adminPassword',
         ]);
+
+        $this->cities = [];
+
         $this->role = User::ROLE_ALIADO;
+
         $this->resetValidation();
     }
 }
+

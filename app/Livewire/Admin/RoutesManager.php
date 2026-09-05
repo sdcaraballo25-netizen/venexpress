@@ -50,6 +50,8 @@ class RoutesManager extends Component
 
     public string $city = '';
 
+    public string $routeType = Route::TYPE_DELIVERY;
+
     public array $selectedStops = [];
 
     /*
@@ -159,12 +161,15 @@ class RoutesManager extends Component
     public function startCreating(): void
     {
         $this->reset([
-            'editingRouteId',
-            'name',
-            'state',
-            'city',
-            'selectedStops',
-        ]);
+    'editingRouteId',
+    'name',
+    'state',
+    'city',
+    'routeType',
+    'selectedStops',
+]);
+
+$this->routeType = Route::TYPE_DELIVERY;
 
         $this->cities = [];
 
@@ -185,6 +190,7 @@ class RoutesManager extends Component
         $this->name = $route->name;
         $this->state = $route->state ?? '';
         $this->city = $route->city ?? '';
+        $this->routeType = $route->route_type ?? Route::TYPE_DELIVERY;
 
         $this->selectedStops = $route->stops
             ->sortBy('sequence')
@@ -213,13 +219,15 @@ class RoutesManager extends Component
         $this->showBuilder = false;
 
         $this->reset([
-            'editingRouteId',
-            'name',
-            'state',
-            'city',
-            'selectedStops',
-        ]);
+    'editingRouteId',
+    'name',
+    'state',
+    'city',
+    'routeType',
+    'selectedStops',
+]);
 
+$this->routeType = Route::TYPE_DELIVERY;
         $this->cities = [];
     }
 
@@ -290,11 +298,12 @@ class RoutesManager extends Component
     public function saveRoute(RouteService $routeService): void
     {
         $this->validate([
-            'name' => ['required', 'string', 'max:255'],
-            'state' => ['required', 'string'],
-            'city' => ['required', 'string'],
-            'selectedStops' => ['required', 'array', 'min:1'],
-        ]);
+    'name' => ['required', 'string', 'max:255'],
+    'state' => ['required', 'string'],
+    'city' => ['required', 'string'],
+    'routeType' => ['required', 'in:' . Route::TYPE_DELIVERY . ',' . Route::TYPE_HUB_TRANSFER],
+    'selectedStops' => ['required', 'array', 'min:1'],
+]);
 
         try {
             if ($this->editingRouteId) {
@@ -317,6 +326,7 @@ class RoutesManager extends Component
         'name' => $this->name,
         'state' => $this->state,
         'city' => $this->city,
+        'route_type' => $this->routeType,
     ],
     allyIdsInOrder: $this->selectedStops,
     createdByUserId: Auth::id(),
@@ -578,10 +588,10 @@ class RoutesManager extends Component
             : collect();
 
         return view('livewire.admin.routes-manager', [
-            'routes' => $routes,
-            'availableAllies' => $availableAllies,
-            'activeDrivers' => $activeDrivers,
-            'collectiblePackages' => $collectiblePackages,
-        ])->layout('layouts.admin');
-    }
+    'routes' => $routes,
+    'availableAllies' => $availableAllies,
+    'activeDrivers' => $activeDrivers,
+    'collectiblePackages' => $collectiblePackages,
+]);
+}
 }

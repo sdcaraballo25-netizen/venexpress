@@ -3,6 +3,7 @@
 use App\Models\Ally;
 use App\Models\Driver;
 use App\Models\User;
+use App\Services\VenezuelaLocationService;
 use Illuminate\Auth\Events\Registered;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Hash;
@@ -13,25 +14,62 @@ use Livewire\Volt\Component;
 new #[Layout('layouts.guest')] class extends Component
 {
     public string $name = '';
+
     public string $email = '';
+
     public string $password = '';
+
     public string $password_confirmation = '';
+
     public string $role = 'cliente';
 
     /**
      * Datos adicionales para aliados.
      */
     public string $business_name = '';
+
     public string $rif = '';
+
+    public string $state = '';
+
     public string $city = '';
+
     public string $address = '';
+
+    public array $states = [];
+
+    public array $cities = [];
 
     /**
      * Datos adicionales para repartidores.
      */
     public string $vehicle_plate = '';
+
     public string $vehicle_type = '';
+
     public string $phone = '';
+
+    /**
+     * Carga los estados disponibles.
+     */
+    public function mount(
+        VenezuelaLocationService $locationService
+    ): void {
+        $this->states = $locationService->states();
+    }
+
+    /**
+     * Actualiza las ciudades cuando cambia el estado.
+     */
+    public function updatedState(
+        VenezuelaLocationService $locationService
+    ): void {
+        $this->city = '';
+
+        $this->cities = $this->state !== ''
+            ? $locationService->citiesByState($this->state)
+            : [];
+    }
 
     /**
      * Maneja el registro.
@@ -39,7 +77,11 @@ new #[Layout('layouts.guest')] class extends Component
     public function register(): void
     {
         $rules = [
-            'name' => ['required', 'string', 'max:255'],
+            'name' => [
+                'required',
+                'string',
+                'max:255',
+            ],
 
             'email' => [
                 'required',
@@ -84,10 +126,14 @@ new #[Layout('layouts.guest')] class extends Component
                     'unique:allies,rif',
                 ],
 
+                'state' => [
+                    'required',
+                    'string',
+                ],
+
                 'city' => [
                     'required',
                     'string',
-                    'max:255',
                 ],
 
                 'address' => [
@@ -151,16 +197,15 @@ new #[Layout('layouts.guest')] class extends Component
         */
 
         if ($user->isAliado()) {
-
             Ally::create([
                 'user_id' => $user->id,
                 'business_name' => $validated['business_name'],
                 'rif' => $validated['rif'],
+                'state' => $validated['state'],
                 'city' => $validated['city'],
                 'address' => $validated['address'],
                 'commission_percentage' => 10.00,
 
-                // IMPORTANTE:
                 // Un aliado nuevo comienza como PENDIENTE.
                 'status' => Ally::STATUS_PENDING,
             ]);
@@ -182,14 +227,14 @@ new #[Layout('layouts.guest')] class extends Component
         */
 
         if ($user->isChofer()) {
-
             Driver::create([
-    'user_id' => $user->id,
-    'vehicle_plate' => $validated['vehicle_plate'],
-    'vehicle_type' => $validated['vehicle_type'],
-    'phone' => $validated['phone'],
-    'status' => Driver::STATUS_ACTIVE,
-]);
+                'user_id' => $user->id,
+                'vehicle_plate' => $validated['vehicle_plate'],
+                'vehicle_type' => $validated['vehicle_type'],
+                'phone' => $validated['phone'],
+                'status' => Driver::STATUS_ACTIVE,
+                'driver_type' => Driver::TYPE_DELIVERY,
+            ]);
 
             Auth::login($user);
 
@@ -374,6 +419,37 @@ new #[Layout('layouts.guest')] class extends Component
                 />
             </div>
 
+            {{-- ESTADO --}}
+            <div>
+                <x-input-label
+                    for="state"
+                    value="Estado"
+                />
+
+                <select
+                    wire:model.live="state"
+                    id="state"
+                    name="state"
+                    class="block mt-1.5 w-full rounded-md border-gray-300 shadow-sm focus:border-blue-500 focus:ring-blue-500"
+                    required
+                >
+                    <option value="">
+                        Seleccionar estado
+                    </option>
+
+                    @foreach ($states as $stateOption)
+                        <option value="{{ $stateOption }}">
+                            {{ $stateOption }}
+                        </option>
+                    @endforeach
+                </select>
+
+                <x-input-error
+                    :messages="$errors->get('state')"
+                    class="mt-2"
+                />
+            </div>
+
             {{-- CIUDAD --}}
             <div>
                 <x-input-label
@@ -381,13 +457,26 @@ new #[Layout('layouts.guest')] class extends Component
                     value="Ciudad"
                 />
 
-                <x-text-input
-                    wire:model="city"
+                <select
+                    wire:model.live="city"
                     id="city"
-                    class="block mt-1.5 w-full"
-                    type="text"
-                    placeholder="Caracas"
-                />
+                    name="city"
+                    class="block mt-1.5 w-full rounded-md border-gray-300 shadow-sm focus:border-blue-500 focus:ring-blue-500"
+                    @disabled($state === '')
+                    required
+                >
+                    <option value="">
+                        {{ $state === ''
+                            ? 'Primero selecciona un estado'
+                            : 'Seleccionar ciudad' }}
+                    </option>
+
+                    @foreach ($cities as $cityOption)
+                        <option value="{{ $cityOption }}">
+                            {{ $cityOption }}
+                        </option>
+                    @endforeach
+                </select>
 
                 <x-input-error
                     :messages="$errors->get('city')"

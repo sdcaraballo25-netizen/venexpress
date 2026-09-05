@@ -16,6 +16,7 @@ use App\Livewire\Admin\IncidentsManager;
 use App\Livewire\Admin\DriverAssignment;
 use App\Livewire\Admin\AuditLogViewer;
 use App\Livewire\Admin\AllyFinance;
+use App\Livewire\Ally\Packages as AllyPackages;
 
 use App\Livewire\Client\Dashboard as ClientDashboard;
 
@@ -65,6 +66,9 @@ Route::prefix('ally')
         Route::get('/comisiones', AllyCommissions::class)
             ->middleware('role:aliado')
             ->name('commissions');
+
+        Route::get('/pedidos', AllyPackages::class)
+            ->name('packages.index');
 
         /*
         |--------------------------------------------------------------------------

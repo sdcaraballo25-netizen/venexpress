@@ -7,6 +7,7 @@ use App\Services\AllyFinancialService;
 use Illuminate\Support\Carbon;
 use Livewire\Attributes\Layout;
 use Livewire\Component;
+use Illuminate\Support\Facades\Auth;
 
 #[Layout('layouts.ally')]
 class Dashboard extends Component
@@ -34,8 +35,10 @@ class Dashboard extends Component
     public function render(
         AllyFinancialService $financialService
     ) {
-        $ally =
-            auth()->user()->resolveAlly();
+        /** @var \App\Models\User $user */
+$user = Auth::user();
+
+$ally = $user->resolveAlly();
 
         if (! $ally) {
             abort(

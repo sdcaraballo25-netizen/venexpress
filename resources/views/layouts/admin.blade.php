@@ -1,4 +1,3 @@
-```blade
 <!DOCTYPE html>
 <html lang="es" x-data="{ sidebarOpen: false }">
 
@@ -9,7 +8,7 @@
     <title>{{ $title ?? 'Panel Administrativo' }} — Venexpress</title>
 
     <link rel="preconnect" href="https://fonts.googleapis.com">
-    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link rel="preconnect" href="https://fonts.googleapis.com" crossorigin>
 
     <link
         href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@500;600;700&family=Inter:wght@400;500;600&family=JetBrains+Mono:wght@500&display=swap"
@@ -85,9 +84,64 @@
                      NAVEGACIÓN
                 ===================================================== --}}
 
-                <nav class="space-y-1">
+                <nav
+                    class="space-y-1"
+                    x-data="{
+                        openGroup: null,
 
-                    {{-- PRINCIPAL --}}
+                        init() {
+
+                            if (
+                                {{ request()->routeIs(
+                                    'admin.packages.reception',
+                                    'admin.packages.assignment',
+                                    'admin.packages.dispatch',
+                                    'admin.routes',
+                                    'admin.routes.dashboard'
+                                ) ? 'true' : 'false' }}
+                            ) {
+                                this.openGroup = 'operaciones';
+
+                            } else if (
+                                {{ request()->routeIs(
+                                    'admin.allies',
+                                    'admin.rate-matrices',
+                                    'admin.ally-finance'
+                                ) ? 'true' : 'false' }}
+                            ) {
+                                this.openGroup = 'aliados';
+
+                            } else if (
+                                {{ request()->routeIs(
+                                    'admin.users',
+                                    'admin.driver-payments'
+                                ) ? 'true' : 'false' }}
+                            ) {
+                                this.openGroup = 'personal';
+
+                            } else if (
+                                {{ request()->routeIs(
+                                    'admin.incidents',
+                                    'admin.audit-log'
+                                ) ? 'true' : 'false' }}
+                            ) {
+                                this.openGroup = 'control';
+                            }
+                        },
+
+                        toggleGroup(group) {
+                            this.openGroup =
+                                this.openGroup === group
+                                    ? null
+                                    : group;
+                        }
+                    }"
+                >
+
+                    {{-- =================================================
+                         PRINCIPAL
+                    ================================================== --}}
+
                     <p class="px-2 text-xs font-semibold text-[#94A3B8] uppercase tracking-wider mb-3">
                         Principal
                     </p>
@@ -121,339 +175,25 @@
                     </a>
 
 
-                    {{-- Aliados --}}
-                    <a
-                        href="{{ route('admin.allies') }}"
-                        class="flex items-center gap-3 px-4 py-3 rounded-xl font-medium transition-colors
-                        {{ request()->routeIs('admin.allies')
-                            ? 'bg-blue-50 text-blue-900'
-                            : 'text-[#64748B] hover:bg-slate-50 hover:text-[#0F172A]' }}"
-                    >
-
-                        <svg
-                            class="w-5 h-5"
-                            fill="none"
-                            stroke="currentColor"
-                            viewBox="0 0 24 24"
-                        >
-                            <path
-                                stroke-linecap="round"
-                                stroke-linejoin="round"
-                                stroke-width="2"
-                                d="M17 20h5v-2a3 3 0 00-5.356-1.857M17 20H7m10 0v-2c0-.656-.126-1.283-.356-1.857M7 20H2v-2a3 3 0 015.356-1.857M7 20v-2c0-.656-.126-1.283-.356-1.857m0 0a5.002 5.002 0 019.288 0M15 7a3 3 0 11-6 0 3 3 0 016 0zm6 3a2 2 0 11-4 0 2 2 0 014 0zM7 10a2 2 0 11-4 0 2 2 0 014 0z"
-                            />
-                        </svg>
-
-                        Aliados
-
-                    </a>
-
-
-                    {{-- Gestión de tarifas --}}
-                    <a
-                        href="{{ route('admin.rate-matrices') }}"
-                        class="flex items-center gap-3 px-4 py-3 rounded-xl font-medium transition-colors
-                        {{ request()->routeIs('admin.rate-matrices')
-                            ? 'bg-blue-50 text-blue-900'
-                            : 'text-[#64748B] hover:bg-slate-50 hover:text-[#0F172A]' }}"
-                    >
-
-                        <svg
-                            class="w-5 h-5 {{ request()->routeIs('admin.rate-matrices') ? 'text-blue-700' : '' }}"
-                            fill="none"
-                            stroke="currentColor"
-                            viewBox="0 0 24 24"
-                        >
-                            <path
-                                stroke-linecap="round"
-                                stroke-linejoin="round"
-                                stroke-width="2"
-                                d="M12 8c-1.657 0-3 .895-3 2s1.343 2 3 2 3 0 3 2-1.343 2-3 2m0-8c1.11 0 2.08.402 2.599 1M12 8V7m0 1v8m0 0v1m0-1c-1.11 0-2.08-.402-2.599-1M21 12a9 9 0 11-18 0 9 9 0 0118 0z"
-                            />
-                        </svg>
-
-                        Gestión de tarifas
-
-                    </a>
-
-
-                    {{-- Recepción --}}
-                    <a
-                        href="{{ route('admin.packages.reception') }}"
-                        class="flex items-center gap-3 px-4 py-3 rounded-xl font-medium transition-colors
-                        {{ request()->routeIs('admin.packages.reception')
-                            ? 'bg-blue-50 text-blue-900'
-                            : 'text-[#64748B] hover:bg-slate-50 hover:text-[#0F172A]' }}"
-                    >
-
-                        <svg
-                            class="w-5 h-5"
-                            fill="none"
-                            stroke="currentColor"
-                            viewBox="0 0 24 24"
-                        >
-                            <path
-                                stroke-linecap="round"
-                                stroke-linejoin="round"
-                                stroke-width="1.8"
-                                d="M3 7h18M5 7v12h14V7M8 11h8M8 15h5"
-                            />
-                        </svg>
-
-                        Recepción de paquetes
-
-                    </a>
-
-
-                    {{-- Asignar reparto --}}
-                    <a
-                        href="{{ route('admin.packages.assignment') }}"
-                        class="flex items-center gap-3 px-4 py-3 rounded-xl font-medium transition-colors
-                        {{ request()->routeIs('admin.packages.assignment')
-                            ? 'bg-blue-50 text-blue-900'
-                            : 'text-[#64748B] hover:bg-slate-50 hover:text-[#0F172A]' }}"
-                    >
-
-                        <svg
-                            class="w-5 h-5"
-                            fill="none"
-                            stroke="currentColor"
-                            viewBox="0 0 24 24"
-                        >
-                            <path
-                                stroke-linecap="round"
-                                stroke-linejoin="round"
-                                stroke-width="2"
-                                d="M5 13l4 4L19 7"
-                            />
-                        </svg>
-
-                        Asignar a reparto
-
-                    </a>
-
-
-                    {{-- Despacho --}}
-                    <a
-                        href="{{ route('admin.packages.dispatch') }}"
-                        class="flex items-center gap-3 px-4 py-3 rounded-xl font-medium transition-colors
-                        {{ request()->routeIs('admin.packages.dispatch')
-                            ? 'bg-blue-50 text-blue-900'
-                            : 'text-[#64748B] hover:bg-slate-50 hover:text-[#0F172A]' }}"
-                    >
-
-                        <svg
-                            class="w-5 h-5"
-                            fill="none"
-                            stroke="currentColor"
-                            viewBox="0 0 24 24"
-                        >
-                            <path
-                                stroke-linecap="round"
-                                stroke-linejoin="round"
-                                stroke-width="1.8"
-                                d="M3 12h13m0 0-4-4m4 4-4 4M17 5h4v14h-4"
-                            />
-                        </svg>
-
-                        Despacho a tránsito
-
-                    </a>
-
-
-                    {{-- Control de rutas --}}
-                    <a
-                        href="{{ route('admin.routes') }}"
-                        class="flex items-center gap-3 px-4 py-3 rounded-xl font-medium transition-colors
-                        {{ request()->routeIs('admin.routes')
-                            ? 'bg-blue-50 text-blue-900'
-                            : 'text-[#64748B] hover:bg-slate-50 hover:text-[#0F172A]' }}"
-                    >
-
-                        <svg
-                            class="w-5 h-5"
-                            fill="none"
-                            stroke="currentColor"
-                            viewBox="0 0 24 24"
-                        >
-                            <path
-                                stroke-linecap="round"
-                                stroke-linejoin="round"
-                                stroke-width="2"
-                                d="M9 20l-5.447-2.724A1 1 0 013 16.382V5.618a1 1 0 011.447-.894L9 7l6-2.572 5.447 2.724A1 1 0 0121 8.053v10.764a1 1 0 01-1.447.894L15 17l-6 2.572zM9 7v13M15 4v13"
-                            />
-                        </svg>
-
-                        Control de rutas
-
-                    </a>
-
-
-                    {{-- Dashboard de rutas --}}
-                    <a
-                        href="{{ route('admin.routes.dashboard') }}"
-                        class="flex items-center gap-3 px-4 py-3 rounded-xl font-medium transition-colors
-                        {{ request()->routeIs('admin.routes.dashboard')
-                            ? 'bg-blue-50 text-blue-900'
-                            : 'text-[#64748B] hover:bg-slate-50 hover:text-[#0F172A]' }}"
-                    >
-
-                        <svg
-                            class="w-5 h-5"
-                            fill="none"
-                            stroke="currentColor"
-                            viewBox="0 0 24 24"
-                        >
-                            <path
-                                stroke-linecap="round"
-                                stroke-linejoin="round"
-                                stroke-width="2"
-                                d="M9 19v-6a2 2 0 012-2h2a2 2 0 012 2v6m-9 0h10a2 2 0 002-2V9.5a1 1 0 00-.4-.8l-5-3.75a1 1 0 00-1.2 0l-5 3.75a1 1 0 00-.4.8V17a2 2 0 002 2z"
-                            />
-                        </svg>
-
-                        Dashboard de rutas
-
-                    </a>
-
-
                     {{-- =================================================
-                         ADMINISTRACIÓN
+                         OPERACIONES
                     ================================================== --}}
 
-                    <p class="px-2 text-xs font-semibold text-[#94A3B8] uppercase tracking-wider mb-3 mt-6">
-                        Administración
-                    </p>
+                    <div class="mt-6">
 
-
-                    {{-- Gestión de usuarios --}}
-                    <a
-                        href="{{ route('admin.users') }}"
-                        class="flex items-center gap-3 px-4 py-3 rounded-xl font-medium transition-colors
-                        {{ request()->routeIs('admin.users')
-                            ? 'bg-blue-50 text-blue-900'
-                            : 'text-[#64748B] hover:bg-slate-50 hover:text-[#0F172A]' }}"
-                    >
-
-                        <svg
-                            class="w-5 h-5"
-                            fill="none"
-                            stroke="currentColor"
-                            viewBox="0 0 24 24"
+                        <button
+                            type="button"
+                            @click="toggleGroup('operaciones')"
+                            class="w-full flex items-center justify-between px-2 py-2 text-xs font-semibold text-[#94A3B8] uppercase tracking-wider hover:text-[#475569] transition-colors"
                         >
-                            <path
-                                stroke-linecap="round"
-                                stroke-linejoin="round"
-                                stroke-width="2"
-                                d="M18 9v3m0 0v3m0-3h3m-3 0h-3m-2-5a4 4 0 11-8 0 4 4 0 018 0zM3 20a6 6 0 0112 0v1H3v-1z"
-                            />
-                        </svg>
 
-                        Gestión de usuarios
-
-                    </a>
-
-
-                    {{-- =================================================
-                         FINANZAS DE ALIADOS
-                    ================================================== --}}
-
-                    <a
-                        href="{{ route('admin.ally-finance') }}"
-                        class="flex items-center gap-3 px-4 py-3 rounded-xl font-medium transition-colors
-                        {{ request()->routeIs('admin.ally-finance')
-                            ? 'bg-blue-50 text-blue-900'
-                            : 'text-[#64748B] hover:bg-slate-50 hover:text-[#0F172A]' }}"
-                    >
-
-                        <svg
-                            class="w-5 h-5 {{ request()->routeIs('admin.ally-finance') ? 'text-blue-700' : '' }}"
-                            fill="none"
-                            stroke="currentColor"
-                            viewBox="0 0 24 24"
-                        >
-                            <path
-                                stroke-linecap="round"
-                                stroke-linejoin="round"
-                                stroke-width="1.8"
-                                d="M12 2v20M17 5H9.5a3.5 3.5 0 000 7h5a3.5 3.5 0 010 7H7"
-                            />
-                        </svg>
-
-                        Finanzas de aliados
-
-                    </a>
-
-
-                    {{-- Remuneraciones --}}
-                    <a
-                        href="{{ route('admin.driver-payments') }}"
-                        class="flex items-center gap-3 px-4 py-3 rounded-xl font-medium transition-colors
-                        {{ request()->routeIs('admin.driver-payments')
-                            ? 'bg-blue-50 text-blue-900'
-                            : 'text-[#64748B] hover:bg-slate-50 hover:text-[#0F172A]' }}"
-                    >
-
-                        <svg
-                            class="w-5 h-5"
-                            fill="none"
-                            stroke="currentColor"
-                            viewBox="0 0 24 24"
-                        >
-                            <path
-                                stroke-linecap="round"
-                                stroke-linejoin="round"
-                                stroke-width="1.8"
-                                d="M12 8c-1.657 0-3 .895-3 2s1.343 2 3 2 3 .895 3 2-1.343 2-3 2m0-8c1.11 0 2.08.402 2.599 1M12 8V7m0 1v8m0 0v1m0-1c-1.11 0-2.08-.402-2.599-1M21 12a9 9 0 11-18 0 9 9 0 0118 0z"
-                            />
-                        </svg>
-
-                        Remuneraciones
-
-                    </a>
-
-
-                    {{-- Incidencias --}}
-                    <a
-                        href="{{ route('admin.incidents') }}"
-                        class="flex items-center gap-3 px-4 py-3 rounded-xl font-medium transition-colors
-                        {{ request()->routeIs('admin.incidents')
-                            ? 'bg-blue-50 text-blue-900'
-                            : 'text-[#64748B] hover:bg-slate-50 hover:text-[#0F172A]' }}"
-                    >
-
-                        <svg
-                            class="w-5 h-5"
-                            fill="none"
-                            stroke="currentColor"
-                            viewBox="0 0 24 24"
-                        >
-                            <path
-                                stroke-linecap="round"
-                                stroke-linejoin="round"
-                                stroke-width="2"
-                                d="M12 9v2m0 4h.01M5.07 19h13.86a2 2 0 001.73-3L13.73 4a2 2 0 00-3.46 0L3.34 16a2 2 0 001.73 3z"
-                            />
-                        </svg>
-
-                        Incidencias
-
-                    </a>
-
-
-                    {{-- Auditoría --}}
-                    @if (Auth::user()?->isAdminPrincipal())
-
-                        <a
-                            href="{{ route('admin.audit-log') }}"
-                            class="flex items-center gap-3 px-4 py-3 rounded-xl font-medium transition-colors
-                            {{ request()->routeIs('admin.audit-log')
-                                ? 'bg-blue-50 text-blue-900'
-                                : 'text-[#64748B] hover:bg-slate-50 hover:text-[#0F172A]' }}"
-                        >
+                            <span>
+                                Operaciones
+                            </span>
 
                             <svg
-                                class="w-5 h-5"
+                                class="w-4 h-4 transition-transform duration-200"
+                                :class="{ 'rotate-180': openGroup === 'operaciones' }"
                                 fill="none"
                                 stroke="currentColor"
                                 viewBox="0 0 24 24"
@@ -462,15 +202,493 @@
                                     stroke-linecap="round"
                                     stroke-linejoin="round"
                                     stroke-width="2"
-                                    d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h6l5 5v11a2 2 0 01-2 2z"
+                                    d="M19 9l-7 7-7-7"
                                 />
                             </svg>
 
-                            Bitácora de auditoría
+                        </button>
 
-                        </a>
 
-                    @endif
+                        <div
+                            x-show="openGroup === 'operaciones'"
+                            x-cloak
+                            class="mt-1 space-y-1"
+                        >
+
+                            {{-- Recepción --}}
+                            <a
+                                href="{{ route('admin.packages.reception') }}"
+                                class="flex items-center gap-3 px-4 py-3 rounded-xl font-medium transition-colors
+                                {{ request()->routeIs('admin.packages.reception')
+                                    ? 'bg-blue-50 text-blue-900'
+                                    : 'text-[#64748B] hover:bg-slate-50 hover:text-[#0F172A]' }}"
+                            >
+
+                                <svg
+                                    class="w-5 h-5"
+                                    fill="none"
+                                    stroke="currentColor"
+                                    viewBox="0 0 24 24"
+                                >
+                                    <path
+                                        stroke-linecap="round"
+                                        stroke-linejoin="round"
+                                        stroke-width="1.8"
+                                        d="M3 7h18M5 7v12h14V7M8 11h8M8 15h5"
+                                    />
+                                </svg>
+
+                                Recepción de paquetes
+
+                            </a>
+
+
+                            {{-- Asignar reparto --}}
+                            <a
+                                href="{{ route('admin.packages.assignment') }}"
+                                class="flex items-center gap-3 px-4 py-3 rounded-xl font-medium transition-colors
+                                {{ request()->routeIs('admin.packages.assignment')
+                                    ? 'bg-blue-50 text-blue-900'
+                                    : 'text-[#64748B] hover:bg-slate-50 hover:text-[#0F172A]' }}"
+                            >
+
+                                <svg
+                                    class="w-5 h-5"
+                                    fill="none"
+                                    stroke="currentColor"
+                                    viewBox="0 0 24 24"
+                                >
+                                    <path
+                                        stroke-linecap="round"
+                                        stroke-linejoin="round"
+                                        stroke-width="2"
+                                        d="M5 13l4 4L19 7"
+                                    />
+                                </svg>
+
+                                Asignar a reparto
+
+                            </a>
+
+
+                            {{-- Despacho --}}
+                            <a
+                                href="{{ route('admin.packages.dispatch') }}"
+                                class="flex items-center gap-3 px-4 py-3 rounded-xl font-medium transition-colors
+                                {{ request()->routeIs('admin.packages.dispatch')
+                                    ? 'bg-blue-50 text-blue-900'
+                                    : 'text-[#64748B] hover:bg-slate-50 hover:text-[#0F172A]' }}"
+                            >
+
+                                <svg
+                                    class="w-5 h-5"
+                                    fill="none"
+                                    stroke="currentColor"
+                                    viewBox="0 0 24 24"
+                                >
+                                    <path
+                                        stroke-linecap="round"
+                                        stroke-linejoin="round"
+                                        stroke-width="1.8"
+                                        d="M3 12h13m0 0-4-4m4 4-4 4M17 5h4v14h-4"
+                                    />
+                                </svg>
+
+                                Despacho a tránsito
+
+                            </a>
+
+
+                            {{-- Control de rutas --}}
+                            <a
+                                href="{{ route('admin.routes') }}"
+                                class="flex items-center gap-3 px-4 py-3 rounded-xl font-medium transition-colors
+                                {{ request()->routeIs('admin.routes')
+                                    ? 'bg-blue-50 text-blue-900'
+                                    : 'text-[#64748B] hover:bg-slate-50 hover:text-[#0F172A]' }}"
+                            >
+
+                                <svg
+                                    class="w-5 h-5"
+                                    fill="none"
+                                    stroke="currentColor"
+                                    viewBox="0 0 24 24"
+                                >
+                                    <path
+                                        stroke-linecap="round"
+                                        stroke-linejoin="round"
+                                        stroke-width="2"
+                                        d="M9 20l-5.447-2.724A1 1 0 013 16.382V5.618a1 1 0 011.447-.894L9 7l6-2.572 5.447 2.724A1 1 0 0121 8.053v10.764a1 1 0 01-1.447.894L15 17l-6 2.572zM9 7v13M15 4v13"
+                                    />
+                                </svg>
+
+                                Control de rutas
+
+                            </a>
+
+
+                            {{-- Dashboard de rutas --}}
+                            <a
+                                href="{{ route('admin.routes.dashboard') }}"
+                                class="flex items-center gap-3 px-4 py-3 rounded-xl font-medium transition-colors
+                                {{ request()->routeIs('admin.routes.dashboard')
+                                    ? 'bg-blue-50 text-blue-900'
+                                    : 'text-[#64748B] hover:bg-slate-50 hover:text-[#0F172A]' }}"
+                            >
+
+                                <svg
+                                    class="w-5 h-5"
+                                    fill="none"
+                                    stroke="currentColor"
+                                    viewBox="0 0 24 24"
+                                >
+                                    <path
+                                        stroke-linecap="round"
+                                        stroke-linejoin="round"
+                                        stroke-width="2"
+                                        d="M9 19v-6a2 2 0 012-2h2a2 2 0 012 2v6m-9 0h10a2 2 0 002-2V9.5a1 1 0 00-.4-.8l-5-3.75a1 1 0 00-1.2 0l-5 3.75a1 1 0 00-.4.8V17a2 2 0 002 2z"
+                                    />
+                                </svg>
+
+                                Dashboard de rutas
+
+                            </a>
+
+                        </div>
+
+                    </div>
+
+
+                    {{-- =================================================
+                         ALIADOS
+                    ================================================== --}}
+
+                    <div class="mt-3">
+
+                        <button
+                            type="button"
+                            @click="toggleGroup('aliados')"
+                            class="w-full flex items-center justify-between px-2 py-2 text-xs font-semibold text-[#94A3B8] uppercase tracking-wider hover:text-[#475569] transition-colors"
+                        >
+
+                            <span>
+                                Aliados
+                            </span>
+
+                            <svg
+                                class="w-4 h-4 transition-transform duration-200"
+                                :class="{ 'rotate-180': openGroup === 'aliados' }"
+                                fill="none"
+                                stroke="currentColor"
+                                viewBox="0 0 24 24"
+                            >
+                                <path
+                                    stroke-linecap="round"
+                                    stroke-linejoin="round"
+                                    stroke-width="2"
+                                    d="M19 9l-7 7-7-7"
+                                />
+                            </svg>
+
+                        </button>
+
+
+                        <div
+                            x-show="openGroup === 'aliados'"
+                            x-cloak
+                            class="mt-1 space-y-1"
+                        >
+
+                            {{-- Aliados --}}
+                            <a
+                                href="{{ route('admin.allies') }}"
+                                class="flex items-center gap-3 px-4 py-3 rounded-xl font-medium transition-colors
+                                {{ request()->routeIs('admin.allies')
+                                    ? 'bg-blue-50 text-blue-900'
+                                    : 'text-[#64748B] hover:bg-slate-50 hover:text-[#0F172A]' }}"
+                            >
+
+                                <svg
+                                    class="w-5 h-5"
+                                    fill="none"
+                                    stroke="currentColor"
+                                    viewBox="0 0 24 24"
+                                >
+                                    <path
+                                        stroke-linecap="round"
+                                        stroke-linejoin="round"
+                                        stroke-width="2"
+                                        d="M17 20h5v-2a3 3 0 00-5.356-1.857M17 20H7m10 0v-2c0-.656-.126-1.283-.356-1.857M7 20H2v-2a3 3 0 015.356-1.857M7 20v-2c0-.656-.126-1.283-.356-1.857m0 0a5.002 5.002 0 019.288 0M15 7a3 3 0 11-6 0 3 3 0 016 0zm6 3a2 2 0 11-4 0 2 2 0 014 0zM7 10a2 2 0 11-4 0 2 2 0 014 0z"
+                                    />
+                                </svg>
+
+                                Aliados
+
+                            </a>
+
+
+                            {{-- Gestión de tarifas --}}
+                            <a
+                                href="{{ route('admin.rate-matrices') }}"
+                                class="flex items-center gap-3 px-4 py-3 rounded-xl font-medium transition-colors
+                                {{ request()->routeIs('admin.rate-matrices')
+                                    ? 'bg-blue-50 text-blue-900'
+                                    : 'text-[#64748B] hover:bg-slate-50 hover:text-[#0F172A]' }}"
+                            >
+
+                                <svg
+                                    class="w-5 h-5"
+                                    fill="none"
+                                    stroke="currentColor"
+                                    viewBox="0 0 24 24"
+                                >
+                                    <path
+                                        stroke-linecap="round"
+                                        stroke-linejoin="round"
+                                        stroke-width="2"
+                                        d="M12 8c-1.657 0-3 .895-3 2s1.343 2 3 2 3 2-3 2-3 2 3 2m0-8c1.11 0 2.08.402 2.599 1M12 8V7m0 1v8m0 0v1m0-1c-1.11 0-2.08-.402-2.599-1M21 12a9 9 0 11-18 0 9 9 0 0118 0z"
+                                    />
+                                </svg>
+
+                                Gestión de tarifas
+
+                            </a>
+
+
+                            {{-- Finanzas de aliados --}}
+                            <a
+                                href="{{ route('admin.ally-finance') }}"
+                                class="flex items-center gap-3 px-4 py-3 rounded-xl font-medium transition-colors
+                                {{ request()->routeIs('admin.ally-finance')
+                                    ? 'bg-blue-50 text-blue-900'
+                                    : 'text-[#64748B] hover:bg-slate-50 hover:text-[#0F172A]' }}"
+                            >
+
+                                <svg
+                                    class="w-5 h-5"
+                                    fill="none"
+                                    stroke="currentColor"
+                                    viewBox="0 0 24 24"
+                                >
+                                    <path
+                                        stroke-linecap="round"
+                                        stroke-linejoin="round"
+                                        stroke-width="1.8"
+                                        d="M12 2v20M17 5H9.5a3.5 3.5 0 000 7h5a3.5 3.5 0 010 7H7"
+                                    />
+                                </svg>
+
+                                Finanzas de aliados
+
+                            </a>
+
+                        </div>
+
+                    </div>
+
+
+                    {{-- =================================================
+                         PERSONAL
+                    ================================================== --}}
+
+                    <div class="mt-3">
+
+                        <button
+                            type="button"
+                            @click="toggleGroup('personal')"
+                            class="w-full flex items-center justify-between px-2 py-2 text-xs font-semibold text-[#94A3B8] uppercase tracking-wider hover:text-[#475569] transition-colors"
+                        >
+
+                            <span>
+                                Personal
+                            </span>
+
+                            <svg
+                                class="w-4 h-4 transition-transform duration-200"
+                                :class="{ 'rotate-180': openGroup === 'personal' }"
+                                fill="none"
+                                stroke="currentColor"
+                                viewBox="0 0 24 24"
+                            >
+                                <path
+                                    stroke-linecap="round"
+                                    stroke-linejoin="round"
+                                    stroke-width="2"
+                                    d="M19 9l-7 7-7-7"
+                                />
+                            </svg>
+
+                        </button>
+
+
+                        <div
+                            x-show="openGroup === 'personal'"
+                            x-cloak
+                            class="mt-1 space-y-1"
+                        >
+
+                            {{-- Gestión de usuarios --}}
+                            <a
+                                href="{{ route('admin.users') }}"
+                                class="flex items-center gap-3 px-4 py-3 rounded-xl font-medium transition-colors
+                                {{ request()->routeIs('admin.users')
+                                    ? 'bg-blue-50 text-blue-900'
+                                    : 'text-[#64748B] hover:bg-slate-50 hover:text-[#0F172A]' }}"
+                            >
+
+                                <svg
+                                    class="w-5 h-5"
+                                    fill="none"
+                                    stroke="currentColor"
+                                    viewBox="0 0 24 24"
+                                >
+                                    <path
+                                        stroke-linecap="round"
+                                        stroke-linejoin="round"
+                                        stroke-width="2"
+                                        d="M18 9v3m0 0v3m0-3h3m-3 0h-3m-2-5a4 4 0 11-8 0 4 4 0 018 0zM3 20a6 6 0 0112 0v1H3v-1z"
+                                    />
+                                </svg>
+
+                                Gestión de usuarios
+
+                            </a>
+
+
+                            {{-- Remuneraciones --}}
+                            <a
+                                href="{{ route('admin.driver-payments') }}"
+                                class="flex items-center gap-3 px-4 py-3 rounded-xl font-medium transition-colors
+                                {{ request()->routeIs('admin.driver-payments')
+                                    ? 'bg-blue-50 text-blue-900'
+                                    : 'text-[#64748B] hover:bg-slate-50 hover:text-[#0F172A]' }}"
+                            >
+
+                                <svg
+                                    class="w-5 h-5"
+                                    fill="none"
+                                    stroke="currentColor"
+                                    viewBox="0 0 24 24"
+                                >
+                                    <path
+                                        stroke-linecap="round"
+                                        stroke-linejoin="round"
+                                        stroke-width="1.8"
+                                        d="M12 8c-1.657 0-3 .895-3 2s1.343 2 3 2 3 .895 3 2-1.343 2-3 2m0-8c1.11 0 2.08.402 2.599 1M12 8V7m0 1v8m0 0v1m0-1c-1.11 0-2.08-.402-2.599-1M21 12a9 9 0 11-18 0 9 9 0 0118 0z"
+                                    />
+                                </svg>
+
+                                Remuneraciones
+
+                            </a>
+
+                        </div>
+
+                    </div>
+
+
+                    {{-- =================================================
+                         CONTROL
+                    ================================================== --}}
+
+                    <div class="mt-3">
+
+                        <button
+                            type="button"
+                            @click="toggleGroup('control')"
+                            class="w-full flex items-center justify-between px-2 py-2 text-xs font-semibold text-[#94A3B8] uppercase tracking-wider hover:text-[#475569] transition-colors"
+                        >
+
+                            <span>
+                                Control
+                            </span>
+
+                            <svg
+                                class="w-4 h-4 transition-transform duration-200"
+                                :class="{ 'rotate-180': openGroup === 'control' }"
+                                fill="none"
+                                stroke="currentColor"
+                                viewBox="0 0 24 24"
+                            >
+                                <path
+                                    stroke-linecap="round"
+                                    stroke-linejoin="round"
+                                    stroke-width="2"
+                                    d="M19 9l-7 7-7-7"
+                                />
+                            </svg>
+
+                        </button>
+
+
+                        <div
+                            x-show="openGroup === 'control'"
+                            x-cloak
+                            class="mt-1 space-y-1"
+                        >
+
+                            {{-- Incidencias --}}
+                            <a
+                                href="{{ route('admin.incidents') }}"
+                                class="flex items-center gap-3 px-4 py-3 rounded-xl font-medium transition-colors
+                                {{ request()->routeIs('admin.incidents')
+                                    ? 'bg-blue-50 text-blue-900'
+                                    : 'text-[#64748B] hover:bg-slate-50 hover:text-[#0F172A]' }}"
+                            >
+
+                                <svg
+                                    class="w-5 h-5"
+                                    fill="none"
+                                    stroke="currentColor"
+                                    viewBox="0 0 24 24"
+                                >
+                                    <path
+                                        stroke-linecap="round"
+                                        stroke-linejoin="round"
+                                        stroke-width="2"
+                                        d="M12 9v2m0 4h.01M5.07 19h13.86a2 2 0 001.73-3L13.73 4a2 2 0 00-3.46 0L3.34 16a2 2 0 001.73 3z"
+                                    />
+                                </svg>
+
+                                Incidencias
+
+                            </a>
+
+
+                            {{-- Auditoría --}}
+                            @if (Auth::user()?->isAdminPrincipal())
+
+                                <a
+                                    href="{{ route('admin.audit-log') }}"
+                                    class="flex items-center gap-3 px-4 py-3 rounded-xl font-medium transition-colors
+                                    {{ request()->routeIs('admin.audit-log')
+                                        ? 'bg-blue-50 text-blue-900'
+                                        : 'text-[#64748B] hover:bg-slate-50 hover:text-[#0F172A]' }}"
+                                >
+
+                                    <svg
+                                        class="w-5 h-5"
+                                        fill="none"
+                                        stroke="currentColor"
+                                        viewBox="0 0 24 24"
+                                    >
+                                        <path
+                                            stroke-linecap="round"
+                                            stroke-linejoin="round"
+                                            stroke-width="2"
+                                            d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h6l5 5v11a2 2 0 01-2 2z"
+                                        />
+                                    </svg>
+
+                                    Bitácora de auditoría
+
+                                </a>
+
+                            @endif
+
+                        </div>
+
+                    </div>
 
                 </nav>
 
@@ -616,4 +834,3 @@
 </body>
 
 </html>
-```

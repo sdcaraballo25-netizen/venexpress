@@ -11,6 +11,26 @@ class Route extends Model
 {
     use HasFactory;
 
+    /*
+    |--------------------------------------------------------------------------
+    | TIPOS DE RUTA
+    |--------------------------------------------------------------------------
+    */
+
+    public const TYPE_HUB_TRANSFER = 'hub_transfer';
+    public const TYPE_DELIVERY = 'delivery';
+
+    public const TYPES = [
+        self::TYPE_HUB_TRANSFER,
+        self::TYPE_DELIVERY,
+    ];
+
+    /*
+    |--------------------------------------------------------------------------
+    | ESTADOS
+    |--------------------------------------------------------------------------
+    */
+
     public const STATUS_DRAFT = 'draft';
     public const STATUS_ASSIGNED = 'assigned';
     public const STATUS_IN_PROGRESS = 'in_progress';
@@ -39,6 +59,7 @@ class Route extends Model
         'status',
         'started_at',
         'completed_at',
+        'route_type',
     ];
 
     /**
@@ -66,7 +87,7 @@ class Route extends Model
     }
 
     /**
-     * Administrador (admin_principal o admin_operativo) que creó la ruta.
+     * Administrador que creó la ruta.
      */
     public function creator(): BelongsTo
     {
@@ -86,6 +107,16 @@ class Route extends Model
     | HELPERS
     |--------------------------------------------------------------------------
     */
+
+    public function isHubTransfer(): bool
+    {
+        return $this->route_type === self::TYPE_HUB_TRANSFER;
+    }
+
+    public function isDelivery(): bool
+    {
+        return $this->route_type === self::TYPE_DELIVERY;
+    }
 
     public function isEditable(): bool
     {
@@ -150,3 +181,4 @@ class Route extends Model
             ->count();
     }
 }
+

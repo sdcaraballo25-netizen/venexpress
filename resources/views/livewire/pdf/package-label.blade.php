@@ -1,216 +1,496 @@
 <!DOCTYPE html>
-<html>
+<html lang="es">
 <head>
-    <meta charset="utf-8">
-    <title>Guía {{ $package->tracking_number }}</title>
+    <meta charset="UTF-8">
+
+    <title>
+        Guía {{ $package->tracking_number }}
+    </title>
+
     <style>
-        /*
-         * dompdf no soporta flexbox ni grid: todo el layout de esta
-         * plantilla usa tablas e inline-block a propósito.
-         */
         @page {
-            margin: 10px;
+            margin: 0;
+        }
+
+        * {
+            box-sizing: border-box;
         }
 
         body {
-            font-family: Helvetica, Arial, sans-serif;
-            font-size: 11px;
-            color: #111;
+            margin: 0;
+            padding: 0;
+            font-family: Arial, Helvetica, sans-serif;
+            color: #000;
+            background: #fff;
+        }
+
+        .label {
+            width: 100%;
+            padding: 18px;
         }
 
         .header {
-            text-align: center;
-            border-bottom: 2px solid #111;
-            padding-bottom: 6px;
-            margin-bottom: 8px;
+            display: table;
+            width: 100%;
+            border-bottom: 2px solid #000;
+            padding-bottom: 10px;
+            margin-bottom: 12px;
+        }
+
+        .header-left,
+        .header-right {
+            display: table-cell;
+            vertical-align: top;
+        }
+
+        .header-right {
+            text-align: right;
         }
 
         .brand {
-            font-size: 16px;
+            font-size: 24px;
+            font-weight: bold;
+            margin: 0;
+        }
+
+        .tracking {
+            font-size: 18px;
+            font-weight: bold;
+            margin: 0;
+            letter-spacing: 1px;
+        }
+
+        .section {
+            border-bottom: 1px solid #000;
+            padding-bottom: 9px;
+            margin-bottom: 10px;
+        }
+
+        .title {
+            font-size: 11px;
+            text-transform: uppercase;
+            color: #444;
+            margin-bottom: 3px;
+        }
+
+        .value {
+            font-size: 14px;
+            font-weight: bold;
+            margin: 0;
+        }
+
+        .small {
+            font-size: 11px;
+            margin: 2px 0 0;
+        }
+
+        .destination {
+            text-align: center;
+            border: 2px solid #000;
+            padding: 10px;
+            margin: 12px 0;
+        }
+
+        .destination .city {
+            font-size: 22px;
+            font-weight: bold;
+            text-transform: uppercase;
+            margin: 0;
+        }
+
+        .destination .state {
+            font-size: 13px;
+            margin: 3px 0 0;
+        }
+
+        .service {
+            text-align: center;
+            border: 1px solid #000;
+            padding: 7px;
+            margin-bottom: 12px;
+            font-size: 13px;
+            font-weight: bold;
+        }
+
+        .qr {
+            text-align: center;
+            margin: 14px 0;
+        }
+
+        .qr svg {
+            display: block;
+            width: 150px;
+            height: 150px;
+            margin: 0 auto;
+        }
+
+        .qr-tracking {
+            margin: 5px 0 0;
+            font-size: 11px;
             font-weight: bold;
             letter-spacing: 1px;
         }
 
-        .tracking-number {
-            font-size: 20px;
-            font-weight: bold;
-            letter-spacing: 2px;
-            margin: 6px 0 2px 0;
-        }
-
-        .barcode {
-            text-align: center;
-            margin: 6px 0;
-        }
-
-        .barcode img, .barcode svg {
-            width: 240px;
-            height: 55px;
-        }
-
-        table.info {
+        .info-grid {
+            display: table;
             width: 100%;
-            border-collapse: collapse;
-            margin-top: 6px;
+            border-top: 1px solid #000;
+            border-bottom: 1px solid #000;
+            margin-top: 10px;
         }
 
-        table.info td {
-            padding: 3px 0;
+        .info-cell {
+            display: table-cell;
+            width: 33.33%;
+            padding: 7px 5px;
             vertical-align: top;
+            text-align: center;
         }
 
-        .box {
-            border: 1px solid #999;
-            border-radius: 4px;
-            padding: 6px;
-            margin-bottom: 8px;
+        .info-cell + .info-cell {
+            border-left: 1px solid #000;
         }
 
-        .label {
+        .info-label {
             font-size: 9px;
             text-transform: uppercase;
             color: #555;
-            letter-spacing: 0.5px;
         }
 
-        .value {
+        .info-value {
             font-size: 12px;
             font-weight: bold;
+            margin-top: 2px;
         }
 
-        .section-title {
+        .cod {
+            background: #000;
+            color: #fff;
+            text-align: center;
+            padding: 8px;
+            margin-top: 12px;
+        }
+
+        .cod-title {
+            font-size: 11px;
+            font-weight: bold;
+            margin: 0;
+        }
+
+        .cod-amount {
+            font-size: 18px;
+            font-weight: bold;
+            margin: 3px 0 0;
+        }
+
+        .fragile {
+            text-align: center;
+            border: 2px solid #000;
+            padding: 7px;
+            margin-top: 12px;
+            font-size: 13px;
+            font-weight: bold;
+        }
+
+        .security {
+            text-align: center;
+            margin-top: 12px;
             font-size: 10px;
-            font-weight: bold;
-            text-transform: uppercase;
-            border-bottom: 1px solid #ccc;
-            margin-bottom: 4px;
-            padding-bottom: 2px;
-        }
-
-        .badge {
-            display: inline-block;
-            border: 1px solid #111;
-            padding: 2px 6px;
-            font-size: 9px;
-            font-weight: bold;
-            text-transform: uppercase;
         }
 
         .footer {
-            margin-top: 10px;
-            font-size: 8px;
-            color: #666;
             text-align: center;
-            border-top: 1px solid #ccc;
-            padding-top: 4px;
+            border-top: 1px dashed #000;
+            margin-top: 14px;
+            padding-top: 8px;
+            font-size: 10px;
         }
     </style>
 </head>
+
 <body>
 
+<div class="label">
+
+    {{-- ========================================================= --}}
+    {{-- ENCABEZADO --}}
+    {{-- ========================================================= --}}
     <div class="header">
-        <div class="brand">VENEXPRESS</div>
-        <div class="tracking-number">{{ $package->tracking_number }}</div>
 
-        <div class="barcode">
-            {!! $barcodeSvg !!}
+        <div class="header-left">
+
+            <p class="brand">
+                VENEXPRESS
+            </p>
+
+            @if ($package->ally)
+                <p class="small">
+                    {{ $package->ally->business_name ?? ($package->ally->name ?? '') }}
+                </p>
+            @endif
+
         </div>
 
-        <span class="badge">
-            {{ $package->isSobre() ? 'SOBRE' : 'PAQUETE' }}
-        </span>
+        <div class="header-right">
 
-        @if ($package->is_fragile)
-            <span class="badge">FRÁGIL</span>
-        @endif
+            <p class="tracking">
+                {{ $package->tracking_number }}
+            </p>
 
-        @if ($package->is_cod)
-            <span class="badge">COBRO CONTRA ENTREGA</span>
-        @endif
-    </div>
+            <p class="small">
+                {{ $package->created_at?->format('d/m/Y H:i') }}
+            </p>
 
-    <table class="info">
-        <tr>
-            <td style="width: 50%;">
-                <div class="box">
-                    <div class="section-title">Origen</div>
-                    <div class="value">{{ $package->origin_city }}</div>
-                    <div>{{ $package->origin_state }}</div>
-
-                    @if ($package->ally)
-                        <div style="margin-top: 4px;">
-                            <span class="label">Agencia</span><br>
-                            {{ $package->ally->business_name }}
-                        </div>
-                    @endif
-                </div>
-            </td>
-            <td style="width: 50%; padding-left: 6px;">
-                <div class="box">
-                    <div class="section-title">Destino</div>
-                    <div class="value">{{ $package->destination_city }}</div>
-                    <div>{{ $package->destination_state }}</div>
-
-                    @if ($package->requires_delivery)
-                        <div style="margin-top: 4px;">
-                            <span class="label">Entrega a domicilio</span><br>
-                            {{ $package->delivery_address }}
-                            @if ($package->delivery_sector)
-                                — {{ $package->delivery_sector }}
-                            @endif
-                        </div>
-                    @else
-                        <div style="margin-top: 4px;">
-                            <span class="label">Modalidad</span><br>
-                            Retiro en agencia destino
-                        </div>
-                    @endif
-                </div>
-            </td>
-        </tr>
-    </table>
-
-    <div class="box">
-        <div class="section-title">Remitente</div>
-        <div class="value">{{ $package->sender_name }}</div>
-        <div>C.I./RIF: {{ $package->sender_id_doc }} · Tel: {{ $package->sender_phone }}</div>
-    </div>
-
-    <div class="box">
-        <div class="section-title">Destinatario</div>
-        <div class="value">{{ $package->recipient_name }}</div>
-        <div>C.I./RIF: {{ $package->recipient_id_doc }} · Tel: {{ $package->recipient_phone }}</div>
-    </div>
-
-    <table class="info">
-        <tr>
-            <td style="width: 33%;">
-                <span class="label">Peso facturable</span><br>
-                <span class="value">{{ number_format((float) $package->billable_weight_kg, 2) }} kg</span>
-            </td>
-            <td style="width: 33%;">
-                <span class="label">Total</span><br>
-                <span class="value">${{ number_format((float) $package->total_price_usd, 2) }}</span>
-            </td>
-            <td style="width: 34%;">
-                <span class="label">Estado actual</span><br>
-                <span class="value">{{ $package->statusLabel() }}</span>
-            </td>
-        </tr>
-    </table>
-
-    @if ($package->is_cod)
-        <div class="box" style="margin-top: 6px;">
-            <span class="label">Cobrar en destino (COD)</span><br>
-            <span class="value">${{ number_format((float) $package->cod_amount_usd, 2) }}</span>
         </div>
+
+    </div>
+
+
+    {{-- ========================================================= --}}
+    {{-- QR --}}
+    {{-- ========================================================= --}}
+    <div class="qr">
+
+        {!! $qrSvg !!}
+
+        <p class="qr-tracking">
+            {{ $package->tracking_number }}
+        </p>
+
+    </div>
+
+
+    {{-- ========================================================= --}}
+    {{-- REMITENTE --}}
+    {{-- ========================================================= --}}
+    <div class="section">
+
+        <div class="title">
+            Remitente
+        </div>
+
+        <p class="value">
+            {{ $package->sender_name }}
+        </p>
+
+        <p class="small">
+            Documento: {{ $package->sender_id_doc }}
+        </p>
+
+        <p class="small">
+            Teléfono: {{ $package->sender_phone }}
+        </p>
+
+        <p class="small">
+            Origen:
+            {{ $package->origin_city }}
+
+            @if ($package->origin_state)
+                , {{ $package->origin_state }}
+            @endif
+        </p>
+
+    </div>
+
+
+    {{-- ========================================================= --}}
+    {{-- DESTINATARIO --}}
+    {{-- ========================================================= --}}
+    <div class="section">
+
+        <div class="title">
+            Destinatario
+        </div>
+
+        <p class="value">
+            {{ $package->recipient_name }}
+        </p>
+
+        <p class="small">
+            Documento: {{ $package->recipient_id_doc }}
+        </p>
+
+        <p class="small">
+            Teléfono: {{ $package->recipient_phone }}
+        </p>
+
+    </div>
+
+
+    {{-- ========================================================= --}}
+    {{-- DESTINO --}}
+    {{-- ========================================================= --}}
+    <div class="destination">
+
+        <p class="city">
+            {{ $package->destination_city }}
+        </p>
+
+        <p class="state">
+            {{ $package->destination_state }}
+        </p>
+
+    </div>
+
+
+    {{-- ========================================================= --}}
+    {{-- SERVICIO --}}
+    {{-- ========================================================= --}}
+    <div class="service">
+
+        @if ($package->requires_delivery)
+            ENTREGA A DOMICILIO
+        @else
+            RETIRO EN AGENCIA
+        @endif
+
+    </div>
+
+
+    {{-- ========================================================= --}}
+    {{-- DIRECCIÓN DE ENTREGA --}}
+    {{-- ========================================================= --}}
+    @if ($package->requires_delivery)
+
+        <div class="section">
+
+            <div class="title">
+                Dirección de entrega
+            </div>
+
+            <p class="value">
+                {{ $package->delivery_address }}
+            </p>
+
+            @if ($package->delivery_sector)
+                <p class="small">
+                    Sector:
+                    {{ $package->delivery_sector }}
+                </p>
+            @endif
+
+            @if ($package->delivery_reference)
+                <p class="small">
+                    Referencia:
+                    {{ $package->delivery_reference }}
+                </p>
+            @endif
+
+        </div>
+
     @endif
 
-    <div class="footer">
-        Verificación: {{ $package->security_hash }} ·
-        Generado {{ now()->format('d/m/Y H:i') }} ·
-        Rastrea tu envío en venexpress.com/rastreo
+
+    {{-- ========================================================= --}}
+    {{-- DATOS DEL PAQUETE --}}
+    {{-- ========================================================= --}}
+    <div class="info-grid">
+
+        <div class="info-cell">
+
+            <div class="info-label">
+                Tipo
+            </div>
+
+            <div class="info-value">
+                {{ strtoupper($package->package_type) }}
+            </div>
+
+        </div>
+
+        <div class="info-cell">
+
+            <div class="info-label">
+                Peso
+            </div>
+
+            <div class="info-value">
+                {{ number_format((float) $package->physical_weight_kg, 3) }} kg
+            </div>
+
+        </div>
+
+        <div class="info-cell">
+
+            <div class="info-label">
+                Estado
+            </div>
+
+            <div class="info-value">
+                {{ str_replace('_', ' ', $package->current_status) }}
+            </div>
+
+        </div>
+
     </div>
+
+
+    {{-- ========================================================= --}}
+    {{-- FRÁGIL --}}
+    {{-- ========================================================= --}}
+    @if ($package->is_fragile)
+
+        <div class="fragile">
+            ⚠ FRÁGIL — MANEJAR CON CUIDADO
+        </div>
+
+    @endif
+
+
+    {{-- ========================================================= --}}
+    {{-- COD --}}
+    {{-- ========================================================= --}}
+    @if ($package->is_cod)
+
+        <div class="cod">
+
+            <p class="cod-title">
+                COBRO CONTRA ENTREGA
+            </p>
+
+            <p class="cod-amount">
+                ${{ number_format((float) $package->cod_amount_usd, 2) }}
+            </p>
+
+        </div>
+
+    @endif
+
+
+    {{-- ========================================================= --}}
+    {{-- SEGURIDAD --}}
+    {{-- ========================================================= --}}
+    @if ($package->security_hash)
+
+        <div class="security">
+
+            Código de seguridad:
+            <strong>
+                {{ $package->security_hash }}
+            </strong>
+
+        </div>
+
+    @endif
+
+
+    {{-- ========================================================= --}}
+    {{-- PIE --}}
+    {{-- ========================================================= --}}
+    <div class="footer">
+
+        <p style="margin:0;">
+            VENEXPRESS
+        </p>
+
+        <p style="margin:3px 0 0;">
+            Conserva esta guía para rastrear tu envío.
+        </p>
+
+    </div>
+
+</div>
 
 </body>
 </html>
+
