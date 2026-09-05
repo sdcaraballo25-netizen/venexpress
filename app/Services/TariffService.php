@@ -5,6 +5,7 @@ namespace App\Services;
 use App\Models\CityDistance;
 use App\Models\Package;
 use App\Models\RateMatrix;
+use App\Support\Money;
 use InvalidArgumentException;
 use RuntimeException;
 
@@ -39,10 +40,9 @@ class TariffService
             );
         }
 
-        return round(
-            ($lengthCm * $widthCm * $heightCm) / 5000,
-            3
-        );
+        $volume = Money::mul(Money::mul($lengthCm, $widthCm), $heightCm);
+
+        return Money::round(Money::div($volume, 5000), 3);
     }
 
     public function calculateBillableWeight(
@@ -219,16 +219,15 @@ class TariffService
             );
         }
 
-        return round(
-            (float) $rateMatrix->base_price_usd
-            + (
-                $billableWeightKg
-                * (float) $rateMatrix->price_per_kg_usd
-            )
-            + (
-                $distanceKm
-                * (float) $rateMatrix->price_per_km_usd
-            ),
+        $weightCost = Money::mul($billableWeightKg, $rateMatrix->price_per_kg_usd);
+        $distanceCost = Money::mul($distanceKm, $rateMatrix->price_per_km_usd);
+
+        return Money::round(
+            Money::sum([
+                $rateMatrix->base_price_usd,
+                $weightCost,
+                $distanceCost,
+            ]),
             2
         );
     }
@@ -243,12 +242,10 @@ class TariffService
             );
         }
 
-        return round(
-            (float) $rateMatrix->envelope_price_usd
-            + (
-                $distanceKm
-                * (float) $rateMatrix->price_per_km_usd
-            ),
+        $distanceCost = Money::mul($distanceKm, $rateMatrix->price_per_km_usd);
+
+        return Money::round(
+            Money::add($rateMatrix->envelope_price_usd, $distanceCost),
             2
         );
     }
@@ -261,11 +258,8 @@ class TariffService
             return 0.0;
         }
 
-        return round(
-            max(
-                0,
-                (float) $rateMatrix->fragile_surcharge_usd
-            ),
+        return Money::round(
+            max(0.0, (float) $rateMatrix->fragile_surcharge_usd),
             2
         );
     }
@@ -300,9 +294,10 @@ class TariffService
             (float) $rateMatrix->insurance_percentage
         );
 
-        return round(
-            $declaredValueUsd
-            * ($percentage / 100),
+        $factor = Money::div($percentage, 100);
+
+        return Money::round(
+            Money::mul($declaredValueUsd, $factor),
             2
         );
     }
@@ -476,20 +471,19 @@ class TariffService
             );
 
         $deliveryFeeUsd = $requiresDelivery
-            ? round(
-                max(
-                    0,
-                    (float) $rateMatrix->delivery_price_usd
-                ),
+            ? Money::round(
+                max(0.0, (float) $rateMatrix->delivery_price_usd),
                 2
             )
             : 0.0;
 
-        $totalUsd = round(
-            $subtotalUsd
-            + $fragileSurchargeUsd
-            + $insurancePriceUsd
-            + $deliveryFeeUsd,
+        $totalUsd = Money::round(
+            Money::sum([
+                $subtotalUsd,
+                $fragileSurchargeUsd,
+                $insurancePriceUsd,
+                $deliveryFeeUsd,
+            ]),
             2
         );
 

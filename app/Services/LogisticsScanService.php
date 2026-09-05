@@ -89,6 +89,10 @@ class LogisticsScanService
                 );
             }
 
+            // Bloqueamos la parada para que dos escaneos concurrentes
+            // (dos guías distintas de la misma agencia, casi al mismo
+            // tiempo) no pisen el conteo de packages_collected_count
+            // el uno al otro (lost update).
             $stop = $route->stops()
                 ->where('ally_id', $lockedPackage->ally_id)
                 ->whereIn('status', [
@@ -96,6 +100,7 @@ class LogisticsScanService
                     RouteStop::STATUS_VISITED,
                 ])
                 ->orderBy('sequence')
+                ->lockForUpdate()
                 ->first();
 
             if (! $stop) {
@@ -128,9 +133,16 @@ class LogisticsScanService
                 ]);
             }
 
+            // lockForUpdate() aquí no es para bloquear estas filas de
+            // histórico (son inmutables), sino para forzar una lectura
+            // fresca fuera del snapshot de REPEATABLE READ, ya que el
+            // stop está bloqueado y necesitamos ver también el commit
+            // de una transacción concurrente que ya haya liberado el
+            // lock antes que esta.
             $collectedCount = $stop->packageHistories()
                 ->where('event_type', PackageHistory::EVENT_SALIDA)
                 ->where('status', Package::STATUS_RECOLECTADO_VENEXPRESS)
+                ->lockForUpdate()
                 ->count();
 
             $stop->update([

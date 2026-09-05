@@ -53,12 +53,20 @@
                                 </p>
                             </div>
                             @if ($payment->status === \App\Models\DriverPayment::STATUS_PENDING)
-                                <button type="button"
-                                        wire:click="markAsPaid({{ $payment->id }})"
-                                        wire:confirm="¿Confirmas que deseas registrar este pago?"
-                                        class="rounded-xl bg-blue-900 px-4 py-2.5 text-sm font-semibold text-white hover:bg-blue-800">
-                                    Marcar pagado
-                                </button>
+                                <div class="flex items-center gap-2">
+                                    <button type="button"
+                                            wire:click="markPaid({{ $payment->id }})"
+                                            wire:confirm="¿Confirmas que deseas registrar este pago?"
+                                            class="rounded-xl bg-blue-900 px-4 py-2.5 text-sm font-semibold text-white hover:bg-blue-800">
+                                        Marcar pagado
+                                    </button>
+                                    <button type="button"
+                                            wire:click="cancelPayment({{ $payment->id }})"
+                                            wire:confirm="¿Confirmas que deseas cancelar esta remuneración pendiente?"
+                                            class="rounded-xl border border-red-200 bg-white px-4 py-2.5 text-sm font-semibold text-red-700 hover:bg-red-50">
+                                        Cancelar
+                                    </button>
+                                </div>
                             @endif
                         </div>
                     </div>

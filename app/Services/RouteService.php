@@ -451,6 +451,15 @@ class RouteService
     ->get();
 
             foreach ($packages as $package) {
+                // Asignamos el repartidor de la ruta ANTES de cambiar
+                // el estado. Sin esto, el paquete queda huérfano de
+                // driver_id y desaparece de las vistas del repartidor
+                // (Dashboard, Mis Paquetes, Detalle) aunque ya haya
+                // sido recolectado en su ruta.
+                $package->update([
+                    'driver_id' => $route->driver_id,
+                ]);
+
                 $this->packageService->changeStatus(
                     package: $package,
                     newStatus: Package::STATUS_RECOLECTADO_VENEXPRESS,

@@ -9,6 +9,7 @@ use App\Models\Driver;
 use App\Models\Package;
 use App\Models\PackageHistory;
 use App\Notifications\PackageStatusUpdated;
+use App\Support\Money;
 use Illuminate\Database\QueryException;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Log;
@@ -760,13 +761,19 @@ class PackageService
     |--------------------------------------------------------------------------
     */
 
-    public function collectCod(Package $package, int $userId): Package
+    public function collectCod(Package $package, int $userId, ?Driver $driver = null): Package
     {
-        return DB::transaction(function () use ($package, $userId) {
+        return DB::transaction(function () use ($package, $userId, $driver) {
             $locked = Package::query()
                 ->whereKey($package->id)
                 ->lockForUpdate()
                 ->firstOrFail();
+
+            if ($driver !== null && (int) $locked->driver_id !== (int) $driver->id) {
+                throw new RuntimeException(
+                    'Este paquete no está asignado a este repartidor.'
+                );
+            }
 
             if (! $locked->is_cod) {
                 throw new RuntimeException('Este paquete no tiene COD.');
@@ -862,9 +869,8 @@ class PackageService
         $percentage =
             (float) $ally->commission_percentage;
 
-        $amount = round(
-            $totalPriceUsd
-            * ($percentage / 100),
+        $amount = Money::round(
+            Money::mul($totalPriceUsd, Money::div($percentage, 100)),
             2
         );
 

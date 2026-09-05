@@ -399,6 +399,17 @@
             background: var(--blue-soft);
         }
 
+        .try-chip-static {
+            cursor: default;
+            font-family: 'Courier New', monospace;
+            letter-spacing: 0.02em;
+        }
+
+        .try-chip-static:hover {
+            border-color: #d8e0ec;
+            background: var(--white);
+        }
+
         /* HERO VISUAL */
         .hero-visual {
             min-height: 360px;
@@ -875,7 +886,7 @@
                             type="text"
                             name="guia"
                             value="{{ request('guia') }}"
-                            placeholder="Ej. VE-2026-0001258"
+                            placeholder="Ej. VEN-20260904-000123"
                             autocomplete="off"
                             spellcheck="false"
                             required
@@ -925,16 +936,17 @@
             </form>
 
             <div class="try-row">
-                <span class="try-label">Probar con:</span>
-
-                <button type="button" class="try-chip" data-guide="VE-00001">
-                    VE-00001
-                </button>
-
-                <button type="button" class="try-chip" data-guide="VE-00002">
-                    VE-00002
-                </button>
+                <span class="try-label">Formato de guía:</span>
+                <span class="try-chip try-chip-static">VEN-20260904-000123</span>
             </div>
+            {{--
+                Antes había botones "Probar con: VE-00001 / VE-00002" que
+                rellenaban el input con guías de ejemplo. Esos números no
+                existen en la base de datos (el generador real produce
+                VEN-YYYYMMDD-NNNNNN), así que siempre devolvían "no
+                encontrado". Se reemplazan por un texto ilustrativo del
+                formato en vez de un botón que siempre falla.
+            --}}
         </div>
 
         <div class="hero-visual" aria-hidden="true">
@@ -1114,6 +1126,11 @@ document.addEventListener('DOMContentLoaded', function () {
             .replace(/\s+/g, ' ');
 
         const patterns = [
+            // Formato real generado por el sistema: VEN-YYYYMMDD-NNNNNN
+            // (8 dígitos de fecha + 4 a 8 dígitos de secuencia). Debe ir
+            // primero: si no, los patrones más genéricos de abajo
+            // capturan solo el bloque de fecha y truncan la guía.
+            /\bVEN[-\s]?\d{8}[-\s]?\d{4,8}\b/,
             /\bVEN[-\s]?\d{4}[-\s]?\d{5,10}\b/,
             /\bVE[-\s]?\d{4}[-\s]?\d{5,10}\b/,
             /\bVEN[-\s]?\d{5,16}\b/,
@@ -1200,14 +1217,6 @@ document.addEventListener('DOMContentLoaded', function () {
     photo.addEventListener('change', function () {
         processImage(this.files[0]);
         this.value = '';
-    });
-
-    document.querySelectorAll('[data-guide]').forEach(function (button) {
-        button.addEventListener('click', function () {
-            input.value = this.dataset.guide;
-            input.focus();
-            input.dispatchEvent(new Event('input', { bubbles: true }));
-        });
     });
 
     form.addEventListener('submit', function (event) {

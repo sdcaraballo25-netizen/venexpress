@@ -66,7 +66,7 @@
                 <input
                     type="text"
                     name="guia"
-                    placeholder="Ej. VE-2026-0001258"
+                    placeholder="Ej. VEN-20260904-000123"
                     class="flex-1 rounded-lg border-gray-300 text-sm focus:ring-blue-600 focus:border-blue-600"
                 >
 
@@ -234,7 +234,7 @@
     <footer id="ayuda" class="bg-blue-950">
         <div class="max-w-7xl mx-auto px-6 py-14 grid md:grid-cols-5 gap-10">
             <div>
-                <img src="{{ asset('images/venexpress-logo-white.svg') }}" alt="Venexpress" class="h-8 mb-4 brightness-0 invert">
+                <img src="{{ asset('images/venexpress-logo-white.png') }}" alt="Venexpress" class="h-8 mb-4 brightness-0 invert">
                 <p class="text-sm text-blue-200">Conectamos a Venezuela con soluciones de envío rápidas, seguras y confiables.</p>
                 <div class="flex items-center gap-3 mt-5">
                     <a href="#" class="w-8 h-8 rounded-full bg-white/10 flex items-center justify-center hover:bg-white/20 transition">

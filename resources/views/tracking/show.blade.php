@@ -12,7 +12,7 @@
 
     <link
         rel="icon"
-        href="{{ asset('images/venexpress-logo.svg') }}"
+        href="{{ asset('images/venexpress-logo.png') }}"
     >
 
     @vite([
@@ -37,7 +37,7 @@
             <a href="{{ route('home') }}">
 
                 <img
-                    src="{{ asset('images/venexpress-logo.svg') }}"
+                    src="{{ asset('images/venexpress-logo.png') }}"
                     alt="Venexpress"
                     class="h-9"
                 >
@@ -231,6 +231,19 @@
 
                 </div>
 
+
+                @if (! ($statusIsKnown ?? true))
+                    <div class="mb-4 rounded-xl border border-amber-200 bg-amber-50 px-4 py-3 text-sm text-amber-800">
+                        Este paquete tiene un estado especial que no forma parte de la línea de tiempo estándar.
+                        La línea de tiempo muestra el último paso conocido; consulta con Venexpress para más detalles.
+                    </div>
+                @endif
+
+                @if ($hasOpenIncident ?? false)
+                    <div class="mb-4 rounded-xl border border-amber-200 bg-amber-50 px-4 py-3 text-sm text-amber-800">
+                        Tu envío tiene una incidencia en revisión, contáctanos.
+                    </div>
+                @endif
 
                 {{-- TIMELINE --}}
                 <div

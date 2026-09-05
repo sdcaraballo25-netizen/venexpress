@@ -53,6 +53,43 @@ class DriverPaymentService
         });
     }
 
+    public function cancel(DriverPayment $payment, int $userId, ?string $notes = null): DriverPayment
+    {
+        return DB::transaction(function () use ($payment, $userId, $notes) {
+            $locked = DriverPayment::query()->whereKey($payment->id)->lockForUpdate()->firstOrFail();
+
+            if ($locked->status !== DriverPayment::STATUS_PENDING) {
+                throw new RuntimeException('Solo se puede cancelar una remuneración pendiente.');
+            }
+
+            $locked->update([
+                'status' => DriverPayment::STATUS_CANCELLED,
+                'notes' => $notes,
+            ]);
+
+            $locked->package()->update([
+                'driver_remuneration_status' => Package::REMUNERATION_CANCELLED,
+            ]);
+
+            AuditLog::create([
+                'actor_user_id' => $userId,
+                'action' => 'driver.payment.cancelled',
+                'target_type' => DriverPayment::class,
+                'target_id' => $locked->id,
+                'description' => 'Canceló una remuneración de repartidor pendiente.',
+                'metadata' => [
+                    'package_id' => $locked->package_id,
+                    'driver_id' => $locked->driver_id,
+                    'amount_usd' => (float) $locked->amount_usd,
+                    'notes' => $notes,
+                ],
+                'ip_address' => request()?->ip(),
+            ]);
+
+            return $locked->fresh();
+        });
+    }
+
     public function markPaid(DriverPayment $payment, int $userId, ?string $notes=null): DriverPayment
     {
         return DB::transaction(function () use ($payment,$userId,$notes) {

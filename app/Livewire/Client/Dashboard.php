@@ -2,6 +2,7 @@
 
 namespace App\Livewire\Client;
 
+use App\Models\AuditLog;
 use App\Models\Customer;
 use App\Models\Incident;
 use App\Models\Package;
@@ -43,6 +44,18 @@ class Dashboard extends Component
 
                 'delivery_accepted_at' =>
                     now(),
+            ]);
+
+            AuditLog::create([
+                'actor_user_id' => Auth::id(),
+                'action' => 'client.delivery_accepted',
+                'target_type' => Package::class,
+                'target_id' => $package->id,
+                'description' => "El cliente aceptó la entrega a domicilio de la guía {$package->tracking_number}.",
+                'metadata' => [
+                    'tracking_number' => $package->tracking_number,
+                ],
+                'ip_address' => request()?->ip(),
             ]);
 
             session()->flash(
@@ -122,7 +135,7 @@ class Dashboard extends Component
                     Package::REMUNERATION_CANCELLED,
             ]);
 
-            Incident::create([
+            $incident = Incident::create([
                 'ally_id' =>
                     $package->ally_id,
 
@@ -144,6 +157,20 @@ class Dashboard extends Component
                     Incident::STATUS_OPEN,
             ]);
 
+            AuditLog::create([
+                'actor_user_id' => Auth::id(),
+                'action' => 'client.delivery_rejected',
+                'target_type' => Package::class,
+                'target_id' => $package->id,
+                'description' => "El cliente rechazó la entrega a domicilio de la guía {$package->tracking_number}. Motivo: {$this->rejectionReason}",
+                'metadata' => [
+                    'tracking_number' => $package->tracking_number,
+                    'reason' => $this->rejectionReason,
+                    'incident_id' => $incident->id,
+                ],
+                'ip_address' => request()?->ip(),
+            ]);
+
             $this->rejectingPackageId = null;
             $this->rejectionReason = '';
 
@@ -159,15 +186,31 @@ class Dashboard extends Component
         }
     }
 
-    protected function clientPackage(int $packageId): Package
+    /**
+     * Hallazgo de auditoría #6: customers.email no es único (a
+     * propósito: varios familiares pueden compartir un correo con
+     * cédulas distintas). Antes este método tomaba solo el PRIMER
+     * Customer encontrado con ->first(), lo que podía dejar fuera
+     * paquetes de otros id_doc asociados al mismo correo. Ahora se
+     * consideran TODOS los id_doc registrados con ese correo.
+     *
+     * @return list<string>
+     */
+    protected function customerIdDocsForCurrentUser(): array
     {
         $user = Auth::user();
 
-        $customer = Customer::query()
+        return Customer::query()
             ->where('email', $user->email)
-            ->first();
+            ->pluck('id_doc')
+            ->all();
+    }
 
-        if (! $customer) {
+    protected function clientPackage(int $packageId): Package
+    {
+        $idDocs = $this->customerIdDocsForCurrentUser();
+
+        if (empty($idDocs)) {
             throw new RuntimeException(
                 'No existe un registro de cliente asociado a tu cuenta.'
             );
@@ -175,28 +218,24 @@ class Dashboard extends Component
 
         return Package::query()
             ->whereKey($packageId)
-            ->where(
+            ->whereIn(
                 'recipient_id_doc',
-                $customer->id_doc
+                $idDocs
             )
             ->firstOrFail();
     }
 
     public function render()
     {
-        $user = Auth::user();
-
-        $customer = Customer::query()
-            ->where('email', $user->email)
-            ->first();
+        $idDocs = $this->customerIdDocsForCurrentUser();
 
         $packages = collect();
 
-        if ($customer) {
+        if (! empty($idDocs)) {
             $packages = Package::query()
-                ->where(
+                ->whereIn(
                     'recipient_id_doc',
-                    $customer->id_doc
+                    $idDocs
                 )
                 ->with([
                     'histories',

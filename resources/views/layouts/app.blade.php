@@ -32,19 +32,21 @@
     <div class="min-h-screen flex">
 
         {{-- NAVEGACIÓN --}}
-        @if(auth()->check() && auth()->user()->isAliadoModule())
-            <livewire:ally.navigation />
-        @elseif(auth()->check())
+        {{--
+            El módulo Ally tiene su propio layout dedicado
+            (layouts/ally.blade.php) con su propio menú lateral.
+            Los componentes Livewire de Ally usan
+            #[Layout('layouts.ally')] y nunca pasan por aquí.
+            Este layout genérico (usado por /dashboard y /profile)
+            solo necesita el menú estándar para el resto de roles.
+        --}}
+        @if(auth()->check())
             <livewire:layout.navigation />
         @endif
 
 
         {{-- CONTENIDO PRINCIPAL --}}
-        <div class="flex-1 min-w-0
-            @if(auth()->check() && auth()->user()->isAliadoModule())
-                ml-64
-            @endif
-        ">
+        <div class="flex-1 min-w-0">
 
             {{-- HEADER --}}
             <header class="h-16 bg-white border-b border-[#E2E8F0] flex items-center justify-between px-6 lg:px-8">

@@ -149,6 +149,38 @@ new #[Layout('layouts.guest')] class extends Component
                     'required',
                     'string',
                     'max:30',
+
+                    /*
+                     * SEGURIDAD:
+                     * El panel de Cliente concede acceso al historial
+                     * de paquetes de una cédula únicamente por
+                     * coincidencia de id_doc. Si permitiéramos que
+                     * cualquier persona "reclame" una cédula ya
+                     * asociada a un customer con contacto real, un
+                     * atacante podría ver guías, direcciones de
+                     * entrega y aceptar/rechazar entregas de otra
+                     * persona con solo conocer o adivinar su cédula,
+                     * además de sobrescribir su nombre/teléfono/email.
+                     *
+                     * Por eso: solo permitimos crear la cuenta si la
+                     * cédula es nueva, o si el customer existente aún
+                     * NO tiene email (fue creado por un aliado al
+                     * despachar una guía y todavía nadie lo reclamó).
+                     * Si el customer ya tiene email, la cédula ya fue
+                     * reclamada por otra cuenta y bloqueamos el
+                     * registro.
+                     */
+                    function (string $attribute, mixed $value, \Closure $fail) {
+                        $existing = Customer::where('id_doc', $value)->first();
+
+                        if ($existing && $existing->email) {
+                            $fail(
+                                'Ya existe una cuenta de cliente registrada '
+                                . 'con esta cédula. Si es tuya, inicia sesión '
+                                . 'o contacta a soporte.'
+                            );
+                        }
+                    },
                 ],
 
                 'phone' => [

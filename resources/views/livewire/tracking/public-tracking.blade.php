@@ -12,6 +12,11 @@
         @error('guia') <p class="mt-2 text-sm text-red-600">{{ $message }}</p> @enderror
         @if ($message) <div class="mt-5 rounded-xl bg-amber-50 p-4 text-amber-800">{{ $message }}</div> @endif
         @if ($package)
+            @if ($hasOpenIncident)
+                <div class="mt-5 rounded-xl bg-amber-50 p-4 text-amber-800">
+                    Tu envío tiene una incidencia en revisión, contáctanos para más detalles.
+                </div>
+            @endif
             <div class="mt-6 rounded-2xl bg-slate-50 p-5 dark:bg-slate-800">
                 <div class="flex flex-wrap items-center justify-between gap-3">
                     <div><p class="text-sm text-slate-500">Guía</p><p class="text-xl font-bold">{{ $package->tracking_number }}</p></div>

@@ -1,7 +1,7 @@
 <?php
 
 use Illuminate\Support\Facades\Route;
-use App\Models\Package;
+use App\Http\Controllers\TrackingController;
 
 use App\Livewire\Admin\Dashboard as AdminDashboard;
 use App\Livewire\Admin\BcvRateManager;
@@ -187,152 +187,11 @@ Route::post(
 |--------------------------------------------------------------------------
 */
 
-Route::get('/rastreo', function () {
-    return view('tracking.index');
-})
+Route::get('/rastreo', [TrackingController::class, 'index'])
     ->name('tracking.index');
 
 
-Route::get('/rastreo/resultado', function () {
-
-    $guia = trim((string) request('guia'));
-
-    $package = Package::query()
-        ->where('tracking_number', $guia)
-        ->first();
-
-    $statusOrder = [
-
-        'RECIBIDO_AGENCIA' => [
-            'label' => 'Recibido en Agencia Aliada',
-            'icon'  => 'fa-warehouse',
-        ],
-
-        'RECOLECTADO_VENEXPRESS' => [
-            'label' => 'Recolectado por Venexpress',
-            'icon'  => 'fa-truck',
-        ],
-
-        'EN_HUB' => [
-            'label' => 'En Hub de Clasificación',
-            'icon'  => 'fa-warehouse',
-        ],
-
-        'EN_TRANSITO_NACIONAL' => [
-            'label' => 'En Tránsito Nacional',
-            'icon'  => 'fa-truck-fast',
-        ],
-
-        'LISTO_RETIRO' => [
-            'label' => 'Listo para Retiro en Agencia Destino',
-            'icon'  => 'fa-truck-ramp-box',
-        ],
-
-        'ENTREGADO' => [
-            'label' => 'Entregado al Cliente',
-            'icon'  => 'fa-house-circle-check',
-        ],
-    ];
-
-    $statusSteps = [];
-    $progressPercent = 0;
-
-    if ($package) {
-
-        $keys = array_keys($statusOrder);
-
-        $currentIndex = array_search(
-            $package->current_status,
-            $keys,
-            true
-        );
-
-        $currentIndex = $currentIndex === false
-            ? 0
-            : $currentIndex;
-
-
-        /*
-         * Historial ordenado cronológicamente.
-         *
-         * No usamos pluck('created_at', 'status') porque
-         * eso elimina estados repetidos.
-         */
-        $history = $package->histories()
-            ->orderBy('created_at')
-            ->orderBy('id')
-            ->get();
-
-
-        /*
-         * Para la línea de progreso utilizamos la última
-         * ocurrencia conocida de cada estado.
-         */
-        $latestHistoryByStatus = $history
-            ->groupBy('status')
-            ->map(function ($events) {
-                return $events->sortBy([
-                    ['created_at', 'desc'],
-                    ['id', 'desc'],
-                ])->first();
-            });
-
-
-        foreach ($keys as $i => $key) {
-
-            $timestamp = null;
-
-            $event = $latestHistoryByStatus->get($key);
-
-            if ($event) {
-
-                $date = \Carbon\Carbon::parse(
-                    $event->created_at
-                );
-
-                $timestamp =
-                    $date->format('d/m/Y')
-                    . '<br>'
-                    . $date->format('h:i a');
-            }
-
-
-            $statusSteps[] = [
-
-                'label' => $statusOrder[$key]['label'],
-
-                'icon' => $statusOrder[$key]['icon'],
-
-                'done' => $i < $currentIndex,
-
-                'current' => $i === $currentIndex,
-
-                'timestamp' => $timestamp,
-            ];
-        }
-
-
-        $progressPercent = $currentIndex === 0
-            ? 8
-            : (
-                $currentIndex
-                / (count($keys) - 1)
-            ) * 100;
-    }
-
-
-    return view('tracking.show', [
-
-        'guia' => $guia,
-
-        'package' => $package,
-
-        'statusSteps' => $statusSteps,
-
-        'progressPercent' => $progressPercent,
-    ]);
-
-})
+Route::get('/rastreo/resultado', [TrackingController::class, 'show'])
     ->middleware('throttle:60,1')
     ->name('tracking.show');
 

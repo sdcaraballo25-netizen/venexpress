@@ -3,6 +3,7 @@
 namespace App\Services;
 
 use App\Models\BcvRate;
+use App\Support\Money;
 use Carbon\Carbon;
 use Illuminate\Support\Facades\Http;
 use RuntimeException;
@@ -128,6 +129,10 @@ class BcvRateService
     {
         $rate ??= $this->getCurrentRate();
 
-        return round($usdAmount * (float) $rate->rate, 2);
+        // La tasa BCV tiene 6 decimales y cambia a diario; usamos
+        // aritmética decimal exacta (ver App\Support\Money) para que
+        // esta conversión no acumule error de coma flotante frente al
+        // resto de la cadena tarifa -> comisión -> liquidación.
+        return Money::round(Money::mul($usdAmount, $rate->rate), 2);
     }
 }

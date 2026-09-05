@@ -5,6 +5,7 @@ namespace App\Services;
 use App\Models\Ally;
 use App\Models\AllyFinancialTransaction;
 use App\Models\AllySettlement;
+use App\Models\AuditLog;
 use App\Models\Package;
 use Illuminate\Support\Facades\DB;
 use InvalidArgumentException;
@@ -220,7 +221,7 @@ class AllyFinancialService
                 );
             }
 
-            return AllySettlement::create([
+            $settlement = AllySettlement::create([
                 'ally_id' => $allyId,
                 'amount_usd' => $amountUsd,
                 'status' => AllySettlement::STATUS_PENDING,
@@ -230,6 +231,22 @@ class AllyFinancialService
                 'requested_by_user_id' => $userId,
                 'requested_at' => now(),
             ]);
+
+            AuditLog::create([
+                'actor_user_id' => $userId,
+                'action' => 'ally_settlement.requested',
+                'target_type' => AllySettlement::class,
+                'target_id' => $settlement->id,
+                'description' => "Solicitó una liquidación de \${$amountUsd} para el aliado #{$allyId}.",
+                'metadata' => [
+                    'ally_id' => $allyId,
+                    'amount_usd' => $amountUsd,
+                    'payment_method' => $paymentMethod,
+                ],
+                'ip_address' => request()?->ip(),
+            ]);
+
+            return $settlement;
         });
     }
 
@@ -349,6 +366,21 @@ class AllyFinancialService
                     'paid_at' => now(),
                 ]);
 
+                AuditLog::create([
+                    'actor_user_id' => $adminUserId,
+                    'action' => 'ally_settlement.paid',
+                    'target_type' => AllySettlement::class,
+                    'target_id' => $settlement->id,
+                    'description' => "Marcó como pagada la liquidación #{$settlement->id} del aliado {$ally->business_name} por \${$amount}.",
+                    'metadata' => [
+                        'ally_id' => $ally->id,
+                        'amount_usd' => $amount,
+                        'payment_method' => $paymentMethod ?: $settlement->payment_method,
+                        'financial_transaction_id' => $transaction->id,
+                    ],
+                    'ip_address' => request()?->ip(),
+                ]);
+
                 return $settlement->fresh();
             }
         );
@@ -382,6 +414,19 @@ class AllyFinancialService
                 $settlement->update([
                     'status' =>
                         AllySettlement::STATUS_CANCELLED,
+                ]);
+
+                AuditLog::create([
+                    'actor_user_id' => $adminUserId,
+                    'action' => 'ally_settlement.cancelled',
+                    'target_type' => AllySettlement::class,
+                    'target_id' => $settlement->id,
+                    'description' => "Canceló la solicitud de liquidación #{$settlement->id} (aliado #{$settlement->ally_id}).",
+                    'metadata' => [
+                        'ally_id' => $settlement->ally_id,
+                        'amount_usd' => (float) $settlement->amount_usd,
+                    ],
+                    'ip_address' => request()?->ip(),
                 ]);
 
                 return $settlement->fresh();
@@ -504,6 +549,23 @@ class AllyFinancialService
                         $reversal->id,
                 ]);
 
+                AuditLog::create([
+                    'actor_user_id' => $adminUserId,
+                    'action' => 'ally_settlement.reversed',
+                    'target_type' => AllySettlement::class,
+                    'target_id' => $settlement->id,
+                    'description' => "Revirtió la liquidación #{$settlement->id} del aliado {$ally->business_name} por \${$original->amount_usd}."
+                        . ($reason ? ' Motivo: ' . $reason : ''),
+                    'metadata' => [
+                        'ally_id' => $ally->id,
+                        'amount_usd' => (float) $original->amount_usd,
+                        'original_transaction_id' => $original->id,
+                        'reversal_transaction_id' => $reversal->id,
+                        'reason' => $reason,
+                    ],
+                    'ip_address' => request()?->ip(),
+                ]);
+
                 return $settlement->fresh();
             }
         );
@@ -584,7 +646,7 @@ class AllyFinancialService
                     }
                 }
 
-                return AllyFinancialTransaction::create([
+                $adjustment = AllyFinancialTransaction::create([
                     'ally_id' => $ally->id,
                     'direction' => $direction,
                     'type' =>
@@ -597,6 +659,23 @@ class AllyFinancialService
                     'created_by_user_id' =>
                         $adminUserId,
                 ]);
+
+                AuditLog::create([
+                    'actor_user_id' => $adminUserId,
+                    'action' => 'ally_financial.adjustment_created',
+                    'target_type' => AllyFinancialTransaction::class,
+                    'target_id' => $adjustment->id,
+                    'description' => "Creó un ajuste manual ({$direction}) de \${$amountUsd} para el aliado {$ally->business_name}. Motivo: {$description}",
+                    'metadata' => [
+                        'ally_id' => $ally->id,
+                        'direction' => $direction,
+                        'amount_usd' => $amountUsd,
+                        'reference' => $reference,
+                    ],
+                    'ip_address' => request()?->ip(),
+                ]);
+
+                return $adjustment;
             }
         );
     }

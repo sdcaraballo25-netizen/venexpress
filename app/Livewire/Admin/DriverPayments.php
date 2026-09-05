@@ -20,6 +20,10 @@ class DriverPayments extends Component
         try { app(DriverPaymentService::class)->markPaid(DriverPayment::findOrFail($id),(int)auth()->id()); session()->flash('success','Remuneración marcada como pagada.'); }
         catch(RuntimeException $e){ session()->flash('error',$e->getMessage()); }
     }
+    public function cancelPayment(int $id): void {
+        try { app(DriverPaymentService::class)->cancel(DriverPayment::findOrFail($id),(int)auth()->id()); session()->flash('success','Remuneración cancelada.'); }
+        catch(RuntimeException $e){ session()->flash('error',$e->getMessage()); }
+    }
     public function render(){
         $q=DriverPayment::query()->with(['driver.user','package'])->latest();
         if($this->status!=='all') $q->where('status',$this->status);

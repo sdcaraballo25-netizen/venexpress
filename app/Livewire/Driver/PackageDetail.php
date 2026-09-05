@@ -156,12 +156,24 @@ $driver = $user?->driver;
     {
         try {
 
+            $user = Auth::user();
+
+            $driver = $user?->driver;
+
+            if (! $driver) {
+                abort(
+                    403,
+                    'Tu usuario no tiene un perfil de repartidor asociado.'
+                );
+            }
+
             $this->package->refresh();
 
             $this->package =
     app(PackageService::class)->collectCod(
         package: $this->package,
         userId: (int) Auth::id(),
+        driver: $driver,
     );
 
             session()->flash(
