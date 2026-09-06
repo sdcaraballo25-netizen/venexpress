@@ -1,8 +1,10 @@
 <?php
 
 use Illuminate\Support\Facades\Route;
-use App\Http\Controllers\TrackingController;
 
+use App\Http\Controllers\TrackingController;
+use App\Http\Controllers\PaymentWebhookController;
+use App\Livewire\Admin\PaymentOrders;
 use App\Livewire\Admin\Dashboard as AdminDashboard;
 use App\Livewire\Admin\BcvRateManager;
 use App\Livewire\Admin\RateMatrixManager;
@@ -16,6 +18,7 @@ use App\Livewire\Admin\IncidentsManager;
 use App\Livewire\Admin\DriverAssignment;
 use App\Livewire\Admin\AuditLogViewer;
 use App\Livewire\Admin\AllyFinance;
+
 use App\Livewire\Ally\Packages as AllyPackages;
 
 use App\Livewire\Client\Dashboard as ClientDashboard;
@@ -359,6 +362,33 @@ Route::prefix('admin')
         Route::get('/bitacora', AuditLogViewer::class)
             ->middleware('role:admin_principal')
             ->name('audit-log');
+
+
+        /*
+        |--------------------------------------------------------------------------
+        | Pagos automatizados
+        |--------------------------------------------------------------------------
+        |
+        | Esta ruta ya está dentro del grupo admin.
+        |
+        | URL:
+        | /admin/payments/{paymentOrder}/confirm-test
+        |
+        | Nombre:
+        | admin.payments.confirm-test
+        |
+        */
+
+        Route::post(
+            '/payments/{paymentOrder}/confirm-test',
+            [PaymentWebhookController::class, 'confirmForTesting']
+        )
+            ->name('payments.confirm-test');
+
+        Route::get('/payments', PaymentOrders::class)
+            ->name('payments');
+
+
     });
 
 

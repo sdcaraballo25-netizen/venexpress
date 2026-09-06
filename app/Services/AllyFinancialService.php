@@ -7,6 +7,7 @@ use App\Models\AllyFinancialTransaction;
 use App\Models\AllySettlement;
 use App\Models\AuditLog;
 use App\Models\Package;
+use App\Models\PaymentOrder;
 use Illuminate\Support\Facades\DB;
 use InvalidArgumentException;
 use RuntimeException;
@@ -676,6 +677,123 @@ class AllyFinancialService
                 ]);
 
                 return $adjustment;
+            }
+        );
+    }
+
+    /**
+     * Registra en el ledger el pago de una deuda del aliado.
+     *
+     * Se invoca cuando una PaymentOrder de propósito "ally_debt"
+     * queda confirmada (ver PaymentReconciliationService). Es
+     * idempotente: la misma orden de pago nunca genera dos
+     * movimientos financieros, sin importar cuántas veces se
+     * intente conciliar.
+     */
+    public function recordAllyDebtPayment(
+        PaymentOrder $order,
+        ?int $confirmedByUserId = null
+    ): AllyFinancialTransaction {
+        if ($order->purpose !== PaymentOrder::PURPOSE_ALLY_DEBT) {
+            throw new InvalidArgumentException(
+                'Solo las órdenes de pago de deuda de aliado '
+                . 'generan este movimiento.'
+            );
+        }
+
+        if (! $order->ally_id) {
+            throw new InvalidArgumentException(
+                'La orden de pago no tiene un aliado asociado.'
+            );
+        }
+
+        $amount = round(
+            (float) $order->amount_usd,
+            2
+        );
+
+        if ($amount <= 0) {
+            throw new InvalidArgumentException(
+                'El monto del pago debe ser mayor que cero.'
+            );
+        }
+
+        return DB::transaction(
+            function () use (
+                $order,
+                $amount,
+                $confirmedByUserId
+            ) {
+                $ally =
+                    Ally::query()
+                        ->whereKey($order->ally_id)
+                        ->lockForUpdate()
+                        ->firstOrFail();
+
+                /*
+                 * Idempotencia: si esta orden ya generó un
+                 * movimiento financiero, no se crea otro.
+                 */
+                $existing =
+                    AllyFinancialTransaction::query()
+                        ->where(
+                            'payment_order_id',
+                            $order->id
+                        )
+                        ->lockForUpdate()
+                        ->first();
+
+                if ($existing) {
+                    return $existing;
+                }
+
+                $transaction =
+                    AllyFinancialTransaction::create([
+                        'ally_id' => $ally->id,
+                        'direction' =>
+                            AllyFinancialTransaction::DIRECTION_CREDIT,
+                        'type' =>
+                            AllyFinancialTransaction::TYPE_PAYMENT,
+                        'amount_usd' => $amount,
+                        'payment_order_id' => $order->id,
+                        'reference' => $order->order_number,
+                        'description' =>
+                            'Pago de deuda registrado mediante '
+                            . 'la orden ' . $order->order_number,
+                        'metadata' => [
+                            'payment_method' =>
+                                $order->payment_method,
+                            'bank_reference' =>
+                                $order->bank_reference,
+                            'bank_code' =>
+                                $order->bank_code,
+                            'bank_name' =>
+                                $order->bank_name,
+                        ],
+                        'created_by_user_id' =>
+                            $confirmedByUserId,
+                    ]);
+
+                AuditLog::create([
+                    'actor_user_id' => $confirmedByUserId,
+                    'action' =>
+                        'ally_financial.payment_confirmed',
+                    'target_type' =>
+                        AllyFinancialTransaction::class,
+                    'target_id' => $transaction->id,
+                    'description' =>
+                        "Se concilió el pago {$order->order_number} "
+                        . "de \${$amount} del aliado "
+                        . "{$ally->business_name}.",
+                    'metadata' => [
+                        'ally_id' => $ally->id,
+                        'payment_order_id' => $order->id,
+                        'amount_usd' => $amount,
+                    ],
+                    'ip_address' => request()?->ip(),
+                ]);
+
+                return $transaction;
             }
         );
     }

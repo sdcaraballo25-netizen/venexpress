@@ -354,6 +354,21 @@
 
                             </a>
 
+
+                            {{-- Órdenes de pago --}}
+                            <a
+                                href="{{ route('admin.payments') }}"
+                                class="flex items-center gap-3 px-4 py-3 rounded-xl font-medium transition-colors
+                                {{ request()->routeIs('admin.payments')
+                                    ? 'bg-blue-50 text-blue-900'
+                                    : 'text-[#64748B] hover:bg-slate-50 hover:text-[#0F172A]' }}"
+                            >
+                                <svg class="w-5 h-5 shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.8" d="M3 7h18M3 7l2 13h14l2-13M8 7V5a4 4 0 018 0v2M8 12h8" />
+                                </svg>
+                                <span class="flex-1">Órdenes de pago</span>
+                                <span class="whitespace-nowrap rounded-full bg-emerald-100 px-2 py-1 text-[9px] font-bold uppercase tracking-wide text-emerald-700">NO Disponible</span>
+                            </a>
                         </div>
 
                     </div>

@@ -5,7 +5,7 @@ namespace App\Http\Controllers;
 use App\Models\Package;
 use Barryvdh\DomPDF\Facade\Pdf;
 use Endroid\QrCode\Builder\Builder;
-use Endroid\QrCode\Writer\PngWriter;
+use Endroid\QrCode\Writer\SvgWriter;
 use Illuminate\Http\Request;
 use Illuminate\Http\Response;
 use Picqer\Barcode\BarcodeGeneratorSVG;
@@ -14,11 +14,6 @@ class PackageLabelController extends Controller
 {
     /**
      * Genera la guía/etiqueta PDF de un paquete.
-     *
-     * La guía contiene:
-     * - QR con el número de guía.
-     * - Código de barras Code 128.
-     * - Datos completos del envío.
      */
     public function pdf(Request $request, Package $package): Response
     {
@@ -46,22 +41,18 @@ class PackageLabelController extends Controller
         | QR
         |--------------------------------------------------------------------------
         |
-        | Se genera como PNG en lugar de SVG para que DomPDF pueda
-        | renderizarlo correctamente dentro del <img>.
+        | Se genera como SVG. No necesita la extensión GD.
         |
         */
 
         $qrResult = (new Builder(
-            writer: new PngWriter(),
+            writer: new SvgWriter(),
             writerOptions: [],
             data: $package->tracking_number,
             size: 180,
             margin: 10,
         ))->build();
 
-        /*
-        | Data URI: data:image/png;base64,...
-        */
         $qrDataUri = $qrResult->getDataUri();
 
         /*
@@ -101,6 +92,7 @@ class PackageLabelController extends Controller
         /*
          * Administradores.
          */
+
         if ($user->isAdmin()) {
             return;
         }
@@ -108,6 +100,7 @@ class PackageLabelController extends Controller
         /*
          * Aliado propietario del paquete.
          */
+
         $ally = $user->resolveAlly();
 
         if (
@@ -120,6 +113,7 @@ class PackageLabelController extends Controller
         /*
          * Repartidor asignado al paquete.
          */
+
         if (
             $user->isRepartidor()
             && $user->driver

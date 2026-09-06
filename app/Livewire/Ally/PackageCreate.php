@@ -114,6 +114,30 @@ class PackageCreate extends Component
         'is_fragile', 'has_insurance', 'declared_value_usd', 'requires_delivery',
     ];
 
+    /**
+     * Obtiene automáticamente el estado de origen de la agencia.
+     * Si la agencia no tiene el estado guardado, lo resuelve usando
+     * la ciudad registrada en config/venezuela.php.
+     */
+    protected function resolveOriginState($ally): string
+    {
+        if (! empty($ally->state)) {
+            return (string) $ally->state;
+        }
+
+        $originCity = trim((string) $ally->city);
+
+        foreach (config('venezuela.states', []) as $state => $cities) {
+            foreach ($cities as $city) {
+                if (mb_strtolower(trim($city)) === mb_strtolower($originCity)) {
+                    return (string) $state;
+                }
+            }
+        }
+
+        return '';
+    }
+
     public function mount(): void
     {
         $ally = auth()->user()->resolveAlly();
@@ -124,7 +148,7 @@ class PackageCreate extends Component
 
         // La guía siempre se origina en la ciudad de la agencia.
         $this->origin_city = $ally->city;
-        $this->origin_state = (string) ($ally->state ?? '');
+        $this->origin_state = $this->resolveOriginState($ally);
     }
 
     protected function rules(): array
@@ -391,9 +415,22 @@ class PackageCreate extends Component
 
     public function save(PackageService $packageService): void
     {
-        $data = $this->validate();
-
         $ally = auth()->user()->resolveAlly();
+
+        if (! $ally) {
+            abort(403, 'Tu usuario no tiene una agencia aliada asociada.');
+        }
+
+        // El origen siempre se toma de la agencia, nunca del formulario.
+        $this->origin_city = (string) $ally->city;
+        $this->origin_state = $this->resolveOriginState($ally);
+
+        if ($this->origin_state === '') {
+            $this->addError('origin_state', 'No se pudo determinar el estado de origen de la agencia.');
+            return;
+        }
+
+        $data = $this->validate();
 
         // Registramos o actualizamos al remitente y destinatario como
         // clientes conocidos, para que la próxima vez que se use su
@@ -420,7 +457,7 @@ class PackageCreate extends Component
             ...$data,
             'ally_id' => $ally->id,
             'origin_city' => $this->origin_city,
-            'origin_state' => $this->origin_state ?: null,
+            'origin_state' => $this->origin_state,
         ], auth()->id());
 
         $this->createdPackageId = $package->id;
@@ -519,7 +556,7 @@ class PackageCreate extends Component
         $this->recipient_doc_type = 'V';
         $this->package_type = Package::TYPE_PAQUETE;
         $this->origin_city = $ally->city;
-        $this->origin_state = (string) ($ally->state ?? '');
+        $this->origin_state = $this->resolveOriginState($ally);
         $this->pricePreview = null;
         $this->pricePreviewError = null;
     }

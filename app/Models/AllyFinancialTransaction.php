@@ -15,6 +15,7 @@ class AllyFinancialTransaction extends Model
 
     public const TYPE_COMMISSION = 'commission';
     public const TYPE_SETTLEMENT = 'settlement';
+    public const TYPE_PAYMENT = 'payment';
     public const TYPE_ADJUSTMENT = 'adjustment';
     public const TYPE_REVERSAL = 'reversal';
 
@@ -25,6 +26,7 @@ class AllyFinancialTransaction extends Model
         'amount_usd',
         'source_type',
         'source_id',
+        'payment_order_id',
         'reversed_transaction_id',
         'reference',
         'description',
@@ -45,6 +47,14 @@ class AllyFinancialTransaction extends Model
         return $this->belongsTo(Ally::class);
     }
 
+    public function paymentOrder(): BelongsTo
+    {
+        return $this->belongsTo(
+            PaymentOrder::class,
+            'payment_order_id'
+        );
+    }
+
     public function createdBy(): BelongsTo
     {
         return $this->belongsTo(
@@ -63,22 +73,19 @@ class AllyFinancialTransaction extends Model
 
     public function isCredit(): bool
     {
-        return $this->direction
-            === self::DIRECTION_CREDIT;
+        return $this->direction === self::DIRECTION_CREDIT;
     }
 
     public function isDebit(): bool
     {
-        return $this->direction
-            === self::DIRECTION_DEBIT;
+        return $this->direction === self::DIRECTION_DEBIT;
     }
 
     /*
      * El ledger es inmutable.
      *
-     * Nunca debemos modificar ni borrar una operación
-     * financiera existente. Para corregirla se crea
-     * otro movimiento.
+     * Nunca se modifica ni elimina una operación financiera.
+     * Las correcciones deben registrarse como nuevos movimientos.
      */
     protected static function booted(): void
     {
