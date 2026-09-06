@@ -1,0 +1,854 @@
+{
+  "communities": {
+    "0": [
+      "app_models_user",
+      "app_models_user_user",
+      "app_models_user_user_ally",
+      "app_models_user_user_casts",
+      "app_models_user_user_driver",
+      "app_models_user_user_isadmin",
+      "app_models_user_user_isaliado",
+      "app_models_user_user_ischofer",
+      "app_models_user_user_packagehistories",
+      "config_auth",
+      "illuminate_auth_notifications_resetpassword",
+      "illuminate_database_eloquent_relations_hasone",
+      "illuminate_foundation_auth_user",
+      "illuminate_foundation_testing_refreshdatabase",
+      "illuminate_foundation_testing_testcase",
+      "illuminate_notifications_notifiable",
+      "illuminate_support_facades_event",
+      "illuminate_support_facades_notification",
+      "illuminate_support_facades_url",
+      "livewire_volt_volt",
+      "tests_feature_auth_authenticationtest",
+      "tests_feature_auth_authenticationtest_authenticationtest",
+      "tests_feature_auth_authenticationtest_authenticationtest_test_login_screen_can_be_rendered",
+      "tests_feature_auth_authenticationtest_authenticationtest_test_navigation_menu_can_be_rendered",
+      "tests_feature_auth_authenticationtest_authenticationtest_test_users_can_authenticate_using_the_login_screen",
+      "tests_feature_auth_authenticationtest_authenticationtest_test_users_can_logout",
+      "tests_feature_auth_authenticationtest_authenticationtest_test_users_can_not_authenticate_with_invalid_password",
+      "tests_feature_auth_emailverificationtest",
+      "tests_feature_auth_emailverificationtest_emailverificationtest",
+      "tests_feature_auth_emailverificationtest_emailverificationtest_test_email_can_be_verified",
+      "tests_feature_auth_emailverificationtest_emailverificationtest_test_email_is_not_verified_with_invalid_hash",
+      "tests_feature_auth_emailverificationtest_emailverificationtest_test_email_verification_screen_can_be_rendered",
+      "tests_feature_auth_passwordconfirmationtest",
+      "tests_feature_auth_passwordconfirmationtest_passwordconfirmationtest",
+      "tests_feature_auth_passwordconfirmationtest_passwordconfirmationtest_test_confirm_password_screen_can_be_rendered",
+      "tests_feature_auth_passwordconfirmationtest_passwordconfirmationtest_test_password_can_be_confirmed",
+      "tests_feature_auth_passwordconfirmationtest_passwordconfirmationtest_test_password_is_not_confirmed_with_invalid_password",
+      "tests_feature_auth_passwordresettest",
+      "tests_feature_auth_passwordresettest_passwordresettest",
+      "tests_feature_auth_passwordresettest_passwordresettest_test_password_can_be_reset_with_valid_token",
+      "tests_feature_auth_passwordresettest_passwordresettest_test_reset_password_link_can_be_requested",
+      "tests_feature_auth_passwordresettest_passwordresettest_test_reset_password_link_screen_can_be_rendered",
+      "tests_feature_auth_passwordresettest_passwordresettest_test_reset_password_screen_can_be_rendered",
+      "tests_feature_auth_passwordupdatetest",
+      "tests_feature_auth_passwordupdatetest_passwordupdatetest",
+      "tests_feature_auth_passwordupdatetest_passwordupdatetest_test_correct_password_must_be_provided_to_update_password",
+      "tests_feature_auth_passwordupdatetest_passwordupdatetest_test_password_can_be_updated",
+      "tests_feature_auth_registrationtest",
+      "tests_feature_auth_registrationtest_registrationtest",
+      "tests_feature_auth_registrationtest_registrationtest_test_new_users_can_register",
+      "tests_feature_auth_registrationtest_registrationtest_test_registration_screen_can_be_rendered",
+      "tests_feature_exampletest",
+      "tests_feature_exampletest_exampletest",
+      "tests_feature_exampletest_exampletest_test_the_application_returns_a_successful_response",
+      "tests_feature_profiletest",
+      "tests_feature_profiletest_profiletest",
+      "tests_feature_profiletest_profiletest_test_correct_password_must_be_provided_to_delete_account",
+      "tests_feature_profiletest_profiletest_test_email_verification_status_is_unchanged_when_the_email_address_is_unchanged",
+      "tests_feature_profiletest_profiletest_test_profile_information_can_be_updated",
+      "tests_feature_profiletest_profiletest_test_profile_page_is_displayed",
+      "tests_feature_profiletest_profiletest_test_user_can_delete_their_account",
+      "tests_testcase",
+      "tests_testcase_testcase"
+    ],
+    "1": [
+      "database_migrations_0001_01_01_000000_create_users_table",
+      "database_migrations_0001_01_01_000000_create_users_table_down",
+      "database_migrations_0001_01_01_000000_create_users_table_up",
+      "database_migrations_0001_01_01_000001_create_cache_table",
+      "database_migrations_0001_01_01_000001_create_cache_table_down",
+      "database_migrations_0001_01_01_000001_create_cache_table_up",
+      "database_migrations_0001_01_01_000002_create_jobs_table",
+      "database_migrations_0001_01_01_000002_create_jobs_table_down",
+      "database_migrations_0001_01_01_000002_create_jobs_table_up",
+      "database_migrations_2026_08_08_232920_create_drivers_table",
+      "database_migrations_2026_08_08_232920_create_drivers_table_down",
+      "database_migrations_2026_08_08_232920_create_drivers_table_up",
+      "database_migrations_2026_08_08_232921_create_bcv_rates_table",
+      "database_migrations_2026_08_08_232921_create_bcv_rates_table_down",
+      "database_migrations_2026_08_08_232921_create_bcv_rates_table_up",
+      "database_migrations_2026_08_08_232921_create_rate_matrices_table",
+      "database_migrations_2026_08_08_232921_create_rate_matrices_table_down",
+      "database_migrations_2026_08_08_232921_create_rate_matrices_table_up",
+      "database_migrations_2026_08_08_232923_create_allies_table",
+      "database_migrations_2026_08_08_232923_create_allies_table_down",
+      "database_migrations_2026_08_08_232923_create_allies_table_up",
+      "database_migrations_2026_08_08_232924_create_packages_table",
+      "database_migrations_2026_08_08_232924_create_packages_table_down",
+      "database_migrations_2026_08_08_232924_create_packages_table_up",
+      "database_migrations_2026_08_08_232925_create_package_histories",
+      "database_migrations_2026_08_08_232925_create_package_histories_down",
+      "database_migrations_2026_08_08_232925_create_package_histories_up",
+      "database_migrations_2026_08_09_000724_add_role_to_users_table",
+      "database_migrations_2026_08_09_000724_add_role_to_users_table_down",
+      "database_migrations_2026_08_09_000724_add_role_to_users_table_up",
+      "database_migrations_2026_08_09_010000_add_driver_id_to_packages_table",
+      "database_migrations_2026_08_09_010000_add_driver_id_to_packages_table_down",
+      "database_migrations_2026_08_09_010000_add_driver_id_to_packages_table_up",
+      "database_migrations_2026_08_09_010500_drop_redundant_indexes",
+      "database_migrations_2026_08_09_010500_drop_redundant_indexes_down",
+      "database_migrations_2026_08_09_010500_drop_redundant_indexes_up",
+      "database_migrations_2026_08_11_193200_create_city_distances_table",
+      "database_migrations_2026_08_11_193200_create_city_distances_table_down",
+      "database_migrations_2026_08_11_193200_create_city_distances_table_up",
+      "database_migrations_2026_08_11_193201_convert_rate_matrices_to_global_tariff",
+      "database_migrations_2026_08_11_193201_convert_rate_matrices_to_global_tariff_down",
+      "database_migrations_2026_08_11_193201_convert_rate_matrices_to_global_tariff_up",
+      "database_migrations_2026_08_20_000000_create_sessions_table",
+      "database_migrations_2026_08_20_000000_create_sessions_table_down",
+      "database_migrations_2026_08_20_000000_create_sessions_table_up",
+      "illuminate_database_migrations_migration",
+      "illuminate_database_schema_blueprint",
+      "illuminate_support_facades_schema"
+    ],
+    "2": [
+      "app_livewire_admin_dashboard_dashboard_render",
+      "app_livewire_ally_createpackage",
+      "app_livewire_ally_createpackage_createpackage",
+      "app_livewire_ally_createpackage_createpackage_pricingpreview",
+      "app_livewire_ally_createpackage_createpackage_render",
+      "app_livewire_ally_createpackage_createpackage_rules",
+      "app_livewire_ally_createpackage_createpackage_save",
+      "app_models_ally",
+      "app_models_ally_ally",
+      "app_models_ally_ally_casts",
+      "app_models_ally_ally_packages",
+      "app_models_ally_ally_user",
+      "app_models_bcvrate",
+      "app_models_citydistance",
+      "app_models_driver",
+      "app_models_driver_driver",
+      "app_models_driver_driver_packages",
+      "app_models_driver_driver_user",
+      "app_models_package",
+      "app_models_package_package",
+      "app_models_package_package_ally",
+      "app_models_package_package_casts",
+      "app_models_package_package_driver",
+      "app_models_package_package_histories",
+      "app_models_package_package_isdelivered",
+      "app_models_packagehistory",
+      "app_models_packagehistory_packagehistory",
+      "app_models_packagehistory_packagehistory_package",
+      "app_models_packagehistory_packagehistory_scannedby",
+      "app_models_ratematrix",
+      "app_models_ratematrix_ratematrix",
+      "app_models_ratematrix_ratematrix_casts",
+      "app_services_packageservice",
+      "app_services_packageservice_packageservice",
+      "app_services_packageservice_packageservice_assigndriver",
+      "app_services_packageservice_packageservice_changestatus",
+      "app_services_packageservice_packageservice_construct",
+      "app_services_packageservice_packageservice_createpackage",
+      "app_services_packageservice_packageservice_generatetrackingnumber",
+      "app_services_packageservice_packageservice_recordhistory",
+      "illuminate_database_eloquent_factories_hasfactory",
+      "illuminate_database_eloquent_model",
+      "illuminate_database_eloquent_relations_belongsto",
+      "illuminate_database_eloquent_relations_hasmany",
+      "livewire_attributes_computed"
+    ],
+    "3": [
+      "composer",
+      "composer_allow_plugins_pestphp_pest_plugin",
+      "composer_allow_plugins_php_http_discovery",
+      "composer_autoload",
+      "composer_autoload_dev",
+      "composer_autoload_dev_psr_4",
+      "composer_autoload_psr_4",
+      "composer_config",
+      "composer_config_allow_plugins",
+      "composer_config_optimize_autoloader",
+      "composer_config_preferred_install",
+      "composer_config_sort_packages",
+      "composer_description",
+      "composer_extra",
+      "composer_extra_laravel",
+      "composer_keywords",
+      "composer_laravel_dont_discover",
+      "composer_license",
+      "composer_minimum_stability",
+      "composer_name",
+      "composer_prefer_stable",
+      "composer_psr_4_app",
+      "composer_psr_4_database_factories",
+      "composer_psr_4_database_seeders",
+      "composer_psr_4_tests",
+      "composer_require",
+      "composer_require_dev",
+      "composer_require_dev_fakerphp_faker",
+      "composer_require_dev_laravel_breeze",
+      "composer_require_dev_laravel_pail",
+      "composer_require_dev_laravel_pint",
+      "composer_require_dev_laravel_sail",
+      "composer_require_dev_mockery_mockery",
+      "composer_require_dev_nunomaduro_collision",
+      "composer_require_dev_phpunit_phpunit",
+      "composer_require_laravel_framework",
+      "composer_require_laravel_tinker",
+      "composer_require_livewire_livewire",
+      "composer_require_livewire_volt",
+      "composer_require_php",
+      "composer_schema",
+      "composer_type",
+      "ref_framework",
+      "ref_laravel"
+    ],
+    "4": [
+      "app_livewire_admin_bcvratemanager",
+      "app_livewire_admin_bcvratemanager_bcvratemanager",
+      "app_livewire_admin_bcvratemanager_bcvratemanager_canceledit",
+      "app_livewire_admin_bcvratemanager_bcvratemanager_delete",
+      "app_livewire_admin_bcvratemanager_bcvratemanager_edit",
+      "app_livewire_admin_bcvratemanager_bcvratemanager_mount",
+      "app_livewire_admin_bcvratemanager_bcvratemanager_render",
+      "app_livewire_admin_bcvratemanager_bcvratemanager_resetform",
+      "app_livewire_admin_bcvratemanager_bcvratemanager_rules",
+      "app_livewire_admin_bcvratemanager_bcvratemanager_save",
+      "app_livewire_admin_citydistancemanager",
+      "app_livewire_admin_dashboard",
+      "app_livewire_admin_dashboard_dashboard",
+      "app_livewire_admin_ratematrixmanager",
+      "app_livewire_admin_ratematrixmanager_ratematrixmanager",
+      "app_livewire_admin_ratematrixmanager_ratematrixmanager_mount",
+      "app_livewire_admin_ratematrixmanager_ratematrixmanager_render",
+      "app_livewire_admin_ratematrixmanager_ratematrixmanager_rules",
+      "app_livewire_admin_ratematrixmanager_ratematrixmanager_save",
+      "app_models_bcvrate_bcvrate",
+      "app_models_bcvrate_bcvrate_casts",
+      "illuminate_support_facades_db",
+      "illuminate_support_facades_route",
+      "livewire_attributes_layout",
+      "livewire_attributes_title",
+      "livewire_component",
+      "livewire_withpagination",
+      "routes_web"
+    ],
+    "5": [
+      "app_livewire_admin_citydistancemanager_citydistancemanager",
+      "app_livewire_admin_citydistancemanager_citydistancemanager_canceledit",
+      "app_livewire_admin_citydistancemanager_citydistancemanager_create",
+      "app_livewire_admin_citydistancemanager_citydistancemanager_delete",
+      "app_livewire_admin_citydistancemanager_citydistancemanager_edit",
+      "app_livewire_admin_citydistancemanager_citydistancemanager_render",
+      "app_livewire_admin_citydistancemanager_citydistancemanager_resetform",
+      "app_livewire_admin_citydistancemanager_citydistancemanager_rules",
+      "app_livewire_admin_citydistancemanager_citydistancemanager_save",
+      "app_models_bcvrate_bcvrate_current",
+      "app_models_bcvrate_php_self",
+      "app_models_citydistance_citydistance",
+      "app_models_citydistance_citydistance_between",
+      "app_models_citydistance_citydistance_casts",
+      "app_models_citydistance_citydistance_normalizepair",
+      "app_models_citydistance_citydistance_setdistance",
+      "app_models_citydistance_php_self",
+      "app_models_ratematrix_php_self",
+      "app_models_ratematrix_ratematrix_current",
+      "database_factories_userfactory",
+      "database_factories_userfactory_userfactory",
+      "database_factories_userfactory_userfactory_definition",
+      "database_factories_userfactory_userfactory_unverified",
+      "illuminate_database_eloquent_factories_factory",
+      "illuminate_support_facades_hash",
+      "static"
+    ],
+    "6": [
+      "autoprefixer",
+      "axios",
+      "concurrently",
+      "laravel_vite_plugin",
+      "package_devdependencies",
+      "package_devdependencies_autoprefixer",
+      "package_devdependencies_axios",
+      "package_devdependencies_concurrently",
+      "package_devdependencies_laravel_vite_plugin",
+      "package_devdependencies_postcss",
+      "package_devdependencies_tailwindcss",
+      "package_devdependencies_tailwindcss_forms",
+      "package_devdependencies_tailwindcss_vite",
+      "package_devdependencies_vite",
+      "package_json_package",
+      "package_json_tailwindcss",
+      "package_private",
+      "package_schema",
+      "package_scripts",
+      "package_scripts_build",
+      "package_scripts_dev",
+      "package_type",
+      "postcss",
+      "tailwindcss_forms",
+      "tailwindcss_vite",
+      "vite"
+    ],
+    "7": [
+      "composer_scripts",
+      "composer_scripts_dev",
+      "composer_scripts_post_autoload_dump",
+      "composer_scripts_post_create_project_cmd",
+      "composer_scripts_post_root_package_install",
+      "composer_scripts_post_update_cmd",
+      "composer_scripts_pre_package_uninstall",
+      "composer_scripts_setup",
+      "composer_scripts_test",
+      "ref_composer_config_disableprocesstimeout",
+      "ref_composer_install",
+      "ref_illuminate_foundation_composerscripts_postautoloaddump",
+      "ref_illuminate_foundation_composerscripts_prepackageuninstall",
+      "ref_npm_install",
+      "ref_npm_run_build",
+      "ref_npx_concurrently_c_93c5fd_c4b5fd_fb7185_fdba74_php_artisan_serve_php_artisan_queue_listen_tries_1_timeout_0_php_artisan_pail_timeout_0_npm_run_dev_names_server_queue_logs_vite_kill_others",
+      "ref_php_artisan_config_clear_ansi",
+      "ref_php_artisan_key_generate",
+      "ref_php_artisan_key_generate_ansi",
+      "ref_php_artisan_migrate_force",
+      "ref_php_artisan_migrate_graceful_ansi",
+      "ref_php_artisan_package_discover_ansi",
+      "ref_php_artisan_test",
+      "ref_php_artisan_vendor_publish_tag_laravel_assets_ansi_force",
+      "ref_php_r_file_exists_database_database_sqlite_touch_database_database_sqlite",
+      "ref_php_r_file_exists_env_copy_env_example_env"
+    ],
+    "8": [
+      "app_http_controllers_auth_verifyemailcontroller",
+      "app_http_controllers_auth_verifyemailcontroller_verifyemailcontroller",
+      "app_http_controllers_auth_verifyemailcontroller_verifyemailcontroller_invoke",
+      "app_http_controllers_controller",
+      "app_http_controllers_controller_controller",
+      "app_http_controllers_driverscancontroller",
+      "app_http_controllers_driverscancontroller_driverscancontroller",
+      "app_http_middleware_ensureuserhasrole",
+      "app_http_middleware_ensureuserhasrole_ensureuserhasrole",
+      "app_http_middleware_ensureuserhasrole_ensureuserhasrole_handle",
+      "bootstrap_app",
+      "closure",
+      "illuminate_auth_events_verified",
+      "illuminate_foundation_application",
+      "illuminate_foundation_auth_emailverificationrequest",
+      "illuminate_foundation_configuration_exceptions",
+      "illuminate_foundation_configuration_middleware",
+      "illuminate_http_redirectresponse",
+      "illuminate_http_request",
+      "public_index",
+      "symfony_component_httpfoundation_response"
+    ],
+    "9": [
+      "app_livewire_actions_logout",
+      "app_livewire_actions_logout_logout",
+      "app_livewire_actions_logout_logout_invoke",
+      "app_livewire_forms_loginform",
+      "app_livewire_forms_loginform_loginform",
+      "app_livewire_forms_loginform_loginform_authenticate",
+      "app_livewire_forms_loginform_loginform_ensureisnotratelimited",
+      "app_livewire_forms_loginform_loginform_throttlekey",
+      "config_cache",
+      "config_database",
+      "config_session",
+      "illuminate_auth_events_lockout",
+      "illuminate_support_facades_auth",
+      "illuminate_support_facades_ratelimiter",
+      "illuminate_support_facades_session",
+      "illuminate_support_str",
+      "illuminate_validation_validationexception",
+      "livewire_attributes_validate",
+      "livewire_form",
+      "pdo_mysql",
+      "routes_auth"
+    ],
+    "10": [
+      "app_services_bcvrateservice",
+      "app_services_bcvrateservice_bcvrateservice",
+      "app_services_bcvrateservice_bcvrateservice_convertusdtoves",
+      "app_services_bcvrateservice_bcvrateservice_getcurrentrate",
+      "app_services_bcvrateservice_bcvrateservice_setrate",
+      "app_services_tariffservice",
+      "app_services_tariffservice_tariffservice",
+      "app_services_tariffservice_tariffservice_calculate",
+      "app_services_tariffservice_tariffservice_calculatebillableweight",
+      "app_services_tariffservice_tariffservice_calculatetotalusd",
+      "app_services_tariffservice_tariffservice_calculatevolumetricweight",
+      "app_services_tariffservice_tariffservice_construct",
+      "app_services_tariffservice_tariffservice_finddistance",
+      "app_services_tariffservice_tariffservice_findrate",
+      "carbon",
+      "carbon_carbon",
+      "runtimeexception"
+    ],
+    "11": [
+      "app_providers_appserviceprovider",
+      "app_providers_appserviceprovider_appserviceprovider",
+      "app_providers_appserviceprovider_appserviceprovider_boot",
+      "app_providers_appserviceprovider_appserviceprovider_register",
+      "app_providers_voltserviceprovider",
+      "app_providers_voltserviceprovider_voltserviceprovider",
+      "app_providers_voltserviceprovider_voltserviceprovider_boot",
+      "app_providers_voltserviceprovider_voltserviceprovider_register",
+      "illuminate_support_serviceprovider"
+    ],
+    "12": [
+      "app_view_components_applayout",
+      "app_view_components_applayout_applayout",
+      "app_view_components_applayout_applayout_render",
+      "app_view_components_guestlayout",
+      "app_view_components_guestlayout_guestlayout",
+      "app_view_components_guestlayout_guestlayout_render",
+      "illuminate_view_component",
+      "illuminate_view_view"
+    ],
+    "13": [
+      "config_logging",
+      "monolog_handler_nullhandler",
+      "monolog_handler_streamhandler",
+      "monolog_handler_syslogudphandler",
+      "monolog_processor_psrlogmessageprocessor"
+    ],
+    "14": [
+      "create",
+      "delete_distance_id",
+      "edit_distance_id",
+      "resources_views_livewire_admin_city_distance_manager_blade",
+      "resources_views_livewire_admin_city_distance_manager_blade_php_canceledit"
+    ],
+    "15": [
+      "database_seeders_databaseseeder",
+      "database_seeders_databaseseeder_databaseseeder",
+      "database_seeders_databaseseeder_databaseseeder_run",
+      "illuminate_database_console_seeds_withoutmodelevents",
+      "illuminate_database_seeder"
+    ],
+    "16": [
+      "delete_item_id",
+      "edit_item_id",
+      "resources_views_livewire_admin_bcv_rate_manager_blade",
+      "resources_views_livewire_admin_bcv_rate_manager_blade_php_canceledit"
+    ],
+    "17": [
+      "phpunit_framework_testcase",
+      "tests_unit_exampletest",
+      "tests_unit_exampletest_exampletest",
+      "tests_unit_exampletest_exampletest_test_that_true_is_true"
+    ],
+    "18": [
+      "profile_delete_user_form",
+      "profile_update_password_form",
+      "profile_update_profile_information_form",
+      "resources_views_profile_blade"
+    ],
+    "19": [
+      "illuminate_foundation_inspiring",
+      "illuminate_support_facades_artisan",
+      "routes_console"
+    ],
+    "20": [
+      "resources_views_livewire_pages_auth_verify_email_blade",
+      "resources_views_livewire_pages_auth_verify_email_blade_php_logout",
+      "sendverification"
+    ],
+    "21": [
+      "layout_navigation",
+      "resources_views_layouts_app_blade"
+    ],
+    "22": [
+      "resources_js_app",
+      "resources_js_bootstrap"
+    ],
+    "23": [
+      "resources_views_livewire_ally_package_create_blade",
+      "set"
+    ],
+    "24": [
+      "resources_views_livewire_layout_navigation_blade",
+      "resources_views_livewire_layout_navigation_blade_php_logout"
+    ],
+    "25": [
+      "app_livewire_ally_dailycashcut"
+    ],
+    "26": [
+      "app_livewire_driver_fieldscanner"
+    ],
+    "27": [
+      "app_livewire_tracking_publictracking"
+    ],
+    "28": [
+      "artisan"
+    ],
+    "29": [
+      "bootstrap_providers"
+    ],
+    "30": [
+      "config_app"
+    ],
+    "31": [
+      "config_filesystems"
+    ],
+    "32": [
+      "config_mail"
+    ],
+    "33": [
+      "config_queue"
+    ],
+    "34": [
+      "config_services"
+    ],
+    "35": [
+      "lang_es_auth"
+    ],
+    "36": [
+      "lang_es_passwords"
+    ],
+    "37": [
+      "lang_es_validation"
+    ],
+    "38": [
+      "postcss_config"
+    ],
+    "39": [
+      "resources_views_components_action_message_blade"
+    ],
+    "40": [
+      "resources_views_components_application_logo_blade"
+    ],
+    "41": [
+      "resources_views_components_auth_session_status_blade"
+    ],
+    "42": [
+      "resources_views_components_danger_button_blade"
+    ],
+    "43": [
+      "resources_views_components_dropdown_blade"
+    ],
+    "44": [
+      "resources_views_components_dropdown_link_blade"
+    ],
+    "45": [
+      "resources_views_components_input_error_blade"
+    ],
+    "46": [
+      "resources_views_components_input_label_blade"
+    ],
+    "47": [
+      "resources_views_components_modal_blade"
+    ],
+    "48": [
+      "resources_views_components_nav_link_blade"
+    ],
+    "49": [
+      "resources_views_components_primary_button_blade"
+    ],
+    "50": [
+      "resources_views_components_responsive_nav_link_blade"
+    ],
+    "51": [
+      "resources_views_components_secondary_button_blade"
+    ],
+    "52": [
+      "resources_views_components_text_input_blade"
+    ],
+    "53": [
+      "resources_views_components_venexpress_logo_blade"
+    ],
+    "54": [
+      "resources_views_dashboard_blade"
+    ],
+    "55": [
+      "resources_views_layouts_admin_blade"
+    ],
+    "56": [
+      "resources_views_layouts_guest_blade"
+    ],
+    "57": [
+      "resources_views_livewire_admin_dashboard_blade"
+    ],
+    "58": [
+      "resources_views_livewire_admin_rate_matrix_manager_blade"
+    ],
+    "59": [
+      "resources_views_livewire_ally_daily_cash_cut_blade"
+    ],
+    "60": [
+      "resources_views_livewire_driver_field_scanner_blade"
+    ],
+    "61": [
+      "resources_views_livewire_pages_auth_confirm_password_blade"
+    ],
+    "62": [
+      "resources_views_livewire_pages_auth_forgot_password_blade"
+    ],
+    "63": [
+      "resources_views_livewire_pages_auth_login_blade"
+    ],
+    "64": [
+      "resources_views_livewire_pages_auth_register_blade"
+    ],
+    "65": [
+      "resources_views_livewire_pages_auth_reset_password_blade"
+    ],
+    "66": [
+      "resources_views_livewire_profile_delete_user_form_blade"
+    ],
+    "67": [
+      "resources_views_livewire_profile_update_password_form_blade"
+    ],
+    "68": [
+      "resources_views_livewire_profile_update_profile_information_form_blade"
+    ],
+    "69": [
+      "resources_views_livewire_tracking_public_tracking_blade"
+    ],
+    "70": [
+      "resources_views_livewire_welcome_navigation_blade"
+    ],
+    "71": [
+      "resources_views_tracking_tracking_show_blade"
+    ],
+    "72": [
+      "resources_views_welc1ome_blade"
+    ],
+    "73": [
+      "resources_views_welcome_blade"
+    ],
+    "74": [
+      "tailwind_config"
+    ],
+    "75": [
+      "vite_config"
+    ]
+  },
+  "cohesion": {
+    "0": 0.059395801331285206,
+    "1": 0.06648936170212766,
+    "2": 0.09090909090909091,
+    "3": 0.045454545454545456,
+    "4": 0.12433862433862433,
+    "5": 0.1076923076923077,
+    "6": 0.07692307692307693,
+    "7": 0.08,
+    "8": 0.12857142857142856,
+    "9": 0.11428571428571428,
+    "10": 0.18382352941176472,
+    "11": 0.2777777777777778,
+    "12": 0.42857142857142855,
+    "13": 0.4,
+    "14": 0.4,
+    "15": 0.6,
+    "16": 0.5,
+    "17": 0.6666666666666666,
+    "18": 0.5,
+    "19": 0.6666666666666666,
+    "20": 0.6666666666666666,
+    "21": 1.0,
+    "22": 1.0,
+    "23": 1.0,
+    "24": 1.0,
+    "25": 1.0,
+    "26": 1.0,
+    "27": 1.0,
+    "28": 1.0,
+    "29": 1.0,
+    "30": 1.0,
+    "31": 1.0,
+    "32": 1.0,
+    "33": 1.0,
+    "34": 1.0,
+    "35": 1.0,
+    "36": 1.0,
+    "37": 1.0,
+    "38": 1.0,
+    "39": 1.0,
+    "40": 1.0,
+    "41": 1.0,
+    "42": 1.0,
+    "43": 1.0,
+    "44": 1.0,
+    "45": 1.0,
+    "46": 1.0,
+    "47": 1.0,
+    "48": 1.0,
+    "49": 1.0,
+    "50": 1.0,
+    "51": 1.0,
+    "52": 1.0,
+    "53": 1.0,
+    "54": 1.0,
+    "55": 1.0,
+    "56": 1.0,
+    "57": 1.0,
+    "58": 1.0,
+    "59": 1.0,
+    "60": 1.0,
+    "61": 1.0,
+    "62": 1.0,
+    "63": 1.0,
+    "64": 1.0,
+    "65": 1.0,
+    "66": 1.0,
+    "67": 1.0,
+    "68": 1.0,
+    "69": 1.0,
+    "70": 1.0,
+    "71": 1.0,
+    "72": 1.0,
+    "73": 1.0,
+    "74": 1.0,
+    "75": 1.0
+  },
+  "gods": [
+    {
+      "id": "app_models_user_user",
+      "label": "User",
+      "degree": 41
+    },
+    {
+      "id": "tests_testcase_testcase",
+      "label": "TestCase",
+      "degree": 18
+    },
+    {
+      "id": "app_models_package_package",
+      "label": "Package",
+      "degree": 18
+    },
+    {
+      "id": "app_models_bcvrate_bcvrate",
+      "label": "BcvRate",
+      "degree": 16
+    },
+    {
+      "id": "app_models_citydistance_citydistance",
+      "label": "CityDistance",
+      "degree": 14
+    },
+    {
+      "id": "app_services_tariffservice_tariffservice",
+      "label": "TariffService",
+      "degree": 12
+    },
+    {
+      "id": "app_livewire_admin_bcvratemanager_bcvratemanager",
+      "label": "BcvRateManager",
+      "degree": 12
+    },
+    {
+      "id": "app_livewire_admin_citydistancemanager_citydistancemanager",
+      "label": "CityDistanceManager",
+      "degree": 12
+    },
+    {
+      "id": "app_models_ratematrix_ratematrix",
+      "label": "RateMatrix",
+      "degree": 11
+    },
+    {
+      "id": "app_services_packageservice_packageservice",
+      "label": "PackageService",
+      "degree": 10
+    }
+  ],
+  "surprises": [
+    {
+      "source": "PackageService",
+      "target": "TariffService",
+      "source_files": [
+        "app/Services/PackageService.php",
+        "app/Services/TariffService.php"
+      ],
+      "confidence": "EXTRACTED",
+      "relation": "references",
+      "why": "bridges separate communities"
+    },
+    {
+      "source": "AuthenticationTest",
+      "target": "TestCase",
+      "source_files": [
+        "tests/Feature/Auth/AuthenticationTest.php",
+        "tests/TestCase.php"
+      ],
+      "confidence": "EXTRACTED",
+      "relation": "inherits",
+      "why": "cross-file semantic connection"
+    },
+    {
+      "source": "EmailVerificationTest",
+      "target": "TestCase",
+      "source_files": [
+        "tests/Feature/Auth/EmailVerificationTest.php",
+        "tests/TestCase.php"
+      ],
+      "confidence": "EXTRACTED",
+      "relation": "inherits",
+      "why": "cross-file semantic connection"
+    },
+    {
+      "source": "PasswordConfirmationTest",
+      "target": "TestCase",
+      "source_files": [
+        "tests/Feature/Auth/PasswordConfirmationTest.php",
+        "tests/TestCase.php"
+      ],
+      "confidence": "EXTRACTED",
+      "relation": "inherits",
+      "why": "cross-file semantic connection"
+    },
+    {
+      "source": "PasswordResetTest",
+      "target": "TestCase",
+      "source_files": [
+        "tests/Feature/Auth/PasswordResetTest.php",
+        "tests/TestCase.php"
+      ],
+      "confidence": "EXTRACTED",
+      "relation": "inherits",
+      "why": "cross-file semantic connection"
+    }
+  ],
+  "questions": [
+    {
+      "type": "bridge_node",
+      "question": "Why does `User` connect `Community 0` to `Community 2`, `Community 5`, `Community 15`?",
+      "why": "High betweenness centrality (0.128) - this node is a cross-community bridge."
+    },
+    {
+      "type": "bridge_node",
+      "question": "Why does `Package` connect `Community 2` to `Community 4`?",
+      "why": "High betweenness centrality (0.035) - this node is a cross-community bridge."
+    },
+    {
+      "type": "bridge_node",
+      "question": "Why does `BcvRate` connect `Community 4` to `Community 2`, `Community 10`, `Community 5`?",
+      "why": "High betweenness centrality (0.032) - this node is a cross-community bridge."
+    },
+    {
+      "type": "isolated_nodes",
+      "question": "What connects `create`, `delete({{ $distance->id }})`, `edit({{ $distance->id }})` to the rest of the system?",
+      "why": "77 weakly-connected nodes found - possible documentation gaps or missing edges."
+    },
+    {
+      "type": "low_cohesion",
+      "question": "Should `Community 0` be split into smaller, more focused modules?",
+      "why": "Cohesion score 0.059395801331285206 - nodes in this community are weakly interconnected."
+    },
+    {
+      "type": "low_cohesion",
+      "question": "Should `Community 1` be split into smaller, more focused modules?",
+      "why": "Cohesion score 0.06648936170212766 - nodes in this community are weakly interconnected."
+    },
+    {
+      "type": "low_cohesion",
+      "question": "Should `Community 2` be split into smaller, more focused modules?",
+      "why": "Cohesion score 0.09090909090909091 - nodes in this community are weakly interconnected."
+    }
+  ]
+}
