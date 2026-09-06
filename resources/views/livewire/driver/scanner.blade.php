@@ -268,7 +268,7 @@
 
                                 scanner = null;
 
-                                @this.scan(decodedText.trim());
+                                $wire.scan(decodedText.trim());
 
                                 setTimeout(startQrScanner, 700);
                             },

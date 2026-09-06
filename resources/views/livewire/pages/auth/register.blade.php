@@ -15,39 +15,28 @@ use Livewire\Volt\Component;
 new #[Layout('layouts.guest')] class extends Component
 {
     public string $name = '';
-
     public string $email = '';
-
     public string $password = '';
-
     public string $password_confirmation = '';
-
     public string $role = 'cliente';
 
     /**
      * Datos adicionales para aliados.
      */
     public string $business_name = '';
-
     public string $rif = '';
-
     public string $state = '';
-
     public string $city = '';
-
     public string $address = '';
 
     public array $states = [];
-
     public array $cities = [];
 
     /**
      * Datos adicionales para repartidores.
      */
     public string $vehicle_plate = '';
-
     public string $vehicle_type = '';
-
     public string $phone = '';
 
     /**
@@ -108,7 +97,7 @@ new #[Layout('layouts.guest')] class extends Component
 
         /*
         |--------------------------------------------------------------------------
-        | VALIDACIÃ“N DE ALIADO
+        | VALIDACIÓN DE ALIADO
         |--------------------------------------------------------------------------
         */
 
@@ -147,7 +136,7 @@ new #[Layout('layouts.guest')] class extends Component
 
         /*
         |--------------------------------------------------------------------------
-        | VALIDACIÃ“N DE CHOFER
+        | VALIDACIÓN DE REPARTIDOR
         |--------------------------------------------------------------------------
         */
 
@@ -223,7 +212,7 @@ new #[Layout('layouts.guest')] class extends Component
 
         /*
         |--------------------------------------------------------------------------
-        | CREAR CHOFER
+        | CREAR REPARTIDOR
         |--------------------------------------------------------------------------
         */
 
@@ -270,10 +259,10 @@ new #[Layout('layouts.guest')] class extends Component
             navigate: true
         );
     }
-}; ?>
+};
+?>
 
 <div>
-
     <div class="mb-8 lg:hidden">
         <x-venexpress-logo size="md" />
     </div>
@@ -283,7 +272,7 @@ new #[Layout('layouts.guest')] class extends Component
     </h1>
 
     <p class="mt-1.5 text-sm text-gray-500">
-        RegÃ­strate para gestionar tus guÃ­as, tarifas o entregas en VenExpress.
+        Regístrate para gestionar tus guías, tarifas o entregas en VenExpress.
     </p>
 
     <form wire:submit="register" class="mt-8 space-y-5">
@@ -317,7 +306,7 @@ new #[Layout('layouts.guest')] class extends Component
         <div>
             <x-input-label
                 for="email"
-                value="Correo electrÃ³nico"
+                value="Correo electrónico"
             />
 
             <x-text-input
@@ -377,15 +366,13 @@ new #[Layout('layouts.guest')] class extends Component
         @if ($role === 'aliado')
 
             <div class="border-t border-gray-200 pt-5">
-
                 <h2 class="text-sm font-semibold text-blue-950">
-                    InformaciÃ³n del punto aliado
+                    Información del punto aliado
                 </h2>
 
                 <p class="mt-1 text-xs text-gray-500">
-                    Estos datos serÃ¡n revisados por VenExpress antes de activar el comercio.
+                    Estos datos serán revisados por VenExpress antes de activar el comercio.
                 </p>
-
             </div>
 
             {{-- EMPRESA --}}
@@ -495,11 +482,11 @@ new #[Layout('layouts.guest')] class extends Component
                 />
             </div>
 
-            {{-- DIRECCIÃ“N --}}
+            {{-- DIRECCIÓN --}}
             <div>
                 <x-input-label
                     for="address"
-                    value="DirecciÃ³n"
+                    value="Dirección"
                 />
 
                 <x-text-input
@@ -507,7 +494,7 @@ new #[Layout('layouts.guest')] class extends Component
                     id="address"
                     class="block mt-1.5 w-full"
                     type="text"
-                    placeholder="DirecciÃ³n del establecimiento"
+                    placeholder="Dirección del establecimiento"
                 />
 
                 <x-input-error
@@ -519,24 +506,22 @@ new #[Layout('layouts.guest')] class extends Component
         @endif
 
         {{-- ====================================================== --}}
-        {{-- DATOS DEL CHOFER --}}
+        {{-- DATOS DEL REPARTIDOR --}}
         {{-- ====================================================== --}}
 
         @if ($role === 'repartidor')
 
             <div class="border-t border-gray-200 pt-5">
-
                 <h2 class="text-sm font-semibold text-blue-950">
-                    InformaciÃ³n del repartidor
+                    Información del repartidor
                 </h2>
-
             </div>
 
             {{-- PLACA --}}
             <div>
                 <x-input-label
                     for="vehicle_plate"
-                    value="Placa del vehÃ­culo"
+                    value="Placa del vehículo"
                 />
 
                 <x-text-input
@@ -553,11 +538,11 @@ new #[Layout('layouts.guest')] class extends Component
                 />
             </div>
 
-            {{-- VEHÃCULO --}}
+            {{-- VEHÍCULO --}}
             <div>
                 <x-input-label
                     for="vehicle_type"
-                    value="Tipo de vehÃ­culo"
+                    value="Tipo de vehículo"
                 />
 
                 <x-text-input
@@ -565,7 +550,7 @@ new #[Layout('layouts.guest')] class extends Component
                     id="vehicle_type"
                     class="block mt-1.5 w-full"
                     type="text"
-                    placeholder="Moto, automÃ³vil, camioneta..."
+                    placeholder="Moto, automóvil, camioneta..."
                 />
 
                 <x-input-error
@@ -574,11 +559,11 @@ new #[Layout('layouts.guest')] class extends Component
                 />
             </div>
 
-            {{-- TELÃ‰FONO --}}
+            {{-- TELÉFONO --}}
             <div>
                 <x-input-label
                     for="phone"
-                    value="TelÃ©fono"
+                    value="Teléfono"
                 />
 
                 <x-text-input
@@ -598,13 +583,13 @@ new #[Layout('layouts.guest')] class extends Component
         @endif
 
         {{-- ====================================================== --}}
-        {{-- CONTRASEÃ‘A --}}
+        {{-- CONTRASEÑA --}}
         {{-- ====================================================== --}}
 
         <div>
             <x-input-label
                 for="password"
-                value="ContraseÃ±a"
+                value="Contraseña"
             />
 
             <x-password-input
@@ -614,7 +599,7 @@ new #[Layout('layouts.guest')] class extends Component
                 name="password"
                 required
                 autocomplete="new-password"
-                placeholder="â€¢â€¢â€¢â€¢â€¢â€¢â€¢â€¢"
+                placeholder="••••••••"
             />
 
             <x-input-error
@@ -623,11 +608,11 @@ new #[Layout('layouts.guest')] class extends Component
             />
         </div>
 
-        {{-- CONFIRMAR CONTRASEÃ‘A --}}
+        {{-- CONFIRMAR CONTRASEÑA --}}
         <div>
             <x-input-label
                 for="password_confirmation"
-                value="Confirmar contraseÃ±a"
+                value="Confirmar contraseña"
             />
 
             <x-password-input
@@ -637,7 +622,7 @@ new #[Layout('layouts.guest')] class extends Component
                 name="password_confirmation"
                 required
                 autocomplete="new-password"
-                placeholder="â€¢â€¢â€¢â€¢â€¢â€¢â€¢â€¢"
+                placeholder="••••••••"
             />
 
             <x-input-error
@@ -646,7 +631,7 @@ new #[Layout('layouts.guest')] class extends Component
             />
         </div>
 
-        {{-- BOTÃ“N --}}
+        {{-- BOTÓN --}}
         <x-primary-button class="w-full py-3">
             Crear cuenta
         </x-primary-button>
@@ -654,15 +639,15 @@ new #[Layout('layouts.guest')] class extends Component
     </form>
 
     <p class="mt-8 text-center text-sm text-gray-500">
-        Â¿Ya tienes una cuenta?
+        ¿Ya tienes una cuenta?
 
         <a
             href="{{ route('login') }}"
             class="font-semibold text-blue-700 hover:text-blue-950"
             wire:navigate
         >
-            Inicia sesiÃ³n
+            Inicia sesión
         </a>
     </p>
-
 </div>
+
