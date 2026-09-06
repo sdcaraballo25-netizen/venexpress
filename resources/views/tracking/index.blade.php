@@ -1,5 +1,6 @@
 <!DOCTYPE html>
 <html lang="es">
+
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
@@ -7,277 +8,197 @@
 
     <title>Rastrea tu envío | Venexpress</title>
 
+    <link rel="icon" href="{{ asset('images/venexpress-logo-solo.png') }}">
+
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+
+    <link
+        href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;500;600;700;800&display=swap"
+        rel="stylesheet"
+    >
+
+    @vite(['resources/css/app.css', 'resources/js/app.js'])
+
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/js/all.min.js"></script>
 
     <style>
-        :root {
-            --blue: #1f3f95;
-            --blue-dark: #172f73;
-            --blue-soft: #edf3ff;
-            --yellow: #fbbd24;
-            --yellow-dark: #f3ad0b;
-            --red: #e52b2f;
-            --text: #14213d;
-            --muted: #64748b;
-            --line: #e2e8f0;
-            --bg: #f6f8fc;
-            --white: #ffffff;
-            --green: #059669;
-        }
-
-        * {
-            box-sizing: border-box;
-            margin: 0;
-            padding: 0;
-        }
-
         html {
             scroll-behavior: smooth;
         }
 
         body {
-            font-family: "Inter", sans-serif;
-            color: var(--text);
-            background: var(--bg);
-            -webkit-font-smoothing: antialiased;
+            font-family: 'Poppins', sans-serif;
         }
 
-        a {
-            color: inherit;
-            text-decoration: none;
+        #rastreo,
+        #como-funciona {
+            scroll-margin-top: 90px;
         }
 
-        button,
-        input {
-            font: inherit;
-        }
+        /* =====================================================
+           NAVBAR
+        ====================================================== */
 
-        img,
-        svg {
-            display: block;
-            max-width: 100%;
-        }
-
-        :focus-visible {
-            outline: 3px solid rgba(251, 189, 36, .55);
-            outline-offset: 3px;
-        }
-
-        .container {
-            width: min(1180px, calc(100% - 40px));
-            margin: 0 auto;
-        }
-
-        /* HEADER */
-        .site-header {
-            height: 76px;
-            background: var(--white);
-            border-bottom: 1px solid #edf0f5;
+        .main-nav-links {
             display: flex;
             align-items: center;
-            position: sticky;
-            top: 0;
-            z-index: 50;
+            gap: 2.25rem;
         }
 
-        .header-inner {
-            display: flex;
-            align-items: center;
-            justify-content: space-between;
-            gap: 30px;
-        }
-
-        .brand {
+        .main-nav-link {
+            position: relative;
             display: inline-flex;
             align-items: center;
-            gap: 10px;
-            font-weight: 800;
-            font-size: 21px;
-            color: var(--blue);
-            letter-spacing: -.03em;
             white-space: nowrap;
+            padding: 0.45rem 0;
+            color: #64748b;
+            font-size: 0.875rem;
+            font-weight: 500;
+            transition:
+                color 0.2s ease,
+                transform 0.2s ease;
         }
 
-        .brand-mark {
-            width: 38px;
-            height: 38px;
-            flex: 0 0 auto;
+        .main-nav-link:hover,
+        .main-nav-link.is-active {
+            color: #172554;
         }
 
-        .brand-express {
-            color: var(--red);
+        .main-nav-link:hover {
+            transform: translateY(-1px);
         }
 
-        .main-nav {
-            display: flex;
-            align-items: center;
-            gap: 34px;
+        .main-nav-link.is-active::after {
+            content: '';
+            position: absolute;
+            left: 0;
+            right: 0;
+            bottom: -0.1rem;
+            height: 2px;
+            border-radius: 999px;
+            background: #dc2626;
         }
 
-        .main-nav a {
-            color: #52627d;
-            font-size: 14px;
-            font-weight: 600;
-            transition: color .2s ease;
-        }
+        /* =====================================================
+           HERO
+        ====================================================== */
 
-        .main-nav a:hover {
-            color: var(--blue);
-        }
-
-        .login-btn {
-            background: var(--yellow);
-            color: #17213a !important;
-            padding: 11px 22px;
-            border-radius: 9px;
-            font-weight: 700 !important;
-        }
-
-        .login-btn:hover {
-            background: var(--yellow-dark);
-        }
-
-        /* HERO */
-        .hero {
+        .tracking-hero {
             position: relative;
             overflow: hidden;
-            background:
-                radial-gradient(circle at 85% 20%, rgba(31, 63, 149, .10), transparent 28%),
-                linear-gradient(180deg, #ffffff 0%, #f6f9ff 100%);
-            padding: 74px 0 82px;
+            background: #ffffff;
         }
 
-        .hero::after {
-            content: "";
+        .tracking-hero-bg {
             position: absolute;
-            width: 520px;
-            height: 520px;
-            right: -240px;
-            top: 40px;
-            border-radius: 50%;
-            border: 70px solid rgba(31, 63, 149, .045);
+            inset: 0;
             pointer-events: none;
         }
 
-        .hero-grid {
-            display: grid;
-            grid-template-columns: 1.05fr .95fr;
-            gap: 64px;
-            align-items: center;
+        .tracking-hero-bg::after {
+            content: '';
+            position: absolute;
+            inset: 0;
+            background:
+                linear-gradient(
+                    90deg,
+                    rgba(255,255,255,0.96) 0%,
+                    rgba(255,255,255,0.92) 40%,
+                    rgba(255,255,255,0.72) 68%,
+                    rgba(255,255,255,0.45) 100%
+                );
+        }
+
+        .tracking-hero-content {
             position: relative;
-            z-index: 1;
+            z-index: 10;
+            min-height: 575px;
         }
 
-        .eyebrow {
-            display: inline-flex;
-            align-items: center;
-            gap: 8px;
-            color: var(--blue);
-            background: var(--blue-soft);
-            border: 1px solid #dce7ff;
-            border-radius: 999px;
-            padding: 8px 13px;
-            font-size: 12px;
-            font-weight: 800;
-            letter-spacing: .05em;
-            text-transform: uppercase;
-            margin-bottom: 18px;
+        .tracking-title {
+            font-size: 3.75rem;
+            line-height: 0.98;
+            letter-spacing: -0.045em;
         }
 
-        .eyebrow::before {
-            content: "";
-            width: 7px;
-            height: 7px;
-            border-radius: 50%;
-            background: var(--yellow);
-            box-shadow: 0 0 0 4px rgba(251,189,36,.16);
+        .tracking-description {
+            max-width: 590px;
         }
 
-        .hero-title {
-            font-size: clamp(44px, 5.5vw, 72px);
-            line-height: 1.02;
-            letter-spacing: -.055em;
-            font-weight: 800;
-            color: var(--blue);
-            max-width: 650px;
-            margin-bottom: 20px;
-        }
+        /* =====================================================
+           TRACKING CARD
+        ====================================================== */
 
-        .hero-title span {
-            color: var(--red);
-        }
-
-        .hero-copy {
-            color: #64748b;
-            font-size: 17px;
-            line-height: 1.65;
-            max-width: 570px;
-            margin-bottom: 32px;
-        }
-
-        /* SEARCH CARD */
-        .search-card {
-            width: min(640px, 100%);
-            background: var(--white);
-            border: 1px solid var(--line);
+        .tracking-card {
+            width: 100%;
+            max-width: 610px;
+            background: rgba(255, 255, 255, 0.92);
+            backdrop-filter: blur(10px);
+            -webkit-backdrop-filter: blur(10px);
+            border: 1px solid rgba(226, 232, 240, 0.95);
             border-radius: 18px;
-            box-shadow: 0 18px 45px rgba(30, 55, 105, .10);
+            box-shadow:
+                0 20px 50px rgba(15, 23, 42, 0.10),
+                0 4px 14px rgba(15, 23, 42, 0.04);
             padding: 10px;
         }
 
-        .search-row {
-            display: flex;
-            min-height: 58px;
-        }
-
-        .input-wrap {
-            flex: 1;
+        .tracking-input-wrapper {
             display: flex;
             align-items: center;
-            gap: 11px;
-            padding: 0 17px;
+            gap: 12px;
             min-width: 0;
-        }
-
-        .input-icon {
-            width: 21px;
-            height: 21px;
-            color: #94a3b8;
-            flex: 0 0 auto;
+            flex: 1;
+            min-height: 56px;
+            padding: 0 16px;
         }
 
         .tracking-input {
             width: 100%;
-            border: 0;
-            outline: 0;
-            color: var(--text);
-            background: transparent;
-            font-size: 15px;
             min-width: 0;
+            border: 0;
+            outline: none;
+            background: transparent;
+            color: #172554;
+            font-size: 14px;
+            font-weight: 500;
         }
 
         .tracking-input::placeholder {
             color: #94a3b8;
         }
 
-        .search-btn {
+        .tracking-search-button {
+            min-height: 54px;
+            min-width: 128px;
             border: 0;
             border-radius: 11px;
-            background: var(--blue);
-            color: var(--white);
-            min-width: 132px;
+            background: #172554;
+            color: #ffffff;
+            font-size: 14px;
+            font-weight: 700;
             padding: 0 22px;
             cursor: pointer;
-            font-weight: 800;
-            transition: background .2s ease, transform .2s ease;
+            transition:
+                background 0.2s ease,
+                transform 0.2s ease,
+                box-shadow 0.2s ease;
         }
 
-        .search-btn:hover {
-            background: var(--blue-dark);
+        .tracking-search-button:hover {
+            background: #1e3a8a;
             transform: translateY(-1px);
+            box-shadow: 0 8px 18px rgba(23, 37, 84, 0.18);
         }
+
+        .tracking-search-button:active {
+            transform: translateY(0);
+        }
+
+        /* =====================================================
+           SCAN OPTIONS
+        ====================================================== */
 
         .scan-options {
             display: grid;
@@ -287,74 +208,98 @@
         }
 
         .scan-button {
-            min-height: 60px;
+            min-height: 66px;
             display: flex;
             align-items: center;
             gap: 12px;
-            border: 1px solid #dbe4f4;
-            background: #f8faff;
+            border: 1px solid #e2e8f0;
+            background: #f8fafc;
             border-radius: 12px;
-            padding: 10px 14px;
+            padding: 10px 13px;
             cursor: pointer;
             text-align: left;
-            transition: border-color .2s, background .2s, transform .2s;
+            transition:
+                border-color 0.2s ease,
+                background 0.2s ease,
+                transform 0.2s ease,
+                box-shadow 0.2s ease;
+        }
+
+        button.scan-button {
+            width: 100%;
+            font-family: inherit;
         }
 
         .scan-button:hover {
-            border-color: #b9c9eb;
-            background: #f1f5ff;
+            border-color: #bfdbfe;
+            background: #eff6ff;
             transform: translateY(-1px);
+            box-shadow: 0 5px 15px rgba(15, 23, 42, 0.05);
+        }
+
+        .scan-button:focus-visible {
+            outline: 3px solid rgba(59, 130, 246, 0.25);
+            outline-offset: 2px;
+        }
+
+        .scan-button.photo:hover {
+            border-color: #fde68a;
+            background: #fffbeb;
         }
 
         .scan-icon {
-            width: 38px;
-            height: 38px;
-            display: grid;
-            place-items: center;
-            border-radius: 10px;
-            background: var(--blue);
-            color: var(--white);
-            font-size: 19px;
+            width: 40px;
+            height: 40px;
             flex: 0 0 auto;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            border-radius: 10px;
+            background: #172554;
+            color: #ffffff;
         }
 
         .scan-button.photo .scan-icon {
-            background: #fff7dc;
-            color: #b77900;
+            background: #fef3c7;
+            color: #d97706;
         }
 
         .scan-title {
             display: block;
-            color: var(--text);
-            font-size: 13px;
-            font-weight: 800;
+            color: #172554;
+            font-size: 12px;
+            font-weight: 700;
         }
 
         .scan-subtitle {
             display: block;
-            color: var(--muted);
-            font-size: 11px;
-            margin-top: 3px;
+            color: #64748b;
+            font-size: 10px;
+            margin-top: 2px;
         }
 
         .file-input {
             display: none;
         }
 
+        /* =====================================================
+           OCR STATUS
+        ====================================================== */
+
         .ocr-status {
             display: none;
             margin-top: 10px;
-            border-radius: 11px;
-            padding: 11px 13px;
-            font-size: 12px;
-            line-height: 1.5;
+            border-radius: 10px;
+            padding: 10px 12px;
+            font-size: 11px;
+            line-height: 1.55;
         }
 
         .ocr-status.show {
             display: block;
             background: #eff6ff;
             border: 1px solid #bfdbfe;
-            color: #1e40af;
+            color: #1d4ed8;
         }
 
         .ocr-status.success {
@@ -369,516 +314,971 @@
             color: #b91c1c;
         }
 
-        .try-row {
+        /* =====================================================
+           CAMERA MODAL
+        ====================================================== */
+
+        .camera-modal {
+            position: fixed;
+            inset: 0;
+            z-index: 9999;
+            display: none;
+            background: rgba(0, 0, 0, 0.94);
+        }
+
+        .camera-modal.is-open {
+            display: block;
+        }
+
+        .camera-modal-inner {
+            width: 100%;
+            min-height: 100dvh;
+            display: flex;
+            flex-direction: column;
+        }
+
+        .camera-header {
+            flex: 0 0 auto;
             display: flex;
             align-items: center;
-            flex-wrap: wrap;
-            gap: 9px;
-            margin-top: 17px;
+            justify-content: space-between;
+            gap: 16px;
+            padding: 18px 20px;
+            color: #ffffff;
         }
 
-        .try-label {
-            color: #94a3b8;
-            font-size: 11px;
+        .camera-header-title {
+            font-size: 17px;
             font-weight: 700;
+            line-height: 1.3;
         }
 
-        .try-chip {
-            border: 1px solid #d8e0ec;
-            background: var(--white);
-            color: var(--blue);
-            border-radius: 7px;
-            padding: 6px 9px;
+        .camera-header-subtitle {
+            margin-top: 3px;
+            color: rgba(255,255,255,0.65);
             font-size: 11px;
-            font-weight: 700;
+        }
+
+        .camera-close-button {
+            width: 42px;
+            height: 42px;
+            flex: 0 0 auto;
+            border: 1px solid rgba(255,255,255,0.15);
+            border-radius: 50%;
+            background: rgba(255,255,255,0.08);
+            color: #ffffff;
+            display: flex;
+            align-items: center;
+            justify-content: center;
             cursor: pointer;
+            transition:
+                background 0.2s ease,
+                transform 0.2s ease;
         }
 
-        .try-chip:hover {
-            border-color: #a9bce4;
-            background: var(--blue-soft);
+        .camera-close-button:hover {
+            background: rgba(255,255,255,0.16);
+            transform: scale(1.03);
         }
 
-        .try-chip-static {
-            cursor: default;
-            font-family: 'Courier New', monospace;
-            letter-spacing: 0.02em;
-        }
-
-        .try-chip-static:hover {
-            border-color: #d8e0ec;
-            background: var(--white);
-        }
-
-        /* HERO VISUAL */
-        .hero-visual {
-            min-height: 360px;
+        .camera-preview-area {
             position: relative;
+            flex: 1 1 auto;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            padding: 10px 16px;
+            min-height: 0;
+        }
+
+        .camera-preview-wrapper {
+            position: relative;
+            width: 100%;
+            max-width: 760px;
+            overflow: hidden;
+            border-radius: 18px;
+            background: #000000;
+            box-shadow: 0 25px 70px rgba(0,0,0,0.45);
+        }
+
+        #camera-video {
+            display: block;
+            width: 100%;
+            height: auto;
+            max-height: 70dvh;
+            min-height: 260px;
+            object-fit: cover;
+            background: #000000;
+        }
+
+        .camera-guide-overlay {
+            position: absolute;
+            inset: 0;
+            pointer-events: none;
             display: flex;
             align-items: center;
             justify-content: center;
         }
 
-        .visual-card {
-            width: min(500px, 100%);
-            aspect-ratio: 1.15 / 1;
-            background: linear-gradient(145deg, #edf3ff, #ffffff);
-            border: 1px solid #e0e8f7;
-            border-radius: 32px;
+        .camera-guide-box {
             position: relative;
-            overflow: hidden;
-            box-shadow: 0 25px 60px rgba(31, 63, 149, .12);
+            width: 86%;
+            max-width: 620px;
+            height: 125px;
+            border: 1px solid rgba(255,255,255,0.65);
+            border-radius: 12px;
+            box-shadow: 0 0 0 9999px rgba(0,0,0,0.18);
         }
 
-        .visual-card::before {
-            content: "";
+        .camera-guide-corner {
             position: absolute;
-            width: 320px;
-            height: 320px;
-            border-radius: 50%;
-            right: -90px;
-            top: -100px;
-            background: rgba(31, 63, 149, .08);
+            width: 26px;
+            height: 26px;
+            border-color: #ffffff;
+            border-style: solid;
         }
 
-        .visual-road {
+        .camera-guide-corner.top-left {
+            left: -2px;
+            top: -2px;
+            border-width: 4px 0 0 4px;
+            border-radius: 7px 0 0 0;
+        }
+
+        .camera-guide-corner.top-right {
+            right: -2px;
+            top: -2px;
+            border-width: 4px 4px 0 0;
+            border-radius: 0 7px 0 0;
+        }
+
+        .camera-guide-corner.bottom-left {
+            left: -2px;
+            bottom: -2px;
+            border-width: 0 0 4px 4px;
+            border-radius: 0 0 0 7px;
+        }
+
+        .camera-guide-corner.bottom-right {
+            right: -2px;
+            bottom: -2px;
+            border-width: 0 4px 4px 0;
+            border-radius: 0 0 7px 0;
+        }
+
+        .camera-scan-line {
             position: absolute;
-            left: 8%;
-            right: 8%;
-            bottom: 19%;
+            left: 4%;
+            right: 4%;
+            top: 50%;
             height: 2px;
-            background: repeating-linear-gradient(
-                to right,
-                #aab8d2 0 8px,
-                transparent 8px 17px
+            border-radius: 999px;
+            background: rgba(255,255,255,0.75);
+            box-shadow: 0 0 12px rgba(255,255,255,0.6);
+            animation: cameraScanLine 2s ease-in-out infinite;
+        }
+
+        @keyframes cameraScanLine {
+            0%,
+            100% {
+                transform: translateY(-48px);
+                opacity: 0.55;
+            }
+
+            50% {
+                transform: translateY(48px);
+                opacity: 1;
+            }
+        }
+
+        .camera-bottom {
+            flex: 0 0 auto;
+            padding: 14px 20px 28px;
+        }
+
+        .camera-error {
+            width: 100%;
+            max-width: 620px;
+            margin: 0 auto 12px;
+            border-radius: 10px;
+            padding: 10px 12px;
+            background: rgba(127,29,29,0.45);
+            border: 1px solid rgba(252,165,165,0.35);
+            color: #fecaca;
+            text-align: center;
+            font-size: 11px;
+            line-height: 1.5;
+        }
+
+        .camera-error.hidden {
+            display: none;
+        }
+
+        .camera-action-row {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 12px;
+        }
+
+        .camera-take-button {
+            min-height: 58px;
+            display: inline-flex;
+            align-items: center;
+            gap: 10px;
+            border: 0;
+            border-radius: 999px;
+            background: #ffffff;
+            color: #172554;
+            padding: 7px 22px 7px 8px;
+            font-family: inherit;
+            font-size: 13px;
+            font-weight: 700;
+            cursor: pointer;
+            box-shadow: 0 12px 35px rgba(0,0,0,0.28);
+            transition:
+                background 0.2s ease,
+                transform 0.2s ease;
+        }
+
+        .camera-take-button:hover {
+            background: #f1f5f9;
+            transform: translateY(-1px);
+        }
+
+        .camera-take-icon {
+            width: 44px;
+            height: 44px;
+            border-radius: 50%;
+            background: #172554;
+            color: #ffffff;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .camera-hint {
+            margin-top: 10px;
+            color: rgba(255,255,255,0.55);
+            font-size: 10px;
+            text-align: center;
+        }
+
+        /* =====================================================
+           FORMAT GUIDE
+        ====================================================== */
+
+        .format-row {
+            display: flex;
+            align-items: center;
+            flex-wrap: wrap;
+            gap: 8px;
+            margin-top: 13px;
+        }
+
+        .format-label {
+            color: #94a3b8;
+            font-size: 10px;
+            font-weight: 600;
+        }
+
+        .format-chip {
+            display: inline-flex;
+            align-items: center;
+            min-height: 27px;
+            padding: 4px 9px;
+            border: 1px solid #e2e8f0;
+            border-radius: 7px;
+            background: #ffffff;
+            color: #1e3a8a;
+            font-family: 'Courier New', monospace;
+            font-size: 10px;
+            font-weight: 700;
+            letter-spacing: 0.02em;
+        }
+
+        /* =====================================================
+           HERO VISUAL
+        ====================================================== */
+
+        .tracking-visual {
+            position: relative;
+            display: flex;
+            justify-content: center;
+            align-items: flex-end;
+        }
+
+        .tracking-visual-card {
+            position: relative;
+            width: 100%;
+            max-width: 560px;
+            min-height: 390px;
+        }
+
+        .tracking-circle {
+            position: absolute;
+            width: 430px;
+            height: 430px;
+            right: 3%;
+            top: 50%;
+            transform: translateY(-50%);
+            border-radius: 50%;
+            background: rgba(239, 246, 255, 0.9);
+        }
+
+        .tracking-circle::before {
+            content: '';
+            position: absolute;
+            inset: 38px;
+            border-radius: 50%;
+            border: 2px dashed rgba(30, 64, 175, 0.16);
+        }
+
+        .tracking-van {
+            position: absolute;
+            width: 100%;
+            max-width: 550px;
+            right: -3%;
+            bottom: 25px;
+            z-index: 5;
+            transform: translateY(25px) scale(1.04);
+            filter: drop-shadow(
+                0 30px 25px rgba(15, 23, 55, 0.22)
             );
         }
 
-        .visual-route {
+        .tracking-shadow {
             position: absolute;
-            left: 11%;
-            right: 11%;
-            bottom: 12%;
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-        }
-
-        .route-point {
-            width: 13px;
-            height: 13px;
-            background: var(--yellow);
-            border: 3px solid var(--white);
-            border-radius: 50%;
-            box-shadow: 0 2px 7px rgba(31,63,149,.2);
-        }
-
-        .route-point.active {
-            width: 17px;
-            height: 17px;
-            background: var(--blue);
-        }
-
-        .van {
-            position: absolute;
-            left: 50%;
-            top: 48%;
-            transform: translate(-50%, -50%);
-            width: 88%;
-            max-width: 455px;
-            height: auto;
-            object-fit: contain;
-            filter: drop-shadow(0 24px 20px rgba(31, 63, 149, .20));
+            right: 7%;
+            bottom: 18px;
+            width: 70%;
+            height: 22px;
+            border-radius: 999px;
+            background: rgba(15, 23, 55, 0.18);
+            filter: blur(9px);
             z-index: 2;
         }
 
-        .visual-badge {
+        .tracking-badge {
             position: absolute;
-            left: 7%;
-            top: 8%;
-            background: var(--white);
-            border: 1px solid #e1e7f1;
-            box-shadow: 0 10px 25px rgba(30,55,105,.10);
+            left: 5%;
+            top: 16%;
+            z-index: 10;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            padding: 11px 14px;
+            background: rgba(255,255,255,0.95);
+            border: 1px solid #e2e8f0;
             border-radius: 12px;
-            padding: 11px 13px;
+            box-shadow: 0 12px 25px rgba(15, 23, 42, 0.08);
         }
 
-        .visual-badge strong {
+        .tracking-badge-icon {
+            width: 34px;
+            height: 34px;
+            border-radius: 9px;
+            background: #eff6ff;
+            color: #1e3a8a;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .tracking-badge strong {
             display: block;
-            color: var(--blue);
-            font-size: 12px;
+            color: #172554;
+            font-size: 11px;
+            line-height: 1.3;
         }
 
-        .visual-badge span {
+        .tracking-badge span {
             display: block;
-            color: var(--muted);
-            font-size: 10px;
-            margin-top: 3px;
+            margin-top: 2px;
+            color: #64748b;
+            font-size: 9px;
         }
 
-        .visual-status {
+        .tracking-status {
             position: absolute;
-            right: 7%;
-            bottom: 8%;
+            right: 2%;
+            bottom: 17%;
+            z-index: 10;
             display: flex;
             align-items: center;
             gap: 8px;
-            background: var(--white);
-            border: 1px solid #e1e7f1;
-            box-shadow: 0 10px 25px rgba(30,55,105,.10);
-            border-radius: 12px;
-            padding: 10px 12px;
+            padding: 9px 12px;
+            background: rgba(255,255,255,0.96);
+            border: 1px solid #e2e8f0;
+            border-radius: 10px;
+            box-shadow: 0 12px 25px rgba(15, 23, 42, 0.08);
             color: #334155;
-            font-size: 11px;
-            font-weight: 700;
+            font-size: 10px;
+            font-weight: 600;
         }
 
-        .status-dot {
+        .tracking-status-dot {
             width: 8px;
             height: 8px;
             border-radius: 50%;
-            background: var(--green);
-            box-shadow: 0 0 0 4px rgba(5,150,105,.12);
+            background: #059669;
+            box-shadow: 0 0 0 4px rgba(5, 150, 105, 0.10);
         }
 
-        /* TRUST BAR */
-        .trust-bar {
-            background: var(--blue);
-            color: var(--white);
-            padding: 24px 0;
+        /* =====================================================
+           BENEFITS
+        ====================================================== */
+
+        .benefits-section {
+            background: #172554;
         }
 
-        .trust-grid {
-            display: grid;
-            grid-template-columns: repeat(4, 1fr);
-            gap: 22px;
-        }
-
-        .trust-item {
+        .benefit-item {
             display: flex;
             align-items: center;
             gap: 12px;
         }
 
-        .trust-icon {
+        .benefit-icon {
             width: 38px;
             height: 38px;
-            display: grid;
-            place-items: center;
-            border-radius: 50%;
-            background: rgba(255,255,255,.10);
-            color: var(--yellow);
-            font-size: 18px;
             flex: 0 0 auto;
+            border-radius: 50%;
+            background: rgba(255,255,255,0.10);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: #fbbf24;
         }
 
-        .trust-item strong {
-            display: block;
+        .benefit-text {
+            color: #ffffff;
             font-size: 12px;
-            line-height: 1.35;
+            line-height: 1.45;
         }
 
-        .trust-item span {
+        .benefit-text small {
             display: block;
             margin-top: 2px;
-            color: rgba(255,255,255,.65);
-            font-size: 10px;
+            color: #bfdbfe;
+            font-size: 9px;
         }
 
-        /* HOW IT WORKS */
-        .section {
-            padding: 82px 0;
-            background: var(--white);
+        /* =====================================================
+           HOW IT WORKS
+        ====================================================== */
+
+        .steps-line {
+            position: absolute;
+            top: 39px;
+            left: 13%;
+            right: 13%;
+            border-top: 2px dashed #d1d5db;
+            z-index: 0;
         }
 
-        .section-heading {
-            text-align: center;
-            max-width: 650px;
-            margin: 0 auto 45px;
-        }
-
-        .section-kicker {
-            color: var(--blue);
-            font-size: 12px;
-            font-weight: 800;
-            letter-spacing: .08em;
-            text-transform: uppercase;
-            margin-bottom: 9px;
-        }
-
-        .section-title {
-            color: var(--text);
-            font-size: clamp(28px, 4vw, 40px);
-            letter-spacing: -.035em;
-            margin-bottom: 12px;
-        }
-
-        .section-copy {
-            color: var(--muted);
-            font-size: 15px;
-            line-height: 1.6;
-        }
-
-        .steps {
-            display: grid;
-            grid-template-columns: repeat(4, 1fr);
-            gap: 18px;
-        }
-
-        .step {
-            border: 1px solid var(--line);
-            border-radius: 16px;
-            padding: 24px 20px;
-            background: var(--white);
-            box-shadow: 0 8px 25px rgba(15,23,42,.045);
+        .step-icon {
+            position: relative;
+            width: 80px;
+            height: 80px;
+            margin: 0 auto;
+            border-radius: 50%;
+            background: #f1f5f9;
+            display: flex;
+            align-items: center;
+            justify-content: center;
         }
 
         .step-number {
-            width: 36px;
-            height: 36px;
-            display: grid;
-            place-items: center;
-            background: var(--blue-soft);
-            color: var(--blue);
-            border-radius: 10px;
-            font-size: 13px;
-            font-weight: 800;
-            margin-bottom: 18px;
+            position: absolute;
+            top: -5px;
+            left: -4px;
+            width: 27px;
+            height: 27px;
+            border-radius: 50%;
+            background: #172554;
+            color: #ffffff;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 10px;
+            font-weight: 700;
         }
 
-        .step h3 {
-            font-size: 15px;
-            margin-bottom: 8px;
+        .step-title {
+            margin-top: 15px;
+            color: #172554;
+            font-size: 14px;
+            font-weight: 600;
         }
 
-        .step p {
-            color: var(--muted);
-            font-size: 13px;
+        .step-description {
+            margin-top: 3px;
+            color: #64748b;
+            font-size: 11px;
             line-height: 1.55;
         }
 
-        /* FOOTER */
-        footer {
-            background: #f8fafc;
-            border-top: 1px solid var(--line);
-            padding: 30px 0;
-        }
+        /* =====================================================
+           FOOTER
+        ====================================================== */
 
-        .footer-inner {
+        .footer-social {
+            width: 32px;
+            height: 32px;
+            border-radius: 50%;
+            background: rgba(255,255,255,0.10);
             display: flex;
-            justify-content: space-between;
             align-items: center;
-            gap: 20px;
+            justify-content: center;
+            transition: background 0.2s ease;
         }
 
-        .footer-copy {
-            color: var(--muted);
-            font-size: 12px;
+        .footer-social:hover {
+            background: rgba(255,255,255,0.20);
         }
 
-        /* RESPONSIVE */
-        @media (max-width: 950px) {
-            .hero-grid {
-                grid-template-columns: 1fr;
-                gap: 42px;
+        /* =====================================================
+           RESPONSIVE
+        ====================================================== */
+
+        @media (min-width: 1280px) {
+
+            .tracking-title {
+                font-size: 4rem;
             }
 
-            .hero-copy,
-            .hero-title {
-                max-width: 700px;
+            .tracking-van {
+                transform: translateY(30px) scale(1.08);
+            }
+        }
+
+        @media (max-width: 1023px) {
+
+            .main-nav-links {
+                gap: 1.35rem;
             }
 
-            .hero-visual {
+            .tracking-title {
+                font-size: 3.45rem;
+            }
+
+            .tracking-visual-card {
                 min-height: 330px;
             }
 
-            .trust-grid {
-                grid-template-columns: repeat(2, 1fr);
+            .tracking-circle {
+                width: 350px;
+                height: 350px;
             }
 
-            .steps {
-                grid-template-columns: repeat(2, 1fr);
-            }
-
-            .main-nav {
-                gap: 18px;
+            .tracking-van {
+                transform: translateY(15px) scale(1.02);
             }
         }
 
-        @media (max-width: 700px) {
-            .container {
-                width: min(100% - 28px, 600px);
-            }
+        @media (max-width: 767px) {
 
-            .site-header {
-                height: 68px;
-            }
-
-            .brand {
-                font-size: 18px;
-            }
-
-            .brand-mark {
-                width: 34px;
-                height: 34px;
-            }
-
-            .main-nav .nav-link {
+            .main-nav-links {
                 display: none;
             }
 
-            .main-nav {
-                gap: 0;
+            .tracking-hero-content {
+                min-height: auto;
+                padding-top: 52px;
+                padding-bottom: 55px;
             }
 
-            .login-btn {
-                padding: 10px 15px;
+            .tracking-title {
+                font-size: 3rem;
             }
 
-            .hero {
-                padding: 48px 0 58px;
-            }
-
-            .hero-title {
-                font-size: clamp(42px, 13vw, 58px);
-            }
-
-            .hero-copy {
+            .tracking-description {
                 font-size: 15px;
-                margin-bottom: 24px;
+                line-height: 1.7;
             }
 
-            .search-card {
-                border-radius: 15px;
+            .tracking-card {
                 padding: 8px;
+                border-radius: 15px;
             }
 
-            .search-row {
-                display: grid;
-                grid-template-columns: 1fr;
-                gap: 8px;
+            .tracking-search-row {
+                display: flex;
+                flex-direction: column;
+                gap: 7px;
             }
 
-            .input-wrap {
-                min-height: 53px;
+            .tracking-input-wrapper {
+                min-height: 52px;
             }
 
-            .search-btn {
-                min-height: 50px;
+            .tracking-search-button {
                 width: 100%;
+                min-height: 50px;
             }
 
             .scan-options {
                 grid-template-columns: 1fr;
             }
 
-            .hero-visual {
+            .tracking-visual {
+                margin-top: 25px;
+            }
+
+            .tracking-visual-card {
                 min-height: 290px;
             }
 
-            .visual-card {
-                border-radius: 24px;
+            .tracking-circle {
+                width: 290px;
+                height: 290px;
+                right: 50%;
+                transform: translate(50%, -50%);
             }
 
-            .trust-grid {
-                grid-template-columns: 1fr 1fr;
-                gap: 18px 10px;
+            .tracking-van {
+                width: 100%;
+                right: 0;
+                bottom: 12px;
+                transform: none;
             }
 
-            .trust-item strong {
-                font-size: 10px;
+            .tracking-badge {
+                left: 0;
+                top: 8%;
+                transform: scale(.88);
+                transform-origin: left top;
             }
 
-            .trust-item span {
-                font-size: 9px;
+            .tracking-status {
+                right: 0;
+                bottom: 8%;
+                transform: scale(.88);
+                transform-origin: right bottom;
             }
 
-            .section {
-                padding: 60px 0;
+            .steps-line {
+                display: none;
             }
 
-            .steps {
-                grid-template-columns: 1fr;
+            .camera-header {
+                padding: 14px 15px;
             }
 
-            .footer-inner {
-                flex-direction: column;
-                align-items: flex-start;
+            .camera-preview-area {
+                padding: 5px 10px;
+            }
+
+            .camera-preview-wrapper {
+                border-radius: 12px;
+            }
+
+            #camera-video {
+                max-height: 68dvh;
+                min-height: 230px;
+            }
+
+            .camera-guide-box {
+                height: 105px;
+            }
+
+            .camera-bottom {
+                padding: 10px 15px 22px;
             }
         }
 
-        @media (max-width: 420px) {
-            .trust-grid {
-                grid-template-columns: 1fr;
+        @media (max-width: 480px) {
+
+            .tracking-title {
+                font-size: 2.65rem;
             }
 
-            .hero-visual {
+            .tracking-hero-content {
+                padding-top: 42px;
+                padding-bottom: 45px;
+            }
+
+            .tracking-visual-card {
                 min-height: 245px;
             }
 
-            .visual-badge,
-            .visual-status {
-                transform: scale(.88);
+            .tracking-circle {
+                width: 235px;
+                height: 235px;
+            }
+
+            .benefit-text {
+                font-size: 10px;
+            }
+
+            .benefit-text small {
+                font-size: 8px;
+            }
+
+            .camera-header-title {
+                font-size: 15px;
+            }
+
+            .camera-header-subtitle {
+                font-size: 10px;
+            }
+
+            .camera-guide-box {
+                height: 90px;
             }
         }
     </style>
 </head>
 
-<body>
 
-<header class="site-header">
-    <div class="container header-inner">
-        <a href="{{ url('/') }}" class="brand" aria-label="Venexpress">
-            <svg class="brand-mark" viewBox="0 0 48 48" fill="none" aria-hidden="true">
-                <path d="M8 13.5 25 5l15 7.5v19L23 40l-15-7.5v-19Z" fill="#FBBE24"/>
-                <path d="M25 5v18l15-7.5" stroke="#1F3F95" stroke-width="3" stroke-linejoin="round"/>
-                <path d="M8 13.5 23 21v19" stroke="#1F3F95" stroke-width="3" stroke-linejoin="round"/>
-                <path d="m17 16 9-4.5v9l-9 4.5v-9Z" fill="#fff"/>
-            </svg>
-            VEN<span class="brand-express">EXPRESS</span>
+<body class="antialiased bg-white">
+
+
+{{-- =========================================================
+     NAVBAR
+========================================================= --}}
+
+<nav
+    id="main-navbar"
+    class="bg-white border-b border-gray-100 sticky top-0 z-50"
+>
+
+    <div class="max-w-7xl mx-auto px-6 py-4 flex items-center justify-between">
+
+        {{-- LOGO --}}
+        <a
+            href="{{ route('home') }}"
+            class="shrink-0"
+            aria-label="Venexpress - Inicio"
+        >
+            <img
+                src="{{ asset('images/venexpress-logo.png') }}"
+                alt="Venexpress"
+                class="h-9 w-auto"
+            >
         </a>
 
-        <nav class="main-nav">
-            <a href="{{ url('/') }}" class="nav-link">Inicio</a>
-            <a href="{{ route('public.calculator') }}" class="nav-link">Servicios</a>
-            <a href="{{ route('public.calculator') }}" class="nav-link">Calcular precio</a>
-            <a href="{{ route('public.offices') }}" class="nav-link">Agencias aliadas</a>
-            <a href="#rastreo" class="nav-link">Rastreo</a>
-            <a href="{{ route('login') }}" class="login-btn">Iniciar sesión</a>
-        </nav>
+
+        {{-- NAV DESKTOP --}}
+        <div class="main-nav-links">
+
+            <a
+                href="{{ route('home') }}"
+                class="main-nav-link"
+            >
+                Inicio
+            </a>
+
+            <a
+                href="{{ route('home') }}#servicios"
+                class="main-nav-link"
+            >
+                Servicios
+            </a>
+
+            <a
+                href="{{ route('public.calculator') }}"
+                class="main-nav-link"
+            >
+                Calcular precio
+            </a>
+
+            <a
+                href="{{ route('public.offices') }}"
+                class="main-nav-link"
+            >
+                Agencias aliadas
+            </a>
+
+            <a
+                href="{{ route('tracking.index') }}"
+                class="main-nav-link is-active"
+            >
+                Rastreo
+            </a>
+
+            <a
+                href="{{ route('home') }}#ayuda"
+                class="main-nav-link"
+            >
+                Ayuda
+            </a>
+
+        </div>
+
+
+        {{-- LOGIN + MOBILE --}}
+        <div class="flex items-center gap-3">
+
+            <a
+                href="{{ route('login') }}"
+                class="bg-amber-400 hover:bg-amber-500 text-blue-950 font-semibold text-sm px-6 py-2.5 rounded-lg transition inline-flex items-center justify-center shadow-sm hover:shadow-md"
+            >
+                Iniciar sesión
+            </a>
+
+
+            <button
+                id="mobile-menu-button"
+                type="button"
+                class="md:hidden w-10 h-10 rounded-lg border border-gray-200 text-blue-950 flex items-center justify-center"
+                aria-label="Abrir menú"
+                aria-expanded="false"
+                aria-controls="mobile-menu"
+            >
+                <i
+                    id="mobile-menu-icon"
+                    class="fa-solid fa-bars"
+                ></i>
+            </button>
+
+        </div>
+
     </div>
-</header>
 
-<main>
 
-<section class="hero" id="rastreo">
-    <div class="container hero-grid">
+    {{-- MENÚ MÓVIL --}}
+    <div
+        id="mobile-menu"
+        class="hidden border-t border-gray-100 bg-white md:hidden"
+    >
 
-        <div>
-            <div class="eyebrow">Seguimiento de envíos</div>
+        <div class="max-w-7xl mx-auto px-6 py-3">
 
-            <h1 class="hero-title">
-                Rastrea tu <span>envío</span>
+            <a
+                href="{{ route('home') }}"
+                class="mobile-menu-link block py-3 text-sm text-gray-600"
+            >
+                Inicio
+            </a>
+
+            <a
+                href="{{ route('home') }}#servicios"
+                class="mobile-menu-link block py-3 text-sm text-gray-600"
+            >
+                Servicios
+            </a>
+
+            <a
+                href="{{ route('public.calculator') }}"
+                class="mobile-menu-link block py-3 text-sm text-gray-600"
+            >
+                Calcular precio
+            </a>
+
+            <a
+                href="{{ route('public.offices') }}"
+                class="mobile-menu-link block py-3 text-sm text-gray-600"
+            >
+                Agencias aliadas
+            </a>
+
+            <a
+                href="{{ route('tracking.index') }}"
+                class="mobile-menu-link block py-3 text-sm font-semibold text-blue-950"
+            >
+                Rastreo
+            </a>
+
+            <a
+                href="{{ route('home') }}#ayuda"
+                class="mobile-menu-link block py-3 text-sm text-gray-600"
+            >
+                Ayuda
+            </a>
+
+        </div>
+
+    </div>
+
+</nav>
+
+
+
+{{-- =========================================================
+     HERO
+========================================================= --}}
+
+<section
+    id="rastreo"
+    class="tracking-hero"
+>
+
+    {{-- Fondo skyline --}}
+    <div class="tracking-hero-bg">
+
+        <img
+            src="{{ asset('images/skyline-hero.png') }}"
+            alt=""
+            class="absolute inset-0 w-full h-full object-cover object-right opacity-70"
+        >
+
+    </div>
+
+
+    <div
+        class="tracking-hero-content max-w-7xl mx-auto px-6 grid md:grid-cols-2 gap-8 lg:gap-10 items-center"
+    >
+
+
+        {{-- =================================================
+             TEXTO + RASTREO
+        ================================================== --}}
+
+        <div class="relative z-20 max-w-2xl">
+
+            <div
+                class="inline-flex items-center gap-2 mb-5 px-3 py-1.5 rounded-full bg-blue-50 border border-blue-100 text-blue-900 text-[10px] font-bold uppercase tracking-[0.14em]"
+            >
+
+                <span
+                    class="w-1.5 h-1.5 rounded-full bg-amber-400"
+                ></span>
+
+                Seguimiento de envíos
+
+            </div>
+
+
+            <h1 class="tracking-title font-extrabold text-blue-950">
+
+                Rastrea tu
+
+                <span class="block text-red-600">
+                    envío.
+                </span>
+
             </h1>
 
-            <p class="hero-copy">
-                Consulta rápidamente dónde se encuentra tu paquete.
-                Escribe tu número de guía o utiliza la cámara de tu teléfono
+
+            <p
+                class="tracking-description mt-6 text-gray-600 text-base md:text-lg leading-7 font-medium"
+            >
+                Consulta el estado de tu paquete de forma rápida y sencilla.
+                Ingresa tu número de guía o utiliza la cámara de tu teléfono
                 para leerlo automáticamente.
             </p>
 
+
+            {{-- =================================================
+                 SEARCH CARD
+            ================================================== --}}
+
             <form
                 id="tracking-form"
-                class="search-card"
+                class="tracking-card mt-7"
                 method="GET"
                 action="{{ route('tracking.show') }}"
             >
-                <div class="search-row">
-                    <div class="input-wrap">
-                        <svg class="input-icon" viewBox="0 0 24 24" fill="none" aria-hidden="true">
-                            <circle cx="11" cy="11" r="7" stroke="currentColor" stroke-width="2"/>
-                            <path d="m16.5 16.5 4 4" stroke="currentColor" stroke-width="2" stroke-linecap="round"/>
-                        </svg>
+
+                <div class="tracking-search-row flex items-center">
+
+                    <div class="tracking-input-wrapper">
+
+                        <i
+                            class="fa-solid fa-magnifying-glass text-gray-400 text-sm shrink-0"
+                        ></i>
 
                         <input
                             id="tracking-guide"
@@ -891,38 +1291,78 @@
                             spellcheck="false"
                             required
                         >
+
                     </div>
 
-                    <button class="search-btn" type="submit">
+
+                    <button
+                        type="submit"
+                        class="tracking-search-button"
+                    >
+                        <i class="fa-solid fa-location-crosshairs mr-2 text-xs"></i>
                         Rastrear
                     </button>
+
                 </div>
+
+
+                {{-- =================================================
+                     OCR / CÁMARA
+                ================================================== --}}
 
                 <div class="scan-options">
 
-                    <label class="scan-button" for="tracking-camera">
-                        <span class="scan-icon">📷</span>
-                        <span>
-                            <span class="scan-title">Usar cámara</span>
-                            <span class="scan-subtitle">Fotografiar la guía</span>
-                        </span>
-                    </label>
-
-                    <input
-                        id="tracking-camera"
-                        class="file-input"
-                        type="file"
-                        accept="image/*"
-                        capture="environment"
+                    {{-- CÁMARA REAL --}}
+                    <button
+                        id="open-camera"
+                        type="button"
+                        class="scan-button"
+                        aria-label="Abrir cámara para fotografiar la guía"
                     >
 
-                    <label class="scan-button photo" for="tracking-photo">
-                        <span class="scan-icon">🖼️</span>
-                        <span>
-                            <span class="scan-title">Subir una foto</span>
-                            <span class="scan-subtitle">Elegir desde la galería</span>
+                        <span class="scan-icon">
+                            <i class="fa-solid fa-camera"></i>
                         </span>
+
+                        <span>
+
+                            <span class="scan-title">
+                                Usar cámara
+                            </span>
+
+                            <span class="scan-subtitle">
+                                Fotografiar la guía
+                            </span>
+
+                        </span>
+
+                    </button>
+
+
+                    {{-- SUBIR FOTO --}}
+                    <label
+                        class="scan-button photo"
+                        for="tracking-photo"
+                    >
+
+                        <span class="scan-icon">
+                            <i class="fa-regular fa-image"></i>
+                        </span>
+
+                        <span>
+
+                            <span class="scan-title">
+                                Subir una foto
+                            </span>
+
+                            <span class="scan-subtitle">
+                                Elegir desde la galería
+                            </span>
+
+                        </span>
+
                     </label>
+
 
                     <input
                         id="tracking-photo"
@@ -930,304 +1370,1750 @@
                         type="file"
                         accept="image/*"
                     >
+
                 </div>
 
-                <div id="ocr-status" class="ocr-status" role="status"></div>
+
+                {{-- OCR STATUS --}}
+                <div
+                    id="ocr-status"
+                    class="ocr-status"
+                    role="status"
+                    aria-live="polite"
+                ></div>
+
             </form>
 
-            <div class="try-row">
-                <span class="try-label">Formato de guía:</span>
-                <span class="try-chip try-chip-static">VEN-20260904-000123</span>
+
+            {{-- FORMATO --}}
+            <div class="format-row">
+
+                <span class="format-label">
+                    Formato de guía:
+                </span>
+
+                <span class="format-chip">
+                    VEN-20260904-000123
+                </span>
+
             </div>
-            {{--
-                Antes había botones "Probar con: VE-00001 / VE-00002" que
-                rellenaban el input con guías de ejemplo. Esos números no
-                existen en la base de datos (el generador real produce
-                VEN-YYYYMMDD-NNNNNN), así que siempre devolvían "no
-                encontrado". Se reemplazan por un texto ilustrativo del
-                formato en vez de un botón que siempre falla.
-            --}}
+
         </div>
 
-        <div class="hero-visual" aria-hidden="true">
-            <div class="visual-card">
 
-                <div class="visual-badge">
-                    <strong>Seguimiento activo</strong>
-                    <span>Tu paquete está en ruta</span>
+
+        {{-- =================================================
+             VEHÍCULO
+        ================================================== --}}
+
+        <div class="tracking-visual">
+
+            <div class="tracking-visual-card">
+
+                <div class="tracking-circle"></div>
+
+
+                {{-- BADGE --}}
+                <div class="tracking-badge">
+
+                    <div class="tracking-badge-icon">
+
+                        <i class="fa-solid fa-route text-xs"></i>
+
+                    </div>
+
+                    <div>
+
+                        <strong>
+                            Seguimiento activo
+                        </strong>
+
+                        <span>
+                            Consulta tu envío en tiempo real
+                        </span>
+
+                    </div>
+
                 </div>
 
-                <!-- Misma camioneta utilizada en la landing principal -->
+
+                {{-- CAMIONETA --}}
                 <img
                     src="{{ asset('images/van-hero.png') }}"
-                    alt="Camioneta Venexpress"
-                    class="van"
-                />
+                    alt="Furgoneta Venexpress"
+                    class="tracking-van"
+                >
 
-                <div class="visual-road"></div>
 
-                <div class="visual-route">
-                    <span class="route-point"></span>
-                    <span class="route-point active"></span>
-                    <span class="route-point"></span>
-                </div>
+                {{-- SOMBRA --}}
+                <div class="tracking-shadow"></div>
 
-                <div class="visual-status">
-                    <span class="status-dot"></span>
+
+                {{-- STATUS --}}
+                <div class="tracking-status">
+
+                    <span class="tracking-status-dot"></span>
+
                     Rastreo disponible
+
                 </div>
+
             </div>
+
         </div>
 
     </div>
+
 </section>
 
-<section class="trust-bar">
-    <div class="container trust-grid">
 
-        <div class="trust-item">
-            <span class="trust-icon">🛡</span>
-            <span>
-                <strong>Envíos seguros</strong>
-                <span>Seguimiento de tu paquete</span>
-            </span>
+
+{{-- =========================================================
+     BENEFICIOS
+========================================================= --}}
+
+<section class="benefits-section">
+
+    <div class="max-w-7xl mx-auto px-6 py-6 grid grid-cols-2 md:grid-cols-4 gap-6">
+
+        <div class="benefit-item">
+
+            <div class="benefit-icon">
+                <i class="fa-solid fa-shield-halved"></i>
+            </div>
+
+            <div class="benefit-text">
+
+                Envíos seguros
+
+                <small>
+                    Seguimiento de tu paquete
+                </small>
+
+            </div>
+
         </div>
 
-        <div class="trust-item">
-            <span class="trust-icon">📍</span>
-            <span>
-                <strong>Cobertura nacional</strong>
-                <span>Principales ciudades</span>
-            </span>
+
+        <div class="benefit-item">
+
+            <div class="benefit-icon">
+                <i class="fa-solid fa-location-dot"></i>
+            </div>
+
+            <div class="benefit-text">
+
+                Cobertura nacional
+
+                <small>
+                    Principales ciudades
+                </small>
+
+            </div>
+
         </div>
 
-        <div class="trust-item">
-            <span class="trust-icon">🤝</span>
-            <span>
-                <strong>Agencias aliadas</strong>
-                <span>Red de atención</span>
-            </span>
+
+        <div class="benefit-item">
+
+            <div class="benefit-icon">
+                <i class="fa-solid fa-handshake"></i>
+            </div>
+
+            <div class="benefit-text">
+
+                Agencias aliadas
+
+                <small>
+                    Red de atención
+                </small>
+
+            </div>
+
         </div>
 
-        <div class="trust-item">
-            <span class="trust-icon">🎧</span>
-            <span>
-                <strong>Atención al cliente</strong>
-                <span>Estamos para ayudarte</span>
-            </span>
+
+        <div class="benefit-item">
+
+            <div class="benefit-icon">
+                <i class="fa-solid fa-headset"></i>
+            </div>
+
+            <div class="benefit-text">
+
+                Atención al cliente
+
+                <small>
+                    Estamos para ayudarte
+                </small>
+
+            </div>
+
         </div>
 
     </div>
+
 </section>
 
-<section class="section">
-    <div class="container">
 
-        <div class="section-heading">
-            <div class="section-kicker">Así funciona</div>
-            <h2 class="section-title">Sigue tu paquete en pocos pasos</h2>
-            <p class="section-copy">
-                Desde que entregas tu paquete hasta que llega a su destino,
-                puedes consultar su recorrido utilizando tu número de guía.
+
+{{-- =========================================================
+     CÓMO FUNCIONA
+========================================================= --}}
+
+<section
+    id="como-funciona"
+    class="bg-white"
+>
+
+    <div class="max-w-7xl mx-auto px-6 py-20">
+
+        <div class="text-center mb-16">
+
+            <h2
+                class="text-3xl font-extrabold text-blue-950 inline-block relative pb-3"
+            >
+
+                Sigue tu paquete en pocos pasos
+
+                <span
+                    class="absolute left-1/2 -translate-x-1/2 bottom-0 w-14 h-1 bg-red-600 rounded-full"
+                ></span>
+
+            </h2>
+
+
+            <p class="mt-4 text-sm text-gray-500">
+                Consulta el recorrido de tu envío utilizando tu número de guía.
             </p>
-        </div>
-
-        <div class="steps">
-
-            <article class="step">
-                <div class="step-number">01</div>
-                <h3>Obtén tu guía</h3>
-                <p>
-                    Encuentra el número de guía que aparece en tu comprobante de envío.
-                </p>
-            </article>
-
-            <article class="step">
-                <div class="step-number">02</div>
-                <h3>Escríbela o escanéala</h3>
-                <p>
-                    Puedes escribirla manualmente o usar la cámara para leerla desde una foto.
-                </p>
-            </article>
-
-            <article class="step">
-                <div class="step-number">03</div>
-                <h3>Consulta el estado</h3>
-                <p>
-                    Presiona “Rastrear” y revisa el estado más reciente registrado.
-                </p>
-            </article>
-
-            <article class="step">
-                <div class="step-number">04</div>
-                <h3>Recibe tu paquete</h3>
-                <p>
-                    Consulta las actualizaciones de tu envío hasta completar la entrega.
-                </p>
-            </article>
 
         </div>
+
+
+        <div class="grid grid-cols-2 md:grid-cols-4 gap-10 relative">
+
+            <div class="steps-line"></div>
+
+
+            {{-- PASO 1 --}}
+            <div class="relative z-10 text-center">
+
+                <div class="step-icon">
+
+                    <i class="fa-solid fa-receipt text-blue-950 text-2xl"></i>
+
+                    <span class="step-number">
+                        1
+                    </span>
+
+                </div>
+
+                <h3 class="step-title">
+                    Obtén tu guía
+                </h3>
+
+                <p class="step-description">
+                    Encuentra el número de guía en tu comprobante de envío.
+                </p>
+
+            </div>
+
+
+            {{-- PASO 2 --}}
+            <div class="relative z-10 text-center">
+
+                <div class="step-icon">
+
+                    <i class="fa-solid fa-barcode text-blue-950 text-2xl"></i>
+
+                    <span class="step-number">
+                        2
+                    </span>
+
+                </div>
+
+                <h3 class="step-title">
+                    Escríbela o escanéala
+                </h3>
+
+                <p class="step-description">
+                    Ingresa la guía manualmente o utiliza la cámara.
+                </p>
+
+            </div>
+
+
+            {{-- PASO 3 --}}
+            <div class="relative z-10 text-center">
+
+                <div class="step-icon">
+
+                    <i class="fa-solid fa-location-crosshairs text-blue-950 text-2xl"></i>
+
+                    <span class="step-number">
+                        3
+                    </span>
+
+                </div>
+
+                <h3 class="step-title">
+                    Consulta el estado
+                </h3>
+
+                <p class="step-description">
+                    Revisa la última actualización registrada de tu paquete.
+                </p>
+
+            </div>
+
+
+            {{-- PASO 4 --}}
+            <div class="relative z-10 text-center">
+
+                <div class="step-icon bg-amber-400">
+
+                    <i class="fa-solid fa-box-open text-blue-950 text-2xl"></i>
+
+                    <span class="step-number">
+                        4
+                    </span>
+
+                </div>
+
+                <h3 class="step-title">
+                    Recibe tu paquete
+                </h3>
+
+                <p class="step-description">
+                    Sigue las actualizaciones hasta completar la entrega.
+                </p>
+
+            </div>
+
+        </div>
+
+
+        <div class="mt-12 text-center">
+
+            <a
+                href="{{ route('public.calculator') }}"
+                class="bg-blue-950 hover:bg-blue-900 text-white text-sm font-semibold px-5 py-2.5 rounded-lg transition inline-flex items-center justify-center"
+            >
+
+                Calcula un nuevo envío
+
+                <i class="fa-solid fa-arrow-right ml-2 text-xs"></i>
+
+            </a>
+
+        </div>
+
     </div>
+
 </section>
 
-</main>
 
-<footer>
-    <div class="container footer-inner">
-        <a href="{{ url('/') }}" class="brand">
-            <svg class="brand-mark" viewBox="0 0 48 48" fill="none" aria-hidden="true">
-                <path d="M8 13.5 25 5l15 7.5v19L23 40l-15-7.5v-19Z" fill="#FBBE24"/>
-                <path d="M25 5v18l15-7.5" stroke="#1F3F95" stroke-width="3" stroke-linejoin="round"/>
-                <path d="M8 13.5 23 21v19" stroke="#1F3F95" stroke-width="3" stroke-linejoin="round"/>
-                <path d="m17 16 9-4.5v9l-9 4.5v-9Z" fill="#fff"/>
-            </svg>
-            VEN<span class="brand-express">EXPRESS</span>
-        </a>
 
-        <p class="footer-copy">
-            © {{ date('Y') }} Venexpress. Todos los derechos reservados.
-        </p>
+{{-- =========================================================
+     CTA
+========================================================= --}}
+
+<section class="bg-gray-50 border-t border-gray-100">
+
+    <div class="max-w-7xl mx-auto px-6 py-14">
+
+        <div
+            class="rounded-2xl bg-blue-950 px-6 py-10 md:px-10 md:py-12 flex flex-col md:flex-row items-center justify-between gap-8"
+        >
+
+            <div>
+
+                <p
+                    class="text-amber-400 text-[11px] font-bold uppercase tracking-[0.15em]"
+                >
+                    ¿Necesitas enviar un paquete?
+                </p>
+
+                <h2
+                    class="mt-2 text-2xl md:text-3xl font-extrabold text-white"
+                >
+                    Calcula tu envío con Venexpress.
+                </h2>
+
+                <p class="mt-2 text-sm text-blue-200 max-w-xl">
+                    Consulta el precio estimado y encuentra una agencia
+                    cercana para entregar tu paquete.
+                </p>
+
+            </div>
+
+
+            <div class="flex flex-wrap items-center gap-3 shrink-0">
+
+                <a
+                    href="{{ route('public.calculator') }}"
+                    class="bg-amber-400 hover:bg-amber-500 text-blue-950 font-semibold text-sm px-5 py-3 rounded-lg transition inline-flex items-center justify-center"
+                >
+
+                    Calcular precio
+
+                    <i class="fa-solid fa-arrow-right ml-2 text-xs"></i>
+
+                </a>
+
+
+                <a
+                    href="{{ route('public.offices') }}"
+                    class="bg-white/10 hover:bg-white/20 border border-white/20 text-white font-semibold text-sm px-5 py-3 rounded-lg transition inline-flex items-center justify-center"
+                >
+
+                    <i class="fa-solid fa-location-dot mr-2 text-amber-400"></i>
+
+                    Agencias
+
+                </a>
+
+            </div>
+
+        </div>
+
     </div>
+
+</section>
+
+
+
+{{-- =========================================================
+     FOOTER
+========================================================= --}}
+
+<footer
+    id="ayuda"
+    class="bg-blue-950"
+>
+
+    <div class="max-w-7xl mx-auto px-6 py-14 grid md:grid-cols-5 gap-10">
+
+        {{-- MARCA --}}
+        <div>
+
+            <img
+                src="{{ asset('images/venexpress-logo-white.png') }}"
+                alt="Venexpress"
+                class="h-8 mb-4"
+            >
+
+            <p class="text-sm text-blue-200">
+                Conectamos a Venezuela con soluciones de envío rápidas,
+                seguras y confiables.
+            </p>
+
+
+            <div class="flex items-center gap-3 mt-5">
+
+                <a
+                    href="#"
+                    class="footer-social"
+                    aria-label="Facebook"
+                >
+                    <i class="fa-brands fa-facebook-f text-white text-xs"></i>
+                </a>
+
+                <a
+                    href="#"
+                    class="footer-social"
+                    aria-label="Instagram"
+                >
+                    <i class="fa-brands fa-instagram text-white text-xs"></i>
+                </a>
+
+                <a
+                    href="#"
+                    class="footer-social"
+                    aria-label="X"
+                >
+                    <i class="fa-brands fa-x-twitter text-white text-xs"></i>
+                </a>
+
+                <a
+                    href="#"
+                    class="footer-social"
+                    aria-label="WhatsApp"
+                >
+                    <i class="fa-brands fa-whatsapp text-white text-xs"></i>
+                </a>
+
+            </div>
+
+        </div>
+
+
+        {{-- ENLACES --}}
+        <div>
+
+            <h4 class="text-white font-semibold text-sm mb-4">
+                Enlaces rápidos
+            </h4>
+
+            <ul class="space-y-2 text-sm text-blue-200">
+
+                <li>
+                    <a
+                        href="{{ route('home') }}"
+                        class="hover:text-white transition"
+                    >
+                        Inicio
+                    </a>
+                </li>
+
+                <li>
+                    <a
+                        href="{{ route('home') }}#servicios"
+                        class="hover:text-white transition"
+                    >
+                        Servicios
+                    </a>
+                </li>
+
+                <li>
+                    <a
+                        href="{{ route('public.offices') }}"
+                        class="hover:text-white transition"
+                    >
+                        Agencias aliadas
+                    </a>
+                </li>
+
+                <li>
+                    <a
+                        href="{{ route('tracking.index') }}"
+                        class="hover:text-white transition"
+                    >
+                        Rastreo
+                    </a>
+                </li>
+
+                <li>
+                    <a
+                        href="{{ route('home') }}#ayuda"
+                        class="hover:text-white transition"
+                    >
+                        Ayuda
+                    </a>
+                </li>
+
+            </ul>
+
+        </div>
+
+
+        {{-- SERVICIOS --}}
+        <div>
+
+            <h4 class="text-white font-semibold text-sm mb-4">
+                Servicios
+            </h4>
+
+            <ul class="space-y-2 text-sm text-blue-200">
+
+                <li>
+                    <a
+                        href="{{ route('public.calculator') }}"
+                        class="hover:text-white transition"
+                    >
+                        Envíos nacionales
+                    </a>
+                </li>
+
+                <li>
+                    <a
+                        href="{{ route('public.calculator') }}"
+                        class="hover:text-white transition"
+                    >
+                        Envíos express
+                    </a>
+                </li>
+
+                <li>
+                    <a
+                        href="{{ route('login') }}"
+                        class="hover:text-white transition"
+                    >
+                        Carga empresarial
+                    </a>
+                </li>
+
+            </ul>
+
+        </div>
+
+
+        {{-- AYUDA --}}
+        <div>
+
+            <h4 class="text-white font-semibold text-sm mb-4">
+                Ayuda
+            </h4>
+
+            <ul class="space-y-2 text-sm text-blue-200">
+
+                <li>
+                    <a
+                        href="{{ route('home') }}#ayuda"
+                        class="hover:text-white transition"
+                    >
+                        Preguntas frecuentes
+                    </a>
+                </li>
+
+                <li>
+                    <a
+                        href="#"
+                        class="hover:text-white transition"
+                    >
+                        Políticas
+                    </a>
+                </li>
+
+                <li>
+                    <a
+                        href="#"
+                        class="hover:text-white transition"
+                    >
+                        Términos y condiciones
+                    </a>
+                </li>
+
+                <li>
+                    <a
+                        href="mailto:info@venexpress.com"
+                        class="hover:text-white transition"
+                    >
+                        Contáctanos
+                    </a>
+                </li>
+
+            </ul>
+
+        </div>
+
+
+        {{-- CONTACTO --}}
+        <div>
+
+            <h4 class="text-white font-semibold text-sm mb-4">
+                Contáctanos
+            </h4>
+
+            <ul class="space-y-3 text-sm text-blue-200">
+
+                <li class="flex items-start gap-2">
+
+                    <i class="fa-solid fa-phone mt-0.5 text-white"></i>
+
+                    <span>
+                        0800-VENEXPRESS<br>
+                        0800-83639773
+                    </span>
+
+                </li>
+
+
+                <li class="flex items-center gap-2">
+
+                    <i class="fa-solid fa-envelope text-white"></i>
+
+                    <span>
+                        info@venexpress.com
+                    </span>
+
+                </li>
+
+
+                <li class="flex items-center gap-2">
+
+                    <i class="fa-solid fa-location-dot text-white"></i>
+
+                    <span>
+                        Caracas, Venezuela
+                    </span>
+
+                </li>
+
+            </ul>
+
+        </div>
+
+    </div>
+
+
+    <div class="border-t border-white/10">
+
+        <div
+            class="max-w-7xl mx-auto px-6 py-6 text-center text-sm text-blue-300"
+        >
+            &copy; {{ date('Y') }} Venexpress. Todos los derechos reservados.
+        </div>
+
+    </div>
+
 </footer>
 
-<script src="https://cdn.jsdelivr.net/npm/tesseract.js@5/dist/tesseract.min.js"></script>
+
+
+{{-- =========================================================
+     MODAL DE CÁMARA
+========================================================= --}}
+
+<div
+    id="camera-modal"
+    class="camera-modal"
+    aria-hidden="true"
+>
+
+    <div class="camera-modal-inner">
+
+        {{-- HEADER --}}
+        <div class="camera-header">
+
+            <div>
+
+                <div class="camera-header-title">
+                    Escanear guía
+                </div>
+
+                <div class="camera-header-subtitle">
+                    Coloca el número de guía dentro del recuadro
+                </div>
+
+            </div>
+
+
+            <button
+                id="close-camera"
+                type="button"
+                class="camera-close-button"
+                aria-label="Cerrar cámara"
+            >
+
+                <i class="fa-solid fa-xmark"></i>
+
+            </button>
+
+        </div>
+
+
+        {{-- PREVIEW --}}
+        <div class="camera-preview-area">
+
+            <div class="camera-preview-wrapper">
+
+                <video
+                    id="camera-video"
+                    autoplay
+                    playsinline
+                    muted
+                ></video>
+
+
+                {{-- MARCO DE GUÍA --}}
+                <div class="camera-guide-overlay">
+
+                    <div class="camera-guide-box">
+
+                        <span class="camera-guide-corner top-left"></span>
+                        <span class="camera-guide-corner top-right"></span>
+                        <span class="camera-guide-corner bottom-left"></span>
+                        <span class="camera-guide-corner bottom-right"></span>
+
+                        <span class="camera-scan-line"></span>
+
+                    </div>
+
+                </div>
+
+            </div>
+
+        </div>
+
+
+        {{-- FOOTER CÁMARA --}}
+        <div class="camera-bottom">
+
+            <div
+                id="camera-error"
+                class="camera-error hidden"
+            ></div>
+
+
+            <div class="camera-action-row">
+
+                <button
+                    id="take-photo"
+                    type="button"
+                    class="camera-take-button"
+                >
+
+                    <span class="camera-take-icon">
+                        <i class="fa-solid fa-camera"></i>
+                    </span>
+
+                    Tomar foto
+
+                </button>
+
+            </div>
+
+
+            <p class="camera-hint">
+                Asegúrate de que la guía tenga buena iluminación y esté enfocada.
+            </p>
+
+        </div>
+
+    </div>
+
+</div>
+
+
+{{-- CANVAS OCULTO PARA CAPTURAR LA FOTO --}}
+<canvas
+    id="camera-canvas"
+    class="hidden"
+></canvas>
+
+
+
+{{-- =========================================================
+     JAVASCRIPT
+========================================================= --}}
 
 <script>
+
 document.addEventListener('DOMContentLoaded', function () {
+
+    /* =====================================================
+       MENÚ MÓVIL
+    ====================================================== */
+
+    const button = document.getElementById('mobile-menu-button');
+    const menu = document.getElementById('mobile-menu');
+    const icon = document.getElementById('mobile-menu-icon');
+
+    if (button && menu && icon) {
+
+        const closeMenu = () => {
+
+            menu.classList.add('hidden');
+
+            icon.classList.remove('fa-xmark');
+            icon.classList.add('fa-bars');
+
+            button.setAttribute('aria-expanded', 'false');
+
+        };
+
+
+        button.addEventListener('click', function () {
+
+            const isOpen = !menu.classList.contains('hidden');
+
+            if (isOpen) {
+
+                closeMenu();
+
+            } else {
+
+                menu.classList.remove('hidden');
+
+                icon.classList.remove('fa-bars');
+                icon.classList.add('fa-xmark');
+
+                button.setAttribute('aria-expanded', 'true');
+
+            }
+
+        });
+
+
+        document
+            .querySelectorAll('.mobile-menu-link')
+            .forEach(link => {
+
+                link.addEventListener('click', closeMenu);
+
+            });
+
+    }
+
+
+    /* =====================================================
+       TRACKING + OCR
+    ====================================================== */
 
     const form = document.getElementById('tracking-form');
     const input = document.getElementById('tracking-guide');
-    const camera = document.getElementById('tracking-camera');
     const photo = document.getElementById('tracking-photo');
     const status = document.getElementById('ocr-status');
 
-    if (!form || !input || !camera || !photo || !status) {
+
+    if (!form || !input || !photo || !status) {
         return;
     }
 
+
+    /* =====================================================
+       CAMERA ELEMENTS
+    ====================================================== */
+
+    const openCameraButton =
+        document.getElementById('open-camera');
+
+    const cameraModal =
+        document.getElementById('camera-modal');
+
+    const closeCameraButton =
+        document.getElementById('close-camera');
+
+    const takePhotoButton =
+        document.getElementById('take-photo');
+
+    const cameraVideo =
+        document.getElementById('camera-video');
+
+    const cameraCanvas =
+        document.getElementById('camera-canvas');
+
+    const cameraError =
+        document.getElementById('camera-error');
+
+
+    let cameraStream = null;
+
+
+    /* =====================================================
+       STATUS
+    ====================================================== */
+
     function setStatus(message, type = '') {
+
         status.textContent = message;
-        status.className = 'ocr-status show' + (type ? ' ' + type : '');
+
+        status.className =
+            'ocr-status show' +
+            (type ? ' ' + type : '');
+
     }
 
+
+    /* =====================================================
+       NORMALIZAR GUÍA
+    ====================================================== */
+
     function normalizeGuide(value) {
-        return value
+
+        return String(value || '')
             .toUpperCase()
             .replace(/[|]/g, 'I')
             .replace(/\s+/g, '-')
             .replace(/--+/g, '-')
             .trim();
+
     }
 
+
+    /* =====================================================
+       EXTRAER GUÍA DEL OCR
+    ====================================================== */
+
     function extractGuide(text) {
+
         const clean = String(text || '')
             .toUpperCase()
             .replace(/\n/g, ' ')
             .replace(/\s+/g, ' ');
 
+
         const patterns = [
-            // Formato real generado por el sistema: VEN-YYYYMMDD-NNNNNN
-            // (8 dígitos de fecha + 4 a 8 dígitos de secuencia). Debe ir
-            // primero: si no, los patrones más genéricos de abajo
-            // capturan solo el bloque de fecha y truncan la guía.
+
+            /*
+             * Formato principal:
+             *
+             * VEN-20260904-000123
+             */
             /\bVEN[-\s]?\d{8}[-\s]?\d{4,8}\b/,
+
+            /*
+             * Formato alternativo:
+             *
+             * VEN-2026-123456
+             */
             /\bVEN[-\s]?\d{4}[-\s]?\d{5,10}\b/,
+
+            /*
+             * VE-2026-123456
+             */
             /\bVE[-\s]?\d{4}[-\s]?\d{5,10}\b/,
+
+            /*
+             * VEN + números
+             */
             /\bVEN[-\s]?\d{5,16}\b/,
+
+            /*
+             * VE + números
+             */
             /\bVE[-\s]?\d{5,16}\b/
         ];
 
+
         for (const pattern of patterns) {
+
             const match = clean.match(pattern);
+
             if (match) {
+
                 return normalizeGuide(match[0]);
+
             }
+
         }
 
-        // Tolerancia para errores comunes del OCR:
-        // VK -> VE, VFN -> VEN
-        const tolerant = clean.match(/\bV[A-Z]{1,2}[-\s]?\d{4}[-\s]?\d{5,10}\b/);
+
+        /*
+         * Tolerancia para errores comunes del OCR.
+         */
+        const tolerant = clean.match(
+            /\bV[A-Z]{1,2}[-\s]?\d{4}[-\s]?\d{5,10}\b/
+        );
+
 
         if (tolerant) {
-            let guide = normalizeGuide(tolerant[0]);
-            guide = guide.replace(/^VK-/, 'VE-');
-            guide = guide.replace(/^VFN-/, 'VEN-');
+
+            let guide = normalizeGuide(
+                tolerant[0]
+            );
+
+            guide = guide.replace(
+                /^VK-/,
+                'VE-'
+            );
+
+            guide = guide.replace(
+                /^VFN-/,
+                'VEN-'
+            );
+
             return guide;
+
         }
 
+
         return null;
+
     }
 
+
+    /* =====================================================
+       PROCESAR IMAGEN CON TESSERACT
+    ====================================================== */
+
     async function processImage(file) {
+
         if (!file) {
             return;
         }
 
-        setStatus('🔎 Analizando la foto y buscando el número de guía...');
 
-        try {
-            const result = await Tesseract.recognize(
-                file,
-                'eng',
-                {
-                    logger: function (info) {
-                        if (info.status === 'recognizing text') {
-                            const progress = Math.round((info.progress || 0) * 100);
-                            setStatus('🔎 Reconociendo la guía... ' + progress + '%');
-                        }
-                    }
-                }
+        if (
+            typeof Tesseract === 'undefined'
+        ) {
+
+            setStatus(
+                'El lector de imágenes todavía no está disponible. Recarga la página e inténtalo nuevamente.',
+                'error'
             );
 
-            const guide = extractGuide(result.data.text);
+            return;
+        }
+
+
+        setStatus(
+            'Analizando la foto y buscando el número de guía...'
+        );
+
+
+        try {
+
+            const result =
+                await Tesseract.recognize(
+
+                    file,
+
+                    'eng',
+
+                    {
+                        logger: function (info) {
+
+                            if (
+                                info.status ===
+                                'recognizing text'
+                            ) {
+
+                                const progress =
+                                    Math.round(
+                                        (info.progress || 0) * 100
+                                    );
+
+                                setStatus(
+                                    'Reconociendo la guía... ' +
+                                    progress +
+                                    '%'
+                                );
+
+                            }
+
+                        }
+                    }
+
+                );
+
+
+            const guide =
+                extractGuide(
+                    result.data.text
+                );
+
 
             if (!guide) {
+
                 setStatus(
                     'No pude identificar la guía. Intenta con una foto más clara o escríbela manualmente.',
                     'error'
                 );
+
                 input.focus();
+
                 return;
+
             }
 
+
+            /*
+             * Colocar la guía en el input.
+             */
             input.value = guide;
-            input.dispatchEvent(new Event('input', { bubbles: true }));
-            input.dispatchEvent(new Event('change', { bubbles: true }));
+
+
+            /*
+             * Disparar eventos por compatibilidad
+             * con posibles listeners externos.
+             */
+            input.dispatchEvent(
+                new Event(
+                    'input',
+                    {
+                        bubbles: true
+                    }
+                )
+            );
+
+
+            input.dispatchEvent(
+                new Event(
+                    'change',
+                    {
+                        bubbles: true
+                    }
+                )
+            );
+
 
             setStatus(
-                '✓ Guía detectada: ' + guide + '. Presiona “Rastrear” para consultar el envío.',
+                '✓ Guía detectada: ' +
+                guide +
+                '. Presiona "Rastrear" para consultar el envío.',
                 'success'
             );
 
+
         } catch (error) {
-            console.error('OCR tracking error:', error);
+
+            console.error(
+                'OCR tracking error:',
+                error
+            );
+
 
             setStatus(
                 'No se pudo leer la imagen. Puedes escribir la guía manualmente.',
                 'error'
             );
+
         }
+
     }
 
-    camera.addEventListener('change', function () {
-        processImage(this.files[0]);
-        this.value = '';
-    });
 
-    photo.addEventListener('change', function () {
-        processImage(this.files[0]);
-        this.value = '';
-    });
+    /* =====================================================
+       ABRIR CÁMARA REAL
+    ====================================================== */
 
-    form.addEventListener('submit', function (event) {
-        if (!input.value.trim()) {
-            event.preventDefault();
-            setStatus('Escribe o escanea un número de guía para continuar.', 'error');
-            input.focus();
+    async function openCamera() {
+
+        if (
+            !navigator.mediaDevices ||
+            !navigator.mediaDevices.getUserMedia
+        ) {
+
+            setStatus(
+                'Tu navegador no permite acceder a la cámara. Puedes subir una foto de la guía.',
+                'error'
+            );
+
+            return;
         }
-    });
+
+
+        cameraError.classList.add('hidden');
+        cameraError.textContent = '';
+
+
+        try {
+
+            /*
+             * Si existía una cámara anterior,
+             * la cerramos primero.
+             */
+            stopCamera();
+
+
+            /*
+             * Solicitar cámara trasera.
+             *
+             * "ideal" permite que el navegador
+             * elija otra cámara si esta no existe.
+             */
+            cameraStream =
+                await navigator.mediaDevices.getUserMedia({
+
+                    video: {
+
+                        facingMode: {
+                            ideal: 'environment'
+                        },
+
+                        width: {
+                            ideal: 1920
+                        },
+
+                        height: {
+                            ideal: 1080
+                        }
+
+                    },
+
+                    audio: false
+
+                });
+
+
+            /*
+             * Conectar stream al video.
+             */
+            cameraVideo.srcObject =
+                cameraStream;
+
+
+            /*
+             * Mostrar modal.
+             */
+            cameraModal.classList.add(
+                'is-open'
+            );
+
+            cameraModal.setAttribute(
+                'aria-hidden',
+                'false'
+            );
+
+
+            /*
+             * Evitar scroll detrás del modal.
+             */
+            document.body.style.overflow =
+                'hidden';
+
+
+            /*
+             * Iniciar reproducción.
+             */
+            await cameraVideo.play();
+
+
+        } catch (error) {
+
+            console.error(
+                'Camera error:',
+                error
+            );
+
+
+            stopCamera();
+
+
+            let message =
+                'No se pudo acceder a la cámara.';
+
+
+            if (
+                error.name ===
+                'NotAllowedError'
+            ) {
+
+                message =
+                    'El acceso a la cámara fue bloqueado. Permite el uso de la cámara en tu navegador e inténtalo nuevamente.';
+
+            } else if (
+                error.name ===
+                'NotFoundError'
+            ) {
+
+                message =
+                    'No encontramos una cámara disponible en este dispositivo.';
+
+            } else if (
+                error.name ===
+                'NotReadableError'
+            ) {
+
+                message =
+                    'La cámara está siendo utilizada por otra aplicación. Cierra otras aplicaciones que estén usando la cámara e inténtalo nuevamente.';
+
+            } else if (
+                error.name ===
+                'SecurityError'
+            ) {
+
+                message =
+                    'El navegador bloqueó la cámara por motivos de seguridad.';
+
+            } else if (
+                error.name ===
+                'OverconstrainedError'
+            ) {
+
+                message =
+                    'La cámara disponible no es compatible con la configuración solicitada.';
+
+            }
+
+
+            cameraError.textContent =
+                message;
+
+            cameraError.classList.remove(
+                'hidden'
+            );
+
+        }
+
+    }
+
+
+    /* =====================================================
+       DETENER CÁMARA
+    ====================================================== */
+
+    function stopCamera() {
+
+        if (cameraStream) {
+
+            cameraStream
+                .getTracks()
+                .forEach(function (track) {
+
+                    track.stop();
+
+                });
+
+            cameraStream = null;
+
+        }
+
+
+        if (cameraVideo) {
+
+            cameraVideo.pause();
+
+            cameraVideo.srcObject = null;
+
+        }
+
+    }
+
+
+    /* =====================================================
+       CERRAR MODAL
+    ====================================================== */
+
+    function closeCamera() {
+
+        stopCamera();
+
+
+        cameraModal.classList.remove(
+            'is-open'
+        );
+
+        cameraModal.setAttribute(
+            'aria-hidden',
+            'true'
+        );
+
+
+        document.body.style.overflow =
+            '';
+
+    }
+
+
+    /* =====================================================
+       TOMAR FOTO
+    ====================================================== */
+
+    function takePhoto() {
+
+        if (!cameraStream) {
+
+            setStatus(
+                'La cámara no está activa.',
+                'error'
+            );
+
+            return;
+
+        }
+
+
+        const width =
+            cameraVideo.videoWidth;
+
+        const height =
+            cameraVideo.videoHeight;
+
+
+        if (!width || !height) {
+
+            setStatus(
+                'La cámara todavía no está lista. Espera un momento e inténtalo nuevamente.',
+                'error'
+            );
+
+            return;
+
+        }
+
+
+        /*
+         * Preparar canvas con la misma
+         * resolución de la cámara.
+         */
+        cameraCanvas.width =
+            width;
+
+        cameraCanvas.height =
+            height;
+
+
+        const context =
+            cameraCanvas.getContext(
+                '2d'
+            );
+
+
+        if (!context) {
+
+            setStatus(
+                'No se pudo preparar la captura.',
+                'error'
+            );
+
+            return;
+
+        }
+
+
+        /*
+         * Dibujar el frame actual.
+         */
+        context.drawImage(
+            cameraVideo,
+            0,
+            0,
+            width,
+            height
+        );
+
+
+        /*
+         * Convertir la captura en JPEG.
+         */
+        cameraCanvas.toBlob(
+            function (blob) {
+
+                if (!blob) {
+
+                    setStatus(
+                        'No se pudo capturar la imagen.',
+                        'error'
+                    );
+
+                    return;
+
+                }
+
+
+                /*
+                 * Crear un File real.
+                 */
+                const file =
+                    new File(
+
+                        [blob],
+
+                        'guia-camera.jpg',
+
+                        {
+                            type:
+                                'image/jpeg',
+                            lastModified:
+                                Date.now()
+                        }
+
+                    );
+
+
+                /*
+                 * Cerramos cámara
+                 * antes del OCR.
+                 */
+                closeCamera();
+
+
+                /*
+                 * Procesamos la imagen
+                 * exactamente igual que
+                 * una foto subida.
+                 */
+                processImage(file);
+
+            },
+
+            'image/jpeg',
+
+            0.92
+
+        );
+
+    }
+
+
+    /* =====================================================
+       BOTÓN ABRIR CÁMARA
+    ====================================================== */
+
+    if (openCameraButton) {
+
+        openCameraButton.addEventListener(
+            'click',
+            openCamera
+        );
+
+    }
+
+
+    /* =====================================================
+       BOTÓN CERRAR CÁMARA
+    ====================================================== */
+
+    if (closeCameraButton) {
+
+        closeCameraButton.addEventListener(
+            'click',
+            closeCamera
+        );
+
+    }
+
+
+    /* =====================================================
+       BOTÓN TOMAR FOTO
+    ====================================================== */
+
+    if (takePhotoButton) {
+
+        takePhotoButton.addEventListener(
+            'click',
+            takePhoto
+        );
+
+    }
+
+
+    /* =====================================================
+       CERRAR AL HACER CLICK FUERA
+    ====================================================== */
+
+    if (cameraModal) {
+
+        cameraModal.addEventListener(
+            'click',
+            function (event) {
+
+                if (
+                    event.target ===
+                    cameraModal
+                ) {
+
+                    closeCamera();
+
+                }
+
+            }
+        );
+
+    }
+
+
+    /* =====================================================
+       CERRAR CON ESCAPE
+    ====================================================== */
+
+    document.addEventListener(
+        'keydown',
+        function (event) {
+
+            if (
+                event.key === 'Escape' &&
+                cameraModal.classList.contains(
+                    'is-open'
+                )
+            ) {
+
+                closeCamera();
+
+            }
+
+        }
+    );
+
+
+    /* =====================================================
+       SUBIR FOTO
+    ====================================================== */
+
+    photo.addEventListener(
+        'change',
+        function () {
+
+            const file =
+                this.files[0];
+
+
+            if (file) {
+
+                processImage(file);
+
+            }
+
+
+            /*
+             * Permite volver a seleccionar
+             * la misma imagen posteriormente.
+             */
+            this.value = '';
+
+        }
+    );
+
+
+    /* =====================================================
+       FORM SUBMIT
+    ====================================================== */
+
+    form.addEventListener(
+        'submit',
+        function (event) {
+
+            if (
+                !input.value.trim()
+            ) {
+
+                event.preventDefault();
+
+
+                setStatus(
+                    'Escribe o escanea un número de guía para continuar.',
+                    'error'
+                );
+
+
+                input.focus();
+
+            }
+
+        }
+    );
+
+
+    /* =====================================================
+       LIBERAR CÁMARA AL SALIR
+    ====================================================== */
+
+    window.addEventListener(
+        'beforeunload',
+        function () {
+
+            stopCamera();
+
+        }
+    );
+
+
+    /* =====================================================
+       LIBERAR CÁMARA SI LA PÁGINA PASA A BACKGROUND
+       EN ALGUNOS NAVEGADORES MÓVILES
+    ====================================================== */
+
+    document.addEventListener(
+        'visibilitychange',
+        function () {
+
+            if (
+                document.hidden &&
+                cameraStream
+            ) {
+
+                closeCamera();
+
+            }
+
+        }
+    );
+
 });
+
 </script>
+
+
+{{-- =========================================================
+     TESSERACT OCR
+========================================================= --}}
+
+<script
+    src="https://cdn.jsdelivr.net/npm/tesseract.js@5/dist/tesseract.min.js"
+></script>
 
 </body>
 </html>

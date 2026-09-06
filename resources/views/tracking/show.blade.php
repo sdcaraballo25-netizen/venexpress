@@ -164,6 +164,27 @@
 
                 </p>
 
+
+                {{-- VOLVER A RASTREAR --}}
+                <div class="mt-6">
+
+                    <a
+                        href="{{ route('tracking.index') }}"
+                        class="inline-flex items-center justify-center gap-2
+                               bg-blue-950 hover:bg-blue-900
+                               text-white font-semibold
+                               text-sm px-5 py-3 rounded-lg
+                               transition"
+                    >
+
+                        <i class="fa-solid fa-arrow-left text-xs"></i>
+
+                        Rastrear otra guía
+
+                    </a>
+
+                </div>
+
             </div>
 
         @else
@@ -233,17 +254,33 @@
 
 
                 @if (! ($statusIsKnown ?? true))
-                    <div class="mb-4 rounded-xl border border-amber-200 bg-amber-50 px-4 py-3 text-sm text-amber-800">
-                        Este paquete tiene un estado especial que no forma parte de la línea de tiempo estándar.
-                        La línea de tiempo muestra el último paso conocido; consulta con Venexpress para más detalles.
+
+                    <div
+                        class="mb-4 rounded-xl border border-amber-200 bg-amber-50 px-4 py-3 text-sm text-amber-800"
+                    >
+
+                        Este paquete tiene un estado especial que no forma
+                        parte de la línea de tiempo estándar. La línea de
+                        tiempo muestra el último paso conocido; consulta con
+                        Venexpress para más detalles.
+
                     </div>
+
                 @endif
 
+
                 @if ($hasOpenIncident ?? false)
-                    <div class="mb-4 rounded-xl border border-amber-200 bg-amber-50 px-4 py-3 text-sm text-amber-800">
+
+                    <div
+                        class="mb-4 rounded-xl border border-amber-200 bg-amber-50 px-4 py-3 text-sm text-amber-800"
+                    >
+
                         Tu envío tiene una incidencia en revisión, contáctanos.
+
                     </div>
+
                 @endif
+
 
                 {{-- TIMELINE --}}
                 <div
@@ -256,9 +293,9 @@
 
 
                     <div
-                        class="absolute top-6 left-0 h-1 bg-blue-900 z-0"
-                        style="width: {{ $progressPercent }}%"
-                    ></div>
+    class="h-2 rounded-full bg-blue-600"
+    @style(['width' => $progressPercent . '%'])
+></div>
 
 
                     @foreach($statusSteps as $step)
@@ -324,6 +361,29 @@
                         </div>
 
                     @endforeach
+
+                </div>
+
+
+                {{-- ACCIONES --}}
+                <div
+                    class="mt-8 pt-6 border-t border-gray-100 flex justify-center"
+                >
+
+                    <a
+                        href="{{ route('tracking.index') }}"
+                        class="inline-flex items-center justify-center gap-2
+                               bg-blue-950 hover:bg-blue-900
+                               text-white font-semibold
+                               text-sm px-5 py-3 rounded-lg
+                               transition"
+                    >
+
+                        <i class="fa-solid fa-arrow-left text-xs"></i>
+
+                        Rastrear otra guía
+
+                    </a>
 
                 </div>
 

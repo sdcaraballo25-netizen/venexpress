@@ -84,9 +84,9 @@
         }
 
         .hero-vehicle {
-            transform: translateY(28px) scale(1.06);
-            transform-origin: center bottom;
-        }
+    transform: translateX(-14%) translateY(28px) scale(1.06);
+    transform-origin: center bottom;
+}
 
         .hero-title {
     font-size: 3.7rem;
@@ -105,14 +105,14 @@
            RESPONSIVE
         ====================================================== */
 
-        @media (min-width: 1280px) {
+     @media (min-width: 1280px) {
     .hero-title {
         font-size: 3.95rem;
         line-height: 1;
     }
 
     .hero-vehicle {
-        transform: translateY(32px) scale(1.10);
+        transform: translateX(-14%) translateY(32px) scale(1.10);
     }
 }
 
@@ -122,7 +122,7 @@
             }
 
             .hero-vehicle {
-                transform: translateY(20px) scale(1.02);
+                transform: translateX(-10%) translateY(20px) scale(1.02);
             }
 
             .main-nav-links {
