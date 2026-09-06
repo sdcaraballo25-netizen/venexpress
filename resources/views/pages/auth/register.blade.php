@@ -4,6 +4,7 @@ use App\Models\Ally;
 use App\Models\Customer;
 use App\Models\Driver;
 use App\Models\User;
+use App\Notifications\WelcomeVerificationToken;
 use Illuminate\Auth\Events\Registered;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Hash;
@@ -202,6 +203,7 @@ new #[Layout('layouts.guest')] class extends Component
         $user = User::create([
             'name' => $validated['name'],
             'email' => $validated['email'],
+            'phone' => $validated['phone'] ?? null,
             'password' => Hash::make($validated['password']),
             'role' => $validated['role'],
         ]);
@@ -288,10 +290,29 @@ new #[Layout('layouts.guest')] class extends Component
             ]
         );
 
-        Auth::login($user);
+        /*
+        |--------------------------------------------------------------------------
+        | VERIFICACIÓN DE CUENTA (solo primer registro)
+        |--------------------------------------------------------------------------
+        |
+        | El cliente NO queda logueado todavía. Se genera un código de
+        | verificación de 6 dígitos, se le envía (hoy solo por
+        | correo), se guarda su id pendiente en sesión, y se le
+        | manda a la pantalla donde debe introducir el código para
+        | poder entrar por primera vez.
+        |
+        */
+
+        $plainToken = $user->generateVerificationToken();
+
+        $user->notify(new WelcomeVerificationToken($plainToken));
+
+        session([
+            'pending_verification_user_id' => $user->id,
+        ]);
 
         $this->redirect(
-            route('cliente.dashboard', absolute: false),
+            route('verify-account', absolute: false),
             navigate: true
         );
     }

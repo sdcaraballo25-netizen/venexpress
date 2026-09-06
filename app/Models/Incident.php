@@ -23,6 +23,14 @@ class Incident extends Model
     ];
 
     /**
+     * Tipo usado cuando el reporte lo crea el propio cliente desde
+     * su panel (a diferencia de las incidencias que reporta un
+     * Aliado sobre una guía). Sirve para distinguir el origen del
+     * reporte sin necesitar una columna nueva.
+     */
+    public const TYPE_RECLAMO_CLIENTE = 'RECLAMO_CLIENTE';
+
+    /**
      * Los atributos que se pueden asignar de forma masiva.
      *
      * @var list<string>

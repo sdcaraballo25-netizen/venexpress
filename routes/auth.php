@@ -22,6 +22,13 @@ Route::middleware('guest')->group(function () {
 
     Volt::route('reset-password/{token}', 'pages.auth.reset-password')
         ->name('password.reset');
+
+    // Pantalla de código de verificación tras el primer registro de
+    // un cliente. El usuario todavía no está logueado en este punto
+    // (su id vive en session('pending_verification_user_id')), por
+    // eso va dentro del grupo "guest".
+    Volt::route('verify-account', 'pages.auth.verify-account')
+        ->name('verify-account');
 });
 
 Route::middleware('auth')->group(function () {

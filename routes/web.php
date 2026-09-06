@@ -22,6 +22,8 @@ use App\Livewire\Admin\AllyFinance;
 use App\Livewire\Ally\Packages as AllyPackages;
 
 use App\Livewire\Client\Dashboard as ClientDashboard;
+use App\Livewire\Client\Incidents as ClientIncidents;
+use App\Livewire\Client\PendingPayments as ClientPendingPayments;
 
 use App\Livewire\Ally\Dashboard as AllyDashboard;
 use App\Livewire\Ally\PackageCreate as AllyPackageCreate;
@@ -140,9 +142,28 @@ Route::view('profile', 'profile')
 |--------------------------------------------------------------------------
 */
 
-Route::get('/cliente/dashboard', ClientDashboard::class)
-    ->middleware(['auth', 'verified', 'role:cliente'])
-    ->name('cliente.dashboard');
+Route::prefix('cliente')
+    ->middleware([
+        'auth',
+        'verified',
+        'role:cliente',
+
+        // Verificación propia de VenExpress por código (distinta del
+        // "verified" nativo de Laravel, que este proyecto no usa).
+        'account.verified',
+    ])
+    ->name('cliente.')
+    ->group(function () {
+
+        Route::get('/dashboard', ClientDashboard::class)
+            ->name('dashboard');
+
+        Route::get('/incidencias', ClientIncidents::class)
+            ->name('incidents');
+
+        Route::get('/pagos-pendientes', ClientPendingPayments::class)
+            ->name('pending-payments');
+    });
 
 
 /*

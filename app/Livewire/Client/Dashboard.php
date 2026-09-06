@@ -11,7 +11,7 @@ use Livewire\Attributes\Layout;
 use Livewire\Component;
 use RuntimeException;
 
-#[Layout('layouts.app')]
+#[Layout('layouts.client')]
 class Dashboard extends Component
 {
     public string $rejectionReason = '';
@@ -218,13 +218,18 @@ class Dashboard extends Component
 
         return Package::query()
             ->whereKey($packageId)
-            ->whereIn(
-                'recipient_id_doc',
-                $idDocs
-            )
+            ->where(function ($query) use ($idDocs) {
+                $query->whereIn('recipient_id_doc', $idDocs)
+                    ->orWhereIn('sender_id_doc', $idDocs);
+            })
             ->firstOrFail();
     }
 
+    /**
+     * Trae TODOS los paquetes a nombre del cliente, ya sea que los
+     * envió (sender_id_doc) o que los está recibiendo
+     * (recipient_id_doc), tal como se pidió: "enviados o en camino".
+     */
     public function render()
     {
         $idDocs = $this->customerIdDocsForCurrentUser();
@@ -233,16 +238,28 @@ class Dashboard extends Component
 
         if (! empty($idDocs)) {
             $packages = Package::query()
-                ->whereIn(
-                    'recipient_id_doc',
-                    $idDocs
-                )
+                ->where(function ($query) use ($idDocs) {
+                    $query->whereIn('recipient_id_doc', $idDocs)
+                        ->orWhereIn('sender_id_doc', $idDocs);
+                })
                 ->with([
                     'histories',
                     'incidents',
                 ])
                 ->latest()
-                ->get();
+                ->get()
+                ->map(function (Package $package) use ($idDocs) {
+                    // Rol del cliente respecto a ESTE paquete en
+                    // particular, para poder rotularlo en la UI
+                    // ("Enviado por ti" / "Para ti").
+                    $package->client_role = in_array(
+                        $package->recipient_id_doc,
+                        $idDocs,
+                        true
+                    ) ? 'recipient' : 'sender';
+
+                    return $package;
+                });
         }
 
         return view(

@@ -8,6 +8,7 @@ use Illuminate\Database\Eloquent\Relations\HasMany;
 use Illuminate\Database\Eloquent\Relations\HasOne;
 use Illuminate\Foundation\Auth\User as Authenticatable;
 use Illuminate\Notifications\Notifiable;
+use Illuminate\Support\Facades\Hash;
 
 class User extends Authenticatable
 {
@@ -30,6 +31,7 @@ class User extends Authenticatable
     protected $fillable = [
         'name',
         'email',
+        'phone',
         'password',
         'role',
         'ally_id',
@@ -40,14 +42,128 @@ class User extends Authenticatable
     protected $hidden = [
         'password',
         'remember_token',
+        'verification_token',
     ];
 
     protected function casts(): array
     {
         return [
             'email_verified_at' => 'datetime',
+            'account_verified_at' => 'datetime',
+            'verification_token_expires_at' => 'datetime',
+            'verification_token_last_sent_at' => 'datetime',
             'password' => 'hashed',
         ];
+    }
+
+    /*
+    |--------------------------------------------------------------------------
+    | VERIFICACIÓN DE CUENTA POR TOKEN
+    |--------------------------------------------------------------------------
+    |
+    | Distinta del sistema nativo de verificación de correo de
+    | Laravel (email_verified_at / MustVerifyEmail, que este proyecto
+    | no usa). Este es un código corto de 6 dígitos que se envía al
+    | registrarse por primera vez y que el usuario debe introducir
+    | antes de poder entrar a su panel.
+    |
+    */
+
+    public const VERIFICATION_TOKEN_TTL_MINUTES = 15;
+
+    public const VERIFICATION_RESEND_COOLDOWN_SECONDS = 60;
+
+    /**
+     * Genera un nuevo código de verificación de 6 dígitos, lo guarda
+     * hasheado y devuelve el código EN CLARO para poder enviarlo por
+     * correo/SMS/WhatsApp. Una vez guardado, el valor en claro no se
+     * puede recuperar de nuevo desde la base de datos.
+     */
+    public function generateVerificationToken(): string
+    {
+        $plainToken = (string) random_int(100000, 999999);
+
+        $this->forceFill([
+            'verification_token' => Hash::make($plainToken),
+            'verification_token_expires_at' => now()->addMinutes(
+                self::VERIFICATION_TOKEN_TTL_MINUTES
+            ),
+            'verification_token_last_sent_at' => now(),
+        ])->save();
+
+        return $plainToken;
+    }
+
+    /**
+     * Compara el código en claro que escribió el usuario contra el
+     * hash guardado, y valida que no haya expirado.
+     */
+    public function verificationTokenIsValid(string $plainToken): bool
+    {
+        if (! $this->verification_token) {
+            return false;
+        }
+
+        if (
+            $this->verification_token_expires_at
+            && $this->verification_token_expires_at->isPast()
+        ) {
+            return false;
+        }
+
+        return Hash::check($plainToken, $this->verification_token);
+    }
+
+    /**
+     * Marca la cuenta como verificada y limpia el token para que no
+     * pueda reutilizarse.
+     */
+    public function markAccountAsVerified(): void
+    {
+        $this->forceFill([
+            'account_verified_at' => now(),
+            'verification_token' => null,
+            'verification_token_expires_at' => null,
+        ])->save();
+    }
+
+    public function isAccountVerified(): bool
+    {
+        return ! is_null($this->account_verified_at);
+    }
+
+    /**
+     * Evita que un usuario spamee el botón "Reenviar código":
+     * solo permite un reenvío cada
+     * VERIFICATION_RESEND_COOLDOWN_SECONDS segundos.
+     */
+    public function canResendVerificationToken(): bool
+    {
+        if (! $this->verification_token_last_sent_at) {
+            return true;
+        }
+
+        return $this->verification_token_last_sent_at
+            ->addSeconds(self::VERIFICATION_RESEND_COOLDOWN_SECONDS)
+            ->isPast();
+    }
+
+    /**
+     * Segundos que faltan para poder reenviar el código (0 si ya se
+     * puede). Útil para mostrar una cuenta regresiva en la UI.
+     */
+    public function secondsUntilCanResendVerificationToken(): int
+    {
+        if ($this->canResendVerificationToken()) {
+            return 0;
+        }
+
+        return (int) now()->diffInSeconds(
+            $this->verification_token_last_sent_at->addSeconds(
+                self::VERIFICATION_RESEND_COOLDOWN_SECONDS
+            ),
+            false
+        );
     }
 
     /**

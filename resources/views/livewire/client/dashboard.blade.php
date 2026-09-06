@@ -1,28 +1,6 @@
-<x-app-layout>
+<div class="space-y-6">
 
-    <x-slot name="header">
-
-        <div class="flex flex-col gap-1">
-
-            <h2 class="font-display text-xl font-semibold text-slate-900">
-                Mi cuenta
-            </h2>
-
-            <p class="text-sm text-slate-500">
-                Consulta tus envíos y confirma tus entregas.
-            </p>
-
-        </div>
-
-    </x-slot>
-
-
-    <div class="py-8">
-
-        <div class="mx-auto max-w-7xl space-y-6 px-4 sm:px-6 lg:px-8">
-
-
-            {{-- Mensajes --}}
+    {{-- Mensajes --}}
             @if (session('success'))
 
                 <div class="rounded-xl border border-emerald-200 bg-emerald-50 p-4 text-sm text-emerald-700">
@@ -49,7 +27,7 @@
                 </h1>
 
                 <p class="mt-1 text-sm text-slate-500">
-                    Aquí puedes consultar tus paquetes y gestionar las entregas a domicilio.
+                    Aquí puedes consultar tus paquetes enviados y por recibir, y gestionar las entregas a domicilio.
                 </p>
 
             </div>
@@ -100,9 +78,27 @@
                                 </div>
 
 
-                                <span class="inline-flex w-fit rounded-full bg-blue-50 px-3 py-1 text-sm font-medium text-blue-700">
-                                    {{ $package->statusLabel() }}
-                                </span>
+                                <div class="flex flex-col items-start gap-2 lg:items-end">
+
+                                    <span class="inline-flex w-fit rounded-full bg-blue-50 px-3 py-1 text-sm font-medium text-blue-700">
+                                        {{ $package->statusLabel() }}
+                                    </span>
+
+                                    <span
+                                        @class([
+                                            'inline-flex w-fit items-center gap-1.5 rounded-full px-3 py-1 text-xs font-medium',
+                                            'bg-emerald-50 text-emerald-700' => $package->client_role === 'sender',
+                                            'bg-indigo-50 text-indigo-700' => $package->client_role === 'recipient',
+                                        ])
+                                    >
+                                        @if ($package->client_role === 'sender')
+                                            Enviado por ti
+                                        @else
+                                            Para ti
+                                        @endif
+                                    </span>
+
+                                </div>
 
                             </div>
 
@@ -293,8 +289,4 @@
 
             @endif
 
-        </div>
-
-    </div>
-
-</x-app-layout>
+</div>

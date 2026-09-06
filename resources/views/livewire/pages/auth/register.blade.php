@@ -1,8 +1,9 @@
-<?php
+﻿<?php
 
 use App\Models\Ally;
 use App\Models\Driver;
 use App\Models\User;
+use App\Notifications\WelcomeVerificationToken;
 use App\Services\VenezuelaLocationService;
 use Illuminate\Auth\Events\Registered;
 use Illuminate\Support\Facades\Auth;
@@ -107,7 +108,7 @@ new #[Layout('layouts.guest')] class extends Component
 
         /*
         |--------------------------------------------------------------------------
-        | VALIDACIÓN DE ALIADO
+        | VALIDACIÃ“N DE ALIADO
         |--------------------------------------------------------------------------
         */
 
@@ -146,7 +147,7 @@ new #[Layout('layouts.guest')] class extends Component
 
         /*
         |--------------------------------------------------------------------------
-        | VALIDACIÓN DE CHOFER
+        | VALIDACIÃ“N DE CHOFER
         |--------------------------------------------------------------------------
         */
 
@@ -252,10 +253,20 @@ new #[Layout('layouts.guest')] class extends Component
         |--------------------------------------------------------------------------
         */
 
-        Auth::login($user);
+        // Generar y guardar el código de verificación.
+        $plainToken = $user->generateVerificationToken();
 
+        // Enviar el código al correo del cliente.
+        $user->notify(new WelcomeVerificationToken($plainToken));
+
+        // Guardar temporalmente el usuario pendiente de verificación.
+        session([
+            'pending_verification_user_id' => $user->id,
+        ]);
+
+        // El cliente debe verificar su cuenta antes de entrar al panel.
         $this->redirect(
-            route('cliente.dashboard', absolute: false),
+            route('verify-account', absolute: false),
             navigate: true
         );
     }
@@ -272,7 +283,7 @@ new #[Layout('layouts.guest')] class extends Component
     </h1>
 
     <p class="mt-1.5 text-sm text-gray-500">
-        Regístrate para gestionar tus guías, tarifas o entregas en VenExpress.
+        RegÃ­strate para gestionar tus guÃ­as, tarifas o entregas en VenExpress.
     </p>
 
     <form wire:submit="register" class="mt-8 space-y-5">
@@ -306,7 +317,7 @@ new #[Layout('layouts.guest')] class extends Component
         <div>
             <x-input-label
                 for="email"
-                value="Correo electrónico"
+                value="Correo electrÃ³nico"
             />
 
             <x-text-input
@@ -368,11 +379,11 @@ new #[Layout('layouts.guest')] class extends Component
             <div class="border-t border-gray-200 pt-5">
 
                 <h2 class="text-sm font-semibold text-blue-950">
-                    Información del punto aliado
+                    InformaciÃ³n del punto aliado
                 </h2>
 
                 <p class="mt-1 text-xs text-gray-500">
-                    Estos datos serán revisados por VenExpress antes de activar el comercio.
+                    Estos datos serÃ¡n revisados por VenExpress antes de activar el comercio.
                 </p>
 
             </div>
@@ -484,11 +495,11 @@ new #[Layout('layouts.guest')] class extends Component
                 />
             </div>
 
-            {{-- DIRECCIÓN --}}
+            {{-- DIRECCIÃ“N --}}
             <div>
                 <x-input-label
                     for="address"
-                    value="Dirección"
+                    value="DirecciÃ³n"
                 />
 
                 <x-text-input
@@ -496,7 +507,7 @@ new #[Layout('layouts.guest')] class extends Component
                     id="address"
                     class="block mt-1.5 w-full"
                     type="text"
-                    placeholder="Dirección del establecimiento"
+                    placeholder="DirecciÃ³n del establecimiento"
                 />
 
                 <x-input-error
@@ -516,7 +527,7 @@ new #[Layout('layouts.guest')] class extends Component
             <div class="border-t border-gray-200 pt-5">
 
                 <h2 class="text-sm font-semibold text-blue-950">
-                    Información del repartidor
+                    InformaciÃ³n del repartidor
                 </h2>
 
             </div>
@@ -525,7 +536,7 @@ new #[Layout('layouts.guest')] class extends Component
             <div>
                 <x-input-label
                     for="vehicle_plate"
-                    value="Placa del vehículo"
+                    value="Placa del vehÃ­culo"
                 />
 
                 <x-text-input
@@ -542,11 +553,11 @@ new #[Layout('layouts.guest')] class extends Component
                 />
             </div>
 
-            {{-- VEHÍCULO --}}
+            {{-- VEHÃCULO --}}
             <div>
                 <x-input-label
                     for="vehicle_type"
-                    value="Tipo de vehículo"
+                    value="Tipo de vehÃ­culo"
                 />
 
                 <x-text-input
@@ -554,7 +565,7 @@ new #[Layout('layouts.guest')] class extends Component
                     id="vehicle_type"
                     class="block mt-1.5 w-full"
                     type="text"
-                    placeholder="Moto, automóvil, camioneta..."
+                    placeholder="Moto, automÃ³vil, camioneta..."
                 />
 
                 <x-input-error
@@ -563,11 +574,11 @@ new #[Layout('layouts.guest')] class extends Component
                 />
             </div>
 
-            {{-- TELÉFONO --}}
+            {{-- TELÃ‰FONO --}}
             <div>
                 <x-input-label
                     for="phone"
-                    value="Teléfono"
+                    value="TelÃ©fono"
                 />
 
                 <x-text-input
@@ -587,13 +598,13 @@ new #[Layout('layouts.guest')] class extends Component
         @endif
 
         {{-- ====================================================== --}}
-        {{-- CONTRASEÑA --}}
+        {{-- CONTRASEÃ‘A --}}
         {{-- ====================================================== --}}
 
         <div>
             <x-input-label
                 for="password"
-                value="Contraseña"
+                value="ContraseÃ±a"
             />
 
             <x-password-input
@@ -603,7 +614,7 @@ new #[Layout('layouts.guest')] class extends Component
                 name="password"
                 required
                 autocomplete="new-password"
-                placeholder="••••••••"
+                placeholder="â€¢â€¢â€¢â€¢â€¢â€¢â€¢â€¢"
             />
 
             <x-input-error
@@ -612,11 +623,11 @@ new #[Layout('layouts.guest')] class extends Component
             />
         </div>
 
-        {{-- CONFIRMAR CONTRASEÑA --}}
+        {{-- CONFIRMAR CONTRASEÃ‘A --}}
         <div>
             <x-input-label
                 for="password_confirmation"
-                value="Confirmar contraseña"
+                value="Confirmar contraseÃ±a"
             />
 
             <x-password-input
@@ -626,7 +637,7 @@ new #[Layout('layouts.guest')] class extends Component
                 name="password_confirmation"
                 required
                 autocomplete="new-password"
-                placeholder="••••••••"
+                placeholder="â€¢â€¢â€¢â€¢â€¢â€¢â€¢â€¢"
             />
 
             <x-input-error
@@ -635,7 +646,7 @@ new #[Layout('layouts.guest')] class extends Component
             />
         </div>
 
-        {{-- BOTÓN --}}
+        {{-- BOTÃ“N --}}
         <x-primary-button class="w-full py-3">
             Crear cuenta
         </x-primary-button>
@@ -643,14 +654,14 @@ new #[Layout('layouts.guest')] class extends Component
     </form>
 
     <p class="mt-8 text-center text-sm text-gray-500">
-        ¿Ya tienes una cuenta?
+        Â¿Ya tienes una cuenta?
 
         <a
             href="{{ route('login') }}"
             class="font-semibold text-blue-700 hover:text-blue-950"
             wire:navigate
         >
-            Inicia sesión
+            Inicia sesiÃ³n
         </a>
     </p>
 

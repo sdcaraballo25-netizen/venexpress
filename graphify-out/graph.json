@@ -121,19 +121,6 @@
       "source_location": "L11"
     },
     {
-      "id": "app_services_distanceapiservice_distanceapiservice",
-      "label": "DistanceApiService",
-      "_callable": true,
-      "_callable_class": true,
-      "_origin": "ast",
-      "community": 111,
-      "community_name": "TariffService",
-      "file_type": "code",
-      "norm_label": "distanceapiservice",
-      "source_file": "app/Services/DistanceApiService.php",
-      "source_location": "L9"
-    },
-    {
       "id": "app_services_tariffservice_tariffservice",
       "label": "TariffService",
       "_callable": true,
@@ -374,11 +361,24 @@
       "_callable_class": true,
       "_origin": "ast",
       "community": 127,
-      "community_name": "Client/Dashboard.php",
+      "community_name": "Driver/Dashboard.php",
       "file_type": "code",
       "norm_label": "dashboard",
       "source_file": "app/Livewire/Driver/Dashboard.php",
       "source_location": "L10"
+    },
+    {
+      "id": "app_services_driverpaymentservice_driverpaymentservice",
+      "label": "DriverPaymentService",
+      "_callable": true,
+      "_callable_class": true,
+      "_origin": "ast",
+      "community": 128,
+      "community_name": "App\\Models\\DriverPayment",
+      "file_type": "code",
+      "norm_label": "driverpaymentservice",
+      "source_file": "app/Services/DriverPaymentService.php",
+      "source_location": "L12"
     },
     {
       "id": "app_livewire_admin_driverpayments_driverpayments",
@@ -407,19 +407,6 @@
       "source_location": "L9"
     },
     {
-      "id": "app_services_driverpaymentservice_driverpaymentservice",
-      "label": "DriverPaymentService",
-      "_callable": true,
-      "_callable_class": true,
-      "_origin": "ast",
-      "community": 14,
-      "community_name": "AuditLog",
-      "file_type": "code",
-      "norm_label": "driverpaymentservice",
-      "source_file": "app/Services/DriverPaymentService.php",
-      "source_location": "L12"
-    },
-    {
       "id": "tests_feature_allyfinancialsettlementtest_allyfinancialsettlementtest",
       "label": "AllyFinancialSettlementTest",
       "_callable": true,
@@ -444,19 +431,6 @@
       "norm_label": "driverassignment",
       "source_file": "app/Livewire/Admin/DriverAssignment.php",
       "source_location": "L12"
-    },
-    {
-      "id": "app_livewire_admin_packagedispatch_packagedispatch",
-      "label": "PackageDispatch",
-      "_callable": true,
-      "_callable_class": true,
-      "_origin": "ast",
-      "community": 141,
-      "community_name": "Package",
-      "file_type": "code",
-      "norm_label": "packagedispatch",
-      "source_file": "app/Livewire/Admin/PackageDispatch.php",
-      "source_location": "L11"
     },
     {
       "id": "app_livewire_admin_packagereception_packagereception",
@@ -521,6 +495,19 @@
       "file_type": "code",
       "norm_label": "package",
       "source_file": "app/Models/Package.php",
+      "source_location": "L10"
+    },
+    {
+      "id": "app_services_destinationreceptionservice_destinationreceptionservice",
+      "label": "DestinationReceptionService",
+      "_callable": true,
+      "_callable_class": true,
+      "_origin": "ast",
+      "community": 141,
+      "community_name": "Package",
+      "file_type": "code",
+      "norm_label": "destinationreceptionservice",
+      "source_file": "app/Services/DestinationReceptionService.php",
       "source_location": "L10"
     },
     {
@@ -615,17 +602,17 @@
       "source_location": "L5"
     },
     {
-      "id": "tests_feature_packageservicecodtest_packageservicecodtest",
-      "label": "PackageServiceCodTest",
+      "id": "app_http_middleware_ensureuserhasrole_ensureuserhasrole",
+      "label": "EnsureUserHasRole",
       "_callable": true,
       "_callable_class": true,
       "_origin": "ast",
       "community": 17,
-      "community_name": "PackageServiceCodTest",
+      "community_name": "bootstrap/app.php",
       "file_type": "code",
-      "norm_label": "packageservicecodtest",
-      "source_file": "tests/Feature/PackageServiceCodTest.php",
-      "source_location": "L21"
+      "norm_label": "ensureuserhasrole",
+      "source_file": "app/Http/Middleware/EnsureUserHasRole.php",
+      "source_location": "L9"
     },
     {
       "id": "tests_feature_auth_passwordconfirmationtest_passwordconfirmationtest",
@@ -693,17 +680,17 @@
       "source_location": "L8"
     },
     {
-      "id": "app_livewire_tracking_publictracking_publictracking",
-      "label": "PublicTracking",
+      "id": "app_services_distanceapiservice_distanceapiservice",
+      "label": "DistanceApiService",
       "_callable": true,
       "_callable_class": true,
       "_origin": "ast",
       "community": 178,
-      "community_name": "PublicTracking",
+      "community_name": "DistanceApiService",
       "file_type": "code",
-      "norm_label": "publictracking",
-      "source_file": "app/Livewire/Tracking/PublicTracking.php",
-      "source_location": "L10"
+      "norm_label": "distanceapiservice",
+      "source_file": "app/Services/DistanceApiService.php",
+      "source_location": "L9"
     },
     {
       "id": "tests_feature_auth_passwordresettest_passwordresettest",
@@ -782,6 +769,110 @@
       "norm_label": "allyfinancialservice",
       "source_file": "app/Services/AllyFinancialService.php",
       "source_location": "L15"
+    },
+    {
+      "id": "app_http_controllers_driverscancontroller_driverscancontroller",
+      "label": "DriverScanController",
+      "_callable": true,
+      "_callable_class": true,
+      "_origin": "ast",
+      "community": 204,
+      "community_name": "Illuminate\\Http\\Request",
+      "file_type": "code",
+      "norm_label": "driverscancontroller",
+      "source_file": "app/Http/Controllers/DriverScanController.php",
+      "source_location": "L9"
+    },
+    {
+      "id": "app_http_controllers_packagelabelcontroller_packagelabelcontroller",
+      "label": "PackageLabelController",
+      "_callable": true,
+      "_callable_class": true,
+      "_origin": "ast",
+      "community": 205,
+      "community_name": "PackageLabelController.php",
+      "file_type": "code",
+      "norm_label": "packagelabelcontroller",
+      "source_file": "app/Http/Controllers/PackageLabelController.php",
+      "source_location": "L13"
+    },
+    {
+      "id": "app_http_controllers_paymentwebhookcontroller_paymentwebhookcontroller",
+      "label": "PaymentWebhookController",
+      "_callable": true,
+      "_callable_class": true,
+      "_origin": "ast",
+      "community": 206,
+      "community_name": "PaymentReconciliationService",
+      "file_type": "code",
+      "norm_label": "paymentwebhookcontroller",
+      "source_file": "app/Http/Controllers/PaymentWebhookController.php",
+      "source_location": "L13"
+    },
+    {
+      "id": "app_services_paymentreconciliationservice_paymentreconciliationservice",
+      "label": "PaymentReconciliationService",
+      "_callable": true,
+      "_callable_class": true,
+      "_origin": "ast",
+      "community": 206,
+      "community_name": "PaymentReconciliationService",
+      "file_type": "code",
+      "norm_label": "paymentreconciliationservice",
+      "source_file": "app/Services/PaymentReconciliationService.php",
+      "source_location": "L10"
+    },
+    {
+      "id": "app_livewire_client_dashboard_dashboard",
+      "label": "Dashboard",
+      "_callable": true,
+      "_callable_class": true,
+      "_origin": "ast",
+      "community": 207,
+      "community_name": "Dashboard",
+      "file_type": "code",
+      "norm_label": "dashboard",
+      "source_file": "app/Livewire/Client/Dashboard.php",
+      "source_location": "L14"
+    },
+    {
+      "id": "app_livewire_admin_packagedispatch_packagedispatch",
+      "label": "PackageDispatch",
+      "_callable": true,
+      "_callable_class": true,
+      "_origin": "ast",
+      "community": 208,
+      "community_name": "PackageDispatch",
+      "file_type": "code",
+      "norm_label": "packagedispatch",
+      "source_file": "app/Livewire/Admin/PackageDispatch.php",
+      "source_location": "L11"
+    },
+    {
+      "id": "app_services_packagedispatchservice_packagedispatchservice",
+      "label": "PackageDispatchService",
+      "_callable": true,
+      "_callable_class": true,
+      "_origin": "ast",
+      "community": 208,
+      "community_name": "PackageDispatch",
+      "file_type": "code",
+      "norm_label": "packagedispatchservice",
+      "source_file": "app/Services/PackageDispatchService.php",
+      "source_location": "L10"
+    },
+    {
+      "id": "app_livewire_driver_packagedetail_packagedetail",
+      "label": "PackageDetail",
+      "_callable": true,
+      "_callable_class": true,
+      "_origin": "ast",
+      "community": 209,
+      "community_name": "PackageDetail",
+      "file_type": "code",
+      "norm_label": "packagedetail",
+      "source_file": "app/Livewire/Driver/PackageDetail.php",
+      "source_location": "L12"
     },
     {
       "id": "app_livewire_admin_alliesmanager_alliesmanager",
@@ -992,19 +1083,6 @@
       "source_location": "L11"
     },
     {
-      "id": "app_livewire_client_dashboard_dashboard",
-      "label": "Dashboard",
-      "_callable": true,
-      "_callable_class": true,
-      "_origin": "ast",
-      "community": 71,
-      "community_name": "Incident",
-      "file_type": "code",
-      "norm_label": "dashboard",
-      "source_file": "app/Livewire/Client/Dashboard.php",
-      "source_location": "L14"
-    },
-    {
       "id": "app_models_incident_incident",
       "label": "Incident",
       "_callable": true,
@@ -1057,69 +1135,17 @@
       "source_location": "L11"
     },
     {
-      "id": "app_http_controllers_driverscancontroller_driverscancontroller",
-      "label": "DriverScanController",
-      "_callable": true,
-      "_callable_class": true,
-      "_origin": "ast",
-      "community": 8,
-      "community_name": "PaymentReconciliationService",
-      "file_type": "code",
-      "norm_label": "driverscancontroller",
-      "source_file": "app/Http/Controllers/DriverScanController.php",
-      "source_location": "L9"
-    },
-    {
-      "id": "app_http_controllers_paymentwebhookcontroller_paymentwebhookcontroller",
-      "label": "PaymentWebhookController",
-      "_callable": true,
-      "_callable_class": true,
-      "_origin": "ast",
-      "community": 8,
-      "community_name": "PaymentReconciliationService",
-      "file_type": "code",
-      "norm_label": "paymentwebhookcontroller",
-      "source_file": "app/Http/Controllers/PaymentWebhookController.php",
-      "source_location": "L13"
-    },
-    {
       "id": "app_http_controllers_trackingcontroller_trackingcontroller",
       "label": "TrackingController",
       "_callable": true,
       "_callable_class": true,
       "_origin": "ast",
       "community": 8,
-      "community_name": "PaymentReconciliationService",
+      "community_name": "App\\Http\\Controllers\\TrackingController",
       "file_type": "code",
       "norm_label": "trackingcontroller",
       "source_file": "app/Http/Controllers/TrackingController.php",
       "source_location": "L19"
-    },
-    {
-      "id": "app_http_middleware_ensureuserhasrole_ensureuserhasrole",
-      "label": "EnsureUserHasRole",
-      "_callable": true,
-      "_callable_class": true,
-      "_origin": "ast",
-      "community": 8,
-      "community_name": "PaymentReconciliationService",
-      "file_type": "code",
-      "norm_label": "ensureuserhasrole",
-      "source_file": "app/Http/Middleware/EnsureUserHasRole.php",
-      "source_location": "L9"
-    },
-    {
-      "id": "app_services_paymentreconciliationservice_paymentreconciliationservice",
-      "label": "PaymentReconciliationService",
-      "_callable": true,
-      "_callable_class": true,
-      "_origin": "ast",
-      "community": 8,
-      "community_name": "PaymentReconciliationService",
-      "file_type": "code",
-      "norm_label": "paymentreconciliationservice",
-      "source_file": "app/Services/PaymentReconciliationService.php",
-      "source_location": "L10"
     },
     {
       "id": "app_view_components_applayout_applayout",
@@ -1128,7 +1154,7 @@
       "_callable_class": true,
       "_origin": "ast",
       "community": 8,
-      "community_name": "PaymentReconciliationService",
+      "community_name": "App\\Http\\Controllers\\TrackingController",
       "file_type": "code",
       "norm_label": "applayout",
       "source_file": "app/View/Components/AppLayout.php",
@@ -1141,7 +1167,7 @@
       "_callable_class": true,
       "_origin": "ast",
       "community": 8,
-      "community_name": "PaymentReconciliationService",
+      "community_name": "App\\Http\\Controllers\\TrackingController",
       "file_type": "code",
       "norm_label": "guestlayout",
       "source_file": "app/View/Components/GuestLayout.php",
@@ -1265,19 +1291,6 @@
       "source_location": "L10"
     },
     {
-      "id": "app_http_controllers_packagelabelcontroller_packagelabelcontroller",
-      "label": "PackageLabelController",
-      "_callable": true,
-      "_callable_class": true,
-      "_origin": "ast",
-      "community": 93,
-      "community_name": "App\\Models\\Package",
-      "file_type": "code",
-      "norm_label": "packagelabelcontroller",
-      "source_file": "app/Http/Controllers/PackageLabelController.php",
-      "source_location": "L13"
-    },
-    {
       "id": "app_livewire_ally_createpackage_createpackage",
       "label": "CreatePackage",
       "_callable": true,
@@ -1291,17 +1304,17 @@
       "source_location": "L12"
     },
     {
-      "id": "app_livewire_driver_packagedetail_packagedetail",
-      "label": "PackageDetail",
+      "id": "app_livewire_tracking_publictracking_publictracking",
+      "label": "PublicTracking",
       "_callable": true,
       "_callable_class": true,
       "_origin": "ast",
       "community": 93,
       "community_name": "App\\Models\\Package",
       "file_type": "code",
-      "norm_label": "packagedetail",
-      "source_file": "app/Livewire/Driver/PackageDetail.php",
-      "source_location": "L12"
+      "norm_label": "publictracking",
+      "source_file": "app/Livewire/Tracking/PublicTracking.php",
+      "source_location": "L10"
     },
     {
       "id": "app_services_logisticsscanservice_logisticsscanservice",
@@ -1328,6 +1341,19 @@
       "norm_label": "packageservice",
       "source_file": "app/Services/PackageService.php",
       "source_location": "L20"
+    },
+    {
+      "id": "tests_feature_packageservicecodtest_packageservicecodtest",
+      "label": "PackageServiceCodTest",
+      "_callable": true,
+      "_callable_class": true,
+      "_origin": "ast",
+      "community": 93,
+      "community_name": "App\\Models\\Package",
+      "file_type": "code",
+      "norm_label": "packageservicecodtest",
+      "source_file": "tests/Feature/PackageServiceCodTest.php",
+      "source_location": "L21"
     },
     {
       "id": "tests_feature_auth_emailverificationtest_emailverificationtest",
@@ -1369,19 +1395,6 @@
       "source_location": "L13"
     },
     {
-      "id": "app_services_destinationreceptionservice_destinationreceptionservice",
-      "label": "DestinationReceptionService",
-      "_callable": true,
-      "_callable_class": true,
-      "_origin": "ast",
-      "community": 98,
-      "community_name": "RuntimeException",
-      "file_type": "code",
-      "norm_label": "destinationreceptionservice",
-      "source_file": "app/Services/DestinationReceptionService.php",
-      "source_location": "L10"
-    },
-    {
       "id": "app_services_hubreceptionservice_hubreceptionservice",
       "label": "HubReceptionService",
       "_callable": true,
@@ -1392,19 +1405,6 @@
       "file_type": "code",
       "norm_label": "hubreceptionservice",
       "source_file": "app/Services/HubReceptionService.php",
-      "source_location": "L10"
-    },
-    {
-      "id": "app_services_packagedispatchservice_packagedispatchservice",
-      "label": "PackageDispatchService",
-      "_callable": true,
-      "_callable_class": true,
-      "_origin": "ast",
-      "community": 98,
-      "community_name": "RuntimeException",
-      "file_type": "code",
-      "norm_label": "packagedispatchservice",
-      "source_file": "app/Services/PackageDispatchService.php",
       "source_location": "L10"
     },
     {
@@ -2092,18 +2092,6 @@
       "source_location": "L14"
     },
     {
-      "id": "app_livewire_admin_bcvratemanager_bcvratemanager_syncnow",
-      "label": ".syncNow()",
-      "_callable": true,
-      "_origin": "ast",
-      "community": 111,
-      "community_name": "TariffService",
-      "file_type": "code",
-      "norm_label": ".syncnow()",
-      "source_file": "app/Livewire/Admin/BcvRateManager.php",
-      "source_location": "L126"
-    },
-    {
       "id": "app_services_bcvrateservice_bcvrateservice_convertusdtoves",
       "label": ".convertUsdToVes()",
       "_callable": true,
@@ -2162,78 +2150,6 @@
       "norm_label": ".syncfromapi()",
       "source_file": "app/Services/BcvRateService.php",
       "source_location": "L81"
-    },
-    {
-      "id": "app_services_distanceapiservice_distanceapiservice_calculateroutedistance",
-      "label": ".calculateRouteDistance()",
-      "_callable": true,
-      "_origin": "ast",
-      "community": 111,
-      "community_name": "TariffService",
-      "file_type": "code",
-      "norm_label": ".calculateroutedistance()",
-      "source_file": "app/Services/DistanceApiService.php",
-      "source_location": "L201"
-    },
-    {
-      "id": "app_services_distanceapiservice_distanceapiservice_distancecachekey",
-      "label": ".distanceCacheKey()",
-      "_callable": true,
-      "_origin": "ast",
-      "community": 111,
-      "community_name": "TariffService",
-      "file_type": "code",
-      "norm_label": ".distancecachekey()",
-      "source_file": "app/Services/DistanceApiService.php",
-      "source_location": "L266"
-    },
-    {
-      "id": "app_services_distanceapiservice_distanceapiservice_drivingdistancekm",
-      "label": ".drivingDistanceKm()",
-      "_callable": true,
-      "_origin": "ast",
-      "community": 111,
-      "community_name": "TariffService",
-      "file_type": "code",
-      "norm_label": ".drivingdistancekm()",
-      "source_file": "app/Services/DistanceApiService.php",
-      "source_location": "L28"
-    },
-    {
-      "id": "app_services_distanceapiservice_distanceapiservice_geocode",
-      "label": ".geocode()",
-      "_callable": true,
-      "_origin": "ast",
-      "community": 111,
-      "community_name": "TariffService",
-      "file_type": "code",
-      "norm_label": ".geocode()",
-      "source_file": "app/Services/DistanceApiService.php",
-      "source_location": "L115"
-    },
-    {
-      "id": "app_services_distanceapiservice_distanceapiservice_normalizestate",
-      "label": ".normalizeState()",
-      "_callable": true,
-      "_origin": "ast",
-      "community": 111,
-      "community_name": "TariffService",
-      "file_type": "code",
-      "norm_label": ".normalizestate()",
-      "source_file": "app/Services/DistanceApiService.php",
-      "source_location": "L326"
-    },
-    {
-      "id": "app_services_distanceapiservice_distanceapiservice_samelocation",
-      "label": ".sameLocation()",
-      "_callable": true,
-      "_origin": "ast",
-      "community": 111,
-      "community_name": "TariffService",
-      "file_type": "code",
-      "norm_label": ".samelocation()",
-      "source_file": "app/Services/DistanceApiService.php",
-      "source_location": "L298"
     },
     {
       "id": "app_services_packageservice_packageservice_construct",
@@ -3969,7 +3885,7 @@
       "_callable": true,
       "_origin": "ast",
       "community": 127,
-      "community_name": "Client/Dashboard.php",
+      "community_name": "Driver/Dashboard.php",
       "file_type": "code",
       "norm_label": ".daterangeforperiod()",
       "source_file": "app/Livewire/Driver/dashboard.php",
@@ -3981,7 +3897,7 @@
       "_callable": true,
       "_origin": "ast",
       "community": 127,
-      "community_name": "Client/Dashboard.php",
+      "community_name": "Driver/Dashboard.php",
       "file_type": "code",
       "norm_label": ".render()",
       "source_file": "app/Livewire/Driver/Dashboard.php",
@@ -3993,11 +3909,59 @@
       "_callable": true,
       "_origin": "ast",
       "community": 127,
-      "community_name": "Client/Dashboard.php",
+      "community_name": "Driver/Dashboard.php",
       "file_type": "code",
       "norm_label": ".setperiod()",
       "source_file": "app/Livewire/Driver/dashboard.php",
       "source_location": "L14"
+    },
+    {
+      "id": "app_services_driverpaymentservice_driverpaymentservice_amount",
+      "label": ".amount()",
+      "_callable": true,
+      "_origin": "ast",
+      "community": 128,
+      "community_name": "App\\Models\\DriverPayment",
+      "file_type": "code",
+      "norm_label": ".amount()",
+      "source_file": "app/Services/DriverPaymentService.php",
+      "source_location": "L14"
+    },
+    {
+      "id": "app_services_driverpaymentservice_driverpaymentservice_cancel",
+      "label": ".cancel()",
+      "_callable": true,
+      "_origin": "ast",
+      "community": 128,
+      "community_name": "App\\Models\\DriverPayment",
+      "file_type": "code",
+      "norm_label": ".cancel()",
+      "source_file": "app/Services/DriverPaymentService.php",
+      "source_location": "L56"
+    },
+    {
+      "id": "app_services_driverpaymentservice_driverpaymentservice_createfordeliveredpackage",
+      "label": ".createForDeliveredPackage()",
+      "_callable": true,
+      "_origin": "ast",
+      "community": 128,
+      "community_name": "App\\Models\\DriverPayment",
+      "file_type": "code",
+      "norm_label": ".createfordeliveredpackage()",
+      "source_file": "app/Services/DriverPaymentService.php",
+      "source_location": "L19"
+    },
+    {
+      "id": "app_services_driverpaymentservice_driverpaymentservice_markpaid",
+      "label": ".markPaid()",
+      "_callable": true,
+      "_origin": "ast",
+      "community": 128,
+      "community_name": "App\\Models\\DriverPayment",
+      "file_type": "code",
+      "norm_label": ".markpaid()",
+      "source_file": "app/Services/DriverPaymentService.php",
+      "source_location": "L93"
     },
     {
       "id": "database_migrations_2026_08_24_090002_create_route_stops_table_down",
@@ -4118,54 +4082,6 @@
       "norm_label": ".casts()",
       "source_file": "app/Models/AuditLog.php",
       "source_location": "L23"
-    },
-    {
-      "id": "app_services_driverpaymentservice_driverpaymentservice_amount",
-      "label": ".amount()",
-      "_callable": true,
-      "_origin": "ast",
-      "community": 14,
-      "community_name": "AuditLog",
-      "file_type": "code",
-      "norm_label": ".amount()",
-      "source_file": "app/Services/DriverPaymentService.php",
-      "source_location": "L14"
-    },
-    {
-      "id": "app_services_driverpaymentservice_driverpaymentservice_cancel",
-      "label": ".cancel()",
-      "_callable": true,
-      "_origin": "ast",
-      "community": 14,
-      "community_name": "AuditLog",
-      "file_type": "code",
-      "norm_label": ".cancel()",
-      "source_file": "app/Services/DriverPaymentService.php",
-      "source_location": "L56"
-    },
-    {
-      "id": "app_services_driverpaymentservice_driverpaymentservice_createfordeliveredpackage",
-      "label": ".createForDeliveredPackage()",
-      "_callable": true,
-      "_origin": "ast",
-      "community": 14,
-      "community_name": "AuditLog",
-      "file_type": "code",
-      "norm_label": ".createfordeliveredpackage()",
-      "source_file": "app/Services/DriverPaymentService.php",
-      "source_location": "L19"
-    },
-    {
-      "id": "app_services_driverpaymentservice_driverpaymentservice_markpaid",
-      "label": ".markPaid()",
-      "_callable": true,
-      "_origin": "ast",
-      "community": 14,
-      "community_name": "AuditLog",
-      "file_type": "code",
-      "norm_label": ".markpaid()",
-      "source_file": "app/Services/DriverPaymentService.php",
-      "source_location": "L93"
     },
     {
       "id": "tests_feature_allyfinancialsettlementtest_allyfinancialsettlementtest_test_adjustment_requires_a_description",
@@ -4310,54 +4226,6 @@
       "norm_label": ".search()",
       "source_file": "app/Livewire/Admin/DriverAssignment.php",
       "source_location": "L21"
-    },
-    {
-      "id": "app_livewire_admin_packagedispatch_packagedispatch_clear",
-      "label": ".clear()",
-      "_callable": true,
-      "_origin": "ast",
-      "community": 141,
-      "community_name": "Package",
-      "file_type": "code",
-      "norm_label": ".clear()",
-      "source_file": "app/Livewire/Admin/PackageDispatch.php",
-      "source_location": "L90"
-    },
-    {
-      "id": "app_livewire_admin_packagedispatch_packagedispatch_dispatchpackage",
-      "label": ".dispatchPackage()",
-      "_callable": true,
-      "_origin": "ast",
-      "community": 141,
-      "community_name": "Package",
-      "file_type": "code",
-      "norm_label": ".dispatchpackage()",
-      "source_file": "app/Livewire/Admin/PackageDispatch.php",
-      "source_location": "L47"
-    },
-    {
-      "id": "app_livewire_admin_packagedispatch_packagedispatch_render",
-      "label": ".render()",
-      "_callable": true,
-      "_origin": "ast",
-      "community": 141,
-      "community_name": "Package",
-      "file_type": "code",
-      "norm_label": ".render()",
-      "source_file": "app/Livewire/Admin/PackageDispatch.php",
-      "source_location": "L102"
-    },
-    {
-      "id": "app_livewire_admin_packagedispatch_packagedispatch_search",
-      "label": ".search()",
-      "_callable": true,
-      "_origin": "ast",
-      "community": 141,
-      "community_name": "Package",
-      "file_type": "code",
-      "norm_label": ".search()",
-      "source_file": "app/Livewire/Admin/PackageDispatch.php",
-      "source_location": "L26"
     },
     {
       "id": "app_livewire_admin_packagereception_packagereception_clear",
@@ -4682,6 +4550,18 @@
       "norm_label": ".verifysecurityhash()",
       "source_file": "app/Models/Package.php",
       "source_location": "L275"
+    },
+    {
+      "id": "app_services_destinationreceptionservice_destinationreceptionservice_receive",
+      "label": ".receive()",
+      "_callable": true,
+      "_origin": "ast",
+      "community": 141,
+      "community_name": "Package",
+      "file_type": "code",
+      "norm_label": ".receive()",
+      "source_file": "app/Services/DestinationReceptionService.php",
+      "source_location": "L16"
     },
     {
       "id": "app_livewire_ally_commissions_commissions_monthlybreakdown",
@@ -5260,124 +5140,16 @@
       "source_location": "L23"
     },
     {
-      "id": "tests_feature_packageservicecodtest_packageservicecodtest_deliverpackage",
-      "label": ".deliverPackage()",
+      "id": "app_http_middleware_ensureuserhasrole_ensureuserhasrole_handle",
+      "label": ".handle()",
       "_callable": true,
       "_origin": "ast",
       "community": 17,
-      "community_name": "PackageServiceCodTest",
+      "community_name": "bootstrap/app.php",
       "file_type": "code",
-      "norm_label": ".deliverpackage()",
-      "source_file": "tests/Feature/PackageServiceCodTest.php",
-      "source_location": "L35"
-    },
-    {
-      "id": "tests_feature_packageservicecodtest_packageservicecodtest_setup",
-      "label": ".setUp()",
-      "_callable": true,
-      "_origin": "ast",
-      "community": 17,
-      "community_name": "PackageServiceCodTest",
-      "file_type": "code",
-      "norm_label": ".setup()",
-      "source_file": "tests/Feature/PackageServiceCodTest.php",
-      "source_location": "L28"
-    },
-    {
-      "id": "tests_feature_packageservicecodtest_packageservicecodtest_test_cod_cannot_be_collected_before_delivery",
-      "label": ".test_cod_cannot_be_collected_before_delivery()",
-      "_callable": true,
-      "_origin": "ast",
-      "community": 17,
-      "community_name": "PackageServiceCodTest",
-      "file_type": "code",
-      "norm_label": ".test_cod_cannot_be_collected_before_delivery()",
-      "source_file": "tests/Feature/PackageServiceCodTest.php",
-      "source_location": "L54"
-    },
-    {
-      "id": "tests_feature_packageservicecodtest_packageservicecodtest_test_cod_cannot_be_liquidated_twice",
-      "label": ".test_cod_cannot_be_liquidated_twice()",
-      "_callable": true,
-      "_origin": "ast",
-      "community": 17,
-      "community_name": "PackageServiceCodTest",
-      "file_type": "code",
-      "norm_label": ".test_cod_cannot_be_liquidated_twice()",
-      "source_file": "tests/Feature/PackageServiceCodTest.php",
-      "source_location": "L130"
-    },
-    {
-      "id": "tests_feature_packageservicecodtest_packageservicecodtest_test_cod_cannot_be_liquidated_without_collecting_first",
-      "label": ".test_cod_cannot_be_liquidated_without_collecting_first()",
-      "_callable": true,
-      "_origin": "ast",
-      "community": 17,
-      "community_name": "PackageServiceCodTest",
-      "file_type": "code",
-      "norm_label": ".test_cod_cannot_be_liquidated_without_collecting_first()",
-      "source_file": "tests/Feature/PackageServiceCodTest.php",
-      "source_location": "L151"
-    },
-    {
-      "id": "tests_feature_packageservicecodtest_packageservicecodtest_test_cod_collection_is_idempotent",
-      "label": ".test_cod_collection_is_idempotent()",
-      "_callable": true,
-      "_origin": "ast",
-      "community": 17,
-      "community_name": "PackageServiceCodTest",
-      "file_type": "code",
-      "norm_label": ".test_cod_collection_is_idempotent()",
-      "source_file": "tests/Feature/PackageServiceCodTest.php",
-      "source_location": "L105"
-    },
-    {
-      "id": "tests_feature_packageservicecodtest_packageservicecodtest_test_full_cod_flow_collect_then_liquidate",
-      "label": ".test_full_cod_flow_collect_then_liquidate()",
-      "_callable": true,
-      "_origin": "ast",
-      "community": 17,
-      "community_name": "PackageServiceCodTest",
-      "file_type": "code",
-      "norm_label": ".test_full_cod_flow_collect_then_liquidate()",
-      "source_file": "tests/Feature/PackageServiceCodTest.php",
-      "source_location": "L71"
-    },
-    {
-      "id": "tests_feature_packageservicecodtest_packageservicecodtest_test_invalid_status_transition_is_rejected",
-      "label": ".test_invalid_status_transition_is_rejected()",
-      "_callable": true,
-      "_origin": "ast",
-      "community": 17,
-      "community_name": "PackageServiceCodTest",
-      "file_type": "code",
-      "norm_label": ".test_invalid_status_transition_is_rejected()",
-      "source_file": "tests/Feature/PackageServiceCodTest.php",
-      "source_location": "L187"
-    },
-    {
-      "id": "tests_feature_packageservicecodtest_packageservicecodtest_test_non_cod_package_rejects_cod_collection",
-      "label": ".test_non_cod_package_rejects_cod_collection()",
-      "_callable": true,
-      "_origin": "ast",
-      "community": 17,
-      "community_name": "PackageServiceCodTest",
-      "file_type": "code",
-      "norm_label": ".test_non_cod_package_rejects_cod_collection()",
-      "source_file": "tests/Feature/PackageServiceCodTest.php",
-      "source_location": "L170"
-    },
-    {
-      "id": "tests_feature_packageservicecodtest_packageservicecodtest_test_status_cannot_change_once_delivered",
-      "label": ".test_status_cannot_change_once_delivered()",
-      "_callable": true,
-      "_origin": "ast",
-      "community": 17,
-      "community_name": "PackageServiceCodTest",
-      "file_type": "code",
-      "norm_label": ".test_status_cannot_change_once_delivered()",
-      "source_file": "tests/Feature/PackageServiceCodTest.php",
-      "source_location": "L203"
+      "norm_label": ".handle()",
+      "source_file": "app/Http/Middleware/EnsureUserHasRole.php",
+      "source_location": "L11"
     },
     {
       "id": "database_migrations_2026_09_03_000001_add_states_to_city_distances_table_down",
@@ -5536,40 +5308,76 @@
       "source_location": "L17"
     },
     {
-      "id": "app_livewire_tracking_publictracking_publictracking_clear",
-      "label": ".clear()",
+      "id": "app_services_distanceapiservice_distanceapiservice_calculateroutedistance",
+      "label": ".calculateRouteDistance()",
       "_callable": true,
       "_origin": "ast",
       "community": 178,
-      "community_name": "PublicTracking",
+      "community_name": "DistanceApiService",
       "file_type": "code",
-      "norm_label": ".clear()",
-      "source_file": "app/Livewire/Tracking/PublicTracking.php",
-      "source_location": "L40"
+      "norm_label": ".calculateroutedistance()",
+      "source_file": "app/Services/DistanceApiService.php",
+      "source_location": "L201"
     },
     {
-      "id": "app_livewire_tracking_publictracking_publictracking_render",
-      "label": ".render()",
+      "id": "app_services_distanceapiservice_distanceapiservice_distancecachekey",
+      "label": ".distanceCacheKey()",
       "_callable": true,
       "_origin": "ast",
       "community": 178,
-      "community_name": "PublicTracking",
+      "community_name": "DistanceApiService",
       "file_type": "code",
-      "norm_label": ".render()",
-      "source_file": "app/Livewire/Tracking/PublicTracking.php",
-      "source_location": "L45"
+      "norm_label": ".distancecachekey()",
+      "source_file": "app/Services/DistanceApiService.php",
+      "source_location": "L266"
     },
     {
-      "id": "app_livewire_tracking_publictracking_publictracking_search",
-      "label": ".search()",
+      "id": "app_services_distanceapiservice_distanceapiservice_drivingdistancekm",
+      "label": ".drivingDistanceKm()",
       "_callable": true,
       "_origin": "ast",
       "community": 178,
-      "community_name": "PublicTracking",
+      "community_name": "DistanceApiService",
       "file_type": "code",
-      "norm_label": ".search()",
-      "source_file": "app/Livewire/Tracking/PublicTracking.php",
-      "source_location": "L18"
+      "norm_label": ".drivingdistancekm()",
+      "source_file": "app/Services/DistanceApiService.php",
+      "source_location": "L28"
+    },
+    {
+      "id": "app_services_distanceapiservice_distanceapiservice_geocode",
+      "label": ".geocode()",
+      "_callable": true,
+      "_origin": "ast",
+      "community": 178,
+      "community_name": "DistanceApiService",
+      "file_type": "code",
+      "norm_label": ".geocode()",
+      "source_file": "app/Services/DistanceApiService.php",
+      "source_location": "L115"
+    },
+    {
+      "id": "app_services_distanceapiservice_distanceapiservice_normalizestate",
+      "label": ".normalizeState()",
+      "_callable": true,
+      "_origin": "ast",
+      "community": 178,
+      "community_name": "DistanceApiService",
+      "file_type": "code",
+      "norm_label": ".normalizestate()",
+      "source_file": "app/Services/DistanceApiService.php",
+      "source_location": "L326"
+    },
+    {
+      "id": "app_services_distanceapiservice_distanceapiservice_samelocation",
+      "label": ".sameLocation()",
+      "_callable": true,
+      "_origin": "ast",
+      "community": 178,
+      "community_name": "DistanceApiService",
+      "file_type": "code",
+      "norm_label": ".samelocation()",
+      "source_file": "app/Services/DistanceApiService.php",
+      "source_location": "L298"
     },
     {
       "id": "tests_feature_auth_passwordresettest_passwordresettest_test_password_can_be_reset_with_valid_token",
@@ -6157,7 +5965,7 @@
       "file_type": "code",
       "norm_label": "down()",
       "source_file": "database/migrations/2026_09_06_013233_add_unique_index_to_payment_order_id_on_ally_financial_transactions.php",
-      "source_location": "L25"
+      "source_location": "L38"
     },
     {
       "id": "database_migrations_2026_09_06_013233_add_unique_index_to_payment_order_id_on_ally_financial_transactions_up",
@@ -6169,7 +5977,331 @@
       "file_type": "code",
       "norm_label": "up()",
       "source_file": "database/migrations/2026_09_06_013233_add_unique_index_to_payment_order_id_on_ally_financial_transactions.php",
-      "source_location": "L16"
+      "source_location": "L21"
+    },
+    {
+      "id": "app_http_controllers_driverscancontroller_driverscancontroller_verify",
+      "label": ".verify()",
+      "_callable": true,
+      "_origin": "ast",
+      "community": 204,
+      "community_name": "Illuminate\\Http\\Request",
+      "file_type": "code",
+      "norm_label": ".verify()",
+      "source_file": "app/Http/Controllers/DriverScanController.php",
+      "source_location": "L21"
+    },
+    {
+      "id": "app_http_controllers_paymentwebhookcontroller_paymentwebhookcontroller_confirmfortesting",
+      "label": ".confirmForTesting()",
+      "_callable": true,
+      "_origin": "ast",
+      "community": 204,
+      "community_name": "Illuminate\\Http\\Request",
+      "file_type": "code",
+      "norm_label": ".confirmfortesting()",
+      "source_file": "app/Http/Controllers/PaymentWebhookController.php",
+      "source_location": "L27"
+    },
+    {
+      "id": "app_http_controllers_packagelabelcontroller_packagelabelcontroller_authorizeview",
+      "label": ".authorizeView()",
+      "_callable": true,
+      "_origin": "ast",
+      "community": 205,
+      "community_name": "PackageLabelController.php",
+      "file_type": "code",
+      "norm_label": ".authorizeview()",
+      "source_file": "app/Http/Controllers/PackageLabelController.php",
+      "source_location": "L82"
+    },
+    {
+      "id": "app_http_controllers_packagelabelcontroller_packagelabelcontroller_pdf",
+      "label": ".pdf()",
+      "_callable": true,
+      "_origin": "ast",
+      "community": 205,
+      "community_name": "PackageLabelController.php",
+      "file_type": "code",
+      "norm_label": ".pdf()",
+      "source_file": "app/Http/Controllers/PackageLabelController.php",
+      "source_location": "L18"
+    },
+    {
+      "id": "app_http_controllers_paymentwebhookcontroller_paymentwebhookcontroller_construct",
+      "label": ".__construct()",
+      "_callable": true,
+      "_origin": "ast",
+      "community": 206,
+      "community_name": "PaymentReconciliationService",
+      "file_type": "code",
+      "norm_label": ".__construct()",
+      "source_file": "app/Http/Controllers/PaymentWebhookController.php",
+      "source_location": "L15"
+    },
+    {
+      "id": "app_services_paymentreconciliationservice_paymentreconciliationservice_construct",
+      "label": ".__construct()",
+      "_callable": true,
+      "_origin": "ast",
+      "community": 206,
+      "community_name": "PaymentReconciliationService",
+      "file_type": "code",
+      "norm_label": ".__construct()",
+      "source_file": "app/Services/PaymentReconciliationService.php",
+      "source_location": "L12"
+    },
+    {
+      "id": "app_services_paymentreconciliationservice_paymentreconciliationservice_markcodascollected",
+      "label": ".markCodAsCollected()",
+      "_callable": true,
+      "_origin": "ast",
+      "community": 206,
+      "community_name": "PaymentReconciliationService",
+      "file_type": "code",
+      "norm_label": ".markcodascollected()",
+      "source_file": "app/Services/PaymentReconciliationService.php",
+      "source_location": "L201"
+    },
+    {
+      "id": "app_services_paymentreconciliationservice_paymentreconciliationservice_reconcileconfirmedorder",
+      "label": ".reconcileConfirmedOrder()",
+      "_callable": true,
+      "_origin": "ast",
+      "community": 206,
+      "community_name": "PaymentReconciliationService",
+      "file_type": "code",
+      "norm_label": ".reconcileconfirmedorder()",
+      "source_file": "app/Services/PaymentReconciliationService.php",
+      "source_location": "L24"
+    },
+    {
+      "id": "app_services_paymentreconciliationservice_paymentreconciliationservice_validateallydebtorder",
+      "label": ".validateAllyDebtOrder()",
+      "_callable": true,
+      "_origin": "ast",
+      "community": 206,
+      "community_name": "PaymentReconciliationService",
+      "file_type": "code",
+      "norm_label": ".validateallydebtorder()",
+      "source_file": "app/Services/PaymentReconciliationService.php",
+      "source_location": "L179"
+    },
+    {
+      "id": "app_services_paymentreconciliationservice_paymentreconciliationservice_validatecodorder",
+      "label": ".validateCodOrder()",
+      "_callable": true,
+      "_origin": "ast",
+      "community": 206,
+      "community_name": "PaymentReconciliationService",
+      "file_type": "code",
+      "norm_label": ".validatecodorder()",
+      "source_file": "app/Services/PaymentReconciliationService.php",
+      "source_location": "L124"
+    },
+    {
+      "id": "app_livewire_client_dashboard_dashboard_acceptdelivery",
+      "label": ".acceptDelivery()",
+      "_callable": true,
+      "_origin": "ast",
+      "community": 207,
+      "community_name": "Dashboard",
+      "file_type": "code",
+      "norm_label": ".acceptdelivery()",
+      "source_file": "app/Livewire/Client/Dashboard.php",
+      "source_location": "L21"
+    },
+    {
+      "id": "app_livewire_client_dashboard_dashboard_cancelrejectdelivery",
+      "label": ".cancelRejectDelivery()",
+      "_callable": true,
+      "_origin": "ast",
+      "community": 207,
+      "community_name": "Dashboard",
+      "file_type": "code",
+      "norm_label": ".cancelrejectdelivery()",
+      "source_file": "app/Livewire/Client/Dashboard.php",
+      "source_location": "L81"
+    },
+    {
+      "id": "app_livewire_client_dashboard_dashboard_clientpackage",
+      "label": ".clientPackage()",
+      "_callable": true,
+      "_origin": "ast",
+      "community": 207,
+      "community_name": "Dashboard",
+      "file_type": "code",
+      "norm_label": ".clientpackage()",
+      "source_file": "app/Livewire/Client/Dashboard.php",
+      "source_location": "L209"
+    },
+    {
+      "id": "app_livewire_client_dashboard_dashboard_customeriddocsforcurrentuser",
+      "label": ".customerIdDocsForCurrentUser()",
+      "_callable": true,
+      "_origin": "ast",
+      "community": 207,
+      "community_name": "Dashboard",
+      "file_type": "code",
+      "norm_label": ".customeriddocsforcurrentuser()",
+      "source_file": "app/Livewire/Client/Dashboard.php",
+      "source_location": "L199"
+    },
+    {
+      "id": "app_livewire_client_dashboard_dashboard_rejectdelivery",
+      "label": ".rejectDelivery()",
+      "_callable": true,
+      "_origin": "ast",
+      "community": 207,
+      "community_name": "Dashboard",
+      "file_type": "code",
+      "norm_label": ".rejectdelivery()",
+      "source_file": "app/Livewire/Client/Dashboard.php",
+      "source_location": "L87"
+    },
+    {
+      "id": "app_livewire_client_dashboard_dashboard_render",
+      "label": ".render()",
+      "_callable": true,
+      "_origin": "ast",
+      "community": 207,
+      "community_name": "Dashboard",
+      "file_type": "code",
+      "norm_label": ".render()",
+      "source_file": "app/Livewire/Client/Dashboard.php",
+      "source_location": "L228"
+    },
+    {
+      "id": "app_livewire_client_dashboard_dashboard_startrejectdelivery",
+      "label": ".startRejectDelivery()",
+      "_callable": true,
+      "_origin": "ast",
+      "community": 207,
+      "community_name": "Dashboard",
+      "file_type": "code",
+      "norm_label": ".startrejectdelivery()",
+      "source_file": "app/Livewire/Client/Dashboard.php",
+      "source_location": "L73"
+    },
+    {
+      "id": "app_livewire_admin_packagedispatch_packagedispatch_clear",
+      "label": ".clear()",
+      "_callable": true,
+      "_origin": "ast",
+      "community": 208,
+      "community_name": "PackageDispatch",
+      "file_type": "code",
+      "norm_label": ".clear()",
+      "source_file": "app/Livewire/Admin/PackageDispatch.php",
+      "source_location": "L90"
+    },
+    {
+      "id": "app_livewire_admin_packagedispatch_packagedispatch_dispatchpackage",
+      "label": ".dispatchPackage()",
+      "_callable": true,
+      "_origin": "ast",
+      "community": 208,
+      "community_name": "PackageDispatch",
+      "file_type": "code",
+      "norm_label": ".dispatchpackage()",
+      "source_file": "app/Livewire/Admin/PackageDispatch.php",
+      "source_location": "L47"
+    },
+    {
+      "id": "app_livewire_admin_packagedispatch_packagedispatch_render",
+      "label": ".render()",
+      "_callable": true,
+      "_origin": "ast",
+      "community": 208,
+      "community_name": "PackageDispatch",
+      "file_type": "code",
+      "norm_label": ".render()",
+      "source_file": "app/Livewire/Admin/PackageDispatch.php",
+      "source_location": "L102"
+    },
+    {
+      "id": "app_livewire_admin_packagedispatch_packagedispatch_search",
+      "label": ".search()",
+      "_callable": true,
+      "_origin": "ast",
+      "community": 208,
+      "community_name": "PackageDispatch",
+      "file_type": "code",
+      "norm_label": ".search()",
+      "source_file": "app/Livewire/Admin/PackageDispatch.php",
+      "source_location": "L26"
+    },
+    {
+      "id": "app_services_packagedispatchservice_packagedispatchservice_dispatch",
+      "label": ".dispatch()",
+      "_callable": true,
+      "_origin": "ast",
+      "community": 208,
+      "community_name": "PackageDispatch",
+      "file_type": "code",
+      "norm_label": ".dispatch()",
+      "source_file": "app/Services/PackageDispatchService.php",
+      "source_location": "L18"
+    },
+    {
+      "id": "app_livewire_driver_packagedetail_packagedetail_collectcod",
+      "label": ".collectCod()",
+      "_callable": true,
+      "_origin": "ast",
+      "community": 209,
+      "community_name": "PackageDetail",
+      "file_type": "code",
+      "norm_label": ".collectcod()",
+      "source_file": "app/Livewire/Driver/PackageDetail.php",
+      "source_location": "L155"
+    },
+    {
+      "id": "app_livewire_driver_packagedetail_packagedetail_completedelivery",
+      "label": ".completeDelivery()",
+      "_callable": true,
+      "_origin": "ast",
+      "community": 209,
+      "community_name": "PackageDetail",
+      "file_type": "code",
+      "norm_label": ".completedelivery()",
+      "source_file": "app/Livewire/Driver/PackageDetail.php",
+      "source_location": "L113"
+    },
+    {
+      "id": "app_livewire_driver_packagedetail_packagedetail_mount",
+      "label": ".mount()",
+      "_callable": true,
+      "_origin": "ast",
+      "community": 209,
+      "community_name": "PackageDetail",
+      "file_type": "code",
+      "norm_label": ".mount()",
+      "source_file": "app/Livewire/Driver/PackageDetail.php",
+      "source_location": "L19"
+    },
+    {
+      "id": "app_livewire_driver_packagedetail_packagedetail_render",
+      "label": ".render()",
+      "_callable": true,
+      "_origin": "ast",
+      "community": 209,
+      "community_name": "PackageDetail",
+      "file_type": "code",
+      "norm_label": ".render()",
+      "source_file": "app/Livewire/Driver/PackageDetail.php",
+      "source_location": "L193"
+    },
+    {
+      "id": "app_livewire_driver_packagedetail_packagedetail_startdelivery",
+      "label": ".startDelivery()",
+      "_callable": true,
+      "_origin": "ast",
+      "community": 209,
+      "community_name": "PackageDetail",
+      "file_type": "code",
+      "norm_label": ".startdelivery()",
+      "source_file": "app/Livewire/Driver/PackageDetail.php",
+      "source_location": "L50"
     },
     {
       "id": "app_livewire_admin_alliesmanager_alliesmanager_activate",
@@ -6794,6 +6926,18 @@
       "norm_label": ".save()",
       "source_file": "app/Livewire/Admin/BcvRateManager.php",
       "source_location": "L51"
+    },
+    {
+      "id": "app_livewire_admin_bcvratemanager_bcvratemanager_syncnow",
+      "label": ".syncNow()",
+      "_callable": true,
+      "_origin": "ast",
+      "community": 26,
+      "community_name": "BcvRate",
+      "file_type": "code",
+      "norm_label": ".syncnow()",
+      "source_file": "app/Livewire/Admin/BcvRateManager.php",
+      "source_location": "L126"
     },
     {
       "id": "app_livewire_admin_ratematrixmanager_ratematrixmanager_cancelediting",
@@ -7432,90 +7576,6 @@
       "source_location": "L9"
     },
     {
-      "id": "app_livewire_client_dashboard_dashboard_acceptdelivery",
-      "label": ".acceptDelivery()",
-      "_callable": true,
-      "_origin": "ast",
-      "community": 71,
-      "community_name": "Incident",
-      "file_type": "code",
-      "norm_label": ".acceptdelivery()",
-      "source_file": "app/Livewire/Client/Dashboard.php",
-      "source_location": "L21"
-    },
-    {
-      "id": "app_livewire_client_dashboard_dashboard_cancelrejectdelivery",
-      "label": ".cancelRejectDelivery()",
-      "_callable": true,
-      "_origin": "ast",
-      "community": 71,
-      "community_name": "Incident",
-      "file_type": "code",
-      "norm_label": ".cancelrejectdelivery()",
-      "source_file": "app/Livewire/Client/Dashboard.php",
-      "source_location": "L81"
-    },
-    {
-      "id": "app_livewire_client_dashboard_dashboard_clientpackage",
-      "label": ".clientPackage()",
-      "_callable": true,
-      "_origin": "ast",
-      "community": 71,
-      "community_name": "Incident",
-      "file_type": "code",
-      "norm_label": ".clientpackage()",
-      "source_file": "app/Livewire/Client/Dashboard.php",
-      "source_location": "L209"
-    },
-    {
-      "id": "app_livewire_client_dashboard_dashboard_customeriddocsforcurrentuser",
-      "label": ".customerIdDocsForCurrentUser()",
-      "_callable": true,
-      "_origin": "ast",
-      "community": 71,
-      "community_name": "Incident",
-      "file_type": "code",
-      "norm_label": ".customeriddocsforcurrentuser()",
-      "source_file": "app/Livewire/Client/Dashboard.php",
-      "source_location": "L199"
-    },
-    {
-      "id": "app_livewire_client_dashboard_dashboard_rejectdelivery",
-      "label": ".rejectDelivery()",
-      "_callable": true,
-      "_origin": "ast",
-      "community": 71,
-      "community_name": "Incident",
-      "file_type": "code",
-      "norm_label": ".rejectdelivery()",
-      "source_file": "app/Livewire/Client/Dashboard.php",
-      "source_location": "L87"
-    },
-    {
-      "id": "app_livewire_client_dashboard_dashboard_render",
-      "label": ".render()",
-      "_callable": true,
-      "_origin": "ast",
-      "community": 71,
-      "community_name": "Incident",
-      "file_type": "code",
-      "norm_label": ".render()",
-      "source_file": "app/Livewire/Client/Dashboard.php",
-      "source_location": "L228"
-    },
-    {
-      "id": "app_livewire_client_dashboard_dashboard_startrejectdelivery",
-      "label": ".startRejectDelivery()",
-      "_callable": true,
-      "_origin": "ast",
-      "community": 71,
-      "community_name": "Incident",
-      "file_type": "code",
-      "norm_label": ".startrejectdelivery()",
-      "source_file": "app/Livewire/Client/Dashboard.php",
-      "source_location": "L73"
-    },
-    {
       "id": "app_models_incident_incident_ally",
       "label": ".ally()",
       "_callable": true,
@@ -7756,48 +7816,12 @@
       "source_location": "L99"
     },
     {
-      "id": "app_http_controllers_driverscancontroller_driverscancontroller_verify",
-      "label": ".verify()",
-      "_callable": true,
-      "_origin": "ast",
-      "community": 8,
-      "community_name": "PaymentReconciliationService",
-      "file_type": "code",
-      "norm_label": ".verify()",
-      "source_file": "app/Http/Controllers/DriverScanController.php",
-      "source_location": "L21"
-    },
-    {
-      "id": "app_http_controllers_paymentwebhookcontroller_paymentwebhookcontroller_confirmfortesting",
-      "label": ".confirmForTesting()",
-      "_callable": true,
-      "_origin": "ast",
-      "community": 8,
-      "community_name": "PaymentReconciliationService",
-      "file_type": "code",
-      "norm_label": ".confirmfortesting()",
-      "source_file": "app/Http/Controllers/PaymentWebhookController.php",
-      "source_location": "L27"
-    },
-    {
-      "id": "app_http_controllers_paymentwebhookcontroller_paymentwebhookcontroller_construct",
-      "label": ".__construct()",
-      "_callable": true,
-      "_origin": "ast",
-      "community": 8,
-      "community_name": "PaymentReconciliationService",
-      "file_type": "code",
-      "norm_label": ".__construct()",
-      "source_file": "app/Http/Controllers/PaymentWebhookController.php",
-      "source_location": "L15"
-    },
-    {
       "id": "app_http_controllers_trackingcontroller_trackingcontroller_buildtimeline",
       "label": ".buildTimeline()",
       "_callable": true,
       "_origin": "ast",
       "community": 8,
-      "community_name": "PaymentReconciliationService",
+      "community_name": "App\\Http\\Controllers\\TrackingController",
       "file_type": "code",
       "norm_label": ".buildtimeline()",
       "source_file": "app/Http/Controllers/TrackingController.php",
@@ -7809,7 +7833,7 @@
       "_callable": true,
       "_origin": "ast",
       "community": 8,
-      "community_name": "PaymentReconciliationService",
+      "community_name": "App\\Http\\Controllers\\TrackingController",
       "file_type": "code",
       "norm_label": ".index()",
       "source_file": "app/Http/Controllers/TrackingController.php",
@@ -7821,83 +7845,11 @@
       "_callable": true,
       "_origin": "ast",
       "community": 8,
-      "community_name": "PaymentReconciliationService",
+      "community_name": "App\\Http\\Controllers\\TrackingController",
       "file_type": "code",
       "norm_label": ".show()",
       "source_file": "app/Http/Controllers/TrackingController.php",
       "source_location": "L65"
-    },
-    {
-      "id": "app_http_middleware_ensureuserhasrole_ensureuserhasrole_handle",
-      "label": ".handle()",
-      "_callable": true,
-      "_origin": "ast",
-      "community": 8,
-      "community_name": "PaymentReconciliationService",
-      "file_type": "code",
-      "norm_label": ".handle()",
-      "source_file": "app/Http/Middleware/EnsureUserHasRole.php",
-      "source_location": "L11"
-    },
-    {
-      "id": "app_services_paymentreconciliationservice_paymentreconciliationservice_construct",
-      "label": ".__construct()",
-      "_callable": true,
-      "_origin": "ast",
-      "community": 8,
-      "community_name": "PaymentReconciliationService",
-      "file_type": "code",
-      "norm_label": ".__construct()",
-      "source_file": "app/Services/PaymentReconciliationService.php",
-      "source_location": "L12"
-    },
-    {
-      "id": "app_services_paymentreconciliationservice_paymentreconciliationservice_markcodascollected",
-      "label": ".markCodAsCollected()",
-      "_callable": true,
-      "_origin": "ast",
-      "community": 8,
-      "community_name": "PaymentReconciliationService",
-      "file_type": "code",
-      "norm_label": ".markcodascollected()",
-      "source_file": "app/Services/PaymentReconciliationService.php",
-      "source_location": "L201"
-    },
-    {
-      "id": "app_services_paymentreconciliationservice_paymentreconciliationservice_reconcileconfirmedorder",
-      "label": ".reconcileConfirmedOrder()",
-      "_callable": true,
-      "_origin": "ast",
-      "community": 8,
-      "community_name": "PaymentReconciliationService",
-      "file_type": "code",
-      "norm_label": ".reconcileconfirmedorder()",
-      "source_file": "app/Services/PaymentReconciliationService.php",
-      "source_location": "L24"
-    },
-    {
-      "id": "app_services_paymentreconciliationservice_paymentreconciliationservice_validateallydebtorder",
-      "label": ".validateAllyDebtOrder()",
-      "_callable": true,
-      "_origin": "ast",
-      "community": 8,
-      "community_name": "PaymentReconciliationService",
-      "file_type": "code",
-      "norm_label": ".validateallydebtorder()",
-      "source_file": "app/Services/PaymentReconciliationService.php",
-      "source_location": "L179"
-    },
-    {
-      "id": "app_services_paymentreconciliationservice_paymentreconciliationservice_validatecodorder",
-      "label": ".validateCodOrder()",
-      "_callable": true,
-      "_origin": "ast",
-      "community": 8,
-      "community_name": "PaymentReconciliationService",
-      "file_type": "code",
-      "norm_label": ".validatecodorder()",
-      "source_file": "app/Services/PaymentReconciliationService.php",
-      "source_location": "L124"
     },
     {
       "id": "app_view_components_applayout_applayout_render",
@@ -7905,7 +7857,7 @@
       "_callable": true,
       "_origin": "ast",
       "community": 8,
-      "community_name": "PaymentReconciliationService",
+      "community_name": "App\\Http\\Controllers\\TrackingController",
       "file_type": "code",
       "norm_label": ".render()",
       "source_file": "app/View/Components/AppLayout.php",
@@ -7917,7 +7869,7 @@
       "_callable": true,
       "_origin": "ast",
       "community": 8,
-      "community_name": "PaymentReconciliationService",
+      "community_name": "App\\Http\\Controllers\\TrackingController",
       "file_type": "code",
       "norm_label": ".render()",
       "source_file": "app/View/Components/GuestLayout.php",
@@ -8404,30 +8356,6 @@
       "source_location": "L67"
     },
     {
-      "id": "app_http_controllers_packagelabelcontroller_packagelabelcontroller_authorizeview",
-      "label": ".authorizeView()",
-      "_callable": true,
-      "_origin": "ast",
-      "community": 93,
-      "community_name": "App\\Models\\Package",
-      "file_type": "code",
-      "norm_label": ".authorizeview()",
-      "source_file": "app/Http/Controllers/PackageLabelController.php",
-      "source_location": "L82"
-    },
-    {
-      "id": "app_http_controllers_packagelabelcontroller_packagelabelcontroller_pdf",
-      "label": ".pdf()",
-      "_callable": true,
-      "_origin": "ast",
-      "community": 93,
-      "community_name": "App\\Models\\Package",
-      "file_type": "code",
-      "norm_label": ".pdf()",
-      "source_file": "app/Http/Controllers/PackageLabelController.php",
-      "source_location": "L18"
-    },
-    {
       "id": "app_livewire_ally_createpackage_createpackage_pricingpreview",
       "label": ".pricingPreview()",
       "_callable": true,
@@ -8476,43 +8404,19 @@
       "source_location": "L89"
     },
     {
-      "id": "app_livewire_driver_packagedetail_packagedetail_collectcod",
-      "label": ".collectCod()",
+      "id": "app_livewire_tracking_publictracking_publictracking_clear",
+      "label": ".clear()",
       "_callable": true,
       "_origin": "ast",
       "community": 93,
       "community_name": "App\\Models\\Package",
       "file_type": "code",
-      "norm_label": ".collectcod()",
-      "source_file": "app/Livewire/Driver/PackageDetail.php",
-      "source_location": "L155"
+      "norm_label": ".clear()",
+      "source_file": "app/Livewire/Tracking/PublicTracking.php",
+      "source_location": "L40"
     },
     {
-      "id": "app_livewire_driver_packagedetail_packagedetail_completedelivery",
-      "label": ".completeDelivery()",
-      "_callable": true,
-      "_origin": "ast",
-      "community": 93,
-      "community_name": "App\\Models\\Package",
-      "file_type": "code",
-      "norm_label": ".completedelivery()",
-      "source_file": "app/Livewire/Driver/PackageDetail.php",
-      "source_location": "L113"
-    },
-    {
-      "id": "app_livewire_driver_packagedetail_packagedetail_mount",
-      "label": ".mount()",
-      "_callable": true,
-      "_origin": "ast",
-      "community": 93,
-      "community_name": "App\\Models\\Package",
-      "file_type": "code",
-      "norm_label": ".mount()",
-      "source_file": "app/Livewire/Driver/PackageDetail.php",
-      "source_location": "L19"
-    },
-    {
-      "id": "app_livewire_driver_packagedetail_packagedetail_render",
+      "id": "app_livewire_tracking_publictracking_publictracking_render",
       "label": ".render()",
       "_callable": true,
       "_origin": "ast",
@@ -8520,20 +8424,20 @@
       "community_name": "App\\Models\\Package",
       "file_type": "code",
       "norm_label": ".render()",
-      "source_file": "app/Livewire/Driver/PackageDetail.php",
-      "source_location": "L193"
+      "source_file": "app/Livewire/Tracking/PublicTracking.php",
+      "source_location": "L45"
     },
     {
-      "id": "app_livewire_driver_packagedetail_packagedetail_startdelivery",
-      "label": ".startDelivery()",
+      "id": "app_livewire_tracking_publictracking_publictracking_search",
+      "label": ".search()",
       "_callable": true,
       "_origin": "ast",
       "community": 93,
       "community_name": "App\\Models\\Package",
       "file_type": "code",
-      "norm_label": ".startdelivery()",
-      "source_file": "app/Livewire/Driver/PackageDetail.php",
-      "source_location": "L50"
+      "norm_label": ".search()",
+      "source_file": "app/Livewire/Tracking/PublicTracking.php",
+      "source_location": "L18"
     },
     {
       "id": "app_services_hubreceptionservice_hubreceptionservice_receive",
@@ -8750,6 +8654,126 @@
       "norm_label": ".validatestatustransition()",
       "source_file": "app/Services/PackageService.php",
       "source_location": "L444"
+    },
+    {
+      "id": "tests_feature_packageservicecodtest_packageservicecodtest_deliverpackage",
+      "label": ".deliverPackage()",
+      "_callable": true,
+      "_origin": "ast",
+      "community": 93,
+      "community_name": "App\\Models\\Package",
+      "file_type": "code",
+      "norm_label": ".deliverpackage()",
+      "source_file": "tests/Feature/PackageServiceCodTest.php",
+      "source_location": "L35"
+    },
+    {
+      "id": "tests_feature_packageservicecodtest_packageservicecodtest_setup",
+      "label": ".setUp()",
+      "_callable": true,
+      "_origin": "ast",
+      "community": 93,
+      "community_name": "App\\Models\\Package",
+      "file_type": "code",
+      "norm_label": ".setup()",
+      "source_file": "tests/Feature/PackageServiceCodTest.php",
+      "source_location": "L28"
+    },
+    {
+      "id": "tests_feature_packageservicecodtest_packageservicecodtest_test_cod_cannot_be_collected_before_delivery",
+      "label": ".test_cod_cannot_be_collected_before_delivery()",
+      "_callable": true,
+      "_origin": "ast",
+      "community": 93,
+      "community_name": "App\\Models\\Package",
+      "file_type": "code",
+      "norm_label": ".test_cod_cannot_be_collected_before_delivery()",
+      "source_file": "tests/Feature/PackageServiceCodTest.php",
+      "source_location": "L54"
+    },
+    {
+      "id": "tests_feature_packageservicecodtest_packageservicecodtest_test_cod_cannot_be_liquidated_twice",
+      "label": ".test_cod_cannot_be_liquidated_twice()",
+      "_callable": true,
+      "_origin": "ast",
+      "community": 93,
+      "community_name": "App\\Models\\Package",
+      "file_type": "code",
+      "norm_label": ".test_cod_cannot_be_liquidated_twice()",
+      "source_file": "tests/Feature/PackageServiceCodTest.php",
+      "source_location": "L130"
+    },
+    {
+      "id": "tests_feature_packageservicecodtest_packageservicecodtest_test_cod_cannot_be_liquidated_without_collecting_first",
+      "label": ".test_cod_cannot_be_liquidated_without_collecting_first()",
+      "_callable": true,
+      "_origin": "ast",
+      "community": 93,
+      "community_name": "App\\Models\\Package",
+      "file_type": "code",
+      "norm_label": ".test_cod_cannot_be_liquidated_without_collecting_first()",
+      "source_file": "tests/Feature/PackageServiceCodTest.php",
+      "source_location": "L151"
+    },
+    {
+      "id": "tests_feature_packageservicecodtest_packageservicecodtest_test_cod_collection_is_idempotent",
+      "label": ".test_cod_collection_is_idempotent()",
+      "_callable": true,
+      "_origin": "ast",
+      "community": 93,
+      "community_name": "App\\Models\\Package",
+      "file_type": "code",
+      "norm_label": ".test_cod_collection_is_idempotent()",
+      "source_file": "tests/Feature/PackageServiceCodTest.php",
+      "source_location": "L105"
+    },
+    {
+      "id": "tests_feature_packageservicecodtest_packageservicecodtest_test_full_cod_flow_collect_then_liquidate",
+      "label": ".test_full_cod_flow_collect_then_liquidate()",
+      "_callable": true,
+      "_origin": "ast",
+      "community": 93,
+      "community_name": "App\\Models\\Package",
+      "file_type": "code",
+      "norm_label": ".test_full_cod_flow_collect_then_liquidate()",
+      "source_file": "tests/Feature/PackageServiceCodTest.php",
+      "source_location": "L71"
+    },
+    {
+      "id": "tests_feature_packageservicecodtest_packageservicecodtest_test_invalid_status_transition_is_rejected",
+      "label": ".test_invalid_status_transition_is_rejected()",
+      "_callable": true,
+      "_origin": "ast",
+      "community": 93,
+      "community_name": "App\\Models\\Package",
+      "file_type": "code",
+      "norm_label": ".test_invalid_status_transition_is_rejected()",
+      "source_file": "tests/Feature/PackageServiceCodTest.php",
+      "source_location": "L187"
+    },
+    {
+      "id": "tests_feature_packageservicecodtest_packageservicecodtest_test_non_cod_package_rejects_cod_collection",
+      "label": ".test_non_cod_package_rejects_cod_collection()",
+      "_callable": true,
+      "_origin": "ast",
+      "community": 93,
+      "community_name": "App\\Models\\Package",
+      "file_type": "code",
+      "norm_label": ".test_non_cod_package_rejects_cod_collection()",
+      "source_file": "tests/Feature/PackageServiceCodTest.php",
+      "source_location": "L170"
+    },
+    {
+      "id": "tests_feature_packageservicecodtest_packageservicecodtest_test_status_cannot_change_once_delivered",
+      "label": ".test_status_cannot_change_once_delivered()",
+      "_callable": true,
+      "_origin": "ast",
+      "community": 93,
+      "community_name": "App\\Models\\Package",
+      "file_type": "code",
+      "norm_label": ".test_status_cannot_change_once_delivered()",
+      "source_file": "tests/Feature/PackageServiceCodTest.php",
+      "source_location": "L203"
     },
     {
       "id": "tests_feature_auth_emailverificationtest_emailverificationtest_test_email_can_be_verified",
@@ -9098,30 +9122,6 @@
       "norm_label": ".updated()",
       "source_file": "app/Livewire/Ally/PackageCreate.php",
       "source_location": "L220"
-    },
-    {
-      "id": "app_services_destinationreceptionservice_destinationreceptionservice_receive",
-      "label": ".receive()",
-      "_callable": true,
-      "_origin": "ast",
-      "community": 98,
-      "community_name": "RuntimeException",
-      "file_type": "code",
-      "norm_label": ".receive()",
-      "source_file": "app/Services/DestinationReceptionService.php",
-      "source_location": "L16"
-    },
-    {
-      "id": "app_services_packagedispatchservice_packagedispatchservice_dispatch",
-      "label": ".dispatch()",
-      "_callable": true,
-      "_origin": "ast",
-      "community": 98,
-      "community_name": "RuntimeException",
-      "file_type": "code",
-      "norm_label": ".dispatch()",
-      "source_file": "app/Services/PackageDispatchService.php",
-      "source_location": "L18"
     },
     {
       "id": "database_migrations_2026_08_21_000002_add_extra_pricing_fields_to_packages_table_down",
@@ -9680,17 +9680,6 @@
       "source_location": "L1"
     },
     {
-      "id": "app_services_distanceapiservice",
-      "label": "DistanceApiService.php",
-      "_origin": "ast",
-      "community": 111,
-      "community_name": "TariffService",
-      "file_type": "code",
-      "norm_label": "distanceapiservice.php",
-      "source_file": "app/Services/DistanceApiService.php",
-      "source_location": "L1"
-    },
-    {
       "id": "app_services_tariffservice",
       "label": "App\\Services\\TariffService",
       "_origin": "ast",
@@ -9724,6 +9713,17 @@
       "source_location": ""
     },
     {
+      "id": "carbon_carbon",
+      "label": "Carbon\\Carbon",
+      "_origin": "ast",
+      "community": 111,
+      "community_name": "TariffService",
+      "file_type": "code",
+      "norm_label": "carbon\\carbon",
+      "source_file": "",
+      "source_location": ""
+    },
+    {
       "id": "distanceapiservice",
       "label": "DistanceApiService",
       "_origin": "ast",
@@ -9742,28 +9742,6 @@
       "community_name": "TariffService",
       "file_type": "code",
       "norm_label": "illuminate\\console\\command",
-      "source_file": "",
-      "source_location": ""
-    },
-    {
-      "id": "illuminate_support_facades_cache",
-      "label": "Illuminate\\Support\\Facades\\Cache",
-      "_origin": "ast",
-      "community": 111,
-      "community_name": "TariffService",
-      "file_type": "code",
-      "norm_label": "illuminate\\support\\facades\\cache",
-      "source_file": "",
-      "source_location": ""
-    },
-    {
-      "id": "illuminate_support_facades_http",
-      "label": "Illuminate\\Support\\Facades\\Http",
-      "_origin": "ast",
-      "community": 111,
-      "community_name": "TariffService",
-      "file_type": "code",
-      "norm_label": "illuminate\\support\\facades\\http",
       "source_file": "",
       "source_location": ""
     },
@@ -10230,6 +10208,39 @@
       "source_location": ""
     },
     {
+      "id": "app_models_auditlog",
+      "label": "App\\Models\\AuditLog",
+      "_origin": "ast",
+      "community": 121,
+      "community_name": "Illuminate\\Foundation\\Testing\\RefreshDatabase",
+      "file_type": "code",
+      "norm_label": "app\\models\\auditlog",
+      "source_file": "",
+      "source_location": ""
+    },
+    {
+      "id": "app_models_user",
+      "label": "App\\Models\\User",
+      "_origin": "ast",
+      "community": 121,
+      "community_name": "Illuminate\\Foundation\\Testing\\RefreshDatabase",
+      "file_type": "code",
+      "norm_label": "app\\models\\user",
+      "source_file": "",
+      "source_location": ""
+    },
+    {
+      "id": "app_services_allyfinancialservice",
+      "label": "AllyFinancialService.php",
+      "_origin": "ast",
+      "community": 121,
+      "community_name": "Illuminate\\Foundation\\Testing\\RefreshDatabase",
+      "file_type": "code",
+      "norm_label": "allyfinancialservice.php",
+      "source_file": "app/Services/AllyFinancialService.php",
+      "source_location": "L1"
+    },
+    {
       "id": "illuminate_foundation_testing_refreshdatabase",
       "label": "Illuminate\\Foundation\\Testing\\RefreshDatabase",
       "_origin": "ast",
@@ -10248,6 +10259,17 @@
       "community_name": "Illuminate\\Foundation\\Testing\\RefreshDatabase",
       "file_type": "code",
       "norm_label": "invalidargumentexception",
+      "source_file": "",
+      "source_location": ""
+    },
+    {
+      "id": "livewire_livewire",
+      "label": "Livewire\\Livewire",
+      "_origin": "ast",
+      "community": 121,
+      "community_name": "Illuminate\\Foundation\\Testing\\RefreshDatabase",
+      "file_type": "code",
+      "norm_label": "livewire\\livewire",
       "source_file": "",
       "source_location": ""
     },
@@ -10271,6 +10293,17 @@
       "file_type": "code",
       "norm_label": "allyfinancialsettlementtest.php",
       "source_file": "tests/Feature/AllyFinancialSettlementTest.php",
+      "source_location": "L1"
+    },
+    {
+      "id": "tests_feature_clientdashboardtest",
+      "label": "ClientDashboardTest.php",
+      "_origin": "ast",
+      "community": 121,
+      "community_name": "Illuminate\\Foundation\\Testing\\RefreshDatabase",
+      "file_type": "code",
+      "norm_label": "clientdashboardtest.php",
+      "source_file": "tests/Feature/ClientDashboardTest.php",
       "source_location": "L1"
     },
     {
@@ -10670,6 +10703,17 @@
       "source_location": ""
     },
     {
+      "id": "app_livewire_tracking_publictracking",
+      "label": "PublicTracking.php",
+      "_origin": "ast",
+      "community": 126,
+      "community_name": "Livewire\\Component",
+      "file_type": "code",
+      "norm_label": "publictracking.php",
+      "source_file": "app/Livewire/Tracking/PublicTracking.php",
+      "source_location": "L1"
+    },
+    {
       "id": "illuminate_validation_rule",
       "label": "Illuminate\\Validation\\Rule",
       "_origin": "ast",
@@ -10758,257 +10802,59 @@
       "source_location": "L1"
     },
     {
-      "id": "app_livewire_client_dashboard",
-      "label": "Client/Dashboard.php",
-      "_origin": "ast",
-      "community": 127,
-      "community_name": "Client/Dashboard.php",
-      "file_type": "code",
-      "norm_label": "client/dashboard.php",
-      "source_file": "app/Livewire/Client/Dashboard.php",
-      "source_location": "L1"
-    },
-    {
       "id": "app_livewire_driver_dashboard",
       "label": "Driver/Dashboard.php",
       "_origin": "ast",
       "community": 127,
-      "community_name": "Client/Dashboard.php",
+      "community_name": "Driver/Dashboard.php",
       "file_type": "code",
       "norm_label": "driver/dashboard.php",
       "source_file": "app/Livewire/Driver/Dashboard.php",
       "source_location": "L1"
     },
     {
-      "id": "app_livewire_driver_packagedetail",
-      "label": "PackageDetail.php",
-      "_origin": "ast",
-      "community": 127,
-      "community_name": "Client/Dashboard.php",
-      "file_type": "code",
-      "norm_label": "packagedetail.php",
-      "source_file": "app/Livewire/Driver/PackageDetail.php",
-      "source_location": "L1"
-    },
-    {
-      "id": "app_livewire_driver_scanner",
-      "label": "Scanner.php",
-      "_origin": "ast",
-      "community": 127,
-      "community_name": "Client/Dashboard.php",
-      "file_type": "code",
-      "norm_label": "scanner.php",
-      "source_file": "app/Livewire/Driver/Scanner.php",
-      "source_location": "L1"
-    },
-    {
-      "id": "illuminate_support_facades_auth",
-      "label": "Illuminate\\Support\\Facades\\Auth",
-      "_origin": "ast",
-      "community": 127,
-      "community_name": "Client/Dashboard.php",
-      "file_type": "code",
-      "norm_label": "illuminate\\support\\facades\\auth",
-      "source_file": "",
-      "source_location": ""
-    },
-    {
-      "id": "app_models_ally",
-      "label": "App\\Models\\Ally",
-      "_origin": "ast",
-      "community": 128,
-      "community_name": "Illuminate\\Database\\Eloquent\\Factories\\HasFactory",
-      "file_type": "code",
-      "norm_label": "app\\models\\ally",
-      "source_file": "",
-      "source_location": ""
-    },
-    {
-      "id": "app_models_allyfinancialtransaction",
-      "label": "AllyFinancialTransaction.php",
-      "_origin": "ast",
-      "community": 128,
-      "community_name": "Illuminate\\Database\\Eloquent\\Factories\\HasFactory",
-      "file_type": "code",
-      "norm_label": "allyfinancialtransaction.php",
-      "source_file": "app/Models/AllyFinancialTransaction.php",
-      "source_location": "L1"
-    },
-    {
-      "id": "app_models_allyuser",
-      "label": "AllyUser.php",
-      "_origin": "ast",
-      "community": 128,
-      "community_name": "Illuminate\\Database\\Eloquent\\Factories\\HasFactory",
-      "file_type": "code",
-      "norm_label": "allyuser.php",
-      "source_file": "app/Models/AllyUser.php",
-      "source_location": "L1"
-    },
-    {
-      "id": "app_models_auditlog",
-      "label": "App\\Models\\AuditLog",
-      "_origin": "ast",
-      "community": 128,
-      "community_name": "Illuminate\\Database\\Eloquent\\Factories\\HasFactory",
-      "file_type": "code",
-      "norm_label": "app\\models\\auditlog",
-      "source_file": "",
-      "source_location": ""
-    },
-    {
-      "id": "app_models_citydistance",
-      "label": "App\\Models\\CityDistance",
-      "_origin": "ast",
-      "community": 128,
-      "community_name": "Illuminate\\Database\\Eloquent\\Factories\\HasFactory",
-      "file_type": "code",
-      "norm_label": "app\\models\\citydistance",
-      "source_file": "",
-      "source_location": ""
-    },
-    {
-      "id": "app_models_customer",
-      "label": "App\\Models\\Customer",
-      "_origin": "ast",
-      "community": 128,
-      "community_name": "Illuminate\\Database\\Eloquent\\Factories\\HasFactory",
-      "file_type": "code",
-      "norm_label": "app\\models\\customer",
-      "source_file": "",
-      "source_location": ""
-    },
-    {
       "id": "app_models_driverpayment",
       "label": "App\\Models\\DriverPayment",
       "_origin": "ast",
       "community": 128,
-      "community_name": "Illuminate\\Database\\Eloquent\\Factories\\HasFactory",
+      "community_name": "App\\Models\\DriverPayment",
       "file_type": "code",
       "norm_label": "app\\models\\driverpayment",
       "source_file": "",
       "source_location": ""
     },
     {
-      "id": "app_models_incident",
-      "label": "App\\Models\\Incident",
-      "_origin": "ast",
-      "community": 128,
-      "community_name": "Illuminate\\Database\\Eloquent\\Factories\\HasFactory",
-      "file_type": "code",
-      "norm_label": "app\\models\\incident",
-      "source_file": "",
-      "source_location": ""
-    },
-    {
-      "id": "app_models_paymentorder",
-      "label": "PaymentOrder.php",
-      "_origin": "ast",
-      "community": 128,
-      "community_name": "Illuminate\\Database\\Eloquent\\Factories\\HasFactory",
-      "file_type": "code",
-      "norm_label": "paymentorder.php",
-      "source_file": "app/Models/PaymentOrder.php",
-      "source_location": "L1"
-    },
-    {
-      "id": "app_models_routestop",
-      "label": "App\\Models\\RouteStop",
-      "_origin": "ast",
-      "community": 128,
-      "community_name": "Illuminate\\Database\\Eloquent\\Factories\\HasFactory",
-      "file_type": "code",
-      "norm_label": "app\\models\\routestop",
-      "source_file": "",
-      "source_location": ""
-    },
-    {
-      "id": "app_models_user",
-      "label": "App\\Models\\User",
-      "_origin": "ast",
-      "community": 128,
-      "community_name": "Illuminate\\Database\\Eloquent\\Factories\\HasFactory",
-      "file_type": "code",
-      "norm_label": "app\\models\\user",
-      "source_file": "",
-      "source_location": ""
-    },
-    {
-      "id": "app_services_allyfinancialservice",
-      "label": "AllyFinancialService.php",
-      "_origin": "ast",
-      "community": 128,
-      "community_name": "Illuminate\\Database\\Eloquent\\Factories\\HasFactory",
-      "file_type": "code",
-      "norm_label": "allyfinancialservice.php",
-      "source_file": "app/Services/AllyFinancialService.php",
-      "source_location": "L1"
-    },
-    {
       "id": "app_services_driverpaymentservice",
       "label": "DriverPaymentService.php",
       "_origin": "ast",
       "community": 128,
-      "community_name": "Illuminate\\Database\\Eloquent\\Factories\\HasFactory",
+      "community_name": "App\\Models\\DriverPayment",
       "file_type": "code",
       "norm_label": "driverpaymentservice.php",
       "source_file": "app/Services/DriverPaymentService.php",
       "source_location": "L1"
     },
     {
-      "id": "illuminate_database_eloquent_factories_hasfactory",
-      "label": "Illuminate\\Database\\Eloquent\\Factories\\HasFactory",
+      "id": "app_services_driverpaymentservice_php_package",
+      "label": "Package",
       "_origin": "ast",
       "community": 128,
-      "community_name": "Illuminate\\Database\\Eloquent\\Factories\\HasFactory",
+      "community_name": "App\\Models\\DriverPayment",
       "file_type": "code",
-      "norm_label": "illuminate\\database\\eloquent\\factories\\hasfactory",
+      "norm_label": "package",
       "source_file": "",
       "source_location": ""
     },
     {
-      "id": "illuminate_database_eloquent_model",
-      "label": "Illuminate\\Database\\Eloquent\\Model",
+      "id": "driverpayment",
+      "label": "DriverPayment",
       "_origin": "ast",
       "community": 128,
-      "community_name": "Illuminate\\Database\\Eloquent\\Factories\\HasFactory",
+      "community_name": "App\\Models\\DriverPayment",
       "file_type": "code",
-      "norm_label": "illuminate\\database\\eloquent\\model",
+      "norm_label": "driverpayment",
       "source_file": "",
       "source_location": ""
-    },
-    {
-      "id": "illuminate_notifications_notifiable",
-      "label": "Illuminate\\Notifications\\Notifiable",
-      "_origin": "ast",
-      "community": 128,
-      "community_name": "Illuminate\\Database\\Eloquent\\Factories\\HasFactory",
-      "file_type": "code",
-      "norm_label": "illuminate\\notifications\\notifiable",
-      "source_file": "",
-      "source_location": ""
-    },
-    {
-      "id": "livewire_livewire",
-      "label": "Livewire\\Livewire",
-      "_origin": "ast",
-      "community": 128,
-      "community_name": "Illuminate\\Database\\Eloquent\\Factories\\HasFactory",
-      "file_type": "code",
-      "norm_label": "livewire\\livewire",
-      "source_file": "",
-      "source_location": ""
-    },
-    {
-      "id": "tests_feature_clientdashboardtest",
-      "label": "ClientDashboardTest.php",
-      "_origin": "ast",
-      "community": 128,
-      "community_name": "Illuminate\\Database\\Eloquent\\Factories\\HasFactory",
-      "file_type": "code",
-      "norm_label": "clientdashboardtest.php",
-      "source_file": "tests/Feature/ClientDashboardTest.php",
-      "source_location": "L1"
     },
     {
       "id": "database_migrations_2026_08_24_090002_create_route_stops_table",
@@ -11396,28 +11242,6 @@
       "source_location": null
     },
     {
-      "id": "app_services_driverpaymentservice_php_package",
-      "label": "Package",
-      "_origin": "ast",
-      "community": 14,
-      "community_name": "AuditLog",
-      "file_type": "code",
-      "norm_label": "package",
-      "source_file": "",
-      "source_location": ""
-    },
-    {
-      "id": "driverpayment",
-      "label": "DriverPayment",
-      "_origin": "ast",
-      "community": 14,
-      "community_name": "AuditLog",
-      "file_type": "code",
-      "norm_label": "driverpayment",
-      "source_file": "",
-      "source_location": ""
-    },
-    {
       "id": "database_migrations_2026_08_24_090003_add_route_stop_id_to_package_histories_table",
       "label": "2026_08_24_090003_add_route_stop_id_to_package_histories_table.php",
       "_origin": "ast",
@@ -11427,6 +11251,17 @@
       "norm_label": "2026_08_24_090003_add_route_stop_id_to_package_histories_table.php",
       "source_file": "database/migrations/2026_08_24_090003_add_route_stop_id_to_package_histories_table.php",
       "source_location": "L1"
+    },
+    {
+      "id": "app_livewire_ally_packagereception",
+      "label": "App\\Livewire\\Ally\\PackageReception",
+      "_origin": "ast",
+      "community": 141,
+      "community_name": "Package",
+      "file_type": "code",
+      "norm_label": "app\\livewire\\ally\\packagereception",
+      "source_file": "",
+      "source_location": ""
     },
     {
       "id": "datetimeinterface",
@@ -12206,13 +12041,101 @@
       "source_location": null
     },
     {
-      "id": "tests_feature_packageservicecodtest_php_package",
-      "label": "Package",
+      "id": "app_http_middleware_ensureuserhasrole",
+      "label": "EnsureUserHasRole.php",
       "_origin": "ast",
       "community": 17,
-      "community_name": "PackageServiceCodTest",
+      "community_name": "bootstrap/app.php",
       "file_type": "code",
-      "norm_label": "package",
+      "norm_label": "ensureuserhasrole.php",
+      "source_file": "app/Http/Middleware/EnsureUserHasRole.php",
+      "source_location": "L1"
+    },
+    {
+      "id": "bootstrap_app",
+      "label": "bootstrap/app.php",
+      "_origin": "ast",
+      "community": 17,
+      "community_name": "bootstrap/app.php",
+      "file_type": "code",
+      "norm_label": "bootstrap/app.php",
+      "source_file": "bootstrap/app.php",
+      "source_location": "L1"
+    },
+    {
+      "id": "closure",
+      "label": "Closure",
+      "_origin": "ast",
+      "community": 17,
+      "community_name": "bootstrap/app.php",
+      "file_type": "code",
+      "norm_label": "closure",
+      "source_file": "",
+      "source_location": ""
+    },
+    {
+      "id": "illuminate_console_scheduling_schedule",
+      "label": "Illuminate\\Console\\Scheduling\\Schedule",
+      "_origin": "ast",
+      "community": 17,
+      "community_name": "bootstrap/app.php",
+      "file_type": "code",
+      "norm_label": "illuminate\\console\\scheduling\\schedule",
+      "source_file": "",
+      "source_location": ""
+    },
+    {
+      "id": "illuminate_foundation_application",
+      "label": "Illuminate\\Foundation\\Application",
+      "_origin": "ast",
+      "community": 17,
+      "community_name": "bootstrap/app.php",
+      "file_type": "code",
+      "norm_label": "illuminate\\foundation\\application",
+      "source_file": "",
+      "source_location": ""
+    },
+    {
+      "id": "illuminate_foundation_configuration_exceptions",
+      "label": "Illuminate\\Foundation\\Configuration\\Exceptions",
+      "_origin": "ast",
+      "community": 17,
+      "community_name": "bootstrap/app.php",
+      "file_type": "code",
+      "norm_label": "illuminate\\foundation\\configuration\\exceptions",
+      "source_file": "",
+      "source_location": ""
+    },
+    {
+      "id": "illuminate_foundation_configuration_middleware",
+      "label": "Illuminate\\Foundation\\Configuration\\Middleware",
+      "_origin": "ast",
+      "community": 17,
+      "community_name": "bootstrap/app.php",
+      "file_type": "code",
+      "norm_label": "illuminate\\foundation\\configuration\\middleware",
+      "source_file": "",
+      "source_location": ""
+    },
+    {
+      "id": "public_index",
+      "label": "index.php",
+      "_origin": "ast",
+      "community": 17,
+      "community_name": "bootstrap/app.php",
+      "file_type": "code",
+      "norm_label": "index.php",
+      "source_file": "public/index.php",
+      "source_location": "L1"
+    },
+    {
+      "id": "symfony_component_httpfoundation_response",
+      "label": "Symfony\\Component\\HttpFoundation\\Response",
+      "_origin": "ast",
+      "community": 17,
+      "community_name": "bootstrap/app.php",
+      "file_type": "code",
+      "norm_label": "symfony\\component\\httpfoundation\\response",
       "source_file": "",
       "source_location": ""
     },
@@ -12459,24 +12382,35 @@
       "source_location": "L1"
     },
     {
-      "id": "app_livewire_tracking_publictracking",
-      "label": "PublicTracking.php",
+      "id": "app_services_distanceapiservice",
+      "label": "DistanceApiService.php",
       "_origin": "ast",
       "community": 178,
-      "community_name": "PublicTracking",
+      "community_name": "DistanceApiService",
       "file_type": "code",
-      "norm_label": "publictracking.php",
-      "source_file": "app/Livewire/Tracking/PublicTracking.php",
+      "norm_label": "distanceapiservice.php",
+      "source_file": "app/Services/DistanceApiService.php",
       "source_location": "L1"
     },
     {
-      "id": "app_livewire_tracking_publictracking_php_package",
-      "label": "Package",
+      "id": "illuminate_support_facades_cache",
+      "label": "Illuminate\\Support\\Facades\\Cache",
       "_origin": "ast",
       "community": 178,
-      "community_name": "PublicTracking",
+      "community_name": "DistanceApiService",
       "file_type": "code",
-      "norm_label": "package",
+      "norm_label": "illuminate\\support\\facades\\cache",
+      "source_file": "",
+      "source_location": ""
+    },
+    {
+      "id": "illuminate_support_facades_http",
+      "label": "Illuminate\\Support\\Facades\\Http",
+      "_origin": "ast",
+      "community": 178,
+      "community_name": "DistanceApiService",
+      "file_type": "code",
+      "norm_label": "illuminate\\support\\facades\\http",
       "source_file": "",
       "source_location": ""
     },
@@ -13075,6 +13009,182 @@
       "source_location": null
     },
     {
+      "id": "app_http_controllers_driverscancontroller",
+      "label": "DriverScanController.php",
+      "_origin": "ast",
+      "community": 204,
+      "community_name": "Illuminate\\Http\\Request",
+      "file_type": "code",
+      "norm_label": "driverscancontroller.php",
+      "source_file": "app/Http/Controllers/DriverScanController.php",
+      "source_location": "L1"
+    },
+    {
+      "id": "app_http_controllers_paymentwebhookcontroller",
+      "label": "PaymentWebhookController.php",
+      "_origin": "ast",
+      "community": 204,
+      "community_name": "Illuminate\\Http\\Request",
+      "file_type": "code",
+      "norm_label": "paymentwebhookcontroller.php",
+      "source_file": "app/Http/Controllers/PaymentWebhookController.php",
+      "source_location": "L1"
+    },
+    {
+      "id": "illuminate_http_jsonresponse",
+      "label": "Illuminate\\Http\\JsonResponse",
+      "_origin": "ast",
+      "community": 204,
+      "community_name": "Illuminate\\Http\\Request",
+      "file_type": "code",
+      "norm_label": "illuminate\\http\\jsonresponse",
+      "source_file": "",
+      "source_location": ""
+    },
+    {
+      "id": "illuminate_http_request",
+      "label": "Illuminate\\Http\\Request",
+      "_origin": "ast",
+      "community": 204,
+      "community_name": "Illuminate\\Http\\Request",
+      "file_type": "code",
+      "norm_label": "illuminate\\http\\request",
+      "source_file": "",
+      "source_location": ""
+    },
+    {
+      "id": "illuminate_support_facades_validator",
+      "label": "Illuminate\\Support\\Facades\\Validator",
+      "_origin": "ast",
+      "community": 204,
+      "community_name": "Illuminate\\Http\\Request",
+      "file_type": "code",
+      "norm_label": "illuminate\\support\\facades\\validator",
+      "source_file": "",
+      "source_location": ""
+    },
+    {
+      "id": "throwable",
+      "label": "Throwable",
+      "_origin": "ast",
+      "community": 204,
+      "community_name": "Illuminate\\Http\\Request",
+      "file_type": "code",
+      "norm_label": "throwable",
+      "source_file": "",
+      "source_location": ""
+    },
+    {
+      "id": "app_http_controllers_packagelabelcontroller",
+      "label": "PackageLabelController.php",
+      "_origin": "ast",
+      "community": 205,
+      "community_name": "PackageLabelController.php",
+      "file_type": "code",
+      "norm_label": "packagelabelcontroller.php",
+      "source_file": "app/Http/Controllers/PackageLabelController.php",
+      "source_location": "L1"
+    },
+    {
+      "id": "barryvdh_dompdf_facade_pdf",
+      "label": "Barryvdh\\DomPDF\\Facade\\Pdf",
+      "_origin": "ast",
+      "community": 205,
+      "community_name": "PackageLabelController.php",
+      "file_type": "code",
+      "norm_label": "barryvdh\\dompdf\\facade\\pdf",
+      "source_file": "",
+      "source_location": ""
+    },
+    {
+      "id": "endroid_qrcode_builder_builder",
+      "label": "Endroid\\QrCode\\Builder\\Builder",
+      "_origin": "ast",
+      "community": 205,
+      "community_name": "PackageLabelController.php",
+      "file_type": "code",
+      "norm_label": "endroid\\qrcode\\builder\\builder",
+      "source_file": "",
+      "source_location": ""
+    },
+    {
+      "id": "endroid_qrcode_writer_svgwriter",
+      "label": "Endroid\\QrCode\\Writer\\SvgWriter",
+      "_origin": "ast",
+      "community": 205,
+      "community_name": "PackageLabelController.php",
+      "file_type": "code",
+      "norm_label": "endroid\\qrcode\\writer\\svgwriter",
+      "source_file": "",
+      "source_location": ""
+    },
+    {
+      "id": "illuminate_http_response",
+      "label": "Illuminate\\Http\\Response",
+      "_origin": "ast",
+      "community": 205,
+      "community_name": "PackageLabelController.php",
+      "file_type": "code",
+      "norm_label": "illuminate\\http\\response",
+      "source_file": "",
+      "source_location": ""
+    },
+    {
+      "id": "picqer_barcode_barcodegeneratorsvg",
+      "label": "Picqer\\Barcode\\BarcodeGeneratorSVG",
+      "_origin": "ast",
+      "community": 205,
+      "community_name": "PackageLabelController.php",
+      "file_type": "code",
+      "norm_label": "picqer\\barcode\\barcodegeneratorsvg",
+      "source_file": "",
+      "source_location": ""
+    },
+    {
+      "id": "controller",
+      "label": "Controller",
+      "_origin": "ast",
+      "community": 206,
+      "community_name": "PaymentReconciliationService",
+      "file_type": "code",
+      "norm_label": "controller",
+      "source_file": "",
+      "source_location": ""
+    },
+    {
+      "id": "app_livewire_client_dashboard_php_package",
+      "label": "Package",
+      "_origin": "ast",
+      "community": 207,
+      "community_name": "Dashboard",
+      "file_type": "code",
+      "norm_label": "package",
+      "source_file": "",
+      "source_location": ""
+    },
+    {
+      "id": "app_livewire_admin_packagedispatch",
+      "label": "PackageDispatch.php",
+      "_origin": "ast",
+      "community": 208,
+      "community_name": "PackageDispatch",
+      "file_type": "code",
+      "norm_label": "packagedispatch.php",
+      "source_file": "app/Livewire/Admin/PackageDispatch.php",
+      "source_location": "L1"
+    },
+    {
+      "id": "app_livewire_driver_packagedetail_php_package",
+      "label": "Package",
+      "_origin": "ast",
+      "community": 209,
+      "community_name": "PackageDetail",
+      "file_type": "code",
+      "norm_label": "package",
+      "source_file": "",
+      "source_location": ""
+    },
+    {
       "id": "layout_navigation",
       "label": "layout.navigation",
       "_origin": "ast",
@@ -13317,6 +13427,116 @@
       "source_location": ""
     },
     {
+      "id": "app_models_ally",
+      "label": "App\\Models\\Ally",
+      "_origin": "ast",
+      "community": 27,
+      "community_name": "Illuminate\\Database\\Eloquent\\Relations\\BelongsTo",
+      "file_type": "code",
+      "norm_label": "app\\models\\ally",
+      "source_file": "",
+      "source_location": ""
+    },
+    {
+      "id": "app_models_allyfinancialtransaction",
+      "label": "AllyFinancialTransaction.php",
+      "_origin": "ast",
+      "community": 27,
+      "community_name": "Illuminate\\Database\\Eloquent\\Relations\\BelongsTo",
+      "file_type": "code",
+      "norm_label": "allyfinancialtransaction.php",
+      "source_file": "app/Models/AllyFinancialTransaction.php",
+      "source_location": "L1"
+    },
+    {
+      "id": "app_models_allyuser",
+      "label": "AllyUser.php",
+      "_origin": "ast",
+      "community": 27,
+      "community_name": "Illuminate\\Database\\Eloquent\\Relations\\BelongsTo",
+      "file_type": "code",
+      "norm_label": "allyuser.php",
+      "source_file": "app/Models/AllyUser.php",
+      "source_location": "L1"
+    },
+    {
+      "id": "app_models_citydistance",
+      "label": "App\\Models\\CityDistance",
+      "_origin": "ast",
+      "community": 27,
+      "community_name": "Illuminate\\Database\\Eloquent\\Relations\\BelongsTo",
+      "file_type": "code",
+      "norm_label": "app\\models\\citydistance",
+      "source_file": "",
+      "source_location": ""
+    },
+    {
+      "id": "app_models_customer",
+      "label": "App\\Models\\Customer",
+      "_origin": "ast",
+      "community": 27,
+      "community_name": "Illuminate\\Database\\Eloquent\\Relations\\BelongsTo",
+      "file_type": "code",
+      "norm_label": "app\\models\\customer",
+      "source_file": "",
+      "source_location": ""
+    },
+    {
+      "id": "app_models_incident",
+      "label": "App\\Models\\Incident",
+      "_origin": "ast",
+      "community": 27,
+      "community_name": "Illuminate\\Database\\Eloquent\\Relations\\BelongsTo",
+      "file_type": "code",
+      "norm_label": "app\\models\\incident",
+      "source_file": "",
+      "source_location": ""
+    },
+    {
+      "id": "app_models_paymentorder",
+      "label": "PaymentOrder.php",
+      "_origin": "ast",
+      "community": 27,
+      "community_name": "Illuminate\\Database\\Eloquent\\Relations\\BelongsTo",
+      "file_type": "code",
+      "norm_label": "paymentorder.php",
+      "source_file": "app/Models/PaymentOrder.php",
+      "source_location": "L1"
+    },
+    {
+      "id": "app_models_routestop",
+      "label": "App\\Models\\RouteStop",
+      "_origin": "ast",
+      "community": 27,
+      "community_name": "Illuminate\\Database\\Eloquent\\Relations\\BelongsTo",
+      "file_type": "code",
+      "norm_label": "app\\models\\routestop",
+      "source_file": "",
+      "source_location": ""
+    },
+    {
+      "id": "illuminate_database_eloquent_factories_hasfactory",
+      "label": "Illuminate\\Database\\Eloquent\\Factories\\HasFactory",
+      "_origin": "ast",
+      "community": 27,
+      "community_name": "Illuminate\\Database\\Eloquent\\Relations\\BelongsTo",
+      "file_type": "code",
+      "norm_label": "illuminate\\database\\eloquent\\factories\\hasfactory",
+      "source_file": "",
+      "source_location": ""
+    },
+    {
+      "id": "illuminate_database_eloquent_model",
+      "label": "Illuminate\\Database\\Eloquent\\Model",
+      "_origin": "ast",
+      "community": 27,
+      "community_name": "Illuminate\\Database\\Eloquent\\Relations\\BelongsTo",
+      "file_type": "code",
+      "norm_label": "illuminate\\database\\eloquent\\model",
+      "source_file": "",
+      "source_location": ""
+    },
+    {
       "id": "illuminate_database_eloquent_relations_belongsto",
       "label": "Illuminate\\Database\\Eloquent\\Relations\\BelongsTo",
       "_origin": "ast",
@@ -13324,6 +13544,17 @@
       "community_name": "Illuminate\\Database\\Eloquent\\Relations\\BelongsTo",
       "file_type": "code",
       "norm_label": "illuminate\\database\\eloquent\\relations\\belongsto",
+      "source_file": "",
+      "source_location": ""
+    },
+    {
+      "id": "illuminate_notifications_notifiable",
+      "label": "Illuminate\\Notifications\\Notifiable",
+      "_origin": "ast",
+      "community": 27,
+      "community_name": "Illuminate\\Database\\Eloquent\\Relations\\BelongsTo",
+      "file_type": "code",
+      "norm_label": "illuminate\\notifications\\notifiable",
       "source_file": "",
       "source_location": ""
     },
@@ -14822,17 +15053,6 @@
       "source_location": null
     },
     {
-      "id": "app_livewire_client_dashboard_php_package",
-      "label": "Package",
-      "_origin": "ast",
-      "community": 71,
-      "community_name": "Incident",
-      "file_type": "code",
-      "norm_label": "package",
-      "source_file": "",
-      "source_location": ""
-    },
-    {
       "id": "app_services_incidentservice",
       "label": "IncidentService.php",
       "_origin": "ast",
@@ -15093,33 +15313,11 @@
       "source_location": "L1"
     },
     {
-      "id": "app_http_controllers_driverscancontroller",
-      "label": "DriverScanController.php",
-      "_origin": "ast",
-      "community": 8,
-      "community_name": "PaymentReconciliationService",
-      "file_type": "code",
-      "norm_label": "driverscancontroller.php",
-      "source_file": "app/Http/Controllers/DriverScanController.php",
-      "source_location": "L1"
-    },
-    {
-      "id": "app_http_controllers_paymentwebhookcontroller",
-      "label": "PaymentWebhookController.php",
-      "_origin": "ast",
-      "community": 8,
-      "community_name": "PaymentReconciliationService",
-      "file_type": "code",
-      "norm_label": "paymentwebhookcontroller.php",
-      "source_file": "app/Http/Controllers/PaymentWebhookController.php",
-      "source_location": "L1"
-    },
-    {
       "id": "app_http_controllers_trackingcontroller",
       "label": "App\\Http\\Controllers\\TrackingController",
       "_origin": "ast",
       "community": 8,
-      "community_name": "PaymentReconciliationService",
+      "community_name": "App\\Http\\Controllers\\TrackingController",
       "file_type": "code",
       "norm_label": "app\\http\\controllers\\trackingcontroller",
       "source_file": "",
@@ -15130,29 +15328,18 @@
       "label": "Package",
       "_origin": "ast",
       "community": 8,
-      "community_name": "PaymentReconciliationService",
+      "community_name": "App\\Http\\Controllers\\TrackingController",
       "file_type": "code",
       "norm_label": "package",
       "source_file": "",
       "source_location": ""
     },
     {
-      "id": "app_http_middleware_ensureuserhasrole",
-      "label": "EnsureUserHasRole.php",
-      "_origin": "ast",
-      "community": 8,
-      "community_name": "PaymentReconciliationService",
-      "file_type": "code",
-      "norm_label": "ensureuserhasrole.php",
-      "source_file": "app/Http/Middleware/EnsureUserHasRole.php",
-      "source_location": "L1"
-    },
-    {
       "id": "app_view_components_applayout",
       "label": "AppLayout.php",
       "_origin": "ast",
       "community": 8,
-      "community_name": "PaymentReconciliationService",
+      "community_name": "App\\Http\\Controllers\\TrackingController",
       "file_type": "code",
       "norm_label": "applayout.php",
       "source_file": "app/View/Components/AppLayout.php",
@@ -15163,139 +15350,18 @@
       "label": "GuestLayout.php",
       "_origin": "ast",
       "community": 8,
-      "community_name": "PaymentReconciliationService",
+      "community_name": "App\\Http\\Controllers\\TrackingController",
       "file_type": "code",
       "norm_label": "guestlayout.php",
       "source_file": "app/View/Components/GuestLayout.php",
       "source_location": "L1"
     },
     {
-      "id": "bootstrap_app",
-      "label": "bootstrap/app.php",
-      "_origin": "ast",
-      "community": 8,
-      "community_name": "PaymentReconciliationService",
-      "file_type": "code",
-      "norm_label": "bootstrap/app.php",
-      "source_file": "bootstrap/app.php",
-      "source_location": "L1"
-    },
-    {
-      "id": "carbon_carbon",
-      "label": "Carbon\\Carbon",
-      "_origin": "ast",
-      "community": 8,
-      "community_name": "PaymentReconciliationService",
-      "file_type": "code",
-      "norm_label": "carbon\\carbon",
-      "source_file": "",
-      "source_location": ""
-    },
-    {
-      "id": "closure",
-      "label": "Closure",
-      "_origin": "ast",
-      "community": 8,
-      "community_name": "PaymentReconciliationService",
-      "file_type": "code",
-      "norm_label": "closure",
-      "source_file": "",
-      "source_location": ""
-    },
-    {
-      "id": "controller",
-      "label": "Controller",
-      "_origin": "ast",
-      "community": 8,
-      "community_name": "PaymentReconciliationService",
-      "file_type": "code",
-      "norm_label": "controller",
-      "source_file": "",
-      "source_location": ""
-    },
-    {
-      "id": "illuminate_console_scheduling_schedule",
-      "label": "Illuminate\\Console\\Scheduling\\Schedule",
-      "_origin": "ast",
-      "community": 8,
-      "community_name": "PaymentReconciliationService",
-      "file_type": "code",
-      "norm_label": "illuminate\\console\\scheduling\\schedule",
-      "source_file": "",
-      "source_location": ""
-    },
-    {
-      "id": "illuminate_foundation_application",
-      "label": "Illuminate\\Foundation\\Application",
-      "_origin": "ast",
-      "community": 8,
-      "community_name": "PaymentReconciliationService",
-      "file_type": "code",
-      "norm_label": "illuminate\\foundation\\application",
-      "source_file": "",
-      "source_location": ""
-    },
-    {
-      "id": "illuminate_foundation_configuration_exceptions",
-      "label": "Illuminate\\Foundation\\Configuration\\Exceptions",
-      "_origin": "ast",
-      "community": 8,
-      "community_name": "PaymentReconciliationService",
-      "file_type": "code",
-      "norm_label": "illuminate\\foundation\\configuration\\exceptions",
-      "source_file": "",
-      "source_location": ""
-    },
-    {
-      "id": "illuminate_foundation_configuration_middleware",
-      "label": "Illuminate\\Foundation\\Configuration\\Middleware",
-      "_origin": "ast",
-      "community": 8,
-      "community_name": "PaymentReconciliationService",
-      "file_type": "code",
-      "norm_label": "illuminate\\foundation\\configuration\\middleware",
-      "source_file": "",
-      "source_location": ""
-    },
-    {
-      "id": "illuminate_http_jsonresponse",
-      "label": "Illuminate\\Http\\JsonResponse",
-      "_origin": "ast",
-      "community": 8,
-      "community_name": "PaymentReconciliationService",
-      "file_type": "code",
-      "norm_label": "illuminate\\http\\jsonresponse",
-      "source_file": "",
-      "source_location": ""
-    },
-    {
-      "id": "illuminate_http_request",
-      "label": "Illuminate\\Http\\Request",
-      "_origin": "ast",
-      "community": 8,
-      "community_name": "PaymentReconciliationService",
-      "file_type": "code",
-      "norm_label": "illuminate\\http\\request",
-      "source_file": "",
-      "source_location": ""
-    },
-    {
-      "id": "illuminate_support_facades_validator",
-      "label": "Illuminate\\Support\\Facades\\Validator",
-      "_origin": "ast",
-      "community": 8,
-      "community_name": "PaymentReconciliationService",
-      "file_type": "code",
-      "norm_label": "illuminate\\support\\facades\\validator",
-      "source_file": "",
-      "source_location": ""
-    },
-    {
       "id": "illuminate_view_component",
       "label": "Illuminate\\View\\Component",
       "_origin": "ast",
       "community": 8,
-      "community_name": "PaymentReconciliationService",
+      "community_name": "App\\Http\\Controllers\\TrackingController",
       "file_type": "code",
       "norm_label": "illuminate\\view\\component",
       "source_file": "",
@@ -15306,42 +15372,9 @@
       "label": "Illuminate\\View\\View",
       "_origin": "ast",
       "community": 8,
-      "community_name": "PaymentReconciliationService",
+      "community_name": "App\\Http\\Controllers\\TrackingController",
       "file_type": "code",
       "norm_label": "illuminate\\view\\view",
-      "source_file": "",
-      "source_location": ""
-    },
-    {
-      "id": "public_index",
-      "label": "index.php",
-      "_origin": "ast",
-      "community": 8,
-      "community_name": "PaymentReconciliationService",
-      "file_type": "code",
-      "norm_label": "index.php",
-      "source_file": "public/index.php",
-      "source_location": "L1"
-    },
-    {
-      "id": "symfony_component_httpfoundation_response",
-      "label": "Symfony\\Component\\HttpFoundation\\Response",
-      "_origin": "ast",
-      "community": 8,
-      "community_name": "PaymentReconciliationService",
-      "file_type": "code",
-      "norm_label": "symfony\\component\\httpfoundation\\response",
-      "source_file": "",
-      "source_location": ""
-    },
-    {
-      "id": "throwable",
-      "label": "Throwable",
-      "_origin": "ast",
-      "community": 8,
-      "community_name": "PaymentReconciliationService",
-      "file_type": "code",
-      "norm_label": "throwable",
       "source_file": "",
       "source_location": ""
     },
@@ -15848,18 +15881,7 @@
       "source_location": ""
     },
     {
-      "id": "app_http_controllers_packagelabelcontroller",
-      "label": "PackageLabelController.php",
-      "_origin": "ast",
-      "community": 93,
-      "community_name": "App\\Models\\Package",
-      "file_type": "code",
-      "norm_label": "packagelabelcontroller.php",
-      "source_file": "app/Http/Controllers/PackageLabelController.php",
-      "source_location": "L1"
-    },
-    {
-      "id": "app_livewire_driver_packagedetail_php_package",
+      "id": "app_livewire_tracking_publictracking_php_package",
       "label": "Package",
       "_origin": "ast",
       "community": 93,
@@ -15980,39 +16002,6 @@
       "source_location": ""
     },
     {
-      "id": "barryvdh_dompdf_facade_pdf",
-      "label": "Barryvdh\\DomPDF\\Facade\\Pdf",
-      "_origin": "ast",
-      "community": 93,
-      "community_name": "App\\Models\\Package",
-      "file_type": "code",
-      "norm_label": "barryvdh\\dompdf\\facade\\pdf",
-      "source_file": "",
-      "source_location": ""
-    },
-    {
-      "id": "endroid_qrcode_builder_builder",
-      "label": "Endroid\\QrCode\\Builder\\Builder",
-      "_origin": "ast",
-      "community": 93,
-      "community_name": "App\\Models\\Package",
-      "file_type": "code",
-      "norm_label": "endroid\\qrcode\\builder\\builder",
-      "source_file": "",
-      "source_location": ""
-    },
-    {
-      "id": "endroid_qrcode_writer_svgwriter",
-      "label": "Endroid\\QrCode\\Writer\\SvgWriter",
-      "_origin": "ast",
-      "community": 93,
-      "community_name": "App\\Models\\Package",
-      "file_type": "code",
-      "norm_label": "endroid\\qrcode\\writer\\svgwriter",
-      "source_file": "",
-      "source_location": ""
-    },
-    {
       "id": "illuminate_database_queryexception",
       "label": "Illuminate\\Database\\QueryException",
       "_origin": "ast",
@@ -16020,17 +16009,6 @@
       "community_name": "App\\Models\\Package",
       "file_type": "code",
       "norm_label": "illuminate\\database\\queryexception",
-      "source_file": "",
-      "source_location": ""
-    },
-    {
-      "id": "illuminate_http_response",
-      "label": "Illuminate\\Http\\Response",
-      "_origin": "ast",
-      "community": 93,
-      "community_name": "App\\Models\\Package",
-      "file_type": "code",
-      "norm_label": "illuminate\\http\\response",
       "source_file": "",
       "source_location": ""
     },
@@ -16046,13 +16024,13 @@
       "source_location": ""
     },
     {
-      "id": "picqer_barcode_barcodegeneratorsvg",
-      "label": "Picqer\\Barcode\\BarcodeGeneratorSVG",
+      "id": "tests_feature_packageservicecodtest_php_package",
+      "label": "Package",
       "_origin": "ast",
       "community": 93,
       "community_name": "App\\Models\\Package",
       "file_type": "code",
-      "norm_label": "picqer\\barcode\\barcodegeneratorsvg",
+      "norm_label": "package",
       "source_file": "",
       "source_location": ""
     },
@@ -16288,17 +16266,6 @@
       "source_location": ""
     },
     {
-      "id": "app_livewire_admin_packagedispatch",
-      "label": "PackageDispatch.php",
-      "_origin": "ast",
-      "community": 98,
-      "community_name": "RuntimeException",
-      "file_type": "code",
-      "norm_label": "packagedispatch.php",
-      "source_file": "app/Livewire/Admin/PackageDispatch.php",
-      "source_location": "L1"
-    },
-    {
       "id": "app_livewire_admin_packagereception",
       "label": "Admin/PackageReception.php",
       "_origin": "ast",
@@ -16321,15 +16288,37 @@
       "source_location": "L1"
     },
     {
-      "id": "app_livewire_ally_packagereception",
-      "label": "App\\Livewire\\Ally\\PackageReception",
+      "id": "app_livewire_client_dashboard",
+      "label": "Client/Dashboard.php",
       "_origin": "ast",
       "community": 98,
       "community_name": "RuntimeException",
       "file_type": "code",
-      "norm_label": "app\\livewire\\ally\\packagereception",
-      "source_file": "",
-      "source_location": ""
+      "norm_label": "client/dashboard.php",
+      "source_file": "app/Livewire/Client/Dashboard.php",
+      "source_location": "L1"
+    },
+    {
+      "id": "app_livewire_driver_packagedetail",
+      "label": "PackageDetail.php",
+      "_origin": "ast",
+      "community": 98,
+      "community_name": "RuntimeException",
+      "file_type": "code",
+      "norm_label": "packagedetail.php",
+      "source_file": "app/Livewire/Driver/PackageDetail.php",
+      "source_location": "L1"
+    },
+    {
+      "id": "app_livewire_driver_scanner",
+      "label": "Scanner.php",
+      "_origin": "ast",
+      "community": 98,
+      "community_name": "RuntimeException",
+      "file_type": "code",
+      "norm_label": "scanner.php",
+      "source_file": "app/Livewire/Driver/Scanner.php",
+      "source_location": "L1"
     },
     {
       "id": "app_services_deliveryassignmentservice",
@@ -16396,6 +16385,17 @@
       "norm_label": "paymentservice.php",
       "source_file": "app/Services/PaymentService.php",
       "source_location": "L1"
+    },
+    {
+      "id": "illuminate_support_facades_auth",
+      "label": "Illuminate\\Support\\Facades\\Auth",
+      "_origin": "ast",
+      "community": 98,
+      "community_name": "RuntimeException",
+      "file_type": "code",
+      "norm_label": "illuminate\\support\\facades\\auth",
+      "source_file": "",
+      "source_location": ""
     },
     {
       "id": "illuminate_support_facades_db",
@@ -37121,7 +37121,7 @@
       "confidence": "EXTRACTED",
       "confidence_score": 1.0,
       "source_file": "database/migrations/2026_09_06_013233_add_unique_index_to_payment_order_id_on_ally_financial_transactions.php",
-      "source_location": "L16",
+      "source_location": "L21",
       "weight": 1.0
     },
     {
@@ -37132,7 +37132,7 @@
       "confidence": "EXTRACTED",
       "confidence_score": 1.0,
       "source_file": "database/migrations/2026_09_06_013233_add_unique_index_to_payment_order_id_on_ally_financial_transactions.php",
-      "source_location": "L25",
+      "source_location": "L38",
       "weight": 1.0
     },
     {
@@ -46360,5 +46360,5 @@
     }
   ],
   "hyperedges": [],
-  "built_at_commit": "440ac13165008bc3a3da240f2584b2eae8392d64"
+  "built_at_commit": "8e56bcd510bf236b19a7e36f1562c797f2241294"
 }
