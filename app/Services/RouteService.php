@@ -22,57 +22,52 @@ class RouteService
      * Crea una nueva ruta con sus agencias/paradas.
      */
     public function createRoute(
-    array $data,
-    array $allyIdsInOrder,
-    int $createdByUserId
-): Route {
-    if (count($allyIdsInOrder) === 0) {
-        throw new RuntimeException(
-            'Una ruta necesita al menos una agencia.'
-        );
+        array $data,
+        array $allyIdsInOrder,
+        int $createdByUserId
+    ): Route {
+        if (count($allyIdsInOrder) === 0) {
+            throw new RuntimeException(
+                'Una ruta necesita al menos una agencia.'
+            );
+        }
+
+        return DB::transaction(function () use (
+            $data,
+            $allyIdsInOrder,
+            $createdByUserId
+        ) {
+            $route = Route::create([
+                'state' => $data['state'] ?? null,
+                'city' => $data['city'],
+                'name' => $data['name'],
+                'created_by' => $createdByUserId,
+                'status' => Route::STATUS_DRAFT,
+            ]);
+
+            $this->syncStops(
+                $route,
+                $allyIdsInOrder
+            );
+
+            $this->log(
+                $createdByUserId,
+                'route.created',
+                $route,
+                "Creó la ruta \"{$route->name}\" en {$route->city}, "
+                . "{$route->state} con "
+                . count($allyIdsInOrder)
+                . ' paradas.',
+                [
+                    'state' => $route->state,
+                    'city' => $route->city,
+                    'stops' => count($allyIdsInOrder),
+                ]
+            );
+
+            return $route->fresh('stops');
+        });
     }
-
-    return DB::transaction(function () use (
-        $data,
-        $allyIdsInOrder,
-        $createdByUserId
-    ) {
-        $route = Route::create([
-            'state' => $data['state'] ?? null,
-            'city' => $data['city'],
-            'name' => $data['name'],
-            'created_by' => $createdByUserId,
-            'status' => Route::STATUS_DRAFT,
-
-            // Si no se especifica, mantenemos delivery
-            // para no romper las rutas existentes.
-            'route_type' => $data['route_type'] ?? Route::TYPE_DELIVERY,
-        ]);
-
-        $this->syncStops(
-            $route,
-            $allyIdsInOrder
-        );
-
-        $this->log(
-            $createdByUserId,
-            'route.created',
-            $route,
-            "Creó la ruta \"{$route->name}\" en {$route->city}, "
-            . "{$route->state} con "
-            . count($allyIdsInOrder)
-            . ' paradas.',
-            [
-                'state' => $route->state,
-                'city' => $route->city,
-                'route_type' => $route->route_type,
-                'stops' => count($allyIdsInOrder),
-            ]
-        );
-
-        return $route->fresh('stops');
-    });
-}
 
     /**
      * Actualiza los datos y las paradas de una ruta.
