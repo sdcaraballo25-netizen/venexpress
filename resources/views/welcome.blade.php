@@ -27,7 +27,10 @@
             scroll-margin-top: 90px;
         }
 
-        /* La navegación no depende de las utilities de gap de Tailwind. */
+        /* =====================================================
+           NAVEGACIÓN
+        ====================================================== */
+
         .main-nav-links {
             display: flex;
             align-items: center;
@@ -43,12 +46,18 @@
             color: #64748b;
             font-size: 0.875rem;
             font-weight: 500;
-            transition: color 0.2s ease;
+            transition:
+                color 0.2s ease,
+                transform 0.2s ease;
         }
 
         .main-nav-link:hover,
         .main-nav-link.is-active {
             color: #172554;
+        }
+
+        .main-nav-link:hover {
+            transform: translateY(-1px);
         }
 
         .main-nav-link.is-active::after {
@@ -62,20 +71,63 @@
             background: #dc2626;
         }
 
+        /* =====================================================
+           HERO
+        ====================================================== */
+
         .hero-section {
-            min-height: 455px;
+            min-height: 500px;
         }
 
         .hero-content {
-            min-height: 455px;
+            min-height: 500px;
         }
 
         .hero-vehicle {
-            transform: translateY(22px);
+            transform: translateY(28px) scale(1.06);
+            transform-origin: center bottom;
+        }
+
+        .hero-title {
+    font-size: 3.7rem;
+    line-height: 1;
+}
+
+        .hero-description {
+            max-width: 560px;
         }
 
         .coverage-map {
             max-width: 31rem;
+        }
+
+        /* =====================================================
+           RESPONSIVE
+        ====================================================== */
+
+        @media (min-width: 1280px) {
+    .hero-title {
+        font-size: 3.95rem;
+        line-height: 1;
+    }
+
+    .hero-vehicle {
+        transform: translateY(32px) scale(1.10);
+    }
+}
+
+        @media (max-width: 1023px) {
+            .hero-title {
+                font-size: 3.75rem;
+            }
+
+            .hero-vehicle {
+                transform: translateY(20px) scale(1.02);
+            }
+
+            .main-nav-links {
+                gap: 1.4rem;
+            }
         }
 
         @media (max-width: 767px) {
@@ -84,12 +136,28 @@
                 min-height: auto;
             }
 
+            .hero-content {
+                padding-top: 3.5rem;
+                padding-bottom: 3.5rem;
+            }
+
+            .hero-title {
+                font-size: 3rem;
+            }
+
             .hero-vehicle {
                 transform: none;
+                margin-top: 1.5rem;
             }
 
             .main-nav-links {
                 display: none;
+            }
+        }
+
+        @media (max-width: 480px) {
+            .hero-title {
+                font-size: 2.65rem;
             }
         }
     </style>
@@ -101,53 +169,71 @@
 
 <body class="antialiased bg-white">
 
+
     {{-- =========================================================
          NAVBAR
     ========================================================== --}}
     <nav id="main-navbar" class="bg-white border-b border-gray-100 sticky top-0 z-50">
+
         <div class="max-w-7xl mx-auto px-6 py-4 flex items-center justify-between">
 
-            <a href="{{ route('home') }}" class="shrink-0" aria-label="Venexpress - Inicio">
+            <a href="{{ route('home') }}"
+               class="shrink-0"
+               aria-label="Venexpress - Inicio">
+
                 <img
                     src="{{ asset('images/venexpress-logo.png') }}"
                     alt="Venexpress"
                     class="h-9 w-auto"
                 >
+
             </a>
 
+
             <div class="main-nav-links">
-                <a href="{{ route('home') }}" class="main-nav-link is-active">
+
+                <a href="{{ route('home') }}"
+                   class="main-nav-link is-active">
                     Inicio
                 </a>
 
-                <a href="#servicios" class="main-nav-link">
+                <a href="#servicios"
+                   class="main-nav-link">
                     Servicios
                 </a>
 
-                <a href="{{ route('public.calculator') }}" class="main-nav-link">
+                <a href="{{ route('public.calculator') }}"
+                   class="main-nav-link">
                     Calcular precio
                 </a>
 
-                <a href="{{ route('public.offices') }}" class="main-nav-link">
+                <a href="{{ route('public.offices') }}"
+                   class="main-nav-link">
                     Agencias aliadas
                 </a>
 
-                <a href="{{ route('tracking.index') }}" class="main-nav-link">
+                <a href="{{ route('tracking.index') }}"
+                   class="main-nav-link">
                     Rastreo
                 </a>
 
-                <a href="#ayuda" class="main-nav-link">
+                <a href="#ayuda"
+                   class="main-nav-link">
                     Ayuda
                 </a>
+
             </div>
 
+
             <div class="flex items-center gap-3">
+
                 <a
                     href="{{ route('login') }}"
-                    class="bg-amber-400 hover:bg-amber-500 text-blue-950 font-semibold text-sm px-6 py-2.5 rounded-lg transition inline-flex items-center justify-center"
+                    class="bg-amber-400 hover:bg-amber-500 text-blue-950 font-semibold text-sm px-6 py-2.5 rounded-lg transition inline-flex items-center justify-center shadow-sm hover:shadow-md"
                 >
                     Iniciar sesión
                 </a>
+
 
                 <button
                     id="mobile-menu-button"
@@ -159,11 +245,16 @@
                 >
                     <i id="mobile-menu-icon" class="fa-solid fa-bars"></i>
                 </button>
+
             </div>
+
         </div>
 
+
         {{-- MENÚ MÓVIL --}}
-        <div id="mobile-menu" class="hidden border-t border-gray-100 bg-white md:hidden">
+        <div id="mobile-menu"
+             class="hidden border-t border-gray-100 bg-white md:hidden">
+
             <div class="max-w-7xl mx-auto px-6 py-3">
 
                 <a href="{{ route('home') }}"
@@ -197,108 +288,144 @@
                 </a>
 
             </div>
+
         </div>
+
     </nav>
 
 
-    
-{{-- =========================================================
-     HERO
-========================================================== --}}
-<section class="hero-section relative overflow-hidden bg-white">
 
-    {{-- Fondo --}}
-    <div class="absolute inset-0 z-0 pointer-events-none">
-        <img
-            src="{{ asset('images/skyline-hero.png') }}"
-            alt=""
-            class="absolute inset-0 w-full h-full object-cover object-right opacity-80"
-        >
-    </div>
+    {{-- =========================================================
+         HERO
+    ========================================================== --}}
+    <section class="hero-section relative overflow-hidden bg-white">
 
-    <div class="hero-content relative z-10 max-w-7xl mx-auto px-6 py-10 md:py-12 grid md:grid-cols-2 gap-6 lg:gap-10 items-center">
+        {{-- Fondo --}}
+        <div class="absolute inset-0 z-0 pointer-events-none">
 
-        {{-- Texto --}}
-<div class="relative z-20 max-w-2xl">
+            <img
+                src="{{ asset('images/skyline-hero.png') }}"
+                alt=""
+                class="absolute inset-0 w-full h-full object-cover object-right opacity-75"
+            >
 
-    <h1 class="text-5xl sm:text-6xl lg:text-[4.25rem] xl:text-[4.5rem] font-extrabold text-blue-950 leading-[1] tracking-tight">
-        <span class="block whitespace-nowrap">
-            Envía fácil.
-        </span>
-
-        <span class="block text-red-600 whitespace-nowrap">
-            Rastrea siempre.
-        </span>
-    </h1>
-
-    <p class="mt-6 text-gray-600 text-lg leading-7.5 max-w-xl font-medium">
-        Calcula el precio de tu envío, encuentra una agencia y consulta el estado de tu paquete de forma sencilla.
-    </p>
-
-    {{-- Acciones principales del hero --}}
-    <div class="mt-7 flex flex-nowrap items-center gap-2">
-
-        <a href="{{ route('public.calculator') }}"
-           class="group inline-flex items-center gap-1.5 bg-white/45 hover:bg-white/75 backdrop-blur-sm border border-blue-900/20 hover:border-blue-900/40 text-blue-950 text-sm font-bold px-3 py-2 rounded-lg transition shadow-sm hover:shadow-md">
-
-            <span class="w-5.5 h-5.5 rounded-md bg-blue-50/80 flex items-center justify-center shrink-0">
-                <i class="fa-solid fa-calculator text-[10px] text-blue-900"></i>
-            </span>
-
-            Calcular precio
-
-            <i class="fa-solid fa-arrow-right text-[10px] text-blue-900/60 transition-transform group-hover:translate-x-0.5"></i>
-        </a>
+        </div>
 
 
-        <a href="{{ route('public.offices') }}"
-           class="group inline-flex items-center gap-1.5 bg-white/45 hover:bg-white/75 backdrop-blur-sm border border-blue-900/20 hover:border-blue-900/40 text-blue-950 text-sm font-bold px-3 py-2 rounded-lg transition shadow-sm hover:shadow-md">
-
-            <span class="w-5.5 h-5.5 rounded-md bg-blue-50/80 flex items-center justify-center shrink-0">
-                <i class="fa-solid fa-location-dot text-amber-500 text-[10px]"></i>
-            </span>
-
-            Agencias cercanas
-
-            <i class="fa-solid fa-arrow-right text-[10px] text-blue-900/60 transition-transform group-hover:translate-x-0.5"></i>
-        </a>
+        <div class="hero-content relative z-10 max-w-7xl mx-auto px-6 py-10 md:py-12 grid md:grid-cols-2 gap-6 lg:gap-10 items-center">
 
 
-        <a href="{{ route('tracking.index') }}"
-           class="group inline-flex items-center gap-1.5 bg-white/45 hover:bg-white/75 backdrop-blur-sm border border-blue-900/20 hover:border-blue-900/40 text-blue-950 text-sm font-bold px-3 py-2 rounded-lg transition shadow-sm hover:shadow-md">
+            {{-- =================================================
+                 TEXTO
+            ================================================== --}}
+            <div class="relative z-20 max-w-2xl">
 
-            <span class="w-5.5 h-5.5 rounded-md bg-blue-50/80 flex items-center justify-center shrink-0">
-                <i class="fa-solid fa-location-crosshairs text-blue-900 text-[10px]"></i>
-            </span>
+                <h1 class="hero-title font-extrabold text-blue-950 leading-[0.82] tracking-tight">
 
-            Rastrear envío
+    <span class="block whitespace-nowrap">
+        Envía fácil.
+    </span>
 
-            <i class="fa-solid fa-arrow-right text-[10px] text-blue-900/60 transition-transform group-hover:translate-x-0.5"></i>
-        </a>
+    <span class="block text-red-600 whitespace-nowrap">
+        Rastrea siempre.
+    </span>
 
-    </div>
+</h1>
 
-</div>
 
-        {{-- Vehículo --}}
-        <div class="relative flex justify-center md:justify-end items-end">
+                <p class="hero-description mt-6 text-gray-600 text-lg leading-7.5 font-medium">
+                    Calcula el precio de tu envío, encuentra una agencia y consulta el estado de tu paquete de forma sencilla.
+                </p>
 
-            <div class="hero-vehicle relative w-full max-w-md lg:max-w-xl">
 
-                <img
-                    src="{{ asset('images/van-hero.png') }}"
-                    alt="Furgoneta Venexpress"
-                    class="w-full relative z-10 drop-shadow-[0_30px_25px_rgba(15,23,55,0.25)]"
-                >
+                {{-- =================================================
+                     BOTONES
+                ================================================== --}}
+                <div class="mt-7 flex flex-nowrap items-center gap-2">
 
-                <div class="absolute left-1/2 bottom-1 -translate-x-1/2 w-[65%] h-5 bg-blue-950/25 rounded-full blur-md"></div>
+
+                    {{-- Calcular --}}
+                    <a
+                        href="{{ route('public.calculator') }}"
+                        class="group inline-flex items-center gap-1.5 bg-white/50 hover:bg-white/80 backdrop-blur-sm border border-blue-900/20 hover:border-blue-900/40 text-blue-950 text-sm font-bold px-3 py-2 rounded-lg transition duration-200 shadow-sm hover:shadow-md"
+                    >
+
+                        <span class="w-5.5 h-5.5 rounded-md bg-blue-50/80 flex items-center justify-center shrink-0">
+                            <i class="fa-solid fa-calculator text-[10px] text-blue-900"></i>
+                        </span>
+
+                        Calcular precio
+
+                        <i class="fa-solid fa-arrow-right text-[10px] text-blue-900/60 transition-transform group-hover:translate-x-0.5"></i>
+
+                    </a>
+
+
+                    {{-- Agencias --}}
+                    <a
+                        href="{{ route('public.offices') }}"
+                        class="group inline-flex items-center gap-1.5 bg-white/50 hover:bg-white/80 backdrop-blur-sm border border-blue-900/20 hover:border-blue-900/40 text-blue-950 text-sm font-bold px-3 py-2 rounded-lg transition duration-200 shadow-sm hover:shadow-md"
+                    >
+
+                        <span class="w-5.5 h-5.5 rounded-md bg-blue-50/80 flex items-center justify-center shrink-0">
+                            <i class="fa-solid fa-location-dot text-amber-500 text-[10px]"></i>
+                        </span>
+
+                        Agencias cercanas
+
+                        <i class="fa-solid fa-arrow-right text-[10px] text-blue-900/60 transition-transform group-hover:translate-x-0.5"></i>
+
+                    </a>
+
+
+                    {{-- Rastreo --}}
+                    <a
+                        href="{{ route('tracking.index') }}"
+                        class="group inline-flex items-center gap-1.5 bg-white/50 hover:bg-white/80 backdrop-blur-sm border border-blue-900/20 hover:border-blue-900/40 text-blue-950 text-sm font-bold px-3 py-2 rounded-lg transition duration-200 shadow-sm hover:shadow-md"
+                    >
+
+                        <span class="w-5.5 h-5.5 rounded-md bg-blue-50/80 flex items-center justify-center shrink-0">
+                            <i class="fa-solid fa-location-crosshairs text-blue-900 text-[10px]"></i>
+                        </span>
+
+                        Rastrear envío
+
+                        <i class="fa-solid fa-arrow-right text-[10px] text-blue-900/60 transition-transform group-hover:translate-x-0.5"></i>
+
+                    </a>
+
+                </div>
+
+            </div>
+
+
+
+            {{-- =================================================
+                 VEHÍCULO
+            ================================================== --}}
+            <div class="relative flex justify-center md:justify-end items-end">
+
+                <div class="hero-vehicle relative w-full max-w-md lg:max-w-2xl">
+
+                    <img
+                        src="{{ asset('images/van-hero.png') }}"
+                        alt="Furgoneta Venexpress"
+                        class="w-full relative z-10 drop-shadow-[0_30px_25px_rgba(15,23,55,0.25)]"
+                    >
+
+
+                    {{-- Sombra debajo de la camioneta --}}
+                    <div
+                        class="absolute left-1/2 bottom-1 -translate-x-1/2 w-[68%] h-5 bg-blue-950/25 rounded-full blur-md"
+                    ></div>
+
+                </div>
 
             </div>
 
         </div>
 
-    </div>
-</section>
+    </section>
 
 
 
@@ -306,50 +433,79 @@
          FRANJA DE BENEFICIOS
     ========================================================== --}}
     <section class="bg-blue-950">
+
         <div class="max-w-7xl mx-auto px-6 py-6 grid grid-cols-2 md:grid-cols-4 gap-6">
 
+
             <div class="flex items-center gap-3">
+
                 <div class="w-9 h-9 rounded-full bg-white/10 flex items-center justify-center shrink-0">
                     <i class="fa-solid fa-shield-halved text-amber-400"></i>
                 </div>
-                <span class="text-white text-sm">Envíos seguros a nivel nacional</span>
+
+                <span class="text-white text-sm">
+                    Envíos seguros a nivel nacional
+                </span>
+
             </div>
 
+
             <div class="flex items-center gap-3">
+
                 <div class="w-9 h-9 rounded-full bg-white/10 flex items-center justify-center shrink-0">
                     <i class="fa-solid fa-location-dot text-amber-400"></i>
                 </div>
-                <span class="text-white text-sm">Cobertura en las principales ciudades</span>
+
+                <span class="text-white text-sm">
+                    Cobertura en las principales ciudades
+                </span>
+
             </div>
 
+
             <div class="flex items-center gap-3">
+
                 <div class="w-9 h-9 rounded-full bg-white/10 flex items-center justify-center shrink-0">
                     <i class="fa-solid fa-handshake text-amber-400"></i>
                 </div>
-                <span class="text-white text-sm">Aliados comerciales de confianza</span>
+
+                <span class="text-white text-sm">
+                    Aliados comerciales de confianza
+                </span>
+
             </div>
 
+
             <div class="flex items-center gap-3">
+
                 <div class="w-9 h-9 rounded-full bg-white/10 flex items-center justify-center shrink-0">
                     <i class="fa-solid fa-headset text-amber-400"></i>
                 </div>
-                <span class="text-white text-sm">Atención al cliente 24/7</span>
+
+                <span class="text-white text-sm">
+                    Atención al cliente 24/7
+                </span>
+
             </div>
 
         </div>
+
     </section>
+
 
 
     {{-- =========================================================
          ACCESOS RÁPIDOS
     ========================================================== --}}
     <section id="servicios" class="bg-white">
+
         <div class="max-w-7xl mx-auto px-6 py-16">
 
             <div class="text-center mb-10">
 
                 <h2 class="text-3xl font-extrabold text-blue-950 inline-block relative pb-3">
                     ¿Qué necesitas hacer?
+
                     <span class="absolute left-1/2 -translate-x-1/2 bottom-0 w-14 h-1 bg-red-600 rounded-full"></span>
                 </h2>
 
@@ -359,13 +515,16 @@
 
             </div>
 
+
             <div class="grid md:grid-cols-3 gap-5 lg:gap-6 items-stretch">
 
-                {{-- CALCULAR ENVÍO: acción principal --}}
+
+                {{-- CALCULAR --}}
                 <a
                     href="{{ route('public.calculator') }}"
                     class="group relative overflow-hidden bg-white rounded-2xl border border-gray-200 p-6 md:p-7 flex flex-col min-h-[245px] transition duration-300 hover:-translate-y-1 hover:border-blue-200 hover:shadow-xl focus:outline-none focus:ring-2 focus:ring-blue-900/20"
                 >
+
                     <div class="absolute top-0 left-0 right-0 h-1 bg-blue-900"></div>
 
                     <div class="w-12 h-12 rounded-xl bg-blue-50 flex items-center justify-center mb-6 transition duration-300 group-hover:bg-blue-900">
@@ -373,6 +532,7 @@
                     </div>
 
                     <div>
+
                         <p class="text-[11px] font-bold uppercase tracking-[0.16em] text-blue-900 mb-2">
                             Tu envío
                         </p>
@@ -384,20 +544,24 @@
                         <p class="text-sm text-gray-500 mt-2 leading-6 max-w-sm">
                             Obtén una estimación del precio de tu envío en pocos pasos.
                         </p>
+
                     </div>
 
                     <span class="inline-flex items-center mt-auto pt-6 text-sm font-semibold text-blue-900 group-hover:text-red-600 transition">
                         Calcular precio
                         <i class="fa-solid fa-arrow-right ml-2 text-xs transition-transform group-hover:translate-x-1"></i>
                     </span>
+
                 </a>
 
 
-                {{-- AGENCIAS: acción secundaria --}}
+
+                {{-- AGENCIAS --}}
                 <a
                     href="{{ route('public.offices') }}"
                     class="group relative overflow-hidden bg-white rounded-2xl border border-gray-200 p-6 md:p-7 flex flex-col min-h-[245px] transition duration-300 hover:-translate-y-1 hover:border-amber-200 hover:shadow-xl focus:outline-none focus:ring-2 focus:ring-amber-400/20"
                 >
+
                     <div class="absolute top-0 left-0 right-0 h-1 bg-amber-400"></div>
 
                     <div class="w-12 h-12 rounded-xl bg-amber-50 flex items-center justify-center mb-6 transition duration-300 group-hover:bg-amber-400">
@@ -405,6 +569,7 @@
                     </div>
 
                     <div>
+
                         <p class="text-[11px] font-bold uppercase tracking-[0.16em] text-amber-600 mb-2">
                             Punto cercano
                         </p>
@@ -416,20 +581,24 @@
                         <p class="text-sm text-gray-500 mt-2 leading-6 max-w-sm">
                             Localiza el punto Venexpress más conveniente para entregar tu paquete.
                         </p>
+
                     </div>
 
                     <span class="inline-flex items-center mt-auto pt-6 text-sm font-semibold text-blue-900 group-hover:text-red-600 transition">
                         Descubrir agencias
                         <i class="fa-solid fa-arrow-right ml-2 text-xs transition-transform group-hover:translate-x-1"></i>
                     </span>
+
                 </a>
 
 
-                {{-- RASTREO: acción secundaria --}}
+
+                {{-- RASTREO --}}
                 <a
                     href="{{ route('tracking.index') }}"
                     class="group relative overflow-hidden bg-white rounded-2xl border border-gray-200 p-6 md:p-7 flex flex-col min-h-[245px] transition duration-300 hover:-translate-y-1 hover:border-blue-200 hover:shadow-xl focus:outline-none focus:ring-2 focus:ring-blue-900/20"
                 >
+
                     <div class="absolute top-0 left-0 right-0 h-1 bg-blue-900"></div>
 
                     <div class="w-12 h-12 rounded-xl bg-blue-50 flex items-center justify-center mb-6 transition duration-300 group-hover:bg-blue-900">
@@ -437,6 +606,7 @@
                     </div>
 
                     <div>
+
                         <p class="text-[11px] font-bold uppercase tracking-[0.16em] text-blue-900 mb-2">
                             Seguimiento
                         </p>
@@ -448,17 +618,22 @@
                         <p class="text-sm text-gray-500 mt-2 leading-6 max-w-sm">
                             Consulta el estado de tu paquete y accede a las herramientas de rastreo.
                         </p>
+
                     </div>
 
                     <span class="inline-flex items-center mt-auto pt-6 text-sm font-semibold text-blue-900 group-hover:text-red-600 transition">
                         Ir al rastreo
                         <i class="fa-solid fa-arrow-right ml-2 text-xs transition-transform group-hover:translate-x-1"></i>
                     </span>
+
                 </a>
 
             </div>
+
         </div>
+
     </section>
+
 
 
     {{-- =========================================================
@@ -470,6 +645,7 @@
 
             <h2 class="text-3xl font-extrabold text-blue-950 inline-block relative pb-3">
                 ¿Cómo funciona?
+
                 <span class="absolute left-1/2 -translate-x-1/2 bottom-0 w-14 h-1 bg-red-600 rounded-full"></span>
             </h2>
 
@@ -602,6 +778,7 @@
     </section>
 
 
+
     {{-- =========================================================
          POR QUÉ ELEGIR VENEXPRESS
     ========================================================== --}}
@@ -612,7 +789,9 @@
             <div class="text-center mb-14">
 
                 <h2 class="text-3xl font-extrabold text-blue-950 inline-block relative pb-3">
-                    ¿Por qué elegir <span class="text-red-600">Venexpress</span>?
+                    ¿Por qué elegir
+                    <span class="text-red-600">Venexpress</span>?
+
                     <span class="absolute left-1/2 -translate-x-1/2 bottom-0 w-14 h-1 bg-red-600 rounded-full"></span>
                 </h2>
 
@@ -621,10 +800,12 @@
 
             <div class="grid md:grid-cols-2 gap-10 items-center">
 
-                {{-- Beneficios --}}
+
+                {{-- BENEFICIOS --}}
                 <div class="grid sm:grid-cols-2 gap-5">
 
                     <div class="bg-white rounded-xl border border-gray-100 p-5">
+
                         <div class="w-10 h-10 rounded-lg bg-blue-50 flex items-center justify-center mb-3">
                             <i class="fa-solid fa-earth-americas text-blue-900"></i>
                         </div>
@@ -636,10 +817,12 @@
                         <p class="text-xs text-gray-500 mt-1">
                             Llegamos a las principales ciudades del país.
                         </p>
+
                     </div>
 
 
                     <div class="bg-white rounded-xl border border-gray-100 p-5">
+
                         <div class="w-10 h-10 rounded-lg bg-amber-50 flex items-center justify-center mb-3">
                             <i class="fa-solid fa-box text-amber-500"></i>
                         </div>
@@ -651,10 +834,12 @@
                         <p class="text-xs text-gray-500 mt-1">
                             Tus paquetes están protegidos en cada etapa del envío.
                         </p>
+
                     </div>
 
 
                     <div class="bg-white rounded-xl border border-gray-100 p-5">
+
                         <div class="w-10 h-10 rounded-lg bg-blue-50 flex items-center justify-center mb-3">
                             <i class="fa-solid fa-people-group text-blue-900"></i>
                         </div>
@@ -666,10 +851,12 @@
                         <p class="text-xs text-gray-500 mt-1">
                             Trabajamos con los mejores aliados del sector.
                         </p>
+
                     </div>
 
 
                     <div class="bg-white rounded-xl border border-gray-100 p-5">
+
                         <div class="w-10 h-10 rounded-lg bg-blue-50 flex items-center justify-center mb-3">
                             <i class="fa-regular fa-clock text-blue-900"></i>
                         </div>
@@ -681,12 +868,14 @@
                         <p class="text-xs text-gray-500 mt-1">
                             Comprometidos con la puntualidad de tu envío.
                         </p>
+
                     </div>
 
                 </div>
 
 
-                {{-- Mapa + CTA --}}
+
+                {{-- MAPA --}}
                 <div class="flex flex-col items-center">
 
                     <img
@@ -699,16 +888,23 @@
                         href="{{ route('public.offices') }}"
                         class="mt-5 bg-blue-950 hover:bg-blue-900 text-white text-sm font-semibold px-5 py-3 rounded-lg transition inline-flex items-center justify-center shadow-sm"
                     >
+
                         <i class="fa-solid fa-location-dot mr-2 text-amber-400"></i>
+
                         Descubre agencias cercanas
+
                         <i class="fa-solid fa-arrow-right ml-2 text-xs"></i>
+
                     </a>
 
                 </div>
 
             </div>
+
         </div>
+
     </section>
+
 
 
     {{-- =========================================================
@@ -717,6 +913,7 @@
     <footer id="ayuda" class="bg-blue-950">
 
         <div class="max-w-7xl mx-auto px-6 py-14 grid md:grid-cols-5 gap-10">
+
 
             <div>
 
@@ -730,25 +927,34 @@
                     Conectamos a Venezuela con soluciones de envío rápidas, seguras y confiables.
                 </p>
 
+
                 <div class="flex items-center gap-3 mt-5">
 
-                    <a href="#"
-                       class="w-8 h-8 rounded-full bg-white/10 flex items-center justify-center hover:bg-white/20 transition">
+                    <a
+                        href="#"
+                        class="w-8 h-8 rounded-full bg-white/10 flex items-center justify-center hover:bg-white/20 transition"
+                    >
                         <i class="fa-brands fa-facebook-f text-white text-sm"></i>
                     </a>
 
-                    <a href="#"
-                       class="w-8 h-8 rounded-full bg-white/10 flex items-center justify-center hover:bg-white/20 transition">
+                    <a
+                        href="#"
+                        class="w-8 h-8 rounded-full bg-white/10 flex items-center justify-center hover:bg-white/20 transition"
+                    >
                         <i class="fa-brands fa-instagram text-white text-sm"></i>
                     </a>
 
-                    <a href="#"
-                       class="w-8 h-8 rounded-full bg-white/10 flex items-center justify-center hover:bg-white/20 transition">
+                    <a
+                        href="#"
+                        class="w-8 h-8 rounded-full bg-white/10 flex items-center justify-center hover:bg-white/20 transition"
+                    >
                         <i class="fa-brands fa-x-twitter text-white text-sm"></i>
                     </a>
 
-                    <a href="#"
-                       class="w-8 h-8 rounded-full bg-white/10 flex items-center justify-center hover:bg-white/20 transition">
+                    <a
+                        href="#"
+                        class="w-8 h-8 rounded-full bg-white/10 flex items-center justify-center hover:bg-white/20 transition"
+                    >
                         <i class="fa-brands fa-whatsapp text-white text-sm"></i>
                     </a>
 
@@ -877,25 +1083,36 @@
                 <ul class="space-y-3 text-sm text-blue-200">
 
                     <li class="flex items-start gap-2">
+
                         <i class="fa-solid fa-phone mt-0.5 text-white"></i>
+
                         <span>
                             0800-VENEXPRESS<br>
                             0800-83639773
                         </span>
+
                     </li>
 
+
                     <li class="flex items-center gap-2">
+
                         <i class="fa-solid fa-envelope text-white"></i>
+
                         <span>
                             info@venexpress.com
                         </span>
+
                     </li>
 
+
                     <li class="flex items-center gap-2">
+
                         <i class="fa-solid fa-location-dot text-white"></i>
+
                         <span>
                             Caracas, Venezuela
                         </span>
+
                     </li>
 
                 </ul>
@@ -916,13 +1133,13 @@
     </footer>
 
 
+
     {{-- =========================================================
          JAVASCRIPT
     ========================================================== --}}
     <script>
         document.addEventListener('DOMContentLoaded', function () {
 
-            // Menú móvil
             const button = document.getElementById('mobile-menu-button');
             const menu = document.getElementById('mobile-menu');
             const icon = document.getElementById('mobile-menu-icon');
@@ -930,29 +1147,43 @@
             if (button && menu && icon) {
 
                 const closeMenu = () => {
+
                     menu.classList.add('hidden');
+
                     icon.classList.remove('fa-xmark');
                     icon.classList.add('fa-bars');
+
                     button.setAttribute('aria-expanded', 'false');
                 };
+
 
                 button.addEventListener('click', function () {
 
                     const open = !menu.classList.contains('hidden');
 
                     if (open) {
+
                         closeMenu();
+
                     } else {
+
                         menu.classList.remove('hidden');
+
                         icon.classList.remove('fa-bars');
                         icon.classList.add('fa-xmark');
+
                         button.setAttribute('aria-expanded', 'true');
                     }
+
                 });
+
 
                 document
                     .querySelectorAll('.mobile-menu-link')
-                    .forEach(link => link.addEventListener('click', closeMenu));
+                    .forEach(link => {
+                        link.addEventListener('click', closeMenu);
+                    });
+
             }
 
         });
