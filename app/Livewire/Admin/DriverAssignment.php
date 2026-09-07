@@ -5,6 +5,7 @@ namespace App\Livewire\Admin;
 use App\Models\Package;
 use App\Models\Route;
 use App\Services\DeliveryAssignmentService;
+use Illuminate\Support\Facades\Auth;
 use Livewire\Attributes\Layout;
 use Livewire\Component;
 use RuntimeException;
@@ -18,8 +19,17 @@ class DriverAssignment extends Component
     public ?string $errorMessage = null;
     public ?string $successMessage = null;
 
+    protected function authorizeAction(): void
+    {
+        $user = Auth::user();
+        if (! $user || ! $user->isActive() || ! in_array($user->role, ['admin_principal', 'admin_operativo'], true)) {
+            abort(403);
+        }
+    }
+
     public function search(): void
     {
+        $this->authorizeAction();
         $this->package = null;
         $this->errorMessage = null;
         $this->successMessage = null;
@@ -42,6 +52,7 @@ class DriverAssignment extends Component
 
     public function assign(): void
     {
+        $this->authorizeAction();
         $this->errorMessage = null;
         $this->successMessage = null;
 
@@ -66,12 +77,29 @@ class DriverAssignment extends Component
         }
     }
 
+    public function unassign(): void
+    {
+        $this->authorizeAction();
+        $this->errorMessage = null;
+        $this->successMessage = null;
+        $this->validate(['trackingNumber' => ['required', 'string', 'max:50']]);
+
+        try {
+            $package = Package::query()->where('tracking_number', trim($this->trackingNumber))->firstOrFail();
+            $this->package = app(DeliveryAssignmentService::class)->unassign($package, (int) Auth::id());
+            $this->successMessage = 'Se retiró la asignación de reparto.';
+        } catch (RuntimeException $e) {
+            $this->errorMessage = $e->getMessage();
+        }
+    }
+
     public function render()
     {
         $routes = Route::query()
             ->with('driver.user')
             ->where('status', Route::STATUS_IN_PROGRESS)
             ->whereNotNull('driver_id')
+            ->where('route_type', Route::TYPE_DELIVERY)
             ->orderBy('city')
             ->orderBy('name')
             ->get();

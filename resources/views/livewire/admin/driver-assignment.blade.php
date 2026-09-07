@@ -42,7 +42,14 @@
                         </select>
                         @error('routeId')<p class="mt-1 text-xs text-red-600">{{ $message }}</p>@enderror
                     </div>
-                    <button wire:loading.attr="disabled" class="w-full rounded-xl bg-emerald-600 px-5 py-3 font-semibold text-white disabled:opacity-50">Asignar a reparto</button>
+                    <button wire:loading.attr="disabled" wire:target="assign" class="w-full rounded-xl bg-emerald-600 px-5 py-3 font-semibold text-white disabled:opacity-50">Asignar a reparto</button>
+                </form>
+
+                @if($package->driver_id)
+                    <button wire:click="unassign" wire:loading.attr="disabled" wire:target="unassign" class="mt-3 w-full rounded-xl bg-amber-600 px-5 py-3 font-semibold text-white disabled:opacity-50">
+                        Retirar asignación
+                    </button>
+
                 </form>
             </div>
         @endif

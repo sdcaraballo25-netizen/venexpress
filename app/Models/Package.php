@@ -106,6 +106,13 @@ class Package extends Model
         'delivery_accepted_at',
         'delivery_rejected_at',
         'delivery_completed_at',
+        'delivery_confirmation_method',
+        'receiver_name',
+        'receiver_id_doc',
+        'receiver_phone',
+        'delivery_photo_path',
+        'customer_confirmed_at',
+        'customer_confirmed_by',
         'delivery_rejection_reason',
 
         'driver_remuneration_usd',
@@ -139,6 +146,7 @@ class Package extends Model
             'delivery_accepted_at' => 'datetime',
             'delivery_rejected_at' => 'datetime',
             'delivery_completed_at' => 'datetime',
+            'customer_confirmed_at' => 'datetime',
 
             'driver_remuneration_usd' => 'decimal:2',
             'driver_remuneration_paid_at' => 'datetime',

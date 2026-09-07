@@ -2,53 +2,110 @@
 
 use Illuminate\Database\Migrations\Migration;
 use Illuminate\Database\Schema\Blueprint;
+use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Schema;
 
 return new class extends Migration
 {
-    /**
-     * Refuerza a nivel de base de datos la idempotencia que ya
-     * aplica AllyFinancialService::recordAllyDebtPayment(): una
-     * misma PaymentOrder nunca debe generar más de un movimiento
-     * financiero. El índice anterior (no único) solo ayudaba a
-     * las consultas, no lo impedía.
-     *
-     * MySQL no permite borrar un índice mientras una llave
-     * foránea dependa de él, así que primero se elimina la FK,
-     * luego el índice viejo, y al final se recrean ambos usando
-     * el nuevo índice único como respaldo.
-     */
     public function up(): void
     {
-        Schema::table('ally_financial_transactions', function (Blueprint $table) {
-            $table->dropForeign(['payment_order_id']);
-            $table->dropIndex(['payment_order_id']);
-        });
+        $table = 'ally_financial_transactions';
+        $column = 'payment_order_id';
+        $indexName = 'ally_financial_transactions_payment_order_id_unique';
 
-        Schema::table('ally_financial_transactions', function (Blueprint $table) {
-            $table->unique('payment_order_id');
+        if (! Schema::hasColumn($table, $column)) {
+            return;
+        }
 
-            $table->foreign('payment_order_id')
-                ->references('id')
-                ->on('payment_orders')
-                ->nullOnDelete();
-        });
+        /*
+        |--------------------------------------------------------------------------
+        | Eliminar índices anteriores solamente si existen
+        |--------------------------------------------------------------------------
+        */
+
+        $indexes = DB::select("
+            SHOW INDEX
+            FROM `{$table}`
+            WHERE Column_name = ?
+        ", [$column]);
+
+        foreach ($indexes as $index) {
+            $existingIndexName = $index->Key_name;
+
+            /*
+            | No eliminar la clave primaria.
+            | Tampoco eliminar el índice que vamos a conservar.
+            */
+            if (
+                $existingIndexName !== 'PRIMARY' &&
+                $existingIndexName !== $indexName
+            ) {
+                DB::statement("
+                    ALTER TABLE `{$table}`
+                    DROP INDEX `{$existingIndexName}`
+                ");
+            }
+        }
+
+        /*
+        |--------------------------------------------------------------------------
+        | Crear índice único si todavía no existe
+        |--------------------------------------------------------------------------
+        */
+
+        $uniqueIndexExists = DB::select("
+            SHOW INDEX
+            FROM `{$table}`
+            WHERE Key_name = ?
+              AND Non_unique = 0
+        ", [$indexName]);
+
+        if (empty($uniqueIndexExists)) {
+            Schema::table($table, function (Blueprint $table) use ($indexName) {
+                $table->unique(
+                    'payment_order_id',
+                    $indexName
+                );
+            });
+        }
     }
 
     public function down(): void
     {
-        Schema::table('ally_financial_transactions', function (Blueprint $table) {
-            $table->dropForeign(['payment_order_id']);
-            $table->dropUnique(['payment_order_id']);
-        });
+        $table = 'ally_financial_transactions';
+        $indexName = 'ally_financial_transactions_payment_order_id_unique';
 
-        Schema::table('ally_financial_transactions', function (Blueprint $table) {
-            $table->index('payment_order_id');
+        if (DB::getDriverName() === 'mysql') {
+            $indexes = DB::select("
+                SHOW INDEX
+                FROM `{$table}`
+                WHERE Key_name = ?
+            ", [$indexName]);
 
-            $table->foreign('payment_order_id')
-                ->references('id')
-                ->on('payment_orders')
-                ->nullOnDelete();
-        });
+            if (! empty($indexes)) {
+                DB::statement("
+                    ALTER TABLE `{$table}`
+                    DROP INDEX `{$indexName}`
+                ");
+            }
+
+            return;
+        }
+
+        /*
+        |--------------------------------------------------------------------------
+        | Compatibilidad con SQLite
+        |--------------------------------------------------------------------------
+        */
+
+        if (Schema::hasTable($table)) {
+            Schema::table($table, function (Blueprint $table) use ($indexName) {
+                try {
+                    $table->dropUnique($indexName);
+                } catch (\Throwable $exception) {
+                    // El índice puede no existir.
+                }
+            });
+        }
     }
 };

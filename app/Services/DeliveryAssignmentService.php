@@ -26,6 +26,10 @@ class DeliveryAssignmentService
                 ->lockForUpdate()
                 ->firstOrFail();
 
+            if (! $lockedRoute->isDelivery()) {
+                throw new RuntimeException('La ruta seleccionada no es una ruta de reparto.');
+            }
+
             if ($lockedRoute->status !== Route::STATUS_IN_PROGRESS) {
                 throw new RuntimeException('La ruta debe estar en curso.');
             }
@@ -87,4 +91,51 @@ class DeliveryAssignmentService
             return $lockedPackage->fresh(['driver.user', 'histories']);
         });
     }
+
+    public function unassign(Package $package, int $userId, ?string $reason = null): Package
+    {
+        return DB::transaction(function () use ($package, $userId, $reason) {
+            $lockedPackage = Package::query()
+                ->whereKey($package->id)
+                ->lockForUpdate()
+                ->firstOrFail();
+
+            if ($lockedPackage->driver_id === null) {
+                throw new RuntimeException('El paquete no tiene un repartidor asignado.');
+            }
+
+            if ($lockedPackage->isDelivered()) {
+                throw new RuntimeException('No se puede retirar la asignación de un paquete entregado.');
+            }
+
+            $previousDriverId = $lockedPackage->driver_id;
+            $lockedPackage->driver_id = null;
+            $lockedPackage->save();
+
+            $lockedPackage->histories()->create([
+                'status' => $lockedPackage->current_status,
+                'event_type' => PackageHistory::EVENT_CORRECCION,
+                'origin_location' => 'Reparto',
+                'destination_location' => 'Agencia destino',
+                'location_description' => 'Se retiró la asignación de reparto.',
+                'scanned_by_user_id' => $userId,
+            ]);
+
+            AuditLog::create([
+                'actor_user_id' => $userId,
+                'action' => 'package.delivery_unassigned',
+                'target_type' => Package::class,
+                'target_id' => $lockedPackage->id,
+                'description' => "Retiró la asignación de la guía {$lockedPackage->tracking_number}.",
+                'metadata' => [
+                    'previous_driver_id' => $previousDriverId,
+                    'reason' => $reason,
+                ],
+                'ip_address' => request()?->ip(),
+            ]);
+
+            return $lockedPackage->fresh(['driver.user', 'histories']);
+        });
+    }
+
 }

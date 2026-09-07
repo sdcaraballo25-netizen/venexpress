@@ -43,6 +43,7 @@ class RouteService
                 'name' => $data['name'],
                 'created_by' => $createdByUserId,
                 'status' => Route::STATUS_DRAFT,
+                'route_type' => $data['route_type'] ?? Route::TYPE_DELIVERY,
             ]);
 
             $this->syncStops(
@@ -61,6 +62,7 @@ class RouteService
                 [
                     'state' => $route->state,
                     'city' => $route->city,
+                    'route_type' => $route->route_type,
                     'stops' => count($allyIdsInOrder),
                 ]
             );
@@ -627,6 +629,7 @@ class RouteService
             data: [
                 'state' => $sourceRoute->state,
                 'city' => $sourceRoute->city,
+                'route_type' => $sourceRoute->route_type,
                 'name' => $newName
                     ?? $sourceRoute->name . ' (nuevo ciclo)',
             ],
