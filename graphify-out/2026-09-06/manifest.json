@@ -132,9 +132,9 @@
     "semantic_hash": ""
   },
   "app/Models/User.php": {
-    "mtime": 1788382282.0,
-    "seen": 1788572112.8058486,
-    "ast_hash": "a61a3c4bc19e3c012967a1933bc74d5e",
+    "mtime": 1788666276.0,
+    "seen": 1788668654.3339596,
+    "ast_hash": "1fe0b9b929bfb39d64108e784293e01c",
     "semantic_hash": ""
   },
   "app/Providers/AppServiceProvider.php": {
@@ -186,9 +186,9 @@
     "semantic_hash": "e66bb13691f6184c762c196427d8e685"
   },
   "bootstrap/app.php": {
-    "mtime": 1787690560.0,
-    "seen": 1788572112.8058677,
-    "ast_hash": "c270c3c4f61d875522d48de675777ccb",
+    "mtime": 1788666276.0,
+    "seen": 1788668654.333985,
+    "ast_hash": "ecb7639c44df2eace331b7bfd1bdf957",
     "semantic_hash": ""
   },
   "bootstrap/providers.php": {
@@ -468,9 +468,9 @@
     "semantic_hash": ""
   },
   "resources/views/Livewire/pages/auth/register.blade.php": {
-    "mtime": 1788658775.0,
-    "seen": 1788660504.7179997,
-    "ast_hash": "be37d0d60153ed41eae32a9af3202fed",
+    "mtime": 1788668457.9165134,
+    "seen": 1788668654.3340912,
+    "ast_hash": "695de96d85cf477a6298c0ad65ba798a",
     "semantic_hash": ""
   },
   "resources/views/Livewire/pages/auth/reset-password.blade.php": {
@@ -636,9 +636,9 @@
     "semantic_hash": ""
   },
   "routes/auth.php": {
-    "mtime": 1787400628.0,
-    "seen": 1788572112.8059824,
-    "ast_hash": "dc0f2c2868ae9e990364cf16969b1e3d",
+    "mtime": 1788666276.0,
+    "seen": 1788668654.3341277,
+    "ast_hash": "cf5b50704f5963e1cdf7e15ae31509a7",
     "semantic_hash": ""
   },
   "routes/console.php": {
@@ -648,9 +648,9 @@
     "semantic_hash": ""
   },
   "routes/web.php": {
-    "mtime": 1788657000.4831722,
-    "seen": 1788660504.718034,
-    "ast_hash": "6e31e32a0feee70b327113c450d01c67",
+    "mtime": 1788666276.0,
+    "seen": 1788668654.3341293,
+    "ast_hash": "d9c4a72156622016bd56f092aada18c0",
     "semantic_hash": ""
   },
   "tailwind.config.js": {
@@ -1050,9 +1050,9 @@
     "semantic_hash": ""
   },
   "app/Models/Incident.php": {
-    "mtime": 1787666084.0,
-    "seen": 1788572112.8058438,
-    "ast_hash": "2f79157fc5f40a6693930b3140053826",
+    "mtime": 1788666276.0,
+    "seen": 1788668654.3339539,
+    "ast_hash": "84c2857a729666a483ecd98a9de30505",
     "semantic_hash": ""
   },
   "app/Services/AllyStaffService.php": {
@@ -1194,9 +1194,9 @@
     "semantic_hash": ""
   },
   "resources/views/Livewire/client/dashboard.blade.php": {
-    "mtime": 1788658775.0,
-    "seen": 1788660504.7179945,
-    "ast_hash": "c9eac867b8e655b9bf353e19c7bbb6c9",
+    "mtime": 1788666276.0,
+    "seen": 1788668654.3340836,
+    "ast_hash": "6de93ee2114f35d0f0d8523d7e04079f",
     "semantic_hash": ""
   },
   "BCV_API_IMPLEMENTACION.md": {
@@ -1320,9 +1320,9 @@
     "semantic_hash": ""
   },
   "app/Livewire/Client/Dashboard.php": {
-    "mtime": 1788570558.0,
-    "seen": 1788572112.805828,
-    "ast_hash": "ad789e125d3314cab4eb5a6b2a8d9fdc",
+    "mtime": 1788666276.0,
+    "seen": 1788668654.3339334,
+    "ast_hash": "8326cfdd06252f1e2384b1f1b4385b72",
     "semantic_hash": ""
   },
   "app/Livewire/Driver/Dashboard.php": {
@@ -1374,9 +1374,9 @@
     "semantic_hash": ""
   },
   "config/venexpress.php": {
-    "mtime": 1788318454.0,
-    "seen": 1788572112.8058774,
-    "ast_hash": "737ed0a9188222945b9bb6162c897d34",
+    "mtime": 1788666276.0,
+    "seen": 1788668654.3339963,
+    "ast_hash": "8a0e4552d888f33f10bd23c64aa710f1",
     "semantic_hash": ""
   },
   "database/migrations/2026_09_02_000001_add_delivery_confirmation_to_packages.php": {
@@ -1536,9 +1536,9 @@
     "semantic_hash": ""
   },
   "resources/views/pages/auth/register.blade.php": {
-    "mtime": 1788554996.0,
-    "seen": 1788572112.805977,
-    "ast_hash": "cd0303c82a0acba567393c75d5b8a1f9",
+    "mtime": 1788666276.0,
+    "seen": 1788668654.3341193,
+    "ast_hash": "d396975d62dbdcb9582a6cd291346c35",
     "semantic_hash": ""
   },
   "app/Livewire/Admin/AuditLogViewer.php": {
@@ -1761,6 +1761,66 @@
     "mtime": 1788650799.1677115,
     "seen": 1788660504.7180262,
     "ast_hash": "ee2ca129fe7e9d9c33f7959ed049388b",
+    "semantic_hash": ""
+  },
+  "app/Http/Middleware/EnsureAccountIsVerified.php": {
+    "mtime": 1788666276.0,
+    "seen": 1788668654.3339038,
+    "ast_hash": "6bec15d7ba364aaf39ca1ef78856edaa",
+    "semantic_hash": ""
+  },
+  "app/Livewire/Client/Incidents.php": {
+    "mtime": 1788666276.0,
+    "seen": 1788668654.3339343,
+    "ast_hash": "8e61ac02705af6d8b9d21ff201f201ae",
+    "semantic_hash": ""
+  },
+  "app/Livewire/Client/PendingPayments.php": {
+    "mtime": 1788666276.0,
+    "seen": 1788668654.333935,
+    "ast_hash": "209114c32e022d7657b1da6180222a41",
+    "semantic_hash": ""
+  },
+  "app/Livewire/Pages/Auth/VerifyAccount.php": {
+    "mtime": 1788667912.8146951,
+    "seen": 1788668654.3339415,
+    "ast_hash": "3cc0960cff21436ac4bac82c90159f46",
+    "semantic_hash": ""
+  },
+  "app/Notifications/WelcomeVerificationToken.php": {
+    "mtime": 1788666276.0,
+    "seen": 1788668654.3339612,
+    "ast_hash": "5944cede800a548d30b31574229f8d01",
+    "semantic_hash": ""
+  },
+  "database/migrations/2026_09_06_020000_add_verification_fields_to_users_table.php": {
+    "mtime": 1788666276.0,
+    "seen": 1788668654.334047,
+    "ast_hash": "11a4442240cef3673d58ce806523265b",
+    "semantic_hash": ""
+  },
+  "resources/views/Livewire/client/incidents.blade.php": {
+    "mtime": 1788666276.0,
+    "seen": 1788668654.3340843,
+    "ast_hash": "16591b41b294d929b3486788633c5ea9",
+    "semantic_hash": ""
+  },
+  "resources/views/Livewire/client/pending-payments.blade.php": {
+    "mtime": 1788666276.0,
+    "seen": 1788668654.3340852,
+    "ast_hash": "7d404349741b0417782e0deaa8441998",
+    "semantic_hash": ""
+  },
+  "resources/views/layouts/client.blade.php": {
+    "mtime": 1788666276.0,
+    "seen": 1788668654.3341157,
+    "ast_hash": "677cd52a9d42bd80c0a33e5a38358079",
+    "semantic_hash": ""
+  },
+  "resources/views/pages/auth/verify-account.blade.php": {
+    "mtime": 1788667928.6796973,
+    "seen": 1788668654.3341203,
+    "ast_hash": "0885d0bfe8fb21ec408b8f0dca316704",
     "semantic_hash": ""
   }
 }

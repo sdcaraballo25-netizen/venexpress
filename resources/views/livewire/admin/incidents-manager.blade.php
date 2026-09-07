@@ -11,6 +11,13 @@
         </div>
     @endif
 
+    @if (session('error'))
+        <div class="mb-6 flex items-center gap-3 rounded-xl border border-red-200 bg-red-50 px-4 py-3 text-sm text-red-700">
+            <div class="flex h-7 w-7 items-center justify-center rounded-full bg-red-100">!</div>
+            <span>{{ session('error') }}</span>
+        </div>
+    @endif
+
     <div class="mb-6 rounded-2xl border border-[#E2E8F0] bg-white p-5 shadow-sm">
         <div class="grid gap-4 md:grid-cols-[1fr_220px]">
             <div>
@@ -63,14 +70,27 @@
                                 <p class="text-xs text-[#94A3B8]">{{ $incident->reportedByUser?->name ?? '—' }}</p>
                             </td>
                             <td class="px-6 py-4 text-center">
-                                <select wire:change="updateStatus({{ $incident->id }}, $event.target.value)"
-                                        class="rounded-xl border-[#E2E8F0] text-xs font-semibold focus:border-blue-500 focus:ring-blue-500">
-                                    @foreach (\App\Livewire\Admin\IncidentsManager::STATUS_LABELS as $value => $label)
-                                        <option value="{{ $value }}" @selected($incident->status === $value)>
-                                            {{ $label }}
-                                        </option>
-                                    @endforeach
-                                </select>
+                                @if ($incident->status === \App\Models\Incident::STATUS_CLOSED && ! auth()->user()?->isAdminPrincipal())
+                                    <span class="inline-flex items-center rounded-xl bg-slate-100 px-3 py-2 text-xs font-semibold text-[#64748B]"
+                                          title="Solo un Administrador Principal puede modificar una incidencia cerrada.">
+                                        {{ \App\Livewire\Admin\IncidentsManager::STATUS_LABELS[$incident->status] }}
+                                    </span>
+                                @else
+                                    <select wire:change="updateStatus({{ $incident->id }}, $event.target.value)"
+                                            class="rounded-xl border-[#E2E8F0] text-xs font-semibold focus:border-blue-500 focus:ring-blue-500">
+                                        @foreach (\App\Livewire\Admin\IncidentsManager::STATUS_LABELS as $value => $label)
+                                            <option value="{{ $value }}" @selected($incident->status === $value)>
+                                                {{ $label }}
+                                            </option>
+                                        @endforeach
+                                    </select>
+                                @endif
+
+                                @if ($incident->resolution_notes)
+                                    <p class="mt-1 max-w-[14rem] truncate text-xs text-[#94A3B8]" title="{{ $incident->resolution_notes }}">
+                                        {{ $incident->resolution_notes }}
+                                    </p>
+                                @endif
                             </td>
                         </tr>
                     @empty
@@ -90,4 +110,47 @@
             </div>
         @endif
     </div>
+
+    {{-- =========================================================
+         MODAL DE NOTAS DE RESOLUCIÓN
+         Se muestra al pasar a 'resuelta' o 'cerrada' cuando la
+         incidencia todavía no tiene resolution_notes.
+    ========================================================== --}}
+    @if ($showResolutionModal)
+        <div class="fixed inset-0 z-50 flex items-center justify-center bg-black/40 p-4">
+            <div class="w-full max-w-md rounded-2xl bg-white shadow-xl">
+                <div class="border-b border-[#E2E8F0] p-6">
+                    <h2 class="text-lg font-bold text-[#0F172A]">
+                        {{ $pendingStatus === \App\Models\Incident::STATUS_CLOSED ? 'Cerrar incidencia' : 'Resolver incidencia' }}
+                    </h2>
+                    <p class="mt-1 text-sm text-[#64748B]">
+                        Describe cómo se resolvió para dejarlo registrado en el historial.
+                    </p>
+                </div>
+
+                <div class="p-6">
+                    <label class="mb-2 block text-xs font-bold uppercase text-[#64748B]">
+                        Notas de resolución
+                    </label>
+                    <textarea wire:model="resolutionNotesInput" rows="4"
+                              class="w-full rounded-xl border-[#E2E8F0] text-sm focus:border-blue-500 focus:ring-blue-500"
+                              placeholder="Ej: Se contactó al destinatario y se reprogramó la entrega el 05/09..."></textarea>
+                    @error('resolutionNotesInput')
+                        <p class="mt-2 text-xs text-red-600">{{ $message }}</p>
+                    @enderror
+                </div>
+
+                <div class="flex justify-end gap-3 border-t border-[#E2E8F0] p-6">
+                    <button wire:click="cancelResolution" type="button"
+                            class="rounded-xl border border-[#E2E8F0] px-4 py-2 text-sm">
+                        Cancelar
+                    </button>
+                    <button wire:click="confirmResolution" type="button"
+                            class="rounded-xl bg-[#0F172A] px-4 py-2 text-sm font-semibold text-white">
+                        Guardar
+                    </button>
+                </div>
+            </div>
+        </div>
+    @endif
 </div>
