@@ -363,6 +363,9 @@ Route::prefix('admin')
         Route::get('/remuneraciones', DriverPayments::class)
             ->name('driver-payments');
 
+        Route::get('/remuneraciones/tarifa', \App\Livewire\Admin\DriverRemunerationManager::class)
+            ->name('driver-remuneration-rate');
+
 
         /*
         |--------------------------------------------------------------------------

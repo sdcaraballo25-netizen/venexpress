@@ -611,12 +611,22 @@ class PackageService
     public function completeDelivery(
         Package $package,
         Driver $driver,
-        ?string $locationDescription = null
+        ?string $locationDescription = null,
+        ?string $receiverName = null,
+        ?string $receiverIdDoc = null,
+        ?string $receiverPhone = null,
+        ?string $deliveryConfirmationMethod = null,
+        ?string $deliveryPhotoPath = null,
     ): Package {
         $updatedPackage = DB::transaction(function () use (
             $package,
             $driver,
-            $locationDescription
+            $locationDescription,
+            $receiverName,
+            $receiverIdDoc,
+            $receiverPhone,
+            $deliveryConfirmationMethod,
+            $deliveryPhotoPath
         ) {
             $lockedPackage = Package::query()
                 ->whereKey($package->id)
@@ -645,11 +655,10 @@ class PackageService
                 );
             }
 
-            if ($lockedPackage->delivery_status !== Package::DELIVERY_ACCEPTED) {
-                throw new RuntimeException(
-                    'El cliente todavía no ha aceptado la entrega.'
-                );
-            }
+            // NOTA: se eliminó el requisito de "delivery_status ===
+            // DELIVERY_ACCEPTED" porque el flujo de aceptación del
+            // cliente todavía no existe en el sistema. El repartidor
+            // puede completar la entrega directamente.
 
             if ($lockedPackage->is_cod && ! $lockedPackage->cod_collected_at) {
                 $lockedPackage->cod_collected_at = now();
@@ -661,6 +670,11 @@ class PackageService
                 'delivery_status' => Package::DELIVERY_COMPLETED,
                 'delivery_completed_at' => now(),
                 'driver_remuneration_status' => Package::REMUNERATION_PENDING,
+                'receiver_name' => $receiverName,
+                'receiver_id_doc' => $receiverIdDoc,
+                'receiver_phone' => $receiverPhone,
+                'delivery_confirmation_method' => $deliveryConfirmationMethod,
+                'delivery_photo_path' => $deliveryPhotoPath,
             ]);
 
             if ($lockedPackage->is_cod && $lockedPackage->cod_collected_at) {

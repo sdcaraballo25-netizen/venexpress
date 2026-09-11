@@ -13,6 +13,15 @@ class DriverPaymentService
 {
     public function amount(): float
     {
+        $rate = \App\Models\DriverRemunerationRate::current();
+
+        if ($rate) {
+            return round((float) $rate->amount_usd, 2);
+        }
+
+        // Respaldo: si el admin todavía no ha registrado ninguna
+        // tarifa desde el panel, se usa el valor histórico del
+        // config/.env para no romper el cálculo de remuneraciones.
         return round((float) config('venexpress.driver_remuneration_usd', env('VENEXPRESS_DRIVER_REMUNERATION_USD', 1.00)), 2);
     }
 
