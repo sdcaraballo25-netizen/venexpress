@@ -60,6 +60,30 @@ class CheckProductionReadiness extends Command
             $warnings[] = 'QUEUE_CONNECTION="sync": los correos y trabajos en cola se ejecutan de forma síncrona, sin reintentos ante fallos.';
         }
 
+        if (in_array(config('queue.default'), ['database', 'redis'], true)) {
+            $warnings[] = sprintf(
+                'QUEUE_CONNECTION="%s": los jobs (ej. notificaciones de PackageStatusUpdated) '
+                . 'solo se procesan si hay un worker corriendo (`php artisan queue:work`, '
+                . 'normalmente bajo Supervisor). Este comando no puede verificar si ese '
+                . 'proceso está activo — confírmalo manualmente en el servidor.',
+                config('queue.default')
+            );
+        }
+
+        $lastBcvRate = \App\Models\BcvRate::query()->latest('created_at')->first();
+
+        if ($lastBcvRate === null) {
+            $warnings[] = 'Nunca se ha registrado una tasa BCV: revisa si `bcv:sync` corrió alguna vez.';
+        } elseif ($lastBcvRate->created_at->lt(now()->subHours(6))) {
+            $warnings[] = sprintf(
+                'La última tasa BCV registrada es de %s (hace más de 6 horas). '
+                . 'bcv:sync está programado cada hora (routes/console.php) pero eso solo '
+                . 'funciona si el cron del scheduler está configurado en el servidor '
+                . '(`* * * * * php artisan schedule:run`). Verifica el crontab.',
+                $lastBcvRate->created_at->diffForHumans()
+            );
+        }
+
         foreach ($warnings as $warning) {
             $this->warn('⚠ ' . $warning);
         }

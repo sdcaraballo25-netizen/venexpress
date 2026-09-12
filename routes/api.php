@@ -35,6 +35,12 @@ Route::prefix('driver')
             Route::get('/dashboard', [DriverDashboardController::class, 'summary'])
                 ->name('dashboard');
 
+            Route::get('/route', [\App\Http\Controllers\Api\DriverRouteController::class, 'active'])
+                ->name('route.active');
+
+            Route::post('/route/start', [\App\Http\Controllers\Api\DriverRouteController::class, 'start'])
+                ->name('route.start');
+
             Route::get('/commissions', [DriverDashboardController::class, 'commissions'])
                 ->name('commissions');
 
@@ -52,5 +58,11 @@ Route::prefix('driver')
 
             Route::post('/packages/{packageId}/collect-cod', [DriverPackageController::class, 'collectCod'])
                 ->name('packages.collect-cod');
+
+            Route::get('/packages/{packageId}/incidents', [\App\Http\Controllers\Api\DriverIncidentController::class, 'index'])
+                ->name('packages.incidents.index');
+
+            Route::post('/packages/{packageId}/incidents', [\App\Http\Controllers\Api\DriverIncidentController::class, 'store'])
+                ->name('packages.incidents.store');
         });
     });
