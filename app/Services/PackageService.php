@@ -602,6 +602,72 @@ class PackageService
         );
     }
 
+    /**
+     * Un repartidor de entrega (driver_type = delivery) reclama un
+     * pedido que ya llegó a tránsito nacional y necesita entrega a
+     * domicilio, sin necesidad de una ruta asignada por el admin.
+     *
+     * "Primero en escanear, primero en repartir": el lockForUpdate()
+     * garantiza que si dos repartidores escanean la misma guía casi
+     * al mismo tiempo, solo el primero la reclama y el segundo recibe
+     * un error claro en vez de una asignación duplicada.
+     */
+    public function claimForDelivery(Package $package, Driver $driver, int $userId): Package
+    {
+        if ($driver->status !== Driver::STATUS_ACTIVE) {
+            throw new RuntimeException('Solo un repartidor activo puede reclamar pedidos.');
+        }
+
+        if ($driver->driver_type !== Driver::TYPE_DELIVERY) {
+            throw new RuntimeException(
+                'Solo los repartidores de entrega final pueden reclamar pedidos aquí. '
+                . 'Los choferes de Hub siguen usando el sistema de rutas.'
+            );
+        }
+
+        return DB::transaction(function () use ($package, $driver, $userId) {
+            $locked = Package::query()
+                ->whereKey($package->id)
+                ->lockForUpdate()
+                ->firstOrFail();
+
+            if (! $locked->requires_delivery) {
+                throw new RuntimeException('Este paquete no requiere entrega a domicilio.');
+            }
+
+            if ($locked->current_status !== Package::STATUS_EN_TRANSITO_NACIONAL) {
+                throw new RuntimeException(
+                    'Este paquete todavía no está listo para reparto. Estado actual: '
+                    . $locked->statusLabel() . '.'
+                );
+            }
+
+            if ($locked->isClaimedForDelivery()) {
+                if ((int) $locked->driver_id === (int) $driver->id) {
+                    // Ya lo tenía él mismo: no es un error, solo lo devolvemos.
+                    return $locked->fresh();
+                }
+
+                throw new RuntimeException('Este pedido ya fue reclamado por otro repartidor.');
+            }
+
+            $locked->update([
+                'driver_id' => $driver->id,
+                'delivery_status' => Package::DELIVERY_ACCEPTED,
+            ]);
+
+            $this->recordHistory(
+                package: $locked,
+                status: $locked->current_status,
+                userId: $userId,
+                locationDescription: 'Pedido reclamado por el repartidor para entrega a domicilio',
+                eventType: PackageHistory::EVENT_MOVIMIENTO,
+            );
+
+            return $locked->fresh();
+        });
+    }
+
     /*
     |--------------------------------------------------------------------------
     | ENTREGA

@@ -80,6 +80,9 @@ class Package extends Model
         'delivery_address',
         'delivery_sector',
         'delivery_reference',
+        'delivery_latitude',
+        'delivery_longitude',
+        'delivery_geocoded_at',
         'delivery_fee_usd',
 
         'package_type',
@@ -142,6 +145,9 @@ class Package extends Model
 
             'requires_delivery' => 'boolean',
             'delivery_fee_usd' => 'decimal:2',
+            'delivery_latitude' => 'decimal:7',
+            'delivery_longitude' => 'decimal:7',
+            'delivery_geocoded_at' => 'datetime',
 
             'delivery_accepted_at' => 'datetime',
             'delivery_rejected_at' => 'datetime',
@@ -240,6 +246,42 @@ class Package extends Model
     public function deliveryAccepted(): bool
     {
         return $this->delivery_status === self::DELIVERY_ACCEPTED;
+    }
+
+    /**
+     * A partir de este cambio de arquitectura, 'delivery_status' deja
+     * de representar "el cliente aceptó la entrega" (ese flujo nunca
+     * se construyó) y pasa a representar el estado de reclamo del
+     * repartidor: pendiente = nadie lo ha tomado, aceptada = un
+     * repartidor lo reclamó y lo está entregando.
+     */
+    public function isClaimedForDelivery(): bool
+    {
+        return $this->driver_id !== null
+            && $this->delivery_status === self::DELIVERY_ACCEPTED;
+    }
+
+    public function isAvailableForDeliveryClaim(): bool
+    {
+        return $this->requires_delivery
+            && $this->current_status === self::STATUS_EN_TRANSITO_NACIONAL
+            && ($this->delivery_status === null || $this->delivery_status === self::DELIVERY_PENDING);
+    }
+
+    /**
+     * Paquetes listos para que cualquier repartidor de entrega los
+     * reclame: ya llegaron a tránsito nacional, requieren entrega a
+     * domicilio, y todavía nadie los ha tomado.
+     */
+    public function scopeAvailableForDeliveryClaim($query)
+    {
+        return $query
+            ->where('requires_delivery', true)
+            ->where('current_status', self::STATUS_EN_TRANSITO_NACIONAL)
+            ->where(function ($q) {
+                $q->whereNull('delivery_status')
+                    ->orWhere('delivery_status', self::DELIVERY_PENDING);
+            });
     }
 
     public function deliveryRejected(): bool

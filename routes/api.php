@@ -44,6 +44,15 @@ Route::prefix('driver')
             Route::get('/commissions', [DriverDashboardController::class, 'commissions'])
                 ->name('commissions');
 
+            Route::post('/deliveries/claim-by-scan', [\App\Http\Controllers\Api\DriverDeliveryController::class, 'claimByScan'])
+                ->name('deliveries.claim-by-scan');
+
+            Route::get('/deliveries/available', [\App\Http\Controllers\Api\DriverDeliveryController::class, 'available'])
+                ->name('deliveries.available');
+
+            Route::post('/packages/{packageId}/claim', [\App\Http\Controllers\Api\DriverDeliveryController::class, 'claim'])
+                ->name('packages.claim');
+
             Route::post('/scan', [DriverPackageController::class, 'scan'])
                 ->name('scan');
 
