@@ -50,6 +50,9 @@ Route::prefix('driver')
             Route::get('/deliveries/available', [\App\Http\Controllers\Api\DriverDeliveryController::class, 'available'])
                 ->name('deliveries.available');
 
+            Route::get('/deliveries/route-order', [\App\Http\Controllers\Api\DriverDeliveryController::class, 'routeOrder'])
+                ->name('deliveries.route-order');
+
             Route::post('/packages/{packageId}/claim', [\App\Http\Controllers\Api\DriverDeliveryController::class, 'claim'])
                 ->name('packages.claim');
 

@@ -114,9 +114,9 @@
     "semantic_hash": ""
   },
   "app/Models/Package.php": {
-    "mtime": 1788760440.0,
-    "seen": 1788748110.0563827,
-    "ast_hash": "4c5d16d79e03af7a12392537df7695e8",
+    "mtime": 1789244735.0,
+    "seen": 1789247339.923907,
+    "ast_hash": "0c4d51358964ba30a9440834f1609954",
     "semantic_hash": ""
   },
   "app/Models/PackageHistory.php": {
@@ -156,9 +156,9 @@
     "semantic_hash": ""
   },
   "app/Services/PackageService.php": {
-    "mtime": 1789089950.0,
-    "seen": 1789098970.338269,
-    "ast_hash": "ac8845a4985e03d337f243cf03beddb2",
+    "mtime": 1789244735.0,
+    "seen": 1789247339.9239306,
+    "ast_hash": "e2f45ede738c88411f0e94460b0a7d5b",
     "semantic_hash": ""
   },
   "app/Services/TariffService.php": {
@@ -186,8 +186,8 @@
     "semantic_hash": "e66bb13691f6184c762c196427d8e685"
   },
   "bootstrap/app.php": {
-    "mtime": 1789177679.0,
-    "seen": 1789245627.0731425,
+    "mtime": 1789177684.0,
+    "seen": 1789247339.9239402,
     "ast_hash": "4282176da7cb6246cb16c7bdcf8bf4a9",
     "semantic_hash": ""
   },
@@ -1915,8 +1915,8 @@
   },
   "routes/api.php": {
     "mtime": 1789176866.0,
-    "seen": 1789245627.073299,
-    "ast_hash": "8cfd5d89ff78e8fb00e90366c9ac1fd6",
+    "seen": 1789247339.924105,
+    "ast_hash": "daf8de5cba9ca8f924193fc65f72e0ae",
     "semantic_hash": ""
   },
   "app/Http/Controllers/Api/DriverIncidentController.php": {
@@ -1977,6 +1977,18 @@
     "mtime": 1789186773.9256058,
     "seen": 1789245627.073339,
     "ast_hash": "7878c24cdfedb9a2b7e55704b6663410",
+    "semantic_hash": ""
+  },
+  "app/Http/Controllers/Api/DriverDeliveryController.php": {
+    "mtime": 1789244735.0,
+    "seen": 1789247339.9238312,
+    "ast_hash": "0be72bd235adb66f8c72bb65ba997e81",
+    "semantic_hash": ""
+  },
+  "database/migrations/2026_09_12_000000_add_delivery_coordinates_to_packages_table.php": {
+    "mtime": 1789244735.0,
+    "seen": 1789247339.9240162,
+    "ast_hash": "12c8ae8e3ab268614037db08e704e4e1",
     "semantic_hash": ""
   }
 }

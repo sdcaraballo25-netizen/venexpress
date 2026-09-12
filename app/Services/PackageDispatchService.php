@@ -4,6 +4,7 @@ namespace App\Services;
 
 use App\Models\Package;
 use App\Models\PackageHistory;
+use App\Jobs\GeocodePackageDeliveryAddress;
 use Illuminate\Support\Facades\DB;
 use RuntimeException;
 
@@ -52,6 +53,14 @@ class PackageDispatchService
 
             $locked->current_status = Package::STATUS_EN_TRANSITO_NACIONAL;
             $locked->save();
+
+            // Geocodificamos la dirección de entrega EN SEGUNDO PLANO,
+            // desde ahora, en vez de esperar a que un repartidor pida
+            // su ruta. Así, para cuando alguien lo reclame, las
+            // coordenadas ya están listas casi siempre.
+            if ($locked->requires_delivery && $locked->delivery_latitude === null) {
+                GeocodePackageDeliveryAddress::dispatch($locked->id);
+            }
 
             PackageHistory::create([
                 'package_id' => $locked->id,

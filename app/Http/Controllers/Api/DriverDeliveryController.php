@@ -6,13 +6,77 @@ use App\Http\Controllers\Controller;
 use App\Http\Resources\DriverPackageResource;
 use App\Models\Driver;
 use App\Models\Package;
+use App\Services\GeocodingService;
 use App\Services\PackageService;
 use Illuminate\Http\JsonResponse;
+use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use RuntimeException;
 
 class DriverDeliveryController extends Controller
 {
+    /**
+     * Ordena los pedidos YA reclamados por este repartidor (pendientes
+     * de entregar) de más lejos a más cerca de su ubicación GPS
+     * actual. Geocodifica bajo demanda (y cachea) las direcciones que
+     * todavía no tengan coordenadas guardadas.
+     */
+    public function routeOrder(Request $request, GeocodingService $geocoding): JsonResponse
+    {
+        $driver = $this->driver();
+
+        $validated = $request->validate([
+            'latitude' => ['required', 'numeric', 'between:-90,90'],
+            'longitude' => ['required', 'numeric', 'between:-180,180'],
+        ]);
+
+        $packages = Package::query()
+            ->where('driver_id', $driver->id)
+            ->where('requires_delivery', true)
+            ->where('current_status', Package::STATUS_EN_TRANSITO_NACIONAL)
+            ->get();
+
+        $notGeocodedYet = [];
+
+        $stops = $packages->map(function (Package $package) use (&$notGeocodedYet) {
+            if ($package->delivery_latitude === null || $package->delivery_longitude === null) {
+                // No bloqueamos la respuesta geocodificando en vivo —
+                // eso sería un cuello de botella si muchos repartidores
+                // piden su ruta al mismo tiempo a nivel nacional. En
+                // vez de eso, nos aseguramos de que ya esté encolado
+                // (por si el job original falló) y lo excluimos de
+                // esta respuesta.
+                \App\Jobs\GeocodePackageDeliveryAddress::dispatch($package->id);
+                $notGeocodedYet[] = $package->tracking_number;
+                return null;
+            }
+
+            return [
+                'package' => $package,
+                'distance_km' => GeocodingService::haversineKm(
+                    (float) $validated['latitude'],
+                    (float) $validated['longitude'],
+                    (float) $package->delivery_latitude,
+                    (float) $package->delivery_longitude,
+                ),
+            ];
+        })->filter()->sortByDesc('distance_km')->values();
+
+        return response()->json([
+            'stops' => $stops->map(fn ($stop, $index) => [
+                'order' => $index + 1,
+                'distance_km' => $stop['distance_km'],
+                'package' => new DriverPackageResource($stop['package']),
+            ]),
+            // Direcciones que aún se están geocodificando en segundo
+            // plano (o que no se pudieron ubicar). El repartidor las
+            // sigue viendo en su lista normal, solo que sin orden por
+            // distancia todavía — reintentar en unos segundos suele
+            // resolverlo.
+            'pending_location' => $notGeocodedYet,
+        ]);
+    }
+
     protected function driver(): Driver
     {
         $driver = Auth::user()?->driver;
