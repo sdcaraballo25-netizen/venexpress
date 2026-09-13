@@ -1218,9 +1218,9 @@
     "semantic_hash": ""
   },
   "app/Livewire/Driver/PackageDetail.php": {
-    "mtime": 1788622525.2996235,
-    "seen": 1789277229.9077473,
-    "ast_hash": "0bb24ff5c54ec0e870cab1398d6f43ca",
+    "mtime": 1789277838.622017,
+    "seen": 1789278168.3062632,
+    "ast_hash": "0fe23da0b1bdab0bbdbb6978a712e17f",
     "semantic_hash": ""
   },
   "app/Livewire/Driver/Packages.php": {
@@ -1326,9 +1326,9 @@
     "semantic_hash": ""
   },
   "app/Livewire/Driver/Dashboard.php": {
-    "mtime": 1789277065.906494,
-    "seen": 1789277229.9077427,
-    "ast_hash": "f9a609d7855e2ac0880d1e6403ea861b",
+    "mtime": 1789277693.577913,
+    "seen": 1789278168.306257,
+    "ast_hash": "87634ddaf8be10342307bba209c29b78",
     "semantic_hash": ""
   },
   "app/Models/DriverPayment.php": {
@@ -1464,9 +1464,9 @@
     "semantic_hash": ""
   },
   "resources/views/layouts/driver.blade.php": {
-    "mtime": 1788394896.0,
-    "seen": 1789277229.9081328,
-    "ast_hash": "0ed67804f723166ae3e0834f5a1bb04f",
+    "mtime": 1789277911.967758,
+    "seen": 1789278168.3067245,
+    "ast_hash": "b354b3adf6e0e5ead98a74797dee425a",
     "semantic_hash": ""
   },
   "app/Livewire/Public/OfficeLocator.php": {
@@ -2232,9 +2232,9 @@
     "semantic_hash": ""
   },
   "resources/views/livewire/driver/dashboard.blade.php": {
-    "mtime": 1789277074.9250295,
-    "seen": 1789277229.90821,
-    "ast_hash": "1910ece68c2b4b1daf7f1d02927385f1",
+    "mtime": 1789277781.7302942,
+    "seen": 1789278168.3068137,
+    "ast_hash": "47ee314d9563a7a84e9f15ced6604539",
     "semantic_hash": ""
   },
   "resources/views/livewire/driver/field-scanner.blade.php": {
@@ -2244,9 +2244,9 @@
     "semantic_hash": ""
   },
   "resources/views/livewire/driver/package-detail.blade.php": {
-    "mtime": 1788622544.638959,
-    "seen": 1789277229.9082139,
-    "ast_hash": "7dca0462822fa9f2f8e8350da009d7ce",
+    "mtime": 1789277868.124845,
+    "seen": 1789278168.306819,
+    "ast_hash": "92d37afbe6c1942bcaf7b32b75244cbb",
     "semantic_hash": ""
   },
   "resources/views/livewire/driver/packages.blade.php": {
@@ -2256,9 +2256,9 @@
     "semantic_hash": ""
   },
   "resources/views/livewire/driver/route-detail.blade.php": {
-    "mtime": 1789277061.2343485,
-    "seen": 1789277229.9082172,
-    "ast_hash": "0d524fbafeb1f5278ca200cbfa17b2b3",
+    "mtime": 1789277947.545483,
+    "seen": 1789278168.3068247,
+    "ast_hash": "3293b44f722418a3f98ec3a4fae55dce",
     "semantic_hash": ""
   },
   "resources/views/livewire/driver/scanner.blade.php": {
@@ -2427,6 +2427,12 @@
     "mtime": 1789259295.2257268,
     "seen": 1789277229.9083772,
     "ast_hash": "d8f0ceaa1b881c5c9954a446189a927f",
+    "semantic_hash": ""
+  },
+  "tests/Feature/Driver/HubDashboardUxTest.php": {
+    "mtime": 1789278079.5159695,
+    "seen": 1789278168.3069541,
+    "ast_hash": "5337de1bec9c9eda49405dff67897a1a",
     "semantic_hash": ""
   }
 }

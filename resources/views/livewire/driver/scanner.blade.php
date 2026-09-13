@@ -14,11 +14,19 @@
 
     <div class="flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
         <div>
-            <h2 class="font-display text-2xl font-semibold text-[#0F172A]">
+            @if ($operationTitle)
+                <span class="inline-flex items-center gap-1.5 rounded-full bg-blue-900 px-3 py-1 text-xs font-bold uppercase tracking-wide text-white">
+                    {{ $operationTitle }}
+                </span>
+            @endif
+
+            <h2 class="mt-2 font-display text-2xl font-semibold text-[#0F172A]">
                 Escanear guía
             </h2>
             <p class="text-sm text-slate-500">
-                @if ($isDistribution)
+                @if ($operationInstructions)
+                    {{ $operationInstructions }}
+                @elseif ($isDistribution)
                     Registra la salida del HUB y la llegada al almacén destino de Venexpress.
                 @else
                     Registra la salida del paquete desde la agencia y su recolección por Venexpress.
@@ -34,6 +42,52 @@
         </a>
     </div>
 
+    @if ($activeRoute && $operationTitle)
+        <div class="rounded-2xl border border-[#E2E8F0] bg-white p-5 shadow-sm">
+            <div class="grid grid-cols-2 gap-4 sm:grid-cols-4">
+                <div>
+                    <p class="text-xs font-bold uppercase tracking-wider text-slate-400">
+                        Ruta
+                    </p>
+                    <p class="mt-1 text-sm font-semibold text-[#0F172A]">
+                        {{ $activeRoute->name }}
+                    </p>
+                </div>
+
+                <div>
+                    <p class="text-xs font-bold uppercase tracking-wider text-slate-400">
+                        @if ($operation === 'collection')
+                            Aliado
+                        @else
+                            Almacén destino
+                        @endif
+                    </p>
+                    <p class="mt-1 text-sm font-semibold text-[#0F172A]">
+                        {{ $contextStop?->ally?->business_name ?? $contextStop?->warehouse?->name ?? '—' }}
+                    </p>
+                </div>
+
+                <div>
+                    <p class="text-xs font-bold uppercase tracking-wider text-slate-400">
+                        Ciudad
+                    </p>
+                    <p class="mt-1 text-sm font-semibold text-[#0F172A]">
+                        {{ $contextStop?->ally?->city ?? $contextStop?->warehouse?->city ?? $activeRoute->city }}
+                    </p>
+                </div>
+
+                <div>
+                    <p class="text-xs font-bold uppercase tracking-wider text-slate-400">
+                        Procesados
+                    </p>
+                    <p class="mt-1 text-sm font-semibold text-[#0F172A]">
+                        {{ $processedCount }}
+                    </p>
+                </div>
+            </div>
+        </div>
+    @endif
+
     <div class="grid grid-cols-1 gap-6 lg:grid-cols-2">
 
         <div class="rounded-2xl border border-[#E2E8F0] bg-white p-6 shadow-sm">
@@ -42,7 +96,11 @@
             </h3>
 
             <p class="mt-1 text-sm text-slate-500">
-                @if ($isDistribution)
+                @if ($operation === 'hub_departure')
+                    Escanea el QR de la guía. El sistema validará que el paquete esté en HUB para tu ruta de distribución.
+                @elseif ($operation === 'hub_arrival')
+                    Escanea el QR de la guía. El sistema validará que el paquete esté en tránsito nacional bajo tu custodia.
+                @elseif ($isDistribution)
                     Escanea el QR de la guía. El sistema validará que el paquete esté en HUB o en tránsito para tu ruta de distribución.
                 @else
                     Escanea el QR de la guía. El sistema validará que la agencia pertenezca a tu ruta activa.
@@ -152,41 +210,85 @@
                     </p>
                 </div>
 
-                @if ($package->requires_delivery)
-                    <div class="mt-4 rounded-xl border border-blue-100 bg-blue-50 p-4">
-                        <p class="text-xs font-medium uppercase tracking-wide text-blue-700">
-                            Entrega a domicilio
-                        </p>
-                        <p class="mt-1 text-sm font-semibold text-blue-900">
-                            {{ $package->delivery_address ?: 'Dirección no especificada' }}
-                        </p>
-                        @if ($package->delivery_sector)
-                            <p class="mt-1 text-xs text-blue-700">
-                                Sector: {{ $package->delivery_sector }}
+                @unless ($operation)
+                    @if ($package->requires_delivery)
+                        <div class="mt-4 rounded-xl border border-blue-100 bg-blue-50 p-4">
+                            <p class="text-xs font-medium uppercase tracking-wide text-blue-700">
+                                Entrega a domicilio
                             </p>
-                        @endif
-                    </div>
-                @else
-                    <div class="mt-4 rounded-xl border border-slate-200 bg-slate-50 p-4">
-                        <p class="text-sm font-medium text-slate-700">
-                            Retiro en agencia destino
-                        </p>
-                    </div>
-                @endif
+                            <p class="mt-1 text-sm font-semibold text-blue-900">
+                                {{ $package->delivery_address ?: 'Dirección no especificada' }}
+                            </p>
+                            @if ($package->delivery_sector)
+                                <p class="mt-1 text-xs text-blue-700">
+                                    Sector: {{ $package->delivery_sector }}
+                                </p>
+                            @endif
+                        </div>
+                    @else
+                        <div class="mt-4 rounded-xl border border-slate-200 bg-slate-50 p-4">
+                            <p class="text-sm font-medium text-slate-700">
+                                Retiro en agencia destino
+                            </p>
+                        </div>
+                    @endif
 
-                @if ($package->is_cod)
-                    <div class="mt-4 rounded-xl border border-amber-200 bg-amber-50 p-4">
-                        <p class="text-xs font-medium uppercase tracking-wide text-amber-700">
-                            Cobro contra entrega
-                        </p>
-                        <p class="mt-1 text-xl font-bold text-amber-900">
-                            ${{ number_format((float) $package->cod_amount_usd, 2) }}
-                        </p>
-                    </div>
-                @endif
+                    @if ($package->is_cod)
+                        <div class="mt-4 rounded-xl border border-amber-200 bg-amber-50 p-4">
+                            <p class="text-xs font-medium uppercase tracking-wide text-amber-700">
+                                Cobro contra entrega
+                            </p>
+                            <p class="mt-1 text-xl font-bold text-amber-900">
+                                ${{ number_format((float) $package->cod_amount_usd, 2) }}
+                            </p>
+                        </div>
+                    @endif
+                @endunless
 
                 <div class="mt-5 rounded-xl border border-emerald-200 bg-emerald-50 p-4">
-                    @if ($package->current_status === \App\Models\Package::STATUS_RECOLECTADO_VENEXPRESS)
+                    @if ($lastAction === 'collection')
+                        <p class="text-sm font-semibold text-emerald-800">
+                            ✓ Paquete procesado
+                        </p>
+                        <p class="mt-1 font-mono text-xs text-emerald-700">
+                            {{ $package->tracking_number }}
+                        </p>
+                        <p class="mt-2 text-sm font-semibold text-emerald-800">
+                            Salida registrada desde la agencia
+                        </p>
+                        <p class="mt-1 text-xs text-emerald-700">
+                            El paquete quedó bajo custodia de Venexpress.
+                        </p>
+                    @elseif ($lastAction === 'hub_departure')
+                        <p class="text-sm font-semibold text-emerald-800">
+                            ✓ Paquete procesado
+                        </p>
+                        <p class="mt-1 font-mono text-xs text-emerald-700">
+                            {{ $package->tracking_number }}
+                        </p>
+                        <p class="mt-2 text-sm font-semibold text-emerald-800">
+                            Salida del HUB registrada
+                        </p>
+                        <p class="mt-1 text-xs text-emerald-700">
+                            Destino: {{ $package->destination_city }}
+                            @if ($package->destination_state)
+                                · {{ $package->destination_state }}
+                            @endif
+                        </p>
+                    @elseif ($lastAction === 'hub_arrival')
+                        <p class="text-sm font-semibold text-emerald-800">
+                            ✓ Paquete procesado
+                        </p>
+                        <p class="mt-1 font-mono text-xs text-emerald-700">
+                            {{ $package->tracking_number }}
+                        </p>
+                        <p class="mt-2 text-sm font-semibold text-emerald-800">
+                            Recepción en almacén registrada
+                        </p>
+                        <p class="mt-1 text-xs text-emerald-700">
+                            Almacén: {{ $arrivalWarehouse?->name ?? 'Almacén destino' }}
+                        </p>
+                    @elseif ($package->current_status === \App\Models\Package::STATUS_RECOLECTADO_VENEXPRESS)
                         <p class="text-sm font-semibold text-emerald-800">
                             ✓ Salida registrada
                         </p>
@@ -199,6 +301,20 @@
                         </p>
                         <p class="mt-1 text-xs text-emerald-700">
                             El siguiente escaneo intentará registrar la salida desde la agencia.
+                        </p>
+                    @elseif ($package->current_status === \App\Models\Package::STATUS_EN_HUB)
+                        <p class="text-sm font-semibold text-emerald-800">
+                            Guía localizada
+                        </p>
+                        <p class="mt-1 text-xs text-emerald-700">
+                            El siguiente escaneo registrará la salida del HUB.
+                        </p>
+                    @elseif ($package->current_status === \App\Models\Package::STATUS_EN_TRANSITO_NACIONAL)
+                        <p class="text-sm font-semibold text-emerald-800">
+                            Guía localizada
+                        </p>
+                        <p class="mt-1 text-xs text-emerald-700">
+                            El siguiente escaneo registrará la recepción en almacén.
                         </p>
                     @else
                         <p class="text-sm font-semibold text-slate-700">

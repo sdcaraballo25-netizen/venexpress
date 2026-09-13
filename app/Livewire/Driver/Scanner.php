@@ -5,6 +5,7 @@ namespace App\Livewire\Driver;
 use App\Models\Driver;
 use App\Models\Package;
 use App\Models\Route;
+use App\Models\RouteStop;
 use App\Services\LogisticsScanService;
 use Illuminate\Support\Facades\Auth;
 use Livewire\Attributes\Layout;
@@ -26,6 +27,21 @@ class Scanner extends Component
 
     public ?string $securityMessage = null;
 
+    /**
+     * Última acción de escaneo completada con éxito: 'collection',
+     * 'hub_departure' o 'hub_arrival'. Solo se usa para presentar la
+     * confirmación correcta en la interfaz (qué operación se acaba de
+     * registrar); no participa en ninguna decisión de negocio, que
+     * sigue resuelta exclusivamente por LogisticsScanService.
+     */
+    public ?string $lastAction = null;
+
+    /**
+     * Paquetes procesados con éxito durante esta sesión de escaneo,
+     * para que el repartidor vea su avance sin salir de la pantalla.
+     */
+    public int $processedCount = 0;
+
     public function searchPackage(): void
     {
         $this->reset([
@@ -34,6 +50,7 @@ class Scanner extends Component
             'successMessage',
             'securityWarning',
             'securityMessage',
+            'lastAction',
         ]);
 
         $this->trackingNumber = trim($this->trackingNumber);
@@ -128,6 +145,9 @@ class Scanner extends Component
             userId: $userId,
         );
 
+        $this->lastAction = 'collection';
+        $this->processedCount++;
+
         $this->successMessage =
             'Salida registrada correctamente. El paquete quedó recolectado por Venexpress.';
 
@@ -154,6 +174,9 @@ class Scanner extends Component
                 userId: $userId,
             );
 
+            $this->lastAction = 'hub_departure';
+            $this->processedCount++;
+
             $this->successMessage =
                 'Salida de HUB registrada correctamente. El paquete quedó en tránsito nacional.';
 
@@ -166,6 +189,9 @@ class Scanner extends Component
                 driver: $driver,
                 userId: $userId,
             );
+
+            $this->lastAction = 'hub_arrival';
+            $this->processedCount++;
 
             $this->successMessage =
                 'Llegada al almacén destino registrada correctamente.';
@@ -189,6 +215,7 @@ class Scanner extends Component
         return Route::query()
             ->where('driver_id', $driver->id)
             ->where('status', Route::STATUS_IN_PROGRESS)
+            ->with(['stops.ally', 'stops.warehouse'])
             ->latest('started_at')
             ->first();
     }
@@ -236,6 +263,7 @@ class Scanner extends Component
             'successMessage',
             'securityWarning',
             'securityMessage',
+            'lastAction',
         ]);
     }
 
@@ -245,8 +273,86 @@ class Scanner extends Component
 
         $activeRoute = $driver ? $this->activeRoute($driver) : null;
 
+        $routeType = $activeRoute?->route_type;
+
+        $operation = null;
+        $operationTitle = null;
+        $operationInstructions = null;
+        $contextStop = null;
+
+        if ($routeType === Route::TYPE_HUB_TRANSFER) {
+            $operation = 'collection';
+            $operationTitle = 'RECOLECCIÓN EN ALIADO';
+            $operationInstructions = 'Escanea las guías que estás recogiendo de este aliado.';
+            $contextStop = $this->contextStop($activeRoute);
+        } elseif ($routeType === Route::TYPE_HUB_DISTRIBUTION) {
+            $operation = in_array($this->lastAction, ['hub_departure', 'hub_arrival'], true)
+                ? $this->lastAction
+                : $this->distributionPhase($driver);
+
+            if ($operation === 'hub_arrival') {
+                $operationTitle = 'RECEPCIÓN EN ALMACÉN';
+                $operationInstructions = 'Escanea los paquetes que estás transfiriendo a este almacén.';
+            } else {
+                $operationTitle = 'SALIDA DESDE HUB';
+                $operationInstructions = 'Escanea los paquetes que salen del HUB hacia este almacén.';
+            }
+
+            $contextStop = $this->contextStop($activeRoute);
+        }
+
+        // El evento de despacho (scanHubDeparture) no fija route_stop_id
+        // porque un mismo camión puede llevar paquetes para varias
+        // paradas; el de llegada (scanHubArrival) sí, así que ahí
+        // podemos mostrar el almacén exacto ya registrado en el
+        // historial, sin adivinar ni tocar LogisticsScanService.
+        $arrivalWarehouse = null;
+
+        if ($this->lastAction === 'hub_arrival' && $this->package) {
+            $arrivalWarehouse = $this->package->histories
+                ->sortByDesc('id')
+                ->first()
+                ?->routeStop
+                ?->warehouse;
+        }
+
         return view('livewire.driver.scanner', [
-            'isDistribution' => $activeRoute?->route_type === Route::TYPE_HUB_DISTRIBUTION,
+            'isDistribution' => $routeType === Route::TYPE_HUB_DISTRIBUTION,
+            'activeRoute' => $activeRoute,
+            'operation' => $operation,
+            'operationTitle' => $operationTitle,
+            'operationInstructions' => $operationInstructions,
+            'contextStop' => $contextStop,
+            'arrivalWarehouse' => $arrivalWarehouse,
         ]);
+    }
+
+    /**
+     * Parada de referencia para mostrar en la interfaz antes de
+     * escanear: la próxima pendiente, igual criterio que ya usa
+     * Dashboard.php para "Próxima parada".
+     */
+    protected function contextStop(Route $route): ?RouteStop
+    {
+        return $route->stops->firstWhere('status', RouteStop::STATUS_PENDING)
+            ?? $route->stops->first();
+    }
+
+    /**
+     * En qué fase de la distribución está el driver: si ya tiene
+     * paquetes en tránsito nacional bajo su custodia, lo más probable
+     * es que esté camino al almacén a registrar llegadas; si no, que
+     * esté saliendo del HUB. Es solo una guía visual por defecto antes
+     * del primer escaneo — el escaneo real sigue decidiéndose por el
+     * estado de cada paquete en LogisticsScanService.
+     */
+    protected function distributionPhase(Driver $driver): string
+    {
+        $hasPendingArrivals = Package::query()
+            ->where('driver_id', $driver->id)
+            ->where('current_status', Package::STATUS_EN_TRANSITO_NACIONAL)
+            ->exists();
+
+        return $hasPendingArrivals ? 'hub_arrival' : 'hub_departure';
     }
 }

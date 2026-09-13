@@ -1230,9 +1230,9 @@
     "semantic_hash": ""
   },
   "app/Livewire/Driver/Scanner.php": {
-    "mtime": 1789265968.8605027,
-    "seen": 1789277229.907754,
-    "ast_hash": "593c4c53f9da70e2674ae79b2f1a3320",
+    "mtime": 1789279134.4026556,
+    "seen": 1789279349.468566,
+    "ast_hash": "d7cff76265b291d74c87aab9b05b81fa",
     "semantic_hash": ""
   },
   "database/migrations/2026_08_27_000000_add_security_hash_to_packages_table.php": {
@@ -2262,9 +2262,9 @@
     "semantic_hash": ""
   },
   "resources/views/livewire/driver/scanner.blade.php": {
-    "mtime": 1789265924.9051216,
-    "seen": 1789277229.9082189,
-    "ast_hash": "25133ca593cce4acc48d75d48444a7d4",
+    "mtime": 1789279178.9657805,
+    "seen": 1789279349.4691114,
+    "ast_hash": "cea0c07cd6c0bd59328ff715d929d465",
     "semantic_hash": ""
   },
   "resources/views/livewire/layout/admin.blade.php": {
@@ -2433,6 +2433,12 @@
     "mtime": 1789278079.5159695,
     "seen": 1789278168.3069541,
     "ast_hash": "5337de1bec9c9eda49405dff67897a1a",
+    "semantic_hash": ""
+  },
+  "tests/Feature/Driver/ScannerHubOperationUxTest.php": {
+    "mtime": 1789279260.3386672,
+    "seen": 1789279349.4692502,
+    "ast_hash": "1b1b5a4f03f049874532d27f5bb52598",
     "semantic_hash": ""
   }
 }
