@@ -36,7 +36,10 @@
         {{-- =========================================================
              MI RUTA ACTUAL (HUB)
         ========================================================== --}}
-        <div class="rounded-3xl border border-[#E2E8F0] bg-white p-6 shadow-sm">
+        <div
+            class="rounded-3xl border border-[#E2E8F0] bg-white p-6 shadow-sm"
+            @if (! $activeRoute) wire:poll.15s @endif
+        >
 
             <div class="flex flex-col gap-5">
 
@@ -84,14 +87,28 @@
 
                         @elseif ($availableRoutes->isNotEmpty())
 
-                            <h2 class="mt-1 font-display text-2xl font-bold text-[#0F172A]">
-                                {{ $availableRoutes->count() }} ruta(s) compatible(s) esperando
-                            </h2>
+                            @php $availableRoutesCount = $availableRoutes->count(); @endphp
 
-                            <p class="mt-1 max-w-xl text-sm text-slate-500">
-                                Todavía no tienes una ruta activa. Toma una de las
-                                rutas compatibles de abajo para comenzar tu operación.
-                            </p>
+                            <div class="mt-2 flex items-center gap-3">
+
+                                <span class="flex h-11 w-11 shrink-0 items-center justify-center rounded-2xl bg-blue-50 font-display text-lg font-bold text-blue-900">
+                                    {{ $availableRoutesCount }}
+                                </span>
+
+                                <div>
+
+                                    <h2 class="font-display text-lg font-bold leading-tight text-[#0F172A]">
+                                        {{ $availableRoutesCount === 1 ? 'Ruta compatible esperando' : 'Rutas compatibles esperando' }}
+                                    </h2>
+
+                                    <p class="mt-0.5 max-w-xl text-sm leading-snug text-slate-500">
+                                        Todavía no tienes una ruta activa. Toma una de las
+                                        rutas compatibles de abajo para comenzar tu operación.
+                                    </p>
+
+                                </div>
+
+                            </div>
 
                         @else
 
@@ -594,7 +611,10 @@
     {{-- =========================================================
          RUTA ACTIVA
     ========================================================== --}}
-    <div class="rounded-3xl border border-[#E2E8F0] bg-white p-6 shadow-sm">
+    <div
+        class="rounded-3xl border border-[#E2E8F0] bg-white p-6 shadow-sm"
+        @if (! $activeRoute) wire:poll.15s @endif
+    >
 
         <div class="flex flex-col gap-5">
 
@@ -626,14 +646,28 @@
 
                     @elseif ($availableRoutes->isNotEmpty())
 
-                        <h2 class="mt-1 font-display text-2xl font-bold text-[#0F172A]">
-                            {{ $availableRoutes->count() }} ruta(s) compatible(s) esperando
-                        </h2>
+                        @php $availableRoutesCount = $availableRoutes->count(); @endphp
 
-                        <p class="mt-1 max-w-xl text-sm text-slate-500">
-                            Todavía no tienes una ruta activa. Toma una de las
-                            rutas compatibles de abajo para comenzar tu operación.
-                        </p>
+                        <div class="mt-2 flex items-center gap-3">
+
+                            <span class="flex h-11 w-11 shrink-0 items-center justify-center rounded-2xl bg-blue-50 font-display text-lg font-bold text-blue-900">
+                                {{ $availableRoutesCount }}
+                            </span>
+
+                            <div>
+
+                                <h2 class="font-display text-lg font-bold leading-tight text-[#0F172A]">
+                                    {{ $availableRoutesCount === 1 ? 'Ruta compatible esperando' : 'Rutas compatibles esperando' }}
+                                </h2>
+
+                                <p class="mt-0.5 max-w-xl text-sm leading-snug text-slate-500">
+                                    Todavía no tienes una ruta activa. Toma una de las
+                                    rutas compatibles de abajo para comenzar tu operación.
+                                </p>
+
+                            </div>
+
+                        </div>
 
                     @else
 
