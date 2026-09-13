@@ -648,9 +648,9 @@
     "semantic_hash": ""
   },
   "routes/web.php": {
-    "mtime": 1789277033.2495394,
-    "seen": 1789277229.908276,
-    "ast_hash": "d1ca95f70f1f7396e08d2d76e83726cd",
+    "mtime": 1789332084.7890997,
+    "seen": 1789333971.4160435,
+    "ast_hash": "e6b66bb9143be7ce490c01dd46323832",
     "semantic_hash": ""
   },
   "tailwind.config.js": {
@@ -1230,9 +1230,9 @@
     "semantic_hash": ""
   },
   "app/Livewire/Driver/Scanner.php": {
-    "mtime": 1789329903.3273365,
-    "seen": 1789330161.4032402,
-    "ast_hash": "6788e5d7d5fef878c5ac85006350beb3",
+    "mtime": 1789335051.6280644,
+    "seen": 1789335404.2879813,
+    "ast_hash": "ea4202584144035e0d25318af713c3f2",
     "semantic_hash": ""
   },
   "database/migrations/2026_08_27_000000_add_security_hash_to_packages_table.php": {
@@ -1464,9 +1464,9 @@
     "semantic_hash": ""
   },
   "resources/views/layouts/driver.blade.php": {
-    "mtime": 1789279918.2162848,
-    "seen": 1789280029.1656702,
-    "ast_hash": "2996935f830ee0bbf33ea8f19c90322d",
+    "mtime": 1789336007.0616002,
+    "seen": 1789336065.7130218,
+    "ast_hash": "79b20ff867b925becfa59eb0cc6064ac",
     "semantic_hash": ""
   },
   "app/Livewire/Public/OfficeLocator.php": {
@@ -2208,9 +2208,9 @@
     "semantic_hash": ""
   },
   "resources/views/livewire/ally/packages.blade.php": {
-    "mtime": 1788640455.90754,
-    "seen": 1789277229.9082026,
-    "ast_hash": "46c31396b8e61163419eff7fc8a588ab",
+    "mtime": 1789332102.6352882,
+    "seen": 1789333971.4159372,
+    "ast_hash": "9a55047d45fa10fe9ccb045ac23716bf",
     "semantic_hash": ""
   },
   "resources/views/livewire/client/dashboard.blade.php": {
@@ -2256,15 +2256,15 @@
     "semantic_hash": ""
   },
   "resources/views/livewire/driver/route-detail.blade.php": {
-    "mtime": 1789281471.3824728,
-    "seen": 1789281854.4988453,
-    "ast_hash": "3f9312b0c085947052a824e9fc0faef0",
+    "mtime": 1789333849.6813369,
+    "seen": 1789333971.4159615,
+    "ast_hash": "999d070e0873c3fda31719c55a789ee6",
     "semantic_hash": ""
   },
   "resources/views/livewire/driver/scanner.blade.php": {
-    "mtime": 1789281395.5845904,
-    "seen": 1789281854.4988477,
-    "ast_hash": "8287f60eefa5a134f86eec0daf6608b0",
+    "mtime": 1789335081.0349865,
+    "seen": 1789335404.2885387,
+    "ast_hash": "27879352903ff776c622bf3560e5e335",
     "semantic_hash": ""
   },
   "resources/views/livewire/layout/admin.blade.php": {
@@ -2406,9 +2406,9 @@
     "semantic_hash": ""
   },
   "tests/Feature/Driver/ScannerLivewireTest.php": {
-    "mtime": 1789266031.407087,
-    "seen": 1789277229.908323,
-    "ast_hash": "0d0d6908685203d253f24dde995eda89",
+    "mtime": 1789335291.7655165,
+    "seen": 1789335404.2886822,
+    "ast_hash": "ae42628eea0f1e06348d9aee88f08721",
     "semantic_hash": ""
   },
   ".claude/skills/venexpress-laravel/SKILL.md": {
@@ -2436,9 +2436,9 @@
     "semantic_hash": ""
   },
   "tests/Feature/Driver/ScannerHubOperationUxTest.php": {
-    "mtime": 1789281514.166284,
-    "seen": 1789281854.4990306,
-    "ast_hash": "ecb7f78cfbaf55f59837d82fd80ba1c6",
+    "mtime": 1789335243.0514977,
+    "seen": 1789335404.2886796,
+    "ast_hash": "a34f683998b2e0e83a4dbfc1e670e910",
     "semantic_hash": ""
   },
   "app/Livewire/Driver/Support/HubDistributionPhase.php": {
@@ -2460,9 +2460,21 @@
     "semantic_hash": ""
   },
   "tests/Feature/Driver/DriverHubReceptionTest.php": {
-    "mtime": 1789330055.597427,
-    "seen": 1789330161.4039536,
-    "ast_hash": "e0e26ecd7f65dc3a6847ccc6760cb071",
+    "mtime": 1789335267.6323807,
+    "seen": 1789335404.2886612,
+    "ast_hash": "ada60d2856f5b56c1ad24900d3365c42",
+    "semantic_hash": ""
+  },
+  "app/Livewire/Ally/PackageDetail.php": {
+    "mtime": 1789332111.0582974,
+    "seen": 1789333971.4153395,
+    "ast_hash": "d773a16fbc6a667cb12c57aada836831",
+    "semantic_hash": ""
+  },
+  "resources/views/livewire/ally/package-detail.blade.php": {
+    "mtime": 1789332142.0040836,
+    "seen": 1789333971.4159288,
+    "ast_hash": "d98e4eeaabfed56f6dd1f170b2542bc1",
     "semantic_hash": ""
   }
 }

@@ -204,16 +204,41 @@ class DriverHubReceptionTest extends TestCase
 
         $component = Livewire::actingAs($user)->test(Scanner::class);
 
+        // 1er escaneo: identifica y propone "collection", sin ejecutar.
         $component
             ->set('trackingNumber', $package->tracking_number)
             ->call('searchPackage')
+            ->assertSet('errorMessage', null)
+            ->assertSet('pendingOperation', 'collection');
+
+        $this->assertSame(Package::STATUS_RECIBIDO_AGENCIA, $package->fresh()->current_status);
+
+        // Confirmación explícita: recién aquí se ejecuta la recolección.
+        $component
+            ->call('confirmOperation', 'collection')
             ->assertSet('errorMessage', null);
 
         $this->assertSame(Package::STATUS_RECOLECTADO_VENEXPRESS, $package->fresh()->current_status);
 
+        // 2do escaneo ACCIDENTAL de la misma guía, inmediatamente
+        // después: el paquete ya está RECOLECTADO_VENEXPRESS, así que la
+        // siguiente etapa disponible es "hub_reception" — pero el
+        // escaneo por sí solo NO debe ejecutarla automáticamente.
         $component
             ->set('trackingNumber', $package->tracking_number)
             ->call('searchPackage')
+            ->assertSet('errorMessage', null)
+            ->assertSet('successMessage', null)
+            ->assertSet('pendingOperation', 'hub_reception')
+            ->assertSee('La recolección de esta guía ya fue registrada');
+
+        // Sigue en RECOLECTADO_VENEXPRESS: el segundo escaneo no avanzó
+        // solo a EN_HUB.
+        $this->assertSame(Package::STATUS_RECOLECTADO_VENEXPRESS, $package->fresh()->current_status);
+
+        // Solo tras confirmar explícitamente se ejecuta la recepción en HUB.
+        $component
+            ->call('confirmOperation', 'hub_reception')
             ->assertSet('errorMessage', null)
             ->assertSet(
                 'successMessage',
@@ -246,10 +271,20 @@ class DriverHubReceptionTest extends TestCase
 
         $this->assertSame(Package::STATUS_RECOLECTADO_VENEXPRESS, $package->fresh()->current_status);
 
-        Livewire::actingAs($user)
+        // El escaneo por sí solo solo mira current_status (RECOLECTADO_
+        // VENEXPRESS -> "hub_reception" disponible): no repite la
+        // validación de pertenencia a la ruta, esa sigue siendo
+        // responsabilidad exclusiva de LogisticsScanService, que se
+        // invoca recién al confirmar.
+        $component = Livewire::actingAs($user)
             ->test(Scanner::class)
             ->set('trackingNumber', $package->fresh()->tracking_number)
             ->call('searchPackage')
+            ->assertSet('errorMessage', null)
+            ->assertSet('pendingOperation', 'hub_reception');
+
+        $component
+            ->call('confirmOperation', 'hub_reception')
             ->assertSet('errorMessage', 'Este paquete no fue recolectado en tu ruta activa.');
 
         $this->assertSame(Package::STATUS_RECOLECTADO_VENEXPRESS, $package->fresh()->current_status);

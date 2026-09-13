@@ -8,7 +8,7 @@
                 href="{{ route('repartidor.dashboard') }}"
                 class="text-sm font-medium text-blue-700 hover:text-blue-900"
             >
-                ← Volver al panel
+                ← Resumen
             </a>
 
             <h1 class="mt-2 font-display text-2xl font-bold text-[#0F172A]">

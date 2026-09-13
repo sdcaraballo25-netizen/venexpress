@@ -201,7 +201,7 @@
             @php
                 $sidebarDriver = auth()->user()?->driver;
                 $sidebarIsHub = $sidebarDriver?->driver_type === \App\Models\Driver::TYPE_HUB;
-                $sidebarActiveRouteId = $sidebarIsHub
+                $sidebarActiveRouteId = $sidebarDriver
                     ? \App\Models\Route::query()
                         ->where('driver_id', $sidebarDriver->id)
                         ->whereIn('status', [
@@ -273,58 +273,12 @@
             </a>
 
 
-            @if ($sidebarIsHub)
+            @if ($sidebarActiveRouteId)
 
-                {{-- MI RUTA (prioridad HUB) --}}
-
-                @if ($sidebarActiveRouteId)
-
-                    <a
-                        href="{{ route('repartidor.route-detail', $sidebarActiveRouteId) }}"
-                        wire:navigate
-                        @click="sidebarOpen = false"
-                        class="
-                            flex items-center gap-3
-                            px-4 py-3
-                            rounded-xl
-                            text-sm
-                            font-medium
-                            transition-colors
-                            {{ request()->routeIs('repartidor.route-detail')
-                                ? 'bg-blue-50 text-blue-900'
-                                : 'text-[#64748B] hover:bg-slate-50 hover:text-[#0F172A]' }}
-                        "
-                    >
-
-                        <svg
-                            class="w-5 h-5 shrink-0"
-                            fill="none"
-                            stroke="currentColor"
-                            viewBox="0 0 24 24"
-                        >
-
-                            <path
-                                stroke-linecap="round"
-                                stroke-linejoin="round"
-                                stroke-width="2"
-                                d="M9 20l-5.447-2.724A2 2 0 012 15.487V8.513a2 2 0 011.106-1.789L9 4m0 16V4m0 16l6-3m-6-13l6 3m0 0l5.447-2.724A2 2 0 0021 6.487v6.026M15 7v10"
-                            />
-
-                        </svg>
-
-                        <span>
-                            Mi ruta
-                        </span>
-
-                    </a>
-
-                @endif
-
-
-                {{-- ESCANEAR PAQUETES (prioridad HUB) --}}
+                {{-- MI RUTA --}}
 
                 <a
-                    href="{{ route('repartidor.scanner') }}"
+                    href="{{ route('repartidor.route-detail', $sidebarActiveRouteId) }}"
                     wire:navigate
                     @click="sidebarOpen = false"
                     class="
@@ -334,7 +288,7 @@
                         text-sm
                         font-medium
                         transition-colors
-                        {{ request()->routeIs('repartidor.scanner')
+                        {{ request()->routeIs('repartidor.route-detail')
                             ? 'bg-blue-50 text-blue-900'
                             : 'text-[#64748B] hover:bg-slate-50 hover:text-[#0F172A]' }}
                     "
@@ -351,18 +305,60 @@
                             stroke-linecap="round"
                             stroke-linejoin="round"
                             stroke-width="2"
-                            d="M3 7V5a2 2 0 012-2h2M17 3h2a2 2 0 012 2v2M21 17v2a2 2 0 01-2 2h-2M7 21H5a2 2 0 01-2-2v-2M7 12h10M12 7v10"
+                            d="M9 20l-5.447-2.724A2 2 0 012 15.487V8.513a2 2 0 011.106-1.789L9 4m0 16V4m0 16l6-3m-6-13l6 3m0 0l5.447-2.724A2 2 0 0021 6.487v6.026M15 7v10"
                         />
 
                     </svg>
 
                     <span>
-                        Escanear paquetes
+                        Mi ruta
                     </span>
 
                 </a>
 
             @endif
+
+
+            {{-- ESCANEAR PAQUETES --}}
+
+            <a
+                href="{{ route('repartidor.scanner') }}"
+                wire:navigate
+                @click="sidebarOpen = false"
+                class="
+                    flex items-center gap-3
+                    px-4 py-3
+                    rounded-xl
+                    text-sm
+                    font-medium
+                    transition-colors
+                    {{ request()->routeIs('repartidor.scanner')
+                        ? 'bg-blue-50 text-blue-900'
+                        : 'text-[#64748B] hover:bg-slate-50 hover:text-[#0F172A]' }}
+                "
+            >
+
+                <svg
+                    class="w-5 h-5 shrink-0"
+                    fill="none"
+                    stroke="currentColor"
+                    viewBox="0 0 24 24"
+                >
+
+                    <path
+                        stroke-linecap="round"
+                        stroke-linejoin="round"
+                        stroke-width="2"
+                        d="M3 7V5a2 2 0 012-2h2M17 3h2a2 2 0 012 2v2M21 17v2a2 2 0 01-2 2h-2M7 21H5a2 2 0 01-2-2v-2M7 12h10M12 7v10"
+                    />
+
+                </svg>
+
+                <span>
+                    Escanear paquetes
+                </span>
+
+            </a>
 
 
             {{-- =================================================
@@ -427,155 +423,6 @@
 
             </a>
 
-
-            @unless ($sidebarIsHub)
-
-            {{-- ESCANEAR --}}
-
-            <a
-                href="{{ route('repartidor.scanner') }}"
-                wire:navigate
-                @click="sidebarOpen = false"
-                class="
-                    flex items-center gap-3
-                    px-4 py-3
-                    rounded-xl
-                    text-sm
-                    font-medium
-                    transition-colors
-                    {{ request()->routeIs('repartidor.scanner')
-                        ? 'bg-blue-50 text-blue-900'
-                        : 'text-[#64748B] hover:bg-slate-50 hover:text-[#0F172A]' }}
-                "
-            >
-
-                <svg
-                    class="w-5 h-5 shrink-0"
-                    fill="none"
-                    stroke="currentColor"
-                    viewBox="0 0 24 24"
-                >
-
-                    <path
-                        stroke-linecap="round"
-                        stroke-linejoin="round"
-                        stroke-width="2"
-                        d="M3 7V5a2 2 0 012-2h2M17 3h2a2 2 0 012 2v2M21 17v2a2 2 0 01-2 2h-2M7 21H5a2 2 0 01-2-2v-2M7 12h10M12 7v10"
-                    />
-
-                </svg>
-
-                <span>
-                    Escanear paquete
-                </span>
-
-            </a>
-
-            @endunless
-
-
-            {{-- HOJA DE RUTA --}}
-
-            <a
-                href="{{ route('repartidor.packages') }}"
-                wire:navigate
-                @click="sidebarOpen = false"
-                class="
-                    flex items-center gap-3
-                    px-4 py-3
-                    rounded-xl
-                    text-sm
-                    font-medium
-                    text-[#64748B]
-                    hover:bg-slate-50
-                    hover:text-[#0F172A]
-                    transition-colors
-                "
-            >
-
-                <svg
-                    class="w-5 h-5 shrink-0"
-                    fill="none"
-                    stroke="currentColor"
-                    viewBox="0 0 24 24"
-                >
-
-                    <path
-                        stroke-linecap="round"
-                        stroke-linejoin="round"
-                        stroke-width="2"
-                        d="M9 20l-5.447-2.724A2 2 0 012 15.487V8.513a2 2 0 011.106-1.789L9 4m0 16V4m0 16l6-3m-6-13l6 3m0 0l5.447-2.724A2 2 0 0021 6.487v6.026M15 7v10"
-                    />
-
-                </svg>
-
-                <span>
-                    Hoja de ruta
-                </span>
-
-            </a>
-
-
-            {{-- =================================================
-                 ACCESO RÁPIDO
-            ================================================== --}}
-
-            <p
-                class="
-                    px-3
-                    mb-3
-                    mt-7
-                    text-xs
-                    font-semibold
-                    uppercase
-                    tracking-wider
-                    text-[#94A3B8]
-                "
-            >
-                Acceso rápido
-            </p>
-
-
-            {{-- VERIFICAR GUÍA --}}
-
-            <a
-                href="{{ route('repartidor.scanner') }}"
-                wire:navigate
-                @click="sidebarOpen = false"
-                class="
-                    flex items-center gap-3
-                    px-4 py-3
-                    rounded-xl
-                    text-sm
-                    font-medium
-                    text-[#64748B]
-                    hover:bg-slate-50
-                    hover:text-[#0F172A]
-                    transition-colors
-                "
-            >
-
-                <svg
-                    class="w-5 h-5 shrink-0"
-                    fill="none"
-                    stroke="currentColor"
-                    viewBox="0 0 24 24"
-                >
-
-                    <path
-                        stroke-linecap="round"
-                        stroke-linejoin="round"
-                        stroke-width="2"
-                        d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"
-                    />
-
-                </svg>
-
-                <span>
-                    Verificar guía
-                </span>
-
-            </a>
 
         </nav>
 
@@ -869,6 +716,8 @@
 
 
 @livewireScripts
+
+<script src="https://unpkg.com/html5-qrcode" type="text/javascript"></script>
 
 @stack('scripts')
 

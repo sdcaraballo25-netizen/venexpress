@@ -36,9 +36,9 @@
 
         <a
             href="{{ route('repartidor.dashboard') }}"
-            class="inline-flex items-center justify-center rounded-xl border border-[#E2E8F0] bg-white px-4 py-2 text-sm font-medium text-[#0F172A] transition hover:bg-slate-50"
+            class="text-sm font-medium text-blue-700 hover:text-blue-900"
         >
-            ← Volver al dashboard
+            ← Resumen
         </a>
     </div>
 
@@ -254,6 +254,26 @@
                     @endif
                 @endunless
 
+                @if ($pendingOperationView && $pendingOperationView['eligible'])
+                    <div class="mt-5 rounded-xl border border-blue-200 bg-blue-50 p-4">
+                        <p class="text-sm font-semibold text-blue-900">
+                            {{ $pendingOperationView['label'] }}
+                        </p>
+                        <p class="mt-1 text-xs text-blue-700">
+                            {{ $pendingOperationView['hint'] }}
+                        </p>
+
+                        <button
+                            type="button"
+                            wire:click="confirmOperation('{{ $pendingOperationView['key'] }}')"
+                            wire:loading.attr="disabled"
+                            class="mt-4 inline-flex w-full items-center justify-center rounded-xl bg-blue-900 px-5 py-3 text-sm font-semibold text-white transition hover:bg-blue-800 disabled:opacity-50 sm:w-auto"
+                        >
+                            <span wire:loading.remove wire:target="confirmOperation">{{ $pendingOperationView['cta'] }}</span>
+                            <span wire:loading wire:target="confirmOperation">Procesando...</span>
+                        </button>
+                    </div>
+                @else
                 <div class="mt-5 rounded-xl border border-emerald-200 bg-emerald-50 p-4">
                     @if ($lastAction === 'collection')
                         <p class="text-sm font-semibold text-emerald-800">
@@ -336,40 +356,39 @@
                                 @endif
                             </p>
                         @endif
-                    @elseif ($package->current_status === \App\Models\Package::STATUS_RECOLECTADO_VENEXPRESS)
+                    @elseif ($lastAction === 'hub_reception')
                         <p class="text-sm font-semibold text-emerald-800">
-                            ✓ Salida registrada
+                            ✓ Paquete procesado
+                        </p>
+                        <p class="mt-1 font-mono text-xs text-emerald-700">
+                            {{ $package->tracking_number }}
+                        </p>
+                        <p class="mt-2 text-sm font-semibold text-emerald-800">
+                            Recepción en HUB registrada
                         </p>
                         <p class="mt-1 text-xs text-emerald-700">
-                            El paquete ya quedó bajo custodia de Venexpress.
+                            El paquete quedó EN_HUB.
                         </p>
-                    @elseif ($package->current_status === \App\Models\Package::STATUS_RECIBIDO_AGENCIA)
-                        <p class="text-sm font-semibold text-emerald-800">
-                            Guía localizada
-                        </p>
-                        <p class="mt-1 text-xs text-emerald-700">
-                            El siguiente escaneo intentará registrar la salida desde la agencia.
-                        </p>
-                    @elseif ($package->current_status === \App\Models\Package::STATUS_EN_HUB)
-                        <p class="text-sm font-semibold text-emerald-800">
-                            Guía localizada
-                        </p>
-                        <p class="mt-1 text-xs text-emerald-700">
-                            El siguiente escaneo registrará la salida del HUB.
-                        </p>
-                    @elseif ($package->current_status === \App\Models\Package::STATUS_EN_TRANSITO_NACIONAL)
-                        <p class="text-sm font-semibold text-emerald-800">
-                            Guía localizada
-                        </p>
-                        <p class="mt-1 text-xs text-emerald-700">
-                            El siguiente escaneo registrará la recepción en almacén.
-                        </p>
+
+                        @if ($operationTotal)
+                            <p class="mt-3 text-sm font-semibold text-emerald-800">
+                                {{ $operationProcessedCount }} de {{ $operationTotal }} paquetes procesados
+                            </p>
+                            <p class="mt-1 text-xs text-emerald-700">
+                                @if ($pendingCount > 0)
+                                    Continúa escaneando las guías restantes.
+                                @else
+                                    Operación completada. No quedan más guías pendientes de recepción.
+                                @endif
+                            </p>
+                        @endif
                     @else
                         <p class="text-sm font-semibold text-slate-700">
                             {{ $package->statusLabel() }}
                         </p>
                     @endif
                 </div>
+                @endif
 
             @else
 

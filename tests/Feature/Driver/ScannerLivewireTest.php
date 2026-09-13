@@ -78,12 +78,23 @@ class ScannerLivewireTest extends TestCase
             'current_status' => Package::STATUS_RECIBIDO_AGENCIA,
         ]);
 
-        Livewire::actingAs($user)
+        $component = Livewire::actingAs($user)
             ->test(Scanner::class)
             ->set('trackingNumber', $package->tracking_number)
             ->call('searchPackage')
             ->assertSet('errorMessage', null)
-            ->assertSet('successMessage', 'Salida registrada correctamente. El paquete quedó recolectado por Venexpress.');
+            ->assertSet('successMessage', null)
+            ->assertSet('pendingOperation', 'collection');
+
+        // El escaneo por sí solo NUNCA ejecuta la transición.
+        $this->assertSame(Package::STATUS_RECIBIDO_AGENCIA, $package->fresh()->current_status);
+        $this->assertNull($package->fresh()->driver_id);
+
+        $component
+            ->call('confirmOperation', 'collection')
+            ->assertSet('errorMessage', null)
+            ->assertSet('successMessage', 'Salida registrada correctamente. El paquete quedó recolectado por Venexpress.')
+            ->assertSet('pendingOperation', null);
 
         $package->refresh();
         $this->assertSame(Package::STATUS_RECOLECTADO_VENEXPRESS, $package->current_status);
@@ -125,10 +136,18 @@ class ScannerLivewireTest extends TestCase
             'destination_state' => 'Carabobo',
         ]);
 
-        Livewire::actingAs($user)
+        $component = Livewire::actingAs($user)
             ->test(Scanner::class)
             ->set('trackingNumber', $package->tracking_number)
             ->call('searchPackage')
+            ->assertSet('errorMessage', null)
+            ->assertSet('successMessage', null)
+            ->assertSet('pendingOperation', 'hub_departure');
+
+        $this->assertSame(Package::STATUS_EN_HUB, $package->fresh()->current_status);
+
+        $component
+            ->call('confirmOperation', 'hub_departure')
             ->assertSet('errorMessage', null)
             ->assertSet('successMessage', 'Salida de HUB registrada correctamente. El paquete quedó en tránsito nacional.');
 
@@ -173,10 +192,19 @@ class ScannerLivewireTest extends TestCase
             'destination_state' => 'Carabobo',
         ]);
 
-        Livewire::actingAs($user)
+        $component = Livewire::actingAs($user)
             ->test(Scanner::class)
             ->set('trackingNumber', $package->tracking_number)
             ->call('searchPackage')
+            ->assertSet('errorMessage', null)
+            ->assertSet('successMessage', null)
+            ->assertSet('pendingOperation', 'hub_arrival');
+
+        $this->assertSame(Package::STATUS_EN_TRANSITO_NACIONAL, $package->fresh()->current_status);
+        $this->assertSame($driver->id, $package->fresh()->driver_id);
+
+        $component
+            ->call('confirmOperation', 'hub_arrival')
             ->assertSet('errorMessage', null)
             ->assertSet('successMessage', 'Llegada al almacén destino registrada correctamente.');
 
@@ -244,5 +272,271 @@ class ScannerLivewireTest extends TestCase
                 'errorMessage',
                 'No tienes una ruta en curso. Inicia una ruta antes de escanear paquetes.'
             );
+    }
+
+    /**
+     * Confirmar dos veces la misma operación (doble clic, o un
+     * reintento de red que duplica la petición) no debe ejecutar la
+     * transición dos veces. La primera confirmación limpia
+     * pendingOperation; la segunda ya no encuentra nada que confirmar.
+     */
+    public function test_confirming_the_same_operation_twice_does_not_execute_it_twice(): void
+    {
+        [$user, $driver] = $this->createDriverUser();
+        $ally = $this->createAlly();
+
+        $route = Route::create([
+            'city' => 'Caracas',
+            'state' => 'Distrito Capital',
+            'name' => 'Recolección Caracas',
+            'driver_id' => $driver->id,
+            'created_by' => $user->id,
+            'status' => Route::STATUS_IN_PROGRESS,
+            'started_at' => now(),
+            'route_type' => Route::TYPE_HUB_TRANSFER,
+        ]);
+
+        RouteStop::create([
+            'route_id' => $route->id,
+            'ally_id' => $ally->id,
+            'sequence' => 1,
+            'status' => RouteStop::STATUS_PENDING,
+        ]);
+
+        $package = $this->createPackage($ally, [
+            'current_status' => Package::STATUS_RECIBIDO_AGENCIA,
+        ]);
+
+        $component = Livewire::actingAs($user)
+            ->test(Scanner::class)
+            ->set('trackingNumber', $package->tracking_number)
+            ->call('searchPackage')
+            ->assertSet('pendingOperation', 'collection');
+
+        $component
+            ->call('confirmOperation', 'collection')
+            ->assertSet('successMessage', 'Salida registrada correctamente. El paquete quedó recolectado por Venexpress.')
+            ->assertSet('pendingOperation', null);
+
+        $this->assertSame(Package::STATUS_RECOLECTADO_VENEXPRESS, $package->fresh()->current_status);
+
+        // Segundo clic sobre el mismo botón: ya no hay pendingOperation,
+        // así que no debe volver a llamar a LogisticsScanService.
+        $component
+            ->call('confirmOperation', 'collection')
+            ->assertSet(
+                'errorMessage',
+                'No hay ninguna operación pendiente de confirmar. Vuelve a escanear la guía.'
+            );
+
+        // El paquete se quedó en RECOLECTADO_VENEXPRESS: el segundo clic
+        // no lo hizo avanzar a EN_HUB por su cuenta.
+        $this->assertSame(Package::STATUS_RECOLECTADO_VENEXPRESS, $package->fresh()->current_status);
+    }
+
+    /**
+     * Si el estado del paquete cambió entre identificarlo y confirmar
+     * (por ejemplo, otro proceso ya lo movió), el snapshot capturado en
+     * el escaneo lo detecta y bloquea la ejecución sin llamar al
+     * servicio — sin sustituir la validación real, que además seguiría
+     * rechazándolo dentro de LogisticsScanService si se le forzara.
+     */
+    public function test_stale_snapshot_blocks_execution_without_calling_the_service(): void
+    {
+        [$user, $driver] = $this->createDriverUser();
+        $ally = $this->createAlly();
+
+        $route = Route::create([
+            'city' => 'Caracas',
+            'state' => 'Distrito Capital',
+            'name' => 'Recolección Caracas',
+            'driver_id' => $driver->id,
+            'created_by' => $user->id,
+            'status' => Route::STATUS_IN_PROGRESS,
+            'started_at' => now(),
+            'route_type' => Route::TYPE_HUB_TRANSFER,
+        ]);
+
+        RouteStop::create([
+            'route_id' => $route->id,
+            'ally_id' => $ally->id,
+            'sequence' => 1,
+            'status' => RouteStop::STATUS_PENDING,
+        ]);
+
+        $package = $this->createPackage($ally, [
+            'current_status' => Package::STATUS_RECIBIDO_AGENCIA,
+        ]);
+
+        $component = Livewire::actingAs($user)
+            ->test(Scanner::class)
+            ->set('trackingNumber', $package->tracking_number)
+            ->call('searchPackage')
+            ->assertSet('pendingOperation', 'collection');
+
+        // El paquete cambia de estado por otra vía (otro repartidor,
+        // otra pestaña) DESPUÉS de identificarlo pero ANTES de confirmar.
+        $package->update(['current_status' => Package::STATUS_RECOLECTADO_VENEXPRESS]);
+
+        $component
+            ->call('confirmOperation', 'collection')
+            ->assertSet(
+                'errorMessage',
+                'Este paquete ya cambió de estado. Vuelve a escanearlo para ver la operación disponible.'
+            )
+            ->assertSet('pendingOperation', null);
+
+        // Sigue en RECOLECTADO_VENEXPRESS (el cambio externo), no pasó a
+        // EN_HUB: confirmOperation no llegó a invocar al servicio.
+        $this->assertSame(Package::STATUS_RECOLECTADO_VENEXPRESS, $package->fresh()->current_status);
+    }
+
+    /**
+     * confirmOperation() exige que el parámetro recibido coincida con
+     * pendingOperation. Protege contra un botón desincronizado (por
+     * ejemplo, una vista vieja en caché) que intente confirmar una
+     * operación distinta a la que el servidor calculó.
+     */
+    public function test_confirm_operation_rejects_a_mismatched_operation_key(): void
+    {
+        [$user, $driver] = $this->createDriverUser();
+        $ally = $this->createAlly();
+
+        $route = Route::create([
+            'city' => 'Caracas',
+            'state' => 'Distrito Capital',
+            'name' => 'Recolección Caracas',
+            'driver_id' => $driver->id,
+            'created_by' => $user->id,
+            'status' => Route::STATUS_IN_PROGRESS,
+            'started_at' => now(),
+            'route_type' => Route::TYPE_HUB_TRANSFER,
+        ]);
+
+        RouteStop::create([
+            'route_id' => $route->id,
+            'ally_id' => $ally->id,
+            'sequence' => 1,
+            'status' => RouteStop::STATUS_PENDING,
+        ]);
+
+        $package = $this->createPackage($ally, [
+            'current_status' => Package::STATUS_RECIBIDO_AGENCIA,
+        ]);
+
+        $component = Livewire::actingAs($user)
+            ->test(Scanner::class)
+            ->set('trackingNumber', $package->tracking_number)
+            ->call('searchPackage')
+            ->assertSet('pendingOperation', 'collection');
+
+        $component
+            ->call('confirmOperation', 'hub_arrival')
+            ->assertSet(
+                'errorMessage',
+                'La operación seleccionada ya no coincide con la guía escaneada. Vuelve a escanear.'
+            );
+
+        $this->assertSame(Package::STATUS_RECIBIDO_AGENCIA, $package->fresh()->current_status);
+    }
+
+    /**
+     * Regla de negocio que debe seguir intacta: driver_id nunca se
+     * asigna por el solo hecho de escanear/identificar la guía, solo
+     * al confirmar y ejecutar la operación.
+     */
+    public function test_driver_id_is_not_assigned_until_the_operation_is_confirmed(): void
+    {
+        [$user, $driver] = $this->createDriverUser();
+        $ally = $this->createAlly();
+
+        $route = Route::create([
+            'city' => 'Caracas',
+            'state' => 'Distrito Capital',
+            'name' => 'Recolección Caracas',
+            'driver_id' => $driver->id,
+            'created_by' => $user->id,
+            'status' => Route::STATUS_IN_PROGRESS,
+            'started_at' => now(),
+            'route_type' => Route::TYPE_HUB_TRANSFER,
+        ]);
+
+        RouteStop::create([
+            'route_id' => $route->id,
+            'ally_id' => $ally->id,
+            'sequence' => 1,
+            'status' => RouteStop::STATUS_PENDING,
+        ]);
+
+        $package = $this->createPackage($ally, [
+            'current_status' => Package::STATUS_RECIBIDO_AGENCIA,
+        ]);
+
+        $this->assertNull($package->driver_id);
+
+        $component = Livewire::actingAs($user)
+            ->test(Scanner::class)
+            ->set('trackingNumber', $package->tracking_number)
+            ->call('searchPackage')
+            ->assertSet('pendingOperation', 'collection');
+
+        // Identificado, pero todavía sin dueño.
+        $this->assertNull($package->fresh()->driver_id);
+
+        $component->call('confirmOperation', 'collection');
+
+        // Recién tras confirmar se asigna el repartidor.
+        $this->assertSame($driver->id, $package->fresh()->driver_id);
+    }
+
+    /**
+     * Un paquete ya asignado a otro repartidor sigue rechazándose: el
+     * escaneo identifica y propone "collection" igual (solo mira
+     * current_status), pero LogisticsScanService::scanCollection()
+     * rechaza la ejecución al confirmar, sin asignar ni mutar nada.
+     */
+    public function test_confirming_collection_rejects_a_package_already_assigned_to_another_driver(): void
+    {
+        [$user, $driver] = $this->createDriverUser();
+        [, $otherDriver] = $this->createDriverUser();
+        $ally = $this->createAlly();
+
+        $route = Route::create([
+            'city' => 'Caracas',
+            'state' => 'Distrito Capital',
+            'name' => 'Recolección Caracas',
+            'driver_id' => $driver->id,
+            'created_by' => $user->id,
+            'status' => Route::STATUS_IN_PROGRESS,
+            'started_at' => now(),
+            'route_type' => Route::TYPE_HUB_TRANSFER,
+        ]);
+
+        RouteStop::create([
+            'route_id' => $route->id,
+            'ally_id' => $ally->id,
+            'sequence' => 1,
+            'status' => RouteStop::STATUS_PENDING,
+        ]);
+
+        $package = $this->createPackage($ally, [
+            'current_status' => Package::STATUS_RECIBIDO_AGENCIA,
+            'driver_id' => $otherDriver->id,
+        ]);
+
+        $component = Livewire::actingAs($user)
+            ->test(Scanner::class)
+            ->set('trackingNumber', $package->tracking_number)
+            ->call('searchPackage')
+            ->assertSet('errorMessage', null)
+            ->assertSet('pendingOperation', 'collection');
+
+        $component
+            ->call('confirmOperation', 'collection')
+            ->assertSet('errorMessage', 'Este paquete ya está asignado a otro repartidor.');
+
+        $package->refresh();
+        $this->assertSame(Package::STATUS_RECIBIDO_AGENCIA, $package->current_status);
+        $this->assertSame($otherDriver->id, $package->driver_id);
     }
 }

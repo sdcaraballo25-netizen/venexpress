@@ -193,6 +193,9 @@ class ScannerHubOperationUxTest extends TestCase
             ->test(Scanner::class)
             ->set('trackingNumber', $package->tracking_number)
             ->call('searchPackage')
+            ->assertSet('pendingOperation', 'collection')
+            ->assertSet('processedCount', 0)
+            ->call('confirmOperation', 'collection')
             ->assertSee('✓ Paquete procesado')
             ->assertSee($package->tracking_number)
             ->assertSee('Salida registrada desde la agencia')
@@ -238,6 +241,8 @@ class ScannerHubOperationUxTest extends TestCase
             ->test(Scanner::class)
             ->set('trackingNumber', $package->tracking_number)
             ->call('searchPackage')
+            ->assertSet('pendingOperation', 'hub_departure')
+            ->call('confirmOperation', 'hub_departure')
             ->assertSee('✓ Paquete procesado')
             ->assertSee('Salida del HUB registrada')
             ->assertSee('Tucupita')
@@ -279,6 +284,8 @@ class ScannerHubOperationUxTest extends TestCase
             ->test(Scanner::class)
             ->set('trackingNumber', $package->tracking_number)
             ->call('searchPackage')
+            ->assertSet('pendingOperation', 'hub_arrival')
+            ->call('confirmOperation', 'hub_arrival')
             ->assertSee('✓ Paquete procesado')
             ->assertSee('Recepción en almacén registrada')
             ->assertSee('Almacén Tucupita');
@@ -318,11 +325,13 @@ class ScannerHubOperationUxTest extends TestCase
             ->test(Scanner::class)
             ->set('trackingNumber', $first->tracking_number)
             ->call('searchPackage')
+            ->call('confirmOperation', 'collection')
             ->assertSet('processedCount', 1)
             ->call('clearSearch')
             ->assertSet('lastAction', null)
             ->set('trackingNumber', $second->tracking_number)
             ->call('searchPackage')
+            ->call('confirmOperation', 'collection')
             ->assertSet('processedCount', 2)
             ->assertSet('errorMessage', null);
 
@@ -364,6 +373,7 @@ class ScannerHubOperationUxTest extends TestCase
         $component
             ->set('trackingNumber', $first->tracking_number)
             ->call('searchPackage')
+            ->call('confirmOperation', 'collection')
             ->assertSee('1 de 2 paquetes procesados')
             ->assertSee('Continúa escaneando las guías restantes de este aliado');
 
@@ -371,6 +381,7 @@ class ScannerHubOperationUxTest extends TestCase
             ->call('clearSearch')
             ->set('trackingNumber', $second->tracking_number)
             ->call('searchPackage')
+            ->call('confirmOperation', 'collection')
             ->assertSee('2 de 2 paquetes procesados')
             ->assertSee('Operación completada');
     }
@@ -415,6 +426,7 @@ class ScannerHubOperationUxTest extends TestCase
         $component
             ->set('trackingNumber', $first->tracking_number)
             ->call('searchPackage')
+            ->call('confirmOperation', 'hub_departure')
             ->assertSee('1 de 2 paquetes procesados')
             ->assertSee('Continúa escaneando las guías restantes');
 
@@ -422,6 +434,7 @@ class ScannerHubOperationUxTest extends TestCase
             ->call('clearSearch')
             ->set('trackingNumber', $second->tracking_number)
             ->call('searchPackage')
+            ->call('confirmOperation', 'hub_departure')
             ->assertSee('2 de 2 paquetes procesados')
             ->assertSee('Operación completada');
     }
@@ -468,6 +481,7 @@ class ScannerHubOperationUxTest extends TestCase
         $component
             ->set('trackingNumber', $first->tracking_number)
             ->call('searchPackage')
+            ->call('confirmOperation', 'hub_arrival')
             ->assertSee('1 de 2 paquetes procesados')
             ->assertSee('Continúa escaneando las guías restantes');
 
@@ -475,6 +489,7 @@ class ScannerHubOperationUxTest extends TestCase
             ->call('clearSearch')
             ->set('trackingNumber', $second->tracking_number)
             ->call('searchPackage')
+            ->call('confirmOperation', 'hub_arrival')
             ->assertSee('2 de 2 paquetes procesados')
             ->assertSee('Operación completada');
     }
