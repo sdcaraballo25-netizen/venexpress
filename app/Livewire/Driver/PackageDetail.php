@@ -2,7 +2,9 @@
 
 namespace App\Livewire\Driver;
 
+use App\Models\Driver;
 use App\Models\Package;
+use App\Models\Route;
 use App\Services\PackageService;
 use Livewire\Attributes\Layout;
 use Livewire\Component;
@@ -16,6 +18,8 @@ class PackageDetail extends Component
 
     public Package $package;
 
+    public bool $isHub = false;
+
     public function mount(int $packageId): void
     {
         $user = Auth::user();
@@ -28,6 +32,8 @@ $driver = $user?->driver;
                 'Tu usuario no tiene un perfil de repartidor asociado.'
             );
         }
+
+        $this->isHub = $driver->driver_type === Driver::TYPE_HUB;
 
         $this->package = Package::query()
             ->where(
@@ -59,6 +65,12 @@ $driver = $user?->driver;
                 abort(
                     403,
                     'Tu usuario no tiene un perfil de repartidor asociado.'
+                );
+            }
+
+            if ($driver->driver_type === Driver::TYPE_HUB) {
+                throw new RuntimeException(
+                    'Esta acción es exclusiva de repartidores de entrega (Delivery).'
                 );
             }
 
@@ -125,6 +137,12 @@ $driver = $user?->driver;
                 );
             }
 
+            if ($driver->driver_type === Driver::TYPE_HUB) {
+                throw new RuntimeException(
+                    'Esta acción es exclusiva de repartidores de entrega (Delivery).'
+                );
+            }
+
             $this->package->refresh();
 
             $this->package =
@@ -167,6 +185,12 @@ $driver = $user?->driver;
                 );
             }
 
+            if ($driver->driver_type === Driver::TYPE_HUB) {
+                throw new RuntimeException(
+                    'Esta acción es exclusiva de repartidores de entrega (Delivery).'
+                );
+            }
+
             $this->package->refresh();
 
             $this->package =
@@ -192,8 +216,24 @@ $driver = $user?->driver;
 
     public function render()
     {
+        $activeRouteId = null;
+
+        if ($this->isHub) {
+            $activeRouteId = Route::query()
+                ->where('driver_id', $this->package->driver_id)
+                ->whereIn('status', [
+                    Route::STATUS_ASSIGNED,
+                    Route::STATUS_IN_PROGRESS,
+                ])
+                ->latest('created_at')
+                ->value('id');
+        }
+
         return view(
-            'livewire.driver.package-detail'
+            'livewire.driver.package-detail',
+            [
+                'activeRouteId' => $activeRouteId,
+            ]
         );
     }
 }

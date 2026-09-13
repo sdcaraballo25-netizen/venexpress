@@ -31,6 +31,357 @@
     </div>
 
 
+    @if ($isHub)
+
+        {{-- =========================================================
+             MI RUTA ACTUAL (HUB)
+        ========================================================== --}}
+        <div class="rounded-3xl border border-[#E2E8F0] bg-white p-6 shadow-sm">
+
+            <div class="flex flex-col gap-5">
+
+                <div class="flex flex-col gap-4 lg:flex-row lg:items-start lg:justify-between">
+
+                    <div>
+
+                        <p class="text-xs font-bold uppercase tracking-wider text-slate-400">
+                            Mi ruta actual
+                        </p>
+
+                        @if ($activeRoute)
+
+                            <h2 class="mt-1 font-display text-2xl font-bold text-[#0F172A]">
+                                {{ $activeRoute->name }}
+                            </h2>
+
+                            <p class="mt-1 text-sm text-slate-500">
+
+                                @if ($activeRoute->route_type === \App\Models\Route::TYPE_HUB_TRANSFER)
+                                    Traslado a hub
+                                @elseif ($activeRoute->route_type === \App\Models\Route::TYPE_HUB_DISTRIBUTION)
+                                    Distribución a almacén
+                                @elseif ($activeRoute->route_type === \App\Models\Route::TYPE_DELIVERY)
+                                    Entregas
+                                @else
+                                    {{ $activeRoute->route_type }}
+                                @endif
+
+                                ·
+
+                                @if ($activeRoute->route_type === \App\Models\Route::TYPE_HUB_TRANSFER)
+                                    Agencias aliadas → Hub Venexpress
+                                @elseif ($activeRoute->route_type === \App\Models\Route::TYPE_HUB_DISTRIBUTION)
+                                    Hub Venexpress → Almacén destino
+                                @else
+                                    Hub / Almacén → Cliente final
+                                @endif
+
+                            </p>
+
+                        @elseif ($availableRoutes->isNotEmpty())
+
+                            <h2 class="mt-1 font-display text-2xl font-bold text-[#0F172A]">
+                                Rutas disponibles
+                            </h2>
+
+                            <p class="mt-1 max-w-xl text-sm text-slate-500">
+                                Toma una ruta compatible para comenzar tu operación.
+                            </p>
+
+                        @else
+
+                            <h2 class="mt-1 font-display text-2xl font-bold text-[#0F172A]">
+                                Sin rutas disponibles
+                            </h2>
+
+                            <p class="mt-1 max-w-xl text-sm text-slate-500">
+                                No hay rutas disponibles por el momento. Vuelve a
+                                revisar más tarde.
+                            </p>
+
+                        @endif
+
+                    </div>
+
+
+                    @if ($activeRoute)
+
+                        <div class="flex flex-wrap items-center gap-2">
+
+                            @if ($activeRoute->status === \App\Models\Route::STATUS_ASSIGNED)
+
+                                <button
+                                    type="button"
+                                    wire:click="startRoute"
+                                    wire:loading.attr="disabled"
+                                    class="inline-flex items-center justify-center rounded-xl bg-blue-900 px-5 py-3 text-sm font-semibold text-white transition hover:bg-blue-800 disabled:cursor-not-allowed disabled:opacity-50"
+                                >
+                                    <span wire:loading.remove wire:target="startRoute">
+                                        Iniciar ruta
+                                    </span>
+
+                                    <span wire:loading wire:target="startRoute">
+                                        Iniciando...
+                                    </span>
+                                </button>
+
+                            @elseif ($activeRoute->status === \App\Models\Route::STATUS_IN_PROGRESS)
+
+                                <span class="inline-flex items-center gap-2 rounded-xl bg-emerald-50 px-4 py-3 text-sm font-semibold text-emerald-700">
+                                    <span class="h-2.5 w-2.5 rounded-full bg-emerald-500"></span>
+                                    Ruta en curso
+                                </span>
+
+                                <button
+                                    type="button"
+                                    wire:click="completeRoute"
+                                    wire:loading.attr="disabled"
+                                    wire:confirm="¿Confirmas que quieres finalizar esta ruta? Las paradas pendientes quedarán marcadas como omitidas."
+                                    class="inline-flex items-center justify-center rounded-xl border border-[#E2E8F0] px-5 py-3 text-sm font-semibold text-[#0F172A] transition hover:border-red-300 hover:bg-red-50 disabled:cursor-not-allowed disabled:opacity-50"
+                                >
+                                    <span wire:loading.remove wire:target="completeRoute">
+                                        Finalizar ruta
+                                    </span>
+
+                                    <span wire:loading wire:target="completeRoute">
+                                        Finalizando...
+                                    </span>
+                                </button>
+
+                            @endif
+
+                            <a
+                                href="{{ route('repartidor.route-detail', $activeRoute->id) }}"
+                                class="inline-flex items-center justify-center rounded-xl border border-[#E2E8F0] px-5 py-3 text-sm font-semibold text-[#0F172A] transition hover:border-blue-300 hover:bg-blue-50"
+                            >
+                                Ver detalles
+                            </a>
+
+                        </div>
+
+                    @endif
+
+                </div>
+
+
+                @if ($activeRoute)
+
+                    {{-- PROGRESO --}}
+                    <div>
+
+                        <div class="mb-2 flex items-center justify-between">
+
+                            <span class="text-xs font-semibold uppercase tracking-wider text-slate-400">
+                                Paradas completadas
+                            </span>
+
+                            <span class="text-sm font-bold text-[#0F172A]">
+                                {{ $visitedStopsCount }} de {{ $routeStopsCount }} · {{ $routeProgress }}%
+                            </span>
+
+                        </div>
+
+                        <div class="h-2.5 w-full rounded-full bg-slate-100">
+                            <div
+                                class="h-2.5 rounded-full bg-blue-700 transition-all duration-500"
+                                @style(['width' => $routeProgress . '%'])
+                            ></div>
+                        </div>
+
+                        <div class="mt-2 flex flex-wrap items-center justify-between gap-2 text-xs text-slate-500">
+
+                            <span>
+                                {{ $pendingStopsCount }} paradas pendientes
+                                · {{ $routePackagesProcessed }} paquetes procesados
+                            </span>
+
+                            <span class="font-semibold text-[#0F172A]">
+
+                                Estado:
+
+                                @if ($activeRoute->status === \App\Models\Route::STATUS_ASSIGNED)
+                                    Asignada
+                                @elseif ($activeRoute->status === \App\Models\Route::STATUS_IN_PROGRESS)
+                                    En curso
+                                @else
+                                    {{ $activeRoute->status }}
+                                @endif
+
+                            </span>
+
+                        </div>
+
+                    </div>
+
+
+                    {{-- PRÓXIMA PARADA --}}
+                    @if ($nextPendingStop)
+
+                        <div class="rounded-2xl bg-slate-50 p-4">
+
+                            <p class="text-xs font-bold uppercase tracking-wider text-slate-400">
+                                Próxima parada
+                            </p>
+
+                            <div class="mt-2 flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
+
+                                <div>
+                                    <p class="font-semibold text-sm text-[#0F172A]">
+                                        {{ $nextPendingStop->ally?->business_name ?? $nextPendingStop->warehouse?->name ?? 'Parada' }}
+                                    </p>
+
+                                    <p class="mt-1 text-xs text-slate-500">
+                                        {{ $nextPendingStop->ally?->city ?? $nextPendingStop->warehouse?->city ?? $activeRoute->city }}
+
+                                        @if ($nextPendingStop->packages_collected_count)
+                                            · {{ $nextPendingStop->packages_collected_count }} paquetes
+                                        @endif
+                                    </p>
+                                </div>
+
+                                <span class="inline-flex w-fit items-center gap-1.5 rounded-full bg-blue-50 px-3 py-1 text-xs font-semibold text-blue-700">
+                                    <span class="h-1.5 w-1.5 rounded-full bg-blue-600"></span>
+                                    Pendiente
+                                </span>
+
+                            </div>
+
+                        </div>
+
+                    @endif
+
+
+                @elseif ($availableRoutes->isNotEmpty())
+
+                    {{-- RUTAS DISPONIBLES --}}
+                    <div class="space-y-3">
+
+                        @foreach ($availableRoutes as $route)
+
+                            <div class="flex flex-col gap-3 rounded-xl border border-[#E2E8F0] p-4 sm:flex-row sm:items-center sm:justify-between">
+
+                                <div>
+
+                                    <p class="font-semibold text-sm text-[#0F172A]">
+                                        {{ $route->name }}
+                                    </p>
+
+                                    <p class="mt-1 text-xs text-slate-500">
+                                        {{ $route->city }}
+
+                                        @if ($route->state)
+                                            · {{ $route->state }}
+                                        @endif
+
+                                        ·
+
+                                        @if ($route->route_type === \App\Models\Route::TYPE_HUB_TRANSFER)
+                                            Traslado a hub
+                                        @elseif ($route->route_type === \App\Models\Route::TYPE_HUB_DISTRIBUTION)
+                                            Distribución a almacén
+                                        @elseif ($route->route_type === \App\Models\Route::TYPE_DELIVERY)
+                                            Entregas
+                                        @else
+                                            {{ $route->route_type }}
+                                        @endif
+
+                                        · {{ $route->stops->count() }} paradas
+                                    </p>
+
+                                </div>
+
+                                <button
+                                    type="button"
+                                    wire:click="claimRoute({{ $route->id }})"
+                                    wire:loading.attr="disabled"
+                                    wire:target="claimRoute({{ $route->id }})"
+                                    class="inline-flex items-center justify-center rounded-xl bg-blue-900 px-4 py-2.5 text-sm font-semibold text-white transition hover:bg-blue-800 disabled:cursor-not-allowed disabled:opacity-50"
+                                >
+                                    <span wire:loading.remove wire:target="claimRoute({{ $route->id }})">
+                                        Tomar ruta
+                                    </span>
+
+                                    <span wire:loading wire:target="claimRoute({{ $route->id }})">
+                                        Tomando...
+                                    </span>
+                                </button>
+
+                            </div>
+
+                        @endforeach
+
+                    </div>
+
+                @endif
+
+
+                {{-- MENSAJES --}}
+                @if (session('routeSuccess'))
+
+                    <div class="rounded-xl border border-emerald-200 bg-emerald-50 px-4 py-3 text-sm text-emerald-700">
+                        {{ session('routeSuccess') }}
+                    </div>
+
+                @endif
+
+
+                @if (session('routeError'))
+
+                    <div class="rounded-xl border border-red-200 bg-red-50 px-4 py-3 text-sm text-red-700">
+                        {{ session('routeError') }}
+                    </div>
+
+                @endif
+
+            </div>
+
+        </div>
+
+
+        {{-- =========================================================
+             ESCANEAR PAQUETES (acción principal HUB)
+        ========================================================== --}}
+        <a
+            href="{{ route('repartidor.scanner') }}"
+            class="group flex flex-col gap-4 rounded-3xl border border-blue-900 bg-blue-900 p-6 shadow-sm transition hover:bg-blue-800 sm:flex-row sm:items-center sm:justify-between"
+        >
+
+            <div class="flex items-center gap-4">
+
+                <div class="flex h-12 w-12 shrink-0 items-center justify-center rounded-xl bg-white/10 text-2xl">
+                    📷
+                </div>
+
+                <div>
+                    <h2 class="font-display text-lg font-bold text-white">
+                        Escanear paquetes
+                    </h2>
+
+                    <p class="mt-1 text-sm text-blue-100">
+                        Procesa los paquetes de esta ruta mediante QR/código.
+                    </p>
+                </div>
+
+            </div>
+
+            <span class="inline-flex shrink-0 items-center justify-center rounded-xl bg-white px-5 py-3 text-sm font-semibold text-blue-900 transition group-hover:bg-blue-50">
+                Abrir escáner
+            </span>
+
+        </a>
+
+
+        {{-- MIS PAQUETES (secundario para HUB) --}}
+        <a
+            href="{{ route('repartidor.packages') }}"
+            class="inline-flex items-center gap-1.5 text-sm font-medium text-slate-500 hover:text-blue-900"
+        >
+            📦 Ver mis paquetes asignados
+        </a>
+
+    @endif
+
+
     {{-- =========================================================
          RESUMEN DEL DÍA
     ========================================================== --}}
@@ -150,6 +501,8 @@
     </div>
 
 
+    @unless ($isHub)
+
     {{-- =========================================================
          RUTA ACTIVA
     ========================================================== --}}
@@ -207,31 +560,42 @@
 
                 @if ($activeRoute)
 
-                    @if ($activeRoute->status === \App\Models\Route::STATUS_ASSIGNED)
+                    <div class="flex flex-wrap items-center gap-2">
 
-                        <button
-                            type="button"
-                            wire:click="startRoute"
-                            wire:loading.attr="disabled"
-                            class="inline-flex items-center justify-center rounded-xl bg-blue-900 px-5 py-3 text-sm font-semibold text-white transition hover:bg-blue-800 disabled:cursor-not-allowed disabled:opacity-50"
+                        @if ($activeRoute->status === \App\Models\Route::STATUS_ASSIGNED)
+
+                            <button
+                                type="button"
+                                wire:click="startRoute"
+                                wire:loading.attr="disabled"
+                                class="inline-flex items-center justify-center rounded-xl bg-blue-900 px-5 py-3 text-sm font-semibold text-white transition hover:bg-blue-800 disabled:cursor-not-allowed disabled:opacity-50"
+                            >
+                                <span wire:loading.remove wire:target="startRoute">
+                                    Iniciar ruta
+                                </span>
+
+                                <span wire:loading wire:target="startRoute">
+                                    Iniciando...
+                                </span>
+                            </button>
+
+                        @elseif ($activeRoute->status === \App\Models\Route::STATUS_IN_PROGRESS)
+
+                            <span class="inline-flex items-center gap-2 rounded-xl bg-emerald-50 px-4 py-3 text-sm font-semibold text-emerald-700">
+                                <span class="h-2.5 w-2.5 rounded-full bg-emerald-500"></span>
+                                Ruta en curso
+                            </span>
+
+                        @endif
+
+                        <a
+                            href="{{ route('repartidor.route-detail', $activeRoute->id) }}"
+                            class="inline-flex items-center justify-center rounded-xl border border-[#E2E8F0] px-5 py-3 text-sm font-semibold text-[#0F172A] transition hover:border-blue-300 hover:bg-blue-50"
                         >
-                            <span wire:loading.remove wire:target="startRoute">
-                                Iniciar ruta
-                            </span>
+                            Ver detalles
+                        </a>
 
-                            <span wire:loading wire:target="startRoute">
-                                Iniciando...
-                            </span>
-                        </button>
-
-                    @elseif ($activeRoute->status === \App\Models\Route::STATUS_IN_PROGRESS)
-
-                        <span class="inline-flex items-center gap-2 rounded-xl bg-emerald-50 px-4 py-3 text-sm font-semibold text-emerald-700">
-                            <span class="h-2.5 w-2.5 rounded-full bg-emerald-500"></span>
-                            Ruta en curso
-                        </span>
-
-                    @endif
+                    </div>
 
                 @endif
 
@@ -516,6 +880,8 @@
         </div>
 
     </div>
+
+    @endunless
 
 
     {{-- =========================================================

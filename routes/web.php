@@ -36,6 +36,7 @@ use App\Livewire\Client\PendingPayments as ClientPendingPayments;
 use App\Livewire\Driver\Dashboard as DriverDashboard;
 use App\Livewire\Driver\PackageDetail;
 use App\Livewire\Driver\Packages;
+use App\Livewire\Driver\RouteDetail;
 use App\Livewire\Driver\Scanner;
 use App\Livewire\Public\OfficeLocator;
 use App\Livewire\Public\PriceCalculator;
@@ -191,6 +192,13 @@ Route::get(
 )
     ->middleware(['auth', 'verified', 'role:repartidor'])
     ->name('repartidor.package-detail');
+
+Route::get(
+    '/repartidor/ruta/{routeId}',
+    RouteDetail::class
+)
+    ->middleware(['auth', 'verified', 'role:repartidor'])
+    ->name('repartidor.route-detail');
 
 Route::post(
     '/repartidor/verificar-guia',

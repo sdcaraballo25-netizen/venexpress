@@ -444,6 +444,30 @@
 
         <div class="mt-4 flex flex-wrap gap-3">
 
+            @if ($isHub)
+
+                {{-- Para HUB, el paquete se procesa por escaneo dentro
+                     de la ruta: no aplican las acciones de Delivery. --}}
+                <div class="rounded-xl bg-slate-50 px-5 py-3 text-sm font-medium text-slate-600">
+                    Este paquete se gestiona escaneándolo dentro de tu ruta.
+                </div>
+
+                <a
+                    href="{{ $activeRouteId ? route('repartidor.route-detail', $activeRouteId) : route('repartidor.dashboard') }}"
+                    class="inline-flex items-center justify-center rounded-xl border border-[#E2E8F0] px-5 py-3 text-sm font-medium text-[#0F172A] transition hover:border-blue-300 hover:bg-blue-50"
+                >
+                    Volver a mi ruta
+                </a>
+
+                <a
+                    href="{{ route('repartidor.scanner') }}"
+                    class="inline-flex items-center justify-center rounded-xl bg-blue-900 px-5 py-3 text-sm font-medium text-white transition hover:bg-blue-800"
+                >
+                    Escanear paquetes
+                </a>
+
+            @else
+
             {{-- Pendiente de recolección --}}
             @if (
                 $package->current_status
@@ -548,6 +572,8 @@
 
             @endif
 
+            @endif
+
 
             {{-- Incidencia --}}
             @if (
@@ -570,7 +596,7 @@
 
 
     {{-- Cobro en destino (COD) pendiente de registrar --}}
-    @if ($package->is_cod && $package->current_status === \App\Models\Package::STATUS_ENTREGADO && ! $package->cod_collected_at)
+    @if (! $isHub && $package->is_cod && $package->current_status === \App\Models\Package::STATUS_ENTREGADO && ! $package->cod_collected_at)
 
         <div class="rounded-2xl border border-amber-200 bg-amber-50 p-5">
 

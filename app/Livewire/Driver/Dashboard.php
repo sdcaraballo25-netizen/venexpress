@@ -2,6 +2,7 @@
 
 namespace App\Livewire\Driver;
 
+use App\Models\Driver;
 use App\Models\Package;
 use App\Models\Route;
 use App\Models\RouteStop;
@@ -10,6 +11,7 @@ use App\Services\RouteService;
 use Illuminate\Support\Facades\Auth;
 use Livewire\Attributes\Layout;
 use Livewire\Component;
+use RuntimeException;
 
 #[Layout('layouts.driver')]
 class Dashboard extends Component
@@ -95,6 +97,56 @@ class Dashboard extends Component
         }
     }
 
+    /**
+     * Finaliza la ruta en curso del repartidor. Reutiliza
+     * RouteService::complete() tal cual — el mismo método que ya
+     * expone la API del repartidor (POST /api/driver/route/complete),
+     * ahora también disponible desde el panel web.
+     */
+    public function completeRoute(): void
+    {
+        /** @var User|null $user */
+        $user = Auth::user();
+
+        $driver = $user?->driver;
+
+        if (! $driver) {
+            abort(
+                403,
+                'Tu usuario no tiene un perfil de repartidor asociado.'
+            );
+        }
+
+        $route = Route::query()
+            ->where('driver_id', $driver->id)
+            ->where('status', Route::STATUS_IN_PROGRESS)
+            ->latest('created_at')
+            ->first();
+
+        if (! $route) {
+            session()->flash(
+                'routeError',
+                'No tienes una ruta en curso para finalizar.'
+            );
+
+            return;
+        }
+
+        try {
+            app(RouteService::class)->complete(
+                route: $route,
+                actingUserId: (int) $user->id,
+            );
+
+            session()->flash(
+                'routeSuccess',
+                'Ruta finalizada correctamente.'
+            );
+        } catch (RuntimeException $e) {
+            session()->flash('routeError', $e->getMessage());
+        }
+    }
+
     public function render()
     {
         /** @var User|null $user */
@@ -108,6 +160,8 @@ class Dashboard extends Component
                 'Tu usuario no tiene un perfil de repartidor asociado.'
             );
         }
+
+        $isHub = $driver->driver_type === Driver::TYPE_HUB;
 
         /*
         |--------------------------------------------------------------------------
@@ -195,7 +249,7 @@ class Dashboard extends Component
                 Route::STATUS_ASSIGNED,
                 Route::STATUS_IN_PROGRESS,
             ])
-            ->with('stops')
+            ->with(['stops.ally', 'stops.warehouse'])
             ->latest('created_at')
             ->first();
 
@@ -223,6 +277,18 @@ class Dashboard extends Component
             )
             : 0;
 
+        // Siguiente parada pendiente, en orden de secuencia. Se toma
+        // de la colección ya cargada por 'stops.ally'/'stops.warehouse'
+        // en vez de Route::nextPendingStop() para no disparar una
+        // consulta adicional.
+        $nextPendingStop = $activeRoute?->stops
+            ->firstWhere('status', RouteStop::STATUS_PENDING);
+
+        // Paquetes ya procesados en las paradas de la ruta activa
+        // (dato que RouteService ya registra por parada al visitarla).
+        $routePackagesProcessed = $activeRoute?->stops
+            ->sum('packages_collected_count') ?? 0;
+
         /*
         |--------------------------------------------------------------------------
         | RESUMEN DEL DÍA
@@ -245,6 +311,7 @@ class Dashboard extends Component
             'livewire.driver.dashboard',
             [
                 'driver' => $driver,
+                'isHub' => $isHub,
 
                 // Paquetes
                 'assignedCount' => $assignedCount,
@@ -264,6 +331,8 @@ class Dashboard extends Component
                 'visitedStopsCount' => $visitedStopsCount,
                 'pendingStopsCount' => $pendingStopsCount,
                 'routeProgress' => $routeProgress,
+                'nextPendingStop' => $nextPendingStop,
+                'routePackagesProcessed' => $routePackagesProcessed,
             ]
         );
     }
