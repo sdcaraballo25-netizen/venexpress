@@ -97,7 +97,8 @@
                                     'admin.packages.assignment',
                                     'admin.packages.dispatch',
                                     'admin.routes',
-                                    'admin.routes.dashboard'
+                                    'admin.routes.dashboard',
+                                    'admin.warehouses'
                                 ) ? 'true' : 'false' }}
                             ) {
                                 this.openGroup = 'operaciones';
@@ -351,6 +352,34 @@
                                 </svg>
 
                                 Dashboard de rutas
+
+                            </a>
+
+
+                            {{-- Almacenes --}}
+                            <a
+                                href="{{ route('admin.warehouses') }}"
+                                class="flex items-center gap-3 px-4 py-3 rounded-xl font-medium transition-colors
+                                {{ request()->routeIs('admin.warehouses')
+                                    ? 'bg-blue-50 text-blue-900'
+                                    : 'text-[#64748B] hover:bg-slate-50 hover:text-[#0F172A]' }}"
+                            >
+
+                                <svg
+                                    class="w-5 h-5"
+                                    fill="none"
+                                    stroke="currentColor"
+                                    viewBox="0 0 24 24"
+                                >
+                                    <path
+                                        stroke-linecap="round"
+                                        stroke-linejoin="round"
+                                        stroke-width="2"
+                                        d="M3 7l9-4 9 4M3 7l9 4m-9-4v10l9 4m0-10l9-4m-9 4v10m9-14v10l-9 4"
+                                    />
+                                </svg>
+
+                                Almacenes
 
                             </a>
 

@@ -5,6 +5,7 @@ namespace App\Services;
 use App\Models\AuditLog;
 use App\Models\Driver;
 use App\Models\Package;
+use App\Models\PackageHistory;
 use App\Models\Route;
 use App\Models\RouteStop;
 use Illuminate\Database\Eloquent\Collection;
@@ -15,8 +16,7 @@ class RouteService
 {
     public function __construct(
         protected PackageService $packageService,
-    ) {
-    }
+    ) {}
 
     /**
      * Crea una nueva ruta con sus agencias/paradas.
@@ -56,9 +56,9 @@ class RouteService
                 'route.created',
                 $route,
                 "Creó la ruta \"{$route->name}\" en {$route->city}, "
-                . "{$route->state} con "
-                . count($allyIdsInOrder)
-                . ' paradas.',
+                ."{$route->state} con "
+                .count($allyIdsInOrder)
+                .' paradas.',
                 [
                     'state' => $route->state,
                     'city' => $route->city,
@@ -144,7 +144,7 @@ class RouteService
         if (! $route->isEditable()) {
             throw new RuntimeException(
                 'Esta ruta ya está en curso o finalizada; '
-                . 'no se puede editar su recorrido.'
+                .'no se puede editar su recorrido.'
             );
         }
 
@@ -171,8 +171,8 @@ class RouteService
                 'route.stops_updated',
                 $route,
                 "Actualizó el recorrido de \"{$route->name}\" ("
-                . count($allyIdsInOrder)
-                . ' paradas).',
+                .count($allyIdsInOrder)
+                .' paradas).',
                 [
                     'stops' => count($allyIdsInOrder),
                 ]
@@ -184,15 +184,24 @@ class RouteService
 
     /**
      * Crea las paradas respetando el orden recibido.
+     *
+     * Los IDs son de Ally para cualquier ruta normal, o de Warehouse
+     * cuando la ruta es de tipo hub_distribution (HUB -> almacén
+     * propio de Venexpress). Una ruta nunca mezcla los dos tipos de
+     * parada.
      */
     protected function syncStops(
         Route $route,
         array $allyIdsInOrder
     ): void {
-        foreach (array_values($allyIdsInOrder) as $index => $allyId) {
+        $locationColumn = $route->isHubDistribution()
+            ? 'warehouse_id'
+            : 'ally_id';
+
+        foreach (array_values($allyIdsInOrder) as $index => $locationId) {
             RouteStop::create([
                 'route_id' => $route->id,
-                'ally_id' => $allyId,
+                $locationColumn => $locationId,
                 'sequence' => $index + 1,
                 'status' => RouteStop::STATUS_PENDING,
             ]);
@@ -200,41 +209,34 @@ class RouteService
     }
 
     /**
-     * Asigna un repartidor a una ruta.
+     * El Driver toma él mismo una ruta disponible (draft, sin dueño).
+     * Reemplaza la asignación manual que antes hacía el Admin — el
+     * Admin ahora solo crea/publica rutas; tomarlas es autoservicio
+     * del Driver.
      *
-     * IMPORTANTE:
+     * IMPORTANTE: esta función NO asigna paquetes. Los paquetes
+     * permanecen con driver_id = NULL hasta que el repartidor
+     * correspondiente los escanee.
      *
-     * Esta función NO asigna paquetes.
-     *
-     * Los paquetes permanecen con driver_id = NULL hasta que
-     * el repartidor correspondiente los escanee.
+     * Protección de concurrencia: lockForUpdate() + re-chequeo de
+     * disponibilidad dentro de la transacción, para que si dos
+     * Drivers intentan tomar la misma ruta casi al mismo tiempo, solo
+     * uno gane (mismo patrón que PackageService::claimForDelivery()).
      */
-    public function assignDriver(
+    public function claimRoute(
         Route $route,
         Driver $driver,
         int $actingUserId
     ): Route {
         if ($driver->status !== Driver::STATUS_ACTIVE) {
             throw new RuntimeException(
-                'Solo se pueden asignar repartidores activos.'
+                'Solo un repartidor activo puede tomar rutas.'
             );
         }
 
-        if ($route->status === Route::STATUS_COMPLETED) {
+        if (! $this->isCompatible($driver, $route)) {
             throw new RuntimeException(
-                'No se puede asignar un repartidor a una ruta completada.'
-            );
-        }
-
-        if ($route->status === Route::STATUS_CANCELLED) {
-            throw new RuntimeException(
-                'No se puede asignar un repartidor a una ruta cancelada.'
-            );
-        }
-
-        if ($route->status === Route::STATUS_IN_PROGRESS) {
-            throw new RuntimeException(
-                'No se puede cambiar el repartidor de una ruta que ya está en curso.'
+                'Esta ruta no es compatible con tu tipo de repartidor.'
             );
         }
 
@@ -243,68 +245,119 @@ class RouteService
             $driver,
             $actingUserId
         ) {
-            /*
-             * La ruta debe tener al menos una agencia.
-             */
-            $allyIds = $route->stops()
-                ->pluck('ally_id')
-                ->unique()
-                ->values();
+            $lockedRoute = Route::query()
+                ->whereKey($route->id)
+                ->lockForUpdate()
+                ->firstOrFail();
 
-            if ($allyIds->isEmpty()) {
+            if (
+                $lockedRoute->status !== Route::STATUS_DRAFT
+                || $lockedRoute->driver_id !== null
+            ) {
                 throw new RuntimeException(
-                    'La ruta no tiene agencias asignadas.'
+                    'Esta ruta ya no está disponible.'
+                );
+            }
+
+            // Un Driver no puede tener más de una ruta activa a la vez.
+            $hasActiveRoute = Route::query()
+                ->where('driver_id', $driver->id)
+                ->whereIn('status', [
+                    Route::STATUS_ASSIGNED,
+                    Route::STATUS_IN_PROGRESS,
+                ])
+                ->exists();
+
+            if ($hasActiveRoute) {
+                throw new RuntimeException(
+                    'Ya tienes una ruta activa. Finalízala antes de tomar otra.'
                 );
             }
 
             /*
-             * Asignamos únicamente el repartidor a la ruta.
-             *
-             * NO modificamos ningún paquete.
+             * La ruta debe tener al menos una parada. Se cuenta de
+             * forma genérica (no por ally_id) porque una ruta de
+             * hub_distribution tiene warehouse_id en vez de ally_id
+             * en sus paradas.
              */
-            $route->update([
+            $locationColumn = $lockedRoute->isHubDistribution()
+                ? 'warehouse_id'
+                : 'ally_id';
+
+            $locationIds = $lockedRoute->stops()
+                ->pluck($locationColumn)
+                ->unique()
+                ->values();
+
+            if ($locationIds->isEmpty()) {
+                throw new RuntimeException(
+                    'La ruta no tiene paradas asignadas.'
+                );
+            }
+
+            $lockedRoute->update([
                 'driver_id' => $driver->id,
                 'status' => Route::STATUS_ASSIGNED,
             ]);
 
-            /*
-             * Auditoría.
-             */
             $this->log(
                 $actingUserId,
-                'route.driver_assigned',
-                $route,
-                "Asignó a {$driver->user->name} "
-                . "({$driver->vehicle_plate}) "
-                . "a la ruta \"{$route->name}\".",
+                'route.claimed',
+                $lockedRoute,
+                "{$driver->user->name} ({$driver->vehicle_plate}) "
+                ."tomó la ruta \"{$lockedRoute->name}\".",
                 [
                     'driver_id' => $driver->id,
-                    'ally_ids' => $allyIds->all(),
-                    'packages_assigned' => 0,
+                    $locationColumn.'s' => $locationIds->all(),
                 ]
             );
 
-            return $route->fresh('stops');
+            return $lockedRoute->fresh('stops');
         });
     }
 
     /**
-     * Asigna un repartidor a una ruta por ID.
+     * route_type compatibles con el driver_type dado. Única fuente de
+     * verdad para la compatibilidad driver_type <-> route_type:
+     * hub -> hub_transfer, hub_distribution
+     * delivery -> delivery
      */
-    public function assignDriverById(
-        int $routeId,
-        int $driverId,
-        int $actingUserId
-    ): Route {
-        $route = Route::findOrFail($routeId);
+    public function compatibleRouteTypes(Driver $driver): array
+    {
+        return match ($driver->driver_type) {
+            Driver::TYPE_HUB => [Route::TYPE_HUB_TRANSFER, Route::TYPE_HUB_DISTRIBUTION],
+            Driver::TYPE_DELIVERY => [Route::TYPE_DELIVERY],
+            default => [],
+        };
+    }
 
-        $driver = Driver::findOrFail($driverId);
-
-        return $this->assignDriver(
-            $route,
-            $driver,
-            $actingUserId
+    protected function isCompatible(Driver $driver, Route $route): bool
+    {
+        return in_array(
+            $route->route_type,
+            $this->compatibleRouteTypes($driver),
+            true
         );
+    }
+
+    /**
+     * Rutas disponibles para que este Driver las tome: sin dueño, en
+     * borrador, compatibles con su driver_type. Sin filtro de
+     * zona/estado (el driver puede tomar rutas de cualquier estado si
+     * es compatible); ordenadas por antigüedad (FIFO) para que la que
+     * lleva más tiempo esperando se ofrezca primero. Fuente única de
+     * verdad para "rutas disponibles", usada tanto por la API
+     * (DriverRouteController) como por el Dashboard web.
+     */
+    public function availableRoutesFor(Driver $driver): Collection
+    {
+        return Route::query()
+            ->whereNull('driver_id')
+            ->where('status', Route::STATUS_DRAFT)
+            ->whereIn('route_type', $this->compatibleRouteTypes($driver))
+            ->with(['stops.ally.user', 'stops.warehouse'])
+            ->orderBy('created_at')
+            ->get();
     }
 
     /**
@@ -345,19 +398,6 @@ class RouteService
         );
 
         return $route->fresh();
-    }
-
-    /**
-     * Inicia una ruta por ID.
-     */
-    public function startRoute(
-        int $routeId,
-        int $actingUserId
-    ): Route {
-        return $this->start(
-            Route::findOrFail($routeId),
-            $actingUserId
-        );
     }
 
     /**
@@ -435,6 +475,12 @@ class RouteService
 
             $stop = $lockedStop;
 
+            if ($stop->ally_id === null) {
+                throw new RuntimeException(
+                    'Esta parada no es una agencia de recolección.'
+                );
+            }
+
             /*
              * Solo permitimos recoger paquetes:
              *
@@ -443,14 +489,14 @@ class RouteService
              * - asignados al mismo repartidor de la ruta
              */
             $packages = Package::query()
-    ->whereIn('id', $packageIds)
-    ->where('ally_id', $stop->ally_id)
-    ->where(
-        'current_status',
-        Package::STATUS_RECIBIDO_AGENCIA
-    )
-    ->whereNull('driver_id')
-    ->get();
+                ->whereIn('id', $packageIds)
+                ->where('ally_id', $stop->ally_id)
+                ->where(
+                    'current_status',
+                    Package::STATUS_RECIBIDO_AGENCIA
+                )
+                ->whereNull('driver_id')
+                ->get();
 
             foreach ($packages as $package) {
                 // Asignamos el repartidor de la ruta ANTES de cambiar
@@ -466,12 +512,11 @@ class RouteService
                     package: $package,
                     newStatus: Package::STATUS_RECOLECTADO_VENEXPRESS,
                     userId: $actingUserId,
-                    locationDescription:
-                        "Salida escaneada desde {$package->ally->business_name}",
+                    locationDescription: "Salida escaneada desde {$package->ally->business_name}",
                     routeStopId: $stop->id,
-                    eventType: \App\Models\PackageHistory::EVENT_SALIDA,
+                    eventType: PackageHistory::EVENT_SALIDA,
                     originLocation: 'Agencia Aliada',
-                    destinationLocation: 'Ruta ' . $route->name,
+                    destinationLocation: 'Ruta '.$route->name,
                 );
             }
 
@@ -485,10 +530,10 @@ class RouteService
                 $actingUserId,
                 'route.stop_visited',
                 $route,
-                "Registró la recolección en "
-                . "{$stop->ally->business_name} ("
-                . $packages->count()
-                . " paquetes) — ruta \"{$route->name}\".",
+                'Registró la recolección en '
+                ."{$stop->ally->business_name} ("
+                .$packages->count()
+                ." paquetes) — ruta \"{$route->name}\".",
                 [
                     'route_stop_id' => $stop->id,
                     'ally_id' => $stop->ally_id,
@@ -543,7 +588,7 @@ class RouteService
                 'route.completed',
                 $route,
                 "Finalizó la ruta \"{$route->name}\" "
-                . "({$skipped} paradas quedaron omitidas).",
+                ."({$skipped} paradas quedaron omitidas).",
                 [
                     'skipped_stops' => $skipped,
                 ]
@@ -551,19 +596,6 @@ class RouteService
 
             return $route->fresh('stops');
         });
-    }
-
-    /**
-     * Finaliza una ruta por ID.
-     */
-    public function completeRoute(
-        int $routeId,
-        int $actingUserId
-    ): Route {
-        return $this->complete(
-            Route::findOrFail($routeId),
-            $actingUserId
-        );
     }
 
     /**
@@ -620,9 +652,13 @@ class RouteService
         int $actingUserId,
         ?string $newName = null
     ): Route {
-        $allyIds = $sourceRoute->stops()
+        $locationColumn = $sourceRoute->isHubDistribution()
+            ? 'warehouse_id'
+            : 'ally_id';
+
+        $locationIds = $sourceRoute->stops()
             ->orderBy('sequence')
-            ->pluck('ally_id')
+            ->pluck($locationColumn)
             ->all();
 
         $newRoute = $this->createRoute(
@@ -631,9 +667,9 @@ class RouteService
                 'city' => $sourceRoute->city,
                 'route_type' => $sourceRoute->route_type,
                 'name' => $newName
-                    ?? $sourceRoute->name . ' (nuevo ciclo)',
+                    ?? $sourceRoute->name.' (nuevo ciclo)',
             ],
-            allyIdsInOrder: $allyIds,
+            allyIdsInOrder: $locationIds,
             createdByUserId: $actingUserId,
         );
 
@@ -642,7 +678,7 @@ class RouteService
             'route.duplicated',
             $newRoute,
             "Creó \"{$newRoute->name}\" como nuevo ciclo "
-            . "de \"{$sourceRoute->name}\".",
+            ."de \"{$sourceRoute->name}\".",
             [
                 'source_route_id' => $sourceRoute->id,
             ]

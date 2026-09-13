@@ -3,9 +3,9 @@
 namespace App\Livewire\Admin;
 
 use App\Models\Ally;
-use App\Models\Driver;
 use App\Models\Route;
 use App\Models\RouteStop;
+use App\Models\Warehouse;
 use App\Services\RouteService;
 use App\Services\VenezuelaLocationService;
 use Illuminate\Support\Facades\Auth;
@@ -53,18 +53,6 @@ class RoutesManager extends Component
     public string $routeType = Route::TYPE_DELIVERY;
 
     public array $selectedStops = [];
-
-    /*
-    |--------------------------------------------------------------------------
-    | Repartidor
-    |--------------------------------------------------------------------------
-    */
-
-    public bool $showAssignModal = false;
-
-    public ?int $assigningRouteId = null;
-
-    public ?int $selectedDriverId = null;
 
     /*
     |--------------------------------------------------------------------------
@@ -161,15 +149,15 @@ class RoutesManager extends Component
     public function startCreating(): void
     {
         $this->reset([
-    'editingRouteId',
-    'name',
-    'state',
-    'city',
-    'routeType',
-    'selectedStops',
-]);
+            'editingRouteId',
+            'name',
+            'state',
+            'city',
+            'routeType',
+            'selectedStops',
+        ]);
 
-$this->routeType = Route::TYPE_DELIVERY;
+        $this->routeType = Route::TYPE_DELIVERY;
 
         $this->cities = [];
 
@@ -192,9 +180,13 @@ $this->routeType = Route::TYPE_DELIVERY;
         $this->city = $route->city ?? '';
         $this->routeType = $route->route_type ?? Route::TYPE_DELIVERY;
 
+        $locationColumn = $this->routeType === Route::TYPE_HUB_DISTRIBUTION
+            ? 'warehouse_id'
+            : 'ally_id';
+
         $this->selectedStops = $route->stops
             ->sortBy('sequence')
-            ->pluck('ally_id')
+            ->pluck($locationColumn)
             ->map(fn ($id) => (int) $id)
             ->values()
             ->all();
@@ -219,15 +211,15 @@ $this->routeType = Route::TYPE_DELIVERY;
         $this->showBuilder = false;
 
         $this->reset([
-    'editingRouteId',
-    'name',
-    'state',
-    'city',
-    'routeType',
-    'selectedStops',
-]);
+            'editingRouteId',
+            'name',
+            'state',
+            'city',
+            'routeType',
+            'selectedStops',
+        ]);
 
-$this->routeType = Route::TYPE_DELIVERY;
+        $this->routeType = Route::TYPE_DELIVERY;
         $this->cities = [];
     }
 
@@ -261,7 +253,7 @@ $this->routeType = Route::TYPE_DELIVERY;
 
     public function moveStopUp(int $index): void
     {
-        if ($index <= 0 || !isset($this->selectedStops[$index])) {
+        if ($index <= 0 || ! isset($this->selectedStops[$index])) {
             return;
         }
 
@@ -279,8 +271,8 @@ $this->routeType = Route::TYPE_DELIVERY;
     {
         if (
             $index < 0 ||
-            !isset($this->selectedStops[$index]) ||
-            !isset($this->selectedStops[$index + 1])
+            ! isset($this->selectedStops[$index]) ||
+            ! isset($this->selectedStops[$index + 1])
         ) {
             return;
         }
@@ -298,12 +290,12 @@ $this->routeType = Route::TYPE_DELIVERY;
     public function saveRoute(RouteService $routeService): void
     {
         $this->validate([
-    'name' => ['required', 'string', 'max:255'],
-    'state' => ['required', 'string'],
-    'city' => ['required', 'string'],
-    'routeType' => ['required', 'in:' . Route::TYPE_DELIVERY . ',' . Route::TYPE_HUB_TRANSFER],
-    'selectedStops' => ['required', 'array', 'min:1'],
-]);
+            'name' => ['required', 'string', 'max:255'],
+            'state' => ['required', 'string'],
+            'city' => ['required', 'string'],
+            'routeType' => ['required', 'in:'.implode(',', Route::TYPES)],
+            'selectedStops' => ['required', 'array', 'min:1'],
+        ]);
 
         try {
             if ($this->editingRouteId) {
@@ -322,15 +314,15 @@ $this->routeType = Route::TYPE_DELIVERY;
                 );
             } else {
                 $routeService->createRoute(
-    data: [
-        'name' => $this->name,
-        'state' => $this->state,
-        'city' => $this->city,
-        'route_type' => $this->routeType,
-    ],
-    allyIdsInOrder: $this->selectedStops,
-    createdByUserId: Auth::id(),
-);
+                    data: [
+                        'name' => $this->name,
+                        'state' => $this->state,
+                        'city' => $this->city,
+                        'route_type' => $this->routeType,
+                    ],
+                    allyIdsInOrder: $this->selectedStops,
+                    createdByUserId: Auth::id(),
+                );
 
                 session()->flash(
                     'success',
@@ -339,98 +331,6 @@ $this->routeType = Route::TYPE_DELIVERY;
             }
 
             $this->cancelBuilder();
-        } catch (RuntimeException $e) {
-            session()->flash('error', $e->getMessage());
-        }
-    }
-
-    /*
-    |--------------------------------------------------------------------------
-    | Asignar repartidor
-    |--------------------------------------------------------------------------
-    */
-
-    public function openAssignModal(int $routeId): void
-    {
-        $route = Route::findOrFail($routeId);
-
-        $this->assigningRouteId = $route->id;
-        $this->selectedDriverId = $route->driver_id;
-
-        $this->showAssignModal = true;
-    }
-
-    public function assignDriver(RouteService $routeService): void
-    {
-        $this->validate([
-            'assigningRouteId' => ['required', 'integer'],
-            'selectedDriverId' => ['required', 'integer'],
-        ]);
-
-        try {
-            $routeService->assignDriverById(
-    routeId: $this->assigningRouteId,
-    driverId: $this->selectedDriverId,
-    actingUserId: Auth::id(),
-);
-
-            session()->flash(
-                'success',
-                'Repartidor asignado correctamente.'
-            );
-
-            $this->showAssignModal = false;
-
-            $this->reset([
-                'assigningRouteId',
-                'selectedDriverId',
-            ]);
-        } catch (RuntimeException $e) {
-            session()->flash('error', $e->getMessage());
-        }
-    }
-
-    /*
-    |--------------------------------------------------------------------------
-    | Iniciar ruta
-    |--------------------------------------------------------------------------
-    */
-
-    public function startRoute(int $routeId, RouteService $routeService): void
-    {
-        try {
-            $routeService->startRoute(
-                routeId: $routeId,
-                actingUserId: Auth::id(),
-            );
-
-            session()->flash(
-                'success',
-                'Ruta iniciada correctamente.'
-            );
-        } catch (RuntimeException $e) {
-            session()->flash('error', $e->getMessage());
-        }
-    }
-
-    /*
-    |--------------------------------------------------------------------------
-    | Finalizar ruta
-    |--------------------------------------------------------------------------
-    */
-
-    public function completeRoute(int $routeId, RouteService $routeService): void
-    {
-        try {
-            $routeService->completeRoute(
-                routeId: $routeId,
-                actingUserId: Auth::id(),
-            );
-
-            session()->flash(
-                'success',
-                'Ruta finalizada correctamente.'
-            );
         } catch (RuntimeException $e) {
             session()->flash('error', $e->getMessage());
         }
@@ -548,6 +448,7 @@ $this->routeType = Route::TYPE_DELIVERY;
             ->with([
                 'driver.user',
                 'stops.ally',
+                'stops.warehouse',
             ])
             ->when(
                 $this->filterState !== '',
@@ -575,11 +476,15 @@ $this->routeType = Route::TYPE_DELIVERY;
                 ->get();
         }
 
-        $activeDrivers = Driver::query()
-            ->with('user')
-            ->where('status', Driver::STATUS_ACTIVE)
-            ->orderBy('vehicle_plate')
-            ->get();
+        $availableWarehouses = collect();
+
+        if ($this->routeType === Route::TYPE_HUB_DISTRIBUTION && $this->state !== '') {
+            $availableWarehouses = Warehouse::query()
+                ->where('state', $this->state)
+                ->where('is_active', true)
+                ->orderBy('name')
+                ->get();
+        }
 
         $collectiblePackages = $this->collectingStopId
             ? $routeService->collectiblePackagesFor(
@@ -588,10 +493,10 @@ $this->routeType = Route::TYPE_DELIVERY;
             : collect();
 
         return view('livewire.admin.routes-manager', [
-    'routes' => $routes,
-    'availableAllies' => $availableAllies,
-    'activeDrivers' => $activeDrivers,
-    'collectiblePackages' => $collectiblePackages,
-]);
-}
+            'routes' => $routes,
+            'availableAllies' => $availableAllies,
+            'availableWarehouses' => $availableWarehouses,
+            'collectiblePackages' => $collectiblePackages,
+        ]);
+    }
 }

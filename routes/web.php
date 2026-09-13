@@ -1,51 +1,51 @@
 <?php
 
-use Illuminate\Support\Facades\Route;
-
-use App\Http\Controllers\TrackingController;
+use App\Http\Controllers\DriverScanController;
+use App\Http\Controllers\PackageLabelController;
 use App\Http\Controllers\PaymentWebhookController;
-use App\Livewire\Admin\PaymentOrders;
-use App\Livewire\Admin\Dashboard as AdminDashboard;
-use App\Livewire\Admin\BcvRateManager;
-use App\Livewire\Admin\RateMatrixManager;
-use App\Livewire\Admin\CityDistanceManager;
+use App\Http\Controllers\TrackingController;
 use App\Livewire\Admin\AlliesManager;
-use App\Livewire\Admin\UsersManager;
-use App\Livewire\Admin\RoutesManager;
-use App\Livewire\Admin\RoutesDashboard;
-use App\Livewire\Admin\DriverPayments;
-use App\Livewire\Admin\IncidentsManager;
-use App\Livewire\Admin\DriverAssignment;
-use App\Livewire\Admin\AuditLogViewer;
 use App\Livewire\Admin\AllyFinance;
-
+use App\Livewire\Admin\AuditLogViewer;
+use App\Livewire\Admin\BcvRateManager;
+use App\Livewire\Admin\CityDistanceManager;
+use App\Livewire\Admin\Dashboard as AdminDashboard;
+use App\Livewire\Admin\DriverAssignment;
+use App\Livewire\Admin\DriverPayments;
+use App\Livewire\Admin\DriverRemunerationManager;
+use App\Livewire\Admin\IncidentsManager;
+use App\Livewire\Admin\PackageDispatch;
+use App\Livewire\Admin\PaymentOrders;
+use App\Livewire\Admin\RateMatrixManager;
+use App\Livewire\Admin\RoutesDashboard;
+use App\Livewire\Admin\RoutesManager;
+use App\Livewire\Admin\UsersManager;
+use App\Livewire\Admin\WarehousesManager;
+use App\Livewire\Ally\Cod as AllyCod;
+use App\Livewire\Ally\Commissions as AllyCommissions;
+use App\Livewire\Ally\DailyCashCut;
+use App\Livewire\Ally\Dashboard as AllyDashboard;
+use App\Livewire\Ally\Incidents as AllyIncidents;
+use App\Livewire\Ally\PackageCreate as AllyPackageCreate;
+use App\Livewire\Ally\PackagePickup as AllyPackagePickup;
+use App\Livewire\Ally\PackageReception;
 use App\Livewire\Ally\Packages as AllyPackages;
-
 use App\Livewire\Client\Dashboard as ClientDashboard;
 use App\Livewire\Client\Incidents as ClientIncidents;
 use App\Livewire\Client\PendingPayments as ClientPendingPayments;
-
-use App\Livewire\Ally\Dashboard as AllyDashboard;
-use App\Livewire\Ally\PackageCreate as AllyPackageCreate;
-use App\Livewire\Ally\Commissions as AllyCommissions;
-use App\Livewire\Ally\DailyCashCut;
-use App\Livewire\Ally\Cod as AllyCod;
-use App\Livewire\Ally\Incidents as AllyIncidents;
-use App\Livewire\Ally\PackagePickup as AllyPackagePickup;
-use App\Livewire\Ally\PackageReception;
-
 use App\Livewire\Driver\Dashboard as DriverDashboard;
-
-use App\Livewire\Public\PriceCalculator;
+use App\Livewire\Driver\PackageDetail;
+use App\Livewire\Driver\Packages;
+use App\Livewire\Driver\Scanner;
 use App\Livewire\Public\OfficeLocator;
-
+use App\Livewire\Public\PriceCalculator;
+use Illuminate\Support\Facades\Route;
 
 /*
 |--------------------------------------------------------------------------
 | Web Routes
 |--------------------------------------------------------------------------
 */
-
 
 /*
 |--------------------------------------------------------------------------
@@ -102,7 +102,6 @@ Route::prefix('ally')
             ->name('packages.reception');
     });
 
-
 /*
 |--------------------------------------------------------------------------
 | Página principal
@@ -112,7 +111,6 @@ Route::prefix('ally')
 Route::get('/', function () {
     return view('welcome');
 })->name('home');
-
 
 /*
 |--------------------------------------------------------------------------
@@ -124,7 +122,6 @@ Route::view('dashboard', 'dashboard')
     ->middleware(['auth', 'verified'])
     ->name('dashboard');
 
-
 /*
 |--------------------------------------------------------------------------
 | Perfil
@@ -134,7 +131,6 @@ Route::view('dashboard', 'dashboard')
 Route::view('profile', 'profile')
     ->middleware(['auth'])
     ->name('profile');
-
 
 /*
 |--------------------------------------------------------------------------
@@ -165,7 +161,6 @@ Route::prefix('cliente')
             ->name('pending-payments');
     });
 
-
 /*
 |--------------------------------------------------------------------------
 | Repartidor
@@ -176,38 +171,33 @@ Route::get('/repartidor/dashboard', DriverDashboard::class)
     ->middleware(['auth', 'verified', 'role:repartidor'])
     ->name('repartidor.dashboard');
 
-
 Route::get(
     '/repartidor/escanear',
-    \App\Livewire\Driver\Scanner::class
+    Scanner::class
 )
     ->middleware(['auth', 'verified', 'role:repartidor'])
     ->name('repartidor.scanner');
 
-
 Route::get(
     '/repartidor/paquetes',
-    \App\Livewire\Driver\Packages::class
+    Packages::class
 )
     ->middleware(['auth', 'verified', 'role:repartidor'])
     ->name('repartidor.packages');
 
-
 Route::get(
     '/repartidor/paquetes/{packageId}',
-    \App\Livewire\Driver\PackageDetail::class
+    PackageDetail::class
 )
     ->middleware(['auth', 'verified', 'role:repartidor'])
     ->name('repartidor.package-detail');
 
-
 Route::post(
     '/repartidor/verificar-guia',
-    [\App\Http\Controllers\DriverScanController::class, 'verify']
+    [DriverScanController::class, 'verify']
 )
     ->middleware(['auth', 'verified', 'role:repartidor'])
     ->name('repartidor.scan.verify');
-
 
 /*
 |--------------------------------------------------------------------------
@@ -218,11 +208,9 @@ Route::post(
 Route::get('/rastreo', [TrackingController::class, 'index'])
     ->name('tracking.index');
 
-
 Route::get('/rastreo/resultado', [TrackingController::class, 'show'])
     ->middleware('throttle:60,1')
     ->name('tracking.show');
-
 
 /*
 |--------------------------------------------------------------------------
@@ -233,7 +221,6 @@ Route::get('/rastreo/resultado', [TrackingController::class, 'show'])
 Route::get('/calcular-precio', PriceCalculator::class)
     ->name('public.calculator');
 
-
 /*
 |--------------------------------------------------------------------------
 | Localizador público de agencias
@@ -242,7 +229,6 @@ Route::get('/calcular-precio', PriceCalculator::class)
 
 Route::get('/agencias', OfficeLocator::class)
     ->name('public.offices');
-
 
 /*
 |--------------------------------------------------------------------------
@@ -267,7 +253,6 @@ Route::prefix('admin')
         Route::get('/', AdminDashboard::class)
             ->name('dashboard');
 
-
         /*
         |--------------------------------------------------------------------------
         | Aliados
@@ -277,7 +262,6 @@ Route::prefix('admin')
         Route::get('/allies', AlliesManager::class)
             ->name('allies');
 
-
         /*
         |--------------------------------------------------------------------------
         | Finanzas de aliados
@@ -286,7 +270,6 @@ Route::prefix('admin')
 
         Route::get('/finanzas-aliados', AllyFinance::class)
             ->name('ally-finance');
-
 
         /*
         |--------------------------------------------------------------------------
@@ -303,7 +286,6 @@ Route::prefix('admin')
         Route::get('/city-distances', CityDistanceManager::class)
             ->name('city-distances');
 
-
         /*
         |--------------------------------------------------------------------------
         | Usuarios
@@ -312,7 +294,6 @@ Route::prefix('admin')
 
         Route::get('/users', UsersManager::class)
             ->name('users');
-
 
         /*
         |--------------------------------------------------------------------------
@@ -326,6 +307,8 @@ Route::prefix('admin')
         Route::get('/rutas/dashboard', RoutesDashboard::class)
             ->name('routes.dashboard');
 
+        Route::get('/almacenes', WarehousesManager::class)
+            ->name('warehouses');
 
         /*
         |--------------------------------------------------------------------------
@@ -335,24 +318,21 @@ Route::prefix('admin')
 
         Route::get(
             '/paquetes/recepcion',
-            \App\Livewire\Admin\PackageReception::class
+            App\Livewire\Admin\PackageReception::class
         )
             ->name('packages.reception');
 
-
         Route::get(
             '/paquetes/despacho',
-            \App\Livewire\Admin\PackageDispatch::class
+            PackageDispatch::class
         )
             ->name('packages.dispatch');
-
 
         Route::get(
             '/paquetes/asignar-repartidor',
             DriverAssignment::class
         )
             ->name('packages.assignment');
-
 
         /*
         |--------------------------------------------------------------------------
@@ -363,9 +343,8 @@ Route::prefix('admin')
         Route::get('/remuneraciones', DriverPayments::class)
             ->name('driver-payments');
 
-        Route::get('/remuneraciones/tarifa', \App\Livewire\Admin\DriverRemunerationManager::class)
+        Route::get('/remuneraciones/tarifa', DriverRemunerationManager::class)
             ->name('driver-remuneration-rate');
-
 
         /*
         |--------------------------------------------------------------------------
@@ -376,7 +355,6 @@ Route::prefix('admin')
         Route::get('/incidencias', IncidentsManager::class)
             ->name('incidents');
 
-
         /*
         |--------------------------------------------------------------------------
         | Auditoría
@@ -386,7 +364,6 @@ Route::prefix('admin')
         Route::get('/bitacora', AuditLogViewer::class)
             ->middleware('role:admin_principal')
             ->name('audit-log');
-
 
         /*
         |--------------------------------------------------------------------------
@@ -412,9 +389,7 @@ Route::prefix('admin')
         Route::get('/payments', PaymentOrders::class)
             ->name('payments');
 
-
     });
-
 
 /*
 |--------------------------------------------------------------------------
@@ -428,11 +403,10 @@ Route::prefix('admin')
 
 Route::get(
     '/paquetes/{package}/guia',
-    [\App\Http\Controllers\PackageLabelController::class, 'pdf']
+    [PackageLabelController::class, 'pdf']
 )
     ->middleware(['auth'])
     ->name('packages.label');
-
 
 /*
 |--------------------------------------------------------------------------
@@ -440,4 +414,4 @@ Route::get(
 |--------------------------------------------------------------------------
 */
 
-require __DIR__ . '/auth.php';
+require __DIR__.'/auth.php';

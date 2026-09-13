@@ -32,6 +32,13 @@ class RouteStopResource extends JsonResource
                 'latitude' => $this->ally->latitude !== null ? (float) $this->ally->latitude : null,
                 'longitude' => $this->ally->longitude !== null ? (float) $this->ally->longitude : null,
             ] : null,
+            'warehouse' => $this->warehouse ? [
+                'id' => $this->warehouse->id,
+                'name' => $this->warehouse->name,
+                'address' => $this->warehouse->address,
+                'city' => $this->warehouse->city,
+                'state' => $this->warehouse->state,
+            ] : null,
         ];
     }
 }

@@ -7,6 +7,7 @@ use App\Models\Route;
 use App\Models\RouteStop;
 use App\Models\User;
 use Illuminate\Foundation\Testing\RefreshDatabase;
+use Illuminate\Support\Facades\Auth;
 use Tests\Feature\Concerns\CreatesTestPackages;
 use Tests\TestCase;
 
@@ -224,6 +225,16 @@ class DriverApiFlowTest extends TestCase
         $headers = ['Authorization' => "Bearer {$token}"];
 
         $this->postJson('/api/driver/logout', [], $headers)->assertOk();
+
+        // Sanctum cachea el usuario resuelto en el guard ('sanctum')
+        // mientras dure la instancia de Application. Como este test
+        // reutiliza la misma Application para ambas peticiones
+        // simuladas, hay que forzar que el guard se resuelva de
+        // nuevo; si no, seguiría devolviendo el usuario autenticado
+        // en el logout aunque el token ya esté borrado en BD. En
+        // producción esto no ocurre: cada request real es un proceso
+        // distinto.
+        Auth::forgetGuards();
 
         // El mismo token ya no debe servir para nada.
         $this->getJson('/api/driver/me', $headers)->assertUnauthorized();

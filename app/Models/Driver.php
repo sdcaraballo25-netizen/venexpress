@@ -15,14 +15,25 @@ class Driver extends Model
      * Tipos de conductor.
      */
     public const TYPE_HUB = 'hub';
+
     public const TYPE_DELIVERY = 'delivery';
+
+    /**
+     * Valor fijo de vehicle_type para drivers HUB: no manejan un
+     * vehículo particular (moto/carro), sino un camión de la flota
+     * de Venexpress.
+     */
+    public const HUB_VEHICLE_TYPE = 'Camión Venexpress';
 
     /**
      * Estados del conductor.
      */
     public const STATUS_PENDING = 'PENDIENTE';
+
     public const STATUS_ACTIVE = 'ACTIVO';
+
     public const STATUS_REJECTED = 'RECHAZADO';
+
     public const STATUS_SUSPENDED = 'SUSPENDIDO';
 
     /**
@@ -77,4 +88,3 @@ class Driver extends Model
         return $this->hasMany(Route::class);
     }
 }
-

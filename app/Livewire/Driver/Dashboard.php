@@ -5,6 +5,8 @@ namespace App\Livewire\Driver;
 use App\Models\Package;
 use App\Models\Route;
 use App\Models\RouteStop;
+use App\Models\User;
+use App\Services\RouteService;
 use Illuminate\Support\Facades\Auth;
 use Livewire\Attributes\Layout;
 use Livewire\Component;
@@ -17,7 +19,7 @@ class Dashboard extends Component
      */
     public function startRoute(): void
     {
-        /** @var \App\Models\User|null $user */
+        /** @var User|null $user */
         $user = Auth::user();
 
         $driver = $user?->driver;
@@ -44,10 +46,10 @@ class Dashboard extends Component
             return;
         }
 
-        $route->update([
-            'status' => Route::STATUS_IN_PROGRESS,
-            'started_at' => now(),
-        ]);
+        app(RouteService::class)->start(
+            route: $route,
+            actingUserId: (int) $user->id,
+        );
 
         session()->flash(
             'routeSuccess',
@@ -55,9 +57,47 @@ class Dashboard extends Component
         );
     }
 
+    /**
+     * El repartidor toma una ruta disponible (draft, sin dueño,
+     * compatible con su driver_type). Reutiliza
+     * RouteService::claimRoute() tal cual — misma validación y
+     * protección de concurrencia que ya usa la API del repartidor.
+     */
+    public function claimRoute(int $routeId): void
+    {
+        /** @var User|null $user */
+        $user = Auth::user();
+
+        $driver = $user?->driver;
+
+        if (! $driver) {
+            abort(
+                403,
+                'Tu usuario no tiene un perfil de repartidor asociado.'
+            );
+        }
+
+        $route = Route::findOrFail($routeId);
+
+        try {
+            app(RouteService::class)->claimRoute(
+                route: $route,
+                driver: $driver,
+                actingUserId: (int) $user->id,
+            );
+
+            session()->flash(
+                'routeSuccess',
+                '¡Ruta tomada! Ya puedes iniciarla cuando estés listo.'
+            );
+        } catch (\RuntimeException $e) {
+            session()->flash('routeError', $e->getMessage());
+        }
+    }
+
     public function render()
     {
-        /** @var \App\Models\User|null $user */
+        /** @var User|null $user */
         $user = Auth::user();
 
         $driver = $user?->driver;
@@ -159,6 +199,10 @@ class Dashboard extends Component
             ->latest('created_at')
             ->first();
 
+        $availableRoutes = $activeRoute
+            ? collect()
+            : app(RouteService::class)->availableRoutesFor($driver);
+
         $routeStopsCount = $activeRoute?->stops->count() ?? 0;
 
         $visitedStopsCount = $activeRoute?->stops
@@ -215,6 +259,7 @@ class Dashboard extends Component
 
                 // Ruta
                 'activeRoute' => $activeRoute,
+                'availableRoutes' => $availableRoutes,
                 'routeStopsCount' => $routeStopsCount,
                 'visitedStopsCount' => $visitedStopsCount,
                 'pendingStopsCount' => $pendingStopsCount,

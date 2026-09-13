@@ -2,8 +2,8 @@
 
 namespace App\Livewire\Admin;
 
-use App\Models\AuditLog;
 use App\Models\Ally;
+use App\Models\AuditLog;
 use App\Models\Driver;
 use App\Models\User;
 use App\Services\VenezuelaLocationService;
@@ -24,40 +24,73 @@ class UsersManager extends Component
     use WithPagination;
 
     public string $search = '';
+
     public string $roleFilter = '';
+
     public string $statusFilter = '';
 
     public bool $showCreateModal = false;
+
     public bool $showConfirmModal = false;
+
     public bool $showDeleteModal = false;
+
     public bool $showEditModal = false;
 
     public ?int $editingUserId = null;
+
     public string $edit_name = '';
+
     public string $edit_email = '';
+
     public string $edit_password = '';
+
     public string $edit_password_confirmation = '';
 
     public string $name = '';
+
     public string $email = '';
+
     public string $password = '';
+
     public string $password_confirmation = '';
+
     public string $role = User::ROLE_ALIADO;
 
     public string $business_name = '';
+
     public string $rif = '';
+
     public string $state = '';
+
     public string $city = '';
+
     public string $address = '';
 
     public array $states = [];
+
     public array $cities = [];
 
     public string $vehicle_plate = '';
+
     public string $vehicle_type = '';
+
     public string $phone = '';
 
+    public string $driver_type = Driver::TYPE_DELIVERY;
+
+    public bool $editIsDriver = false;
+
+    public string $edit_driver_type = '';
+
+    public string $edit_vehicle_plate = '';
+
+    public string $edit_vehicle_type = '';
+
+    public string $edit_phone = '';
+
     public string $adminPassword = '';
+
     public ?int $pendingUserId = null;
 
     public function mount(VenezuelaLocationService $locationService): void
@@ -155,8 +188,7 @@ class UsersManager extends Component
         $this->validate([
             'adminPassword' => ['required', 'string'],
         ], [
-            'adminPassword.required' =>
-                'Debes introducir tu contraseña de administrador.',
+            'adminPassword.required' => 'Debes introducir tu contraseña de administrador.',
         ]);
 
         if (! Hash::check($this->adminPassword, $actor->password)) {
@@ -194,13 +226,17 @@ class UsersManager extends Component
             }
 
             if ($user->isRepartidor()) {
+                $isHub = $validated['driver_type'] === Driver::TYPE_HUB;
+
                 Driver::create([
                     'user_id' => $user->id,
                     'vehicle_plate' => $validated['vehicle_plate'],
-                    'vehicle_type' => $validated['vehicle_type'],
+                    'vehicle_type' => $isHub
+                        ? Driver::HUB_VEHICLE_TYPE
+                        : $validated['vehicle_type'],
                     'phone' => $validated['phone'],
                     'status' => Driver::STATUS_ACTIVE,
-                    'driver_type' => Driver::TYPE_DELIVERY,
+                    'driver_type' => $validated['driver_type'],
                 ]);
             }
 
@@ -209,8 +245,7 @@ class UsersManager extends Component
                 'action' => 'user.created',
                 'target_type' => User::class,
                 'target_id' => $user->id,
-                'description' =>
-                    "Creó al usuario {$user->name} con rol {$user->role}.",
+                'description' => "Creó al usuario {$user->name} con rol {$user->role}.",
                 'metadata' => [
                     'role' => $user->role,
                     'email' => $user->email,
@@ -250,6 +285,15 @@ class UsersManager extends Component
         $this->edit_password = '';
         $this->edit_password_confirmation = '';
 
+        $this->editIsDriver = $target->isRepartidor() && $target->driver !== null;
+
+        if ($this->editIsDriver) {
+            $this->edit_driver_type = $target->driver->driver_type;
+            $this->edit_vehicle_plate = $target->driver->vehicle_plate;
+            $this->edit_vehicle_type = $target->driver->vehicle_type;
+            $this->edit_phone = $target->driver->phone;
+        }
+
         $this->resetValidation();
 
         $this->showEditModal = true;
@@ -259,12 +303,17 @@ class UsersManager extends Component
     {
         $this->showEditModal = false;
         $this->editingUserId = null;
+        $this->editIsDriver = false;
 
         $this->reset([
             'edit_name',
             'edit_email',
             'edit_password',
             'edit_password_confirmation',
+            'edit_driver_type',
+            'edit_vehicle_plate',
+            'edit_vehicle_type',
+            'edit_phone',
         ]);
 
         $this->resetValidation();
@@ -287,6 +336,10 @@ class UsersManager extends Component
             403
         );
 
+        // Regla explícita: solo se tocan datos de Driver si el usuario
+        // objetivo es repartidor y ya tiene un registro Driver asociado.
+        $isTargetDriver = $target->isRepartidor() && $target->driver !== null;
+
         $rules = [
             'edit_name' => [
                 'required',
@@ -298,7 +351,7 @@ class UsersManager extends Component
                 'string',
                 'email',
                 'max:255',
-                'unique:users,email,' . $target->id,
+                'unique:users,email,'.$target->id,
             ],
         ];
 
@@ -310,6 +363,40 @@ class UsersManager extends Component
             ];
         }
 
+        if ($isTargetDriver) {
+            $rules += [
+                'edit_driver_type' => [
+                    'required',
+                    'string',
+                    'in:'.implode(',', [Driver::TYPE_HUB, Driver::TYPE_DELIVERY]),
+                ],
+
+                'edit_vehicle_plate' => [
+                    'required',
+                    'string',
+                    'max:20',
+                    'unique:drivers,vehicle_plate,'.$target->driver->id,
+                ],
+
+                'edit_phone' => [
+                    'required',
+                    'string',
+                    'max:30',
+                ],
+            ];
+
+            // Un driver HUB no maneja un vehículo particular: el campo
+            // no aplica y se sobreescribe siempre con
+            // Driver::HUB_VEHICLE_TYPE al guardar.
+            if ($this->edit_driver_type !== Driver::TYPE_HUB) {
+                $rules['edit_vehicle_type'] = [
+                    'required',
+                    'string',
+                    'max:255',
+                ];
+            }
+        }
+
         $validated = $this->validate(
             $rules,
             [],
@@ -317,6 +404,10 @@ class UsersManager extends Component
                 'edit_name' => 'nombre',
                 'edit_email' => 'correo electrónico',
                 'edit_password' => 'contraseña',
+                'edit_driver_type' => 'tipo de repartidor',
+                'edit_vehicle_plate' => 'placa',
+                'edit_vehicle_type' => 'tipo de vehículo',
+                'edit_phone' => 'teléfono',
             ]
         );
 
@@ -329,22 +420,51 @@ class UsersManager extends Component
             $data['password'] = $validated['edit_password'];
         }
 
-        DB::transaction(function () use ($actor, $target, $data) {
+        $driverData = null;
+        $previousDriverType = null;
+
+        if ($isTargetDriver) {
+            $previousDriverType = $target->driver->driver_type;
+            $isHub = $validated['edit_driver_type'] === Driver::TYPE_HUB;
+
+            $driverData = [
+                'driver_type' => $validated['edit_driver_type'],
+                'vehicle_plate' => $validated['edit_vehicle_plate'],
+                'vehicle_type' => $isHub
+                    ? Driver::HUB_VEHICLE_TYPE
+                    : $validated['edit_vehicle_type'],
+                'phone' => $validated['edit_phone'],
+            ];
+        }
+
+        DB::transaction(function () use ($actor, $target, $data, $driverData, $previousDriverType) {
             $target->update($data);
+
+            $metadata = [
+                'fields' => array_keys($data),
+            ];
+
+            if ($driverData !== null) {
+                $target->driver->update($driverData);
+
+                if ($previousDriverType !== $driverData['driver_type']) {
+                    $metadata['driver_type'] = [
+                        'from' => $previousDriverType,
+                        'to' => $driverData['driver_type'],
+                    ];
+                }
+            }
 
             AuditLog::create([
                 'actor_user_id' => $actor->id,
                 'action' => 'user.updated',
                 'target_type' => User::class,
                 'target_id' => $target->id,
-                'description' =>
-                    "Editó los datos del usuario {$target->name}."
-                    . (isset($data['password'])
+                'description' => "Editó los datos del usuario {$target->name}."
+                    .(isset($data['password'])
                         ? ' Se restableció su contraseña.'
                         : ''),
-                'metadata' => [
-                    'fields' => array_keys($data),
-                ],
+                'metadata' => $metadata,
                 'ip_address' => request()->ip(),
             ]);
         });
@@ -380,8 +500,7 @@ class UsersManager extends Component
 
             if ($target->isRepartidor()) {
                 $target->driver?->update([
-                    'status' =>
-                        $newStatus === User::STATUS_ACTIVE
+                    'status' => $newStatus === User::STATUS_ACTIVE
                             ? Driver::STATUS_ACTIVE
                             : Driver::STATUS_SUSPENDED,
                 ]);
@@ -393,8 +512,7 @@ class UsersManager extends Component
             'action' => 'user.status_changed',
             'target_type' => User::class,
             'target_id' => $target->id,
-            'description' =>
-                "Cambió el estado de {$target->name} a {$newStatus}.",
+            'description' => "Cambió el estado de {$target->name} a {$newStatus}.",
             'metadata' => [
                 'status' => $newStatus,
             ],
@@ -425,8 +543,8 @@ class UsersManager extends Component
             session()->flash(
                 'error',
                 "No puedes eliminar a {$target->name}: tiene guías "
-                . "o pagos registrados en el sistema. "
-                . 'Desactiva la cuenta en su lugar para conservar el historial.'
+                .'o pagos registrados en el sistema. '
+                .'Desactiva la cuenta en su lugar para conservar el historial.'
             );
 
             return;
@@ -457,8 +575,7 @@ class UsersManager extends Component
                 'string',
             ],
         ], [
-            'adminPassword.required' =>
-                'Debes introducir tu contraseña de administrador.',
+            'adminPassword.required' => 'Debes introducir tu contraseña de administrador.',
         ]);
 
         if (! Hash::check($this->adminPassword, $actor->password)) {
@@ -478,8 +595,8 @@ class UsersManager extends Component
             session()->flash(
                 'error',
                 "No puedes eliminar a {$target->name}: tiene guías "
-                . "o pagos registrados en el sistema. "
-                . 'Desactiva la cuenta en su lugar para conservar el historial.'
+                .'o pagos registrados en el sistema. '
+                .'Desactiva la cuenta en su lugar para conservar el historial.'
             );
 
             return;
@@ -497,8 +614,7 @@ class UsersManager extends Component
                     'action' => 'user.deleted',
                     'target_type' => User::class,
                     'target_id' => $target->id,
-                    'description' =>
-                        "Eliminó al usuario {$name} con rol {$role}.",
+                    'description' => "Eliminó al usuario {$name} con rol {$role}.",
                     'metadata' => [
                         'role' => $role,
                     ],
@@ -513,7 +629,7 @@ class UsersManager extends Component
             session()->flash(
                 'error',
                 "No se pudo eliminar a {$target->name} porque todavía "
-                . 'tiene registros asociados en el sistema.'
+                .'tiene registros asociados en el sistema.'
             );
 
             return;
@@ -535,7 +651,7 @@ class UsersManager extends Component
             ->when(
                 $this->search !== '',
                 function ($query) {
-                    $term = '%' . $this->search . '%';
+                    $term = '%'.$this->search.'%';
 
                     $query->where(function ($q) use ($term) {
                         $q->where(
@@ -552,19 +668,17 @@ class UsersManager extends Component
             )
             ->when(
                 $this->roleFilter !== '',
-                fn ($query) =>
-                    $query->where(
-                        'role',
-                        $this->roleFilter
-                    )
+                fn ($query) => $query->where(
+                    'role',
+                    $this->roleFilter
+                )
             )
             ->when(
                 $this->statusFilter !== '',
-                fn ($query) =>
-                    $query->where(
-                        'status',
-                        $this->statusFilter
-                    )
+                fn ($query) => $query->where(
+                    'status',
+                    $this->statusFilter
+                )
             )
             ->latest()
             ->paginate(12);
@@ -605,7 +719,7 @@ class UsersManager extends Component
             'role' => [
                 'required',
                 'string',
-                'in:' . implode(
+                'in:'.implode(
                     ',',
                     array_keys(User::roleLabels())
                 ),
@@ -647,17 +761,17 @@ class UsersManager extends Component
 
         if ($this->role === User::ROLE_REPARTIDOR) {
             $rules += [
+                'driver_type' => [
+                    'required',
+                    'string',
+                    'in:'.implode(',', [Driver::TYPE_HUB, Driver::TYPE_DELIVERY]),
+                ],
+
                 'vehicle_plate' => [
                     'required',
                     'string',
                     'max:20',
                     'unique:drivers,vehicle_plate',
-                ],
-
-                'vehicle_type' => [
-                    'required',
-                    'string',
-                    'max:255',
                 ],
 
                 'phone' => [
@@ -666,6 +780,17 @@ class UsersManager extends Component
                     'max:30',
                 ],
             ];
+
+            // Un driver HUB no maneja un vehículo particular: el campo
+            // no aplica y se sobreescribe siempre con
+            // Driver::HUB_VEHICLE_TYPE al guardar.
+            if ($this->driver_type !== Driver::TYPE_HUB) {
+                $rules['vehicle_type'] = [
+                    'required',
+                    'string',
+                    'max:255',
+                ];
+            }
         }
 
         return $rules;
@@ -686,6 +811,7 @@ class UsersManager extends Component
             'vehicle_plate',
             'vehicle_type',
             'phone',
+            'driver_type',
             'adminPassword',
         ]);
 
@@ -696,4 +822,3 @@ class UsersManager extends Component
         $this->resetValidation();
     }
 }
-

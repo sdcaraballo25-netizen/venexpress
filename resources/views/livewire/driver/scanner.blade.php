@@ -18,7 +18,11 @@
                 Escanear guía
             </h2>
             <p class="text-sm text-slate-500">
-                Registra la salida del paquete desde la agencia y su recolección por Venexpress.
+                @if ($isDistribution)
+                    Registra la salida del HUB y la llegada al almacén destino de Venexpress.
+                @else
+                    Registra la salida del paquete desde la agencia y su recolección por Venexpress.
+                @endif
             </p>
         </div>
 
@@ -38,7 +42,11 @@
             </h3>
 
             <p class="mt-1 text-sm text-slate-500">
-                Escanea el QR de la guía. El sistema validará que la agencia pertenezca a tu ruta activa.
+                @if ($isDistribution)
+                    Escanea el QR de la guía. El sistema validará que el paquete esté en HUB o en tránsito para tu ruta de distribución.
+                @else
+                    Escanea el QR de la guía. El sistema validará que la agencia pertenezca a tu ruta activa.
+                @endif
             </p>
 
             <div

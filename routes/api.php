@@ -2,7 +2,11 @@
 
 use App\Http\Controllers\Api\DriverAuthController;
 use App\Http\Controllers\Api\DriverDashboardController;
+use App\Http\Controllers\Api\DriverDeliveryController;
+use App\Http\Controllers\Api\DriverHubDistributionController;
+use App\Http\Controllers\Api\DriverIncidentController;
 use App\Http\Controllers\Api\DriverPackageController;
+use App\Http\Controllers\Api\DriverRouteController;
 use Illuminate\Support\Facades\Route;
 
 /*
@@ -35,29 +39,47 @@ Route::prefix('driver')
             Route::get('/dashboard', [DriverDashboardController::class, 'summary'])
                 ->name('dashboard');
 
-            Route::get('/route', [\App\Http\Controllers\Api\DriverRouteController::class, 'active'])
+            Route::get('/route', [DriverRouteController::class, 'active'])
                 ->name('route.active');
 
-            Route::post('/route/start', [\App\Http\Controllers\Api\DriverRouteController::class, 'start'])
+            Route::post('/route/start', [DriverRouteController::class, 'start'])
                 ->name('route.start');
+
+            Route::get('/route/available', [DriverRouteController::class, 'available'])
+                ->name('route.available');
+
+            Route::post('/route/{routeId}/claim', [DriverRouteController::class, 'claim'])
+                ->name('route.claim');
+
+            Route::post('/route/complete', [DriverRouteController::class, 'complete'])
+                ->name('route.complete');
 
             Route::get('/commissions', [DriverDashboardController::class, 'commissions'])
                 ->name('commissions');
 
-            Route::post('/deliveries/claim-by-scan', [\App\Http\Controllers\Api\DriverDeliveryController::class, 'claimByScan'])
+            Route::post('/deliveries/claim-by-scan', [DriverDeliveryController::class, 'claimByScan'])
                 ->name('deliveries.claim-by-scan');
 
-            Route::get('/deliveries/available', [\App\Http\Controllers\Api\DriverDeliveryController::class, 'available'])
+            Route::get('/deliveries/available', [DriverDeliveryController::class, 'available'])
                 ->name('deliveries.available');
 
-            Route::get('/deliveries/route-order', [\App\Http\Controllers\Api\DriverDeliveryController::class, 'routeOrder'])
+            Route::get('/deliveries/route-order', [DriverDeliveryController::class, 'routeOrder'])
                 ->name('deliveries.route-order');
 
-            Route::post('/packages/{packageId}/claim', [\App\Http\Controllers\Api\DriverDeliveryController::class, 'claim'])
+            Route::post('/packages/{packageId}/claim', [DriverDeliveryController::class, 'claim'])
                 ->name('packages.claim');
 
             Route::post('/scan', [DriverPackageController::class, 'scan'])
                 ->name('scan');
+
+            // HUB Distribución: HUB -> almacén propio de Venexpress destino.
+            // Actor distinto del driver de HUB Recolección (arriba) y de la
+            // app de Delivery.
+            Route::post('/hub/dispatch', [DriverHubDistributionController::class, 'departFromHub'])
+                ->name('hub.dispatch');
+
+            Route::post('/hub/arrival', [DriverHubDistributionController::class, 'arriveAtDestination'])
+                ->name('hub.arrival');
 
             Route::get('/packages', [DriverPackageController::class, 'index'])
                 ->name('packages.index');
@@ -71,10 +93,10 @@ Route::prefix('driver')
             Route::post('/packages/{packageId}/collect-cod', [DriverPackageController::class, 'collectCod'])
                 ->name('packages.collect-cod');
 
-            Route::get('/packages/{packageId}/incidents', [\App\Http\Controllers\Api\DriverIncidentController::class, 'index'])
+            Route::get('/packages/{packageId}/incidents', [DriverIncidentController::class, 'index'])
                 ->name('packages.incidents.index');
 
-            Route::post('/packages/{packageId}/incidents', [\App\Http\Controllers\Api\DriverIncidentController::class, 'store'])
+            Route::post('/packages/{packageId}/incidents', [DriverIncidentController::class, 'store'])
                 ->name('packages.incidents.store');
         });
     });

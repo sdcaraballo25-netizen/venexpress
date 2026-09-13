@@ -278,14 +278,29 @@
                             <h3 class="font-semibold text-orange-950">Información del repartidor</h3>
                             <div class="mt-4 grid gap-5 md:grid-cols-2">
                                 <div>
+                                    <x-input-label for="driver-type" value="Tipo de repartidor" />
+                                    <select wire:model.live="driver_type" id="driver-type" class="mt-1.5 block w-full rounded-md border-gray-300 shadow-sm focus:border-blue-500 focus:ring-blue-500">
+                                        <option value="{{ \App\Models\Driver::TYPE_HUB }}">HUB</option>
+                                        <option value="{{ \App\Models\Driver::TYPE_DELIVERY }}">Delivery</option>
+                                    </select>
+                                    <x-input-error :messages="$errors->get('driver_type')" class="mt-2" />
+                                </div>
+                                <div>
                                     <x-input-label for="vehicle-plate" value="Placa" />
                                     <x-text-input wire:model="vehicle_plate" id="vehicle-plate" class="mt-1.5 block w-full" type="text" />
                                     <x-input-error :messages="$errors->get('vehicle_plate')" class="mt-2" />
                                 </div>
                                 <div>
-                                    <x-input-label for="vehicle-type" value="Tipo de vehículo" />
-                                    <x-text-input wire:model="vehicle_type" id="vehicle-type" class="mt-1.5 block w-full" type="text" placeholder="Moto, automóvil, furgoneta..." />
-                                    <x-input-error :messages="$errors->get('vehicle_type')" class="mt-2" />
+                                    @if ($driver_type === \App\Models\Driver::TYPE_HUB)
+                                        <x-input-label value="Vehículo" />
+                                        <p class="mt-1.5 rounded-md bg-orange-100/70 px-3 py-2.5 text-sm text-orange-900">
+                                            {{ \App\Models\Driver::HUB_VEHICLE_TYPE }}
+                                        </p>
+                                    @else
+                                        <x-input-label for="vehicle-type" value="Tipo de vehículo" />
+                                        <x-text-input wire:model="vehicle_type" id="vehicle-type" class="mt-1.5 block w-full" type="text" placeholder="Moto, automóvil, furgoneta..." />
+                                        <x-input-error :messages="$errors->get('vehicle_type')" class="mt-2" />
+                                    @endif
                                 </div>
                                 <div>
                                     <x-input-label for="phone" value="Teléfono" />
@@ -351,6 +366,44 @@
                         <x-text-input wire:model="edit_email" id="admin-user-edit-email" class="mt-1.5 block w-full" type="email" />
                         <x-input-error :messages="$errors->get('edit_email')" class="mt-2" />
                     </div>
+
+                    @if ($editIsDriver)
+                        <div class="rounded-xl border border-orange-100 bg-orange-50/50 p-5">
+                            <h3 class="font-semibold text-orange-950">Información del repartidor</h3>
+                            <div class="mt-4 grid gap-5 md:grid-cols-2">
+                                <div>
+                                    <x-input-label for="admin-user-edit-driver-type" value="Tipo de repartidor" />
+                                    <select wire:model.live="edit_driver_type" id="admin-user-edit-driver-type" class="mt-1.5 block w-full rounded-md border-gray-300 shadow-sm focus:border-blue-500 focus:ring-blue-500">
+                                        <option value="{{ \App\Models\Driver::TYPE_HUB }}">HUB</option>
+                                        <option value="{{ \App\Models\Driver::TYPE_DELIVERY }}">Delivery</option>
+                                    </select>
+                                    <x-input-error :messages="$errors->get('edit_driver_type')" class="mt-2" />
+                                </div>
+                                <div>
+                                    <x-input-label for="admin-user-edit-vehicle-plate" value="Placa" />
+                                    <x-text-input wire:model="edit_vehicle_plate" id="admin-user-edit-vehicle-plate" class="mt-1.5 block w-full" type="text" />
+                                    <x-input-error :messages="$errors->get('edit_vehicle_plate')" class="mt-2" />
+                                </div>
+                                <div>
+                                    @if ($edit_driver_type === \App\Models\Driver::TYPE_HUB)
+                                        <x-input-label value="Vehículo" />
+                                        <p class="mt-1.5 rounded-md bg-orange-100/70 px-3 py-2.5 text-sm text-orange-900">
+                                            {{ \App\Models\Driver::HUB_VEHICLE_TYPE }}
+                                        </p>
+                                    @else
+                                        <x-input-label for="admin-user-edit-vehicle-type" value="Tipo de vehículo" />
+                                        <x-text-input wire:model="edit_vehicle_type" id="admin-user-edit-vehicle-type" class="mt-1.5 block w-full" type="text" placeholder="Moto, automóvil, furgoneta..." />
+                                        <x-input-error :messages="$errors->get('edit_vehicle_type')" class="mt-2" />
+                                    @endif
+                                </div>
+                                <div>
+                                    <x-input-label for="admin-user-edit-phone" value="Teléfono" />
+                                    <x-text-input wire:model="edit_phone" id="admin-user-edit-phone" class="mt-1.5 block w-full" type="text" />
+                                    <x-input-error :messages="$errors->get('edit_phone')" class="mt-2" />
+                                </div>
+                            </div>
+                        </div>
+                    @endif
 
                     <div class="grid gap-5 md:grid-cols-2">
                         <div>

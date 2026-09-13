@@ -18,11 +18,15 @@ class Route extends Model
     */
 
     public const TYPE_HUB_TRANSFER = 'hub_transfer';
+
     public const TYPE_DELIVERY = 'delivery';
+
+    public const TYPE_HUB_DISTRIBUTION = 'hub_distribution';
 
     public const TYPES = [
         self::TYPE_HUB_TRANSFER,
         self::TYPE_DELIVERY,
+        self::TYPE_HUB_DISTRIBUTION,
     ];
 
     /*
@@ -32,9 +36,13 @@ class Route extends Model
     */
 
     public const STATUS_DRAFT = 'draft';
+
     public const STATUS_ASSIGNED = 'assigned';
+
     public const STATUS_IN_PROGRESS = 'in_progress';
+
     public const STATUS_COMPLETED = 'completed';
+
     public const STATUS_CANCELLED = 'cancelled';
 
     public const STATUSES = [
@@ -118,6 +126,16 @@ class Route extends Model
         return $this->route_type === self::TYPE_DELIVERY;
     }
 
+    /**
+     * Ruta que transporta paquetes desde el HUB hasta un almacén
+     * propio de Venexpress destino. Sus paradas (RouteStop) usan
+     * warehouse_id en vez de ally_id.
+     */
+    public function isHubDistribution(): bool
+    {
+        return $this->route_type === self::TYPE_HUB_DISTRIBUTION;
+    }
+
     public function isEditable(): bool
     {
         return in_array(
@@ -181,4 +199,3 @@ class Route extends Model
             ->count();
     }
 }
-

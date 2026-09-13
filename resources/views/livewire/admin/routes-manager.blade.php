@@ -134,6 +134,8 @@
 
                                 @if ($route->route_type === \App\Models\Route::TYPE_HUB_TRANSFER)
                                     Hub → Aliado
+                                @elseif ($route->route_type === \App\Models\Route::TYPE_HUB_DISTRIBUTION)
+                                    Hub → Almacén destino
                                 @else
                                     Delivery → Cliente
                                 @endif
@@ -147,29 +149,6 @@
                                 class="px-3 py-2 rounded-lg border border-[#E2E8F0] text-sm text-[#475569] hover:bg-slate-50">
                                 Editar
                             </button>
-
-                            <button
-                                wire:click="openAssignModal({{ $route->id }})"
-                                class="px-3 py-2 rounded-lg border border-[#E2E8F0] text-sm text-[#475569] hover:bg-slate-50">
-                                Repartidor
-                            </button>
-
-                            @if ($route->status === 'assigned')
-                                <button
-                                    wire:click="startRoute({{ $route->id }})"
-                                    class="px-3 py-2 rounded-lg bg-blue-600 text-white text-sm hover:bg-blue-700">
-                                    Iniciar
-                                </button>
-                            @endif
-
-                            @if ($route->status === 'in_progress')
-                                <button
-                                    wire:click="completeRoute({{ $route->id }})"
-                                    wire:confirm="¿Quieres finalizar esta ruta?"
-                                    class="px-3 py-2 rounded-lg bg-emerald-600 text-white text-sm hover:bg-emerald-700">
-                                    Finalizar
-                                </button>
-                            @endif
 
                             @if ($route->status !== 'completed' && $route->status !== 'cancelled')
                                 <button
@@ -247,17 +226,17 @@
 
                                     <div>
                                         <p class="font-semibold text-sm text-[#0F172A]">
-                                            {{ $stop->ally?->business_name ?? 'Agencia' }}
+                                            {{ $stop->ally?->business_name ?? $stop->warehouse?->name ?? 'Parada' }}
                                         </p>
 
                                         <p class="text-xs text-[#64748B]">
-                                            {{ $stop->ally?->city ?? $route->city }}
+                                            {{ $stop->ally?->city ?? $stop->warehouse?->city ?? $route->city }}
                                         </p>
                                     </div>
 
                                 </div>
 
-                                @if ($route->status === 'in_progress')
+                                @if ($route->status === 'in_progress' && $route->route_type !== \App\Models\Route::TYPE_HUB_DISTRIBUTION)
                                     <button
                                         wire:click="openCollectionModal({{ $route->id }}, {{ $stop->id }})"
                                         class="px-3 py-2 rounded-lg bg-slate-100 hover:bg-slate-200 text-xs font-semibold text-slate-700">
@@ -347,7 +326,7 @@
                             </label>
 
                             <select
-                                wire:model="routeType"
+                                wire:model.live="routeType"
                                 class="w-full rounded-xl border-[#E2E8F0]">
 
                                 <option value="{{ \App\Models\Route::TYPE_DELIVERY }}">
@@ -356,6 +335,10 @@
 
                                 <option value="{{ \App\Models\Route::TYPE_HUB_TRANSFER }}">
                                     Hub → Aliado
+                                </option>
+
+                                <option value="{{ \App\Models\Route::TYPE_HUB_DISTRIBUTION }}">
+                                    Hub → Almacén destino
                                 </option>
 
                             </select>
@@ -456,64 +439,130 @@
 
                     </div>
 
-                    {{-- AGENCIAS DISPONIBLES --}}
-                    <div>
+                    @if ($routeType === \App\Models\Route::TYPE_HUB_DISTRIBUTION)
 
-                        <p class="text-xs font-bold text-[#64748B] uppercase mb-3">
-                            Agencias disponibles
-                        </p>
+                        {{-- ALMACENES DISPONIBLES --}}
+                        <div>
 
-                        @if ($state === '' || $city === '')
+                            <p class="text-xs font-bold text-[#64748B] uppercase mb-3">
+                                Almacenes disponibles
+                            </p>
 
-                            <div class="rounded-xl bg-slate-50 p-4 text-sm text-[#64748B]">
-                                Selecciona primero el estado y la ciudad.
-                            </div>
+                            @if ($state === '')
 
-                        @elseif ($availableAllies->isEmpty())
+                                <div class="rounded-xl bg-slate-50 p-4 text-sm text-[#64748B]">
+                                    Selecciona primero el estado.
+                                </div>
 
-                            <div class="rounded-xl bg-amber-50 p-4 text-sm text-amber-700">
-                                No hay agencias aliadas activas en esta ciudad.
-                            </div>
+                            @elseif ($availableWarehouses->isEmpty())
 
-                        @else
+                                <div class="rounded-xl bg-amber-50 p-4 text-sm text-amber-700">
+                                    No hay almacenes activos en este estado. Créalos primero en
+                                    <a href="{{ route('admin.warehouses') }}" class="underline font-semibold">Almacenes</a>.
+                                </div>
 
-                            <div class="space-y-2">
+                            @else
 
-                                @foreach ($availableAllies as $ally)
+                                <div class="space-y-2">
 
-                                    <button
-                                        type="button"
-                                        wire:click="toggleStop({{ $ally->id }})"
-                                        class="w-full flex items-center justify-between rounded-xl border p-4 text-left transition
-                                        {{ in_array($ally->id, $selectedStops, true)
-                                            ? 'border-blue-500 bg-blue-50'
-                                            : 'border-[#E2E8F0] hover:bg-slate-50' }}">
+                                    @foreach ($availableWarehouses as $warehouse)
 
-                                        <div>
+                                        <button
+                                            type="button"
+                                            wire:click="toggleStop({{ $warehouse->id }})"
+                                            class="w-full flex items-center justify-between rounded-xl border p-4 text-left transition
+                                            {{ in_array($warehouse->id, $selectedStops, true)
+                                                ? 'border-blue-500 bg-blue-50'
+                                                : 'border-[#E2E8F0] hover:bg-slate-50' }}">
 
-                                            <p class="text-sm font-semibold text-[#0F172A]">
-                                                {{ $ally->business_name }}
-                                            </p>
+                                            <div>
 
-                                            <p class="text-xs text-[#64748B]">
-                                                {{ $ally->city }}
-                                            </p>
+                                                <p class="text-sm font-semibold text-[#0F172A]">
+                                                    {{ $warehouse->name }}
+                                                </p>
 
-                                        </div>
+                                                <p class="text-xs text-[#64748B]">
+                                                    {{ $warehouse->city }}
+                                                </p>
 
-                                        <span class="text-sm font-bold">
-                                            {{ in_array($ally->id, $selectedStops, true) ? '✓' : '+' }}
-                                        </span>
+                                            </div>
 
-                                    </button>
+                                            <span class="text-sm font-bold">
+                                                {{ in_array($warehouse->id, $selectedStops, true) ? '✓' : '+' }}
+                                            </span>
 
-                                @endforeach
+                                        </button>
 
-                            </div>
+                                    @endforeach
 
-                        @endif
+                                </div>
 
-                    </div>
+                            @endif
+
+                        </div>
+
+                    @else
+
+                        {{-- AGENCIAS DISPONIBLES --}}
+                        <div>
+
+                            <p class="text-xs font-bold text-[#64748B] uppercase mb-3">
+                                Agencias disponibles
+                            </p>
+
+                            @if ($state === '' || $city === '')
+
+                                <div class="rounded-xl bg-slate-50 p-4 text-sm text-[#64748B]">
+                                    Selecciona primero el estado y la ciudad.
+                                </div>
+
+                            @elseif ($availableAllies->isEmpty())
+
+                                <div class="rounded-xl bg-amber-50 p-4 text-sm text-amber-700">
+                                    No hay agencias aliadas activas en esta ciudad.
+                                </div>
+
+                            @else
+
+                                <div class="space-y-2">
+
+                                    @foreach ($availableAllies as $ally)
+
+                                        <button
+                                            type="button"
+                                            wire:click="toggleStop({{ $ally->id }})"
+                                            class="w-full flex items-center justify-between rounded-xl border p-4 text-left transition
+                                            {{ in_array($ally->id, $selectedStops, true)
+                                                ? 'border-blue-500 bg-blue-50'
+                                                : 'border-[#E2E8F0] hover:bg-slate-50' }}">
+
+                                            <div>
+
+                                                <p class="text-sm font-semibold text-[#0F172A]">
+                                                    {{ $ally->business_name }}
+                                                </p>
+
+                                                <p class="text-xs text-[#64748B]">
+                                                    {{ $ally->city }}
+                                                </p>
+
+                                            </div>
+
+                                            <span class="text-sm font-bold">
+                                                {{ in_array($ally->id, $selectedStops, true) ? '✓' : '+' }}
+                                            </span>
+
+                                        </button>
+
+                                    @endforeach
+
+                                </div>
+
+                            @endif
+
+                        </div>
+
+                    @endif
 
                     {{-- ORDEN --}}
                     <div>
@@ -525,17 +574,27 @@
                         @if (empty($selectedStops))
 
                             <div class="rounded-xl bg-slate-50 p-5 text-sm text-[#64748B]">
-                                Selecciona las agencias que formarán parte de la ruta.
+                                @if ($routeType === \App\Models\Route::TYPE_HUB_DISTRIBUTION)
+                                    Selecciona los almacenes que formarán parte de la ruta.
+                                @else
+                                    Selecciona las agencias que formarán parte de la ruta.
+                                @endif
                             </div>
 
                         @else
 
                             <div class="space-y-2">
 
-                                @foreach ($selectedStops as $index => $allyId)
+                                @foreach ($selectedStops as $index => $locationId)
 
                                     @php
-                                        $selectedAlly = $availableAllies->firstWhere('id', $allyId);
+                                        $isDistribution = $routeType === \App\Models\Route::TYPE_HUB_DISTRIBUTION;
+
+                                        $selectedLabel = $isDistribution
+                                            ? $availableWarehouses->firstWhere('id', $locationId)?->name
+                                            : $availableAllies->firstWhere('id', $locationId)?->business_name;
+
+                                        $selectedLabel ??= ($isDistribution ? 'Almacén #' : 'Agencia #') . $locationId;
                                     @endphp
 
                                     <div class="flex items-center justify-between rounded-xl border border-[#E2E8F0] p-3">
@@ -547,7 +606,7 @@
                                             </span>
 
                                             <span class="text-sm font-semibold text-[#0F172A]">
-                                                {{ $selectedAlly?->business_name ?? 'Agencia #' . $allyId }}
+                                                {{ $selectedLabel }}
                                             </span>
 
                                         </div>
@@ -570,7 +629,7 @@
 
                                             <button
                                                 type="button"
-                                                wire:click="toggleStop({{ $allyId }})"
+                                                wire:click="toggleStop({{ $locationId }})"
                                                 class="px-2 py-1 rounded-lg bg-red-50 text-red-600 text-xs">
                                                 ✕
                                             </button>
@@ -617,77 +676,8 @@
 
     @endif
 
-    {{-- =========================================================
-         MODAL ASIGNAR REPARTIDOR
-    ========================================================== --}}
-    @if ($showAssignModal)
-
-        <div class="fixed inset-0 z-50 bg-black/40 flex items-center justify-center p-4">
-
-            <div class="bg-white rounded-2xl shadow-xl w-full max-w-md">
-
-                <div class="p-6 border-b border-[#E2E8F0]">
-
-                    <h2 class="text-lg font-bold text-[#0F172A]">
-                        Asignar repartidor
-                    </h2>
-
-                </div>
-
-                <div class="p-6">
-
-                    <label class="block text-xs font-bold text-[#64748B] uppercase mb-2">
-                        Repartidor
-                    </label>
-
-                    <select
-                        wire:model="selectedDriverId"
-                        class="w-full rounded-xl border-[#E2E8F0]">
-
-                        <option value="">
-                            Seleccionar repartidor
-                        </option>
-
-                        @foreach ($activeDrivers as $driver)
-
-                            <option value="{{ $driver->id }}">
-                                {{ $driver->user?->name ?? 'Repartidor' }}
-                                — {{ $driver->vehicle_plate }}
-                            </option>
-
-                        @endforeach
-
-                    </select>
-
-                    @error('selectedDriverId')
-                        <p class="text-xs text-red-600 mt-2">
-                            {{ $message }}
-                        </p>
-                    @enderror
-
-                </div>
-
-                <div class="p-6 border-t border-[#E2E8F0] flex justify-end gap-3">
-
-                    <button
-                        wire:click="$set('showAssignModal', false)"
-                        class="px-4 py-2 rounded-xl border border-[#E2E8F0] text-sm">
-                        Cancelar
-                    </button>
-
-                    <button
-                        wire:click="assignDriver"
-                        class="px-4 py-2 rounded-xl bg-[#0F172A] text-white text-sm font-semibold">
-                        Guardar
-                    </button>
-
-                </div>
-
-            </div>
-
-        </div>
-
-    @endif
+    {{-- Tomar/iniciar la ruta ya no son acciones del Admin — el Driver las
+         hace desde su propia app (RouteService::claimRoute()/start()). --}}
 
     {{-- =========================================================
          MODAL RECOLECCIÓN

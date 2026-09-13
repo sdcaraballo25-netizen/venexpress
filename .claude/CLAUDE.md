@@ -1,157 +1,323 @@
-# graphify
-- **graphify** (`.claude/skills/graphify/SKILL.md`) - any input to knowledge graph. Trigger: `/graphify`
-When the user types `/graphify`, use the installed graphify skill or instructions before doing anything else.
-
-
 # Venexpress — Project Rules
 
 ## Project Context
 
 Venexpress is a national logistics and shipping platform for Venezuela.
 
-The system uses a decentralized network of physical partner locations ("Agencias Aliadas") to receive, process and deliver shipments.
+The system uses a decentralized network of physical partner locations
+("Agencias Aliadas") to receive, process and deliver shipments.
 
-Before making architectural changes, use Graphify to understand the existing relationships between controllers, models, services, routes, views and other components.
+The project is an MVP. Prefer simple, maintainable solutions over
+unnecessary complexity.
 
-## Architecture Navigation
+---
 
-Graphify is the project's architecture index.
+## General Development Rules
 
-Before broad repository searches:
+Before modifying the project:
 
-1. Consult `graphify-out/GRAPH_REPORT.md`.
-2. Use Graphify to identify relevant nodes and relationships.
-3. Read only the source files necessary for the requested task.
-4. Verify conclusions against the actual source code.
-5. Do not treat Graphify's graph as authoritative if it conflicts with current source code.
+1. Understand the existing implementation.
+2. Search for existing functionality before creating new functionality.
+3. Reuse existing components, services, models and views when appropriate.
+4. Make the smallest safe change that solves the requested problem.
+5. Do not refactor unrelated code.
+6. Do not introduce new architectural patterns without a clear reason.
 
-Useful commands:
+Never invent architecture, models, relationships, routes or business rules
+that are not supported by the existing code.
 
-- `graphify query "<question>"`
-- `graphify explain "<node>"`
-- `graphify path "<node A>" "<node B>"`
-- `graphify affected "<node>"`
-- `graphify god-nodes`
+---
 
 ## Token Efficiency
 
 Do not read the entire repository unless explicitly requested.
 
-Do not recursively inspect unrelated directories.
+Prefer targeted searches and reading only the files relevant to the task.
 
-Prefer Graphify to discover relevant files before using broad Glob/Grep searches.
+When investigating a feature, start from the relevant:
 
-Read only the files necessary to complete the task.
+- route
+- Livewire component/controller
+- model
+- service
+- Blade view
+- migration
 
-Avoid repeating repository exploration when the required architectural information is already available through Graphify.
+Avoid recursively inspecting unrelated directories.
 
-## Laravel Rules
+---
 
-Follow the existing Laravel architecture and conventions.
+## Laravel Architecture
 
-Before creating a new controller, service, model, middleware or component:
+Venexpress uses Laravel with Livewire and Blade.
 
-1. Check whether an existing component already performs the required responsibility.
-2. Use Graphify to inspect related components.
-3. Prefer extending existing functionality over creating duplicate logic.
+Before creating a new:
 
-Do not introduce a new architectural pattern without explaining why it is necessary.
+- controller
+- Livewire component
+- service
+- model
+- middleware
+- request
+- policy
+
+first check whether an existing component already performs the same
+responsibility.
+
+Prefer extending existing functionality instead of duplicating logic.
+
+Follow the conventions already used in the project.
+
+Do not introduce unnecessary repositories, DTOs, services or other
+abstractions simply for the sake of architecture.
+
+---
 
 ## Database
 
-Never modify database structure directly without inspecting the existing migrations and models.
+Never modify the database structure without inspecting the existing:
 
-Before modifying a migration:
+- migrations
+- models
+- relationships
+- foreign keys
+
+Before changing a migration:
 
 1. Inspect the related model.
-2. Inspect existing migrations.
+2. Inspect relevant migrations.
 3. Check relationships and foreign keys.
-4. Identify affected application components with Graphify.
+4. Identify the application components affected by the change.
 
 Never silently delete production-relevant data.
 
-## API / Backend
+Prefer additive and backwards-compatible changes when possible.
 
-Before modifying an API endpoint:
+---
 
-1. Identify its route.
-2. Identify its controller.
-3. Identify related services.
-4. Identify request validation.
-5. Identify affected models.
-6. Identify consumers of the endpoint.
+## Backend / API
 
-Use Graphify to trace the relationships before editing.
+Before modifying an API endpoint, identify:
+
+1. Route
+2. Controller or Livewire component
+3. Validation
+4. Services
+5. Models
+6. Consumers of the endpoint
+
+Verify that changes do not break existing consumers.
+
+Reuse existing business logic whenever possible.
+
+---
 
 ## Frontend
 
-Before modifying a frontend component:
+Venexpress is designed as a responsive web/PWA application.
 
-1. Identify its route/page.
-2. Identify its backend endpoint or controller.
-3. Identify related components.
-4. Check whether the component is reused elsewhere.
+Before modifying a frontend feature, identify:
 
-Avoid breaking existing responsive/PWA behavior.
+1. Route or page
+2. Livewire component/controller
+3. Related Blade views
+4. Reusable components
+5. Backend functionality used by the page
+
+Maintain responsive behavior for:
+
+- desktop
+- tablet
+- mobile
+
+Prefer the project's existing UI patterns and Tailwind conventions.
+
+Do not replace working components unnecessarily.
+
+---
+
+## UI / Design
+
+Venexpress visual identity uses:
+
+- Yellow
+- Blue
+- Red
+
+The interface should be:
+
+- modern
+- clean
+- minimalist
+- professional
+- easy to understand
+
+Avoid excessive decoration.
+
+Prioritize usability and consistency across:
+
+- Admin
+- Agencia Aliada
+- Repartidor
+- Cliente
+
+When modifying an existing interface, preserve established design patterns
+unless the task specifically requests a redesign.
+
+---
 
 ## Authentication and Authorization
 
-Authentication and authorization changes are high-impact changes.
+Authentication and authorization are high-impact areas.
 
-Before modifying authentication:
+Before modifying them, inspect:
 
-- inspect routes;
-- inspect middleware;
-- inspect controllers;
-- inspect models;
-- inspect email verification;
-- inspect authorization policies/gates if present;
-- use Graphify to identify affected components.
+- routes
+- middleware
+- controllers
+- Livewire components
+- models
+- policies/gates
+- email verification when relevant
 
-Do not weaken authentication or authorization to make a feature work.
+Never weaken authentication or authorization simply to make a feature work.
+
+Always preserve role restrictions.
+
+Current application roles include:
+
+- admin
+- aliado
+- chofer
+- cliente
+
+Do not add or remove roles without confirming that the change is required.
+
+---
+
+## Business Logic
+
+Venexpress handles logistics operations including:
+
+- package registration
+- shipping guides
+- agencies
+- routes
+- drivers/repartidores
+- clients
+- tariffs
+- package tracking
+- incidents
+- cash closing
+- QR/barcode identification
+
+Business rules must be implemented consistently.
+
+Before changing a business rule, inspect where the rule is currently
+implemented and whether other parts of the application depend on it.
+
+Avoid duplicating business calculations in multiple places.
+
+---
 
 ## Changes
 
-Before modifying multiple files, explain briefly:
+For changes involving multiple files, briefly explain:
 
-- entry point;
-- affected components;
-- relevant Graphify relationships;
-- expected impact.
+- entry point
+- affected components
+- important dependencies
+- expected impact
 
-Prefer the smallest safe change.
+Then implement the smallest reasonable change.
 
-Do not refactor unrelated code while implementing a requested feature.
+Do not perform unrelated refactors.
+
+If a requested change requires a larger architectural modification,
+explain why before making it.
+
+---
 
 ## Verification
 
-After changes:
+After making changes:
 
 1. Run the most relevant focused tests.
-2. Run static/lint checks when available.
+2. Run static analysis or lint checks when available.
 3. Verify affected routes/components.
-4. Report what was tested and what could not be tested.
+4. Check for obvious regressions.
 
-Never claim that a change works without verification.
+Always report:
+
+- what was changed
+- what was tested
+- what could not be tested
+
+Never claim that something works without verification.
+
+---
 
 ## Generated Files
 
 Do not manually edit:
 
-- `graphify-out/`
-- Graphify cache files
-- generated build artifacts
+- generated build files
+- cache files
+- compiled assets
+- vendor files
 
 unless the task explicitly requires it.
 
-Graphify-generated files should be regenerated using Graphify commands.
+---
+
+## Git
+
+Keep changes focused and easy to review.
+
+Before committing:
+
+1. Check `git status`.
+2. Review changed files.
+3. Verify the implementation.
+4. Avoid committing unrelated changes.
+
+Do not reset, delete or overwrite other developers' work without
+explicitly confirming it is safe.
+
+---
+
+## Working With Two Developers
+
+The repository is shared by two developers.
+
+Avoid modifying files unrelated to the requested task.
+
+Be careful when changing shared configuration.
+
+Before destructive Git operations such as:
+
+- reset
+- checkout of other developers' changes
+- force push
+- deleting branches
+
+ask for confirmation unless the user explicitly requested the operation.
+
+---
 
 ## Uncertainty
 
-If Graphify and the current source code disagree:
+If the existing source code contradicts assumptions in these rules,
+trust the current source code.
 
-- trust the current source code;
-- report the discrepancy;
-- update the graph when appropriate.
+Report the discrepancy clearly.
 
-Never invent architecture that is not supported by the repository.
+Never invent:
+
+- database relationships
+- routes
+- business rules
+- component behavior
+- API contracts
+
+When necessary, inspect the relevant source files before deciding.

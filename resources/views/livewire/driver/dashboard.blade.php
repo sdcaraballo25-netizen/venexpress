@@ -179,15 +179,25 @@
                             @endif
                         </p>
 
-                    @else
+                    @elseif ($availableRoutes->isNotEmpty())
 
                         <h2 class="mt-1 font-display text-2xl font-bold text-[#0F172A]">
-                            Sin ruta asignada
+                            Rutas disponibles
                         </h2>
 
                         <p class="mt-1 max-w-xl text-sm text-slate-500">
-                            Cuando el administrador te asigne una ruta,
-                            podrás verla y comenzar tu operación desde aquí.
+                            Toma una ruta compatible para comenzar tu operación.
+                        </p>
+
+                    @else
+
+                        <h2 class="mt-1 font-display text-2xl font-bold text-[#0F172A]">
+                            Sin rutas disponibles
+                        </h2>
+
+                        <p class="mt-1 max-w-xl text-sm text-slate-500">
+                            No hay rutas disponibles por el momento. Vuelve a
+                            revisar más tarde.
                         </p>
 
                     @endif
@@ -336,6 +346,67 @@
                         </p>
 
                     </div>
+
+                </div>
+
+            @elseif ($availableRoutes->isNotEmpty())
+
+                {{-- RUTAS DISPONIBLES --}}
+                <div class="space-y-3">
+
+                    @foreach ($availableRoutes as $route)
+
+                        <div class="flex flex-col gap-3 rounded-xl border border-[#E2E8F0] p-4 sm:flex-row sm:items-center sm:justify-between">
+
+                            <div>
+
+                                <p class="font-semibold text-sm text-[#0F172A]">
+                                    {{ $route->name }}
+                                </p>
+
+                                <p class="mt-1 text-xs text-slate-500">
+                                    {{ $route->city }}
+
+                                    @if ($route->state)
+                                        · {{ $route->state }}
+                                    @endif
+
+                                    ·
+
+                                    @if ($route->route_type === \App\Models\Route::TYPE_HUB_TRANSFER)
+                                        Traslado a hub
+                                    @elseif ($route->route_type === \App\Models\Route::TYPE_HUB_DISTRIBUTION)
+                                        Distribución a almacén
+                                    @elseif ($route->route_type === \App\Models\Route::TYPE_DELIVERY)
+                                        Entregas
+                                    @else
+                                        {{ $route->route_type }}
+                                    @endif
+
+                                    · {{ $route->stops->count() }} paradas
+                                </p>
+
+                            </div>
+
+                            <button
+                                type="button"
+                                wire:click="claimRoute({{ $route->id }})"
+                                wire:loading.attr="disabled"
+                                wire:target="claimRoute({{ $route->id }})"
+                                class="inline-flex items-center justify-center rounded-xl bg-blue-900 px-4 py-2.5 text-sm font-semibold text-white transition hover:bg-blue-800 disabled:cursor-not-allowed disabled:opacity-50"
+                            >
+                                <span wire:loading.remove wire:target="claimRoute({{ $route->id }})">
+                                    Tomar ruta
+                                </span>
+
+                                <span wire:loading wire:target="claimRoute({{ $route->id }})">
+                                    Tomando...
+                                </span>
+                            </button>
+
+                        </div>
+
+                    @endforeach
 
                 </div>
 

@@ -40,6 +40,7 @@ class RouteStop extends Model
     protected $fillable = [
         'route_id',
         'ally_id',
+        'warehouse_id',
         'sequence',
         'status',
         'visited_at',
@@ -74,6 +75,16 @@ class RouteStop extends Model
     public function ally(): BelongsTo
     {
         return $this->belongsTo(Ally::class);
+    }
+
+    /**
+     * Almacén propio de Venexpress, cuando esta parada pertenece a
+     * una ruta de tipo Route::TYPE_HUB_DISTRIBUTION. Mutuamente
+     * excluyente con ally(): una parada usa uno u otro, nunca ambos.
+     */
+    public function warehouse(): BelongsTo
+    {
+        return $this->belongsTo(Warehouse::class);
     }
 
     /**
