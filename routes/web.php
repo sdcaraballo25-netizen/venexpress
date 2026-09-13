@@ -27,6 +27,7 @@ use App\Livewire\Ally\DailyCashCut;
 use App\Livewire\Ally\Dashboard as AllyDashboard;
 use App\Livewire\Ally\Incidents as AllyIncidents;
 use App\Livewire\Ally\PackageCreate as AllyPackageCreate;
+use App\Livewire\Ally\PackageDetail as AllyPackageDetail;
 use App\Livewire\Ally\PackagePickup as AllyPackagePickup;
 use App\Livewire\Ally\PackageReception;
 use App\Livewire\Ally\Packages as AllyPackages;
@@ -75,6 +76,9 @@ Route::prefix('ally')
 
         Route::get('/pedidos', AllyPackages::class)
             ->name('packages.index');
+
+        Route::get('/pedidos/{packageId}', AllyPackageDetail::class)
+            ->name('packages.show');
 
         /*
         |--------------------------------------------------------------------------

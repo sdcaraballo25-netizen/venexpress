@@ -105,6 +105,10 @@
                         </th>
 
                         <th class="px-5 py-3 text-left font-semibold text-slate-600">
+                            Servicio
+                        </th>
+
+                        <th class="px-5 py-3 text-left font-semibold text-slate-600">
                             Estado
                         </th>
 
@@ -173,6 +177,21 @@
 
                             </td>
 
+                            {{-- SERVICIO --}}
+                            <td class="px-5 py-4">
+
+                                @if ($package->requires_delivery)
+                                    <span class="inline-flex rounded-full bg-blue-50 px-2.5 py-1 text-xs font-medium text-blue-700">
+                                        Delivery
+                                    </span>
+                                @else
+                                    <span class="inline-flex rounded-full bg-slate-100 px-2.5 py-1 text-xs font-medium text-slate-700">
+                                        Retiro en oficina
+                                    </span>
+                                @endif
+
+                            </td>
+
                             {{-- ESTADO --}}
                             <td class="px-5 py-4">
 
@@ -209,17 +228,28 @@
                             </td>
 
                             {{-- ACCIÓN --}}
-                            <td class="px-5 py-4 text-right">
+                            <td class="px-5 py-4">
 
-                                @if ($package->id)
+                                <div class="flex flex-wrap items-center justify-end gap-2">
+
                                     <a
-                                        href="{{ route('packages.label', $package->id) }}"
-                                        target="_blank"
-                                        class="inline-flex items-center rounded-lg border border-blue-900 px-3 py-2 text-xs font-medium text-blue-900 hover:bg-blue-50"
+                                        href="{{ route('ally.packages.show', $package->id) }}"
+                                        class="inline-flex items-center rounded-lg bg-blue-900 px-3 py-2 text-xs font-medium text-white hover:bg-blue-800"
                                     >
-                                        Ver guía
+                                        Ver
                                     </a>
-                                @endif
+
+                                    @if ($package->id)
+                                        <a
+                                            href="{{ route('packages.label', $package->id) }}"
+                                            target="_blank"
+                                            class="inline-flex items-center rounded-lg border border-blue-900 px-3 py-2 text-xs font-medium text-blue-900 hover:bg-blue-50"
+                                        >
+                                            Ver guía
+                                        </a>
+                                    @endif
+
+                                </div>
 
                             </td>
 
@@ -229,7 +259,7 @@
 
                         <tr>
                             <td
-                                colspan="7"
+                                colspan="8"
                                 class="px-5 py-12 text-center"
                             >
                                 <p class="font-medium text-[#0F172A]">
