@@ -8,6 +8,7 @@ use App\Models\Package;
 use App\Models\Route;
 use App\Models\RouteStop;
 use App\Services\LogisticsScanService;
+use App\Services\RouteService;
 use Illuminate\Support\Facades\Auth;
 use Livewire\Attributes\Layout;
 use Livewire\Component;
@@ -122,7 +123,7 @@ class Scanner extends Component
 
         try {
             $package = match ($activeRoute->route_type) {
-                Route::TYPE_HUB_TRANSFER => $this->scanForCollection(
+                Route::TYPE_HUB_TRANSFER => $this->scanForHubTransfer(
                     $service,
                     $package,
                     $driver,
@@ -144,6 +145,52 @@ class Scanner extends Component
             $this->errorMessage = $e->getMessage();
             $this->package = $package;
         }
+    }
+
+    /**
+     * Ruta hub_transfer: Aliado -> HUB. Un mismo botón "Escanear"
+     * cubre las dos operaciones físicas de este tramo, decidido por
+     * el estado actual del paquete — mismo patrón que ya usa
+     * scanForDistribution() para hub_distribution. Reutiliza
+     * LogisticsScanService::scanCollection()/scanHubReception() tal
+     * cual, sin duplicar ninguna de sus validaciones.
+     */
+    protected function scanForHubTransfer(
+        LogisticsScanService $service,
+        Package $package,
+        Driver $driver,
+        int $userId,
+    ): Package {
+        if ($package->current_status === Package::STATUS_RECIBIDO_AGENCIA) {
+            return $this->scanForCollection(
+                $service,
+                $package,
+                $driver,
+                $userId,
+            );
+        }
+
+        if ($package->current_status === Package::STATUS_RECOLECTADO_VENEXPRESS) {
+            $package = $service->scanHubReception(
+                package: $package,
+                driver: $driver,
+                userId: $userId,
+            );
+
+            $this->lastAction = 'hub_reception';
+            $this->processedCount++;
+            $this->trackOperation('hub_reception');
+
+            $this->successMessage =
+                'Recepción en HUB registrada correctamente. El paquete quedó EN_HUB.';
+
+            return $package;
+        }
+
+        throw new RuntimeException(
+            'Este paquete no está en un estado válido para tu ruta de '
+            .'recolección. Estado actual: '.$package->statusLabel().'.'
+        );
     }
 
     /**
@@ -319,9 +366,18 @@ class Scanner extends Component
         $contextStop = null;
 
         if ($routeType === Route::TYPE_HUB_TRANSFER) {
-            $operation = 'collection';
-            $operationTitle = 'RECOLECCIÓN EN ALIADO';
-            $operationInstructions = 'Escanea las guías que estás recogiendo de este aliado.';
+            $operation = $this->lastAction === 'hub_reception'
+                ? 'hub_reception'
+                : 'collection';
+
+            if ($operation === 'hub_reception') {
+                $operationTitle = 'RECEPCIÓN EN HUB';
+                $operationInstructions = 'Escanea los paquetes que estás recibiendo en el HUB.';
+            } else {
+                $operationTitle = 'RECOLECCIÓN EN ALIADO';
+                $operationInstructions = 'Escanea las guías que estás recogiendo de este aliado.';
+            }
+
             $contextStop = $this->contextStop($activeRoute);
         } elseif ($routeType === Route::TYPE_HUB_DISTRIBUTION) {
             $operation = in_array($this->lastAction, ['hub_departure', 'hub_arrival'], true)
@@ -365,6 +421,14 @@ class Scanner extends Component
             $pendingCount = Package::query()
                 ->where('ally_id', $contextStop->ally_id)
                 ->where('current_status', Package::STATUS_RECIBIDO_AGENCIA)
+                ->count();
+        } elseif ($operation === 'hub_reception' && $activeRoute) {
+            $pendingCount = Package::query()
+                ->whereIn(
+                    'id',
+                    app(RouteService::class)->packageIdsCollectedOnRoute($activeRoute)
+                )
+                ->where('current_status', Package::STATUS_RECOLECTADO_VENEXPRESS)
                 ->count();
         } elseif ($operation === 'hub_departure') {
             $pendingCount = HubDistributionPhase::pendingDepartureCount($activeRoute);

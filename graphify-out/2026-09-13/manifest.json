@@ -972,9 +972,9 @@
     "semantic_hash": ""
   },
   "app/Services/RouteService.php": {
-    "mtime": 1789272870.368143,
-    "seen": 1789277229.9078615,
-    "ast_hash": "6b79dbff4c10a25b92ad5e812a470a48",
+    "mtime": 1789328309.8460298,
+    "seen": 1789328650.7234647,
+    "ast_hash": "5abd366a8fca85ce9e9b7367be5d9048",
     "semantic_hash": ""
   },
   "database/migrations/2026_08_23_000000_create_password_reset_tokens_table.php": {
@@ -1326,9 +1326,9 @@
     "semantic_hash": ""
   },
   "app/Livewire/Driver/Dashboard.php": {
-    "mtime": 1789281418.577587,
-    "seen": 1789281854.4983044,
-    "ast_hash": "eed10a6a094fa45e3ddfdf5062ed0c17",
+    "mtime": 1789328319.4847393,
+    "seen": 1789328650.7233138,
+    "ast_hash": "64aef96605b5d0bfcdd70856a3905df4",
     "semantic_hash": ""
   },
   "app/Models/DriverPayment.php": {
@@ -2232,9 +2232,9 @@
     "semantic_hash": ""
   },
   "resources/views/livewire/driver/dashboard.blade.php": {
-    "mtime": 1789281437.4587748,
-    "seen": 1789281854.4988267,
-    "ast_hash": "dc448baf7fbaf6b5c308e04e7405c79c",
+    "mtime": 1789328335.3742154,
+    "seen": 1789328650.724191,
+    "ast_hash": "01637d183b9cefdd35bce1da5ba63c78",
     "semantic_hash": ""
   },
   "resources/views/livewire/driver/field-scanner.blade.php": {
@@ -2430,9 +2430,9 @@
     "semantic_hash": ""
   },
   "tests/Feature/Driver/HubDashboardUxTest.php": {
-    "mtime": 1789281495.2672436,
-    "seen": 1789281854.4990232,
-    "ast_hash": "a90e17ca63b71d80ab37da200c2341f9",
+    "mtime": 1789282055.0435705,
+    "seen": 1789282131.3246558,
+    "ast_hash": "27d43fb391a1501082c1243bc451f4a7",
     "semantic_hash": ""
   },
   "tests/Feature/Driver/ScannerHubOperationUxTest.php": {
@@ -2445,6 +2445,18 @@
     "mtime": 1789281299.2452478,
     "seen": 1789281854.4983208,
     "ast_hash": "4080db60e1e59da9cb524ed8e044b17d",
+    "semantic_hash": ""
+  },
+  "tests/Feature/Driver/DriverRouteCompletePendingPackagesTest.php": {
+    "mtime": 1789328556.3362544,
+    "seen": 1789328650.7245243,
+    "ast_hash": "fed496cb317f1ac200001a243a773f60",
+    "semantic_hash": ""
+  },
+  "tests/Feature/Driver/DriverRouteReleaseTest.php": {
+    "mtime": 1789328552.421567,
+    "seen": 1789328650.724531,
+    "ast_hash": "0daba5fae036732e73ef4bc7297b67d3",
     "semantic_hash": ""
   }
 }

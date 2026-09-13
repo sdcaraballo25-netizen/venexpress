@@ -147,6 +147,22 @@
                                     </span>
                                 </button>
 
+                                <button
+                                    type="button"
+                                    wire:click="releaseRoute"
+                                    wire:loading.attr="disabled"
+                                    wire:confirm="¿Confirmas que quieres liberar esta ruta? Volverá a estar disponible para otros repartidores."
+                                    class="inline-flex items-center justify-center rounded-xl border border-[#E2E8F0] px-5 py-3 text-sm font-semibold text-[#0F172A] transition hover:border-amber-300 hover:bg-amber-50 disabled:cursor-not-allowed disabled:opacity-50"
+                                >
+                                    <span wire:loading.remove wire:target="releaseRoute">
+                                        Liberar ruta
+                                    </span>
+
+                                    <span wire:loading wire:target="releaseRoute">
+                                        Liberando...
+                                    </span>
+                                </button>
+
                             @elseif ($activeRoute->status === \App\Models\Route::STATUS_IN_PROGRESS)
 
                                 <span class="inline-flex items-center gap-2 rounded-xl bg-emerald-50 px-4 py-3 text-sm font-semibold text-emerald-700">
@@ -703,6 +719,22 @@
 
                                 <span wire:loading wire:target="startRoute">
                                     Iniciando...
+                                </span>
+                            </button>
+
+                            <button
+                                type="button"
+                                wire:click="releaseRoute"
+                                wire:loading.attr="disabled"
+                                wire:confirm="¿Confirmas que quieres liberar esta ruta? Volverá a estar disponible para otros repartidores."
+                                class="inline-flex items-center justify-center rounded-xl border border-[#E2E8F0] px-5 py-3 text-sm font-semibold text-[#0F172A] transition hover:border-amber-300 hover:bg-amber-50 disabled:cursor-not-allowed disabled:opacity-50"
+                            >
+                                <span wire:loading.remove wire:target="releaseRoute">
+                                    Liberar ruta
+                                </span>
+
+                                <span wire:loading wire:target="releaseRoute">
+                                    Liberando...
                                 </span>
                             </button>
 

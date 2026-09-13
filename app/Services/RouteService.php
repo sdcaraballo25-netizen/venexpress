@@ -2,6 +2,7 @@
 
 namespace App\Services;
 
+use App\Livewire\Driver\Support\HubDistributionPhase;
 use App\Models\AuditLog;
 use App\Models\Driver;
 use App\Models\Package;
@@ -317,6 +318,76 @@ class RouteService
     }
 
     /**
+     * El Driver libera una ruta que ya tomó pero todavía no inició,
+     * para que vuelva a quedar disponible para cualquier repartidor
+     * compatible.
+     *
+     * Distinto de cancel(): aquí la ruta logística NO se cancela,
+     * solo se desasocia del driver y vuelve a STATUS_DRAFT. No toca
+     * Package en absoluto (igual que claimRoute(), que tampoco los
+     * asigna).
+     *
+     * Solo aplica cuando la ruta está STATUS_ASSIGNED: una ruta
+     * STATUS_IN_PROGRESS ya no se "libera", debe finalizarse con
+     * complete().
+     */
+    public function release(
+        Route $route,
+        Driver $driver,
+        int $actingUserId
+    ): Route {
+        return DB::transaction(function () use (
+            $route,
+            $driver,
+            $actingUserId
+        ) {
+            $lockedRoute = Route::query()
+                ->whereKey($route->id)
+                ->lockForUpdate()
+                ->firstOrFail();
+
+            if ((int) $lockedRoute->driver_id !== (int) $driver->id) {
+                throw new RuntimeException(
+                    'Esta ruta no está asignada a tu usuario.'
+                );
+            }
+
+            if ($lockedRoute->status === Route::STATUS_IN_PROGRESS) {
+                throw new RuntimeException(
+                    'Esta ruta ya está en curso; no se puede liberar. '
+                    .'Debes finalizarla.'
+                );
+            }
+
+            if ($lockedRoute->status !== Route::STATUS_ASSIGNED) {
+                throw new RuntimeException(
+                    'Solo se puede liberar una ruta que esté asignada '
+                    .'y sin iniciar.'
+                );
+            }
+
+            $lockedRoute->update([
+                'driver_id' => null,
+                'status' => Route::STATUS_DRAFT,
+            ]);
+
+            $this->log(
+                $actingUserId,
+                'route.released',
+                $lockedRoute,
+                "{$driver->user->name} ({$driver->vehicle_plate}) "
+                ."liberó la ruta \"{$lockedRoute->name}\" antes de "
+                .'iniciarla.',
+                [
+                    'driver_id' => $driver->id,
+                ]
+            );
+
+            return $lockedRoute->fresh('stops');
+        });
+    }
+
+    /**
      * route_type compatibles con el driver_type dado. Única fuente de
      * verdad para la compatibilidad driver_type <-> route_type:
      * hub -> hub_transfer, hub_distribution
@@ -546,7 +617,105 @@ class RouteService
     }
 
     /**
+     * IDs de Package recolectados en esta ruta durante su ciclo
+     * actual: el evento EVENT_SALIDA que ya registran
+     * RouteService::registerCollection() (Admin) y
+     * LogisticsScanService::scanCollection() (Driver) al pistolear en
+     * una de sus paradas. Única fuente de verdad para "qué paquetes
+     * pertenecen a esta ruta" en rutas delivery/hub_transfer — NUNCA
+     * se determina comparando solo Package.driver_id, porque ese
+     * campo también lo usa el flujo independiente
+     * PackageService::claimForDelivery(), que no pertenece a ninguna
+     * ruta.
+     */
+    public function packageIdsCollectedOnRoute(Route $route): \Illuminate\Support\Collection
+    {
+        $stopIds = $route->stops()->pluck('id');
+
+        return PackageHistory::query()
+            ->whereIn('route_stop_id', $stopIds)
+            ->where('event_type', PackageHistory::EVENT_SALIDA)
+            ->pluck('package_id')
+            ->unique()
+            ->values();
+    }
+
+    /**
+     * Cuenta los paquetes de esta ruta que todavía no llegaron a su
+     * hito final, según route_type — la definición de "pendiente" no
+     * es la misma para los tres tipos:
+     *
+     * - delivery: el mismo driver de la ruta entrega directamente al
+     *   cliente, así que el hito final es ENTREGADO.
+     * - hub_transfer: el driver solo lleva el paquete hasta el HUB;
+     *   el hito final de SU ruta es EN_HUB (recepción en HUB), no
+     *   ENTREGADO — eso ocurre días después, en otra ruta y con otro
+     *   driver.
+     * - hub_distribution: el driver saca paquetes del HUB
+     *   (scanHubDeparture) y los deja bajo su custodia
+     *   (EN_TRANSITO_NACIONAL) hasta registrar su llegada al almacén
+     *   (scanHubArrival, que libera driver_id). Se reutiliza
+     *   HubDistributionPhase::pendingArrivalsCount(), la misma fuente
+     *   de verdad que ya usan Dashboard/Scanner para esta fase.
+     */
+    protected function pendingPackagesCountFor(Route $route): int
+    {
+        return match ($route->route_type) {
+            Route::TYPE_DELIVERY => Package::query()
+                ->whereIn('id', $this->packageIdsCollectedOnRoute($route))
+                ->where(
+                    'current_status',
+                    '!=',
+                    Package::STATUS_ENTREGADO
+                )
+                ->count(),
+
+            Route::TYPE_HUB_TRANSFER => Package::query()
+                ->whereIn('id', $this->packageIdsCollectedOnRoute($route))
+                ->where(
+                    'current_status',
+                    Package::STATUS_RECOLECTADO_VENEXPRESS
+                )
+                ->count(),
+
+            Route::TYPE_HUB_DISTRIBUTION => $route->driver
+                ? HubDistributionPhase::pendingArrivalsCount($route->driver)
+                : 0,
+
+            default => 0,
+        };
+    }
+
+    /**
+     * Mensaje de error mostrado cuando complete() se bloquea por
+     * paquetes pendientes, redactado según qué hito le falta a cada
+     * route_type (ver pendingPackagesCountFor()).
+     */
+    protected function pendingPackagesMessage(Route $route, int $count): string
+    {
+        $suffix = match ($route->route_type) {
+            Route::TYPE_HUB_TRANSFER => $count === 1
+                ? 'tienes 1 paquete pendiente de recibir en el HUB.'
+                : "tienes {$count} paquetes pendientes de recibir en el HUB.",
+
+            Route::TYPE_HUB_DISTRIBUTION => $count === 1
+                ? 'tienes 1 paquete pendiente de llegar al almacén destino.'
+                : "tienes {$count} paquetes pendientes de llegar al almacén destino.",
+
+            default => $count === 1
+                ? 'tienes 1 paquete pendiente de entregar.'
+                : "tienes {$count} paquetes pendientes de entregar.",
+        };
+
+        return "No puedes finalizar esta ruta: todavía {$suffix}";
+    }
+
+    /**
      * Finaliza una ruta.
+     *
+     * No se permite finalizar si quedan paquetes de ESTA ruta sin
+     * llegar a su hito final, que depende de route_type (ver
+     * pendingPackagesCountFor()).
      */
     public function complete(
         Route $route,
@@ -562,14 +731,33 @@ class RouteService
             $route,
             $actingUserId
         ) {
-            $skipped = $route->stops()
+            $lockedRoute = Route::query()
+                ->whereKey($route->id)
+                ->lockForUpdate()
+                ->firstOrFail();
+
+            if (! $lockedRoute->isInProgress()) {
+                throw new RuntimeException(
+                    'Solo se puede finalizar una ruta que está en curso.'
+                );
+            }
+
+            $pendingCount = $this->pendingPackagesCountFor($lockedRoute);
+
+            if ($pendingCount > 0) {
+                throw new RuntimeException(
+                    $this->pendingPackagesMessage($lockedRoute, $pendingCount)
+                );
+            }
+
+            $skipped = $lockedRoute->stops()
                 ->where(
                     'status',
                     RouteStop::STATUS_PENDING
                 )
                 ->count();
 
-            $route->stops()
+            $lockedRoute->stops()
                 ->where(
                     'status',
                     RouteStop::STATUS_PENDING
@@ -578,7 +766,7 @@ class RouteService
                     'status' => RouteStop::STATUS_SKIPPED,
                 ]);
 
-            $route->update([
+            $lockedRoute->update([
                 'status' => Route::STATUS_COMPLETED,
                 'completed_at' => now(),
             ]);
@@ -586,15 +774,15 @@ class RouteService
             $this->log(
                 $actingUserId,
                 'route.completed',
-                $route,
-                "Finalizó la ruta \"{$route->name}\" "
+                $lockedRoute,
+                "Finalizó la ruta \"{$lockedRoute->name}\" "
                 ."({$skipped} paradas quedaron omitidas).",
                 [
                     'skipped_stops' => $skipped,
                 ]
             );
 
-            return $route->fresh('stops');
+            return $lockedRoute->fresh('stops');
         });
     }
 

@@ -99,6 +99,58 @@ class Dashboard extends Component
     }
 
     /**
+     * El repartidor libera una ruta que tomó pero todavía no ha
+     * iniciado, para que vuelva a quedar disponible para otros
+     * repartidores. Reutiliza RouteService::release() — NO cancela
+     * la ruta logística, solo la desasocia y la devuelve a
+     * STATUS_DRAFT.
+     */
+    public function releaseRoute(): void
+    {
+        /** @var User|null $user */
+        $user = Auth::user();
+
+        $driver = $user?->driver;
+
+        if (! $driver) {
+            abort(
+                403,
+                'Tu usuario no tiene un perfil de repartidor asociado.'
+            );
+        }
+
+        $route = Route::query()
+            ->where('driver_id', $driver->id)
+            ->where('status', Route::STATUS_ASSIGNED)
+            ->latest('created_at')
+            ->first();
+
+        if (! $route) {
+            session()->flash(
+                'routeError',
+                'No tienes una ruta asignada para liberar.'
+            );
+
+            return;
+        }
+
+        try {
+            app(RouteService::class)->release(
+                route: $route,
+                driver: $driver,
+                actingUserId: (int) $user->id,
+            );
+
+            session()->flash(
+                'routeSuccess',
+                'Ruta liberada. Ya está disponible para otros repartidores.'
+            );
+        } catch (RuntimeException $e) {
+            session()->flash('routeError', $e->getMessage());
+        }
+    }
+
+    /**
      * Finaliza la ruta en curso del repartidor. Reutiliza
      * RouteService::complete() tal cual — el mismo método que ya
      * expone la API del repartidor (POST /api/driver/route/complete),

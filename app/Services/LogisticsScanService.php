@@ -15,6 +15,8 @@ class LogisticsScanService
     public function __construct(
         protected PackageService $packageService,
         protected PackageDispatchService $packageDispatchService,
+        protected HubReceptionService $hubReceptionService,
+        protected RouteService $routeService,
     ) {}
 
     /**
@@ -155,6 +157,83 @@ class LogisticsScanService
                 'histories',
             ]);
         });
+    }
+
+    /**
+     * Registra la recepción física en el HUB de un paquete
+     * recolectado en la ruta hub_transfer en curso de este mismo
+     * driver (segunda mitad de "Aliado -> HUB", después de
+     * scanCollection()).
+     *
+     * Reutiliza HubReceptionService::receive() tal cual para la
+     * transición de estado (RECOLECTADO_VENEXPRESS -> EN_HUB,
+     * EVENT_RECEPCION) — ese servicio no cambia y sigue funcionando
+     * igual para Admin\PackageReception. Aquí solo se agrega la
+     * validación de que el paquete pertenece a la ruta hub_transfer
+     * activa de este driver, la misma garantía que ya aplican
+     * scanCollection()/scanHubDeparture()/scanHubArrival(): NUNCA se
+     * decide por Package.driver_id a solas, sino por el
+     * PackageHistory (EVENT_SALIDA) que dejó su recolección.
+     *
+     * Reglas:
+     * - El repartidor debe estar activo y ser de tipo hub.
+     * - Debe tener una ruta hub_transfer en curso.
+     * - El paquete debe estar RECOLECTADO_VENEXPRESS.
+     * - El paquete debe haber sido recolectado en ESA ruta.
+     */
+    public function scanHubReception(
+        Package $package,
+        Driver $driver,
+        int $userId,
+    ): Package {
+        if ($driver->status !== Driver::STATUS_ACTIVE) {
+            throw new RuntimeException(
+                'Solo un repartidor activo puede escanear paquetes.'
+            );
+        }
+
+        if ($driver->driver_type !== Driver::TYPE_HUB) {
+            throw new RuntimeException(
+                'Solo un repartidor de HUB puede registrar recepciones en HUB.'
+            );
+        }
+
+        if ($package->current_status !== Package::STATUS_RECOLECTADO_VENEXPRESS) {
+            throw new RuntimeException(
+                'Este paquete no está disponible para recepción en HUB. '
+                .'Estado actual: '.$package->statusLabel().'.'
+            );
+        }
+
+        $route = Route::query()
+            ->where('driver_id', $driver->id)
+            ->where('status', Route::STATUS_IN_PROGRESS)
+            ->where('route_type', Route::TYPE_HUB_TRANSFER)
+            ->latest('started_at')
+            ->first();
+
+        if (! $route) {
+            throw new RuntimeException(
+                'No tienes una ruta de recolección en curso. '
+                .'Inicia una ruta antes de escanear paquetes.'
+            );
+        }
+
+        $belongsToThisRoute = $this->routeService
+            ->packageIdsCollectedOnRoute($route)
+            ->contains($package->id);
+
+        if (! $belongsToThisRoute) {
+            throw new RuntimeException(
+                'Este paquete no fue recolectado en tu ruta activa.'
+            );
+        }
+
+        return $this->hubReceptionService->receive(
+            package: $package,
+            userId: $userId,
+            hubLocation: 'HUB Venexpress',
+        );
     }
 
     /**
