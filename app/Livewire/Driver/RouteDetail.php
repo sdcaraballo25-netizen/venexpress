@@ -2,6 +2,8 @@
 
 namespace App\Livewire\Driver;
 
+use App\Livewire\Driver\Support\HubDistributionPhase;
+use App\Models\Driver;
 use App\Models\Route;
 use App\Models\RouteStop;
 use App\Models\User;
@@ -59,6 +61,44 @@ class RouteDetail extends Component
             )
             : 0;
 
+        /*
+        |--------------------------------------------------------------------------
+        | ACCIÓN DE ESCANEO PRINCIPAL (HUB)
+        |--------------------------------------------------------------------------
+        |
+        | Mismo criterio que Dashboard.php y Scanner.php (vía
+        | HubDistributionPhase), para que las tres pantallas siempre
+        | muestren la misma acción a un driver de HUB.
+        */
+
+        $hubScanOperation = null;
+        $hubScanPendingCount = null;
+        $hubScanWarehouseName = null;
+
+        $nextPendingStop = $this->route->stops
+            ->firstWhere('status', RouteStop::STATUS_PENDING);
+
+        if ($this->route->isInProgress()) {
+            /** @var User|null $user */
+            $user = Auth::user();
+
+            /** @var Driver|null $driver */
+            $driver = $user?->driver;
+
+            if ($driver && $this->route->route_type === Route::TYPE_HUB_TRANSFER) {
+                $hubScanOperation = 'collection';
+            } elseif ($driver && $this->route->route_type === Route::TYPE_HUB_DISTRIBUTION) {
+                $hubScanOperation = HubDistributionPhase::resolve($driver);
+
+                if ($hubScanOperation === HubDistributionPhase::ARRIVAL) {
+                    $hubScanPendingCount = HubDistributionPhase::pendingArrivalsCount($driver);
+                    $hubScanWarehouseName = $nextPendingStop?->warehouse?->name;
+                } else {
+                    $hubScanPendingCount = HubDistributionPhase::pendingDepartureCount($this->route);
+                }
+            }
+        }
+
         return view(
             'livewire.driver.route-detail',
             [
@@ -66,6 +106,10 @@ class RouteDetail extends Component
                 'visitedStopsCount' => $visitedStopsCount,
                 'pendingStopsCount' => $pendingStopsCount,
                 'routeProgress' => $routeProgress,
+                'nextPendingStop' => $nextPendingStop,
+                'hubScanOperation' => $hubScanOperation,
+                'hubScanPendingCount' => $hubScanPendingCount,
+                'hubScanWarehouseName' => $hubScanWarehouseName,
             ]
         );
     }

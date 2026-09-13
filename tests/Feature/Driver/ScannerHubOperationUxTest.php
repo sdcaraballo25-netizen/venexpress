@@ -329,6 +329,156 @@ class ScannerHubOperationUxTest extends TestCase
         $this->assertSame(2, $component->get('processedCount'));
     }
 
+    public function test_collection_progress_message_shows_x_of_y_and_completes_when_no_pending_remain(): void
+    {
+        [$user, $driver] = $this->createDriverUser();
+        $ally = $this->createAlly();
+
+        $route = Route::create([
+            'city' => 'Caracas',
+            'state' => 'Distrito Capital',
+            'name' => 'Recolección Caracas',
+            'driver_id' => $driver->id,
+            'created_by' => $user->id,
+            'status' => Route::STATUS_IN_PROGRESS,
+            'started_at' => now(),
+            'route_type' => Route::TYPE_HUB_TRANSFER,
+        ]);
+
+        RouteStop::create([
+            'route_id' => $route->id,
+            'ally_id' => $ally->id,
+            'sequence' => 1,
+            'status' => RouteStop::STATUS_PENDING,
+        ]);
+
+        $first = $this->createPackage($ally, [
+            'current_status' => Package::STATUS_RECIBIDO_AGENCIA,
+        ]);
+        $second = $this->createPackage($ally, [
+            'current_status' => Package::STATUS_RECIBIDO_AGENCIA,
+        ]);
+
+        $component = Livewire::actingAs($user)->test(Scanner::class);
+
+        $component
+            ->set('trackingNumber', $first->tracking_number)
+            ->call('searchPackage')
+            ->assertSee('1 de 2 paquetes procesados')
+            ->assertSee('Continúa escaneando las guías restantes de este aliado');
+
+        $component
+            ->call('clearSearch')
+            ->set('trackingNumber', $second->tracking_number)
+            ->call('searchPackage')
+            ->assertSee('2 de 2 paquetes procesados')
+            ->assertSee('Operación completada');
+    }
+
+    public function test_hub_departure_progress_message_shows_x_of_y_and_completes_when_no_pending_remain(): void
+    {
+        [$user, $driver] = $this->createDriverUser();
+        $warehouse = $this->createWarehouse();
+
+        $route = Route::create([
+            'city' => 'Tucupita',
+            'state' => 'Delta Amacuro',
+            'name' => 'Distribución Tucupita',
+            'driver_id' => $driver->id,
+            'created_by' => $user->id,
+            'status' => Route::STATUS_IN_PROGRESS,
+            'started_at' => now(),
+            'route_type' => Route::TYPE_HUB_DISTRIBUTION,
+        ]);
+
+        RouteStop::create([
+            'route_id' => $route->id,
+            'warehouse_id' => $warehouse->id,
+            'sequence' => 1,
+            'status' => RouteStop::STATUS_PENDING,
+        ]);
+
+        $ally = $this->createAlly();
+        $first = $this->createPackage($ally, [
+            'current_status' => Package::STATUS_EN_HUB,
+            'destination_city' => 'Tucupita',
+            'destination_state' => 'Delta Amacuro',
+        ]);
+        $second = $this->createPackage($ally, [
+            'current_status' => Package::STATUS_EN_HUB,
+            'destination_city' => 'Tucupita',
+            'destination_state' => 'Delta Amacuro',
+        ]);
+
+        $component = Livewire::actingAs($user)->test(Scanner::class);
+
+        $component
+            ->set('trackingNumber', $first->tracking_number)
+            ->call('searchPackage')
+            ->assertSee('1 de 2 paquetes procesados')
+            ->assertSee('Continúa escaneando las guías restantes');
+
+        $component
+            ->call('clearSearch')
+            ->set('trackingNumber', $second->tracking_number)
+            ->call('searchPackage')
+            ->assertSee('2 de 2 paquetes procesados')
+            ->assertSee('Operación completada');
+    }
+
+    public function test_hub_arrival_progress_message_shows_x_of_y_and_completes_when_no_pending_remain(): void
+    {
+        [$user, $driver] = $this->createDriverUser();
+        $warehouse = $this->createWarehouse();
+
+        $route = Route::create([
+            'city' => 'Tucupita',
+            'state' => 'Delta Amacuro',
+            'name' => 'Distribución Tucupita',
+            'driver_id' => $driver->id,
+            'created_by' => $user->id,
+            'status' => Route::STATUS_IN_PROGRESS,
+            'started_at' => now(),
+            'route_type' => Route::TYPE_HUB_DISTRIBUTION,
+        ]);
+
+        RouteStop::create([
+            'route_id' => $route->id,
+            'warehouse_id' => $warehouse->id,
+            'sequence' => 1,
+            'status' => RouteStop::STATUS_PENDING,
+        ]);
+
+        $ally = $this->createAlly();
+        $first = $this->createPackage($ally, [
+            'current_status' => Package::STATUS_EN_TRANSITO_NACIONAL,
+            'driver_id' => $driver->id,
+            'destination_city' => 'Tucupita',
+            'destination_state' => 'Delta Amacuro',
+        ]);
+        $second = $this->createPackage($ally, [
+            'current_status' => Package::STATUS_EN_TRANSITO_NACIONAL,
+            'driver_id' => $driver->id,
+            'destination_city' => 'Tucupita',
+            'destination_state' => 'Delta Amacuro',
+        ]);
+
+        $component = Livewire::actingAs($user)->test(Scanner::class);
+
+        $component
+            ->set('trackingNumber', $first->tracking_number)
+            ->call('searchPackage')
+            ->assertSee('1 de 2 paquetes procesados')
+            ->assertSee('Continúa escaneando las guías restantes');
+
+        $component
+            ->call('clearSearch')
+            ->set('trackingNumber', $second->tracking_number)
+            ->call('searchPackage')
+            ->assertSee('2 de 2 paquetes procesados')
+            ->assertSee('Operación completada');
+    }
+
     public function test_hub_driver_never_sees_delivery_wording_when_active_route_is_unsupported(): void
     {
         [$user, $driver] = $this->createDriverUser(Driver::TYPE_DELIVERY);

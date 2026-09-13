@@ -45,7 +45,11 @@
                     <div>
 
                         <p class="text-xs font-bold uppercase tracking-wider text-slate-400">
-                            Mi ruta actual
+                            @if ($activeRoute)
+                                Mi ruta actual
+                            @else
+                                Rutas disponibles
+                            @endif
                         </p>
 
                         @if ($activeRoute)
@@ -81,11 +85,12 @@
                         @elseif ($availableRoutes->isNotEmpty())
 
                             <h2 class="mt-1 font-display text-2xl font-bold text-[#0F172A]">
-                                Rutas disponibles
+                                {{ $availableRoutes->count() }} ruta(s) compatible(s) esperando
                             </h2>
 
                             <p class="mt-1 max-w-xl text-sm text-slate-500">
-                                Toma una ruta compatible para comenzar tu operación.
+                                Todavía no tienes una ruta activa. Toma una de las
+                                rutas compatibles de abajo para comenzar tu operación.
                             </p>
 
                         @else
@@ -95,8 +100,8 @@
                             </h2>
 
                             <p class="mt-1 max-w-xl text-sm text-slate-500">
-                                No hay rutas disponibles por el momento. Vuelve a
-                                revisar más tarde.
+                                No tienes una ruta activa y no hay rutas compatibles
+                                por el momento. Vuelve a revisar más tarde.
                             </p>
 
                         @endif
@@ -339,36 +344,119 @@
 
 
         {{-- =========================================================
-             ESCANEAR PAQUETES (acción principal HUB)
+             ESCANEAR (acción principal HUB — específica a la fase)
         ========================================================== --}}
-        <a
-            href="{{ route('repartidor.scanner') }}"
-            class="group flex flex-col gap-4 rounded-3xl border border-blue-900 bg-blue-900 p-6 shadow-sm transition hover:bg-blue-800 sm:flex-row sm:items-center sm:justify-between"
-        >
+        @if ($hubScanOperation)
 
-            <div class="flex items-center gap-4">
+            @php
+                $hubScanTitle = match ($hubScanOperation) {
+                    'collection' => 'RECOLECCIÓN EN ALIADO',
+                    \App\Livewire\Driver\Support\HubDistributionPhase::DEPARTURE => 'SALIDA DESDE HUB',
+                    \App\Livewire\Driver\Support\HubDistributionPhase::ARRIVAL => 'RECEPCIÓN EN ALMACÉN',
+                };
 
-                <div class="flex h-12 w-12 shrink-0 items-center justify-center rounded-xl bg-white/10 text-2xl">
-                    📷
+                $hubScanSubtitle = match ($hubScanOperation) {
+                    'collection' => 'Aliado → HUB',
+                    \App\Livewire\Driver\Support\HubDistributionPhase::DEPARTURE => 'HUB → Almacén destino',
+                    \App\Livewire\Driver\Support\HubDistributionPhase::ARRIVAL => 'Llegada al almacén destino',
+                };
+
+                $hubScanCta = match ($hubScanOperation) {
+                    'collection' => 'Escanear recolección',
+                    \App\Livewire\Driver\Support\HubDistributionPhase::DEPARTURE => 'Escanear salida',
+                    \App\Livewire\Driver\Support\HubDistributionPhase::ARRIVAL => 'Escanear recepción',
+                };
+            @endphp
+
+            <a
+                href="{{ route('repartidor.scanner') }}"
+                class="group flex flex-col gap-4 rounded-3xl border border-blue-900 bg-blue-900 p-6 shadow-sm transition hover:bg-blue-800 sm:flex-row sm:items-center sm:justify-between"
+            >
+
+                <div class="flex items-center gap-4">
+
+                    <div class="flex h-12 w-12 shrink-0 items-center justify-center rounded-xl bg-white/10 text-2xl">
+                        📷
+                    </div>
+
+                    <div>
+                        <span class="inline-flex items-center gap-1.5 rounded-full bg-white/10 px-2.5 py-1 text-[11px] font-bold uppercase tracking-wide text-white">
+                            {{ $hubScanTitle }}
+                        </span>
+
+                        <h2 class="mt-1.5 font-display text-lg font-bold text-white">
+                            {{ $hubScanSubtitle }}
+                        </h2>
+
+                        @if ($hubScanOperation === 'collection')
+                            <p class="mt-1 text-sm text-blue-100">
+                                Siguiente parada:
+                                <span class="font-semibold text-white">
+                                    {{ $nextPendingStop?->ally?->business_name ?? '—' }}
+                                </span>
+                            </p>
+                        @elseif ($hubScanOperation === \App\Livewire\Driver\Support\HubDistributionPhase::DEPARTURE)
+                            <p class="mt-1 text-sm text-blue-100">
+                                Paquetes pendientes:
+                                <span class="font-semibold text-white">
+                                    {{ $hubScanPendingCount }}
+                                </span>
+                            </p>
+                        @else
+                            <p class="mt-1 text-sm text-blue-100">
+                                Almacén:
+                                <span class="font-semibold text-white">
+                                    {{ $hubScanWarehouseName ?? '—' }}
+                                </span>
+                                · Paquetes por recibir:
+                                <span class="font-semibold text-white">
+                                    {{ $hubScanPendingCount }}
+                                </span>
+                            </p>
+                        @endif
+                    </div>
+
                 </div>
 
-                <div>
-                    <h2 class="font-display text-lg font-bold text-white">
-                        Escanear paquetes
-                    </h2>
+                <span class="inline-flex shrink-0 items-center justify-center rounded-xl bg-white px-5 py-3 text-sm font-semibold text-blue-900 transition group-hover:bg-blue-50">
+                    {{ $hubScanCta }}
+                </span>
 
-                    <p class="mt-1 text-sm text-blue-100">
-                        Procesa los paquetes de esta ruta mediante QR/código.
-                    </p>
+            </a>
+
+        @else
+
+            {{-- Sin ruta HUB en curso: acceso genérico al escáner. --}}
+            <a
+                href="{{ route('repartidor.scanner') }}"
+                class="group flex flex-col gap-4 rounded-3xl border border-blue-900 bg-blue-900 p-6 shadow-sm transition hover:bg-blue-800 sm:flex-row sm:items-center sm:justify-between"
+            >
+
+                <div class="flex items-center gap-4">
+
+                    <div class="flex h-12 w-12 shrink-0 items-center justify-center rounded-xl bg-white/10 text-2xl">
+                        📷
+                    </div>
+
+                    <div>
+                        <h2 class="font-display text-lg font-bold text-white">
+                            Escanear paquetes
+                        </h2>
+
+                        <p class="mt-1 text-sm text-blue-100">
+                            Procesa los paquetes de esta ruta mediante QR/código.
+                        </p>
+                    </div>
+
                 </div>
 
-            </div>
+                <span class="inline-flex shrink-0 items-center justify-center rounded-xl bg-white px-5 py-3 text-sm font-semibold text-blue-900 transition group-hover:bg-blue-50">
+                    Abrir escáner
+                </span>
 
-            <span class="inline-flex shrink-0 items-center justify-center rounded-xl bg-white px-5 py-3 text-sm font-semibold text-blue-900 transition group-hover:bg-blue-50">
-                Abrir escáner
-            </span>
+            </a>
 
-        </a>
+        @endif
 
 
         {{-- MIS PAQUETES (secundario para HUB) --}}
@@ -515,7 +603,11 @@
                 <div>
 
                     <p class="text-xs font-bold uppercase tracking-wider text-slate-400">
-                        Ruta actual
+                        @if ($activeRoute)
+                            Ruta actual
+                        @else
+                            Rutas disponibles
+                        @endif
                     </p>
 
                     @if ($activeRoute)
@@ -535,11 +627,12 @@
                     @elseif ($availableRoutes->isNotEmpty())
 
                         <h2 class="mt-1 font-display text-2xl font-bold text-[#0F172A]">
-                            Rutas disponibles
+                            {{ $availableRoutes->count() }} ruta(s) compatible(s) esperando
                         </h2>
 
                         <p class="mt-1 max-w-xl text-sm text-slate-500">
-                            Toma una ruta compatible para comenzar tu operación.
+                            Todavía no tienes una ruta activa. Toma una de las
+                            rutas compatibles de abajo para comenzar tu operación.
                         </p>
 
                     @else
@@ -549,8 +642,8 @@
                         </h2>
 
                         <p class="mt-1 max-w-xl text-sm text-slate-500">
-                            No hay rutas disponibles por el momento. Vuelve a
-                            revisar más tarde.
+                            No tienes una ruta activa y no hay rutas compatibles
+                            por el momento. Vuelve a revisar más tarde.
                         </p>
 
                     @endif

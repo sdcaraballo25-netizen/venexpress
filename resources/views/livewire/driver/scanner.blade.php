@@ -44,7 +44,7 @@
 
     @if ($activeRoute && $operationTitle)
         <div class="rounded-2xl border border-[#E2E8F0] bg-white p-5 shadow-sm">
-            <div class="grid grid-cols-2 gap-4 sm:grid-cols-4">
+            <div class="grid grid-cols-2 gap-4 sm:grid-cols-5">
                 <div>
                     <p class="text-xs font-bold uppercase tracking-wider text-slate-400">
                         Ruta
@@ -73,6 +73,15 @@
                     </p>
                     <p class="mt-1 text-sm font-semibold text-[#0F172A]">
                         {{ $contextStop?->ally?->city ?? $contextStop?->warehouse?->city ?? $activeRoute->city }}
+                    </p>
+                </div>
+
+                <div>
+                    <p class="text-xs font-bold uppercase tracking-wider text-slate-400">
+                        Pendientes
+                    </p>
+                    <p class="mt-1 text-sm font-semibold text-[#0F172A]">
+                        {{ $pendingCount ?? '—' }}
                     </p>
                 </div>
 
@@ -259,6 +268,19 @@
                         <p class="mt-1 text-xs text-emerald-700">
                             El paquete quedó bajo custodia de Venexpress.
                         </p>
+
+                        @if ($operationTotal)
+                            <p class="mt-3 text-sm font-semibold text-emerald-800">
+                                {{ $operationProcessedCount }} de {{ $operationTotal }} paquetes procesados
+                            </p>
+                            <p class="mt-1 text-xs text-emerald-700">
+                                @if ($pendingCount > 0)
+                                    Continúa escaneando las guías restantes de este aliado.
+                                @else
+                                    Operación completada. No quedan más guías pendientes en este aliado.
+                                @endif
+                            </p>
+                        @endif
                     @elseif ($lastAction === 'hub_departure')
                         <p class="text-sm font-semibold text-emerald-800">
                             ✓ Paquete procesado
@@ -275,6 +297,19 @@
                                 · {{ $package->destination_state }}
                             @endif
                         </p>
+
+                        @if ($operationTotal)
+                            <p class="mt-3 text-sm font-semibold text-emerald-800">
+                                {{ $operationProcessedCount }} de {{ $operationTotal }} paquetes procesados
+                            </p>
+                            <p class="mt-1 text-xs text-emerald-700">
+                                @if ($pendingCount > 0)
+                                    Continúa escaneando las guías restantes.
+                                @else
+                                    Operación completada. Cuando salgas hacia el destino, continúa con la recepción en almacén.
+                                @endif
+                            </p>
+                        @endif
                     @elseif ($lastAction === 'hub_arrival')
                         <p class="text-sm font-semibold text-emerald-800">
                             ✓ Paquete procesado
@@ -288,6 +323,19 @@
                         <p class="mt-1 text-xs text-emerald-700">
                             Almacén: {{ $arrivalWarehouse?->name ?? 'Almacén destino' }}
                         </p>
+
+                        @if ($operationTotal)
+                            <p class="mt-3 text-sm font-semibold text-emerald-800">
+                                {{ $operationProcessedCount }} de {{ $operationTotal }} paquetes procesados
+                            </p>
+                            <p class="mt-1 text-xs text-emerald-700">
+                                @if ($pendingCount > 0)
+                                    Continúa escaneando las guías restantes.
+                                @else
+                                    Operación completada. No quedan más guías pendientes de recepción.
+                                @endif
+                            </p>
+                        @endif
                     @elseif ($package->current_status === \App\Models\Package::STATUS_RECOLECTADO_VENEXPRESS)
                         <p class="text-sm font-semibold text-emerald-800">
                             ✓ Salida registrada

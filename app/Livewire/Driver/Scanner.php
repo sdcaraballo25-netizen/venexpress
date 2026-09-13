@@ -2,6 +2,7 @@
 
 namespace App\Livewire\Driver;
 
+use App\Livewire\Driver\Support\HubDistributionPhase;
 use App\Models\Driver;
 use App\Models\Package;
 use App\Models\Route;
@@ -41,6 +42,23 @@ class Scanner extends Component
      * para que el repartidor vea su avance sin salir de la pantalla.
      */
     public int $processedCount = 0;
+
+    /**
+     * Identifica la operación actual (p.ej. 'collection:{allyId}',
+     * 'hub_departure', 'hub_arrival') para saber cuándo el driver pasó
+     * a una operación distinta y así reiniciar el contador "X de Y" de
+     * esa operación en particular, sin afectar a $processedCount.
+     */
+    public string $currentOperationKey = '';
+
+    /**
+     * Paquetes procesados con éxito dentro de la operación actual
+     * ($currentOperationKey). Se reinicia automáticamente cuando la
+     * operación cambia (por ejemplo, de recolección en un aliado a
+     * recolección en el siguiente, o de salida de HUB a recepción en
+     * almacén).
+     */
+    public int $operationProcessedCount = 0;
 
     public function searchPackage(): void
     {
@@ -147,6 +165,7 @@ class Scanner extends Component
 
         $this->lastAction = 'collection';
         $this->processedCount++;
+        $this->trackOperation('collection:'.$package->ally_id);
 
         $this->successMessage =
             'Salida registrada correctamente. El paquete quedó recolectado por Venexpress.';
@@ -176,6 +195,7 @@ class Scanner extends Component
 
             $this->lastAction = 'hub_departure';
             $this->processedCount++;
+            $this->trackOperation(HubDistributionPhase::DEPARTURE);
 
             $this->successMessage =
                 'Salida de HUB registrada correctamente. El paquete quedó en tránsito nacional.';
@@ -192,6 +212,7 @@ class Scanner extends Component
 
             $this->lastAction = 'hub_arrival';
             $this->processedCount++;
+            $this->trackOperation(HubDistributionPhase::ARRIVAL);
 
             $this->successMessage =
                 'Llegada al almacén destino registrada correctamente.';
@@ -203,6 +224,23 @@ class Scanner extends Component
             'Este paquete no está en un estado válido para tu ruta de '
             .'distribución. Estado actual: '.$package->statusLabel().'.'
         );
+    }
+
+    /**
+     * Registra un escaneo exitoso bajo una clave de operación
+     * (aliado+parada para recolección, o la fase de distribución).
+     * Si la clave cambia respecto al último escaneo, reinicia el
+     * contador "X de Y" para no arrastrar el progreso de una operación
+     * distinta a la actual.
+     */
+    protected function trackOperation(string $key): void
+    {
+        if ($key !== $this->currentOperationKey) {
+            $this->currentOperationKey = $key;
+            $this->operationProcessedCount = 0;
+        }
+
+        $this->operationProcessedCount++;
     }
 
     /**
@@ -288,7 +326,7 @@ class Scanner extends Component
         } elseif ($routeType === Route::TYPE_HUB_DISTRIBUTION) {
             $operation = in_array($this->lastAction, ['hub_departure', 'hub_arrival'], true)
                 ? $this->lastAction
-                : $this->distributionPhase($driver);
+                : HubDistributionPhase::resolve($driver);
 
             if ($operation === 'hub_arrival') {
                 $operationTitle = 'RECEPCIÓN EN ALMACÉN';
@@ -316,6 +354,28 @@ class Scanner extends Component
                 ?->warehouse;
         }
 
+        // Cuántos paquetes faltan justo ahora para la operación
+        // vigente, para mostrar "X de Y procesados" y decidir si ya
+        // "Operación completada" o si "Continúa escaneando". Es un
+        // dato de presentación: no decide nada, solo refleja el mismo
+        // estado que LogisticsScanService ya validó en cada scan.
+        $pendingCount = null;
+
+        if ($operation === 'collection' && $contextStop?->ally_id) {
+            $pendingCount = Package::query()
+                ->where('ally_id', $contextStop->ally_id)
+                ->where('current_status', Package::STATUS_RECIBIDO_AGENCIA)
+                ->count();
+        } elseif ($operation === 'hub_departure') {
+            $pendingCount = HubDistributionPhase::pendingDepartureCount($activeRoute);
+        } elseif ($operation === 'hub_arrival') {
+            $pendingCount = HubDistributionPhase::pendingArrivalsCount($driver);
+        }
+
+        $operationTotal = $pendingCount !== null
+            ? $pendingCount + $this->operationProcessedCount
+            : null;
+
         return view('livewire.driver.scanner', [
             'isDistribution' => $routeType === Route::TYPE_HUB_DISTRIBUTION,
             'activeRoute' => $activeRoute,
@@ -324,6 +384,8 @@ class Scanner extends Component
             'operationInstructions' => $operationInstructions,
             'contextStop' => $contextStop,
             'arrivalWarehouse' => $arrivalWarehouse,
+            'pendingCount' => $pendingCount,
+            'operationTotal' => $operationTotal,
         ]);
     }
 
@@ -336,23 +398,5 @@ class Scanner extends Component
     {
         return $route->stops->firstWhere('status', RouteStop::STATUS_PENDING)
             ?? $route->stops->first();
-    }
-
-    /**
-     * En qué fase de la distribución está el driver: si ya tiene
-     * paquetes en tránsito nacional bajo su custodia, lo más probable
-     * es que esté camino al almacén a registrar llegadas; si no, que
-     * esté saliendo del HUB. Es solo una guía visual por defecto antes
-     * del primer escaneo — el escaneo real sigue decidiéndose por el
-     * estado de cada paquete en LogisticsScanService.
-     */
-    protected function distributionPhase(Driver $driver): string
-    {
-        $hasPendingArrivals = Package::query()
-            ->where('driver_id', $driver->id)
-            ->where('current_status', Package::STATUS_EN_TRANSITO_NACIONAL)
-            ->exists();
-
-        return $hasPendingArrivals ? 'hub_arrival' : 'hub_departure';
     }
 }

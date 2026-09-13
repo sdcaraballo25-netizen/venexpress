@@ -47,37 +47,105 @@
     </div>
 
 
-    {{-- Escanear paquetes (acceso principal mientras la ruta está en curso) --}}
+    {{-- Escanear (acceso principal mientras la ruta está en curso) --}}
     @if ($route->isInProgress())
 
-        <a
-            href="{{ route('repartidor.scanner') }}"
-            class="group flex flex-col gap-4 rounded-2xl border border-blue-900 bg-blue-900 p-5 shadow-sm transition hover:bg-blue-800 sm:flex-row sm:items-center sm:justify-between"
-        >
+        @if ($hubScanOperation)
 
-            <div class="flex items-center gap-4">
+            @php
+                $hubScanTitle = match ($hubScanOperation) {
+                    'collection' => 'RECOLECCIÓN EN ALIADO',
+                    \App\Livewire\Driver\Support\HubDistributionPhase::DEPARTURE => 'SALIDA DESDE HUB',
+                    \App\Livewire\Driver\Support\HubDistributionPhase::ARRIVAL => 'RECEPCIÓN EN ALMACÉN',
+                };
 
-                <div class="flex h-11 w-11 shrink-0 items-center justify-center rounded-xl bg-white/10 text-xl">
-                    📷
+                $hubScanCta = match ($hubScanOperation) {
+                    'collection' => 'Escanear recolección',
+                    \App\Livewire\Driver\Support\HubDistributionPhase::DEPARTURE => 'Escanear salida',
+                    \App\Livewire\Driver\Support\HubDistributionPhase::ARRIVAL => 'Escanear recepción',
+                };
+            @endphp
+
+            <a
+                href="{{ route('repartidor.scanner') }}"
+                class="group flex flex-col gap-4 rounded-2xl border border-blue-900 bg-blue-900 p-5 shadow-sm transition hover:bg-blue-800 sm:flex-row sm:items-center sm:justify-between"
+            >
+
+                <div class="flex items-center gap-4">
+
+                    <div class="flex h-11 w-11 shrink-0 items-center justify-center rounded-xl bg-white/10 text-xl">
+                        📷
+                    </div>
+
+                    <div>
+                        <span class="inline-flex items-center gap-1.5 rounded-full bg-white/10 px-2.5 py-1 text-[11px] font-bold uppercase tracking-wide text-white">
+                            {{ $hubScanTitle }}
+                        </span>
+
+                        @if ($hubScanOperation === 'collection')
+                            <p class="mt-1.5 text-sm text-blue-100">
+                                Siguiente parada:
+                                <span class="font-semibold text-white">
+                                    {{ $nextPendingStop?->ally?->business_name ?? '—' }}
+                                </span>
+                            </p>
+                        @elseif ($hubScanOperation === \App\Livewire\Driver\Support\HubDistributionPhase::DEPARTURE)
+                            <p class="mt-1.5 text-sm text-blue-100">
+                                Paquetes pendientes:
+                                <span class="font-semibold text-white">{{ $hubScanPendingCount }}</span>
+                            </p>
+                        @else
+                            <p class="mt-1.5 text-sm text-blue-100">
+                                Almacén:
+                                <span class="font-semibold text-white">{{ $hubScanWarehouseName ?? '—' }}</span>
+                                · Por recibir:
+                                <span class="font-semibold text-white">{{ $hubScanPendingCount }}</span>
+                            </p>
+                        @endif
+                    </div>
+
                 </div>
 
-                <div>
-                    <h2 class="font-display text-base font-bold text-white">
-                        Escanear paquetes
-                    </h2>
+                <span class="inline-flex shrink-0 items-center justify-center rounded-xl bg-white px-5 py-3 text-sm font-semibold text-blue-900 transition group-hover:bg-blue-50">
+                    {{ $hubScanCta }}
+                </span>
 
-                    <p class="mt-1 text-sm text-blue-100">
-                        Continúa procesando las paradas de esta ruta.
-                    </p>
+            </a>
+
+        @else
+
+            {{-- Delivery u otro route_type no soportado en esta pantalla:
+                 acceso genérico, sin tocar el vocabulario de Delivery. --}}
+            <a
+                href="{{ route('repartidor.scanner') }}"
+                class="group flex flex-col gap-4 rounded-2xl border border-blue-900 bg-blue-900 p-5 shadow-sm transition hover:bg-blue-800 sm:flex-row sm:items-center sm:justify-between"
+            >
+
+                <div class="flex items-center gap-4">
+
+                    <div class="flex h-11 w-11 shrink-0 items-center justify-center rounded-xl bg-white/10 text-xl">
+                        📷
+                    </div>
+
+                    <div>
+                        <h2 class="font-display text-base font-bold text-white">
+                            Escanear paquetes
+                        </h2>
+
+                        <p class="mt-1 text-sm text-blue-100">
+                            Continúa procesando las paradas de esta ruta.
+                        </p>
+                    </div>
+
                 </div>
 
-            </div>
+                <span class="inline-flex shrink-0 items-center justify-center rounded-xl bg-white px-5 py-3 text-sm font-semibold text-blue-900 transition group-hover:bg-blue-50">
+                    Abrir escáner
+                </span>
 
-            <span class="inline-flex shrink-0 items-center justify-center rounded-xl bg-white px-5 py-3 text-sm font-semibold text-blue-900 transition group-hover:bg-blue-50">
-                Abrir escáner
-            </span>
+            </a>
 
-        </a>
+        @endif
 
     @endif
 

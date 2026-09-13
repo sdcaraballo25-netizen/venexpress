@@ -47,11 +47,98 @@ class HubDashboardUxTest extends TestCase
     {
         [$user, $driver] = $this->createDriverUser(Driver::TYPE_HUB);
 
+        // Sin ruta activa y sin rutas disponibles: la etiqueta no debe
+        // decir "Mi ruta actual" (no hay ninguna) sino reflejar que no
+        // hay rutas asignadas todavía.
+        Livewire::actingAs($user)
+            ->test(Dashboard::class)
+            ->assertSee('Rutas disponibles')
+            ->assertSee('Sin rutas disponibles')
+            ->assertDontSee('Mi ruta actual')
+            ->assertSee('Escanear paquetes')
+            ->assertSee('Abrir escáner');
+    }
+
+    public function test_hub_dashboard_label_reflects_active_route_not_available_routes(): void
+    {
+        [$user, $driver] = $this->createDriverUser(Driver::TYPE_HUB);
+        $ally = $this->createAlly();
+        $creator = User::factory()->create();
+
+        $route = Route::create([
+            'city' => 'Caracas',
+            'state' => 'Distrito Capital',
+            'name' => 'Ruta con dueño',
+            'driver_id' => $driver->id,
+            'created_by' => $creator->id,
+            'status' => Route::STATUS_IN_PROGRESS,
+            'started_at' => now(),
+            'route_type' => Route::TYPE_HUB_TRANSFER,
+        ]);
+
+        RouteStop::create([
+            'route_id' => $route->id,
+            'ally_id' => $ally->id,
+            'sequence' => 1,
+            'status' => RouteStop::STATUS_PENDING,
+        ]);
+
+        // Con una ruta activa, el rótulo debe decir "Mi ruta actual" y
+        // no debe aparecer el texto de "rutas disponibles" en absoluto
+        // (aunque hubiera otras rutas draft compatibles sueltas).
         Livewire::actingAs($user)
             ->test(Dashboard::class)
             ->assertSee('Mi ruta actual')
-            ->assertSee('Escanear paquetes')
-            ->assertSee('Abrir escáner');
+            ->assertSee($route->name)
+            ->assertDontSee('Rutas disponibles')
+            ->assertDontSee('ruta(s) compatible(s) esperando');
+    }
+
+    public function test_hub_dashboard_label_shows_available_routes_when_no_active_route(): void
+    {
+        [$user, $driver] = $this->createDriverUser(Driver::TYPE_HUB);
+        $ally = $this->createAlly();
+        $creator = User::factory()->create();
+
+        $first = Route::create([
+            'city' => 'Caracas',
+            'state' => 'Distrito Capital',
+            'name' => 'Ruta disponible 1',
+            'created_by' => $creator->id,
+            'status' => Route::STATUS_DRAFT,
+            'route_type' => Route::TYPE_HUB_TRANSFER,
+        ]);
+        $second = Route::create([
+            'city' => 'Valencia',
+            'state' => 'Carabobo',
+            'name' => 'Ruta disponible 2',
+            'created_by' => $creator->id,
+            'status' => Route::STATUS_DRAFT,
+            'route_type' => Route::TYPE_HUB_TRANSFER,
+        ]);
+
+        RouteStop::create([
+            'route_id' => $first->id,
+            'ally_id' => $ally->id,
+            'sequence' => 1,
+            'status' => RouteStop::STATUS_PENDING,
+        ]);
+        RouteStop::create([
+            'route_id' => $second->id,
+            'ally_id' => $ally->id,
+            'sequence' => 1,
+            'status' => RouteStop::STATUS_PENDING,
+        ]);
+
+        // Sin ruta activa: el rótulo debe decir "Rutas disponibles", no
+        // "Mi ruta actual", y deben listarse TODAS las compatibles.
+        Livewire::actingAs($user)
+            ->test(Dashboard::class)
+            ->assertSee('Rutas disponibles')
+            ->assertDontSee('Mi ruta actual')
+            ->assertSee($first->name)
+            ->assertSee($second->name)
+            ->assertSeeInOrder(['Tomar ruta', 'Tomar ruta']);
     }
 
     public function test_hub_dashboard_shows_active_route_and_next_stop_details(): void
@@ -215,18 +302,23 @@ class HubDashboardUxTest extends TestCase
     {
         [$user, $driver] = $this->createDriverUser(Driver::TYPE_DELIVERY);
 
+        // Sin ruta activa y sin rutas disponibles, el rótulo es
+        // "Rutas disponibles" (no "Ruta actual", que implicaría tener
+        // una) — mismo criterio ya aplicado al panel HUB.
         Livewire::actingAs($user)
             ->test(Dashboard::class)
             ->assertDontSee('Mi ruta actual')
             ->assertDontSee('Abrir escáner')
-            ->assertSee('Ruta actual')
+            ->assertSee('Rutas disponibles')
             ->assertSee('Acciones rápidas');
     }
 
     public function test_route_detail_keeps_access_to_scanner_when_route_is_in_progress(): void
     {
         [$user, $driver] = $this->createDriverUser(Driver::TYPE_HUB);
-        $ally = $this->createAlly();
+        $ally = $this->createAlly([
+            'business_name' => 'Agencia con escáner',
+        ]);
         $creator = User::factory()->create();
 
         $route = Route::create([
@@ -247,12 +339,142 @@ class HubDashboardUxTest extends TestCase
             'status' => RouteStop::STATUS_PENDING,
         ]);
 
+        // El CTA de escaneo ahora es específico a la operación (antes
+        // era genérico "Escanear paquetes"/"Abrir escáner"), pero
+        // sigue apuntando a la misma pantalla de escaneo.
+        $this->actingAs($user)
+            ->get(route('repartidor.route-detail', $route->id))
+            ->assertOk()
+            ->assertSee('RECOLECCIÓN EN ALIADO')
+            ->assertSee('Agencia con escáner')
+            ->assertSee('Escanear recolección')
+            ->assertSee(route('repartidor.scanner'));
+    }
+
+    public function test_route_detail_shows_generic_scanner_cta_for_delivery_route(): void
+    {
+        [$user, $driver] = $this->createDriverUser(Driver::TYPE_DELIVERY);
+        $creator = User::factory()->create();
+
+        $route = Route::create([
+            'city' => 'Caracas',
+            'state' => 'Distrito Capital',
+            'name' => 'Ruta de entrega',
+            'driver_id' => $driver->id,
+            'created_by' => $creator->id,
+            'status' => Route::STATUS_IN_PROGRESS,
+            'started_at' => now(),
+            'route_type' => Route::TYPE_DELIVERY,
+        ]);
+
+        // Delivery no participa de este ajuste de UX: conserva el CTA
+        // genérico tal cual estaba.
         $this->actingAs($user)
             ->get(route('repartidor.route-detail', $route->id))
             ->assertOk()
             ->assertSee('Escanear paquetes')
             ->assertSee('Abrir escáner')
-            ->assertSee(route('repartidor.scanner'));
+            ->assertDontSee('RECOLECCIÓN EN ALIADO')
+            ->assertDontSee('SALIDA DESDE HUB')
+            ->assertDontSee('RECEPCIÓN EN ALMACÉN');
+    }
+
+    public function test_hub_dashboard_shows_departure_phase_cta_with_pending_count(): void
+    {
+        [$user, $driver] = $this->createDriverUser(Driver::TYPE_HUB);
+        $creator = User::factory()->create();
+
+        $warehouse = Warehouse::create([
+            'name' => 'Almacén Tucupita',
+            'city' => 'Tucupita',
+            'state' => 'Delta Amacuro',
+            'address' => 'Zona Industrial',
+            'is_active' => true,
+        ]);
+
+        $route = Route::create([
+            'city' => 'Tucupita',
+            'state' => 'Delta Amacuro',
+            'name' => 'Distribución Tucupita',
+            'driver_id' => $driver->id,
+            'created_by' => $creator->id,
+            'status' => Route::STATUS_IN_PROGRESS,
+            'started_at' => now(),
+            'route_type' => Route::TYPE_HUB_DISTRIBUTION,
+        ]);
+
+        RouteStop::create([
+            'route_id' => $route->id,
+            'warehouse_id' => $warehouse->id,
+            'sequence' => 1,
+            'status' => RouteStop::STATUS_PENDING,
+        ]);
+
+        $ally = $this->createAlly();
+        $this->createPackage($ally, [
+            'current_status' => Package::STATUS_EN_HUB,
+            'destination_city' => 'Tucupita',
+            'destination_state' => 'Delta Amacuro',
+        ]);
+        $this->createPackage($ally, [
+            'current_status' => Package::STATUS_EN_HUB,
+            'destination_city' => 'Tucupita',
+            'destination_state' => 'Delta Amacuro',
+        ]);
+
+        Livewire::actingAs($user)
+            ->test(Dashboard::class)
+            ->assertSee('SALIDA DESDE HUB')
+            ->assertSee('Escanear salida')
+            ->assertSee('Paquetes pendientes')
+            ->assertSee('2')
+            ->assertDontSee('RECEPCIÓN EN ALMACÉN');
+    }
+
+    public function test_hub_dashboard_shows_arrival_phase_cta_once_packages_are_in_transit(): void
+    {
+        [$user, $driver] = $this->createDriverUser(Driver::TYPE_HUB);
+        $creator = User::factory()->create();
+
+        $warehouse = Warehouse::create([
+            'name' => 'Almacén Tucupita',
+            'city' => 'Tucupita',
+            'state' => 'Delta Amacuro',
+            'address' => 'Zona Industrial',
+            'is_active' => true,
+        ]);
+
+        $route = Route::create([
+            'city' => 'Tucupita',
+            'state' => 'Delta Amacuro',
+            'name' => 'Distribución Tucupita',
+            'driver_id' => $driver->id,
+            'created_by' => $creator->id,
+            'status' => Route::STATUS_IN_PROGRESS,
+            'started_at' => now(),
+            'route_type' => Route::TYPE_HUB_DISTRIBUTION,
+        ]);
+
+        RouteStop::create([
+            'route_id' => $route->id,
+            'warehouse_id' => $warehouse->id,
+            'sequence' => 1,
+            'status' => RouteStop::STATUS_PENDING,
+        ]);
+
+        $ally = $this->createAlly();
+        $this->createPackage($ally, [
+            'current_status' => Package::STATUS_EN_TRANSITO_NACIONAL,
+            'driver_id' => $driver->id,
+        ]);
+
+        Livewire::actingAs($user)
+            ->test(Dashboard::class)
+            ->assertSee('RECEPCIÓN EN ALMACÉN')
+            ->assertSee('Escanear recepción')
+            ->assertSee('Almacén Tucupita')
+            ->assertSee('Paquetes por recibir')
+            ->assertDontSee('SALIDA DESDE HUB');
     }
 
     public function test_package_detail_hides_delivery_actions_for_hub_driver(): void

@@ -2,6 +2,7 @@
 
 namespace App\Livewire\Driver;
 
+use App\Livewire\Driver\Support\HubDistributionPhase;
 use App\Models\Driver;
 use App\Models\Package;
 use App\Models\Route;
@@ -307,6 +308,38 @@ class Dashboard extends Component
             )
             ->count();
 
+        /*
+        |--------------------------------------------------------------------------
+        | ACCIÓN DE ESCANEO PRINCIPAL (HUB)
+        |--------------------------------------------------------------------------
+        |
+        | Qué debe escanear el driver de HUB ahora mismo, para que el
+        | Dashboard sea explícito ("Escanear recolección" / "Escanear
+        | salida" / "Escanear recepción") en vez de un botón genérico
+        | "Escanear paquetes". Usa el mismo criterio de fase que ya usa
+        | Scanner (HubDistributionPhase), así que ambas pantallas nunca
+        | se contradicen.
+        */
+
+        $hubScanOperation = null;
+        $hubScanPendingCount = null;
+        $hubScanWarehouseName = null;
+
+        if ($isHub && $activeRoute && $activeRoute->isInProgress()) {
+            if ($activeRoute->route_type === Route::TYPE_HUB_TRANSFER) {
+                $hubScanOperation = 'collection';
+            } elseif ($activeRoute->route_type === Route::TYPE_HUB_DISTRIBUTION) {
+                $hubScanOperation = HubDistributionPhase::resolve($driver);
+
+                if ($hubScanOperation === HubDistributionPhase::ARRIVAL) {
+                    $hubScanPendingCount = HubDistributionPhase::pendingArrivalsCount($driver);
+                    $hubScanWarehouseName = $nextPendingStop?->warehouse?->name;
+                } else {
+                    $hubScanPendingCount = HubDistributionPhase::pendingDepartureCount($activeRoute);
+                }
+            }
+        }
+
         return view(
             'livewire.driver.dashboard',
             [
@@ -333,6 +366,11 @@ class Dashboard extends Component
                 'routeProgress' => $routeProgress,
                 'nextPendingStop' => $nextPendingStop,
                 'routePackagesProcessed' => $routePackagesProcessed,
+
+                // Acción de escaneo principal (HUB)
+                'hubScanOperation' => $hubScanOperation,
+                'hubScanPendingCount' => $hubScanPendingCount,
+                'hubScanWarehouseName' => $hubScanWarehouseName,
             ]
         );
     }
