@@ -40,11 +40,13 @@ class RouteService
         ) {
             $route = Route::create([
                 'state' => $data['state'] ?? null,
-                'city' => $data['city'],
+                'city' => $data['city'] ?? null,
                 'name' => $data['name'],
                 'created_by' => $createdByUserId,
                 'status' => Route::STATUS_DRAFT,
                 'route_type' => $data['route_type'] ?? Route::TYPE_DELIVERY,
+                'origin_warehouse_id' => $data['origin_warehouse_id'] ?? null,
+                'return_warehouse_id' => $data['return_warehouse_id'] ?? null,
             ]);
 
             $this->syncStops(
@@ -56,14 +58,15 @@ class RouteService
                 $createdByUserId,
                 'route.created',
                 $route,
-                "Creó la ruta \"{$route->name}\" en {$route->city}, "
-                ."{$route->state} con "
+                "Creó la ruta \"{$route->name}\"{$this->locationSuffix($route)} con "
                 .count($allyIdsInOrder)
                 .' paradas.',
                 [
                     'state' => $route->state,
                     'city' => $route->city,
                     'route_type' => $route->route_type,
+                    'origin_warehouse_id' => $route->origin_warehouse_id,
+                    'return_warehouse_id' => $route->return_warehouse_id,
                     'stops' => count($allyIdsInOrder),
                 ]
             );
@@ -74,14 +77,20 @@ class RouteService
 
     /**
      * Actualiza los datos y las paradas de una ruta.
+     *
+     * state/city son opcionales desde la Fase 2 (rutas multiestado):
+     * ya no restringen qué paradas puede tener la ruta, quedan solo
+     * como metadato descriptivo/de búsqueda para el listado de rutas.
      */
     public function updateRoute(
         int $routeId,
         string $name,
-        string $state,
-        string $city,
+        ?string $state,
+        ?string $city,
         array $allyIds,
-        int $actingUserId
+        int $actingUserId,
+        ?int $originWarehouseId = null,
+        ?int $returnWarehouseId = null,
     ): Route {
         $route = Route::findOrFail($routeId);
 
@@ -103,12 +112,16 @@ class RouteService
             $state,
             $city,
             $allyIds,
-            $actingUserId
+            $actingUserId,
+            $originWarehouseId,
+            $returnWarehouseId,
         ) {
             $route->update([
                 'name' => $name,
                 'state' => $state,
                 'city' => $city,
+                'origin_warehouse_id' => $originWarehouseId,
+                'return_warehouse_id' => $returnWarehouseId,
             ]);
 
             $route->stops()->delete();
@@ -126,6 +139,8 @@ class RouteService
                 [
                     'state' => $route->state,
                     'city' => $route->city,
+                    'origin_warehouse_id' => $route->origin_warehouse_id,
+                    'return_warehouse_id' => $route->return_warehouse_id,
                     'stops' => count($allyIds),
                 ]
             );
@@ -854,6 +869,8 @@ class RouteService
                 'state' => $sourceRoute->state,
                 'city' => $sourceRoute->city,
                 'route_type' => $sourceRoute->route_type,
+                'origin_warehouse_id' => $sourceRoute->origin_warehouse_id,
+                'return_warehouse_id' => $sourceRoute->return_warehouse_id,
                 'name' => $newName
                     ?? $sourceRoute->name.' (nuevo ciclo)',
             ],
@@ -888,6 +905,19 @@ class RouteService
             $actingUserId,
             $newName
         );
+    }
+
+    /**
+     * Texto descriptivo "en Ciudad, Estado" para el log de auditoría.
+     * Desde la Fase 2, state/city son opcionales (ya no restringen
+     * las paradas de la ruta), así que puede no haber nada que
+     * mostrar — en ese caso no se agrega ningún sufijo.
+     */
+    protected function locationSuffix(Route $route): string
+    {
+        $parts = array_filter([$route->city, $route->state]);
+
+        return $parts === [] ? '' : ' en '.implode(', ', $parts);
     }
 
     /**

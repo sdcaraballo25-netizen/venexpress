@@ -2,10 +2,12 @@
 
 namespace App\Livewire\Ally;
 
+use App\Models\Ally;
 use App\Models\Customer;
 use App\Models\Package;
 use App\Services\PackageService;
 use App\Services\TariffService;
+use App\Services\VenezuelaLocationService;
 use Livewire\Attributes\Layout;
 use Livewire\Component;
 use Illuminate\Validation\Rule;
@@ -46,6 +48,18 @@ class PackageCreate extends Component
     public string $destination_state = '';
     public string $destination_city = '';
 
+    /**
+     * Catálogo de estados/ciudades para el destino, servido por
+     * VenezuelaLocationService (database/data/venezuela.json) —
+     * fuente única geográfica del sistema. Antes este formulario leía
+     * config('venezuela.states'), una segunda fuente independiente
+     * que ya se retiró para evitar inconsistencias (ej. "Vargas" vs
+     * "La Guaira" para el mismo estado).
+     */
+    public array $destinationStates = [];
+
+    public array $destinationCities = [];
+
     // Paquete
     public string $package_type = Package::TYPE_PAQUETE;
     public ?float $physical_weight_kg = null;
@@ -61,6 +75,17 @@ class PackageCreate extends Component
     public string $delivery_address = '';
     public string $delivery_sector = '';
     public string $delivery_reference = '';
+
+    /**
+     * Punto de retiro elegido por el cliente cuando el pedido NO
+     * requiere delivery (Regla 58-B). Solo se ofrecen Aliados
+     * verificados como destino (Ally::scopeVerifiedDestinations()),
+     * acotados al estado de destino ya elegido. El Aliado NO
+     * selecciona ruta, HUB ni almacén — solo este punto final.
+     */
+    public ?int $pickup_ally_id = null;
+
+    public array $pickupAllies = [];
 
     // Cobro
     public string $payment_method = '';
@@ -126,9 +151,10 @@ class PackageCreate extends Component
         }
 
         $originCity = trim((string) $ally->city);
+        $locationService = app(VenezuelaLocationService::class);
 
-        foreach (config('venezuela.states', []) as $state => $cities) {
-            foreach ($cities as $city) {
+        foreach ($locationService->states() as $state) {
+            foreach ($locationService->citiesByState($state) as $city) {
                 if (mb_strtolower(trim($city)) === mb_strtolower($originCity)) {
                     return (string) $state;
                 }
@@ -138,7 +164,7 @@ class PackageCreate extends Component
         return '';
     }
 
-    public function mount(): void
+    public function mount(VenezuelaLocationService $locationService): void
     {
         $ally = auth()->user()->resolveAlly();
 
@@ -149,6 +175,8 @@ class PackageCreate extends Component
         // La guía siempre se origina en la ciudad de la agencia.
         $this->origin_city = $ally->city;
         $this->origin_state = $this->resolveOriginState($ally);
+
+        $this->destinationStates = $locationService->states();
     }
 
     protected function rules(): array
@@ -168,7 +196,7 @@ class PackageCreate extends Component
             'recipient_phone' => ['required', 'string', 'max:30'],
             'recipient_email' => ['nullable', 'email', 'max:150'],
 
-            'destination_state' => ['required', 'string', Rule::in(array_keys(config('venezuela.states', [])))],
+            'destination_state' => ['required', 'string', Rule::in($this->destinationStates)],
             'destination_city' => [
                 'required',
                 'string',
@@ -179,6 +207,18 @@ class PackageCreate extends Component
             'delivery_address' => ['nullable', 'string', 'max:1000', 'required_if:requires_delivery,true'],
             'delivery_sector' => ['nullable', 'string', 'max:255', 'required_if:requires_delivery,true'],
             'delivery_reference' => ['nullable', 'string', 'max:1000'],
+
+            'pickup_ally_id' => [
+                'nullable',
+                'integer',
+                'required_if:requires_delivery,false',
+                Rule::exists('allies', 'id')->where(
+                    fn ($query) => $query
+                        ->where('is_verified_destination', true)
+                        ->where('status', Ally::STATUS_ACTIVE)
+                        ->where('state', $this->destination_state)
+                ),
+            ],
 
             'package_type' => ['required', 'in:' . implode(',', Package::TYPES)],
             'physical_weight_kg' => ['required', 'numeric', 'min:0.01'],
@@ -210,6 +250,8 @@ class PackageCreate extends Component
             'destination_city.required' => 'Selecciona la ciudad destino.',
             'delivery_address.required_if' => 'Indica la dirección exacta de entrega.',
             'delivery_sector.required_if' => 'Indica el sector o urbanización.',
+            'pickup_ally_id.required_if' => 'Selecciona el punto de retiro.',
+            'pickup_ally_id.exists' => 'El punto de retiro seleccionado no está disponible.',
         ];
     }
 
@@ -221,12 +263,24 @@ class PackageCreate extends Component
     {
         if ($property === 'destination_state') {
             $this->destination_city = '';
+            $this->destinationCities = $this->citiesForSelectedState();
+
+            // El punto de retiro elegido pertenece al estado destino
+            // anterior; deja de ser válido si el estado cambió.
+            $this->pickup_ally_id = null;
+            $this->refreshPickupAllies();
         }
 
-        if ($property === 'requires_delivery' && ! $this->requires_delivery) {
-            $this->delivery_address = '';
-            $this->delivery_sector = '';
-            $this->delivery_reference = '';
+        if ($property === 'requires_delivery') {
+            if ($this->requires_delivery) {
+                // Con delivery, no aplica punto de retiro.
+                $this->pickup_ally_id = null;
+            } else {
+                $this->delivery_address = '';
+                $this->delivery_sector = '';
+                $this->delivery_reference = '';
+                $this->refreshPickupAllies();
+            }
         }
 
         if ($property === 'is_cod') {
@@ -495,6 +549,7 @@ class PackageCreate extends Component
             'delivery_address' => $this->delivery_address,
             'delivery_sector' => $this->delivery_sector,
             'delivery_reference' => $this->delivery_reference,
+            'pickup_ally_name' => $package->pickupAlly?->business_name,
             'is_cod' => $this->is_cod,
             'payment_method' => $this->payment_method,
             'cod_amount_usd' => $this->cod_amount_usd,
@@ -543,8 +598,9 @@ class PackageCreate extends Component
             'sender_name', 'sender_phone', 'sender_email',
             'recipient_doc_type', 'recipient_doc_number', 'recipient_id_doc',
             'recipient_name', 'recipient_phone', 'recipient_email',
-            'destination_state', 'destination_city',
+            'destination_state', 'destination_city', 'destinationCities',
             'requires_delivery', 'delivery_address', 'delivery_sector', 'delivery_reference',
+            'pickup_ally_id', 'pickupAllies',
             'physical_weight_kg', 'length_cm', 'width_cm', 'height_cm',
             'is_fragile', 'has_insurance', 'declared_value_usd',
             'payment_method', 'is_cod', 'cod_amount_usd',
@@ -563,7 +619,34 @@ class PackageCreate extends Component
 
     protected function citiesForSelectedState(): array
     {
-        return config('venezuela.states')[$this->destination_state] ?? [];
+        if ($this->destination_state === '') {
+            return [];
+        }
+
+        return app(VenezuelaLocationService::class)->citiesByState($this->destination_state);
+    }
+
+    /**
+     * Aliados verificados como punto de retiro (Regla 9-12) en el
+     * estado destino ya elegido. Solo se recalcula cuando aplica
+     * (requires_delivery = false); esta fase no implementa ninguna
+     * resolución logística de cobertura, solo un filtro directo por
+     * el estado que el cliente ya seleccionó como destino.
+     */
+    protected function refreshPickupAllies(): void
+    {
+        if ($this->requires_delivery || $this->destination_state === '') {
+            $this->pickupAllies = [];
+
+            return;
+        }
+
+        $this->pickupAllies = Ally::query()
+            ->verifiedDestinations()
+            ->where('state', $this->destination_state)
+            ->orderBy('business_name')
+            ->get(['id', 'business_name', 'city', 'state'])
+            ->toArray();
     }
 
     public function render()

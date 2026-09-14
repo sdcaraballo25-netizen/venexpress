@@ -3,6 +3,8 @@
 namespace App\Livewire\Admin;
 
 use App\Models\Warehouse;
+use App\Services\VenezuelaLocationService;
+use Illuminate\Validation\Rule;
 use Livewire\Attributes\Layout;
 use Livewire\Attributes\Title;
 use Livewire\Component;
@@ -30,6 +32,35 @@ class WarehousesManager extends Component
 
     public ?string $successMessage = null;
 
+    /**
+     * Catálogo de estados, servido por VenezuelaLocationService
+     * (database/data/venezuela.json) — fuente única geográfica del
+     * sistema. Estado/Ciudad dejan de ser texto libre: la ciudad se
+     * elige de una lista dependiente del estado seleccionado.
+     */
+    public array $states = [];
+
+    public array $cities = [];
+
+    public function mount(VenezuelaLocationService $locationService): void
+    {
+        $this->states = $locationService->states();
+    }
+
+    /**
+     * Al cambiar el Estado seleccionado, se recarga la lista de
+     * ciudades dependientes y se limpia la ciudad elegida (mismo
+     * patrón que ya usa Admin\RoutesManager).
+     */
+    public function updatedState(VenezuelaLocationService $locationService): void
+    {
+        $this->city = '';
+
+        $this->cities = $this->state !== ''
+            ? $locationService->citiesByState($this->state)
+            : [];
+    }
+
     public function startCreating(): void
     {
         $this->resetForm();
@@ -37,14 +68,17 @@ class WarehousesManager extends Component
         $this->showForm = true;
     }
 
-    public function editWarehouse(int $warehouseId): void
+    public function editWarehouse(int $warehouseId, VenezuelaLocationService $locationService): void
     {
         $warehouse = Warehouse::findOrFail($warehouseId);
 
         $this->editingWarehouseId = $warehouse->id;
         $this->name = $warehouse->name;
-        $this->city = $warehouse->city;
         $this->state = $warehouse->state;
+        $this->cities = $this->state !== ''
+            ? $locationService->citiesByState($this->state)
+            : [];
+        $this->city = $warehouse->city;
         $this->address = $warehouse->address ?? '';
 
         $this->showForm = true;
@@ -65,6 +99,7 @@ class WarehousesManager extends Component
             'city',
             'state',
             'address',
+            'cities',
         ]);
     }
 
@@ -72,8 +107,8 @@ class WarehousesManager extends Component
     {
         $this->validate([
             'name' => ['required', 'string', 'max:255'],
-            'city' => ['required', 'string', 'max:255'],
-            'state' => ['required', 'string', 'max:255'],
+            'state' => ['required', 'string', Rule::in($this->states)],
+            'city' => ['required', 'string', Rule::in($this->cities)],
             'address' => ['nullable', 'string', 'max:255'],
         ]);
 

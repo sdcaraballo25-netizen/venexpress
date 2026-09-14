@@ -192,6 +192,17 @@
 
                                 {{ $ally->city }}
 
+                                @if($ally->is_verified_destination)
+                                    <div class="mt-1">
+                                        <span
+                                            title="Configuración administrativa temporal — no proviene de un flujo de verificación documental todavía"
+                                            class="inline-flex items-center gap-1 rounded-md bg-emerald-50 px-2 py-0.5 text-[10px] font-semibold text-emerald-700"
+                                        >
+                                            Punto de retiro verificado
+                                        </span>
+                                    </div>
+                                @endif
+
                             </td>
 
 
@@ -240,6 +251,30 @@
                                         >
                                             <i class="fa-solid fa-location-dot"></i>
                                             {{ $ally->latitude ? 'Editar ubicación' : 'Fijar ubicación' }}
+                                        </button>
+                                    @endif
+
+                                    {{-- =========================================
+                                         PUNTO DE RETIRO VERIFICADO
+                                         (configuración administrativa temporal,
+                                         no es el flujo de verificación documental)
+                                    ========================================== --}}
+                                    @if($ally->status !== Ally::STATUS_REJECTED)
+                                        <button
+                                            wire:click="toggleVerifiedDestination({{ $ally->id }})"
+                                            wire:confirm="{{ $ally->is_verified_destination
+                                                ? '¿Quitar la verificación de punto de entrega/retiro de este aliado?'
+                                                : 'Esto es una configuración administrativa temporal (todavía no existe el flujo de verificación documental). ¿Marcar este aliado como punto verificado de entrega/retiro?' }}"
+                                            title="Configuración administrativa temporal"
+                                            class="px-3 py-2 rounded-lg
+                                                   {{ $ally->is_verified_destination
+                                                        ? 'bg-emerald-50 text-emerald-700 hover:bg-emerald-100'
+                                                        : 'bg-slate-50 text-slate-600 hover:bg-slate-100' }}
+                                                   text-xs font-semibold
+                                                   transition inline-flex items-center gap-1.5"
+                                        >
+                                            <i class="fa-solid fa-shield-halved"></i>
+                                            {{ $ally->is_verified_destination ? 'Quitar verificación' : 'Marcar verificado (temporal)' }}
                                         </button>
                                     @endif
 
@@ -436,7 +471,7 @@
                         <label class="block text-xs font-medium text-[#64748B] mb-1">Estado</label>
                         <select wire:model="location_state" class="w-full rounded-lg border-[#E2E8F0] text-sm focus:ring-blue-500 focus:border-blue-500">
                             <option value="">Selecciona...</option>
-                            @foreach (array_keys(config('venezuela.states', [])) as $state)
+                            @foreach ($venezuelaStates as $state)
                                 <option value="{{ $state }}">{{ $state }}</option>
                             @endforeach
                         </select>

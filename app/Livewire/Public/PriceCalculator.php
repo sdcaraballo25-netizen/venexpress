@@ -4,6 +4,7 @@ namespace App\Livewire\Public;
 
 use App\Models\Package;
 use App\Services\TariffService;
+use App\Services\VenezuelaLocationService;
 use Livewire\Attributes\Computed;
 use Livewire\Attributes\Layout;
 use Livewire\Component;
@@ -75,12 +76,28 @@ class PriceCalculator extends Component
     }
 
     /**
+     * Estados disponibles, servidos por VenezuelaLocationService
+     * (database/data/venezuela.json) — fuente única geográfica del
+     * sistema. Antes esta pantalla leía config('venezuela.states'),
+     * una segunda fuente independiente que ya se retiró.
+     */
+    #[Computed]
+    public function states(): array
+    {
+        return app(VenezuelaLocationService::class)->states();
+    }
+
+    /**
      * Ciudades disponibles para el estado de origen seleccionado.
      */
     #[Computed]
     public function originCities(): array
     {
-        return config('venezuela.states')[$this->origin_state] ?? [];
+        if ($this->origin_state === '') {
+            return [];
+        }
+
+        return app(VenezuelaLocationService::class)->citiesByState($this->origin_state);
     }
 
     /**
@@ -89,7 +106,11 @@ class PriceCalculator extends Component
     #[Computed]
     public function destinationCities(): array
     {
-        return config('venezuela.states')[$this->destination_state] ?? [];
+        if ($this->destination_state === '') {
+            return [];
+        }
+
+        return app(VenezuelaLocationService::class)->citiesByState($this->destination_state);
     }
 
     public function calculate(): void

@@ -48,7 +48,7 @@
                             <select wire:model.live="origin_state"
                                 class="w-full rounded-lg border-gray-200 text-sm focus:ring-blue-950 focus:border-blue-950">
                                 <option value="">Selecciona...</option>
-                                @foreach (array_keys(config('venezuela.states', [])) as $state)
+                                @foreach ($this->states as $state)
                                     <option value="{{ $state }}">{{ $state }}</option>
                                 @endforeach
                             </select>
@@ -72,7 +72,7 @@
                             <select wire:model.live="destination_state"
                                 class="w-full rounded-lg border-gray-200 text-sm focus:ring-blue-950 focus:border-blue-950">
                                 <option value="">Selecciona...</option>
-                                @foreach (array_keys(config('venezuela.states', [])) as $state)
+                                @foreach ($this->states as $state)
                                     <option value="{{ $state }}">{{ $state }}</option>
                                 @endforeach
                             </select>

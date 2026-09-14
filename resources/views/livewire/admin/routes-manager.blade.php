@@ -123,7 +123,11 @@
                             </div>
 
                             <p class="text-sm text-[#64748B] mt-1">
-                                {{ $route->city }}
+                                @php
+                                    $routeLocation = trim(implode(', ', array_filter([$route->city, $route->state])));
+                                @endphp
+
+                                {{ $routeLocation !== '' ? $routeLocation : 'Varios estados/ciudades' }}
                             </p>
 
                             {{-- TIPO DE RUTA --}}
@@ -140,6 +144,22 @@
                                     Delivery → Cliente
                                 @endif
                             </p>
+
+                            @if ($route->originWarehouse || $route->returnWarehouse)
+                                <p class="text-xs text-[#64748B] mt-1">
+                                    @if ($route->originWarehouse)
+                                        <span class="font-semibold text-[#475569]">Parte de:</span>
+                                        {{ $route->originWarehouse->name }}
+                                    @endif
+                                    @if ($route->originWarehouse && $route->returnWarehouse)
+                                        &middot;
+                                    @endif
+                                    @if ($route->returnWarehouse)
+                                        <span class="font-semibold text-[#475569]">Regresa a:</span>
+                                        {{ $route->returnWarehouse->name }}
+                                    @endif
+                                </p>
+                            @endif
                         </div>
 
                         <div class="flex flex-wrap gap-2">
@@ -229,8 +249,13 @@
                                             {{ $stop->ally?->business_name ?? $stop->warehouse?->name ?? 'Parada' }}
                                         </p>
 
+                                        @php
+                                            $stopCity = $stop->ally?->city ?? $stop->warehouse?->city ?? $route->city;
+                                            $stopState = $stop->ally?->state ?? $stop->warehouse?->state ?? $route->state;
+                                        @endphp
+
                                         <p class="text-xs text-[#64748B]">
-                                            {{ $stop->ally?->city ?? $stop->warehouse?->city ?? $route->city }}
+                                            {{ $stopCity }}{{ $stopState ? ', '.$stopState : '' }}
                                         </p>
                                     </div>
 
@@ -300,7 +325,7 @@
                         </h2>
 
                         <p class="text-sm text-[#64748B] mt-1">
-                            Define la ciudad y ordena las agencias.
+                            Ordena las paradas — pueden pertenecer a distintos estados o ciudades.
                         </p>
 
                     </div>
@@ -351,11 +376,11 @@
 
                         </div>
 
-                        {{-- ESTADO --}}
+                        {{-- ESTADO (referencial, no limita las paradas) --}}
                         <div>
 
                             <label class="block text-xs font-bold text-[#64748B] uppercase mb-2">
-                                Estado
+                                Estado <span class="normal-case font-normal text-[10px]">(opcional, solo referencial)</span>
                             </label>
 
                             <select
@@ -363,7 +388,7 @@
                                 class="w-full rounded-xl border-[#E2E8F0]">
 
                                 <option value="">
-                                    Seleccionar estado
+                                    Sin especificar
                                 </option>
 
                                 @foreach ($states as $stateOption)
@@ -382,11 +407,11 @@
 
                         </div>
 
-                        {{-- CIUDAD --}}
+                        {{-- CIUDAD (referencial, no limita las paradas) --}}
                         <div>
 
                             <label class="block text-xs font-bold text-[#64748B] uppercase mb-2">
-                                Ciudad
+                                Ciudad <span class="normal-case font-normal text-[10px]">(opcional, solo referencial)</span>
                             </label>
 
                             <select
@@ -397,7 +422,7 @@
                                 <option value="">
                                     {{ $state === ''
                                         ? 'Primero selecciona un estado'
-                                        : 'Seleccionar ciudad' }}
+                                        : 'Sin especificar' }}
                                 </option>
 
                                 @foreach ($cities as $cityOption)
@@ -439,6 +464,82 @@
 
                     </div>
 
+                    {{-- HUB DE ORIGEN / RETORNO (opcional) --}}
+                    <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+
+                        <div>
+
+                            <label class="block text-xs font-bold text-[#64748B] uppercase mb-2">
+                                HUB de origen <span class="normal-case font-normal text-[10px]">(opcional)</span>
+                            </label>
+
+                            <select
+                                wire:model="originWarehouseId"
+                                class="w-full rounded-xl border-[#E2E8F0]">
+
+                                <option value="">Sin especificar</option>
+
+                                @foreach ($allWarehouses as $warehouseOption)
+                                    <option value="{{ $warehouseOption->id }}">
+                                        {{ $warehouseOption->name }} ({{ $warehouseOption->city }})
+                                    </option>
+                                @endforeach
+
+                            </select>
+
+                            @error('originWarehouseId')
+                                <p class="text-xs text-red-600 mt-1">{{ $message }}</p>
+                            @enderror
+
+                        </div>
+
+                        <div>
+
+                            <label class="block text-xs font-bold text-[#64748B] uppercase mb-2">
+                                HUB de retorno <span class="normal-case font-normal text-[10px]">(opcional)</span>
+                            </label>
+
+                            <select
+                                wire:model="returnWarehouseId"
+                                class="w-full rounded-xl border-[#E2E8F0]">
+
+                                <option value="">Sin especificar</option>
+
+                                @foreach ($allWarehouses as $warehouseOption)
+                                    <option value="{{ $warehouseOption->id }}">
+                                        {{ $warehouseOption->name }} ({{ $warehouseOption->city }})
+                                    </option>
+                                @endforeach
+
+                            </select>
+
+                            @error('returnWarehouseId')
+                                <p class="text-xs text-red-600 mt-1">{{ $message }}</p>
+                            @enderror
+
+                        </div>
+
+                    </div>
+
+                    {{-- BUSCADOR DE PARADAS --}}
+                    <div>
+
+                        <label class="block text-xs font-bold text-[#64748B] uppercase mb-2">
+                            Buscar parada
+                        </label>
+
+                        <input
+                            type="text"
+                            wire:model.live.debounce.300ms="stopSearch"
+                            placeholder="Nombre, ciudad o estado..."
+                            class="w-full rounded-xl border-[#E2E8F0]">
+
+                        <p class="text-xs text-[#94A3B8] mt-1">
+                            Solo acota la lista de abajo — no limita qué paradas puedes agregar a la ruta.
+                        </p>
+
+                    </div>
+
                     @if ($routeType === \App\Models\Route::TYPE_HUB_DISTRIBUTION)
 
                         {{-- ALMACENES DISPONIBLES --}}
@@ -448,17 +549,15 @@
                                 Almacenes disponibles
                             </p>
 
-                            @if ($state === '')
-
-                                <div class="rounded-xl bg-slate-50 p-4 text-sm text-[#64748B]">
-                                    Selecciona primero el estado.
-                                </div>
-
-                            @elseif ($availableWarehouses->isEmpty())
+                            @if ($availableWarehouses->isEmpty())
 
                                 <div class="rounded-xl bg-amber-50 p-4 text-sm text-amber-700">
-                                    No hay almacenes activos en este estado. Créalos primero en
-                                    <a href="{{ route('admin.warehouses') }}" class="underline font-semibold">Almacenes</a>.
+                                    @if ($stopSearch !== '')
+                                        Ningún almacén activo coincide con "{{ $stopSearch }}".
+                                    @else
+                                        No hay almacenes activos. Créalos primero en
+                                        <a href="{{ route('admin.warehouses') }}" class="underline font-semibold">Almacenes</a>.
+                                    @endif
                                 </div>
 
                             @else
@@ -482,7 +581,7 @@
                                                 </p>
 
                                                 <p class="text-xs text-[#64748B]">
-                                                    {{ $warehouse->city }}
+                                                    {{ $warehouse->city }}{{ $warehouse->state ? ', '.$warehouse->state : '' }}
                                                 </p>
 
                                             </div>
@@ -510,16 +609,14 @@
                                 Agencias disponibles
                             </p>
 
-                            @if ($state === '' || $city === '')
-
-                                <div class="rounded-xl bg-slate-50 p-4 text-sm text-[#64748B]">
-                                    Selecciona primero el estado y la ciudad.
-                                </div>
-
-                            @elseif ($availableAllies->isEmpty())
+                            @if ($availableAllies->isEmpty())
 
                                 <div class="rounded-xl bg-amber-50 p-4 text-sm text-amber-700">
-                                    No hay agencias aliadas activas en esta ciudad.
+                                    @if ($stopSearch !== '')
+                                        Ninguna agencia activa coincide con "{{ $stopSearch }}".
+                                    @else
+                                        No hay agencias aliadas activas.
+                                    @endif
                                 </div>
 
                             @else
@@ -543,7 +640,7 @@
                                                 </p>
 
                                                 <p class="text-xs text-[#64748B]">
-                                                    {{ $ally->city }}
+                                                    {{ $ally->city }}{{ $ally->state ? ', '.$ally->state : '' }}
                                                 </p>
 
                                             </div>

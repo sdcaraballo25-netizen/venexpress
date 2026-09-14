@@ -51,12 +51,15 @@
                     <label class="text-sm font-medium text-slate-600">
                         Estado
                     </label>
-                    <input
-                        type="text"
-                        wire:model="state"
-                        placeholder="Ej. Carabobo"
+                    <select
+                        wire:model.live="state"
                         class="mt-2 w-full rounded-xl border border-slate-300 px-4 py-3 text-sm focus:border-blue-900 focus:ring-blue-900"
                     >
+                        <option value="">Selecciona...</option>
+                        @foreach ($states as $stateOption)
+                            <option value="{{ $stateOption }}">{{ $stateOption }}</option>
+                        @endforeach
+                    </select>
                     @error('state')
                         <p class="mt-1 text-xs text-red-600">{{ $message }}</p>
                     @enderror
@@ -66,12 +69,16 @@
                     <label class="text-sm font-medium text-slate-600">
                         Ciudad
                     </label>
-                    <input
-                        type="text"
+                    <select
                         wire:model="city"
-                        placeholder="Ej. Valencia"
-                        class="mt-2 w-full rounded-xl border border-slate-300 px-4 py-3 text-sm focus:border-blue-900 focus:ring-blue-900"
+                        @disabled($state === '')
+                        class="mt-2 w-full rounded-xl border border-slate-300 px-4 py-3 text-sm focus:border-blue-900 focus:ring-blue-900 disabled:bg-slate-50"
                     >
+                        <option value="">Selecciona...</option>
+                        @foreach ($cities as $cityOption)
+                            <option value="{{ $cityOption }}">{{ $cityOption }}</option>
+                        @endforeach
+                    </select>
                     @error('city')
                         <p class="mt-1 text-xs text-red-600">{{ $message }}</p>
                     @enderror

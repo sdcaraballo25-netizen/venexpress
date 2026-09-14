@@ -4,6 +4,8 @@ namespace App\Livewire\Admin;
 
 use App\Models\Ally;
 use App\Models\AuditLog;
+use App\Services\VenezuelaLocationService;
+use Illuminate\Validation\Rule;
 use Livewire\Attributes\Layout;
 use Livewire\Attributes\Title;
 use Livewire\Component;
@@ -56,7 +58,7 @@ class AlliesManager extends Component
     public function saveLocation(): void
     {
         $this->validate([
-            'location_state' => ['required', 'string'],
+            'location_state' => ['required', 'string', Rule::in(app(VenezuelaLocationService::class)->states())],
             'location_latitude' => ['required', 'numeric', 'between:-90,90'],
             'location_longitude' => ['required', 'numeric', 'between:-180,180'],
         ], [], [
@@ -190,6 +192,47 @@ class AlliesManager extends Component
     }
 
     /**
+     * Activa/desactiva manualmente la capacidad de "Aliado verificado
+     * como punto final de entrega/retiro".
+     *
+     * ESTO ES UNA CONFIGURACIÓN ADMINISTRATIVA TEMPORAL: todavía no
+     * existe el flujo real de verificación documental (solicitud ->
+     * revisión -> aprobado/rechazado), así que por ahora el Admin
+     * activa o desactiva el flag directamente. Cuando ese flujo se
+     * construya, esta acción manual dejará de ser el único camino.
+     */
+    public function toggleVerifiedDestination(int $allyId): void
+    {
+        $ally = Ally::findOrFail($allyId);
+
+        $newValue = ! $ally->is_verified_destination;
+
+        $ally->update([
+            'is_verified_destination' => $newValue,
+            'destination_verification_status' => $newValue
+                ? Ally::DESTINATION_VERIFICATION_APPROVED
+                : null,
+            'destination_verified_at' => $newValue ? now() : null,
+        ]);
+
+        $this->logAllyAction(
+            $ally,
+            'ally.destination_verification_toggled',
+            $newValue
+                ? "Marcó manualmente a {$ally->business_name} como punto verificado de entrega/retiro (configuración temporal)."
+                : "Quitó la verificación de punto de entrega/retiro de {$ally->business_name}.",
+            ['is_verified_destination' => $newValue]
+        );
+
+        session()->flash(
+            'success',
+            $newValue
+                ? 'El aliado fue marcado como punto verificado de entrega/retiro.'
+                : 'Se quitó la verificación de punto de entrega/retiro.'
+        );
+    }
+
+    /**
      * Registra en la bitácora de auditoría una acción administrativa
      * sobre un aliado (cambio de estado o de ubicación).
      */
@@ -230,6 +273,7 @@ class AlliesManager extends Component
 
         return view('livewire.admin.allies-manager', [
             'allies' => $allies,
+            'venezuelaStates' => app(VenezuelaLocationService::class)->states(),
         ]);
     }
 }

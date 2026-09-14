@@ -68,6 +68,8 @@ class Route extends Model
         'started_at',
         'completed_at',
         'route_type',
+        'origin_warehouse_id',
+        'return_warehouse_id',
     ];
 
     /**
@@ -108,6 +110,25 @@ class Route extends Model
     public function stops(): HasMany
     {
         return $this->hasMany(RouteStop::class)->orderBy('sequence');
+    }
+
+    /**
+     * HUB (Warehouse) desde el que el driver parte antes de visitar
+     * las paradas de la ruta. Opcional: informativo/de planificación,
+     * no participa en las validaciones de escaneo (Fase 2).
+     */
+    public function originWarehouse(): BelongsTo
+    {
+        return $this->belongsTo(Warehouse::class, 'origin_warehouse_id');
+    }
+
+    /**
+     * HUB (Warehouse) al que el driver debe regresar con la carga al
+     * finalizar la ruta. Opcional, mismo criterio que originWarehouse().
+     */
+    public function returnWarehouse(): BelongsTo
+    {
+        return $this->belongsTo(Warehouse::class, 'return_warehouse_id');
     }
 
     /*

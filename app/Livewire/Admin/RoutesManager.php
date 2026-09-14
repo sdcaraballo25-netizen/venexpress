@@ -54,6 +54,22 @@ class RoutesManager extends Component
 
     public array $selectedStops = [];
 
+    /**
+     * HUB (Warehouse) desde el que el driver parte / al que regresa.
+     * Ambos opcionales — Fase 2 (rutas multiestado, Reglas 32/41).
+     */
+    public ?int $originWarehouseId = null;
+
+    public ?int $returnWarehouseId = null;
+
+    /**
+     * Búsqueda opcional para acotar la lista de paradas disponibles
+     * (agencias o almacenes, según el tipo de ruta). Reemplaza el
+     * filtro duro por state/city: ya no limita qué se puede agregar,
+     * solo ayuda a encontrar algo en una lista larga.
+     */
+    public string $stopSearch = '';
+
     /*
     |--------------------------------------------------------------------------
     | Recolección
@@ -155,6 +171,9 @@ class RoutesManager extends Component
             'city',
             'routeType',
             'selectedStops',
+            'originWarehouseId',
+            'returnWarehouseId',
+            'stopSearch',
         ]);
 
         $this->routeType = Route::TYPE_DELIVERY;
@@ -179,6 +198,9 @@ class RoutesManager extends Component
         $this->state = $route->state ?? '';
         $this->city = $route->city ?? '';
         $this->routeType = $route->route_type ?? Route::TYPE_DELIVERY;
+        $this->originWarehouseId = $route->origin_warehouse_id;
+        $this->returnWarehouseId = $route->return_warehouse_id;
+        $this->stopSearch = '';
 
         $locationColumn = $this->routeType === Route::TYPE_HUB_DISTRIBUTION
             ? 'warehouse_id'
@@ -217,6 +239,9 @@ class RoutesManager extends Component
             'city',
             'routeType',
             'selectedStops',
+            'originWarehouseId',
+            'returnWarehouseId',
+            'stopSearch',
         ]);
 
         $this->routeType = Route::TYPE_DELIVERY;
@@ -291,10 +316,15 @@ class RoutesManager extends Component
     {
         $this->validate([
             'name' => ['required', 'string', 'max:255'],
-            'state' => ['required', 'string'],
-            'city' => ['required', 'string'],
+            // Estado/Ciudad de la ruta son opcionales desde la Fase 2:
+            // ya no restringen qué paradas puede tener la ruta, quedan
+            // solo como metadato descriptivo/de búsqueda.
+            'state' => ['nullable', 'string'],
+            'city' => ['nullable', 'string'],
             'routeType' => ['required', 'in:'.implode(',', Route::TYPES)],
             'selectedStops' => ['required', 'array', 'min:1'],
+            'originWarehouseId' => ['nullable', 'integer', 'exists:warehouses,id'],
+            'returnWarehouseId' => ['nullable', 'integer', 'exists:warehouses,id'],
         ]);
 
         try {
@@ -302,10 +332,12 @@ class RoutesManager extends Component
                 $routeService->updateRoute(
                     routeId: $this->editingRouteId,
                     name: $this->name,
-                    state: $this->state,
-                    city: $this->city,
+                    state: $this->state !== '' ? $this->state : null,
+                    city: $this->city !== '' ? $this->city : null,
                     allyIds: $this->selectedStops,
                     actingUserId: Auth::id(),
+                    originWarehouseId: $this->originWarehouseId,
+                    returnWarehouseId: $this->returnWarehouseId,
                 );
 
                 session()->flash(
@@ -316,9 +348,11 @@ class RoutesManager extends Component
                 $routeService->createRoute(
                     data: [
                         'name' => $this->name,
-                        'state' => $this->state,
-                        'city' => $this->city,
+                        'state' => $this->state !== '' ? $this->state : null,
+                        'city' => $this->city !== '' ? $this->city : null,
                         'route_type' => $this->routeType,
+                        'origin_warehouse_id' => $this->originWarehouseId,
+                        'return_warehouse_id' => $this->returnWarehouseId,
                     ],
                     allyIdsInOrder: $this->selectedStops,
                     createdByUserId: Auth::id(),
@@ -449,6 +483,8 @@ class RoutesManager extends Component
                 'driver.user',
                 'stops.ally',
                 'stops.warehouse',
+                'originWarehouse',
+                'returnWarehouse',
             ])
             ->when(
                 $this->filterState !== '',
@@ -465,26 +501,47 @@ class RoutesManager extends Component
             ->latest()
             ->paginate(10);
 
-        $availableAllies = collect();
+        /*
+         * Fase 2: las paradas ya no se filtran por el state/city de la
+         * ruta (Reglas 24/26/27) — se listan todas las agencias/
+         * almacenes activos, acotables solo con una búsqueda opcional
+         * que no restringe qué se puede agregar.
+         */
+        $availableAllies = Ally::query()
+            ->where('status', Ally::STATUS_ACTIVE)
+            ->when($this->stopSearch !== '', function ($query) {
+                $search = $this->stopSearch;
 
-        if ($this->state !== '' && $this->city !== '') {
-            $availableAllies = Ally::query()
-                ->where('state', $this->state)
-                ->where('city', $this->city)
-                ->where('status', Ally::STATUS_ACTIVE)
-                ->orderBy('business_name')
-                ->get();
-        }
+                $query->where(function ($q) use ($search) {
+                    $q->where('business_name', 'like', "%{$search}%")
+                        ->orWhere('city', 'like', "%{$search}%")
+                        ->orWhere('state', 'like', "%{$search}%");
+                });
+            })
+            ->orderBy('business_name')
+            ->get();
 
-        $availableWarehouses = collect();
+        // Todos los almacenes activos, sin filtrar: fuente tanto del
+        // picker de paradas (rutas hub_distribution) como de los
+        // selects de HUB de origen/retorno (cualquier tipo de ruta).
+        $allWarehouses = Warehouse::query()
+            ->where('is_active', true)
+            ->orderBy('name')
+            ->get();
 
-        if ($this->routeType === Route::TYPE_HUB_DISTRIBUTION && $this->state !== '') {
-            $availableWarehouses = Warehouse::query()
-                ->where('state', $this->state)
+        $availableWarehouses = $this->stopSearch !== ''
+            ? Warehouse::query()
                 ->where('is_active', true)
+                ->where(function ($query) {
+                    $search = $this->stopSearch;
+
+                    $query->where('name', 'like', "%{$search}%")
+                        ->orWhere('city', 'like', "%{$search}%")
+                        ->orWhere('state', 'like', "%{$search}%");
+                })
                 ->orderBy('name')
-                ->get();
-        }
+                ->get()
+            : $allWarehouses;
 
         $collectiblePackages = $this->collectingStopId
             ? $routeService->collectiblePackagesFor(
@@ -496,6 +553,7 @@ class RoutesManager extends Component
             'routes' => $routes,
             'availableAllies' => $availableAllies,
             'availableWarehouses' => $availableWarehouses,
+            'allWarehouses' => $allWarehouses,
             'collectiblePackages' => $collectiblePackages,
         ]);
     }

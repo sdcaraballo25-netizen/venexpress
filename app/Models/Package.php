@@ -60,6 +60,7 @@ class Package extends Model
         'tracking_number',
         'security_hash',
         'ally_id',
+        'pickup_ally_id',
         'driver_id',
 
         'sender_name',
@@ -185,6 +186,17 @@ class Package extends Model
     public function ally(): BelongsTo
     {
         return $this->belongsTo(Ally::class);
+    }
+
+    /**
+     * Aliado verificado elegido por el cliente como punto de retiro,
+     * cuando el pedido no requiere delivery (requires_delivery =
+     * false). Distinto de ally(), que es siempre el Aliado de origen
+     * donde se registró el pedido.
+     */
+    public function pickupAlly(): BelongsTo
+    {
+        return $this->belongsTo(Ally::class, 'pickup_ally_id');
     }
 
     public function driver(): BelongsTo

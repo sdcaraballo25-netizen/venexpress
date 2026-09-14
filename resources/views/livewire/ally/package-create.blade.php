@@ -173,6 +173,8 @@
                     @if (! empty($printSnapshot['delivery_reference']))
                         <p style="margin:2px 0;"><strong>Referencia:</strong> {{ $printSnapshot['delivery_reference'] }}</p>
                     @endif
+                @elseif (! empty($printSnapshot['pickup_ally_name']))
+                    <p style="margin:2px 0;"><strong>Punto de retiro:</strong> {{ $printSnapshot['pickup_ally_name'] }}</p>
                 @endif
 
                 <p style="margin:8px 0 2px;">
@@ -231,6 +233,8 @@
                 <strong>Destino:</strong>
                 @if (! empty($printSnapshot['requires_delivery']))
                     {{ $printSnapshot['delivery_address'] ?? '' }} — {{ $printSnapshot['delivery_sector'] ?? '' }},
+                @elseif (! empty($printSnapshot['pickup_ally_name']))
+                    Retiro en {{ $printSnapshot['pickup_ally_name'] }},
                 @else
                     Retiro en agencia,
                 @endif
@@ -522,7 +526,7 @@
                         <select wire:model.live="destination_state"
                             class="mt-1 w-full rounded-xl border border-slate-300 px-3 py-2 text-sm shadow-sm focus:border-blue-900 focus:ring-blue-900">
                             <option value="">Selecciona un estado...</option>
-                            @foreach (array_keys(config('venezuela.states', [])) as $state)
+                            @foreach ($destinationStates as $state)
                                 <option value="{{ $state }}">{{ $state }}</option>
                             @endforeach
                         </select>
@@ -535,7 +539,7 @@
                             @disabled(empty($destination_state))
                             class="mt-1 w-full rounded-xl border border-slate-300 px-3 py-2 text-sm shadow-sm focus:border-blue-900 focus:ring-blue-900 disabled:bg-slate-50">
                             <option value="">Selecciona una ciudad...</option>
-                            @foreach (config('venezuela.states')[$destination_state] ?? [] as $city)
+                            @foreach ($destinationCities as $city)
                                 <option value="{{ $city }}">{{ $city }}</option>
                             @endforeach
                         </select>
@@ -661,6 +665,32 @@
                             <strong>${{ number_format($pricePreview['delivery_fee_usd'] ?? 0, 2) }}</strong>
                         </div>
                     @endif
+                @else
+                    <div class="mt-4">
+                        <label class="text-sm text-slate-600">Punto de retiro</label>
+
+                        @if ($destination_state === '')
+                            <p class="mt-2 text-xs text-[#94A3B8]">
+                                Selecciona primero el estado destino.
+                            </p>
+                        @elseif (empty($pickupAllies))
+                            <p class="mt-2 text-xs text-amber-700 bg-amber-50 rounded-lg px-3 py-2">
+                                No hay puntos de retiro verificados disponibles en {{ $destination_state }} todavía.
+                            </p>
+                        @else
+                            <select wire:model.live="pickup_ally_id"
+                                class="mt-1 w-full rounded-xl border border-slate-300 px-3 py-2 text-sm shadow-sm focus:border-blue-900 focus:ring-blue-900">
+                                <option value="">Selecciona un punto de retiro...</option>
+                                @foreach ($pickupAllies as $pickupAlly)
+                                    <option value="{{ $pickupAlly['id'] }}">
+                                        {{ $pickupAlly['business_name'] }} — {{ $pickupAlly['city'] }}
+                                    </option>
+                                @endforeach
+                            </select>
+                        @endif
+
+                        @error('pickup_ally_id') <p class="text-xs text-red-600 mt-1">{{ $message }}</p> @enderror
+                    </div>
                 @endif
             </div>
 
