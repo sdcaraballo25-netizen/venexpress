@@ -62,6 +62,16 @@ class PackageCreate extends Component
     public string $delivery_sector = '';
     public string $delivery_reference = '';
 
+    /**
+     * Coordenadas exactas, capturadas por el Google Places Autocomplete
+     * del campo "Dirección exacta de entrega" cuando el aliado
+     * selecciona una sugerencia (ver package-create.blade.php). Se
+     * limpian apenas el texto cambia sin volver a seleccionar una
+     * sugerencia, para no guardar coordenadas de una dirección vieja.
+     */
+    public ?float $delivery_latitude = null;
+    public ?float $delivery_longitude = null;
+
     // Cobro
     public string $payment_method = '';
     public bool $is_cod = false;
@@ -179,6 +189,8 @@ class PackageCreate extends Component
             'delivery_address' => ['nullable', 'string', 'max:1000', 'required_if:requires_delivery,true'],
             'delivery_sector' => ['nullable', 'string', 'max:255', 'required_if:requires_delivery,true'],
             'delivery_reference' => ['nullable', 'string', 'max:1000'],
+            'delivery_latitude' => ['nullable', 'numeric', 'between:-90,90'],
+            'delivery_longitude' => ['nullable', 'numeric', 'between:-180,180'],
 
             'package_type' => ['required', 'in:' . implode(',', Package::TYPES)],
             'physical_weight_kg' => ['required', 'numeric', 'min:0.01'],
@@ -190,7 +202,7 @@ class PackageCreate extends Component
             'has_insurance' => ['boolean'],
             'declared_value_usd' => ['nullable', 'required_if:has_insurance,true', 'numeric', 'min:0.01'],
 
-            'payment_method' => [$this->is_cod ? 'nullable' : 'required', 'in:efectivo_usd,efectivo_ves,pago_movil,transferencia,zelle'],
+            'payment_method' => [$this->is_cod ? 'nullable' : 'required', Rule::in(Package::PAYMENT_METHODS)],
 
             'is_cod' => ['boolean'],
             'cod_amount_usd' => ['nullable', 'required_if:is_cod,true', 'numeric', 'min:0.01'],
@@ -221,13 +233,37 @@ class PackageCreate extends Component
     {
         if ($property === 'destination_state') {
             $this->destination_city = '';
+
+            // La coordenada exacta que haya quedado de una selección
+            // previa del autocompletado ya no corresponde al nuevo
+            // destino — sin esto, el mensaje "✓ Ubicación exacta
+            // confirmada" seguiría mostrándose con datos viejos.
+            $this->delivery_latitude = null;
+            $this->delivery_longitude = null;
+        }
+
+        if ($property === 'destination_city') {
+            $this->delivery_latitude = null;
+            $this->delivery_longitude = null;
         }
 
         if ($property === 'requires_delivery' && ! $this->requires_delivery) {
             $this->delivery_address = '';
             $this->delivery_sector = '';
             $this->delivery_reference = '';
+            $this->delivery_latitude = null;
+            $this->delivery_longitude = null;
         }
+
+        // NOTA: no limpiamos delivery_latitude/longitude aquí cuando
+        // cambia delivery_address, porque el autocompletado de Google
+        // setea ambas cosas en la MISMA actualización (mismo request),
+        // y el orden en que Livewire dispara updated() por propiedad
+        // no está garantizado — podríamos borrar las coordenadas que
+        // el propio autocompletado acaba de fijar. Esa limpieza vive
+        // del lado de JS (evento "input" nativo del textarea, que solo
+        // dispara con tecleo real, nunca cuando Google fija el valor
+        // programáticamente al seleccionar una sugerencia).
 
         if ($property === 'is_cod') {
             // Si es cobro contra entrega, no se define método de pago en taquilla.
@@ -525,13 +561,7 @@ class PackageCreate extends Component
      */
     public static function paymentMethodLabels(): array
     {
-        return [
-            'efectivo_usd' => 'Efectivo (USD)',
-            'efectivo_ves' => 'Efectivo (VES)',
-            'pago_movil' => 'Pago móvil',
-            'transferencia' => 'Transferencia',
-            'zelle' => 'Zelle',
-        ];
+        return Package::PAYMENT_METHOD_LABELS;
     }
 
     protected function resetForm(): void
@@ -545,6 +575,7 @@ class PackageCreate extends Component
             'recipient_name', 'recipient_phone', 'recipient_email',
             'destination_state', 'destination_city',
             'requires_delivery', 'delivery_address', 'delivery_sector', 'delivery_reference',
+            'delivery_latitude', 'delivery_longitude',
             'physical_weight_kg', 'length_cm', 'width_cm', 'height_cm',
             'is_fragile', 'has_insurance', 'declared_value_usd',
             'payment_method', 'is_cod', 'cod_amount_usd',

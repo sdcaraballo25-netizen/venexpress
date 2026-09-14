@@ -37,29 +37,11 @@ class GeocodePackageDeliveryAddress implements ShouldQueue
             return;
         }
 
-        // Si ya se geocodificó (ej. reintentado por error transitorio
-        // pero en realidad ya había terminado), no repetimos la
-        // petición innecesariamente.
-        if ($package->delivery_latitude !== null && $package->delivery_longitude !== null) {
-            return;
-        }
-
-        $fullAddress = trim(implode(', ', array_filter([
-            $package->delivery_address,
-            $package->delivery_sector,
-            $package->destination_city,
-            'Venezuela',
-        ])));
-
-        $coords = $geocoding->geocode($fullAddress);
-
-        if ($coords) {
-            $package->forceFill([
-                'delivery_latitude' => $coords['latitude'],
-                'delivery_longitude' => $coords['longitude'],
-                'delivery_geocoded_at' => now(),
-            ])->save();
-        }
+        // DriverDeliveryController::routeOrder() ya intenta geocodificar
+        // de forma síncrona en el momento; este job es solo el
+        // respaldo para cuando esa consulta en vivo falló (Nominatim
+        // caído o sin resultados momentáneamente).
+        $geocoding->geocodePackageDeliveryAddress($package);
 
         // Throttle: al menos 1 segundo entre cada job de esta cola.
         // Con un solo worker dedicado, esto espacía las peticiones a

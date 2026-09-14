@@ -164,7 +164,8 @@ class DriverApiFlowTest extends TestCase
             'current_status' => \App\Models\Package::STATUS_EN_TRANSITO_NACIONAL,
         ])->save();
 
-        // 9. Completar entrega vía API.
+        // 9. Un COD sin forma de pago no se puede entregar: el
+        //    repartidor debe confirmar cómo le cancelaron primero.
         $this->postJson(
             "/api/driver/packages/{$package->id}/complete-delivery",
             [
@@ -174,19 +175,33 @@ class DriverApiFlowTest extends TestCase
                 'delivery_confirmation_method' => 'cedula',
             ],
             $headers
+        )->assertUnprocessable()
+            ->assertJsonValidationErrors(['cod_payment_method']);
+
+        $package->refresh();
+        $this->assertNotSame(\App\Models\Package::STATUS_ENTREGADO, $package->current_status);
+
+        // 10. Completar entrega vía API, esta vez sí indicando la forma de pago.
+        $this->postJson(
+            "/api/driver/packages/{$package->id}/complete-delivery",
+            [
+                'receiver_name' => 'María Gómez',
+                'receiver_id_doc' => 'V-87654321',
+                'receiver_phone' => '0424-7654321',
+                'delivery_confirmation_method' => 'cedula',
+                'cod_payment_method' => 'efectivo_usd',
+            ],
+            $headers
         )->assertOk()
             ->assertJsonPath('package.current_status', \App\Models\Package::STATUS_ENTREGADO);
 
         $package->refresh();
         $this->assertSame(\App\Models\Package::STATUS_ENTREGADO, $package->current_status);
         $this->assertNotNull($package->delivery_completed_at);
-
-        // completeDelivery() ya cobra el COD automáticamente si no se
-        // había cobrado antes, así que a esta altura ya debería estar
-        // registrado sin necesidad de un segundo request.
         $this->assertNotNull($package->cod_collected_at);
+        $this->assertSame('efectivo_usd', $package->cod_payment_method);
 
-        // 10. Confirmamos que el endpoint de collect-cod es idempotente:
+        // 11. Confirmamos que el endpoint de collect-cod es idempotente:
         //     llamarlo de nuevo no debe romper nada ni duplicar el cobro.
         $this->postJson(
             "/api/driver/packages/{$package->id}/collect-cod",
@@ -194,7 +209,7 @@ class DriverApiFlowTest extends TestCase
             $headers
         )->assertOk();
 
-        // 11. Un repartidor NO puede tocar un paquete que no es suyo.
+        // 12. Un repartidor NO puede tocar un paquete que no es suyo.
         [, $otroDriver] = $this->createDriverUser();
         $paqueteAjeno = $this->createPackage($ally, [
             'requires_delivery' => true,

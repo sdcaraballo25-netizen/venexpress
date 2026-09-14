@@ -3,6 +3,7 @@
 namespace Tests\Feature;
 
 use App\Models\AuditLog;
+use App\Models\Driver;
 use App\Models\Package;
 use App\Models\User;
 use App\Services\PackageService;
@@ -211,5 +212,102 @@ class PackageServiceCodTest extends TestCase
         $this->expectException(RuntimeException::class);
 
         $this->service->changeStatus($package, Package::STATUS_EN_TRANSITO_NACIONAL, $user->id);
+    }
+
+    private function createActiveDriver(): Driver
+    {
+        $user = User::factory()->create([
+            'role' => User::ROLE_REPARTIDOR,
+            'status' => User::STATUS_ACTIVE,
+        ]);
+
+        return Driver::factory()->create([
+            'user_id' => $user->id,
+            'status' => Driver::STATUS_ACTIVE,
+        ]);
+    }
+
+    /**
+     * completeDelivery() ya no puede marcar un COD como cobrado sin
+     * que el repartidor confirme con qué forma de pago le cancelaron
+     * — antes lo asumía automáticamente, sin ningún registro real.
+     */
+    public function test_complete_delivery_requires_a_payment_method_for_cod_packages(): void
+    {
+        $ally = $this->createAlly();
+        $driver = $this->createActiveDriver();
+
+        $package = $this->createPackage($ally, [
+            'requires_delivery' => true,
+            'driver_id' => $driver->id,
+            'current_status' => Package::STATUS_EN_TRANSITO_NACIONAL,
+            'is_cod' => true,
+            'cod_amount_usd' => 15.00,
+        ]);
+
+        $this->expectException(RuntimeException::class);
+        $this->expectExceptionMessage(
+            'Este pedido es contra entrega (COD): indica la forma de pago con la que te cancelaron antes de confirmar la entrega.'
+        );
+
+        $this->service->completeDelivery(
+            package: $package,
+            driver: $driver,
+            receiverName: 'María Gómez',
+            receiverIdDoc: 'V-87654321',
+            deliveryConfirmationMethod: 'cedula',
+        );
+    }
+
+    public function test_complete_delivery_stores_the_cod_payment_method(): void
+    {
+        $ally = $this->createAlly();
+        $driver = $this->createActiveDriver();
+
+        $package = $this->createPackage($ally, [
+            'requires_delivery' => true,
+            'driver_id' => $driver->id,
+            'current_status' => Package::STATUS_EN_TRANSITO_NACIONAL,
+            'is_cod' => true,
+            'cod_amount_usd' => 15.00,
+        ]);
+
+        $delivered = $this->service->completeDelivery(
+            package: $package,
+            driver: $driver,
+            receiverName: 'María Gómez',
+            receiverIdDoc: 'V-87654321',
+            deliveryConfirmationMethod: 'cedula',
+            codPaymentMethod: 'pago_movil',
+        );
+
+        $this->assertSame(Package::STATUS_ENTREGADO, $delivered->current_status);
+        $this->assertNotNull($delivered->cod_collected_at);
+        $this->assertSame('pago_movil', $delivered->cod_payment_method);
+    }
+
+    public function test_complete_delivery_does_not_require_a_payment_method_for_non_cod_packages(): void
+    {
+        $ally = $this->createAlly();
+        $driver = $this->createActiveDriver();
+
+        $package = $this->createPackage($ally, [
+            'requires_delivery' => true,
+            'driver_id' => $driver->id,
+            'current_status' => Package::STATUS_EN_TRANSITO_NACIONAL,
+            'is_cod' => false,
+        ]);
+
+        $delivered = $this->service->completeDelivery(
+            package: $package,
+            driver: $driver,
+            receiverName: 'María Gómez',
+            receiverIdDoc: 'V-87654321',
+            deliveryConfirmationMethod: 'cedula',
+        );
+
+        $this->assertSame(Package::STATUS_ENTREGADO, $delivered->current_status);
+        $this->assertNull($delivered->cod_collected_at);
+        $this->assertNull($delivered->cod_payment_method);
     }
 }

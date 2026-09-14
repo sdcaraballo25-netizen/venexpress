@@ -44,8 +44,16 @@ if ($user->isChofer()) {
     return;
 }
 
-if ($user->isAliadoModule()) {
+if ($user->isAliado()) {
     $this->redirect(route('ally.dashboard', absolute: false), navigate: true);
+    return;
+}
+
+// Taquilla no tiene acceso al Dashboard general del negocio (ve solo
+// lo que ella misma registra) — la mandamos directo a registrar
+// pedidos, su tarea principal.
+if ($user->isAliadoTaquilla()) {
+    $this->redirect(route('ally.packages.create', absolute: false), navigate: true);
     return;
 }
 
@@ -67,8 +75,8 @@ $this->redirect(route('dashboard', absolute: false), navigate: true);
 
     <form wire:submit="login" class="mt-8 space-y-5">
         <div>
-            <x-input-label for="email" value="Correo electrónico" />
-            <x-text-input wire:model="form.email" id="email" class="block mt-1.5 w-full" type="email" name="email" required autofocus autocomplete="username" placeholder="tu@correo.com" />
+            <x-input-label for="email" value="Correo o usuario" />
+            <x-text-input wire:model="form.email" id="email" class="block mt-1.5 w-full" type="text" name="email" required autofocus autocomplete="username" placeholder="tu@correo.com o tu usuario" />
             <x-input-error :messages="$errors->get('form.email')" class="mt-2" />
         </div>
 

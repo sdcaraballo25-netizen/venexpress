@@ -96,36 +96,38 @@
                 </p>
 
 
-                {{-- DASHBOARD --}}
-                <a
-                    href="{{ route('ally.dashboard') }}"
-                    wire:navigate
-                    @click="sidebarOpen = false"
-                    class="flex items-center gap-3 px-4 py-3 rounded-xl font-medium transition-colors
-                    {{ request()->routeIs('ally.dashboard')
-                        ? 'bg-blue-50 text-blue-900'
-                        : 'text-[#64748B] hover:bg-slate-50 hover:text-[#0F172A]' }}"
-                >
-
-                    <svg
-                        class="w-5 h-5"
-                        fill="none"
-                        stroke="currentColor"
-                        viewBox="0 0 24 24"
+                {{-- DASHBOARD (solo Aliado Administrador: agrega TODAS las taquillas) --}}
+                @if (auth()->user()->isAliado())
+                    <a
+                        href="{{ route('ally.dashboard') }}"
+                        wire:navigate
+                        @click="sidebarOpen = false"
+                        class="flex items-center gap-3 px-4 py-3 rounded-xl font-medium transition-colors
+                        {{ request()->routeIs('ally.dashboard')
+                            ? 'bg-blue-50 text-blue-900'
+                            : 'text-[#64748B] hover:bg-slate-50 hover:text-[#0F172A]' }}"
                     >
-                        <path
-                            stroke-linecap="round"
-                            stroke-linejoin="round"
-                            stroke-width="2"
-                            d="M4 6a2 2 0 012-2h2a2 2 0 012 2v2a2 2 0 01-2 2H6a2 2 0 01-2-2V6zM14 6a2 2 0 012-2h2a2 2 0 012 2v2a2 2 0 01-2 2h-2a2 2 0 01-2-2V6zM4 16a2 2 0 012-2h2a2 2 0 012 2v2a2 2 0 01-2 2H6a2 2 0 01-2-2v-2zM14 16a2 2 0 012-2h2a2 2 0 012 2v2a2 2 0 01-2-2v-2z"
-                        />
-                    </svg>
 
-                    <span>
-                        Resumen
-                    </span>
+                        <svg
+                            class="w-5 h-5"
+                            fill="none"
+                            stroke="currentColor"
+                            viewBox="0 0 24 24"
+                        >
+                            <path
+                                stroke-linecap="round"
+                                stroke-linejoin="round"
+                                stroke-width="2"
+                                d="M4 6a2 2 0 012-2h2a2 2 0 012 2v2a2 2 0 01-2 2H6a2 2 0 01-2-2V6zM14 6a2 2 0 012-2h2a2 2 0 012 2v2a2 2 0 01-2 2h-2a2 2 0 01-2-2V6zM4 16a2 2 0 012-2h2a2 2 0 012 2v2a2 2 0 01-2 2H6a2 2 0 01-2-2v-2zM14 16a2 2 0 012-2h2a2 2 0 012 2v2a2 2 0 01-2-2v-2z"
+                            />
+                        </svg>
 
-                </a>
+                        <span>
+                            Resumen
+                        </span>
+
+                    </a>
+                @endif
 
 
                 {{-- ==================================================
@@ -261,6 +263,43 @@
                 </a>
 
 
+                {{-- CIERRE DEL DÍA --}}
+                {{--
+                    Visible para ambos roles: el Aliado Administrador ve
+                    todo el negocio (con filtro por taquilla), Taquilla
+                    solo ve lo que ella misma registró.
+                --}}
+                <a
+                    href="{{ route('ally.sales-closeout') }}"
+                    wire:navigate
+                    @click="sidebarOpen = false"
+                    class="flex items-center gap-3 px-4 py-3 rounded-xl font-medium transition-colors
+                    {{ request()->routeIs('ally.sales-closeout')
+                        ? 'bg-blue-50 text-blue-900'
+                        : 'text-[#64748B] hover:bg-slate-50 hover:text-[#0F172A]' }}"
+                >
+
+                    <svg
+                        class="w-5 h-5"
+                        fill="none"
+                        stroke="currentColor"
+                        viewBox="0 0 24 24"
+                    >
+                        <path
+                            stroke-linecap="round"
+                            stroke-linejoin="round"
+                            stroke-width="2"
+                            d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z"
+                        />
+                    </svg>
+
+                    <span>
+                        Cierre del día
+                    </span>
+
+                </a>
+
+
                 {{-- COBRO EN DESTINO --}}
                 {{--
                     Fuera del bloque "Administración": la ruta ally.cod
@@ -345,8 +384,14 @@
 
 
                     {{-- TAQUILLAS --}}
-                    <div
-                        class="flex items-center gap-3 px-4 py-3 rounded-xl font-medium text-[#94A3B8]"
+                    <a
+                        href="{{ route('ally.staff') }}"
+                        wire:navigate
+                        @click="sidebarOpen = false"
+                        class="flex items-center gap-3 px-4 py-3 rounded-xl font-medium transition-colors
+                        {{ request()->routeIs('ally.staff')
+                            ? 'bg-blue-50 text-blue-900'
+                            : 'text-[#64748B] hover:bg-slate-50 hover:text-[#0F172A]' }}"
                     >
 
                         <svg
@@ -367,7 +412,7 @@
                             Gestión de Taquillas
                         </span>
 
-                    </div>
+                    </a>
 
 
                     {{-- Comisiones --}}

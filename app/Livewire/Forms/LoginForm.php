@@ -12,7 +12,12 @@ use Livewire\Form;
 
 class LoginForm extends Form
 {
-    #[Validate('required|string|email')]
+    /**
+     * Acepta un correo o un "usuario" simple (ej. "taquilla1") — las
+     * cuentas de Taquilla no tienen un correo real que el Aliado
+     * Administrador tenga que inventarse (ver AllyStaffService).
+     */
+    #[Validate('required|string')]
     public string $email = '';
 
     #[Validate('required|string')]
@@ -30,7 +35,14 @@ class LoginForm extends Form
     {
         $this->ensureIsNotRateLimited();
 
-        if (! Auth::attempt($this->only(['email', 'password']), $this->remember)) {
+        // str_contains('@') es suficiente para distinguir: un
+        // username válido (ver validación en AllyStaffService/
+        // StaffManager) nunca lleva "@".
+        $field = str_contains($this->email, '@') ? 'email' : 'username';
+
+        $credentials = [$field => $this->email, 'password' => $this->password];
+
+        if (! Auth::attempt($credentials, $this->remember)) {
             RateLimiter::hit($this->throttleKey());
 
             throw ValidationException::withMessages([

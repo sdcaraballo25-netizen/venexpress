@@ -31,6 +31,8 @@ use App\Livewire\Ally\PackageDetail as AllyPackageDetail;
 use App\Livewire\Ally\PackagePickup as AllyPackagePickup;
 use App\Livewire\Ally\PackageReception;
 use App\Livewire\Ally\Packages as AllyPackages;
+use App\Livewire\Ally\SalesCloseout as AllySalesCloseout;
+use App\Livewire\Ally\StaffManager as AllyStaffManager;
 use App\Livewire\Client\Dashboard as ClientDashboard;
 use App\Livewire\Client\Incidents as ClientIncidents;
 use App\Livewire\Client\PendingPayments as ClientPendingPayments;
@@ -64,7 +66,11 @@ Route::prefix('ally')
     ->name('ally.')
     ->group(function () {
 
+        // Ventas de TODO el negocio (todas las taquillas combinadas):
+        // solo el Aliado Administrador. Taquilla usa /cierre-del-dia
+        // (más abajo), que solo muestra lo que ella misma registró.
         Route::get('/dashboard', AllyDashboard::class)
+            ->middleware('role:aliado')
             ->name('dashboard');
 
         Route::get('/pedidos/nuevo', AllyPackageCreate::class)
@@ -82,6 +88,16 @@ Route::prefix('ally')
 
         /*
         |--------------------------------------------------------------------------
+        | Gestión de Taquillas (RF-ALI-02)
+        |--------------------------------------------------------------------------
+        */
+
+        Route::get('/taquillas', AllyStaffManager::class)
+            ->middleware('role:aliado')
+            ->name('staff');
+
+        /*
+        |--------------------------------------------------------------------------
         | Corte de caja
         |--------------------------------------------------------------------------
         */
@@ -89,6 +105,11 @@ Route::prefix('ally')
         Route::get('/corte-caja', DailyCashCut::class)
             ->middleware('role:aliado')
             ->name('cash-cut');
+
+        // Cierre del día por forma de pago: Administrador ve todo el
+        // negocio (con filtro por taquilla); Taquilla solo lo suyo.
+        Route::get('/cierre-del-dia', AllySalesCloseout::class)
+            ->name('sales-closeout');
 
         Route::get('/cod', AllyCod::class)
             ->middleware('role:aliado,aliado_taquilla')

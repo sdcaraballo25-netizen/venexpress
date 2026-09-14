@@ -36,6 +36,24 @@ class Package extends Model
         self::STATUS_ENTREGADO => 'Entregado',
     ];
 
+    /**
+     * Estados desde los que un repartidor de entrega puede
+     * autoasignarse un paquete escaneando su guía (self-claim):
+     * - EN_TRANSITO_NACIONAL: todavía no pasó por la agencia destino.
+     * - LISTO_RETIRO: ya fue recibido en la agencia destino (Ally\PackageReception
+     *   no distingue si requiere entrega a domicilio), pero sigue sin
+     *   repartidor asignado.
+     *
+     * Ver PackageService::claimForDelivery(), que además regresa el
+     * paquete a EN_TRANSITO_NACIONAL al reclamarlo desde LISTO_RETIRO,
+     * para que completeDelivery() (que exige EN_TRANSITO_NACIONAL)
+     * funcione igual sin importar de cuál de los dos estados vino.
+     */
+    public const CLAIMABLE_FOR_DELIVERY_STATUSES = [
+        self::STATUS_EN_TRANSITO_NACIONAL,
+        self::STATUS_LISTO_RETIRO,
+    ];
+
     public const TYPE_SOBRE = 'sobre';
     public const TYPE_PAQUETE = 'paquete';
 
@@ -46,6 +64,29 @@ class Package extends Model
 
     public const COD_PENDIENTE = 'pendiente';
     public const COD_LIQUIDADO = 'liquidado';
+
+    /**
+     * Formas de pago aceptadas, usadas tanto por el aliado al
+     * registrar el pedido (payment_method) como por el repartidor al
+     * confirmar el cobro contra entrega (cod_payment_method).
+     */
+    public const PAYMENT_METHODS = [
+        'efectivo_usd',
+        'efectivo_ves',
+        'pago_movil',
+        'transferencia',
+        'punto_venta',
+        'zelle',
+    ];
+
+    public const PAYMENT_METHOD_LABELS = [
+        'efectivo_usd' => 'Efectivo (USD)',
+        'efectivo_ves' => 'Efectivo (VES)',
+        'pago_movil' => 'Pago móvil',
+        'transferencia' => 'Transferencia',
+        'punto_venta' => 'Punto de venta',
+        'zelle' => 'Zelle',
+    ];
 
     public const DELIVERY_PENDING = 'pendiente';
     public const DELIVERY_ACCEPTED = 'aceptada';
@@ -60,6 +101,7 @@ class Package extends Model
         'tracking_number',
         'security_hash',
         'ally_id',
+        'registered_by_user_id',
         'driver_id',
 
         'sender_name',
@@ -129,6 +171,7 @@ class Package extends Model
         'cod_liquidated_at',
         'cod_collected_at',
         'cod_collected_by_user_id',
+        'cod_payment_method',
 
         'commission_percentage_used',
         'commission_amount_usd',
@@ -190,6 +233,16 @@ class Package extends Model
     public function driver(): BelongsTo
     {
         return $this->belongsTo(Driver::class);
+    }
+
+    /**
+     * Usuario (Aliado Administrador o Taquilla) que registró esta
+     * guía — usado para agrupar ventas por taquilla en el cierre del
+     * día. Null en guías creadas antes de esta columna.
+     */
+    public function registeredBy(): BelongsTo
+    {
+        return $this->belongsTo(User::class, 'registered_by_user_id');
     }
 
     public function histories(): HasMany
@@ -264,20 +317,21 @@ class Package extends Model
     public function isAvailableForDeliveryClaim(): bool
     {
         return $this->requires_delivery
-            && $this->current_status === self::STATUS_EN_TRANSITO_NACIONAL
+            && in_array($this->current_status, self::CLAIMABLE_FOR_DELIVERY_STATUSES, true)
             && ($this->delivery_status === null || $this->delivery_status === self::DELIVERY_PENDING);
     }
 
     /**
      * Paquetes listos para que cualquier repartidor de entrega los
-     * reclame: ya llegaron a tránsito nacional, requieren entrega a
-     * domicilio, y todavía nadie los ha tomado.
+     * reclame: requieren entrega a domicilio, están en un estado
+     * reclamable (ver CLAIMABLE_FOR_DELIVERY_STATUSES) y todavía nadie
+     * los ha tomado.
      */
     public function scopeAvailableForDeliveryClaim($query)
     {
         return $query
             ->where('requires_delivery', true)
-            ->where('current_status', self::STATUS_EN_TRANSITO_NACIONAL)
+            ->whereIn('current_status', self::CLAIMABLE_FOR_DELIVERY_STATUSES)
             ->where(function ($q) {
                 $q->whereNull('delivery_status')
                     ->orWhere('delivery_status', self::DELIVERY_PENDING);

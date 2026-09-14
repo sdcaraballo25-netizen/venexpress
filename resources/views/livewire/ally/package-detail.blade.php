@@ -18,6 +18,12 @@
             <p class="mt-1 text-sm font-tracking text-slate-500">
                 {{ $package->tracking_number }}
             </p>
+
+            @if (auth()->user()->isAliado() && $package->registeredBy)
+                <p class="mt-1 text-xs text-slate-400">
+                    Registrado por <span class="font-medium text-slate-600">{{ $package->registeredBy->name }}</span>
+                </p>
+            @endif
         </div>
 
         <div class="flex flex-wrap items-center gap-2">

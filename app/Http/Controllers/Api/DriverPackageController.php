@@ -96,6 +96,88 @@ class DriverPackageController extends Controller
     }
 
     /**
+     * Recepción física en el HUB de un paquete ya recolectado
+     * (segunda mitad de "Aliado -> HUB" en una ruta hub_transfer).
+     * Reutiliza LogisticsScanService::scanHubReception() tal cual,
+     * igual que scan() reutiliza scanCollection() — pero, a
+     * diferencia de scan(), aquí NO hay un caso "silencioso" para un
+     * doble escaneo: scanHubReception() limpia driver_id al recibir
+     * el paquete en HUB, así que un segundo escaneo ya no pertenece
+     * a nadie en particular y simplemente falla con un 422 que dice
+     * el estado actual (ya no es RECOLECTADO_VENEXPRESS), sin
+     * necesidad de un caso especial.
+     */
+    public function hubReception(Request $request): JsonResponse
+    {
+        $validated = $request->validate([
+            'tracking_number' => ['required', 'string'],
+        ]);
+
+        $driver = $this->driver();
+
+        $package = Package::query()
+            ->where('tracking_number', trim($validated['tracking_number']))
+            ->with(['ally', 'driver', 'histories'])
+            ->first();
+
+        if (! $package) {
+            return response()->json([
+                'message' => "No existe una guía con número: {$validated['tracking_number']}",
+            ], 404);
+        }
+
+        try {
+            $package = app(LogisticsScanService::class)->scanHubReception(
+                package: $package,
+                driver: $driver,
+                userId: (int) Auth::id(),
+            );
+
+            return response()->json([
+                'message' => 'Recepción en HUB registrada correctamente. El paquete quedó EN_HUB.',
+                'package' => new DriverPackageResource($package),
+            ]);
+        } catch (RuntimeException $e) {
+            return response()->json([
+                'message' => $e->getMessage(),
+                'package' => new DriverPackageResource($package),
+            ], 422);
+        }
+    }
+
+    /**
+     * Identifica una guía por número de tracking sin ejecutar ningún
+     * movimiento (equivalente de solo-lectura a
+     * Scanner::searchPackage() del portal web). La app la usa para
+     * decidir qué operación proponer (recolección / recepción en HUB
+     * / salida / llegada) antes de pedirle confirmación al
+     * repartidor, en vez de ejecutar a ciegas en el primer escaneo.
+     */
+    public function lookup(Request $request): JsonResponse
+    {
+        $validated = $request->validate([
+            'tracking_number' => ['required', 'string'],
+        ]);
+
+        $this->driver();
+
+        $package = Package::query()
+            ->where('tracking_number', trim($validated['tracking_number']))
+            ->with(['ally', 'driver', 'histories'])
+            ->first();
+
+        if (! $package) {
+            return response()->json([
+                'message' => "No existe una guía con número: {$validated['tracking_number']}",
+            ], 404);
+        }
+
+        return response()->json([
+            'package' => new DriverPackageResource($package),
+        ]);
+    }
+
+    /**
      * Lista de pedidos del repartidor autenticado (todos los que ha
      * escaneado), con el mismo filtro por estado que ya usa el
      * portal web (all / pending / in_progress / delivered / incidents).
@@ -190,17 +272,28 @@ class DriverPackageController extends Controller
     {
         $driver = $this->driver();
 
+        $package = Package::query()
+            ->where('driver_id', $driver->id)
+            ->findOrFail($packageId);
+
+        // No se puede confirmar la entrega de un COD sin decir con
+        // qué forma de pago cancelaron (a menos que ya se hubiera
+        // cobrado antes, ej. collectCod()).
+        $codPaymentMethodRequired = $package->is_cod && ! $package->cod_collected_at;
+
         $validated = $request->validate([
             'receiver_name' => ['required', 'string', 'max:150'],
             'receiver_id_doc' => ['required', 'string', 'max:30'],
             'receiver_phone' => ['nullable', 'string', 'max:30'],
             'delivery_confirmation_method' => ['required', 'in:firma,foto,cedula'],
             'photo' => ['nullable', 'image', 'max:5120'],
+            'cod_payment_method' => [
+                $codPaymentMethodRequired ? 'required' : 'nullable',
+                'in:' . implode(',', Package::PAYMENT_METHODS),
+            ],
+        ], [
+            'cod_payment_method.required' => 'Este pedido es contra entrega (COD): indica la forma de pago con la que te cancelaron.',
         ]);
-
-        $package = Package::query()
-            ->where('driver_id', $driver->id)
-            ->findOrFail($packageId);
 
         $photoPath = null;
 
@@ -218,6 +311,7 @@ class DriverPackageController extends Controller
                 receiverPhone: $validated['receiver_phone'] ?? null,
                 deliveryConfirmationMethod: $validated['delivery_confirmation_method'],
                 deliveryPhotoPath: $photoPath,
+                codPaymentMethod: $validated['cod_payment_method'] ?? null,
             );
 
             return response()->json([
