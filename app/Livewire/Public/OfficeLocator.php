@@ -21,6 +21,12 @@ class OfficeLocator extends Component
 
     public string $search = '';
 
+    public ?float $userLat = null;
+
+    public ?float $userLng = null;
+
+    public ?string $locationError = null;
+
     #[Computed]
     public function states(): array
     {
@@ -35,7 +41,7 @@ class OfficeLocator extends Component
     #[Computed]
     public function allies()
     {
-        return Ally::publiclyVisible()
+        $allies = Ally::publiclyVisible()
             ->when($this->state !== '', fn ($q) => $q->where('state', $this->state))
             ->when($this->search !== '', function ($q) {
                 $q->where(function ($sub) {
@@ -46,6 +52,19 @@ class OfficeLocator extends Component
             })
             ->orderBy('business_name')
             ->get();
+
+        if ($this->userLat !== null && $this->userLng !== null) {
+            return $allies
+                ->sortBy(fn (Ally $ally) => $this->haversineKm(
+                    $this->userLat,
+                    $this->userLng,
+                    (float) $ally->latitude,
+                    (float) $ally->longitude,
+                ))
+                ->values();
+        }
+
+        return $allies;
     }
 
     public function updated(string $property): void
@@ -53,6 +72,58 @@ class OfficeLocator extends Component
         if (in_array($property, ['state', 'search'], true)) {
             $this->dispatch('offices-updated', allies: $this->mapPoints());
         }
+    }
+
+    /**
+     * Usa la ubicación que el navegador del visitante reportó (ver
+     * geolocationSuccess() en la vista) para ordenar la lista de
+     * agencias de más cercana a más lejana.
+     */
+    public function useMyLocation(float $lat, float $lng): void
+    {
+        $this->userLat = $lat;
+        $this->userLng = $lng;
+        $this->locationError = null;
+
+        unset($this->allies);
+
+        $this->dispatch('offices-updated', allies: $this->mapPoints());
+    }
+
+    public function locationDenied(): void
+    {
+        $this->locationError = 'No pudimos acceder a tu ubicación. Revisa los permisos del navegador.';
+    }
+
+    /**
+     * Distancia en kilómetros desde la ubicación del visitante hasta
+     * esta agencia (null si el visitante no compartió su ubicación).
+     */
+    public function distanceTo(Ally $ally): ?float
+    {
+        if ($this->userLat === null || $this->userLng === null) {
+            return null;
+        }
+
+        return $this->haversineKm($this->userLat, $this->userLng, (float) $ally->latitude, (float) $ally->longitude);
+    }
+
+    /**
+     * Distancia en línea recta entre dos coordenadas (fórmula de
+     * Haversine), suficiente para ordenar "más cercano primero" sin
+     * depender de un servicio externo de rutas.
+     */
+    protected function haversineKm(float $lat1, float $lng1, float $lat2, float $lng2): float
+    {
+        $earthRadiusKm = 6371;
+
+        $latDelta = deg2rad($lat2 - $lat1);
+        $lngDelta = deg2rad($lng2 - $lng1);
+
+        $a = sin($latDelta / 2) ** 2
+            + cos(deg2rad($lat1)) * cos(deg2rad($lat2)) * sin($lngDelta / 2) ** 2;
+
+        return $earthRadiusKm * 2 * atan2(sqrt($a), sqrt(1 - $a));
     }
 
     /**
@@ -76,6 +147,8 @@ class OfficeLocator extends Component
             'allies' => $this->allies,
             'states' => $this->states,
             'mapPoints' => $this->mapPoints(),
+            'userLat' => $this->userLat,
+            'userLng' => $this->userLng,
         ]);
     }
 }

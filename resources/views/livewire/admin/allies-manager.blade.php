@@ -1,5 +1,6 @@
 @php
     use App\Models\Ally;
+    use Illuminate\Support\Facades\Storage;
 @endphp
 
 <div class="min-h-screen">
@@ -160,15 +161,27 @@
                             ================================================== --}}
                             <td class="px-6 py-4">
 
-                                <div>
+                                <div class="flex items-center gap-3">
 
-                                    <p class="font-semibold text-[#0F172A]">
-                                        {{ $ally->business_name }}
-                                    </p>
+                                    @if($ally->storefront_photo_path)
+                                        <img
+                                            src="{{ Storage::url($ally->storefront_photo_path) }}"
+                                            alt="Fachada de {{ $ally->business_name }}"
+                                            class="w-10 h-10 rounded-lg object-cover border border-[#E2E8F0] shrink-0"
+                                        >
+                                    @endif
 
-                                    <p class="text-xs text-[#64748B] mt-1">
-                                        {{ $ally->user?->email }}
-                                    </p>
+                                    <div>
+
+                                        <p class="font-semibold text-[#0F172A]">
+                                            {{ $ally->business_name }}
+                                        </p>
+
+                                        <p class="text-xs text-[#64748B] mt-1">
+                                            {{ $ally->user?->email }}
+                                        </p>
+
+                                    </div>
 
                                 </div>
 
@@ -391,11 +404,6 @@
     {{-- =========================================================
          MODAL: UBICACIÓN DE LA AGENCIA (para el localizador público)
     ========================================================== --}}
-    @once
-        <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/leaflet/1.9.4/leaflet.min.css">
-        <script src="https://cdnjs.cloudflare.com/ajax/libs/leaflet/1.9.4/leaflet.min.js"></script>
-    @endonce
-
     @if($showLocationModal)
 
         <div
@@ -471,40 +479,6 @@
             </div>
 
         </div>
-
-        <script>
-            function allyLocationMap({ lat, lng, hasPoint }) {
-                return {
-                    map: null,
-                    marker: null,
-                    init(el) {
-                        this.map = L.map(el).setView([lat, lng], hasPoint ? 14 : 6);
-
-                        L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
-                            attribution: '&copy; OpenStreetMap contributors',
-                        }).addTo(this.map);
-
-                        if (hasPoint) {
-                            this.marker = L.marker([lat, lng]).addTo(this.map);
-                        }
-
-                        this.map.on('click', (e) => {
-                            const { lat, lng } = e.latlng;
-
-                            if (this.marker) {
-                                this.marker.setLatLng([lat, lng]);
-                            } else {
-                                this.marker = L.marker([lat, lng]).addTo(this.map);
-                            }
-
-                            $wire.call('setLocationFromMap', lat, lng);
-                        });
-
-                        setTimeout(() => this.map.invalidateSize(), 150);
-                    },
-                }
-            }
-        </script>
 
     @endif
 

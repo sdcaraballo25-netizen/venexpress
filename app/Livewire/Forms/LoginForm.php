@@ -2,8 +2,11 @@
 
 namespace App\Livewire\Forms;
 
+use App\Models\User;
 use Illuminate\Auth\Events\Lockout;
 use Illuminate\Support\Facades\Auth;
+use Illuminate\Support\Facades\Cache;
+use Illuminate\Support\Facades\Password;
 use Illuminate\Support\Facades\RateLimiter;
 use Illuminate\Support\Str;
 use Illuminate\Validation\ValidationException;
@@ -72,14 +75,42 @@ class LoginForm extends Form
 
         event(new Lockout(request()));
 
+        $this->sendRecoveryEmailOnLockout();
+
         $seconds = RateLimiter::availableIn($this->throttleKey());
 
         throw ValidationException::withMessages([
             'form.email' => trans('auth.throttle', [
                 'seconds' => $seconds,
                 'minutes' => ceil($seconds / 60),
-            ]),
+            ]).' Te enviamos un correo para que puedas restablecer tu contraseña.',
         ]);
+    }
+
+    /**
+     * Al agotar los 5 intentos, se envía automáticamente un correo de
+     * recuperación de contraseña a la cuenta (mismo enlace único y
+     * seguro que genera Password::sendResetLink() en "Olvidé mi
+     * contraseña" — un token aleatorio de un solo uso, hasheado en
+     * la base de datos, que expira).
+     *
+     * Cache::add() garantiza un solo envío por ventana de bloqueo
+     * (60s, igual que el decay de RateLimiter::hit() en authenticate()),
+     * aunque el usuario siga reintentando mientras sigue bloqueado.
+     */
+    protected function sendRecoveryEmailOnLockout(): void
+    {
+        if (! Cache::add('login-lockout-email:'.$this->throttleKey(), true, 60)) {
+            return;
+        }
+
+        $field = str_contains($this->email, '@') ? 'email' : 'username';
+
+        $user = User::where($field, $this->email)->first();
+
+        if ($user?->email) {
+            Password::sendResetLink(['email' => $user->email]);
+        }
     }
 
     /**

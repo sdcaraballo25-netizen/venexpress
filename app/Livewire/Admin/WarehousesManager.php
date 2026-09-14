@@ -3,6 +3,7 @@
 namespace App\Livewire\Admin;
 
 use App\Models\Warehouse;
+use App\Services\VenezuelaLocationService;
 use Livewire\Attributes\Layout;
 use Livewire\Attributes\Title;
 use Livewire\Component;
@@ -30,6 +31,24 @@ class WarehousesManager extends Component
 
     public ?string $successMessage = null;
 
+    public array $states = [];
+
+    public array $cities = [];
+
+    public function mount(VenezuelaLocationService $locationService): void
+    {
+        $this->states = $locationService->states();
+    }
+
+    public function updatedState(VenezuelaLocationService $locationService): void
+    {
+        $this->city = '';
+
+        $this->cities = $this->state !== ''
+            ? $locationService->citiesByState($this->state)
+            : [];
+    }
+
     public function startCreating(): void
     {
         $this->resetForm();
@@ -37,14 +56,17 @@ class WarehousesManager extends Component
         $this->showForm = true;
     }
 
-    public function editWarehouse(int $warehouseId): void
+    public function editWarehouse(int $warehouseId, VenezuelaLocationService $locationService): void
     {
         $warehouse = Warehouse::findOrFail($warehouseId);
 
         $this->editingWarehouseId = $warehouse->id;
         $this->name = $warehouse->name;
-        $this->city = $warehouse->city;
         $this->state = $warehouse->state;
+        $this->cities = $this->state !== ''
+            ? $locationService->citiesByState($this->state)
+            : [];
+        $this->city = $warehouse->city;
         $this->address = $warehouse->address ?? '';
 
         $this->showForm = true;
@@ -66,6 +88,8 @@ class WarehousesManager extends Component
             'state',
             'address',
         ]);
+
+        $this->cities = [];
     }
 
     public function save(): void

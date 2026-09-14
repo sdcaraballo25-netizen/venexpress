@@ -21,6 +21,7 @@ class User extends Authenticatable
     public const ROLE_ALIADO_TAQUILLA = 'aliado_taquilla';
     public const ROLE_REPARTIDOR = 'repartidor';
     public const ROLE_CLIENTE = 'cliente';
+    public const ROLE_ALMACEN = 'almacen';
 
     // Alias de compatibilidad para código existente.
     public const ROLE_ADMIN = self::ROLE_ADMIN_PRINCIPAL;
@@ -37,6 +38,7 @@ class User extends Authenticatable
         'password',
         'role',
         'ally_id',
+        'warehouse_id',
         'status',
         'email_verified_at',
     ];
@@ -192,6 +194,15 @@ class User extends Authenticatable
         return $this->hasOne(Driver::class);
     }
 
+    /**
+     * Almacén propio de Venexpress al que pertenece este usuario
+     * cuando es personal de almacén (role 'almacen').
+     */
+    public function warehouse(): BelongsTo
+    {
+        return $this->belongsTo(Warehouse::class);
+    }
+
     public function packageHistories(): HasMany
     {
         return $this->hasMany(PackageHistory::class, 'scanned_by_user_id');
@@ -241,6 +252,11 @@ class User extends Authenticatable
         return $this->role === self::ROLE_REPARTIDOR;
     }
 
+    public function isAlmacen(): bool
+    {
+        return $this->role === self::ROLE_ALMACEN;
+    }
+
     public function isChofer(): bool
     {
         return $this->isRepartidor();
@@ -288,6 +304,7 @@ class User extends Authenticatable
                 self::ROLE_ALIADO_TAQUILLA,
                 self::ROLE_REPARTIDOR,
                 self::ROLE_CLIENTE,
+                self::ROLE_ALMACEN,
             ], true);
         }
 
@@ -298,6 +315,7 @@ class User extends Authenticatable
                 self::ROLE_ALIADO_TAQUILLA,
                 self::ROLE_REPARTIDOR,
                 self::ROLE_CLIENTE,
+                self::ROLE_ALMACEN,
             ], true);
         }
 
@@ -374,6 +392,26 @@ class User extends Authenticatable
         return false;
     }
 
+    /**
+     * Nombre de la ruta "principal" de este usuario según su rol,
+     * usado por el nav genérico (layouts.app) para que el link
+     * "Dashboard" lleve a cada quien a su panel real en vez del
+     * dashboard genérico de Breeze. Misma lógica de destino que usa
+     * el login (resources/views/Livewire/pages/auth/login.blade.php).
+     */
+    public function homeRouteName(): string
+    {
+        return match (true) {
+            $this->isCliente() => 'cliente.dashboard',
+            $this->isChofer() => 'repartidor.dashboard',
+            $this->isAliado() => 'ally.dashboard',
+            $this->isAliadoTaquilla() => 'ally.packages.create',
+            $this->isAlmacen() => 'almacen.dashboard',
+            $this->isAdmin() => 'admin.dashboard',
+            default => 'dashboard',
+        };
+    }
+
     public static function roleLabels(): array
     {
         return [
@@ -383,6 +421,7 @@ class User extends Authenticatable
             self::ROLE_ALIADO_TAQUILLA => 'Aliado Taquilla',
             self::ROLE_REPARTIDOR => 'Repartidor',
             self::ROLE_CLIENTE => 'Cliente',
+            self::ROLE_ALMACEN => 'Personal de Almacén',
         ];
     }
 }

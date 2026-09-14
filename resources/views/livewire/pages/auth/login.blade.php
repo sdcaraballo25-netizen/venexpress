@@ -57,6 +57,11 @@ if ($user->isAliadoTaquilla()) {
     return;
 }
 
+if ($user->isAlmacen()) {
+    $this->redirect(route('almacen.dashboard', absolute: false), navigate: true);
+    return;
+}
+
 $this->redirect(route('dashboard', absolute: false), navigate: true);
     }
 }; ?>

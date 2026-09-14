@@ -82,6 +82,8 @@ class PackageCreate extends Component
     public bool $recipientCustomerFound = false;
     public bool $showSenderCustomerModal = false;
     public bool $showRecipientCustomerModal = false;
+    public int $senderPreviousPackagesCount = 0;
+    public int $recipientPreviousPackagesCount = 0;
 
     // Resultado tras registrar
     public ?int $createdPackageId = null;
@@ -325,6 +327,7 @@ class PackageCreate extends Component
 
         $foundProperty = $prefix === 'sender' ? 'senderCustomerFound' : 'recipientCustomerFound';
         $modalProperty = $prefix === 'sender' ? 'showSenderCustomerModal' : 'showRecipientCustomerModal';
+        $countProperty = $prefix === 'sender' ? 'senderPreviousPackagesCount' : 'recipientPreviousPackagesCount';
 
         // Evita consultar la BD o abrir el modal con cada tecla
         // cuando aún no hay suficientes caracteres para un
@@ -332,6 +335,7 @@ class PackageCreate extends Component
         if (strlen($number) < 5) {
             $this->$foundProperty = false;
             $this->$modalProperty = false;
+            $this->$countProperty = 0;
 
             return;
         }
@@ -341,6 +345,14 @@ class PackageCreate extends Component
         if ($customer) {
             $this->$foundProperty = true;
             $this->$modalProperty = false;
+
+            // Historial: cuántos pedidos anteriores tiene esta
+            // cédula, ya sea como remitente o como destinatario, para
+            // que el staff del aliado sepa que ya es cliente conocido.
+            $this->$countProperty = Package::query()
+                ->where('sender_id_doc', $idDoc)
+                ->orWhere('recipient_id_doc', $idDoc)
+                ->count();
 
             if ($prefix === 'sender') {
                 $this->sender_name = $customer->name;
@@ -358,6 +370,7 @@ class PackageCreate extends Component
         // No existe: pedimos sus datos en el modal.
         $this->$foundProperty = false;
         $this->$modalProperty = true;
+        $this->$countProperty = 0;
 
         if ($prefix === 'sender') {
             $this->sender_name = '';
@@ -581,6 +594,7 @@ class PackageCreate extends Component
             'payment_method', 'is_cod', 'cod_amount_usd',
             'senderCustomerFound', 'recipientCustomerFound',
             'showSenderCustomerModal', 'showRecipientCustomerModal',
+            'senderPreviousPackagesCount', 'recipientPreviousPackagesCount',
         ]);
 
         $this->sender_doc_type = 'V';

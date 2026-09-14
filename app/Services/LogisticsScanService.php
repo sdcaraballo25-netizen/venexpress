@@ -468,4 +468,5 @@ class LogisticsScanService
                 && mb_strtolower(trim((string) $stop->warehouse->state)) === $packageState;
         });
     }
+
 }

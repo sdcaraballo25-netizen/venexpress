@@ -333,6 +333,11 @@
                             <p class="font-medium text-emerald-700">✓ Cliente encontrado</p>
                             <p class="mt-1 text-emerald-700">{{ $sender_name }}</p>
                             <p class="text-emerald-600">{{ $sender_phone }}{{ $sender_email ? ' · '.$sender_email : '' }}</p>
+                            @if ($senderPreviousPackagesCount > 0)
+                                <p class="mt-1 text-xs text-emerald-600">
+                                    Tiene {{ $senderPreviousPackagesCount }} {{ $senderPreviousPackagesCount === 1 ? 'pedido anterior' : 'pedidos anteriores' }} en el sistema.
+                                </p>
+                            @endif
                         </div>
                         <button type="button" wire:click="openSenderCustomerModal"
                             class="shrink-0 text-xs font-medium text-emerald-700 underline hover:text-emerald-900">
@@ -386,6 +391,11 @@
                             <p class="font-medium text-emerald-700">✓ Cliente encontrado</p>
                             <p class="mt-1 text-emerald-700">{{ $recipient_name }}</p>
                             <p class="text-emerald-600">{{ $recipient_phone }}{{ $recipient_email ? ' · '.$recipient_email : '' }}</p>
+                            @if ($recipientPreviousPackagesCount > 0)
+                                <p class="mt-1 text-xs text-emerald-600">
+                                    Tiene {{ $recipientPreviousPackagesCount }} {{ $recipientPreviousPackagesCount === 1 ? 'pedido anterior' : 'pedidos anteriores' }} en el sistema.
+                                </p>
+                            @endif
                         </div>
                         <button type="button" wire:click="openRecipientCustomerModal"
                             class="shrink-0 text-xs font-medium text-emerald-700 underline hover:text-emerald-900">

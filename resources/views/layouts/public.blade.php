@@ -154,8 +154,8 @@
 
                 {{-- Ayuda --}}
                 <a
-                    href="{{ route('home') }}#ayuda"
-                    class="main-nav-link"
+                    href="{{ route('public.help') }}"
+                    class="main-nav-link {{ request()->routeIs('public.help') ? 'is-active' : '' }}"
                 >
                     Ayuda
                 </a>
@@ -243,8 +243,8 @@
 
 
                 <a
-                    href="{{ route('home') }}#ayuda"
-                    class="mobile-menu-link block py-3 text-sm text-gray-600"
+                    href="{{ route('public.help') }}"
+                    class="mobile-menu-link block py-3 text-sm {{ request()->routeIs('public.help') ? 'font-semibold text-blue-950' : 'text-gray-600' }}"
                 >
                     Ayuda
                 </a>
@@ -343,7 +343,7 @@
 
                         <li>
                             <a
-                                href="{{ route('home') }}#ayuda"
+                                href="{{ route('public.help') }}"
                                 class="hover:text-white transition"
                             >
                                 Ayuda
@@ -407,10 +407,19 @@
 
                         <li>
                             <a
-                                href="{{ route('home') }}#ayuda"
+                                href="{{ route('public.help') }}"
                                 class="hover:text-white transition"
                             >
                                 Preguntas frecuentes
+                            </a>
+                        </li>
+
+                        <li>
+                            <a
+                                href="{{ route('public.recommendations') }}"
+                                class="hover:text-white transition"
+                            >
+                                Recomendaciones
                             </a>
                         </li>
 

@@ -191,6 +191,7 @@
                         <select wire:model.live="role" id="admin-user-role" class="mt-1.5 block w-full rounded-md border-gray-300 shadow-sm focus:border-blue-500 focus:ring-blue-500">
                             <option value="aliado">Aliado</option>
                             <option value="repartidor">Repartidor</option>
+                            <option value="almacen">Personal de Almacén</option>
                             <option value="admin_operativo">Administrador Operativo</option>
                             @if (auth()->user()->isAdminPrincipal())
                                 <option value="admin_principal">Administrador Principal</option>
@@ -307,6 +308,22 @@
                                     <x-text-input wire:model="phone" id="phone" class="mt-1.5 block w-full" type="text" />
                                     <x-input-error :messages="$errors->get('phone')" class="mt-2" />
                                 </div>
+                            </div>
+                        </div>
+                    @endif
+
+                    @if ($role === 'almacen')
+                        <div class="rounded-xl border border-purple-100 bg-purple-50/50 p-5">
+                            <h3 class="font-semibold text-purple-950">Información de almacén</h3>
+                            <div class="mt-4">
+                                <x-input-label for="warehouse-id" value="Almacén asignado" />
+                                <select wire:model="warehouse_id" id="warehouse-id" class="mt-1.5 block w-full rounded-md border-gray-300 shadow-sm focus:border-blue-500 focus:ring-blue-500">
+                                    <option value="">Selecciona un almacén...</option>
+                                    @foreach ($warehouses as $warehouse)
+                                        <option value="{{ $warehouse->id }}">{{ $warehouse->name }} ({{ $warehouse->city }})</option>
+                                    @endforeach
+                                </select>
+                                <x-input-error :messages="$errors->get('warehouse_id')" class="mt-2" />
                             </div>
                         </div>
                     @endif

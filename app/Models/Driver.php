@@ -48,6 +48,9 @@ class Driver extends Model
         'phone',
         'status',
         'driver_type',
+        'license_photo_path',
+        'id_photo_path',
+        'vehicle_registration_photo_path',
     ];
 
     /*

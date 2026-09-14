@@ -19,6 +19,50 @@
 
     @livewireStyles
 
+    {{--
+        Leaflet + registro del picker de ubicación como Alpine.data(),
+        cargado siempre en el <head> (no dentro de un bloque
+        condicional de Livewire): un <script> insertado más tarde por
+        un morph de Livewire (ej. al abrir el modal de ubicación)
+        nunca se auto-ejecuta, así que la función tiene que existir
+        desde antes de que Alpine arranque.
+    --}}
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/leaflet/1.9.4/leaflet.min.css">
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/leaflet/1.9.4/leaflet.min.js"></script>
+    <script>
+        document.addEventListener('alpine:init', () => {
+            Alpine.data('allyLocationMap', ({ lat, lng, hasPoint }) => ({
+                map: null,
+                marker: null,
+                init(el) {
+                    this.map = L.map(el).setView([lat, lng], hasPoint ? 14 : 6);
+
+                    L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
+                        attribution: '&copy; OpenStreetMap contributors',
+                    }).addTo(this.map);
+
+                    if (hasPoint) {
+                        this.marker = L.marker([lat, lng]).addTo(this.map);
+                    }
+
+                    this.map.on('click', (e) => {
+                        const { lat, lng } = e.latlng;
+
+                        if (this.marker) {
+                            this.marker.setLatLng([lat, lng]);
+                        } else {
+                            this.marker = L.marker([lat, lng]).addTo(this.map);
+                        }
+
+                        this.$wire.call('setLocationFromMap', lat, lng);
+                    });
+
+                    setTimeout(() => this.map.invalidateSize(), 150);
+                },
+            }));
+        });
+    </script>
+
     <style>
         body {
             font-family: 'Inter', ui-sans-serif, system-ui, sans-serif;
@@ -115,7 +159,8 @@
                             } else if (
                                 {{ request()->routeIs(
                                     'admin.users',
-                                    'admin.driver-payments'
+                                    'admin.driver-payments',
+                                    'admin.drivers.approval'
                                 ) ? 'true' : 'false' }}
                             ) {
                                 this.openGroup = 'personal';
@@ -123,6 +168,7 @@
                             } else if (
                                 {{ request()->routeIs(
                                     'admin.incidents',
+                                    'admin.recommendations',
                                     'admin.audit-log'
                                 ) ? 'true' : 'false' }}
                             ) {
@@ -172,6 +218,34 @@
                         </svg>
 
                         Resumen
+
+                    </a>
+
+
+                    {{-- Ayuda --}}
+                    <a
+                        href="{{ route('admin.help') }}"
+                        class="flex items-center gap-3 px-4 py-3 rounded-xl font-medium transition-colors
+                        {{ request()->routeIs('admin.help')
+                            ? 'bg-blue-50 text-blue-900'
+                            : 'text-[#64748B] hover:bg-slate-50 hover:text-[#0F172A]' }}"
+                    >
+
+                        <svg
+                            class="w-5 h-5 {{ request()->routeIs('admin.help') ? 'text-blue-700' : '' }}"
+                            fill="none"
+                            stroke="currentColor"
+                            viewBox="0 0 24 24"
+                        >
+                            <path
+                                stroke-linecap="round"
+                                stroke-linejoin="round"
+                                stroke-width="2"
+                                d="M8.228 9c.549-1.165 2.03-2 3.772-2 2.21 0 4 1.343 4 3 0 1.4-1.278 2.575-3.006 2.907-.542.104-.994.54-.994 1.093m0 3h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"
+                            />
+                        </svg>
+
+                        Ayuda
 
                     </a>
 
@@ -626,6 +700,34 @@
 
                             </a>
 
+
+                            {{-- Aprobación de repartidores --}}
+                            <a
+                                href="{{ route('admin.drivers.approval') }}"
+                                class="flex items-center gap-3 px-4 py-3 rounded-xl font-medium transition-colors
+                                {{ request()->routeIs('admin.drivers.approval')
+                                    ? 'bg-blue-50 text-blue-900'
+                                    : 'text-[#64748B] hover:bg-slate-50 hover:text-[#0F172A]' }}"
+                            >
+
+                                <svg
+                                    class="w-5 h-5"
+                                    fill="none"
+                                    stroke="currentColor"
+                                    viewBox="0 0 24 24"
+                                >
+                                    <path
+                                        stroke-linecap="round"
+                                        stroke-linejoin="round"
+                                        stroke-width="2"
+                                        d="M5 13l4 4L19 7"
+                                    />
+                                </svg>
+
+                                Aprobar repartidores
+
+                            </a>
+
                         </div>
 
                     </div>
@@ -695,6 +797,34 @@
                                 </svg>
 
                                 Incidencias
+
+                            </a>
+
+
+                            {{-- Recomendaciones --}}
+                            <a
+                                href="{{ route('admin.recommendations') }}"
+                                class="flex items-center gap-3 px-4 py-3 rounded-xl font-medium transition-colors
+                                {{ request()->routeIs('admin.recommendations')
+                                    ? 'bg-blue-50 text-blue-900'
+                                    : 'text-[#64748B] hover:bg-slate-50 hover:text-[#0F172A]' }}"
+                            >
+
+                                <svg
+                                    class="w-5 h-5"
+                                    fill="none"
+                                    stroke="currentColor"
+                                    viewBox="0 0 24 24"
+                                >
+                                    <path
+                                        stroke-linecap="round"
+                                        stroke-linejoin="round"
+                                        stroke-width="2"
+                                        d="M8 10h.01M12 10h.01M16 10h.01M9 16H5a2 2 0 01-2-2V6a2 2 0 012-2h14a2 2 0 012 2v8a2 2 0 01-2 2h-6l-4 4v-4z"
+                                    />
+                                </svg>
+
+                                Recomendaciones
 
                             </a>
 

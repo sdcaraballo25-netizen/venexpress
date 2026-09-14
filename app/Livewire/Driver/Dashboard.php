@@ -398,6 +398,12 @@ class Dashboard extends Component
                 'driver' => $driver,
                 'isHub' => $isHub,
 
+                // Primera vez que este repartidor entra: nunca se le
+                // asignó ni entregó ningún paquete todavía. Se usa
+                // para mostrar un mensaje de bienvenida en vez del
+                // dashboard "vacío" a secas.
+                'isFirstTimeDriver' => $assignedCount === 0 && $deliveredCount === 0,
+
                 // Paquetes
                 'assignedCount' => $assignedCount,
                 'pendingCount' => $pendingCount,
