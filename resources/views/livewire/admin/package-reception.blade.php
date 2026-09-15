@@ -135,6 +135,28 @@
         </div>
     </div>
 
+    @if ($package && $this->canReleaseFromHub())
+        <div class="rounded-2xl border border-amber-200 bg-amber-50 p-6 shadow-sm">
+            <h3 class="font-display text-lg font-semibold text-slate-900">
+                Liberar paquete en HUB destino
+            </h3>
+
+            <p class="mt-1 text-sm text-slate-600">
+                Esta guía ya está físicamente en su HUB destino final. Elige qué ocurre a continuación:
+            </p>
+
+            <button
+                type="button"
+                wire:click="releaseFromHub"
+                wire:loading.attr="disabled"
+                wire:confirm="¿Confirmas esta acción? Esta guía cambiará de estado."
+                class="mt-4 w-full rounded-xl bg-amber-500 px-5 py-3 text-sm font-semibold text-white hover:bg-amber-600 disabled:opacity-50 sm:w-auto"
+            >
+                {{ $this->releaseActionLabel() }}
+            </button>
+        </div>
+    @endif
+
     @if ($package && $package->histories->count())
         <div class="rounded-2xl border border-slate-200 bg-white p-6 shadow-sm">
             <h3 class="font-display text-lg font-semibold text-slate-900">

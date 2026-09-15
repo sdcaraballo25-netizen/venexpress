@@ -5,6 +5,7 @@ namespace App\Livewire\Admin;
 use App\Models\Package;
 use App\Models\Warehouse;
 use App\Services\HubReceptionService;
+use App\Services\HubReleaseService;
 use App\Services\LogisticsResolutionResult;
 use App\Services\LogisticsResolutionService;
 use Illuminate\Validation\Rule;
@@ -193,6 +194,103 @@ class PackageReception extends Component
             'successMessage',
             'errorMessage',
         ]);
+    }
+
+    /**
+     * Fase 5B-2 — Liberación explícita de un paquete que ya llegó a su
+     * HUB destino (EN_HUB en current_warehouse_id === destination_warehouse_id).
+     *
+     * Acción totalmente separada de receive(): esta no recibe nada
+     * físicamente, decide qué pasa con un paquete que YA está recibido
+     * en su HUB final, según la modalidad de destino elegida por el
+     * cliente (pickup_mode / requires_delivery). No usa $warehouseId
+     * en absoluto — el HUB relevante ya es el actual del paquete.
+     */
+    public function releaseFromHub(): void
+    {
+        $this->reset(['successMessage', 'errorMessage']);
+
+        if (! $this->package) {
+            $this->errorMessage = 'Busca primero una guía.';
+            return;
+        }
+
+        try {
+            $released = app(HubReleaseService::class)->release(
+                package: $this->package,
+                userId: (int) auth()->id(),
+            );
+
+            $this->package = $released;
+
+            $this->successMessage = match (true) {
+                $released->pickup_mode === Package::PICKUP_MODE_HUB =>
+                    'Paquete liberado: queda listo para retiro directo en este HUB.',
+
+                $released->pickup_mode === Package::PICKUP_MODE_ALLY =>
+                    'Paquete despachado hacia el punto Aliado de retiro.',
+
+                default => 'Paquete despachado para su entrega a domicilio (Delivery).',
+            };
+        } catch (RuntimeException $e) {
+            $this->errorMessage = $e->getMessage();
+            $this->package = $this->package->fresh([
+                'ally',
+                'driver',
+                'histories',
+            ]);
+        }
+    }
+
+    /**
+     * Controla si el botón de liberación debe mostrarse: solo cuando
+     * el paquete está EN_HUB, físicamente en su HUB destino resuelto,
+     * y con una modalidad de destino final coherente. Es una lectura
+     * de presentación (sin efectos secundarios) que refleja las mismas
+     * condiciones que HubReleaseService::release() valida de verdad —
+     * si algo no calza aquí, el botón simplemente no aparece; si algo
+     * cambiara entre el render y el click, release() lo rechaza igual.
+     */
+    public function canReleaseFromHub(): bool
+    {
+        if (! $this->package || $this->package->current_status !== Package::STATUS_EN_HUB) {
+            return false;
+        }
+
+        if (! app(LogisticsResolutionService::class)->isAtDestinationWarehouse($this->package)) {
+            return false;
+        }
+
+        $isCoherentHubPickup = $this->package->pickup_mode === Package::PICKUP_MODE_HUB
+            && $this->package->pickup_ally_id === null
+            && ! $this->package->requires_delivery;
+
+        $isCoherentAllyPickup = $this->package->pickup_mode === Package::PICKUP_MODE_ALLY
+            && $this->package->pickup_ally_id !== null
+            && ! $this->package->requires_delivery;
+
+        $isCoherentDelivery = $this->package->requires_delivery
+            && $this->package->pickup_mode === null;
+
+        return $isCoherentHubPickup || $isCoherentAllyPickup || $isCoherentDelivery;
+    }
+
+    /**
+     * Texto exacto que debe ver Admin para cada modalidad, tal como lo
+     * pide la especificación de Fase 5B-2.
+     */
+    public function releaseActionLabel(): ?string
+    {
+        if (! $this->package) {
+            return null;
+        }
+
+        return match (true) {
+            $this->package->pickup_mode === Package::PICKUP_MODE_HUB => 'Dejar listo para retiro en este HUB',
+            $this->package->pickup_mode === Package::PICKUP_MODE_ALLY => 'Despachar al punto aliado',
+            $this->package->requires_delivery => 'Despachar para delivery',
+            default => null,
+        };
     }
 
     public function render()
