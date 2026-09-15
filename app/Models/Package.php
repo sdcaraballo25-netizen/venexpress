@@ -56,11 +56,26 @@ class Package extends Model
     public const REMUNERATION_PAID = 'pagada';
     public const REMUNERATION_CANCELLED = 'cancelada';
 
+    /**
+     * Modalidad de destino final cuando requires_delivery = false.
+     * NULL cuando el pedido requiere delivery — el flujo de Delivery
+     * no usa este campo.
+     */
+    public const PICKUP_MODE_HUB = 'hub';
+
+    public const PICKUP_MODE_ALLY = 'ally';
+
+    public const PICKUP_MODES = [
+        self::PICKUP_MODE_HUB,
+        self::PICKUP_MODE_ALLY,
+    ];
+
     protected $fillable = [
         'tracking_number',
         'security_hash',
         'ally_id',
         'pickup_ally_id',
+        'pickup_mode',
         'destination_warehouse_id',
         'current_warehouse_id',
         'destination_resolution_status',

@@ -91,6 +91,7 @@ class PackageCreateTest extends TestCase
             ->set('recipient_phone', '0424-7654321')
             ->set('destination_state', 'Carabobo')
             ->set('destination_city', 'Valencia')
+            ->set('pickup_mode', 'ally')
             ->set('pickup_ally_id', $pickupAlly->id)
             ->set('package_type', Package::TYPE_PAQUETE)
             ->set('physical_weight_kg', 2.0)

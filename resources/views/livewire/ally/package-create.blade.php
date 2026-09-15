@@ -162,7 +162,13 @@
 
             <div style="text-align:center;border-bottom:1px dashed #000;padding:6px 0;margin-bottom:10px;">
                 <p style="font-size:13px;font-weight:700;margin:0;">
-                    {{ ! empty($printSnapshot['requires_delivery']) ? 'ENTREGA A DOMICILIO' : 'RETIRO EN AGENCIA' }}
+                    @if (! empty($printSnapshot['requires_delivery']))
+                        ENTREGA A DOMICILIO
+                    @elseif (($printSnapshot['pickup_mode'] ?? null) === 'hub')
+                        RETIRO EN HUB
+                    @else
+                        RETIRO EN PUNTO ALIADO
+                    @endif
                 </p>
             </div>
 
@@ -235,6 +241,8 @@
                     {{ $printSnapshot['delivery_address'] ?? '' }} — {{ $printSnapshot['delivery_sector'] ?? '' }},
                 @elseif (! empty($printSnapshot['pickup_ally_name']))
                     Retiro en {{ $printSnapshot['pickup_ally_name'] }},
+                @elseif (($printSnapshot['pickup_mode'] ?? null) === 'hub')
+                    Retiro en HUB destino,
                 @else
                     Retiro en agencia,
                 @endif
@@ -620,17 +628,82 @@
                 @endif
             </div>
 
-            {{-- DELIVERY --}}
+            {{-- MODALIDAD DE DESTINO FINAL --}}
             <div class="rounded-2xl border border-[#E2E8F0] bg-white p-5 shadow-sm">
                 <h3 class="font-display text-lg font-semibold text-[#0F172A] mb-4">
-                    Entrega a domicilio
+                    ¿Cómo recibirá el cliente?
                 </h3>
 
-                <label class="flex items-center gap-2 text-sm text-slate-600">
-                    <input type="checkbox" wire:model.live="requires_delivery"
-                        class="h-4 w-4 rounded border border-slate-300 text-blue-900 focus:ring-blue-900">
-                    Requiere delivery
-                </label>
+                <div class="grid grid-cols-1 sm:grid-cols-3 gap-3">
+                    <button
+                        type="button"
+                        wire:click="selectHubPickup"
+                        class="rounded-xl border px-4 py-3 text-left text-sm font-medium transition
+                            {{ (! $requires_delivery && $pickup_mode === 'hub')
+                                ? 'border-blue-900 bg-blue-50 text-blue-900'
+                                : 'border-slate-300 text-slate-600 hover:border-blue-300' }}"
+                    >
+                        Retiro en HUB
+                    </button>
+
+                    <button
+                        type="button"
+                        wire:click="selectAllyPickup"
+                        class="rounded-xl border px-4 py-3 text-left text-sm font-medium transition
+                            {{ (! $requires_delivery && $pickup_mode === 'ally')
+                                ? 'border-blue-900 bg-blue-50 text-blue-900'
+                                : 'border-slate-300 text-slate-600 hover:border-blue-300' }}"
+                    >
+                        Retiro en Punto Aliado
+                    </button>
+
+                    <button
+                        type="button"
+                        wire:click="selectDelivery"
+                        class="rounded-xl border px-4 py-3 text-left text-sm font-medium transition
+                            {{ $requires_delivery
+                                ? 'border-blue-900 bg-blue-50 text-blue-900'
+                                : 'border-slate-300 text-slate-600 hover:border-blue-300' }}"
+                    >
+                        Delivery
+                    </button>
+                </div>
+
+                @error('pickup_mode') <p class="text-xs text-red-600 mt-2">{{ $message }}</p> @enderror
+
+                @if (! $requires_delivery && $pickup_mode === 'hub')
+                    <div class="mt-4 rounded-xl border border-blue-100 bg-blue-50 px-4 py-3 text-sm text-blue-900">
+                        El cliente retirará su paquete directamente en el HUB de destino.
+                    </div>
+                @endif
+
+                @if (! $requires_delivery && $pickup_mode === 'ally')
+                    <div class="mt-4">
+                        <label class="text-sm text-slate-600">Punto de retiro</label>
+
+                        @if ($destination_state === '')
+                            <p class="mt-2 text-xs text-[#94A3B8]">
+                                Selecciona primero el estado destino.
+                            </p>
+                        @elseif (empty($pickupAllies))
+                            <p class="mt-2 text-xs text-amber-700 bg-amber-50 rounded-lg px-3 py-2">
+                                No hay puntos de retiro verificados disponibles en {{ $destination_state }} todavía.
+                            </p>
+                        @else
+                            <select wire:model.live="pickup_ally_id"
+                                class="mt-1 w-full rounded-xl border border-slate-300 px-3 py-2 text-sm shadow-sm focus:border-blue-900 focus:ring-blue-900">
+                                <option value="">Selecciona un punto de retiro...</option>
+                                @foreach ($pickupAllies as $pickupAlly)
+                                    <option value="{{ $pickupAlly['id'] }}">
+                                        {{ $pickupAlly['business_name'] }} — {{ $pickupAlly['city'] }}
+                                    </option>
+                                @endforeach
+                            </select>
+                        @endif
+
+                        @error('pickup_ally_id') <p class="text-xs text-red-600 mt-1">{{ $message }}</p> @enderror
+                    </div>
+                @endif
 
                 @if ($requires_delivery)
                     <div class="grid grid-cols-1 md:grid-cols-2 gap-4 mt-4">
@@ -665,32 +738,6 @@
                             <strong>${{ number_format($pricePreview['delivery_fee_usd'] ?? 0, 2) }}</strong>
                         </div>
                     @endif
-                @else
-                    <div class="mt-4">
-                        <label class="text-sm text-slate-600">Punto de retiro</label>
-
-                        @if ($destination_state === '')
-                            <p class="mt-2 text-xs text-[#94A3B8]">
-                                Selecciona primero el estado destino.
-                            </p>
-                        @elseif (empty($pickupAllies))
-                            <p class="mt-2 text-xs text-amber-700 bg-amber-50 rounded-lg px-3 py-2">
-                                No hay puntos de retiro verificados disponibles en {{ $destination_state }} todavía.
-                            </p>
-                        @else
-                            <select wire:model.live="pickup_ally_id"
-                                class="mt-1 w-full rounded-xl border border-slate-300 px-3 py-2 text-sm shadow-sm focus:border-blue-900 focus:ring-blue-900">
-                                <option value="">Selecciona un punto de retiro...</option>
-                                @foreach ($pickupAllies as $pickupAlly)
-                                    <option value="{{ $pickupAlly['id'] }}">
-                                        {{ $pickupAlly['business_name'] }} — {{ $pickupAlly['city'] }}
-                                    </option>
-                                @endforeach
-                            </select>
-                        @endif
-
-                        @error('pickup_ally_id') <p class="text-xs text-red-600 mt-1">{{ $message }}</p> @enderror
-                    </div>
                 @endif
             </div>
 
@@ -805,7 +852,7 @@
             <div class="mt-6 flex items-center justify-end gap-3">
                 <span
                     wire:loading
-                    wire:target="destination_state,destination_city,physical_weight_kg,length_cm,width_cm,height_cm,package_type,is_fragile,has_insurance,declared_value_usd,requires_delivery"
+                    wire:target="destination_state,destination_city,physical_weight_kg,length_cm,width_cm,height_cm,package_type,is_fragile,has_insurance,declared_value_usd,selectDelivery,selectHubPickup,selectAllyPickup"
                     class="text-xs text-slate-400"
                 >
                     Calculando tarifa...

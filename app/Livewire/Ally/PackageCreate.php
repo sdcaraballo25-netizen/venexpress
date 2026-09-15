@@ -77,8 +77,18 @@ class PackageCreate extends Component
     public string $delivery_reference = '';
 
     /**
-     * Punto de retiro elegido por el cliente cuando el pedido NO
-     * requiere delivery (Regla 58-B). Solo se ofrecen Aliados
+     * Modalidad de destino final cuando el pedido NO requiere
+     * delivery: Package::PICKUP_MODE_HUB (retiro directo en el HUB
+     * destino, resuelto más adelante por LogisticsResolutionService —
+     * aquí nunca se elige un HUB manualmente) o
+     * Package::PICKUP_MODE_ALLY (retiro en pickup_ally_id, igual que
+     * antes). NULL cuando requires_delivery = true.
+     */
+    public ?string $pickup_mode = null;
+
+    /**
+     * Punto de retiro elegido por el cliente cuando pickup_mode =
+     * PICKUP_MODE_ALLY (Regla 58-B). Solo se ofrecen Aliados
      * verificados como destino (Ally::scopeVerifiedDestinations()),
      * acotados al estado de destino ya elegido. El Aliado NO
      * selecciona ruta, HUB ni almacén — solo este punto final.
@@ -208,10 +218,18 @@ class PackageCreate extends Component
             'delivery_sector' => ['nullable', 'string', 'max:255', 'required_if:requires_delivery,true'],
             'delivery_reference' => ['nullable', 'string', 'max:1000'],
 
+            'pickup_mode' => [
+                'nullable',
+                'required_if:requires_delivery,false',
+                'prohibited_if:requires_delivery,true',
+                Rule::in(Package::PICKUP_MODES),
+            ],
+
             'pickup_ally_id' => [
                 'nullable',
                 'integer',
-                'required_if:requires_delivery,false',
+                'required_if:pickup_mode,' . Package::PICKUP_MODE_ALLY,
+                'prohibited_unless:pickup_mode,' . Package::PICKUP_MODE_ALLY,
                 Rule::exists('allies', 'id')->where(
                     fn ($query) => $query
                         ->where('is_verified_destination', true)
@@ -250,7 +268,10 @@ class PackageCreate extends Component
             'destination_city.required' => 'Selecciona la ciudad destino.',
             'delivery_address.required_if' => 'Indica la dirección exacta de entrega.',
             'delivery_sector.required_if' => 'Indica el sector o urbanización.',
+            'pickup_mode.required_if' => 'Selecciona cómo recibirá el pedido el cliente.',
+            'pickup_mode.prohibited_if' => 'No debe indicarse una modalidad de retiro cuando el pedido requiere delivery.',
             'pickup_ally_id.required_if' => 'Selecciona el punto de retiro.',
+            'pickup_ally_id.prohibited_unless' => 'El punto de retiro solo aplica cuando la modalidad es "Retiro en Punto Aliado".',
             'pickup_ally_id.exists' => 'El punto de retiro seleccionado no está disponible.',
         ];
     }
@@ -273,13 +294,25 @@ class PackageCreate extends Component
 
         if ($property === 'requires_delivery') {
             if ($this->requires_delivery) {
-                // Con delivery, no aplica punto de retiro.
+                // Con delivery, no aplica ninguna modalidad de retiro.
+                $this->pickup_mode = null;
                 $this->pickup_ally_id = null;
+                $this->pickupAllies = [];
             } else {
                 $this->delivery_address = '';
                 $this->delivery_sector = '';
                 $this->delivery_reference = '';
                 $this->refreshPickupAllies();
+            }
+        }
+
+        if ($property === 'pickup_mode') {
+            if ($this->pickup_mode === Package::PICKUP_MODE_ALLY) {
+                $this->refreshPickupAllies();
+            } else {
+                // HUB (o vacío): nunca lleva un Aliado asociado.
+                $this->pickup_ally_id = null;
+                $this->pickupAllies = [];
             }
         }
 
@@ -467,6 +500,54 @@ class PackageCreate extends Component
         }
     }
 
+    /*
+    |--------------------------------------------------------------------------
+    | MODALIDAD DE DESTINO FINAL
+    |--------------------------------------------------------------------------
+    |
+    | Tres acciones explícitas, una por opción del selector "¿Cómo
+    | recibirá el cliente?". Cada una deja requires_delivery/
+    | pickup_mode/pickup_ally_id en el único estado válido para esa
+    | modalidad — el mismo que exige rules() — sin depender de que
+    | updated() se dispare de nuevo para completar la limpieza.
+    */
+
+    public function selectDelivery(): void
+    {
+        $this->requires_delivery = true;
+        $this->pickup_mode = null;
+        $this->pickup_ally_id = null;
+        $this->pickupAllies = [];
+
+        $this->refreshPricePreview(app(TariffService::class));
+    }
+
+    public function selectHubPickup(): void
+    {
+        $this->requires_delivery = false;
+        $this->pickup_mode = Package::PICKUP_MODE_HUB;
+        $this->pickup_ally_id = null;
+        $this->pickupAllies = [];
+        $this->delivery_address = '';
+        $this->delivery_sector = '';
+        $this->delivery_reference = '';
+
+        $this->refreshPricePreview(app(TariffService::class));
+    }
+
+    public function selectAllyPickup(): void
+    {
+        $this->requires_delivery = false;
+        $this->pickup_mode = Package::PICKUP_MODE_ALLY;
+        $this->pickup_ally_id = null;
+        $this->delivery_address = '';
+        $this->delivery_sector = '';
+        $this->delivery_reference = '';
+
+        $this->refreshPickupAllies();
+        $this->refreshPricePreview(app(TariffService::class));
+    }
+
     public function save(PackageService $packageService): void
     {
         $ally = auth()->user()->resolveAlly();
@@ -549,6 +630,7 @@ class PackageCreate extends Component
             'delivery_address' => $this->delivery_address,
             'delivery_sector' => $this->delivery_sector,
             'delivery_reference' => $this->delivery_reference,
+            'pickup_mode' => $this->pickup_mode,
             'pickup_ally_name' => $package->pickupAlly?->business_name,
             'is_cod' => $this->is_cod,
             'payment_method' => $this->payment_method,
@@ -600,7 +682,7 @@ class PackageCreate extends Component
             'recipient_name', 'recipient_phone', 'recipient_email',
             'destination_state', 'destination_city', 'destinationCities',
             'requires_delivery', 'delivery_address', 'delivery_sector', 'delivery_reference',
-            'pickup_ally_id', 'pickupAllies',
+            'pickup_mode', 'pickup_ally_id', 'pickupAllies',
             'physical_weight_kg', 'length_cm', 'width_cm', 'height_cm',
             'is_fragile', 'has_insurance', 'declared_value_usd',
             'payment_method', 'is_cod', 'cod_amount_usd',
@@ -629,13 +711,14 @@ class PackageCreate extends Component
     /**
      * Aliados verificados como punto de retiro (Regla 9-12) en el
      * estado destino ya elegido. Solo se recalcula cuando aplica
-     * (requires_delivery = false); esta fase no implementa ninguna
-     * resolución logística de cobertura, solo un filtro directo por
-     * el estado que el cliente ya seleccionó como destino.
+     * (pickup_mode = PICKUP_MODE_ALLY); esta fase no implementa
+     * ninguna resolución logística de cobertura, solo un filtro
+     * directo por el estado que el cliente ya seleccionó como
+     * destino.
      */
     protected function refreshPickupAllies(): void
     {
-        if ($this->requires_delivery || $this->destination_state === '') {
+        if ($this->pickup_mode !== Package::PICKUP_MODE_ALLY || $this->destination_state === '') {
             $this->pickupAllies = [];
 
             return;

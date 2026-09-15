@@ -79,7 +79,7 @@ class PackageCreatePickupTest extends TestCase
             ->set('payment_method', 'efectivo_usd');
     }
 
-    public function test_pickup_point_is_required_when_delivery_is_not_requested(): void
+    public function test_pickup_mode_is_required_when_delivery_is_not_requested(): void
     {
         $ally = $this->createAlly(['city' => 'Caracas', 'state' => 'Distrito Capital']);
 
@@ -89,6 +89,21 @@ class PackageCreatePickupTest extends TestCase
             ->set('destination_state', 'Carabobo')
             ->set('destination_city', 'Valencia')
             ->set('requires_delivery', false)
+            ->call('save')
+            ->assertHasErrors(['pickup_mode']);
+    }
+
+    public function test_pickup_ally_id_is_required_when_pickup_mode_is_ally(): void
+    {
+        $ally = $this->createAlly(['city' => 'Caracas', 'state' => 'Distrito Capital']);
+
+        $component = Livewire::actingAs($ally->user)->test(PackageCreate::class);
+
+        $this->fillCommonFields($component)
+            ->set('destination_state', 'Carabobo')
+            ->set('destination_city', 'Valencia')
+            ->set('requires_delivery', false)
+            ->set('pickup_mode', 'ally')
             ->call('save')
             ->assertHasErrors(['pickup_ally_id']);
     }
@@ -132,6 +147,7 @@ class PackageCreatePickupTest extends TestCase
             ->set('destination_state', 'Carabobo')
             ->set('destination_city', 'Valencia')
             ->set('requires_delivery', false)
+            ->set('pickup_mode', 'ally')
             ->set('pickup_ally_id', $notVerified->id)
             ->call('save')
             ->assertHasErrors(['pickup_ally_id']);
@@ -154,6 +170,7 @@ class PackageCreatePickupTest extends TestCase
             ->set('destination_state', 'Carabobo')
             ->set('destination_city', 'Valencia')
             ->set('requires_delivery', false)
+            ->set('pickup_mode', 'ally')
             ->set('pickup_ally_id', $wrongStatePickup->id)
             ->call('save')
             ->assertHasErrors(['pickup_ally_id']);
@@ -187,6 +204,7 @@ class PackageCreatePickupTest extends TestCase
         Livewire::actingAs($ally->user)
             ->test(PackageCreate::class)
             ->set('destination_state', 'Carabobo')
+            ->set('pickup_mode', 'ally')
             ->assertViewHas('pickupAllies', function ($pickupAllies) use ($validPickup) {
                 $names = array_column($pickupAllies, 'business_name');
 
