@@ -17,6 +17,7 @@ class LogisticsScanService
         protected PackageDispatchService $packageDispatchService,
         protected HubReceptionService $hubReceptionService,
         protected RouteService $routeService,
+        protected LogisticsResolutionService $logisticsResolutionService,
     ) {}
 
     /**
@@ -196,15 +197,32 @@ class LogisticsScanService
      * driver de Distribución (driver_type = hub) con una ruta
      * hub_distribution en curso.
      *
-     * Reglas:
+     * Fase 5B-1 — HUB origen -> HUB destino DIRECTO. Reglas:
      * - El repartidor debe estar activo y ser de tipo hub.
      * - Debe tener una ruta hub_distribution en curso.
      * - El paquete debe estar EN_HUB.
+     * - destination_resolution_status debe ser 'resolved' y
+     *   destination_warehouse_id debe existir — LogisticsResolutionService
+     *   ya resolvió esto en la recepción de origen (Fase 5A); aquí NO
+     *   se vuelve a decidir nada automáticamente, solo se exige que ya
+     *   esté resuelto.
+     * - Si el paquete ya está en su HUB destino
+     *   (isAtDestinationWarehouse()), se rechaza: no se genera una
+     *   transferencia innecesaria.
+     * - La ruta activa debe tener una parada (warehouse_id) igual al
+     *   destination_warehouse_id del paquete — el paquete solo puede
+     *   salir hacia SU HUB destino, nunca hacia cualquier otro.
      * - El escaneo asigna el paquete a este driver si aún no tiene uno.
      * - Delega el cambio de estado a PackageDispatchService::dispatch()
-     *   (EN_HUB -> EN_TRANSITO_NACIONAL), sin modificar ese servicio.
-     * - No fija route_stop_id todavía: al salir del HUB el camión
-     *   lleva paquetes para varias paradas futuras, no una sola.
+     *   (EN_HUB -> EN_TRANSITO_NACIONAL), pasándole el route_stop_id
+     *   de la parada de destino: dispatch() acepta ese parámetro
+     *   opcional (Fase 5B-1) y lo usa para llenar route_stop_id del
+     *   propio evento SALIDA que ya crea — un único evento por
+     *   despacho, sin duplicar historial.
+     * - current_warehouse_id NO se toca: sigue reflejando el HUB
+     *   origen mientras el paquete está en tránsito (regla de negocio
+     *   confirmada: "mientras el paquete está en tránsito, mantener el
+     *   último HUB físicamente confirmado").
      */
     public function scanHubDeparture(
         Package $package,
@@ -259,6 +277,7 @@ class LogisticsScanService
                 ->where('driver_id', $driver->id)
                 ->where('status', Route::STATUS_IN_PROGRESS)
                 ->where('route_type', Route::TYPE_HUB_DISTRIBUTION)
+                ->with('stops.warehouse')
                 ->latest('started_at')
                 ->first();
 
@@ -266,6 +285,32 @@ class LogisticsScanService
                 throw new RuntimeException(
                     'No tienes una ruta de distribución en curso. '
                     .'Inicia una ruta antes de escanear paquetes.'
+                );
+            }
+
+            if (
+                $lockedPackage->destination_resolution_status !== LogisticsResolutionResult::STATUS_RESOLVED
+                || $lockedPackage->destination_warehouse_id === null
+            ) {
+                throw new RuntimeException(
+                    'Este paquete no tiene un HUB destino resuelto. No puede salir en una transferencia '
+                    .'entre HUBs hasta que Admin revise su cobertura logística.'
+                );
+            }
+
+            if ($this->logisticsResolutionService->isAtDestinationWarehouse($lockedPackage)) {
+                throw new RuntimeException(
+                    'Este paquete ya está en su HUB destino. No requiere una transferencia entre HUBs.'
+                );
+            }
+
+            $stop = $route->stops->first(
+                fn (RouteStop $stop) => $stop->warehouse_id === $lockedPackage->destination_warehouse_id
+            );
+
+            if (! $stop) {
+                throw new RuntimeException(
+                    'Esta ruta no tiene como destino el HUB que corresponde a este paquete.'
                 );
             }
 
@@ -280,6 +325,7 @@ class LogisticsScanService
                 userId: $userId,
                 originLocation: 'HUB',
                 destinationLocation: 'Ruta de distribución '.$route->name,
+                routeStopId: $stop->id,
             );
 
             return $dispatched->fresh([
@@ -291,15 +337,18 @@ class LogisticsScanService
     }
 
     /**
-     * Registra la llegada de un paquete al almacén propio de
-     * Venexpress destino, escaneada por el mismo driver de
-     * Distribución que lo sacó del HUB.
+     * Registra la llegada FÍSICA de un paquete al HUB destino,
+     * escaneada por el mismo driver de Distribución que lo sacó del
+     * HUB origen.
      *
-     * IMPORTANTE: este método NO cambia current_status. El paquete
-     * permanece EN_TRANSITO_NACIONAL, que es el estado que la app de
-     * Delivery (de otro desarrollador) ya sabe leer hoy para reclamar
-     * y entregar. Solo se registra el movimiento y se libera la
-     * custodia del driver de HUB.
+     * IMPORTANTE: este método NO cambia current_status ni hace la
+     * recepción interna. El paquete permanece EN_TRANSITO_NACIONAL.
+     * Solo registra que el vehículo llegó y libera la custodia del
+     * driver — la verificación/recepción administrativa (que sí
+     * transiciona a EN_HUB) es una operación separada, hecha por
+     * Admin/interno (ver HubReceptionService::receiveTransferAtWarehouse(),
+     * Fase 5B-1). El driver nunca confirma la recepción final, ni
+     * siquiera para una transferencia entre HUBs.
      */
     public function scanHubArrival(
         Package $package,
@@ -395,32 +444,26 @@ class LogisticsScanService
 
     /**
      * Resuelve a qué parada (almacén) de la ruta de distribución
-     * corresponde este paquete, comparando destination_city/state del
-     * paquete contra la ciudad/estado del almacén de cada parada.
+     * corresponde este paquete.
      *
-     * Mismo criterio de coincidencia por texto que ya usa
-     * Ally\PackageReception::belongsToDestinationAgency() para
-     * agencias — es la misma limitación que ya existe hoy (no hay FK
-     * directo entre Package y su destino), no algo nuevo.
+     * Fase 5B-1: deja de comparar texto de ciudad/estado — usa
+     * destination_warehouse_id (ya resuelto por
+     * LogisticsResolutionService en la salida del HUB origen,
+     * scanHubDeparture()) contra el warehouse_id de cada parada. Es
+     * la misma relación real que scanHubDeparture() ya validó al
+     * aceptar el despacho, así que aquí solo se vuelve a localizar la
+     * parada — no se decide nada nuevo.
      */
     protected function resolveDestinationStop(
         Package $package,
         Route $route,
     ): ?RouteStop {
-        $packageCity = mb_strtolower(trim((string) $package->destination_city));
-        $packageState = mb_strtolower(trim((string) $package->destination_state));
-
-        if ($packageCity === '' || $packageState === '') {
+        if ($package->destination_warehouse_id === null) {
             return null;
         }
 
-        return $route->stops->first(function (RouteStop $stop) use ($packageCity, $packageState) {
-            if (! $stop->warehouse) {
-                return false;
-            }
-
-            return mb_strtolower(trim((string) $stop->warehouse->city)) === $packageCity
-                && mb_strtolower(trim((string) $stop->warehouse->state)) === $packageState;
-        });
+        return $route->stops->first(
+            fn (RouteStop $stop) => $stop->warehouse_id === $package->destination_warehouse_id
+        );
     }
 }

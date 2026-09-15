@@ -249,4 +249,247 @@ class HubReceptionServiceTest extends TestCase
 
         $this->assertSame($routesBefore, Route::count());
     }
+
+    /*
+    |--------------------------------------------------------------------------
+    | receiveTransferAtWarehouse() — Fase 5B-1, HUB -> HUB directo
+    |--------------------------------------------------------------------------
+    */
+
+    public function test_transfer_reception_transitions_en_transito_to_en_hub(): void
+    {
+        $ally = $this->createAlly();
+        $originWarehouse = Warehouse::factory()->create();
+        $destinationWarehouse = Warehouse::factory()->create(['state' => 'Carabobo', 'city' => 'Valencia']);
+
+        WarehouseCoverage::create([
+            'warehouse_id' => $destinationWarehouse->id,
+            'state' => 'Carabobo',
+            'city' => 'Valencia',
+            'is_active' => true,
+        ]);
+
+        $package = $this->createPackage($ally, [
+            'current_status' => Package::STATUS_EN_TRANSITO_NACIONAL,
+            'destination_state' => 'Carabobo',
+            'destination_city' => 'Valencia',
+            'current_warehouse_id' => $originWarehouse->id,
+            'destination_warehouse_id' => $destinationWarehouse->id,
+            'destination_resolution_status' => LogisticsResolutionResult::STATUS_RESOLVED,
+        ]);
+
+        $received = $this->service()->receiveTransferAtWarehouse(
+            $package,
+            $ally->user_id,
+            $destinationWarehouse
+        );
+
+        $this->assertSame(Package::STATUS_EN_HUB, $received->current_status);
+    }
+
+    public function test_transfer_reception_sets_current_warehouse_id_to_the_destination_hub(): void
+    {
+        $ally = $this->createAlly();
+        $originWarehouse = Warehouse::factory()->create();
+        $destinationWarehouse = Warehouse::factory()->create(['state' => 'Carabobo', 'city' => 'Valencia']);
+
+        WarehouseCoverage::create([
+            'warehouse_id' => $destinationWarehouse->id,
+            'state' => 'Carabobo',
+            'city' => 'Valencia',
+            'is_active' => true,
+        ]);
+
+        $package = $this->createPackage($ally, [
+            'current_status' => Package::STATUS_EN_TRANSITO_NACIONAL,
+            'destination_state' => 'Carabobo',
+            'destination_city' => 'Valencia',
+            'current_warehouse_id' => $originWarehouse->id,
+            'destination_warehouse_id' => $destinationWarehouse->id,
+            'destination_resolution_status' => LogisticsResolutionResult::STATUS_RESOLVED,
+        ]);
+
+        $received = $this->service()->receiveTransferAtWarehouse(
+            $package,
+            $ally->user_id,
+            $destinationWarehouse
+        );
+
+        $this->assertSame($destinationWarehouse->id, $received->current_warehouse_id);
+    }
+
+    public function test_transfer_reception_keeps_destination_warehouse_id_as_the_destination_hub(): void
+    {
+        $ally = $this->createAlly();
+        $destinationWarehouse = Warehouse::factory()->create(['state' => 'Carabobo', 'city' => 'Valencia']);
+
+        WarehouseCoverage::create([
+            'warehouse_id' => $destinationWarehouse->id,
+            'state' => 'Carabobo',
+            'city' => 'Valencia',
+            'is_active' => true,
+        ]);
+
+        $package = $this->createPackage($ally, [
+            'current_status' => Package::STATUS_EN_TRANSITO_NACIONAL,
+            'destination_state' => 'Carabobo',
+            'destination_city' => 'Valencia',
+            'destination_warehouse_id' => $destinationWarehouse->id,
+            'destination_resolution_status' => LogisticsResolutionResult::STATUS_RESOLVED,
+        ]);
+
+        $received = $this->service()->receiveTransferAtWarehouse(
+            $package,
+            $ally->user_id,
+            $destinationWarehouse
+        );
+
+        $this->assertSame($destinationWarehouse->id, $received->destination_warehouse_id);
+    }
+
+    public function test_transfer_reception_releases_driver_id(): void
+    {
+        $ally = $this->createAlly();
+        $driver = Driver::factory()->create();
+        $destinationWarehouse = Warehouse::factory()->create(['state' => 'Carabobo', 'city' => 'Valencia']);
+
+        WarehouseCoverage::create([
+            'warehouse_id' => $destinationWarehouse->id,
+            'state' => 'Carabobo',
+            'city' => 'Valencia',
+            'is_active' => true,
+        ]);
+
+        $package = $this->createPackage($ally, [
+            'current_status' => Package::STATUS_EN_TRANSITO_NACIONAL,
+            'destination_state' => 'Carabobo',
+            'destination_city' => 'Valencia',
+            'driver_id' => $driver->id,
+            'destination_warehouse_id' => $destinationWarehouse->id,
+            'destination_resolution_status' => LogisticsResolutionResult::STATUS_RESOLVED,
+        ]);
+
+        $received = $this->service()->receiveTransferAtWarehouse(
+            $package,
+            $ally->user_id,
+            $destinationWarehouse
+        );
+
+        $this->assertNull($received->driver_id);
+    }
+
+    public function test_transfer_reception_creates_exactly_one_package_history_event(): void
+    {
+        $ally = $this->createAlly();
+        $destinationWarehouse = Warehouse::factory()->create(['state' => 'Carabobo', 'city' => 'Valencia']);
+
+        WarehouseCoverage::create([
+            'warehouse_id' => $destinationWarehouse->id,
+            'state' => 'Carabobo',
+            'city' => 'Valencia',
+            'is_active' => true,
+        ]);
+
+        $package = $this->createPackage($ally, [
+            'current_status' => Package::STATUS_EN_TRANSITO_NACIONAL,
+            'destination_state' => 'Carabobo',
+            'destination_city' => 'Valencia',
+            'destination_warehouse_id' => $destinationWarehouse->id,
+            'destination_resolution_status' => LogisticsResolutionResult::STATUS_RESOLVED,
+        ]);
+
+        $this->service()->receiveTransferAtWarehouse($package, $ally->user_id, $destinationWarehouse);
+
+        $this->assertSame(1, PackageHistory::where('package_id', $package->id)->count());
+
+        $history = PackageHistory::where('package_id', $package->id)->first();
+        $this->assertSame(PackageHistory::EVENT_RECEPCION, $history->event_type);
+        $this->assertSame(Package::STATUS_EN_HUB, $history->status);
+    }
+
+    public function test_transfer_reception_rejects_the_wrong_destination_warehouse(): void
+    {
+        $ally = $this->createAlly();
+        $correctWarehouse = Warehouse::factory()->create(['state' => 'Carabobo', 'city' => 'Valencia']);
+        $wrongWarehouse = Warehouse::factory()->create(['is_active' => true]);
+
+        WarehouseCoverage::create([
+            'warehouse_id' => $correctWarehouse->id,
+            'state' => 'Carabobo',
+            'city' => 'Valencia',
+            'is_active' => true,
+        ]);
+
+        $package = $this->createPackage($ally, [
+            'current_status' => Package::STATUS_EN_TRANSITO_NACIONAL,
+            'destination_state' => 'Carabobo',
+            'destination_city' => 'Valencia',
+            'destination_warehouse_id' => $correctWarehouse->id,
+            'destination_resolution_status' => LogisticsResolutionResult::STATUS_RESOLVED,
+        ]);
+
+        $this->expectException(RuntimeException::class);
+        $this->expectExceptionMessage(
+            'Este paquete no tiene como destino este almacén. Verifica que lo estás recibiendo en el HUB correcto.'
+        );
+
+        $this->service()->receiveTransferAtWarehouse($package, $ally->user_id, $wrongWarehouse);
+    }
+
+    public function test_transfer_reception_rejects_when_package_is_not_en_transito(): void
+    {
+        $ally = $this->createAlly();
+        $warehouse = Warehouse::factory()->create(['is_active' => true]);
+
+        $package = $this->createPackage($ally, [
+            'current_status' => Package::STATUS_EN_HUB,
+        ]);
+
+        $this->expectException(RuntimeException::class);
+
+        $this->service()->receiveTransferAtWarehouse($package, $ally->user_id, $warehouse);
+    }
+
+    public function test_transfer_reception_rejects_an_inactive_warehouse(): void
+    {
+        $ally = $this->createAlly();
+        $warehouse = Warehouse::factory()->create(['is_active' => false]);
+
+        $package = $this->createPackage($ally, [
+            'current_status' => Package::STATUS_EN_TRANSITO_NACIONAL,
+        ]);
+
+        $this->expectException(RuntimeException::class);
+        $this->expectExceptionMessage('Solo se puede registrar recepción interna en un almacén activo.');
+
+        $this->service()->receiveTransferAtWarehouse($package, $ally->user_id, $warehouse);
+    }
+
+    public function test_transfer_reception_rejects_when_coverage_no_longer_resolves(): void
+    {
+        $ally = $this->createAlly();
+        $warehouse = Warehouse::factory()->create(['is_active' => true]);
+
+        // Sin WarehouseCoverage configurada: la resolución en vivo da
+        // no_coverage. No se decide nada automáticamente — se rechaza
+        // por completo, el paquete no cambia.
+        $package = $this->createPackage($ally, [
+            'current_status' => Package::STATUS_EN_TRANSITO_NACIONAL,
+            'destination_state' => 'Carabobo',
+            'destination_city' => 'Valencia',
+            'destination_warehouse_id' => $warehouse->id,
+            'destination_resolution_status' => LogisticsResolutionResult::STATUS_RESOLVED,
+        ]);
+
+        try {
+            $this->service()->receiveTransferAtWarehouse($package, $ally->user_id, $warehouse);
+            $this->fail('Se esperaba una RuntimeException por falta de cobertura.');
+        } catch (RuntimeException $e) {
+            // esperado
+        }
+
+        $package->refresh();
+        $this->assertSame(Package::STATUS_EN_TRANSITO_NACIONAL, $package->current_status);
+        $this->assertNull($package->current_warehouse_id);
+    }
 }

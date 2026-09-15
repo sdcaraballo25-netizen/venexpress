@@ -15,12 +15,19 @@ class PackageDispatchService
      *
      * EN_HUB -> EN_TRANSITO_NACIONAL
      * Cada despacho genera un evento SALIDA inmutable.
+     *
+     * $routeStopId es opcional: cuando el despacho pertenece a una
+     * transferencia directa entre HUBs (Fase 5B-1), identifica la
+     * parada de destino en el propio evento SALIDA. Si se omite
+     * (comportamiento existente, sin cambios), el evento se crea
+     * igual que siempre con route_stop_id = null.
      */
     public function dispatch(
         Package $package,
         int $userId,
         string $originLocation,
         string $destinationLocation,
+        ?int $routeStopId = null,
     ): Package {
         $originLocation = trim($originLocation);
         $destinationLocation = trim($destinationLocation);
@@ -38,6 +45,7 @@ class PackageDispatchService
             $userId,
             $originLocation,
             $destinationLocation,
+            $routeStopId,
         ) {
             $locked = Package::query()
                 ->whereKey($package->id)
@@ -64,7 +72,7 @@ class PackageDispatchService
 
             PackageHistory::create([
                 'package_id' => $locked->id,
-                'route_stop_id' => null,
+                'route_stop_id' => $routeStopId,
                 'status' => Package::STATUS_EN_TRANSITO_NACIONAL,
                 'event_type' => PackageHistory::EVENT_SALIDA,
                 'origin_location' => $originLocation,

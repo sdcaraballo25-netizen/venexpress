@@ -9,6 +9,7 @@ use App\Models\Route;
 use App\Models\RouteStop;
 use App\Models\User;
 use App\Models\Warehouse;
+use App\Models\WarehouseCoverage;
 use Illuminate\Foundation\Testing\RefreshDatabase;
 use Livewire\Livewire;
 use Tests\Feature\Concerns\CreatesTestPackages;
@@ -53,6 +54,22 @@ class ScannerHubOperationUxTest extends TestCase
             'address' => 'Zona Industrial',
             'is_active' => true,
         ], $overrides));
+    }
+
+    /**
+     * Fase 5B-1: scanHubDeparture()/scanHubArrival() ya no comparan
+     * texto de ciudad/estado, exigen destination_warehouse_id
+     * resuelto. Crea la cobertura necesaria para que
+     * LogisticsResolutionService resuelva hacia $warehouse.
+     */
+    private function coverWarehouse(Warehouse $warehouse): void
+    {
+        WarehouseCoverage::create([
+            'warehouse_id' => $warehouse->id,
+            'state' => $warehouse->state,
+            'city' => $warehouse->city,
+            'is_active' => true,
+        ]);
     }
 
     public function test_hub_transfer_shows_collection_operation_with_ally_and_city_before_scanning(): void
@@ -211,6 +228,7 @@ class ScannerHubOperationUxTest extends TestCase
     {
         [$user, $driver] = $this->createDriverUser();
         $warehouse = $this->createWarehouse();
+        $this->coverWarehouse($warehouse);
 
         $route = Route::create([
             'city' => 'Tucupita',
@@ -235,6 +253,8 @@ class ScannerHubOperationUxTest extends TestCase
             'current_status' => Package::STATUS_EN_HUB,
             'destination_city' => 'Tucupita',
             'destination_state' => 'Delta Amacuro',
+            'destination_warehouse_id' => $warehouse->id,
+            'destination_resolution_status' => 'resolved',
         ]);
 
         Livewire::actingAs($user)
@@ -253,6 +273,7 @@ class ScannerHubOperationUxTest extends TestCase
     {
         [$user, $driver] = $this->createDriverUser();
         $warehouse = $this->createWarehouse();
+        $this->coverWarehouse($warehouse);
 
         $route = Route::create([
             'city' => 'Tucupita',
@@ -278,6 +299,8 @@ class ScannerHubOperationUxTest extends TestCase
             'driver_id' => $driver->id,
             'destination_city' => 'Tucupita',
             'destination_state' => 'Delta Amacuro',
+            'destination_warehouse_id' => $warehouse->id,
+            'destination_resolution_status' => 'resolved',
         ]);
 
         Livewire::actingAs($user)
@@ -390,6 +413,7 @@ class ScannerHubOperationUxTest extends TestCase
     {
         [$user, $driver] = $this->createDriverUser();
         $warehouse = $this->createWarehouse();
+        $this->coverWarehouse($warehouse);
 
         $route = Route::create([
             'city' => 'Tucupita',
@@ -414,11 +438,15 @@ class ScannerHubOperationUxTest extends TestCase
             'current_status' => Package::STATUS_EN_HUB,
             'destination_city' => 'Tucupita',
             'destination_state' => 'Delta Amacuro',
+            'destination_warehouse_id' => $warehouse->id,
+            'destination_resolution_status' => 'resolved',
         ]);
         $second = $this->createPackage($ally, [
             'current_status' => Package::STATUS_EN_HUB,
             'destination_city' => 'Tucupita',
             'destination_state' => 'Delta Amacuro',
+            'destination_warehouse_id' => $warehouse->id,
+            'destination_resolution_status' => 'resolved',
         ]);
 
         $component = Livewire::actingAs($user)->test(Scanner::class);
@@ -443,6 +471,7 @@ class ScannerHubOperationUxTest extends TestCase
     {
         [$user, $driver] = $this->createDriverUser();
         $warehouse = $this->createWarehouse();
+        $this->coverWarehouse($warehouse);
 
         $route = Route::create([
             'city' => 'Tucupita',
@@ -468,12 +497,16 @@ class ScannerHubOperationUxTest extends TestCase
             'driver_id' => $driver->id,
             'destination_city' => 'Tucupita',
             'destination_state' => 'Delta Amacuro',
+            'destination_warehouse_id' => $warehouse->id,
+            'destination_resolution_status' => 'resolved',
         ]);
         $second = $this->createPackage($ally, [
             'current_status' => Package::STATUS_EN_TRANSITO_NACIONAL,
             'driver_id' => $driver->id,
             'destination_city' => 'Tucupita',
             'destination_state' => 'Delta Amacuro',
+            'destination_warehouse_id' => $warehouse->id,
+            'destination_resolution_status' => 'resolved',
         ]);
 
         $component = Livewire::actingAs($user)->test(Scanner::class);

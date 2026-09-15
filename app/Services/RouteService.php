@@ -2,7 +2,6 @@
 
 namespace App\Services;
 
-use App\Livewire\Driver\Support\HubDistributionPhase;
 use App\Models\AuditLog;
 use App\Models\Driver;
 use App\Models\Package;
@@ -656,6 +655,26 @@ class RouteService
     }
 
     /**
+     * IDs de Package despachados en el tramo HUB -> HUB de esta ruta
+     * (route_type hub_distribution): el evento EVENT_SALIDA que
+     * PackageDispatchService::dispatch() registra al salir del HUB
+     * origen, con route_stop_id ya fijado a la parada de destino
+     * (LogisticsScanService::scanHubDeparture() se lo pasa, Fase
+     * 5B-1).
+     */
+    public function packageIdsDispatchedOnRoute(Route $route): \Illuminate\Support\Collection
+    {
+        $stopIds = $route->stops()->pluck('id');
+
+        return PackageHistory::query()
+            ->whereIn('route_stop_id', $stopIds)
+            ->where('event_type', PackageHistory::EVENT_SALIDA)
+            ->pluck('package_id')
+            ->unique()
+            ->values();
+    }
+
+    /**
      * Cuenta los paquetes de esta ruta que todavía no llegaron a su
      * hito final, según route_type — la definición de "pendiente" no
      * es la misma para los tres tipos:
@@ -666,12 +685,20 @@ class RouteService
      *   el hito final de SU ruta es EN_HUB (recepción en HUB), no
      *   ENTREGADO — eso ocurre días después, en otra ruta y con otro
      *   driver.
-     * - hub_distribution: el driver saca paquetes del HUB
-     *   (scanHubDeparture) y los deja bajo su custodia
-     *   (EN_TRANSITO_NACIONAL) hasta registrar su llegada al almacén
-     *   (scanHubArrival, que libera driver_id). Se reutiliza
-     *   HubDistributionPhase::pendingArrivalsCount(), la misma fuente
-     *   de verdad que ya usan Dashboard/Scanner para esta fase.
+     * - hub_distribution (Fase 5B-1): el driver saca paquetes del HUB
+     *   origen hacia su HUB destino directo (scanHubDeparture, que
+     *   deja constancia con un evento EVENT_TRANSFERENCIA ligado a la
+     *   parada) y los deja bajo su custodia (EN_TRANSITO_NACIONAL)
+     *   hasta registrar la llegada física (scanHubArrival, que libera
+     *   driver_id pero NO cambia el estado — la recepción interna es
+     *   una operación aparte de Admin). El hito final de ESTA ruta
+     *   (la responsabilidad del driver) es la llegada, no la
+     *   recepción interna: por eso "pendiente" se define como
+     *   "todavía bajo custodia de este driver y en tránsito", el
+     *   mismo criterio de siempre, ahora escrito con el patrón
+     *   PackageHistory/packageIdsDispatchedOnRoute() en vez de
+     *   HubDistributionPhase (que solo mira por driver_id, sin
+     *   verificar que el paquete realmente salió de ESTA ruta).
      */
     protected function pendingPackagesCountFor(Route $route): int
     {
@@ -693,9 +720,11 @@ class RouteService
                 )
                 ->count(),
 
-            Route::TYPE_HUB_DISTRIBUTION => $route->driver
-                ? HubDistributionPhase::pendingArrivalsCount($route->driver)
-                : 0,
+            Route::TYPE_HUB_DISTRIBUTION => Package::query()
+                ->whereIn('id', $this->packageIdsDispatchedOnRoute($route))
+                ->where('current_status', Package::STATUS_EN_TRANSITO_NACIONAL)
+                ->where('driver_id', $route->driver_id)
+                ->count(),
 
             default => 0,
         };

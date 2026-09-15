@@ -5,7 +5,7 @@ namespace App\Livewire\Driver\Support;
 use App\Models\Driver;
 use App\Models\Package;
 use App\Models\Route;
-use App\Models\RouteStop;
+use App\Services\LogisticsResolutionResult;
 
 /**
  * Determina en qué fase de una ruta hub_distribution está un driver de
@@ -53,45 +53,34 @@ class HubDistributionPhase
     }
 
     /**
-     * Paquetes en HUB con destino a alguno de los almacenes (paradas)
-     * de esta ruta de distribución. Conteo informativo para la
-     * interfaz: compara por ciudad/estado de texto, la misma
-     * limitación conocida que ya documenta
-     * LogisticsScanService::resolveDestinationStop(); el escaneo real
-     * sigue validando cada paquete ahí, esto no participa en esa
-     * decisión.
+     * Paquetes EN_HUB cuyo HUB destino ya resuelto (Fase 4/5A,
+     * destination_warehouse_id) es alguno de los almacenes (paradas)
+     * de esta ruta de distribución.
+     *
+     * Fase 5B-1: deja de comparar texto de ciudad/estado — usa la
+     * misma fuente de verdad que la operación real
+     * (LogisticsScanService::scanHubDeparture() solo acepta paquetes
+     * con destination_resolution_status = resolved y
+     * destination_warehouse_id igual a una parada de la ruta), para
+     * que este conteo nunca muestre algo distinto de lo que el
+     * escaneo realmente va a aceptar.
      */
     public static function pendingDepartureCount(Route $route): int
     {
-        $destinations = $route->stops
-            ->map(function (RouteStop $stop) {
-                if (! $stop->warehouse) {
-                    return null;
-                }
-
-                return [
-                    'city' => mb_strtolower(trim((string) $stop->warehouse->city)),
-                    'state' => mb_strtolower(trim((string) $stop->warehouse->state)),
-                ];
-            })
+        $warehouseIds = $route->stops
+            ->pluck('warehouse_id')
             ->filter()
-            ->unique(fn (array $destination) => $destination['city'].'|'.$destination['state'])
+            ->unique()
             ->values();
 
-        if ($destinations->isEmpty()) {
+        if ($warehouseIds->isEmpty()) {
             return 0;
         }
 
         return Package::query()
             ->where('current_status', Package::STATUS_EN_HUB)
-            ->where(function ($query) use ($destinations) {
-                foreach ($destinations as $destination) {
-                    $query->orWhere(function ($q) use ($destination) {
-                        $q->whereRaw('LOWER(TRIM(destination_city)) = ?', [$destination['city']])
-                            ->whereRaw('LOWER(TRIM(destination_state)) = ?', [$destination['state']]);
-                    });
-                }
-            })
+            ->where('destination_resolution_status', LogisticsResolutionResult::STATUS_RESOLVED)
+            ->whereIn('destination_warehouse_id', $warehouseIds)
             ->count();
     }
 }

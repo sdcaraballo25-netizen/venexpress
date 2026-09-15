@@ -72,11 +72,17 @@ class PackageReception extends Component
     }
 
     /**
-     * Recepción/verificación interna en HUB (Fase 5A). Reemplaza, en
-     * este flujo de Admin, al viejo receive() basado en texto libre:
-     * usa HubReceptionService::receiveAtWarehouse(), que además
-     * resuelve el HUB destino con LogisticsResolutionService y deja
-     * fijados current_warehouse_id/destination_warehouse_id.
+     * Recepción/verificación interna en HUB. Reutiliza la misma
+     * pantalla para los dos casos que existen hoy, según en qué
+     * estado esté el paquete encontrado:
+     *
+     * - RECOLECTADO_VENEXPRESS -> EN_HUB: recepción de origen, desde
+     *   un Aliado (Fase 5A, HubReceptionService::receiveAtWarehouse()).
+     * - EN_TRANSITO_NACIONAL -> EN_HUB: recepción de una transferencia
+     *   directa entre HUBs (Fase 5B-1,
+     *   HubReceptionService::receiveTransferAtWarehouse()).
+     *
+     * Cualquier otro estado no es válido para esta pantalla.
      */
     public function receive(): void
     {
@@ -112,11 +118,24 @@ class PackageReception extends Component
         }
 
         try {
-            $received = app(HubReceptionService::class)->receiveAtWarehouse(
-                package: $package,
-                userId: (int) auth()->id(),
-                warehouse: $warehouse,
-            );
+            $received = match ($package->current_status) {
+                Package::STATUS_RECOLECTADO_VENEXPRESS => app(HubReceptionService::class)->receiveAtWarehouse(
+                    package: $package,
+                    userId: (int) auth()->id(),
+                    warehouse: $warehouse,
+                ),
+
+                Package::STATUS_EN_TRANSITO_NACIONAL => app(HubReceptionService::class)->receiveTransferAtWarehouse(
+                    package: $package,
+                    userId: (int) auth()->id(),
+                    warehouse: $warehouse,
+                ),
+
+                default => throw new RuntimeException(
+                    'Esta guía no está en un estado que permita recepción en HUB. Estado actual: '
+                    .$package->statusLabel().'.'
+                ),
+            };
 
             $this->package = $received;
 

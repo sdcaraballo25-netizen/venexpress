@@ -134,6 +134,8 @@ class ScannerLivewireTest extends TestCase
             'current_status' => Package::STATUS_EN_HUB,
             'destination_city' => 'Valencia',
             'destination_state' => 'Carabobo',
+            'destination_warehouse_id' => $warehouse->id,
+            'destination_resolution_status' => 'resolved',
         ]);
 
         $component = Livewire::actingAs($user)
@@ -190,6 +192,8 @@ class ScannerLivewireTest extends TestCase
             'driver_id' => $driver->id,
             'destination_city' => 'Valencia',
             'destination_state' => 'Carabobo',
+            'destination_warehouse_id' => $warehouse->id,
+            'destination_resolution_status' => 'resolved',
         ]);
 
         $component = Livewire::actingAs($user)

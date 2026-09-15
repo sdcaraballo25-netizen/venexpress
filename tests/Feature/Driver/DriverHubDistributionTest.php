@@ -9,6 +9,8 @@ use App\Models\Route;
 use App\Models\RouteStop;
 use App\Models\User;
 use App\Models\Warehouse;
+use App\Models\WarehouseCoverage;
+use App\Services\LogisticsScanService;
 use Illuminate\Foundation\Testing\RefreshDatabase;
 use Tests\Feature\Concerns\CreatesTestPackages;
 use Tests\TestCase;
@@ -84,10 +86,27 @@ class DriverHubDistributionTest extends TestCase
         return ['Authorization' => "Bearer {$token}"];
     }
 
+    /**
+     * Fase 5B-1: scanHubDeparture()/scanHubArrival() ya no comparan
+     * texto de ciudad/estado — exigen destination_warehouse_id
+     * resuelto por LogisticsResolutionService. Crea la cobertura
+     * necesaria para que resuelva hacia $warehouse.
+     */
+    private function coverWarehouse(Warehouse $warehouse): void
+    {
+        WarehouseCoverage::create([
+            'warehouse_id' => $warehouse->id,
+            'state' => $warehouse->state,
+            'city' => $warehouse->city,
+            'is_active' => true,
+        ]);
+    }
+
     public function test_departs_package_from_hub_successfully(): void
     {
         [$user, $driver] = $this->createHubDriverUser();
         $warehouse = $this->createWarehouse();
+        $this->coverWarehouse($warehouse);
         $this->startDistributionRoute($driver, $warehouse);
 
         $ally = $this->createAlly();
@@ -95,6 +114,8 @@ class DriverHubDistributionTest extends TestCase
             'current_status' => Package::STATUS_EN_HUB,
             'destination_city' => 'Valencia',
             'destination_state' => 'Carabobo',
+            'destination_warehouse_id' => $warehouse->id,
+            'destination_resolution_status' => 'resolved',
         ]);
 
         $this->postJson('/api/driver/hub/dispatch', [
@@ -107,18 +128,46 @@ class DriverHubDistributionTest extends TestCase
         $this->assertSame(Package::STATUS_EN_TRANSITO_NACIONAL, $package->current_status);
         $this->assertSame($driver->id, $package->driver_id);
 
+        // current_warehouse_id NO se toca durante el tránsito: sigue
+        // reflejando el último HUB físicamente confirmado (ninguno
+        // todavía en este test, ya que el paquete no pasó por una
+        // recepción de origen real) — el punto crítico es que el
+        // despacho no lo modifica.
+        $this->assertNull($package->current_warehouse_id);
+
+        // Una salida HUB->HUB genera exactamente UN evento de salida
+        // relevante (EVENT_SALIDA), con el route_stop_id de la parada
+        // de destino ya incluido en ese mismo evento — sin un
+        // EVENT_TRANSFERENCIA adicional.
+        $salidaHistories = $package->histories()
+            ->where('event_type', PackageHistory::EVENT_SALIDA)
+            ->get();
+
+        $this->assertCount(1, $salidaHistories);
         $this->assertSame(
-            1,
-            $package->histories()
-                ->where('event_type', PackageHistory::EVENT_SALIDA)
-                ->count()
+            $this->routeStopIdFor($driver, $warehouse),
+            $salidaHistories->first()->route_stop_id
         );
+
+        $this->assertSame(
+            0,
+            $package->histories()->where('event_type', PackageHistory::EVENT_TRANSFERENCIA)->count()
+        );
+    }
+
+    private function routeStopIdFor(Driver $driver, Warehouse $warehouse): int
+    {
+        return RouteStop::query()
+            ->whereHas('route', fn ($q) => $q->where('driver_id', $driver->id))
+            ->where('warehouse_id', $warehouse->id)
+            ->value('id');
     }
 
     public function test_arrives_package_at_destination_warehouse_without_changing_status(): void
     {
         [$user, $driver] = $this->createHubDriverUser();
         $warehouse = $this->createWarehouse();
+        $this->coverWarehouse($warehouse);
         $route = $this->startDistributionRoute($driver, $warehouse);
         $stop = $route->stops()->first();
 
@@ -127,6 +176,8 @@ class DriverHubDistributionTest extends TestCase
             'current_status' => Package::STATUS_EN_HUB,
             'destination_city' => 'Valencia',
             'destination_state' => 'Carabobo',
+            'destination_warehouse_id' => $warehouse->id,
+            'destination_resolution_status' => 'resolved',
         ]);
 
         $headers = $this->authHeaders($user);
@@ -222,36 +273,167 @@ class DriverHubDistributionTest extends TestCase
             ->assertStatus(422);
     }
 
-    public function test_arrival_rejects_when_destination_does_not_match_any_stop(): void
+    /**
+     * Fase 5B-1: scanHubDeparture() ya garantiza que un paquete solo
+     * sale hacia una ruta cuya parada coincide con su
+     * destination_warehouse_id (ver test_dispatch_rejects_a_package_
+     * whose_destination_is_a_different_hub más abajo) — así que en el
+     * flujo normal la llegada nunca puede desajustarse. Este test
+     * cubre la resolución de scanHubArrival()/resolveDestinationStop()
+     * de forma aislada, simulando un paquete que de algún modo llegó
+     * a EN_TRANSITO_NACIONAL bajo la custodia de este driver sin que
+     * su destino coincida con ninguna parada de la ruta activa (por
+     * ejemplo, datos heredados de antes de esta fase).
+     */
+    public function test_arrival_rejects_when_destination_warehouse_does_not_match_any_stop(): void
     {
         [$user, $driver] = $this->createHubDriverUser();
         $warehouse = $this->createWarehouse([
             'city' => 'Valencia',
             'state' => 'Carabobo',
         ]);
+        $otherWarehouse = $this->createWarehouse([
+            'name' => 'Almacén Maracaibo',
+            'city' => 'Maracaibo',
+            'state' => 'Zulia',
+        ]);
         $this->startDistributionRoute($driver, $warehouse);
 
         $ally = $this->createAlly();
         $package = $this->createPackage($ally, [
-            'current_status' => Package::STATUS_EN_HUB,
+            'current_status' => Package::STATUS_EN_TRANSITO_NACIONAL,
+            'driver_id' => $driver->id,
             'destination_city' => 'Maracaibo',
             'destination_state' => 'Zulia',
+            'destination_warehouse_id' => $otherWarehouse->id,
+            'destination_resolution_status' => 'resolved',
         ]);
-
-        $headers = $this->authHeaders($user);
-
-        $this->postJson('/api/driver/hub/dispatch', [
-            'tracking_number' => $package->tracking_number,
-        ], $headers)->assertOk();
 
         $this->postJson('/api/driver/hub/arrival', [
             'tracking_number' => $package->tracking_number,
-        ], $headers)->assertStatus(422);
+        ], $this->authHeaders($user))->assertStatus(422);
 
         $this->assertSame(
             Package::STATUS_EN_TRANSITO_NACIONAL,
             $package->fresh()->current_status
         );
+    }
+
+    public function test_dispatch_rejects_a_package_whose_destination_is_a_different_hub(): void
+    {
+        [$user, $driver] = $this->createHubDriverUser();
+        $warehouse = $this->createWarehouse();
+        $this->coverWarehouse($warehouse);
+        $this->startDistributionRoute($driver, $warehouse);
+
+        $otherWarehouse = $this->createWarehouse([
+            'name' => 'Almacén Maracaibo',
+            'city' => 'Maracaibo',
+            'state' => 'Zulia',
+        ]);
+
+        $ally = $this->createAlly();
+        $package = $this->createPackage($ally, [
+            'current_status' => Package::STATUS_EN_HUB,
+            'destination_warehouse_id' => $otherWarehouse->id,
+            'destination_resolution_status' => 'resolved',
+        ]);
+
+        $this->postJson('/api/driver/hub/dispatch', [
+            'tracking_number' => $package->tracking_number,
+        ], $this->authHeaders($user))
+            ->assertStatus(422)
+            ->assertJsonFragment([
+                'message' => 'Esta ruta no tiene como destino el HUB que corresponde a este paquete.',
+            ]);
+
+        $this->assertSame(Package::STATUS_EN_HUB, $package->fresh()->current_status);
+    }
+
+    public function test_dispatch_rejects_a_package_without_a_resolved_destination(): void
+    {
+        [$user, $driver] = $this->createHubDriverUser();
+        $warehouse = $this->createWarehouse();
+        $this->startDistributionRoute($driver, $warehouse);
+
+        $ally = $this->createAlly();
+        $package = $this->createPackage($ally, [
+            'current_status' => Package::STATUS_EN_HUB,
+        ]);
+
+        $this->postJson('/api/driver/hub/dispatch', [
+            'tracking_number' => $package->tracking_number,
+        ], $this->authHeaders($user))
+            ->assertStatus(422)
+            ->assertJsonFragment([
+                'message' => 'Este paquete no tiene un HUB destino resuelto. No puede salir en una '
+                    .'transferencia entre HUBs hasta que Admin revise su cobertura logística.',
+            ]);
+
+        $this->assertNull($package->fresh()->destination_warehouse_id);
+    }
+
+    public function test_current_warehouse_id_keeps_the_origin_hub_after_departure(): void
+    {
+        [$user, $driver] = $this->createHubDriverUser();
+        $originWarehouse = $this->createWarehouse([
+            'name' => 'Almacén Caracas',
+            'city' => 'Caracas',
+            'state' => 'Distrito Capital',
+        ]);
+        $destinationWarehouse = $this->createWarehouse();
+        $this->coverWarehouse($destinationWarehouse);
+        $this->startDistributionRoute($driver, $destinationWarehouse);
+
+        $ally = $this->createAlly();
+        $package = $this->createPackage($ally, [
+            'current_status' => Package::STATUS_EN_HUB,
+            'destination_city' => 'Valencia',
+            'destination_state' => 'Carabobo',
+            'current_warehouse_id' => $originWarehouse->id,
+            'destination_warehouse_id' => $destinationWarehouse->id,
+            'destination_resolution_status' => 'resolved',
+        ]);
+
+        $this->postJson('/api/driver/hub/dispatch', [
+            'tracking_number' => $package->tracking_number,
+        ], $this->authHeaders($user))->assertOk();
+
+        // Regla de negocio confirmada: mientras el paquete está en
+        // tránsito, current_warehouse_id mantiene el último HUB
+        // físicamente confirmado (el de origen) — NUNCA se pone en
+        // null durante el tránsito.
+        $this->assertSame($originWarehouse->id, $package->fresh()->current_warehouse_id);
+        $this->assertSame($destinationWarehouse->id, $package->fresh()->destination_warehouse_id);
+        $this->assertSame(Package::STATUS_EN_TRANSITO_NACIONAL, $package->fresh()->current_status);
+    }
+
+    public function test_dispatch_rejects_a_package_already_at_its_destination_warehouse(): void
+    {
+        [$user, $driver] = $this->createHubDriverUser();
+        $warehouse = $this->createWarehouse();
+        $this->coverWarehouse($warehouse);
+        $this->startDistributionRoute($driver, $warehouse);
+
+        $ally = $this->createAlly();
+        $package = $this->createPackage($ally, [
+            'current_status' => Package::STATUS_EN_HUB,
+            'destination_city' => 'Valencia',
+            'destination_state' => 'Carabobo',
+            'current_warehouse_id' => $warehouse->id,
+            'destination_warehouse_id' => $warehouse->id,
+            'destination_resolution_status' => 'resolved',
+        ]);
+
+        $this->postJson('/api/driver/hub/dispatch', [
+            'tracking_number' => $package->tracking_number,
+        ], $this->authHeaders($user))
+            ->assertStatus(422)
+            ->assertJsonFragment([
+                'message' => 'Este paquete ya está en su HUB destino. No requiere una transferencia entre HUBs.',
+            ]);
+
+        $this->assertSame(Package::STATUS_EN_HUB, $package->fresh()->current_status);
     }
 
     public function test_delivery_driver_cannot_use_hub_distribution_endpoints(): void

@@ -186,4 +186,90 @@ class PackageReceptionHubTest extends TestCase
             'current_status' => Package::STATUS_RECOLECTADO_VENEXPRESS,
         ]);
     }
+
+    /*
+    |--------------------------------------------------------------------------
+    | Fase 5B-1 — recepción de transferencia HUB -> HUB (EN_TRANSITO_NACIONAL)
+    |--------------------------------------------------------------------------
+    */
+
+    public function test_admin_can_receive_a_transfer_from_another_hub(): void
+    {
+        $admin = $this->createAdmin();
+        $ally = $this->createAlly();
+        $originWarehouse = Warehouse::factory()->create();
+        $destinationWarehouse = Warehouse::factory()->create(['state' => 'Carabobo', 'city' => 'Valencia']);
+
+        WarehouseCoverage::create([
+            'warehouse_id' => $destinationWarehouse->id,
+            'state' => 'Carabobo',
+            'city' => 'Valencia',
+            'is_active' => true,
+        ]);
+
+        $package = $this->createPackage($ally, [
+            'current_status' => Package::STATUS_EN_TRANSITO_NACIONAL,
+            'destination_state' => 'Carabobo',
+            'destination_city' => 'Valencia',
+            'current_warehouse_id' => $originWarehouse->id,
+            'destination_warehouse_id' => $destinationWarehouse->id,
+            'destination_resolution_status' => 'resolved',
+        ]);
+
+        Livewire::actingAs($admin)
+            ->test(PackageReception::class)
+            ->set('trackingNumber', $package->tracking_number)
+            ->call('search')
+            ->set('warehouseId', $destinationWarehouse->id)
+            ->call('receive')
+            ->assertSet('errorMessage', null)
+            ->assertSet('successMessage', 'Recepción registrada. Este almacén es el destino final de este paquete.');
+
+        $this->assertDatabaseHas('packages', [
+            'id' => $package->id,
+            'current_status' => Package::STATUS_EN_HUB,
+            'current_warehouse_id' => $destinationWarehouse->id,
+            'destination_warehouse_id' => $destinationWarehouse->id,
+        ]);
+    }
+
+    public function test_admin_cannot_receive_a_transfer_at_the_wrong_warehouse(): void
+    {
+        $admin = $this->createAdmin();
+        $ally = $this->createAlly();
+        $correctWarehouse = Warehouse::factory()->create(['state' => 'Carabobo', 'city' => 'Valencia']);
+        $wrongWarehouse = Warehouse::factory()->create();
+
+        WarehouseCoverage::create([
+            'warehouse_id' => $correctWarehouse->id,
+            'state' => 'Carabobo',
+            'city' => 'Valencia',
+            'is_active' => true,
+        ]);
+
+        $package = $this->createPackage($ally, [
+            'current_status' => Package::STATUS_EN_TRANSITO_NACIONAL,
+            'destination_state' => 'Carabobo',
+            'destination_city' => 'Valencia',
+            'destination_warehouse_id' => $correctWarehouse->id,
+            'destination_resolution_status' => 'resolved',
+        ]);
+
+        Livewire::actingAs($admin)
+            ->test(PackageReception::class)
+            ->set('trackingNumber', $package->tracking_number)
+            ->call('search')
+            ->set('warehouseId', $wrongWarehouse->id)
+            ->call('receive')
+            ->assertSet(
+                'errorMessage',
+                'Este paquete no tiene como destino este almacén. Verifica que lo estás recibiendo en el '
+                    .'HUB correcto.'
+            );
+
+        $this->assertDatabaseHas('packages', [
+            'id' => $package->id,
+            'current_status' => Package::STATUS_EN_TRANSITO_NACIONAL,
+        ]);
+    }
 }

@@ -10,6 +10,7 @@ use App\Models\Route;
 use App\Models\RouteStop;
 use App\Models\User;
 use App\Models\Warehouse;
+use App\Models\WarehouseCoverage;
 use App\Services\HubReceptionService;
 use App\Services\LogisticsScanService;
 use App\Services\RouteService;
@@ -185,11 +186,20 @@ class DriverRouteCompletePendingPackagesTest extends TestCase
             'status' => RouteStop::STATUS_PENDING,
         ]);
 
+        WarehouseCoverage::create([
+            'warehouse_id' => $warehouse->id,
+            'state' => 'Carabobo',
+            'city' => 'Valencia',
+            'is_active' => true,
+        ]);
+
         $ally = $this->createAlly();
         $package = $this->createPackage($ally, [
             'current_status' => Package::STATUS_EN_HUB,
             'destination_city' => 'Valencia',
             'destination_state' => 'Carabobo',
+            'destination_warehouse_id' => $warehouse->id,
+            'destination_resolution_status' => 'resolved',
         ]);
 
         $scanService = app(LogisticsScanService::class);

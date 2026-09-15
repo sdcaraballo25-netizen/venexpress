@@ -196,4 +196,92 @@ class HubReceptionService
 
         return Warehouse::find($warehouseId)?->name ?? "almacén #{$warehouseId}";
     }
+
+    /**
+     * Fase 5B-1 — HUB origen -> HUB destino DIRECTO.
+     *
+     * Recepción/verificación interna en el HUB DESTINO de una
+     * transferencia entre HUBs (después de que
+     * LogisticsScanService::scanHubArrival() registró la llegada
+     * física, sin cambiar el estado). Es una operación
+     * administrativa/interna — el Driver nunca la ejecuta.
+     *
+     * A diferencia de receiveAtWarehouse() (que siempre completa la
+     * recepción física, aunque la resolución falle, porque el
+     * paquete ya llegó y hay que dejar constancia), aquí la
+     * transferencia SOLO se completa si la resolución en vivo sigue
+     * siendo 'resolved' y apunta exactamente a este almacén. Si no,
+     * no se decide nada automáticamente: se rechaza por completo (el
+     * paquete queda tal cual, EN_TRANSITO_NACIONAL) para que Admin
+     * revise la cobertura antes de reintentar — no tiene sentido
+     * "recibirlo a medias" en un HUB que ya no es su destino según la
+     * configuración vigente.
+     */
+    public function receiveTransferAtWarehouse(
+        Package $package,
+        int $userId,
+        Warehouse $warehouse,
+    ): Package {
+        if (! $warehouse->is_active) {
+            throw new RuntimeException(
+                'Solo se puede registrar recepción interna en un almacén activo.'
+            );
+        }
+
+        return DB::transaction(function () use ($package, $userId, $warehouse) {
+            $locked = Package::query()
+                ->whereKey($package->id)
+                ->lockForUpdate()
+                ->firstOrFail();
+
+            if ($locked->current_status !== Package::STATUS_EN_TRANSITO_NACIONAL) {
+                throw new RuntimeException(
+                    'Solo se puede registrar recepción de transferencia para un paquete en tránsito '
+                    .'nacional. Estado actual: '.$locked->statusLabel().'.'
+                );
+            }
+
+            $resolution = $this->logisticsResolutionService->resolveForPackage($locked);
+
+            if (! $resolution->isResolved()) {
+                throw new RuntimeException(
+                    'No se puede completar la recepción de esta transferencia: '.$resolution->reason
+                    .' Corrige la cobertura logística antes de reintentar.'
+                );
+            }
+
+            if ($resolution->warehouseId !== $warehouse->id) {
+                throw new RuntimeException(
+                    'Este paquete no tiene como destino este almacén. Verifica que lo estás recibiendo '
+                    .'en el HUB correcto.'
+                );
+            }
+
+            $locked->current_status = Package::STATUS_EN_HUB;
+            $locked->driver_id = null;
+            $locked->current_warehouse_id = $warehouse->id;
+            $locked->destination_warehouse_id = $resolution->warehouseId;
+            $locked->destination_resolution_status = $resolution->status;
+            $locked->save();
+
+            PackageHistory::create([
+                'package_id' => $locked->id,
+                'status' => Package::STATUS_EN_HUB,
+                'event_type' => PackageHistory::EVENT_RECEPCION,
+                'origin_location' => 'Transferencia entre HUBs',
+                'destination_location' => $warehouse->name,
+                'location_description' => "Recepción interna de transferencia verificada en "
+                    ."{$warehouse->name}. Destino final confirmado.",
+                'scanned_by_user_id' => $userId,
+            ]);
+
+            return $locked->fresh([
+                'ally',
+                'driver',
+                'histories',
+                'currentWarehouse',
+                'destinationWarehouse',
+            ]);
+        });
+    }
 }
