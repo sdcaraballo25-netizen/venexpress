@@ -63,6 +63,7 @@ class Package extends Model
         'pickup_ally_id',
         'destination_warehouse_id',
         'current_warehouse_id',
+        'destination_resolution_status',
         'driver_id',
 
         'sender_name',

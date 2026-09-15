@@ -2,6 +2,7 @@
 
 namespace App\Livewire\Ally;
 
+use App\Models\Ally;
 use App\Models\Package;
 use App\Services\DestinationReceptionService;
 use Livewire\Attributes\Layout;
@@ -59,13 +60,13 @@ class PackageReception extends Component
             return;
         }
 
-        if (! $this->belongsToDestinationAgency(
+        if (! $this->isAuthorizedPickupPoint(
             $package,
             $ally
         )) {
             $this->error =
-                'Esta guía no pertenece a la ciudad y estado '
-                . 'de destino de tu agencia.';
+                'Esta guía no está asignada a tu agencia como '
+                . 'punto de retiro.';
 
             return;
         }
@@ -107,13 +108,13 @@ class PackageReception extends Component
                 )
                 ->firstOrFail();
 
-            if (! $this->belongsToDestinationAgency(
+            if (! $this->isAuthorizedPickupPoint(
                 $package,
                 $ally
             )) {
                 throw new RuntimeException(
-                    'La guía no corresponde a la ciudad y estado '
-                    . 'de esta agencia.'
+                    'La guía no está asignada a esta agencia como '
+                    . 'punto de retiro.'
                 );
             }
 
@@ -133,36 +134,37 @@ class PackageReception extends Component
         }
     }
 
-    protected function belongsToDestinationAgency(
+    /**
+     * Fase 5A — corrige la brecha de Fase 3: antes, cualquier Ally
+     * activo cuya ciudad/estado coincidiera POR TEXTO con el destino
+     * del paquete podía recibirlo, sin mirar si el cliente lo había
+     * elegido realmente como punto de retiro (pickup_ally_id) ni si
+     * estaba verificado como destino. Ahora solo puede recibirlo el
+     * Ally que sea exactamente pickup_ally_id, esté activo y esté
+     * verificado como destino (Ally::isVerifiedDestination(), Fase 1).
+     *
+     * Un paquete con requires_delivery = true nunca tiene
+     * pickup_ally_id (Fase 3), así que con esto también queda
+     * bloqueado que se reciba por error en una agencia un paquete que
+     * en realidad requiere entrega a domicilio.
+     */
+    protected function isAuthorizedPickupPoint(
         Package $package,
-        $ally
+        Ally $ally
     ): bool {
-        $packageCity = mb_strtolower(
-            trim((string) $package->destination_city)
-        );
-
-        $allyCity = mb_strtolower(
-            trim((string) $ally->city)
-        );
-
-        $packageState = mb_strtolower(
-            trim((string) $package->destination_state)
-        );
-
-        $allyState = mb_strtolower(
-            trim((string) $ally->state)
-        );
-
-        if ($packageCity === '' || $allyCity === '') {
+        if ($package->pickup_ally_id === null) {
             return false;
         }
 
-        if ($packageState === '' || $allyState === '') {
+        if ((int) $package->pickup_ally_id !== (int) $ally->id) {
             return false;
         }
 
-        return $packageCity === $allyCity
-            && $packageState === $allyState;
+        if ($ally->status !== Ally::STATUS_ACTIVE) {
+            return false;
+        }
+
+        return $ally->isVerifiedDestination();
     }
 
     public function render()

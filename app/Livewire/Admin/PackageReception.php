@@ -3,7 +3,11 @@
 namespace App\Livewire\Admin;
 
 use App\Models\Package;
+use App\Models\Warehouse;
 use App\Services\HubReceptionService;
+use App\Services\LogisticsResolutionResult;
+use App\Services\LogisticsResolutionService;
+use Illuminate\Validation\Rule;
 use Livewire\Attributes\Layout;
 use Livewire\Component;
 use RuntimeException;
@@ -13,13 +17,37 @@ class PackageReception extends Component
 {
     public string $trackingNumber = '';
 
-    public string $destinationLocation = '';
+    public ?int $warehouseId = null;
 
     public ?Package $package = null;
 
     public ?string $successMessage = null;
 
     public ?string $errorMessage = null;
+
+    /**
+     * Almacenes activos, para el selector de "en qué HUB se recibe
+     * este paquete" (Fase 5A). Reemplaza el campo de texto libre que
+     * había antes — hace falta el Warehouse real, no un texto, para
+     * poder fijar current_warehouse_id.
+     *
+     * @var array<int, Warehouse>
+     */
+    public array $warehouses = [];
+
+    public function mount(): void
+    {
+        $this->loadWarehouses();
+    }
+
+    protected function loadWarehouses(): void
+    {
+        $this->warehouses = Warehouse::query()
+            ->where('is_active', true)
+            ->orderBy('name')
+            ->get(['id', 'name'])
+            ->all();
+    }
 
     public function search(): void
     {
@@ -43,16 +71,28 @@ class PackageReception extends Component
         }
     }
 
+    /**
+     * Recepción/verificación interna en HUB (Fase 5A). Reemplaza, en
+     * este flujo de Admin, al viejo receive() basado en texto libre:
+     * usa HubReceptionService::receiveAtWarehouse(), que además
+     * resuelve el HUB destino con LogisticsResolutionService y deja
+     * fijados current_warehouse_id/destination_warehouse_id.
+     */
     public function receive(): void
     {
         $this->reset(['successMessage', 'errorMessage']);
 
         $this->validate([
             'trackingNumber' => ['required', 'string', 'max:100'],
-            'destinationLocation' => ['required', 'string', 'max:255'],
+            'warehouseId' => [
+                'required',
+                'integer',
+                Rule::exists('warehouses', 'id')->where('is_active', true),
+            ],
         ], [
             'trackingNumber.required' => 'Introduce el número de guía.',
-            'destinationLocation.required' => 'Indica el Hub donde fue recibido el paquete.',
+            'warehouseId.required' => 'Selecciona el almacén donde se recibe el paquete.',
+            'warehouseId.exists' => 'Selecciona un almacén activo.',
         ]);
 
         $package = Package::query()
@@ -64,17 +104,25 @@ class PackageReception extends Component
             return;
         }
 
+        $warehouse = Warehouse::find($this->warehouseId);
+
+        if (! $warehouse) {
+            $this->errorMessage = 'Selecciona un almacén activo.';
+            return;
+        }
+
         try {
-            $this->package = app(HubReceptionService::class)->receive(
+            $received = app(HubReceptionService::class)->receiveAtWarehouse(
                 package: $package,
                 userId: (int) auth()->id(),
-                destinationLocation: $this->destinationLocation,
+                warehouse: $warehouse,
             );
 
-            $this->successMessage =
-                'Recepción en Hub registrada correctamente. El paquete quedó EN_HUB.';
+            $this->package = $received;
 
-            $this->destinationLocation = '';
+            $this->successMessage = $this->outcomeMessage($received, $warehouse);
+
+            $this->warehouseId = null;
         } catch (RuntimeException $e) {
             $this->errorMessage = $e->getMessage();
             $this->package = $package->fresh([
@@ -85,11 +133,43 @@ class PackageReception extends Component
         }
     }
 
+    /**
+     * Mensaje que ve Admin según el resultado de la resolución
+     * (re-resuelto aquí solo para presentación: es una lectura pura,
+     * ya auditada sin efectos secundarios — no repite ninguna
+     * decisión de negocio, esa ya la tomó y persistió el servicio).
+     */
+    protected function outcomeMessage(Package $received, Warehouse $warehouse): string
+    {
+        $resolution = app(LogisticsResolutionService::class)->resolveForPackage($received);
+
+        return match ($resolution->status) {
+            LogisticsResolutionResult::STATUS_RESOLVED => $resolution->warehouseId === $warehouse->id
+                ? 'Recepción registrada. Este almacén es el destino final de este paquete.'
+                : 'Recepción registrada. Este paquete debe redistribuirse hacia otro almacén '
+                    .'(pendiente de programar en una fase posterior).',
+
+            LogisticsResolutionResult::STATUS_NO_COVERAGE =>
+                '⚠️ Recepción registrada, pero no hay ningún almacén con cobertura activa para el '
+                .'destino de este paquete. Requiere revisión manual — configura la cobertura en Almacenes.',
+
+            LogisticsResolutionResult::STATUS_AMBIGUOUS =>
+                '⚠️ Recepción registrada, pero hay más de un almacén con cobertura activa para el '
+                .'destino de este paquete. Corrige la cobertura antes de continuar.',
+
+            LogisticsResolutionResult::STATUS_INVALID =>
+                '⚠️ Recepción registrada, pero el estado/ciudad de destino de este paquete no es '
+                .'válido en el catálogo. Requiere revisión manual.',
+
+            default => 'Recepción en Hub registrada correctamente. El paquete quedó EN_HUB.',
+        };
+    }
+
     public function clear(): void
     {
         $this->reset([
             'trackingNumber',
-            'destinationLocation',
+            'warehouseId',
             'package',
             'successMessage',
             'errorMessage',

@@ -10,6 +10,7 @@ use App\Models\Route;
 use App\Models\RouteStop;
 use App\Models\User;
 use App\Models\Warehouse;
+use App\Services\HubReceptionService;
 use App\Services\LogisticsScanService;
 use App\Services\RouteService;
 use Illuminate\Foundation\Testing\RefreshDatabase;
@@ -140,10 +141,16 @@ class DriverRouteCompletePendingPackagesTest extends TestCase
 
         $this->assertSame(Route::STATUS_IN_PROGRESS, $route->fresh()->status);
 
-        app(LogisticsScanService::class)->scanHubReception(
+        // scanHubReception() del Driver quedó bloqueado en Fase 5A; la
+        // recepción en HUB ahora es una operación administrativa
+        // interna. Para este test solo hace falta llevar el paquete a
+        // EN_HUB, así que se usa HubReceptionService::receive() (el
+        // método antiguo, sin cambios) directamente, igual que lo
+        // haría Admin\PackageReception hasta antes de esta fase.
+        app(HubReceptionService::class)->receive(
             package: $package->fresh(),
-            driver: $driver,
             userId: (int) $user->id,
+            hubLocation: 'HUB Venexpress',
         );
 
         $this->assertSame(Package::STATUS_EN_HUB, $package->fresh()->current_status);

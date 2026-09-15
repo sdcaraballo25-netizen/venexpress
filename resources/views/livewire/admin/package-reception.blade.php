@@ -96,17 +96,20 @@
 
                 <div>
                     <label class="text-sm font-medium text-slate-600">
-                        Lugar de recepción
+                        Almacén (HUB) que recibe
                     </label>
 
-                    <input
-                        type="text"
-                        wire:model="destinationLocation"
-                        placeholder="Ej. Hub Caracas"
+                    <select
+                        wire:model="warehouseId"
                         class="mt-2 w-full rounded-xl border border-slate-300 px-4 py-3 text-sm focus:border-blue-900 focus:ring-blue-900"
                     >
+                        <option value="">Selecciona...</option>
+                        @foreach ($warehouses as $warehouse)
+                            <option value="{{ $warehouse->id }}">{{ $warehouse->name }}</option>
+                        @endforeach
+                    </select>
 
-                    @error('destinationLocation')
+                    @error('warehouseId')
                         <p class="mt-1 text-xs text-red-600">{{ $message }}</p>
                     @enderror
                 </div>

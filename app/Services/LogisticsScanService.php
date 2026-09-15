@@ -160,79 +160,34 @@ class LogisticsScanService
     }
 
     /**
-     * Registra la recepción física en el HUB de un paquete
-     * recolectado en la ruta hub_transfer en curso de este mismo
-     * driver (segunda mitad de "Aliado -> HUB", después de
-     * scanCollection()).
+     * BLOQUEADO desde Fase 5A.
      *
-     * Reutiliza HubReceptionService::receive() tal cual para la
-     * transición de estado (RECOLECTADO_VENEXPRESS -> EN_HUB,
-     * EVENT_RECEPCION) — ese servicio no cambia y sigue funcionando
-     * igual para Admin\PackageReception. Aquí solo se agrega la
-     * validación de que el paquete pertenece a la ruta hub_transfer
-     * activa de este driver, la misma garantía que ya aplican
-     * scanCollection()/scanHubDeparture()/scanHubArrival(): NUNCA se
-     * decide por Package.driver_id a solas, sino por el
-     * PackageHistory (EVENT_SALIDA) que dejó su recolección.
+     * La recepción/verificación interna en HUB dejó de ser una
+     * operación que el Driver puede confirmar desde el Scanner: ahora
+     * es una operación administrativa interna, ejecutada desde
+     * Admin\PackageReception vía
+     * HubReceptionService::receiveAtWarehouse() (que además resuelve
+     * el HUB destino con LogisticsResolutionService y deja fijados
+     * current_warehouse_id/destination_warehouse_id — algo que este
+     * método nunca hizo).
      *
-     * Reglas:
-     * - El repartidor debe estar activo y ser de tipo hub.
-     * - Debe tener una ruta hub_transfer en curso.
-     * - El paquete debe estar RECOLECTADO_VENEXPRESS.
-     * - El paquete debe haber sido recolectado en ESA ruta.
+     * Se conserva la firma y este método (en vez de eliminarlo) a
+     * propósito: Scanner.php sigue llamándolo tal cual al confirmar
+     * la operación 'hub_reception' (ver
+     * Scanner::executeHubReception()), y no se modifica Scanner.php
+     * en esta fase — así el Driver recibe aquí mismo un mensaje claro
+     * en vez de un error genérico o un comportamiento inesperado. La
+     * limpieza de la interfaz del Scanner (dejar de ofrecer esta
+     * operación) queda para una fase posterior.
      */
     public function scanHubReception(
         Package $package,
         Driver $driver,
         int $userId,
     ): Package {
-        if ($driver->status !== Driver::STATUS_ACTIVE) {
-            throw new RuntimeException(
-                'Solo un repartidor activo puede escanear paquetes.'
-            );
-        }
-
-        if ($driver->driver_type !== Driver::TYPE_HUB) {
-            throw new RuntimeException(
-                'Solo un repartidor de HUB puede registrar recepciones en HUB.'
-            );
-        }
-
-        if ($package->current_status !== Package::STATUS_RECOLECTADO_VENEXPRESS) {
-            throw new RuntimeException(
-                'Este paquete no está disponible para recepción en HUB. '
-                .'Estado actual: '.$package->statusLabel().'.'
-            );
-        }
-
-        $route = Route::query()
-            ->where('driver_id', $driver->id)
-            ->where('status', Route::STATUS_IN_PROGRESS)
-            ->where('route_type', Route::TYPE_HUB_TRANSFER)
-            ->latest('started_at')
-            ->first();
-
-        if (! $route) {
-            throw new RuntimeException(
-                'No tienes una ruta de recolección en curso. '
-                .'Inicia una ruta antes de escanear paquetes.'
-            );
-        }
-
-        $belongsToThisRoute = $this->routeService
-            ->packageIdsCollectedOnRoute($route)
-            ->contains($package->id);
-
-        if (! $belongsToThisRoute) {
-            throw new RuntimeException(
-                'Este paquete no fue recolectado en tu ruta activa.'
-            );
-        }
-
-        return $this->hubReceptionService->receive(
-            package: $package,
-            userId: $userId,
-            hubLocation: 'HUB Venexpress',
+        throw new RuntimeException(
+            'La recepción de paquetes en HUB ahora se confirma desde la operación interna de HUB '
+            .'en el panel de Admin. Los repartidores ya no pueden confirmarla desde aquí.'
         );
     }
 

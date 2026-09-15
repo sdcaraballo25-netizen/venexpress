@@ -6,7 +6,6 @@ use App\Livewire\Driver\Scanner;
 use App\Models\Ally;
 use App\Models\Driver;
 use App\Models\Package;
-use App\Models\PackageHistory;
 use App\Models\Route;
 use App\Models\RouteStop;
 use App\Models\User;
@@ -20,23 +19,31 @@ use Tests\Feature\Concerns\CreatesTestPackages;
 use Tests\TestCase;
 
 /**
- * Cubre la recepción en HUB (segunda mitad de "Aliado -> HUB", tras
- * scanCollection()): LogisticsScanService::scanHubReception().
+ * Fase 5A — LogisticsScanService::scanHubReception() quedó bloqueado:
+ * la recepción/verificación interna en HUB dejó de ser algo que el
+ * Driver puede confirmar desde el Scanner. Ahora es una operación
+ * administrativa interna (ver
+ * tests/Feature/Admin/PackageReceptionHubTest.php y
+ * tests/Feature/Services/HubReceptionServiceTest.php).
+ *
+ * Este archivo antes cubría el escaneo exitoso de recepción en HUB
+ * por parte del Driver; ahora cubre exactamente lo contrario: que ese
+ * camino esté bloqueado, con un mensaje claro, sin tocar Scanner.php
+ * ni scanner.blade.php (protegidos en esta fase).
  *
  * Reutiliza HubReceptionService::receive() tal cual para la
- * transición RECOLECTADO_VENEXPRESS -> EN_HUB (EVENT_RECEPCION); lo
- * nuevo aquí es la validación de que el paquete pertenece a la ruta
- * hub_transfer activa del driver, NUNCA decidida solo por
- * Package.driver_id.
- *
- * No prueba de nuevo el flujo de Admin\PackageReception (no se
- * modificó HubReceptionService), salvo un smoke test para confirmar
- * que sigue funcionando sin ninguna ruta involucrada.
+ * transición RECOLECTADO_VENEXPRESS -> EN_HUB (EVENT_RECEPCION) — ese
+ * método no cambió y sigue funcionando igual para el smoke test de
+ * más abajo.
  */
 class DriverHubReceptionTest extends TestCase
 {
     use CreatesTestPackages;
     use RefreshDatabase;
+
+    private const BLOCKED_MESSAGE =
+        'La recepción de paquetes en HUB ahora se confirma desde la operación interna de HUB '
+        .'en el panel de Admin. Los repartidores ya no pueden confirmarla desde aquí.';
 
     private function createDriverUser(string $driverType = Driver::TYPE_HUB): array
     {
@@ -80,11 +87,11 @@ class DriverHubReceptionTest extends TestCase
         return [$route, $stop];
     }
 
-    public function test_driver_can_receive_a_package_collected_on_their_active_route(): void
+    public function test_scan_hub_reception_is_blocked_even_for_an_otherwise_valid_reception(): void
     {
         [$user, $driver] = $this->createDriverUser();
         $ally = $this->createAlly();
-        [$route, $stop] = $this->createInProgressHubTransferRoute($driver, $ally);
+        $this->createInProgressHubTransferRoute($driver, $ally);
 
         $package = $this->createPackage($ally, [
             'current_status' => Package::STATUS_RECIBIDO_AGENCIA,
@@ -93,57 +100,13 @@ class DriverHubReceptionTest extends TestCase
         $scanService = app(LogisticsScanService::class);
         $scanService->scanCollection($package, $driver, (int) $user->id);
 
-        $received = $scanService->scanHubReception($package->fresh(), $driver, (int) $user->id);
-
-        $this->assertSame(Package::STATUS_EN_HUB, $received->current_status);
-        $this->assertNull($received->driver_id);
-
-        $this->assertNotNull(
-            $package->fresh()->histories()
-                ->where('event_type', PackageHistory::EVENT_RECEPCION)
-                ->first()
-        );
-
-        $this->assertSame(RouteStop::STATUS_VISITED, $stop->fresh()->status);
-    }
-
-    public function test_hub_reception_fails_for_a_package_not_collected_on_the_active_route(): void
-    {
-        [$user, $driver] = $this->createDriverUser();
-        $ally = $this->createAlly();
-        $this->createInProgressHubTransferRoute($driver, $ally);
-
-        // Ya está RECOLECTADO_VENEXPRESS y con driver_id de ESTE
-        // driver, pero SIN ningún PackageHistory de EVENT_SALIDA
-        // ligado a las paradas de su ruta activa — no debe bastar con
-        // que driver_id coincida.
-        $package = $this->createPackage($ally, [
-            'current_status' => Package::STATUS_RECOLECTADO_VENEXPRESS,
-            'driver_id' => $driver->id,
-        ]);
-
         $this->expectException(RuntimeException::class);
-        $this->expectExceptionMessage('Este paquete no fue recolectado en tu ruta activa.');
+        $this->expectExceptionMessage(self::BLOCKED_MESSAGE);
 
-        app(LogisticsScanService::class)->scanHubReception($package, $driver, (int) $user->id);
+        $scanService->scanHubReception($package->fresh(), $driver, (int) $user->id);
     }
 
-    public function test_hub_reception_fails_without_an_active_hub_transfer_route(): void
-    {
-        [$user, $driver] = $this->createDriverUser();
-        $ally = $this->createAlly();
-
-        $package = $this->createPackage($ally, [
-            'current_status' => Package::STATUS_RECOLECTADO_VENEXPRESS,
-            'driver_id' => $driver->id,
-        ]);
-
-        $this->expectException(RuntimeException::class);
-
-        app(LogisticsScanService::class)->scanHubReception($package, $driver, (int) $user->id);
-    }
-
-    public function test_hub_reception_fails_when_package_is_not_recolectado(): void
+    public function test_scan_hub_reception_is_blocked_and_does_not_change_package_status(): void
     {
         [$user, $driver] = $this->createDriverUser();
         $ally = $this->createAlly();
@@ -153,12 +116,19 @@ class DriverHubReceptionTest extends TestCase
             'current_status' => Package::STATUS_RECIBIDO_AGENCIA,
         ]);
 
-        $this->expectException(RuntimeException::class);
+        $scanService = app(LogisticsScanService::class);
+        $scanService->scanCollection($package, $driver, (int) $user->id);
 
-        app(LogisticsScanService::class)->scanHubReception($package, $driver, (int) $user->id);
+        try {
+            $scanService->scanHubReception($package->fresh(), $driver, (int) $user->id);
+        } catch (RuntimeException $e) {
+            // esperado
+        }
+
+        $this->assertSame(Package::STATUS_RECOLECTADO_VENEXPRESS, $package->fresh()->current_status);
     }
 
-    public function test_hub_reception_fails_for_delivery_type_driver(): void
+    public function test_scan_hub_reception_is_blocked_regardless_of_driver_type(): void
     {
         [$user, $driver] = $this->createDriverUser(Driver::TYPE_DELIVERY);
         $ally = $this->createAlly();
@@ -169,7 +139,7 @@ class DriverHubReceptionTest extends TestCase
         ]);
 
         $this->expectException(RuntimeException::class);
-        $this->expectExceptionMessage('Solo un repartidor de HUB puede registrar recepciones en HUB.');
+        $this->expectExceptionMessage(self::BLOCKED_MESSAGE);
 
         app(LogisticsScanService::class)->scanHubReception($package, $driver, (int) $user->id);
     }
@@ -192,7 +162,7 @@ class DriverHubReceptionTest extends TestCase
         $this->assertSame(Package::STATUS_EN_HUB, $received->current_status);
     }
 
-    public function test_scanner_receives_package_at_hub_after_collecting_it_on_the_same_route(): void
+    public function test_scanner_blocks_hub_reception_after_collecting_on_the_same_route(): void
     {
         [$user, $driver] = $this->createDriverUser();
         $ally = $this->createAlly();
@@ -214,79 +184,31 @@ class DriverHubReceptionTest extends TestCase
         $this->assertSame(Package::STATUS_RECIBIDO_AGENCIA, $package->fresh()->current_status);
 
         // Confirmación explícita: recién aquí se ejecuta la recolección.
+        // scanCollection() no cambió en Fase 5A, sigue funcionando igual.
         $component
             ->call('confirmOperation', 'collection')
             ->assertSet('errorMessage', null);
 
         $this->assertSame(Package::STATUS_RECOLECTADO_VENEXPRESS, $package->fresh()->current_status);
 
-        // 2do escaneo ACCIDENTAL de la misma guía, inmediatamente
-        // después: el paquete ya está RECOLECTADO_VENEXPRESS, así que la
-        // siguiente etapa disponible es "hub_reception" — pero el
-        // escaneo por sí solo NO debe ejecutarla automáticamente.
+        // 2do escaneo de la misma guía: el paquete ya está RECOLECTADO_
+        // VENEXPRESS, así que la siguiente etapa disponible es
+        // "hub_reception" — Scanner.php no cambió (sigue protegido) y
+        // sigue proponiéndola, pero confirmarla ahora queda bloqueada
+        // por LogisticsScanService::scanHubReception().
         $component
             ->set('trackingNumber', $package->tracking_number)
-            ->call('searchPackage')
-            ->assertSet('errorMessage', null)
-            ->assertSet('successMessage', null)
-            ->assertSet('pendingOperation', 'hub_reception')
-            ->assertSee('La recolección de esta guía ya fue registrada');
-
-        // Sigue en RECOLECTADO_VENEXPRESS: el segundo escaneo no avanzó
-        // solo a EN_HUB.
-        $this->assertSame(Package::STATUS_RECOLECTADO_VENEXPRESS, $package->fresh()->current_status);
-
-        // Solo tras confirmar explícitamente se ejecuta la recepción en HUB.
-        $component
-            ->call('confirmOperation', 'hub_reception')
-            ->assertSet('errorMessage', null)
-            ->assertSet(
-                'successMessage',
-                'Recepción en HUB registrada correctamente. El paquete quedó EN_HUB.'
-            );
-
-        $this->assertSame(Package::STATUS_EN_HUB, $package->fresh()->current_status);
-    }
-
-    public function test_scanner_rejects_hub_reception_for_a_package_collected_on_another_route(): void
-    {
-        [$user, $driver] = $this->createDriverUser();
-        [$otherUser, $otherDriver] = $this->createDriverUser();
-
-        $ally = $this->createAlly();
-        $this->createInProgressHubTransferRoute($driver, $ally);
-        [$otherRoute, $otherStop] = $this->createInProgressHubTransferRoute($otherDriver, $ally);
-
-        $package = $this->createPackage($ally, [
-            'current_status' => Package::STATUS_RECIBIDO_AGENCIA,
-        ]);
-
-        // Lo recolecta el OTRO driver, en SU propia ruta.
-        app(RouteService::class)->registerCollection(
-            $otherRoute,
-            $otherStop,
-            [$package->id],
-            (int) $otherUser->id
-        );
-
-        $this->assertSame(Package::STATUS_RECOLECTADO_VENEXPRESS, $package->fresh()->current_status);
-
-        // El escaneo por sí solo solo mira current_status (RECOLECTADO_
-        // VENEXPRESS -> "hub_reception" disponible): no repite la
-        // validación de pertenencia a la ruta, esa sigue siendo
-        // responsabilidad exclusiva de LogisticsScanService, que se
-        // invoca recién al confirmar.
-        $component = Livewire::actingAs($user)
-            ->test(Scanner::class)
-            ->set('trackingNumber', $package->fresh()->tracking_number)
             ->call('searchPackage')
             ->assertSet('errorMessage', null)
             ->assertSet('pendingOperation', 'hub_reception');
 
         $component
             ->call('confirmOperation', 'hub_reception')
-            ->assertSet('errorMessage', 'Este paquete no fue recolectado en tu ruta activa.');
+            ->assertSet('errorMessage', self::BLOCKED_MESSAGE);
 
+        // El paquete se queda en RECOLECTADO_VENEXPRESS: ya no avanza
+        // a EN_HUB por esta vía. La recepción real ahora se hace desde
+        // Admin\PackageReception (ver PackageReceptionHubTest).
         $this->assertSame(Package::STATUS_RECOLECTADO_VENEXPRESS, $package->fresh()->current_status);
     }
 }
