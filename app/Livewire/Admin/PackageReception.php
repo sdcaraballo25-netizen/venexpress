@@ -73,6 +73,29 @@ class PackageReception extends Component
     }
 
     /**
+     * Entrada del lector QR, llamada desde JS vía $wire.scanGuide(...).
+     *
+     * El QR impreso en la guía contiene exactamente el tracking_number
+     * (PackageLabelController), así que basta con rellenar el campo y
+     * reutilizar search(). Deliberadamente NO recibe el paquete: la
+     * recepción en HUB necesita que el Admin elija el almacén y
+     * confirme, igual que en el flujo manual — el escáner solo ahorra
+     * el tecleo de la guía.
+     */
+    public function scanGuide(string $code): void
+    {
+        $code = trim($code);
+
+        if ($code === '') {
+            return;
+        }
+
+        $this->trackingNumber = $code;
+
+        $this->search();
+    }
+
+    /**
      * Recepción/verificación interna en HUB. Reutiliza la misma
      * pantalla para los dos casos que existen hoy, según en qué
      * estado esté el paquete encontrado:

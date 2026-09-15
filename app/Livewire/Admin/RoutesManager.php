@@ -33,6 +33,14 @@ class RoutesManager extends Component
 
     public string $filterStatus = '';
 
+    /**
+     * Ciudades del estado elegido en el filtro del listado. Va aparte
+     * de $cities (que alimenta el constructor de rutas): compartirlas
+     * hacía que filtrar el listado reescribiera el select de ciudad
+     * del formulario de creación/edición.
+     */
+    public array $filterCities = [];
+
     /*
     |--------------------------------------------------------------------------
     | Constructor de ruta
@@ -179,9 +187,31 @@ class RoutesManager extends Component
 
         $this->resetPage();
 
-        $this->cities = $this->filterState !== ''
+        $this->filterCities = $this->filterState !== ''
             ? $locationService->citiesByState($this->filterState)
             : [];
+    }
+
+    public function updatedFilterCity(): void
+    {
+        $this->resetPage();
+    }
+
+    public function updatedFilterStatus(): void
+    {
+        $this->resetPage();
+    }
+
+    public function clearFilters(): void
+    {
+        $this->reset([
+            'filterState',
+            'filterCity',
+            'filterStatus',
+            'filterCities',
+        ]);
+
+        $this->resetPage();
     }
 
     /*

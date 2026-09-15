@@ -15,14 +15,27 @@
 
         @if ($packages->isNotEmpty())
 
-            <div class="rounded-2xl bg-blue-900 px-5 py-3 text-white">
-                <p class="text-xs uppercase tracking-wide text-blue-200">
-                    Total pendiente
-                </p>
+            <div class="flex flex-col items-stretch gap-3 sm:flex-row sm:items-center">
 
-                <p class="font-display text-xl font-bold">
-                    ${{ number_format($totalPendingUsd, 2) }}
-                </p>
+                <div class="rounded-2xl bg-blue-900 px-5 py-3 text-white">
+                    <p class="text-xs uppercase tracking-wide text-blue-200">
+                        Total pendiente · {{ $packages->count() }} {{ $packages->count() === 1 ? 'paquete' : 'paquetes' }}
+                    </p>
+
+                    <p class="font-display text-xl font-bold">
+                        ${{ number_format($totalPendingUsd, 2) }}
+                    </p>
+                </div>
+
+                <button
+                    type="button"
+                    disabled
+                    title="Próximamente disponible"
+                    class="cursor-not-allowed rounded-xl bg-slate-100 px-5 py-3 text-sm font-semibold text-slate-400"
+                >
+                    Pagar todo (${{ number_format($totalPendingUsd, 2) }})
+                </button>
+
             </div>
 
         @endif

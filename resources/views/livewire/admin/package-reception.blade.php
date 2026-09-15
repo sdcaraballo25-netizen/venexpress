@@ -61,6 +61,44 @@
                     </div>
                 </div>
 
+                {{-- Lector QR: rellena el campo de guía y dispara la
+                     búsqueda. La recepción sigue confirmándose a mano. --}}
+                <div wire:ignore class="rounded-xl border border-slate-200 bg-slate-50 p-4">
+                    <div class="flex flex-wrap items-center justify-between gap-3">
+                        <div class="flex items-center gap-2">
+                            <span class="rounded-lg bg-blue-50 p-2 text-blue-900">
+                                <svg class="h-5 w-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.8"
+                                        d="M3 7h4V3m14 4h-4V3M3 17h4v4m14-4h-4v4M7 7h10v10H7z" />
+                                </svg>
+                            </span>
+
+                            <div>
+                                <p class="text-sm font-semibold text-slate-800">
+                                    Escanear QR de la guía
+                                </p>
+                                <p id="qr-hint" class="text-xs text-slate-500">
+                                    Usa la cámara en lugar de teclear el número.
+                                </p>
+                            </div>
+                        </div>
+
+                        <button
+                            type="button"
+                            id="qr-toggle"
+                            class="rounded-xl border border-slate-300 bg-white px-4 py-2 text-sm font-medium text-slate-700 hover:bg-slate-100"
+                        >
+                            Activar cámara
+                        </button>
+                    </div>
+
+                    <div
+                        id="qr-reader"
+                        class="mt-4 hidden overflow-hidden rounded-xl border border-slate-200 bg-white"
+                        style="max-width: 380px;"
+                    ></div>
+                </div>
+
                 @if ($package)
                     <div class="rounded-xl bg-slate-50 p-4">
                         <p class="text-xs uppercase tracking-wide text-slate-400">
@@ -193,3 +231,90 @@
         </div>
     @endif
 </div>
+
+@assets
+    <script src="https://unpkg.com/html5-qrcode" type="text/javascript"></script>
+@endassets
+
+@script
+<script>
+    let scanner = null;
+    let scanning = false;
+
+    const toggle = document.getElementById('qr-toggle');
+    const reader = document.getElementById('qr-reader');
+    const hint = document.getElementById('qr-hint');
+
+    function setHint(text) {
+        if (hint) {
+            hint.textContent = text;
+        }
+    }
+
+    async function stopScanner() {
+        scanning = false;
+
+        if (scanner) {
+            try {
+                await scanner.stop();
+                await scanner.clear();
+            } catch (error) {
+                console.warn('No se pudo detener el lector QR:', error);
+            }
+        }
+
+        scanner = null;
+
+        reader.classList.add('hidden');
+        toggle.textContent = 'Activar cámara';
+    }
+
+    async function startScanner() {
+        if (scanning || typeof Html5Qrcode === 'undefined') {
+            setHint('El lector QR no está disponible en este navegador.');
+            return;
+        }
+
+        reader.classList.remove('hidden');
+        toggle.textContent = 'Detener cámara';
+        setHint('Apunta la cámara al QR de la guía.');
+
+        try {
+            scanner = new Html5Qrcode('qr-reader');
+            scanning = true;
+
+            await scanner.start(
+                { facingMode: 'environment' },
+                { fps: 10, qrbox: { width: 250, height: 250 } },
+                async (decodedText) => {
+                    if (!decodedText || !scanning) {
+                        return;
+                    }
+
+                    const code = decodedText.trim();
+
+                    await stopScanner();
+
+                    setHint('Guía escaneada: ' + code);
+
+                    $wire.scanGuide(code);
+                },
+                () => {}
+            );
+        } catch (error) {
+            console.error('Error iniciando la cámara:', error);
+            scanner = null;
+            scanning = false;
+            reader.classList.add('hidden');
+            toggle.textContent = 'Activar cámara';
+            setHint('No se pudo acceder a la cámara. Revisa los permisos del navegador.');
+        }
+    }
+
+    if (toggle && reader) {
+        toggle.addEventListener('click', () => {
+            scanning ? stopScanner() : startScanner();
+        });
+    }
+</script>
+@endscript

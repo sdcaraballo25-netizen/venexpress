@@ -12,9 +12,11 @@ use Livewire\Component;
  * Muestra al cliente los paquetes de pago contra entrega (COD) que
  * tiene a su nombre como destinatario y todavía no ha cancelado.
  *
- * Los botones de "Pago móvil" e "Inmediato" se muestran deshabilitados
- * a propósito: el flujo de cobro en línea todavía no está habilitado
- * (así lo pidió el negocio). Cuando se active, este componente debe:
+ * Los botones de "Pago móvil", "Inmediato" y "Pagar todo" se muestran
+ * deshabilitados a propósito: el flujo de cobro en línea todavía no
+ * está habilitado (así lo pidió el negocio). "Pagar todo" es solo la
+ * versión consolidada del mismo botón (paga el total en vez de un
+ * paquete), no un flujo distinto. Cuando se active, este componente debe:
  *
  *   1. Reutilizar App\Models\PaymentOrder (ya existe, lo usa el
  *      módulo Aliado/Admin) creando una orden con

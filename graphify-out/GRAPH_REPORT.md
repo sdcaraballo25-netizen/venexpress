@@ -1,22 +1,22 @@
-# Graph Report - venexpress  (2026-09-14)
+# Graph Report - venexpress  (2026-09-15)
 
 ## Corpus Check
-- 374 files · ~310,024 words
+- 437 files · ~341,003 words
 - Verdict: corpus is large enough that graph structure adds value.
 
 ## Summary
-- 1976 nodes · 4427 edges · 262 communities (208 shown, 54 thin omitted)
-- Extraction: 99% EXTRACTED · 1% INFERRED · 0% AMBIGUOUS · INFERRED: 63 edges (avg confidence: 0.85)
+- 2416 nodes · 5773 edges · 307 communities (224 shown, 83 thin omitted)
+- Extraction: 99% EXTRACTED · 1% INFERRED · 0% AMBIGUOUS · INFERRED: 54 edges (avg confidence: 0.85)
 - Token cost: 0 input · 0 output
 
 ## Graph Freshness
-- Built from commit: `dc33d377`
+- Built from commit: `a366babf`
 - Run `git rev-parse HEAD` and compare to check if the graph is stale.
 - Run `graphify update .` after code changes (no API cost).
 
 ## Community Hubs (Navigation)
-- RoutesManager
-- ScannerHubOperationUxTest
+- AuditLog
+- RouteStop
 - composer.json
 - allies-manager.blade.php
 - What You Must Do When Invoked
@@ -25,8 +25,8 @@
 - Incident
 - setup
 - Venexpress — Project Rules
-- VenezuelaLocationService
-- ScannerLivewireTest
+- Illuminate\Database\Eloquent\Relations\BelongsTo
+- AllyUser
 - logging.php
 - Money
 - graphify reference: extra exports and benchmark
@@ -36,16 +36,16 @@
 - console.php
 - verify-email.blade.php
 - layout.navigation
-- DriverRouteController.php
+- Illuminate\Http\Request
 - users-manager.blade.php
 - layout/navigation.blade.php
 - DriverPayment
-- App\Models\Ally
-- App\Http\Controllers\Api\DriverIncidentController
+- StaffManager
+- Warehouse
 - Dashboard
-- RouteService
-- CreatePackage.php
-- Packages
+- Route
+- WarehouseCoverage
+- DriversApprovalManager
 - graphify reference: query, path, explain
 - graphify reference: add a URL and watch a folder
 - graphify reference: commit hook and native CLAUDE.md integration
@@ -54,59 +54,64 @@
 - graphify reference: transcribe video and audio
 - CLAUDE.md
 - extraction-spec.md
-- RuntimeException
+- VenezuelaLocationService
 - copilot-instructions.md
 - rate-matrix-manager.blade.php
 - Actualización automática de tasa BCV
-- Route
+- DriverRouteReleaseTest
 - User
 - CityDistance
-- DatabaseSeeder.php
+- RoutesManager
 - require-dev
 - PackageCreate
 - Livewire\Component
-- RouteStop
+- Recommendation
+- HubDashboardUxTest
 - AllyFinancialService
+- Illuminate\Support\Facades\Schema
 - ally-finance.blade.php
-- PackageStatusUpdated
+- Illuminate\Database\Migrations\Migration
+- UsersManager
+- WarehousesManager
 - TariffService
 - venexpress-ui/SKILL.md
 - bootstrap/app.php
-- PackageServiceCodTest
+- PackageStatusUpdated
 - routes-manager.blade.php
-- static
+- DriverHubReceptionTest
 - package-create.blade.php
-- DriverDeliveryController.php
-- PackageService
-- Illuminate\Support\Facades\Schema
-- Illuminate\Database\Migrations\Migration
+- DriverDeliveryController
+- ScannerLivewireTest
+- Illuminate\Database\Schema\Blueprint
 - GeocodePackageDeliveryAddress
-- Dashboard
-- UsersManager
+- HubDistributionPhase
+- RoutesManagerStopFilterTest
 - PackageDetailCodPaymentMethodTest
 - DeliveryClaimFromDestinationAgencyTest
+- Controller
 - Ally/dashboard.blade.php
 - require
 - 1. Principio general
-- Illuminate\Database\Eloquent\Factories\HasFactory
+- Illuminate\Database\Eloquent\Relations\HasMany
 - driver/dashboard.blade.php
+- PackageReception
 - client/dashboard.blade.php
-- Packages
+- Illuminate\Console\Command
 - Package
-- App\Http\Controllers\TrackingController
-- keywords
+- LogisticsResolutionService
+- OfficeLocator
 - TariffServiceTest
 - BcvRate
-- Illuminate\Database\Schema\Blueprint
 - RateMatrixManager
-- Illuminate\Console\Command
+- Customer
 - package-detail.blade.php
 - confirmOperation(
-- App\Models\Driver
+- DriverApiFlowTest
 - DriverRouteController
-- Driver
+- Almacen/Dashboard.php
+- Scanner
 - Checklist final antes de operar en real — Venexpress
-- Controller
+- api.php
 - liquidate({{ $package->id }})
 - driver-payments.blade.php
 - receive
@@ -116,76 +121,103 @@
 - city-distance-manager.blade.php
 - Checklist de infraestructura para producción
 - driver-assignment.blade.php
-- Illuminate\Foundation\Testing\RefreshDatabase
+- Packages
+- TestCase
 - config
-- DriverHubDistributionController
+- DriverRouteClaimTest
+- Dashboard
 - bcv-rate-manager.blade.php
 - Logout.php
 - psr-4
 - PackageLabelController.php
 - price-calculator.blade.php
-- Illuminate\Database\Eloquent\Relations\BelongsTo
+- PackageCreateFulfillmentModeTest
 - sanctum.php
 - incidents-manager.blade.php
-- HubDistributionPhase
-- Commissions
-- SalesCloseoutTest
-- Illuminate\Http\Request
+- PackageReceptionPickupVerificationTest
+- Driver
+- PackageCreateTest
+- PackageCreatePickupTest
+- HubReleaseService
+- Dashboard
+- RoutesManagerListFilterTest
+- OfficeLocatorLocationTest
+- .route
+- RecommendationFormTest
+- Illuminate\Http\JsonResponse
+- EmailVerificationTest.php
 - PriceCalculator
 - warehouses-manager.blade.php
 - resend
 - venexpress-laravel/SKILL.md
-- PendingPayments
+- DashboardClaimRouteTest
 - PackagesVisibilityTest
-- AuditLogViewer
+- DriverRouteCompleteTest
+- RoutesManagerMultistateTest
 - DriverRouteActiveHubScanTest
+- RouteDetailTest
+- drivers-approval-manager.blade.php
+- AlliesManagerDestinationVerificationTest
+- Livewire\Volt\Volt
 - DeliveryRouteOrderGeocodingTest
+- PackageReceptionScannerTest
 - PackageCreateDeliveryCoordinatesTest
 - post-create-project-cmd
 - PaymentOrder
-- Warehouse
-- AuditLog
+- DriverHubDistributionTest
+- VenezuelaLocationServiceCatalogTest
 - DriverAssignment
 - staff-manager.blade.php
 - PackageCreateRegisteredByTest
-- StaffManagerTest
+- DriverHubDistributionController
+- PaymentWebhookController.php
+- archive({{ $recommendation->id }})
+- assignToDriver({{ $route->id }})
+- PriceCalculatorCatalogTest
+- AlliesManagerLocationTest
+- autoload-dev
+- ExampleTest
 
 ## God Nodes (most connected - your core abstractions)
-1. `Package` - 237 edges
-2. `User` - 209 edges
-3. `Route` - 145 edges
-4. `RouteStop` - 88 edges
-5. `Driver` - 80 edges
-6. `TestCase` - 62 edges
-7. `Ally` - 61 edges
-8. `AuditLog` - 55 edges
-9. `PackageService` - 38 edges
-10. `RouteService` - 38 edges
+1. `Package` - 275 edges
+2. `User` - 250 edges
+3. `Route` - 191 edges
+4. `TestCase` - 138 edges
+5. `Warehouse` - 136 edges
+6. `Driver` - 132 edges
+7. `Ally` - 101 edges
+8. `RouteStop` - 96 edges
+9. `WarehouseCoverage` - 63 edges
+10. `AuditLog` - 59 edges
 
 ## Surprising Connections (you probably didn't know these)
+- `createAlly()` --references_constant--> `Ally`  [EXTRACTED]
+  tests/Feature/Concerns/CreatesTestPackages.php → app/Models/Ally.php
+- `createPackage()` --references--> `Ally`  [EXTRACTED]
+  tests/Feature/Concerns/CreatesTestPackages.php → app/Models/Ally.php
 - `createPackage()` --references_constant--> `Package`  [EXTRACTED]
   tests/Feature/Concerns/CreatesTestPackages.php → app/Models/Package.php
-- `PackageServiceCodTest` --references--> `PackageService`  [EXTRACTED]
-  tests/Feature/PackageServiceCodTest.php → app/Services/PackageService.php
 - `AllyFinancialServiceTest` --references--> `AllyFinancialService`  [EXTRACTED]
   tests/Feature/AllyFinancialServiceTest.php → app/Services/AllyFinancialService.php
 - `AllyFinancialSettlementTest` --references--> `AllyFinancialService`  [EXTRACTED]
   tests/Feature/AllyFinancialSettlementTest.php → app/Services/AllyFinancialService.php
-- `TariffServiceTest` --references--> `TariffService`  [EXTRACTED]
-  tests/Feature/TariffServiceTest.php → app/Services/TariffService.php
 
 ## Import Cycles
 - None detected.
 
-## Communities (262 total, 54 thin omitted)
+## Communities (307 total, 83 thin omitted)
+
+### Community 0 - "AuditLog"
+Cohesion: 0.12
+Nodes (8): AuditLog, PackageHistory, DeliveryAssignmentService, DriverPaymentService, Illuminate\Auth\Access\AuthorizationException, Illuminate\Database\QueryException, Illuminate\Support\Facades\DB, RuntimeException
 
 ### Community 3 - "composer.json"
 Cohesion: 0.14
-Nodes (13): autoload-dev, psr-4, description, extra, laravel, dont-discover, license, minimum-stability (+5 more)
+Nodes (13): description, extra, laravel, keywords, dont-discover, license, minimum-stability, name (+5 more)
 
 ### Community 4 - "allies-manager.blade.php"
-Cohesion: 0.25
-Nodes (7): activate({{ $ally->id }}), approve({{ $ally->id }}), editLocation({{ $ally->id }}), reject({{ $ally->id }}), $set(, saveLocation, suspend({{ $ally->id }})
+Cohesion: 0.22
+Nodes (8): activate({{ $ally->id }}), approve({{ $ally->id }}), editLocation({{ $ally->id }}), reject({{ $ally->id }}), $set(, saveLocation, suspend({{ $ally->id }}), toggleVerifiedDestination({{ $ally->id }})
 
 ### Community 5 - "What You Must Do When Invoked"
 Cohesion: 0.07
@@ -200,8 +232,8 @@ Cohesion: 0.14
 Nodes (14): scripts, dev, post-autoload-dump, post-update-cmd, pre-package-uninstall, test, Composer\\Config::disableProcessTimeout, Illuminate\\Foundation\\ComposerScripts::postAutoloadDump (+6 more)
 
 ### Community 8 - "Incident"
-Cohesion: 0.10
-Nodes (4): IncidentsManager, Incidents, Incident, IncidentService
+Cohesion: 0.08
+Nodes (6): IncidentsManager, Incidents, Incidents, PublicTracking, Incident, IncidentService
 
 ### Community 9 - "setup"
 Cohesion: 0.25
@@ -211,12 +243,20 @@ Nodes (8): post-root-package-install, setup, composer install, npm install, npm 
 Cohesion: 0.11
 Nodes (17): Authentication and Authorization, Backend / API, Business Logic, Changes, Database, Frontend, General Development Rules, Generated Files (+9 more)
 
+### Community 11 - "Illuminate\Database\Eloquent\Relations\BelongsTo"
+Cohesion: 0.07
+Nodes (4): DriverRemunerationRate, Illuminate\Database\Eloquent\Factories\HasFactory, Illuminate\Database\Eloquent\Model, Illuminate\Database\Eloquent\Relations\BelongsTo
+
+### Community 12 - "AllyUser"
+Cohesion: 0.16
+Nodes (6): AllyUser, AllyUserService, Illuminate\Database\Eloquent\Relations\HasOne, Illuminate\Foundation\Auth\User, Illuminate\Notifications\Notifiable, Laravel\Sanctum\HasApiTokens
+
 ### Community 13 - "logging.php"
 Cohesion: 0.40
 Nodes (4): Monolog\Handler\NullHandler, Monolog\Handler\StreamHandler, Monolog\Handler\SyslogUdpHandler, Monolog\Processor\PsrLogMessageProcessor
 
 ### Community 14 - "Money"
-Cohesion: 0.16
+Cohesion: 0.15
 Nodes (4): Money, PHPUnit\Framework\TestCase, ExampleTest, MoneyTest
 
 ### Community 15 - "graphify reference: extra exports and benchmark"
@@ -227,10 +267,6 @@ Nodes (8): graphify reference: extra exports and benchmark, Step 6b - Wiki (only
 Cohesion: 0.22
 Nodes (8): About Laravel, Code of Conduct, Contributing, Laravel Sponsors, Learning Laravel, License, Premium Partners, Security Vulnerabilities
 
-### Community 17 - "Ally"
-Cohesion: 0.05
-Nodes (11): AlliesManager, OfficeLocator, Ally, AllyUser, AllyUserService, Illuminate\Database\Eloquent\Relations\HasMany, Illuminate\Foundation\Auth\User, Illuminate\Notifications\Notifiable (+3 more)
-
 ### Community 18 - "profile.blade.php"
 Cohesion: 0.50
 Nodes (3): profile.delete-user-form, profile.update-password-form, profile.update-profile-information-form
@@ -239,29 +275,25 @@ Nodes (3): profile.delete-user-form, profile.update-password-form, profile.updat
 Cohesion: 0.50
 Nodes (3): Illuminate\Foundation\Inspiring, Illuminate\Support\Facades\Artisan, Illuminate\Support\Facades\Schedule
 
-### Community 22 - "DriverRouteController.php"
+### Community 22 - "Illuminate\Http\Request"
 Cohesion: 0.16
-Nodes (8): App\Http\Controllers\Api\DriverDashboardController, DriverDashboardController, DriverPackageResource, DriverPaymentResource, App\Http\Resources\RouteResource, RouteResource, RouteStopResource, Illuminate\Http\Resources\Json\JsonResource
+Nodes (7): DriverAuthController, DriverPaymentResource, IncidentResource, RouteResource, RouteStopResource, Illuminate\Http\Request, Illuminate\Http\Resources\Json\JsonResource
 
 ### Community 23 - "users-manager.blade.php"
 Cohesion: 0.20
 Nodes (9): closeCreateModal, closeEditModal, createUser, deleteUser, openCreateModal, openEditModal({{ $user->id }}), requestDelete({{ $user->id }}), $set( (+1 more)
 
-### Community 25 - "DriverPayment"
-Cohesion: 0.18
-Nodes (3): DriverPayments, DriverPayment, DriverPaymentService
+### Community 26 - "StaffManager"
+Cohesion: 0.05
+Nodes (19): StaffManager, LoginForm, AllyStaffService, DistanceApiService, DriverFactory, UserFactory, WarehouseFactory, Illuminate\Auth\Events\Lockout (+11 more)
 
-### Community 26 - "App\Models\Ally"
-Cohesion: 0.06
-Nodes (17): SalesCloseout, StaffManager, LoginForm, App\Models\Ally, AllyStaffService, DriverFactory, UserFactory, WarehouseFactory (+9 more)
+### Community 27 - "Warehouse"
+Cohesion: 0.05
+Nodes (9): Warehouse, HubReceptionService, PackageReceptionHubTest, RoutesManagerHubDistributionTest, WarehouseCoverageManagerTest, WarehousesManagerTest, WarehouseDispatchTest, HubReceptionServiceTest (+1 more)
 
-### Community 27 - "App\Http\Controllers\Api\DriverIncidentController"
-Cohesion: 0.36
-Nodes (3): App\Http\Controllers\Api\DriverIncidentController, DriverIncidentController, IncidentResource
-
-### Community 72 - "RouteService"
-Cohesion: 0.16
-Nodes (3): App\Services\RouteService, RouteService, Illuminate\Database\Eloquent\Collection
+### Community 72 - "Route"
+Cohesion: 0.12
+Nodes (3): Route, RouteService, Illuminate\Database\Eloquent\Collection
 
 ### Community 76 - "graphify reference: query, path, explain"
 Cohesion: 0.33
@@ -279,10 +311,6 @@ Nodes (3): For git commit hook, For native CLAUDE.md integration, graphify refer
 Cohesion: 0.50
 Nodes (3): For --cluster-only, For --update (incremental re-extraction), graphify reference: incremental update and cluster-only
 
-### Community 84 - "RuntimeException"
-Cohesion: 0.11
-Nodes (11): App\Livewire\Admin\PackageDispatch, App\Livewire\Ally\PackageReception, PackageHistory, DeliveryAssignmentService, Route, DestinationReceptionService, HubReceptionService, PackageDispatchService (+3 more)
-
 ### Community 86 - "rate-matrix-manager.blade.php"
 Cohesion: 0.50
 Nodes (3): cancelEditing, resetSimulation, startEditing
@@ -291,81 +319,65 @@ Nodes (3): cancelEditing, resetSimulation, startEditing
 Cohesion: 0.33
 Nodes (5): Actualización automática de tasa BCV, En desarrollo local, Funcionamiento, Prueba manual, URL configurable
 
-### Community 91 - "Route"
-Cohesion: 0.10
-Nodes (5): Dashboard, Route, DashboardClaimRouteTest, DriverRouteCompleteTest, DriverRouteReleaseTest
-
 ### Community 92 - "User"
-Cohesion: 0.04
-Nodes (13): Ally, User, Illuminate\Database\Eloquent\Relations\HasOne, Illuminate\Support\Facades\Event, Illuminate\Support\Facades\URL, AllyFinancialServiceTest, AuthenticationTest, EmailVerificationTest (+5 more)
+Cohesion: 0.05
+Nodes (8): User, AllyFinancialServiceTest, AllyFinancialSettlementTest, AuthenticationTest, PasswordConfirmationTest, createAlly(), ProfileTest, UserAuthorizationTest
 
 ### Community 93 - "CityDistance"
-Cohesion: 0.17
-Nodes (3): CityDistanceManager, CityDistance, self
-
-### Community 94 - "DatabaseSeeder.php"
-Cohesion: 0.33
-Nodes (3): DatabaseSeeder, Illuminate\Database\Console\Seeds\WithoutModelEvents, Illuminate\Database\Seeder
+Cohesion: 0.10
+Nodes (7): CityDistanceManager, self, CityDistance, self, self, self, static
 
 ### Community 95 - "require-dev"
 Cohesion: 0.20
 Nodes (10): require-dev, doctrine/dbal, fakerphp/faker, laravel/breeze, laravel/pail, laravel/pint, laravel/sail, mockery/mockery (+2 more)
 
 ### Community 98 - "Livewire\Component"
-Cohesion: 0.15
-Nodes (32): App\Livewire\Admin\AlliesManager, App\Livewire\Admin\AllyFinance, App\Livewire\Admin\AuditLogViewer, App\Livewire\Admin\BcvRateManager, App\Livewire\Admin\CityDistanceManager, Dashboard, App\Livewire\Admin\DriverAssignment, App\Livewire\Admin\DriverPayments (+24 more)
+Cohesion: 0.06
+Nodes (23): AuditLogViewer, Dashboard, DriverRemunerationManager, HelpCenter, PaymentOrders, RoutesDashboard, DailyCashCut, HelpCenter (+15 more)
 
-### Community 100 - "RouteStop"
-Cohesion: 0.15
-Nodes (3): RouteStop, HubDashboardUxTest, RouteDetailTest
+### Community 99 - "Recommendation"
+Cohesion: 0.27
+Nodes (3): RecommendationsManager, RecommendationForm, Recommendation
 
 ### Community 102 - "AllyFinancialService"
-Cohesion: 0.09
-Nodes (4): AllyFinance, DailyCashCut, AllyFinancialTransaction, AllyFinancialService
+Cohesion: 0.07
+Nodes (4): AllyFinance, AllyFinancialTransaction, AllySettlement, AllyFinancialService
 
 ### Community 104 - "ally-finance.blade.php"
 Cohesion: 0.29
 Nodes (6): cancelSettlement({{ $settlement->id }}), markPaid({{ $settlement->id }}), openReversal({{ $settlement->id }}), $set(, reverseSettlement, selectAlly({{ $ally->id }})
 
-### Community 107 - "PackageStatusUpdated"
-Cohesion: 0.22
-Nodes (5): App\Notifications\PackageStatusUpdated, PackageStatusUpdated, WelcomeVerificationToken, Illuminate\Notifications\Messages\MailMessage, Illuminate\Notifications\Notification
-
 ### Community 111 - "TariffService"
 Cohesion: 0.24
-Nodes (4): RateMatrix, App\Services\TariffService, TariffService, InvalidArgumentException
+Nodes (3): RateMatrix, TariffService, InvalidArgumentException
 
 ### Community 112 - "venexpress-ui/SKILL.md"
 Cohesion: 0.17
 Nodes (11): Avoid "AI Generated" Aesthetics, Buttons, Color Discipline, Core Design Philosophy, Layout, Professional Product Design, Spacing, Typography (+3 more)
 
 ### Community 113 - "bootstrap/app.php"
-Cohesion: 0.21
-Nodes (8): EnsureAccountIsVerified, EnsureUserHasRole, Closure, Illuminate\Console\Scheduling\Schedule, Illuminate\Foundation\Application, Illuminate\Foundation\Configuration\Exceptions, Illuminate\Foundation\Configuration\Middleware, Symfony\Component\HttpFoundation\Response
+Cohesion: 0.18
+Nodes (10): EnsureAccountIsApproved, EnsureAccountIsVerified, EnsureUserHasRole, Closure, Illuminate\Console\Scheduling\Schedule, Illuminate\Foundation\Application, Illuminate\Foundation\Configuration\Exceptions, Illuminate\Foundation\Configuration\Middleware (+2 more)
+
+### Community 114 - "PackageStatusUpdated"
+Cohesion: 0.22
+Nodes (4): PackageStatusUpdated, WelcomeVerificationToken, Illuminate\Notifications\Messages\MailMessage, Illuminate\Notifications\Notification
 
 ### Community 115 - "routes-manager.blade.php"
-Cohesion: 0.13
-Nodes (14): cancelBuilder, cancelRoute({{ $route->id }}), duplicateRoute({{ $route->id }}), editRoute({{ $route->id }}), moveStopDown({{ $index }}), moveStopUp({{ $index }}), openCollectionModal({{ $route->id }}, {{ $stop->id }}), registerCollection (+6 more)
-
-### Community 116 - "static"
-Cohesion: 0.20
-Nodes (4): self, self, self, static
+Cohesion: 0.12
+Nodes (15): cancelBuilder, cancelRoute({{ $route->id }}), clearFilters, duplicateRoute({{ $route->id }}), editRoute({{ $route->id }}), moveStopDown({{ $index }}), moveStopUp({{ $index }}), openCollectionModal({{ $route->id }}, {{ $stop->id }}) (+7 more)
 
 ### Community 118 - "package-create.blade.php"
-Cohesion: 0.25
-Nodes (7): openRecipientCustomerModal, openSenderCustomerModal, registerAnother, $set(, saveRecipientCustomer, saveSenderCustomer, $set(
-
-### Community 120 - "DriverDeliveryController.php"
-Cohesion: 0.36
-Nodes (3): DriverDeliveryController, Driver, App\Http\Controllers\Controller
-
-### Community 121 - "PackageService"
-Cohesion: 0.21
-Nodes (5): App\Models\PackageHistory, PackageService, Driver, TariffService, PackageHistory
+Cohesion: 0.20
+Nodes (9): openRecipientCustomerModal, openSenderCustomerModal, registerAnother, $set(, saveRecipientCustomer, saveSenderCustomer, selectAllyPickup, selectDelivery (+1 more)
 
 ### Community 125 - "GeocodePackageDeliveryAddress"
-Cohesion: 0.07
-Nodes (15): GeocodePackageDeliveryAddress, PackageObserver, AppServiceProvider, VoltServiceProvider, DistanceApiService, GeocodingService, Illuminate\Bus\Queueable, Illuminate\Contracts\Queue\ShouldQueue (+7 more)
+Cohesion: 0.10
+Nodes (12): GeocodePackageDeliveryAddress, PackageObserver, AppServiceProvider, VoltServiceProvider, GeocodingService, Illuminate\Bus\Queueable, Illuminate\Contracts\Queue\ShouldQueue, Illuminate\Foundation\Bus\Dispatchable (+4 more)
+
+### Community 130 - "Controller"
+Cohesion: 0.29
+Nodes (3): DriverDashboardController, Controller, DriverPackageResource
 
 ### Community 134 - "require"
 Cohesion: 0.18
@@ -375,61 +387,53 @@ Nodes (11): require, barryvdh/laravel-dompdf, endroid/qr-code, ext-bcmath, larav
 Cohesion: 0.22
 Nodes (8): 1. Principio general, 2. Laravel, Cambio de backend, Cambio de base de datos, Cambio de flujo completo, Cambio pequeño, Objetivo, Venexpress Testing
 
-### Community 136 - "Illuminate\Database\Eloquent\Factories\HasFactory"
-Cohesion: 0.12
-Nodes (14): DriverRemunerationManager, App\Models\AuditLog, App\Models\BcvRate, App\Models\CityDistance, App\Models\Customer, DriverRemunerationRate, App\Models\RateMatrix, App\Models\Warehouse (+6 more)
-
 ### Community 137 - "driver/dashboard.blade.php"
 Cohesion: 0.40
 Nodes (4): claimRoute({{ $route->id }}), completeRoute, releaseRoute, startRoute
 
 ### Community 139 - "client/dashboard.blade.php"
 Cohesion: 0.40
-Nodes (4): acceptDelivery({{ $package->id }}), cancelRejectDelivery, rejectDelivery, startRejectDelivery({{ $package->id }})
+Nodes (4): acceptDelivery({{ $package->id }}), clearHistoryFilters, showHistory, showPending
+
+### Community 140 - "Illuminate\Console\Command"
+Cohesion: 0.38
+Nodes (3): CheckProductionReadiness, SyncBcvRate, Illuminate\Console\Command
 
 ### Community 141 - "Package"
 Cohesion: 0.05
-Nodes (11): PackageDispatch, PackageReception, Cod, PackageDetail, PackagePickup, PackageReception, PackageDetail, PublicTracking (+3 more)
+Nodes (10): Cod, PackageDetail, PackagePickup, PackageReception, PackageDetail, Package, PackageService, DateTimeInterface (+2 more)
 
-### Community 142 - "App\Http\Controllers\TrackingController"
-Cohesion: 0.26
-Nodes (6): App\Http\Controllers\TrackingController, TrackingController, AppLayout, GuestLayout, Illuminate\View\Component, Illuminate\View\View
-
-### Community 143 - "keywords"
-Cohesion: 0.67
-Nodes (3): keywords, framework, laravel
+### Community 142 - "LogisticsResolutionService"
+Cohesion: 0.07
+Nodes (12): TrackingController, Commissions, SalesCloseout, LogisticsResolutionResult, self, LogisticsResolutionService, Collection, AppLayout (+4 more)
 
 ### Community 145 - "BcvRate"
-Cohesion: 0.15
+Cohesion: 0.14
 Nodes (4): BcvRateManager, BcvRate, BcvRateService, Carbon\Carbon
 
-### Community 150 - "Illuminate\Console\Command"
-Cohesion: 0.38
-Nodes (3): CheckProductionReadiness, SyncBcvRate, Illuminate\Console\Command
+### Community 150 - "Customer"
+Cohesion: 0.14
+Nodes (6): Customer, DatabaseSeeder, Illuminate\Database\Console\Seeds\WithoutModelEvents, Illuminate\Database\Seeder, ClientDashboardTest, ClientPendingPaymentsTest
 
 ### Community 151 - "package-detail.blade.php"
 Cohesion: 0.50
 Nodes (3): collectCod, completeDelivery, startDelivery
 
-### Community 153 - "App\Models\Driver"
-Cohesion: 0.13
-Nodes (8): App\Models\Driver, App\Models\Route, App\Models\RouteStop, Illuminate\Support\Facades\Queue, DeliveryAssignmentServiceTest, DriverApiFlowTest, DriverHubTransferApiTest, Tests\TestCase
+### Community 156 - "Almacen/Dashboard.php"
+Cohesion: 0.14
+Nodes (4): CreatePackage, Dashboard, DestinationReceptionService, Livewire\Attributes\Computed
 
-### Community 155 - "DriverRouteController"
-Cohesion: 0.40
-Nodes (4): DriverRouteController, Driver, Route, RouteService
-
-### Community 157 - "Driver"
-Cohesion: 0.09
-Nodes (8): FieldScanner, Scanner, Driver, App\Services\LogisticsScanService, LogisticsScanService, UsersManagerDriverTypeTest, DriverHubReceptionTest, DriverRouteCompletePendingPackagesTest
+### Community 157 - "Scanner"
+Cohesion: 0.16
+Nodes (3): FieldScanner, Scanner, LogisticsScanService
 
 ### Community 158 - "Checklist final antes de operar en real — Venexpress"
 Cohesion: 0.40
 Nodes (4): App del repartidor (Flutter), Backend (Laravel), Checklist final antes de operar en real — Venexpress, QA (Fase 4)
 
-### Community 159 - "Controller"
-Cohesion: 0.25
-Nodes (7): App\Http\Controllers\Api\DriverHubDistributionController, VerifyEmailController, Controller, Illuminate\Auth\Events\Verified, Illuminate\Foundation\Auth\EmailVerificationRequest, Illuminate\Http\RedirectResponse, Illuminate\Support\Facades\Route
+### Community 159 - "api.php"
+Cohesion: 0.23
+Nodes (5): DriverIncidentController, VerifyEmailController, Illuminate\Foundation\Auth\EmailVerificationRequest, Illuminate\Http\RedirectResponse, Illuminate\Support\Facades\Route
 
 ### Community 166 - "city-distance-manager.blade.php"
 Cohesion: 0.40
@@ -439,9 +443,9 @@ Nodes (4): create, delete({{ $distance->id }}), edit({{ $distance->id }}), cance
 Cohesion: 0.40
 Nodes (4): 1. Cron del scheduler (necesario para `bcv:sync`), 2. Worker de colas (necesario para que los correos se envíen), 3. Correo real (además de lo anterior), Checklist de infraestructura para producción
 
-### Community 175 - "Illuminate\Foundation\Testing\RefreshDatabase"
-Cohesion: 0.11
-Nodes (13): Illuminate\Auth\Notifications\ResetPassword, Illuminate\Database\Eloquent\ModelNotFoundException, Illuminate\Foundation\Testing\RefreshDatabase, Illuminate\Foundation\Testing\TestCase, Livewire\Livewire, Livewire\Volt\Volt, PasswordUpdateTest, RegistrationTest (+5 more)
+### Community 175 - "TestCase"
+Cohesion: 0.10
+Nodes (10): Illuminate\Database\Eloquent\ModelNotFoundException, Illuminate\Foundation\Testing\RefreshDatabase, Illuminate\Foundation\Testing\TestCase, Illuminate\Support\Facades\Http, Illuminate\Support\Facades\Queue, Livewire\Livewire, DeliveryAssignmentServiceTest, PackageCreateCustomerHistoryTest (+2 more)
 
 ### Community 176 - "config"
 Cohesion: 0.29
@@ -457,66 +461,86 @@ Nodes (5): autoload, psr-4, App\\, Database\\Factories\\, Database\\Seeders\\
 
 ### Community 184 - "PackageLabelController.php"
 Cohesion: 0.28
-Nodes (7): App\Http\Controllers\PackageLabelController, PackageLabelController, Barryvdh\DomPDF\Facade\Pdf, Endroid\QrCode\Builder\Builder, Endroid\QrCode\Writer\SvgWriter, Illuminate\Http\Response, Picqer\Barcode\BarcodeGeneratorSVG
+Nodes (6): PackageLabelController, Barryvdh\DomPDF\Facade\Pdf, Endroid\QrCode\Builder\Builder, Endroid\QrCode\Writer\SvgWriter, Illuminate\Http\Response, Picqer\Barcode\BarcodeGeneratorSVG
 
 ### Community 189 - "sanctum.php"
 Cohesion: 0.40
 Nodes (4): Illuminate\Cookie\Middleware\EncryptCookies, Illuminate\Foundation\Http\Middleware\ValidateCsrfToken, Laravel\Sanctum\Http\Middleware\AuthenticateSession, Laravel\Sanctum\Sanctum
 
-### Community 194 - "HubDistributionPhase"
-Cohesion: 0.22
-Nodes (3): RouteDetail, App\Livewire\Driver\Support\HubDistributionPhase, HubDistributionPhase
+### Community 194 - "Driver"
+Cohesion: 0.13
+Nodes (5): Driver, UsersManagerDriverTypeTest, DriverDashboardTest, DriverHubTransferApiTest, DriverRouteCompletePendingPackagesTest
 
-### Community 211 - "Illuminate\Http\Request"
-Cohesion: 0.19
-Nodes (11): App\Http\Controllers\Api\DriverAuthController, DriverAuthController, DriverPackageController, App\Http\Controllers\DriverScanController, DriverScanController, App\Http\Controllers\PaymentWebhookController, PaymentWebhookController, Illuminate\Http\JsonResponse (+3 more)
+### Community 199 - "HubReleaseService"
+Cohesion: 0.17
+Nodes (3): PackageDispatch, HubReleaseService, PackageDispatchService
+
+### Community 209 - ".route"
+Cohesion: 0.07
+Nodes (7): VerifyAccount, WarehouseStaffRoleTest, SalesCloseoutTest, StaffManagerTest, RegistrationTest, AppDownloadAccessTest, PublicTrackingHubDestinationLabelTest
+
+### Community 211 - "Illuminate\Http\JsonResponse"
+Cohesion: 0.28
+Nodes (4): DriverPackageController, DriverScanController, Illuminate\Http\JsonResponse, Illuminate\Support\Facades\Storage
+
+### Community 212 - "EmailVerificationTest.php"
+Cohesion: 0.25
+Nodes (4): Illuminate\Auth\Events\Verified, Illuminate\Support\Facades\Event, Illuminate\Support\Facades\URL, EmailVerificationTest
 
 ### Community 217 - "warehouses-manager.blade.php"
-Cohesion: 0.40
-Nodes (4): cancelForm, editWarehouse({{ $warehouse->id }}), startCreating, toggleActive({{ $warehouse->id }})
+Cohesion: 0.25
+Nodes (7): cancelForm, editWarehouse({{ $warehouse->id }}), startCreating, startCreating, toggleActive({{ $warehouse->id }}), toggleCoverageActive({{ $coverage->id }}), toggleCoveragePanel({{ $warehouse->id }})
 
 ### Community 224 - "venexpress-laravel/SKILL.md"
 Cohesion: 0.40
 Nodes (4): Core Principle, Investigation Strategy, Technology Stack, Venexpress Laravel Development
+
+### Community 244 - "drivers-approval-manager.blade.php"
+Cohesion: 0.40
+Nodes (4): activate({{ $driver->id }}), approve({{ $driver->id }}), reject({{ $driver->id }}), suspend({{ $driver->id }})
+
+### Community 251 - "Livewire\Volt\Volt"
+Cohesion: 0.14
+Nodes (6): Illuminate\Auth\Notifications\ResetPassword, Illuminate\Http\UploadedFile, Illuminate\Support\Facades\Notification, Livewire\Volt\Volt, PasswordResetTest, PasswordUpdateTest
 
 ### Community 257 - "post-create-project-cmd"
 Cohesion: 0.50
 Nodes (4): post-create-project-cmd, @php artisan key:generate --ansi, @php artisan migrate --graceful --ansi, @php -r \"file_exists('database/database.sqlite') || touch('database/database.sqlite');\
 
 ### Community 258 - "PaymentOrder"
-Cohesion: 0.10
-Nodes (5): PaymentOrders, PaymentOrder, PaymentReconciliationService, PaymentService, Illuminate\Contracts\View\View
-
-### Community 259 - "Warehouse"
-Cohesion: 0.15
-Nodes (5): WarehousesManager, Warehouse, RoutesManagerHubDistributionTest, WarehousesManagerTest, DriverHubDistributionTest
-
-### Community 262 - "AuditLog"
-Cohesion: 0.18
-Nodes (4): AuditLog, Customer, AllyFinancialSettlementTest, ClientDashboardTest
+Cohesion: 0.12
+Nodes (3): PaymentOrder, PaymentReconciliationService, PaymentService
 
 ### Community 266 - "staff-manager.blade.php"
 Cohesion: 0.40
 Nodes (4): cancel, edit({{ $member->id }}), startCreate, toggleActive({{ $member->id }})
 
+### Community 276 - "PaymentWebhookController.php"
+Cohesion: 0.40
+Nodes (3): PaymentWebhookController, Illuminate\Support\Facades\Validator, Throwable
+
+### Community 303 - "autoload-dev"
+Cohesion: 0.67
+Nodes (3): autoload-dev, psr-4, Tests\\
+
 ## Knowledge Gaps
-- **260 isolated node(s):** `$schema`, `name`, `type`, `description`, `laravel` (+255 more)
+- **274 isolated node(s):** `$schema`, `name`, `type`, `description`, `laravel` (+269 more)
   These have ≤1 connection - possible missing edges or undocumented components.
-- **54 thin communities (<3 nodes) omitted from report** — run `graphify query` to explore isolated nodes.
+- **83 thin communities (<3 nodes) omitted from report** — run `graphify query` to explore isolated nodes.
 
 ## Suggested Questions
 _Questions this graph is uniquely positioned to answer:_
 
-- **Why does `Package` connect `Package` to `PackageDetailCodPaymentMethodTest`, `PaymentOrder`, `AuditLog`, `Incident`, `DriverAssignment`, `Illuminate\Database\Eloquent\Factories\HasFactory`, `Packages`, `PackageCreateRegisteredByTest`, `App\Http\Controllers\TrackingController`, `BcvRate`, `Ally`, `DriverRouteController.php`, `DriverPayment`, `App\Models\Ally`, `App\Http\Controllers\Api\DriverIncidentController`, `App\Models\Driver`, `Driver`, `Controller`, `Illuminate\Foundation\Testing\RefreshDatabase`, `DriverHubDistributionController`, `PackageLabelController.php`, `Illuminate\Database\Eloquent\Relations\BelongsTo`, `HubDistributionPhase`, `Dashboard`, `RouteService`, `CreatePackage.php`, `Packages`, `Commissions`, `Illuminate\Http\Request`, `RuntimeException`, `Route`, `PendingPayments`, `Livewire\Component`, `AllyFinancialService`, `PackageStatusUpdated`, `TariffService`, `PackageServiceCodTest`, `DriverDeliveryController.php`, `PackageService`, `GeocodePackageDeliveryAddress`, `Dashboard`, `PackageCreateDeliveryCoordinatesTest`?**
-  _High betweenness centrality (0.173) - this node is a cross-community bridge._
-- **Why does `User` connect `User` to `PackageDetailCodPaymentMethodTest`, `DeliveryClaimFromDestinationAgencyTest`, `ScannerHubOperationUxTest`, `Warehouse`, `AuditLog`, `Illuminate\Database\Eloquent\Factories\HasFactory`, `Incident`, `ScannerLivewireTest`, `StaffManagerTest`, `BcvRate`, `Ally`, `App\Models\Driver`, `App\Models\Ally`, `Driver`, `Illuminate\Foundation\Testing\RefreshDatabase`, `HubDistributionPhase`, `SalesCloseoutTest`, `Illuminate\Http\Request`, `RuntimeException`, `Route`, `DatabaseSeeder.php`, `Livewire\Component`, `RouteStop`, `DriverRouteActiveHubScanTest`, `PackageServiceCodTest`, `DeliveryRouteOrderGeocodingTest`, `UsersManager`?**
-  _High betweenness centrality (0.113) - this node is a cross-community bridge._
-- **Why does `Route` connect `Route` to `RoutesManager`, `Livewire\Component`, `HubDistributionPhase`, `RouteStop`, `Warehouse`, `ScannerHubOperationUxTest`, `Illuminate\Database\Eloquent\Factories\HasFactory`, `DriverAssignment`, `RouteService`, `VenezuelaLocationService`, `ScannerLivewireTest`, `Illuminate\Foundation\Testing\RefreshDatabase`, `Ally`, `App\Models\Driver`, `Illuminate\Database\Eloquent\Relations\BelongsTo`, `Driver`?**
-  _High betweenness centrality (0.040) - this node is a cross-community bridge._
-- **Are the 5 inferred relationships involving `RouteStop` (e.g. with `.test_full_delivery_flow_through_the_real_api()` and `.test_hub_driver_completes_collection_and_hub_reception_through_the_real_api()`) actually correct?**
-  _`RouteStop` has 5 INFERRED edges - model-reasoned connections that need verification._
+- **Why does `Package` connect `Package` to `AuditLog`, `PackageDetailCodPaymentMethodTest`, `Controller`, `PaymentOrder`, `Incident`, `DriverAssignment`, `PackageReception`, `Illuminate\Database\Eloquent\Relations\BelongsTo`, `Illuminate\Database\Eloquent\Relations\HasMany`, `PackageCreateRegisteredByTest`, `LogisticsResolutionService`, `DriverHubDistributionController`, `BcvRate`, `Illuminate\Http\Request`, `DriverPayment`, `StaffManager`, `Warehouse`, `Almacen/Dashboard.php`, `Scanner`, `api.php`, `Packages`, `TestCase`, `Dashboard`, `PackageLabelController.php`, `Driver`, `HubReleaseService`, `Route`, `Dashboard`, `Dashboard`, `WarehouseCoverage`, `Illuminate\Http\JsonResponse`, `PriceCalculator`, `PackageCreate`, `Livewire\Component`, `AllyFinancialService`, `TariffService`, `PackageStatusUpdated`, `DriverDeliveryController`, `GeocodePackageDeliveryAddress`, `HubDistributionPhase`, `PackageCreateDeliveryCoordinatesTest`?**
+  _High betweenness centrality (0.162) - this node is a cross-community bridge._
+- **Why does `User` connect `User` to `AuditLog`, `DeliveryClaimFromDestinationAgencyTest`, `PackageDetailCodPaymentMethodTest`, `DriverHubDistributionTest`, `RouteStop`, `Illuminate\Database\Eloquent\Relations\HasMany`, `Incident`, `Illuminate\Database\Eloquent\Relations\BelongsTo`, `AllyUser`, `Package`, `Illuminate\Http\Request`, `Customer`, `DriverPayment`, `StaffManager`, `Warehouse`, `DriverApiFlowTest`, `AlliesManagerLocationTest`, `TestCase`, `DriverRouteClaimTest`, `Driver`, `RoutesManagerListFilterTest`, `OfficeLocatorLocationTest`, `.route`, `RecommendationFormTest`, `EmailVerificationTest.php`, `DriverRouteReleaseTest`, `Livewire\Component`, `DashboardClaimRouteTest`, `HubDashboardUxTest`, `DriverRouteCompleteTest`, `UsersManager`, `RoutesManagerMultistateTest`, `DriverRouteActiveHubScanTest`, `RouteDetailTest`, `DriverHubReceptionTest`, `ScannerLivewireTest`, `AlliesManagerDestinationVerificationTest`, `Livewire\Volt\Volt`, `DeliveryRouteOrderGeocodingTest`, `PackageReceptionScannerTest`, `RoutesManagerStopFilterTest`?**
+  _High betweenness centrality (0.083) - this node is a cross-community bridge._
+- **Why does `Ally` connect `Ally` to `AuditLog`, `Illuminate\Database\Eloquent\Relations\HasMany`, `Incident`, `Illuminate\Database\Eloquent\Relations\BelongsTo`, `AllyUser`, `Package`, `LogisticsResolutionService`, `OfficeLocator`, `Customer`, `DriverPayment`, `StaffManager`, `Warehouse`, `Almacen/Dashboard.php`, `TestCase`, `DriverRouteClaimTest`, `PackageReceptionPickupVerificationTest`, `Driver`, `HubReleaseService`, `Route`, `OfficeLocatorLocationTest`, `.route`, `DriverRouteReleaseTest`, `User`, `RoutesManager`, `PackageCreate`, `Livewire\Component`, `DashboardClaimRouteTest`, `AllyFinancialService`, `DriverRouteCompleteTest`, `UsersManager`, `bootstrap/app.php`, `DriverHubReceptionTest`, `Livewire\Volt\Volt`?**
+  _High betweenness centrality (0.053) - this node is a cross-community bridge._
 - **What connects `$schema`, `name`, `type` to the rest of the system?**
-  _260 weakly-connected nodes found - possible documentation gaps or missing edges._
+  _274 weakly-connected nodes found - possible documentation gaps or missing edges._
+- **Should `AuditLog` be split into smaller, more focused modules?**
+  _Cohesion score 0.12121212121212122 - nodes in this community are weakly interconnected._
 - **Should `composer.json` be split into smaller, more focused modules?**
   _Cohesion score 0.14285714285714285 - nodes in this community are weakly interconnected._
 - **Should `What You Must Do When Invoked` be split into smaller, more focused modules?**

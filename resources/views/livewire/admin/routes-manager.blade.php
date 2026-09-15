@@ -33,7 +33,25 @@
 
     {{-- FILTROS --}}
     <div class="bg-white rounded-2xl border border-[#E2E8F0] p-5 shadow-sm mb-6">
-        <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+        <div class="grid grid-cols-1 md:grid-cols-3 gap-4">
+
+            <div>
+                <label class="block text-xs font-bold text-[#64748B] uppercase mb-2">
+                    Estado
+                </label>
+
+                <select
+                    wire:model.live="filterState"
+                    class="w-full rounded-xl border-[#E2E8F0] text-sm focus:border-blue-500 focus:ring-blue-500">
+                    <option value="">Todos los estados</option>
+
+                    @foreach ($states as $stateOption)
+                        <option value="{{ $stateOption }}">
+                            {{ $stateOption }}
+                        </option>
+                    @endforeach
+                </select>
+            </div>
 
             <div>
                 <label class="block text-xs font-bold text-[#64748B] uppercase mb-2">
@@ -45,7 +63,7 @@
                     class="w-full rounded-xl border-[#E2E8F0] text-sm focus:border-blue-500 focus:ring-blue-500">
                     <option value="">Todas las ciudades</option>
 
-                    @foreach ($citiesWithAllies as $cityOption)
+                    @foreach ($filterState !== '' ? $filterCities : $citiesWithAllies as $cityOption)
                         <option value="{{ $cityOption }}">
                             {{ $cityOption }}
                         </option>
@@ -55,14 +73,14 @@
 
             <div>
                 <label class="block text-xs font-bold text-[#64748B] uppercase mb-2">
-                    Estado
+                    Estatus de la ruta
                 </label>
 
                 <select
                     wire:model.live="filterStatus"
                     class="w-full rounded-xl border-[#E2E8F0] text-sm focus:border-blue-500 focus:ring-blue-500">
 
-                    <option value="">Todos los estados</option>
+                    <option value="">Todos los estatus</option>
                     <option value="draft">Borrador</option>
                     <option value="assigned">Asignada</option>
                     <option value="in_progress">En curso</option>
@@ -73,6 +91,21 @@
             </div>
 
         </div>
+
+        @if ($filterState !== '' || $filterCity !== '' || $filterStatus !== '')
+            <div class="mt-4 flex items-center justify-between gap-3">
+                <p class="text-xs text-[#64748B]">
+                    {{ $routes->total() }} {{ $routes->total() === 1 ? 'ruta encontrada' : 'rutas encontradas' }}
+                </p>
+
+                <button
+                    type="button"
+                    wire:click="clearFilters"
+                    class="text-xs font-semibold text-blue-700 hover:text-blue-900">
+                    Limpiar filtros
+                </button>
+            </div>
+        @endif
     </div>
 
     {{-- LISTADO --}}
