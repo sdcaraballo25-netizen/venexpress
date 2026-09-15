@@ -528,14 +528,66 @@
                             Buscar parada
                         </label>
 
-                        <input
-                            type="text"
-                            wire:model.live.debounce.300ms="stopSearch"
-                            placeholder="Nombre, ciudad o estado..."
-                            class="w-full rounded-xl border-[#E2E8F0]">
+                        <div class="grid grid-cols-1 sm:grid-cols-3 gap-3">
+
+                            <div>
+                                <label class="block text-[10px] font-semibold text-[#94A3B8] uppercase mb-1">
+                                    Estado
+                                </label>
+                                <select
+                                    wire:model.live="stopFilterState"
+                                    class="w-full rounded-xl border-[#E2E8F0] text-sm">
+
+                                    <option value="">Selecciona un estado</option>
+
+                                    @foreach ($states as $stateOption)
+                                        <option value="{{ $stateOption }}">
+                                            {{ $stateOption }}
+                                        </option>
+                                    @endforeach
+
+                                </select>
+                            </div>
+
+                            <div>
+                                <label class="block text-[10px] font-semibold text-[#94A3B8] uppercase mb-1">
+                                    Ciudad
+                                </label>
+                                <select
+                                    wire:model.live="stopFilterCity"
+                                    @disabled($stopFilterState === '')
+                                    class="w-full rounded-xl border-[#E2E8F0] text-sm disabled:bg-slate-50">
+
+                                    <option value="">
+                                        {{ $stopFilterState === ''
+                                            ? 'Selecciona primero un estado'
+                                            : 'Todas las ciudades' }}
+                                    </option>
+
+                                    @foreach ($stopFilterCities as $cityOption)
+                                        <option value="{{ $cityOption }}">
+                                            {{ $cityOption }}
+                                        </option>
+                                    @endforeach
+
+                                </select>
+                            </div>
+
+                            <div>
+                                <label class="block text-[10px] font-semibold text-[#94A3B8] uppercase mb-1">
+                                    Buscar
+                                </label>
+                                <input
+                                    type="text"
+                                    wire:model.live.debounce.300ms="stopSearch"
+                                    placeholder="Nombre, ciudad o estado..."
+                                    class="w-full rounded-xl border-[#E2E8F0] text-sm">
+                            </div>
+
+                        </div>
 
                         <p class="text-xs text-[#94A3B8] mt-1">
-                            Solo acota la lista de abajo — no limita qué paradas puedes agregar a la ruta.
+                            Solo acotan la lista de abajo — no limitan qué paradas puedes agregar a la ruta.
                         </p>
 
                     </div>

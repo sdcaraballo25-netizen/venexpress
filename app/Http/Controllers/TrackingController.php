@@ -4,6 +4,7 @@ namespace App\Http\Controllers;
 
 use App\Models\Incident;
 use App\Models\Package;
+use App\Services\LogisticsResolutionService;
 use Carbon\Carbon;
 use Illuminate\Http\Request;
 use Illuminate\View\View;
@@ -18,6 +19,11 @@ use Illuminate\View\View;
  */
 class TrackingController extends Controller
 {
+    public function __construct(
+        private readonly LogisticsResolutionService $logisticsResolutionService,
+    ) {
+    }
+
     /**
      * Línea de tiempo pública de estados. El orden de este array define
      * el orden de los pasos que ve el cliente; no necesariamente coincide
@@ -191,9 +197,28 @@ class TrackingController extends Controller
                     . $date->format('h:i a');
             }
 
+            $label = self::STATUS_ORDER[$key]['label'];
+
+            // EN_HUB no distingue, por sí solo, si el paquete sigue
+            // pendiente de otra transferencia HUB -> HUB o si ya
+            // llegó a su HUB destino final (current_warehouse_id ===
+            // destination_warehouse_id). Solo se ajusta la etiqueta
+            // del paso ACTUAL (no la de un EN_HUB pasado en el
+            // historial, que ya quedó completado de todas formas) —
+            // reutiliza LogisticsResolutionService::isAtDestinationWarehouse()
+            // tal cual, sin duplicar esa lógica. Si no se puede
+            // resolver (sin current_warehouse_id, sin cobertura,
+            // ambiguo, etc.), isAtDestinationWarehouse() ya devuelve
+            // false y se conserva la etiqueta genérica de siempre.
+            if ($key === Package::STATUS_EN_HUB && $package->current_status === Package::STATUS_EN_HUB) {
+                $label = $this->logisticsResolutionService->isAtDestinationWarehouse($package)
+                    ? 'Llegó al HUB de destino'
+                    : $label;
+            }
+
             $statusSteps[] = [
 
-                'label' => self::STATUS_ORDER[$key]['label'],
+                'label' => $label,
 
                 'icon' => self::STATUS_ORDER[$key]['icon'],
 

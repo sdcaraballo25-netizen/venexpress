@@ -70,6 +70,19 @@ class RoutesManager extends Component
      */
     public string $stopSearch = '';
 
+    /**
+     * Filtro jerárquico Estado -> Ciudad para el mismo buscador de
+     * paradas, independiente de state/city de la ruta (esos son solo
+     * referenciales, ver arriba). Igual que stopSearch, es solo una
+     * ayuda para encontrar la agencia/almacén — no restringe qué se
+     * puede agregar a la ruta.
+     */
+    public string $stopFilterState = '';
+
+    public string $stopFilterCity = '';
+
+    public array $stopFilterCities = [];
+
     /*
     |--------------------------------------------------------------------------
     | Recolección
@@ -141,6 +154,21 @@ class RoutesManager extends Component
 
     /*
     |--------------------------------------------------------------------------
+    | Cambio de estado del buscador de paradas
+    |--------------------------------------------------------------------------
+    */
+
+    public function updatedStopFilterState(VenezuelaLocationService $locationService): void
+    {
+        $this->stopFilterCity = '';
+
+        $this->stopFilterCities = $this->stopFilterState !== ''
+            ? $locationService->citiesByState($this->stopFilterState)
+            : [];
+    }
+
+    /*
+    |--------------------------------------------------------------------------
     | Cambio de filtro de estado
     |--------------------------------------------------------------------------
     */
@@ -174,6 +202,9 @@ class RoutesManager extends Component
             'originWarehouseId',
             'returnWarehouseId',
             'stopSearch',
+            'stopFilterState',
+            'stopFilterCity',
+            'stopFilterCities',
         ]);
 
         $this->routeType = Route::TYPE_DELIVERY;
@@ -201,6 +232,9 @@ class RoutesManager extends Component
         $this->originWarehouseId = $route->origin_warehouse_id;
         $this->returnWarehouseId = $route->return_warehouse_id;
         $this->stopSearch = '';
+        $this->stopFilterState = '';
+        $this->stopFilterCity = '';
+        $this->stopFilterCities = [];
 
         $locationColumn = $this->routeType === Route::TYPE_HUB_DISTRIBUTION
             ? 'warehouse_id'
@@ -242,6 +276,9 @@ class RoutesManager extends Component
             'originWarehouseId',
             'returnWarehouseId',
             'stopSearch',
+            'stopFilterState',
+            'stopFilterCity',
+            'stopFilterCities',
         ]);
 
         $this->routeType = Route::TYPE_DELIVERY;
@@ -504,11 +541,21 @@ class RoutesManager extends Component
         /*
          * Fase 2: las paradas ya no se filtran por el state/city de la
          * ruta (Reglas 24/26/27) — se listan todas las agencias/
-         * almacenes activos, acotables solo con una búsqueda opcional
-         * que no restringe qué se puede agregar.
+         * almacenes activos, acotables con un filtro jerárquico
+         * Estado -> Ciudad y/o una búsqueda de texto, ninguno de los
+         * cuales restringe qué se puede agregar (solo ayudan a
+         * encontrar algo en una lista larga).
          */
         $availableAllies = Ally::query()
             ->where('status', Ally::STATUS_ACTIVE)
+            ->when(
+                $this->stopFilterState !== '',
+                fn ($q) => $q->where('state', $this->stopFilterState)
+            )
+            ->when(
+                $this->stopFilterCity !== '',
+                fn ($q) => $q->where('city', $this->stopFilterCity)
+            )
             ->when($this->stopSearch !== '', function ($query) {
                 $search = $this->stopSearch;
 
@@ -521,27 +568,37 @@ class RoutesManager extends Component
             ->orderBy('business_name')
             ->get();
 
-        // Todos los almacenes activos, sin filtrar: fuente tanto del
-        // picker de paradas (rutas hub_distribution) como de los
-        // selects de HUB de origen/retorno (cualquier tipo de ruta).
+        // Todos los almacenes activos, sin filtrar: fuente de los
+        // selects de HUB de origen/retorno (cualquier tipo de ruta) —
+        // esos nunca se acotan por el buscador de paradas.
         $allWarehouses = Warehouse::query()
             ->where('is_active', true)
             ->orderBy('name')
             ->get();
 
-        $availableWarehouses = $this->stopSearch !== ''
-            ? Warehouse::query()
-                ->where('is_active', true)
-                ->where(function ($query) {
-                    $search = $this->stopSearch;
+        // Fuente del picker de paradas (rutas hub_distribution), esta
+        // sí acotada por el filtro Estado/Ciudad/texto del buscador.
+        $availableWarehouses = Warehouse::query()
+            ->where('is_active', true)
+            ->when(
+                $this->stopFilterState !== '',
+                fn ($q) => $q->where('state', $this->stopFilterState)
+            )
+            ->when(
+                $this->stopFilterCity !== '',
+                fn ($q) => $q->where('city', $this->stopFilterCity)
+            )
+            ->when($this->stopSearch !== '', function ($query) {
+                $search = $this->stopSearch;
 
-                    $query->where('name', 'like', "%{$search}%")
+                $query->where(function ($q) use ($search) {
+                    $q->where('name', 'like', "%{$search}%")
                         ->orWhere('city', 'like', "%{$search}%")
                         ->orWhere('state', 'like', "%{$search}%");
-                })
-                ->orderBy('name')
-                ->get()
-            : $allWarehouses;
+                });
+            })
+            ->orderBy('name')
+            ->get();
 
         $collectiblePackages = $this->collectingStopId
             ? $routeService->collectiblePackagesFor(
