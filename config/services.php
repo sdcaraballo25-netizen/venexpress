@@ -6,6 +6,13 @@ return [
         'url' => env('BCV_API_URL', 'https://ve.dolarapi.com/v1/dolares/oficial'),
     ],
 
+    'google_maps' => [
+        // Places Autocomplete en el formulario de "Registrar pedido"
+        // (dirección exacta de entrega). Null/vacío = el campo sigue
+        // siendo texto libre, sin autocompletado ni coordenadas exactas.
+        'api_key' => env('GOOGLE_MAPS_API_KEY'),
+    ],
+
     /*
     |--------------------------------------------------------------------------
     | Third Party Services

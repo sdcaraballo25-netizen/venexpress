@@ -18,8 +18,10 @@ class DriverDeliveryController extends Controller
     /**
      * Ordena los pedidos YA reclamados por este repartidor (pendientes
      * de entregar) de más lejos a más cerca de su ubicación GPS
-     * actual. Geocodifica bajo demanda (y cachea) las direcciones que
-     * todavía no tengan coordenadas guardadas.
+     * actual. Geocodifica de una vez (síncrono, dentro de esta misma
+     * petición) las direcciones que todavía no tengan coordenadas
+     * guardadas, para que el repartidor no dependa de que un worker
+     * de colas esté corriendo en ese momento.
      */
     public function routeOrder(Request $request, GeocodingService $geocoding): JsonResponse
     {
@@ -37,18 +39,27 @@ class DriverDeliveryController extends Controller
             ->get();
 
         $notGeocodedYet = [];
+        $liveGeocodeCalls = 0;
 
-        $stops = $packages->map(function (Package $package) use (&$notGeocodedYet) {
+        $stops = $packages->map(function (Package $package) use (&$notGeocodedYet, &$liveGeocodeCalls, $geocoding, $validated) {
             if ($package->delivery_latitude === null || $package->delivery_longitude === null) {
-                // No bloqueamos la respuesta geocodificando en vivo —
-                // eso sería un cuello de botella si muchos repartidores
-                // piden su ruta al mismo tiempo a nivel nacional. En
-                // vez de eso, nos aseguramos de que ya esté encolado
-                // (por si el job original falló) y lo excluimos de
-                // esta respuesta.
-                \App\Jobs\GeocodePackageDeliveryAddress::dispatch($package->id);
-                $notGeocodedYet[] = $package->tracking_number;
-                return null;
+                // Respetamos la política de uso justo de Nominatim
+                // (~1 petición/segundo) también aquí: si este mismo
+                // repartidor tiene varios paquetes sin geocodificar,
+                // espaciamos las consultas en vivo entre sí.
+                if ($liveGeocodeCalls > 0) {
+                    sleep(1);
+                }
+                $liveGeocodeCalls++;
+
+                if (! $geocoding->geocodePackageDeliveryAddress($package)) {
+                    // Nominatim no encontró la dirección o la consulta
+                    // falló transitoriamente: encolamos un reintento en
+                    // segundo plano y lo excluimos de esta respuesta.
+                    \App\Jobs\GeocodePackageDeliveryAddress::dispatch($package->id);
+                    $notGeocodedYet[] = $package->tracking_number;
+                    return null;
+                }
             }
 
             return [
@@ -68,11 +79,10 @@ class DriverDeliveryController extends Controller
                 'distance_km' => $stop['distance_km'],
                 'package' => new DriverPackageResource($stop['package']),
             ]),
-            // Direcciones que aún se están geocodificando en segundo
-            // plano (o que no se pudieron ubicar). El repartidor las
-            // sigue viendo en su lista normal, solo que sin orden por
-            // distancia todavía — reintentar en unos segundos suele
-            // resolverlo.
+            // Direcciones que Nominatim no pudo ubicar en el momento
+            // (quedaron encoladas para reintentar en segundo plano).
+            // El repartidor las sigue viendo en su lista normal, solo
+            // que sin orden por distancia todavía.
             'pending_location' => $notGeocodedYet,
         ]);
     }

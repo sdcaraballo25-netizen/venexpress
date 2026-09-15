@@ -345,6 +345,11 @@
                             <p class="font-medium text-emerald-700">✓ Cliente encontrado</p>
                             <p class="mt-1 text-emerald-700">{{ $sender_name }}</p>
                             <p class="text-emerald-600">{{ $sender_phone }}{{ $sender_email ? ' · '.$sender_email : '' }}</p>
+                            @if ($senderPreviousPackagesCount > 0)
+                                <p class="mt-1 text-xs text-emerald-600">
+                                    Tiene {{ $senderPreviousPackagesCount }} {{ $senderPreviousPackagesCount === 1 ? 'pedido anterior' : 'pedidos anteriores' }} en el sistema.
+                                </p>
+                            @endif
                         </div>
                         <button type="button" wire:click="openSenderCustomerModal"
                             class="shrink-0 text-xs font-medium text-emerald-700 underline hover:text-emerald-900">
@@ -398,6 +403,11 @@
                             <p class="font-medium text-emerald-700">✓ Cliente encontrado</p>
                             <p class="mt-1 text-emerald-700">{{ $recipient_name }}</p>
                             <p class="text-emerald-600">{{ $recipient_phone }}{{ $recipient_email ? ' · '.$recipient_email : '' }}</p>
+                            @if ($recipientPreviousPackagesCount > 0)
+                                <p class="mt-1 text-xs text-emerald-600">
+                                    Tiene {{ $recipientPreviousPackagesCount }} {{ $recipientPreviousPackagesCount === 1 ? 'pedido anterior' : 'pedidos anteriores' }} en el sistema.
+                                </p>
+                            @endif
                         </div>
                         <button type="button" wire:click="openRecipientCustomerModal"
                             class="shrink-0 text-xs font-medium text-emerald-700 underline hover:text-emerald-900">
@@ -709,10 +719,56 @@
                     <div class="grid grid-cols-1 md:grid-cols-2 gap-4 mt-4">
                         <div class="md:col-span-2">
                             <label class="text-sm text-slate-600">Dirección exacta de entrega</label>
-                            <textarea wire:model.live="delivery_address" rows="2"
-                                placeholder="Calle/avenida, edificio o casa, número, piso, apartamento..."
-                                class="mt-1 w-full rounded-xl border border-slate-300 px-3 py-2 text-sm shadow-sm focus:border-blue-900 focus:ring-blue-900"></textarea>
+                            <textarea
+                                wire:model.live="delivery_address"
+                                rows="2"
+                                placeholder="{{ config('services.google_maps.api_key') ? 'Empieza a escribir y elige la sugerencia del mapa...' : 'Calle/avenida, edificio o casa, número, piso, apartamento...' }}"
+                                class="mt-1 w-full rounded-xl border border-slate-300 px-3 py-2 text-sm shadow-sm focus:border-blue-900 focus:ring-blue-900"
+                                @if (config('services.google_maps.api_key'))
+                                    x-data="{
+                                        initAutocomplete(el) {
+                                            if (! window.google?.maps?.places) return;
+
+                                            const autocomplete = new google.maps.places.Autocomplete(el, {
+                                                componentRestrictions: { country: 've' },
+                                                fields: ['formatted_address', 'geometry'],
+                                            });
+
+                                            autocomplete.addListener('place_changed', () => {
+                                                const place = autocomplete.getPlace();
+                                                if (! place.geometry?.location) return;
+
+                                                $wire.set('delivery_address', place.formatted_address ?? el.value);
+                                                $wire.set('delivery_latitude', place.geometry.location.lat());
+                                                $wire.set('delivery_longitude', place.geometry.location.lng());
+                                            });
+                                        }
+                                    }"
+                                    x-init="
+                                        $el.addEventListener('input', () => {
+                                            $wire.set('delivery_latitude', null, false);
+                                            $wire.set('delivery_longitude', null, false);
+                                        });
+
+                                        if (window.google?.maps?.places) {
+                                            initAutocomplete($el);
+                                        } else {
+                                            window.addEventListener('google-maps-loaded', () => initAutocomplete($el), { once: true });
+                                        }
+                                    "
+                                @endif
+                            ></textarea>
                             @error('delivery_address') <p class="text-xs text-red-600 mt-1">{{ $message }}</p> @enderror
+
+                            @if ($delivery_latitude !== null)
+                                <p class="text-xs font-medium text-emerald-700 mt-1">
+                                    ✓ Ubicación exacta confirmada desde el mapa
+                                </p>
+                            @elseif (config('services.google_maps.api_key') && $delivery_address !== '')
+                                <p class="text-xs text-amber-700 mt-1">
+                                    Elige una sugerencia de la lista para guardar la ubicación exacta (si no eliges ninguna, se ubicará solo de forma aproximada por ciudad).
+                                </p>
+                            @endif
                         </div>
 
                         <div>
@@ -759,11 +815,9 @@
                         <select wire:model="payment_method"
                             class="mt-1 w-full rounded-xl border border-slate-300 px-3 py-2 text-sm shadow-sm focus:border-blue-900 focus:ring-blue-900">
                             <option value="">Selecciona...</option>
-                            <option value="efectivo_usd">Efectivo USD</option>
-                            <option value="efectivo_ves">Efectivo VES</option>
-                            <option value="pago_movil">Pago móvil</option>
-                            <option value="transferencia">Transferencia</option>
-                            <option value="zelle">Zelle</option>
+                            @foreach (\App\Models\Package::PAYMENT_METHOD_LABELS as $value => $label)
+                                <option value="{{ $value }}">{{ $label }}</option>
+                            @endforeach
                         </select>
                         @error('payment_method') <p class="text-xs text-red-600 mt-1">{{ $message }}</p> @enderror
                     </div>
@@ -875,3 +929,24 @@
         <script src="https://cdnjs.cloudflare.com/ajax/libs/qrcodejs/1.0.0/qrcode.min.js"></script>
     @endpush
 @endonce
+
+@if (config('services.google_maps.api_key'))
+    @once
+        @push('scripts')
+            <script>
+                // Google llama esto por nombre global (parámetro "callback"
+                // de la URL de abajo); lo traducimos a un evento normal
+                // para que Alpine no dependa de cuándo se registra esta
+                // función respecto a cuándo Alpine ya arrancó.
+                window.__venexpressGoogleMapsLoaded = function () {
+                    window.dispatchEvent(new Event('google-maps-loaded'));
+                };
+            </script>
+            <script
+                src="https://maps.googleapis.com/maps/api/js?key={{ config('services.google_maps.api_key') }}&libraries=places&callback=__venexpressGoogleMapsLoaded&loading=async"
+                async
+                defer
+            ></script>
+        @endpush
+    @endonce
+@endif

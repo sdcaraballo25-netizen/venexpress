@@ -31,6 +31,51 @@
     </div>
 
 
+    @if ($isFirstTimeDriver)
+
+        {{-- =========================================================
+             BIENVENIDA (primera vez, sin historial todavía)
+        ========================================================== --}}
+        <div class="rounded-3xl bg-gradient-to-br from-blue-900 to-blue-950 p-8 text-white shadow-sm">
+
+            <div class="flex flex-col gap-6 md:flex-row md:items-center md:justify-between">
+
+                <div class="max-w-xl">
+                    <span class="inline-flex items-center gap-2 rounded-full bg-white/10 px-3 py-1.5 text-xs font-semibold text-blue-100">
+                        <i class="fa-solid fa-circle-check text-emerald-400"></i>
+                        Cuenta aprobada
+                    </span>
+
+                    <h2 class="mt-4 font-display text-2xl font-bold">
+                        ¡Bienvenido a Venexpress, {{ $driver->user?->name ?? auth()->user()->name }}!
+                    </h2>
+
+                    <p class="mt-2 text-sm text-blue-100">
+                        Todavía no tienes paquetes ni rutas asignadas — es normal, es tu primera vez aquí.
+                        En cuanto un administrador te asigne una ruta, aparecerá abajo y podrás empezar a escanear.
+                    </p>
+                </div>
+
+                <div class="flex shrink-0 flex-col gap-2 sm:flex-row">
+                    <a href="{{ route('repartidor.app-download') }}" wire:navigate
+                        class="inline-flex items-center justify-center gap-2 rounded-xl bg-white px-5 py-3 text-sm font-semibold text-blue-950 hover:bg-blue-50 transition">
+                        <i class="fa-solid fa-download"></i>
+                        Descargar app
+                    </a>
+                    <a href="{{ route('repartidor.help') }}" wire:navigate
+                        class="inline-flex items-center justify-center gap-2 rounded-xl border border-white/30 px-5 py-3 text-sm font-semibold text-white hover:bg-white/10 transition">
+                        <i class="fa-solid fa-circle-question"></i>
+                        Ver ayuda
+                    </a>
+                </div>
+
+            </div>
+
+        </div>
+
+    @endif
+
+
     @if ($isHub)
 
         {{-- =========================================================

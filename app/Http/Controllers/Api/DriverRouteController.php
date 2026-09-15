@@ -4,7 +4,10 @@ namespace App\Http\Controllers\Api;
 
 use App\Http\Controllers\Controller;
 use App\Http\Resources\RouteResource;
+use App\Livewire\Driver\Support\HubDistributionPhase;
+use App\Models\Driver;
 use App\Models\Route;
+use App\Models\RouteStop;
 use App\Services\RouteService;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Support\Facades\Auth;
@@ -83,13 +86,72 @@ class DriverRouteController extends Controller
         if (! $route) {
             return response()->json([
                 'route' => null,
+                'hub_scan' => null,
                 'message' => 'No tienes una ruta asignada por el momento.',
             ]);
         }
 
         return response()->json([
             'route' => new RouteResource($route),
+            'hub_scan' => $this->hubScanInfo($driver, $route),
         ]);
+    }
+
+    /**
+     * Qué debe escanear ahora mismo un repartidor de HUB, para que el
+     * dashboard de la app sea explícito ("Escanear recolección" /
+     * "Escanear salida" / "Escanear recepción") en vez de un botón
+     * genérico. Replica tal cual el bloque "ACCIÓN DE ESCANEO
+     * PRINCIPAL (HUB)" de Livewire\Driver\Dashboard::render(), para
+     * que el portal web y la app nunca se contradigan.
+     */
+    protected function hubScanInfo(Driver $driver, Route $route): ?array
+    {
+        if ($driver->driver_type !== Driver::TYPE_HUB || ! $route->isInProgress()) {
+            return null;
+        }
+
+        $nextPendingStop = $route->stops->firstWhere('status', RouteStop::STATUS_PENDING);
+
+        if ($route->route_type === Route::TYPE_HUB_TRANSFER) {
+            return [
+                'operation' => 'collection',
+                'title' => 'RECOLECCIÓN EN ALIADO',
+                'subtitle' => 'Aliado → HUB',
+                'cta' => 'Escanear recolección',
+                'pending_count' => null,
+                'next_stop_name' => $nextPendingStop?->ally?->business_name,
+                'warehouse_name' => null,
+            ];
+        }
+
+        if ($route->route_type === Route::TYPE_HUB_DISTRIBUTION) {
+            $operation = HubDistributionPhase::resolve($driver);
+
+            if ($operation === HubDistributionPhase::ARRIVAL) {
+                return [
+                    'operation' => $operation,
+                    'title' => 'RECEPCIÓN EN ALMACÉN',
+                    'subtitle' => 'Llegada al almacén destino',
+                    'cta' => 'Escanear recepción',
+                    'pending_count' => HubDistributionPhase::pendingArrivalsCount($driver),
+                    'next_stop_name' => null,
+                    'warehouse_name' => $nextPendingStop?->warehouse?->name,
+                ];
+            }
+
+            return [
+                'operation' => $operation,
+                'title' => 'SALIDA DESDE HUB',
+                'subtitle' => 'HUB → Almacén destino',
+                'cta' => 'Escanear salida',
+                'pending_count' => HubDistributionPhase::pendingDepartureCount($route),
+                'next_stop_name' => null,
+                'warehouse_name' => null,
+            ];
+        }
+
+        return null;
     }
 
     /**

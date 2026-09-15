@@ -3,6 +3,7 @@
 namespace App\Http\Controllers\Api;
 
 use App\Http\Controllers\Controller;
+use App\Models\Driver;
 use App\Models\User;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
@@ -56,6 +57,17 @@ class DriverAuthController extends Controller
             throw ValidationException::withMessages([
                 'email' => ['Tu usuario no tiene un perfil de repartidor asociado.'],
             ]);
+        }
+
+        if ($driver->status !== Driver::STATUS_ACTIVE) {
+            $message = match ($driver->status) {
+                Driver::STATUS_PENDING => 'Tu cuenta de repartidor está pendiente de aprobación por un administrador.',
+                Driver::STATUS_REJECTED => 'Tu solicitud de repartidor fue rechazada. Contacta al administrador.',
+                Driver::STATUS_SUSPENDED => 'Tu cuenta de repartidor está suspendida. Contacta al administrador.',
+                default => 'Tu cuenta de repartidor no está activa.',
+            };
+
+            throw ValidationException::withMessages(['email' => [$message]]);
         }
 
         // Un dispositivo = un token. Si el repartidor reinstala la

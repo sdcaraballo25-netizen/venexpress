@@ -514,6 +514,23 @@
                     === \App\Models\Package::DELIVERY_ACCEPTED
                 )
 
+                    @if ($package->is_cod && ! $package->cod_collected_at)
+                        <div class="mb-3">
+                            <label class="text-sm font-medium text-slate-700">
+                                Forma de pago del cobro (COD: US$ {{ number_format((float) $package->cod_amount_usd, 2) }})
+                            </label>
+                            <select
+                                wire:model="codPaymentMethod"
+                                class="mt-1 w-full rounded-xl border border-slate-300 px-3 py-2 text-sm shadow-sm focus:border-emerald-600 focus:ring-emerald-600"
+                            >
+                                <option value="">Selecciona cómo te cancelaron...</option>
+                                @foreach (\App\Models\Package::PAYMENT_METHOD_LABELS as $value => $label)
+                                    <option value="{{ $value }}">{{ $label }}</option>
+                                @endforeach
+                            </select>
+                        </div>
+                    @endif
+
                     <button
                         type="button"
                         wire:click="completeDelivery"

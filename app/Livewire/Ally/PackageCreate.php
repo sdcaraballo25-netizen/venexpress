@@ -97,6 +97,16 @@ class PackageCreate extends Component
 
     public array $pickupAllies = [];
 
+    /**
+     * Coordenadas exactas, capturadas por el Google Places Autocomplete
+     * del campo "Dirección exacta de entrega" cuando el aliado
+     * selecciona una sugerencia (ver package-create.blade.php). Se
+     * limpian apenas el texto cambia sin volver a seleccionar una
+     * sugerencia, para no guardar coordenadas de una dirección vieja.
+     */
+    public ?float $delivery_latitude = null;
+    public ?float $delivery_longitude = null;
+
     // Cobro
     public string $payment_method = '';
     public bool $is_cod = false;
@@ -107,6 +117,8 @@ class PackageCreate extends Component
     public bool $recipientCustomerFound = false;
     public bool $showSenderCustomerModal = false;
     public bool $showRecipientCustomerModal = false;
+    public int $senderPreviousPackagesCount = 0;
+    public int $recipientPreviousPackagesCount = 0;
 
     // Resultado tras registrar
     public ?int $createdPackageId = null;
@@ -217,6 +229,8 @@ class PackageCreate extends Component
             'delivery_address' => ['nullable', 'string', 'max:1000', 'required_if:requires_delivery,true'],
             'delivery_sector' => ['nullable', 'string', 'max:255', 'required_if:requires_delivery,true'],
             'delivery_reference' => ['nullable', 'string', 'max:1000'],
+            'delivery_latitude' => ['nullable', 'numeric', 'between:-90,90'],
+            'delivery_longitude' => ['nullable', 'numeric', 'between:-180,180'],
 
             'pickup_mode' => [
                 'nullable',
@@ -248,7 +262,7 @@ class PackageCreate extends Component
             'has_insurance' => ['boolean'],
             'declared_value_usd' => ['nullable', 'required_if:has_insurance,true', 'numeric', 'min:0.01'],
 
-            'payment_method' => [$this->is_cod ? 'nullable' : 'required', 'in:efectivo_usd,efectivo_ves,pago_movil,transferencia,zelle'],
+            'payment_method' => [$this->is_cod ? 'nullable' : 'required', Rule::in(Package::PAYMENT_METHODS)],
 
             'is_cod' => ['boolean'],
             'cod_amount_usd' => ['nullable', 'required_if:is_cod,true', 'numeric', 'min:0.01'],
@@ -290,6 +304,18 @@ class PackageCreate extends Component
             // anterior; deja de ser válido si el estado cambió.
             $this->pickup_ally_id = null;
             $this->refreshPickupAllies();
+
+            // La coordenada exacta que haya quedado de una selección
+            // previa del autocompletado ya no corresponde al nuevo
+            // destino — sin esto, el mensaje "✓ Ubicación exacta
+            // confirmada" seguiría mostrándose con datos viejos.
+            $this->delivery_latitude = null;
+            $this->delivery_longitude = null;
+        }
+
+        if ($property === 'destination_city') {
+            $this->delivery_latitude = null;
+            $this->delivery_longitude = null;
         }
 
         if ($property === 'requires_delivery') {
@@ -302,6 +328,8 @@ class PackageCreate extends Component
                 $this->delivery_address = '';
                 $this->delivery_sector = '';
                 $this->delivery_reference = '';
+                $this->delivery_latitude = null;
+                $this->delivery_longitude = null;
                 $this->refreshPickupAllies();
             }
         }
@@ -315,6 +343,16 @@ class PackageCreate extends Component
                 $this->pickupAllies = [];
             }
         }
+
+        // NOTA: no limpiamos delivery_latitude/longitude aquí cuando
+        // cambia delivery_address, porque el autocompletado de Google
+        // setea ambas cosas en la MISMA actualización (mismo request),
+        // y el orden en que Livewire dispara updated() por propiedad
+        // no está garantizado — podríamos borrar las coordenadas que
+        // el propio autocompletado acaba de fijar. Esa limpieza vive
+        // del lado de JS (evento "input" nativo del textarea, que solo
+        // dispara con tecleo real, nunca cuando Google fija el valor
+        // programáticamente al seleccionar una sugerencia).
 
         if ($property === 'is_cod') {
             // Si es cobro contra entrega, no se define método de pago en taquilla.
@@ -376,6 +414,7 @@ class PackageCreate extends Component
 
         $foundProperty = $prefix === 'sender' ? 'senderCustomerFound' : 'recipientCustomerFound';
         $modalProperty = $prefix === 'sender' ? 'showSenderCustomerModal' : 'showRecipientCustomerModal';
+        $countProperty = $prefix === 'sender' ? 'senderPreviousPackagesCount' : 'recipientPreviousPackagesCount';
 
         // Evita consultar la BD o abrir el modal con cada tecla
         // cuando aún no hay suficientes caracteres para un
@@ -383,6 +422,7 @@ class PackageCreate extends Component
         if (strlen($number) < 5) {
             $this->$foundProperty = false;
             $this->$modalProperty = false;
+            $this->$countProperty = 0;
 
             return;
         }
@@ -392,6 +432,14 @@ class PackageCreate extends Component
         if ($customer) {
             $this->$foundProperty = true;
             $this->$modalProperty = false;
+
+            // Historial: cuántos pedidos anteriores tiene esta
+            // cédula, ya sea como remitente o como destinatario, para
+            // que el staff del aliado sepa que ya es cliente conocido.
+            $this->$countProperty = Package::query()
+                ->where('sender_id_doc', $idDoc)
+                ->orWhere('recipient_id_doc', $idDoc)
+                ->count();
 
             if ($prefix === 'sender') {
                 $this->sender_name = $customer->name;
@@ -409,6 +457,7 @@ class PackageCreate extends Component
         // No existe: pedimos sus datos en el modal.
         $this->$foundProperty = false;
         $this->$modalProperty = true;
+        $this->$countProperty = 0;
 
         if ($prefix === 'sender') {
             $this->sender_name = '';
@@ -662,13 +711,7 @@ class PackageCreate extends Component
      */
     public static function paymentMethodLabels(): array
     {
-        return [
-            'efectivo_usd' => 'Efectivo (USD)',
-            'efectivo_ves' => 'Efectivo (VES)',
-            'pago_movil' => 'Pago móvil',
-            'transferencia' => 'Transferencia',
-            'zelle' => 'Zelle',
-        ];
+        return Package::PAYMENT_METHOD_LABELS;
     }
 
     protected function resetForm(): void
@@ -683,11 +726,13 @@ class PackageCreate extends Component
             'destination_state', 'destination_city', 'destinationCities',
             'requires_delivery', 'delivery_address', 'delivery_sector', 'delivery_reference',
             'pickup_mode', 'pickup_ally_id', 'pickupAllies',
+            'delivery_latitude', 'delivery_longitude',
             'physical_weight_kg', 'length_cm', 'width_cm', 'height_cm',
             'is_fragile', 'has_insurance', 'declared_value_usd',
             'payment_method', 'is_cod', 'cod_amount_usd',
             'senderCustomerFound', 'recipientCustomerFound',
             'showSenderCustomerModal', 'showRecipientCustomerModal',
+            'senderPreviousPackagesCount', 'recipientPreviousPackagesCount',
         ]);
 
         $this->sender_doc_type = 'V';

@@ -6,6 +6,7 @@ use App\Models\Ally;
 use App\Models\AuditLog;
 use App\Models\Driver;
 use App\Models\User;
+use App\Models\Warehouse;
 use App\Services\VenezuelaLocationService;
 use Illuminate\Database\QueryException;
 use Illuminate\Support\Facades\Auth;
@@ -78,6 +79,8 @@ class UsersManager extends Component
     public string $phone = '';
 
     public string $driver_type = Driver::TYPE_DELIVERY;
+
+    public ?int $warehouse_id = null;
 
     public bool $editIsDriver = false;
 
@@ -237,6 +240,12 @@ class UsersManager extends Component
                     'phone' => $validated['phone'],
                     'status' => Driver::STATUS_ACTIVE,
                     'driver_type' => $validated['driver_type'],
+                ]);
+            }
+
+            if ($user->isAlmacen()) {
+                $user->update([
+                    'warehouse_id' => $validated['warehouse_id'],
                 ]);
             }
 
@@ -688,6 +697,7 @@ class UsersManager extends Component
             [
                 'users' => $users,
                 'roleLabels' => User::roleLabels(),
+                'warehouses' => Warehouse::query()->where('is_active', true)->orderBy('name')->get(),
             ]
         );
     }
@@ -793,6 +803,16 @@ class UsersManager extends Component
             }
         }
 
+        if ($this->role === User::ROLE_ALMACEN) {
+            $rules += [
+                'warehouse_id' => [
+                    'required',
+                    'integer',
+                    'exists:warehouses,id',
+                ],
+            ];
+        }
+
         return $rules;
     }
 
@@ -812,6 +832,7 @@ class UsersManager extends Component
             'vehicle_type',
             'phone',
             'driver_type',
+            'warehouse_id',
             'adminPassword',
         ]);
 

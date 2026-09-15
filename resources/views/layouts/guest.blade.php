@@ -15,6 +15,51 @@
         </style>
 
         @vite(['resources/css/app.css', 'resources/js/app.js'])
+
+        {{--
+            Leaflet + registro del picker de ubicación como
+            Alpine.data(), cargado siempre en el <head> (no dentro de
+            un bloque condicional de Livewire): un <script> insertado
+            más tarde por un morph de Livewire (ej. al cambiar
+            "role" a "aliado") nunca se auto-ejecuta, así que la
+            función tiene que existir desde antes de que Alpine
+            arranque.
+        --}}
+        <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/leaflet/1.9.4/leaflet.min.css">
+        <script src="https://cdnjs.cloudflare.com/ajax/libs/leaflet/1.9.4/leaflet.min.js"></script>
+        <script>
+            document.addEventListener('alpine:init', () => {
+                Alpine.data('registerLocationMap', ({ lat, lng, hasPoint }) => ({
+                    map: null,
+                    marker: null,
+                    init(el) {
+                        this.map = L.map(el).setView([lat, lng], hasPoint ? 14 : 6);
+
+                        L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
+                            attribution: '&copy; OpenStreetMap contributors',
+                        }).addTo(this.map);
+
+                        if (hasPoint) {
+                            this.marker = L.marker([lat, lng]).addTo(this.map);
+                        }
+
+                        this.map.on('click', (e) => {
+                            const { lat, lng } = e.latlng;
+
+                            if (this.marker) {
+                                this.marker.setLatLng([lat, lng]);
+                            } else {
+                                this.marker = L.marker([lat, lng]).addTo(this.map);
+                            }
+
+                            this.$wire.call('setLocationFromMap', lat, lng);
+                        });
+
+                        setTimeout(() => this.map.invalidateSize(), 150);
+                    },
+                }));
+            });
+        </script>
     </head>
     <body class="font-sans text-blue-950 antialiased">
         <div class="min-h-screen grid lg:grid-cols-[minmax(0,0.85fr)_minmax(0,1fr)] bg-white">

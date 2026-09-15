@@ -72,6 +72,12 @@ Route::prefix('driver')
             Route::post('/scan', [DriverPackageController::class, 'scan'])
                 ->name('scan');
 
+            // Segunda mitad de "Aliado -> HUB" (recepción física en el
+            // HUB), después de /scan. Mismo actor: driver de HUB
+            // Recolección en una ruta hub_transfer.
+            Route::post('/scan/hub-reception', [DriverPackageController::class, 'hubReception'])
+                ->name('scan.hub-reception');
+
             // HUB Distribución: HUB -> almacén propio de Venexpress destino.
             // Actor distinto del driver de HUB Recolección (arriba) y de la
             // app de Delivery.
@@ -83,6 +89,12 @@ Route::prefix('driver')
 
             Route::get('/packages', [DriverPackageController::class, 'index'])
                 ->name('packages.index');
+
+            // Debe ir ANTES de /packages/{packageId}: es una búsqueda
+            // por tracking_number, de solo lectura, para que la app
+            // decida qué operación de escaneo proponer.
+            Route::get('/packages/lookup', [DriverPackageController::class, 'lookup'])
+                ->name('packages.lookup');
 
             Route::get('/packages/{packageId}', [DriverPackageController::class, 'show'])
                 ->name('packages.show');

@@ -11,6 +11,7 @@ use App\Livewire\Admin\BcvRateManager;
 use App\Livewire\Admin\CityDistanceManager;
 use App\Livewire\Admin\Dashboard as AdminDashboard;
 use App\Livewire\Admin\DriverAssignment;
+use App\Livewire\Admin\DriversApprovalManager;
 use App\Livewire\Admin\DriverPayments;
 use App\Livewire\Admin\DriverRemunerationManager;
 use App\Livewire\Admin\IncidentsManager;
@@ -20,27 +21,38 @@ use App\Livewire\Admin\RateMatrixManager;
 use App\Livewire\Admin\RoutesDashboard;
 use App\Livewire\Admin\RoutesManager;
 use App\Livewire\Admin\UsersManager;
+use App\Livewire\Admin\HelpCenter as AdminHelpCenter;
 use App\Livewire\Admin\WarehousesManager;
+use App\Livewire\Almacen\Dashboard as AlmacenDashboard;
+use App\Livewire\Almacen\HelpCenter as AlmacenHelpCenter;
 use App\Livewire\Ally\Cod as AllyCod;
 use App\Livewire\Ally\Commissions as AllyCommissions;
 use App\Livewire\Ally\DailyCashCut;
 use App\Livewire\Ally\Dashboard as AllyDashboard;
+use App\Livewire\Ally\HelpCenter as AllyHelpCenter;
 use App\Livewire\Ally\Incidents as AllyIncidents;
 use App\Livewire\Ally\PackageCreate as AllyPackageCreate;
 use App\Livewire\Ally\PackageDetail as AllyPackageDetail;
 use App\Livewire\Ally\PackagePickup as AllyPackagePickup;
 use App\Livewire\Ally\PackageReception;
 use App\Livewire\Ally\Packages as AllyPackages;
+use App\Livewire\Ally\SalesCloseout as AllySalesCloseout;
+use App\Livewire\Ally\StaffManager as AllyStaffManager;
 use App\Livewire\Client\Dashboard as ClientDashboard;
 use App\Livewire\Client\Incidents as ClientIncidents;
 use App\Livewire\Client\PendingPayments as ClientPendingPayments;
+use App\Livewire\Driver\AppDownload;
 use App\Livewire\Driver\Dashboard as DriverDashboard;
+use App\Livewire\Driver\HelpCenter as DriverHelpCenter;
 use App\Livewire\Driver\PackageDetail;
 use App\Livewire\Driver\Packages;
 use App\Livewire\Driver\RouteDetail;
 use App\Livewire\Driver\Scanner;
+use App\Livewire\Admin\RecommendationsManager;
+use App\Livewire\Public\HelpCenter;
 use App\Livewire\Public\OfficeLocator;
 use App\Livewire\Public\PriceCalculator;
+use App\Livewire\Public\RecommendationForm;
 use Illuminate\Support\Facades\Route;
 
 /*
@@ -60,11 +72,16 @@ Route::prefix('ally')
         'auth',
         'verified',
         'role:aliado,aliado_taquilla',
+        'account.approved',
     ])
     ->name('ally.')
     ->group(function () {
 
+        // Ventas de TODO el negocio (todas las taquillas combinadas):
+        // solo el Aliado Administrador. Taquilla usa /cierre-del-dia
+        // (más abajo), que solo muestra lo que ella misma registró.
         Route::get('/dashboard', AllyDashboard::class)
+            ->middleware('role:aliado')
             ->name('dashboard');
 
         Route::get('/pedidos/nuevo', AllyPackageCreate::class)
@@ -82,6 +99,16 @@ Route::prefix('ally')
 
         /*
         |--------------------------------------------------------------------------
+        | Gestión de Taquillas (RF-ALI-02)
+        |--------------------------------------------------------------------------
+        */
+
+        Route::get('/taquillas', AllyStaffManager::class)
+            ->middleware('role:aliado')
+            ->name('staff');
+
+        /*
+        |--------------------------------------------------------------------------
         | Corte de caja
         |--------------------------------------------------------------------------
         */
@@ -89,6 +116,11 @@ Route::prefix('ally')
         Route::get('/corte-caja', DailyCashCut::class)
             ->middleware('role:aliado')
             ->name('cash-cut');
+
+        // Cierre del día por forma de pago: Administrador ve todo el
+        // negocio (con filtro por taquilla); Taquilla solo lo suyo.
+        Route::get('/cierre-del-dia', AllySalesCloseout::class)
+            ->name('sales-closeout');
 
         Route::get('/cod', AllyCod::class)
             ->middleware('role:aliado,aliado_taquilla')
@@ -105,7 +137,23 @@ Route::prefix('ally')
         Route::get('/paquetes/recepcion', PackageReception::class)
             ->middleware('role:aliado,aliado_taquilla')
             ->name('packages.reception');
+
+        Route::get('/ayuda', AllyHelpCenter::class)
+            ->middleware('role:aliado,aliado_taquilla')
+            ->name('help');
     });
+
+/*
+|--------------------------------------------------------------------------
+| Cuenta pendiente de aprobación
+|--------------------------------------------------------------------------
+*/
+
+Route::get('/cuenta/pendiente', function () {
+    return view('account-pending');
+})
+    ->middleware('auth')
+    ->name('account.pending');
 
 /*
 |--------------------------------------------------------------------------
@@ -173,43 +221,69 @@ Route::prefix('cliente')
 */
 
 Route::get('/repartidor/dashboard', DriverDashboard::class)
-    ->middleware(['auth', 'verified', 'role:repartidor'])
+    ->middleware(['auth', 'verified', 'role:repartidor', 'account.approved'])
     ->name('repartidor.dashboard');
 
 Route::get(
     '/repartidor/escanear',
     Scanner::class
 )
-    ->middleware(['auth', 'verified', 'role:repartidor'])
+    ->middleware(['auth', 'verified', 'role:repartidor', 'account.approved'])
     ->name('repartidor.scanner');
 
 Route::get(
     '/repartidor/paquetes',
     Packages::class
 )
-    ->middleware(['auth', 'verified', 'role:repartidor'])
+    ->middleware(['auth', 'verified', 'role:repartidor', 'account.approved'])
     ->name('repartidor.packages');
 
 Route::get(
     '/repartidor/paquetes/{packageId}',
     PackageDetail::class
 )
-    ->middleware(['auth', 'verified', 'role:repartidor'])
+    ->middleware(['auth', 'verified', 'role:repartidor', 'account.approved'])
     ->name('repartidor.package-detail');
 
 Route::get(
     '/repartidor/ruta/{routeId}',
     RouteDetail::class
 )
-    ->middleware(['auth', 'verified', 'role:repartidor'])
+    ->middleware(['auth', 'verified', 'role:repartidor', 'account.approved'])
     ->name('repartidor.route-detail');
 
 Route::post(
     '/repartidor/verificar-guia',
     [DriverScanController::class, 'verify']
 )
-    ->middleware(['auth', 'verified', 'role:repartidor'])
+    ->middleware(['auth', 'verified', 'role:repartidor', 'account.approved'])
     ->name('repartidor.scan.verify');
+
+// IMPORTANTE: la descarga de la app vive detrás del login de
+// repartidor a propósito — exponerla en el sitio público permitiría
+// a cualquiera descargar el APK y explorar la superficie de la API
+// del driver sin ser un repartidor real.
+Route::get('/repartidor/descargar-app', AppDownload::class)
+    ->middleware(['auth', 'verified', 'role:repartidor', 'account.approved'])
+    ->name('repartidor.app-download');
+
+Route::get('/repartidor/ayuda', DriverHelpCenter::class)
+    ->middleware(['auth', 'verified', 'role:repartidor', 'account.approved'])
+    ->name('repartidor.help');
+
+/*
+|--------------------------------------------------------------------------
+| Almacén
+|--------------------------------------------------------------------------
+*/
+
+Route::get('/almacen/dashboard', AlmacenDashboard::class)
+    ->middleware(['auth', 'verified', 'role:almacen'])
+    ->name('almacen.dashboard');
+
+Route::get('/almacen/ayuda', AlmacenHelpCenter::class)
+    ->middleware(['auth', 'verified', 'role:almacen'])
+    ->name('almacen.help');
 
 /*
 |--------------------------------------------------------------------------
@@ -241,6 +315,18 @@ Route::get('/calcular-precio', PriceCalculator::class)
 
 Route::get('/agencias', OfficeLocator::class)
     ->name('public.offices');
+
+/*
+|--------------------------------------------------------------------------
+| Ayuda y recomendaciones (público)
+|--------------------------------------------------------------------------
+*/
+
+Route::get('/ayuda', HelpCenter::class)
+    ->name('public.help');
+
+Route::get('/recomendaciones', RecommendationForm::class)
+    ->name('public.recommendations');
 
 /*
 |--------------------------------------------------------------------------
@@ -355,6 +441,9 @@ Route::prefix('admin')
         Route::get('/remuneraciones', DriverPayments::class)
             ->name('driver-payments');
 
+        Route::get('/repartidores/aprobacion', DriversApprovalManager::class)
+            ->name('drivers.approval');
+
         Route::get('/remuneraciones/tarifa', DriverRemunerationManager::class)
             ->name('driver-remuneration-rate');
 
@@ -366,6 +455,24 @@ Route::prefix('admin')
 
         Route::get('/incidencias', IncidentsManager::class)
             ->name('incidents');
+
+        /*
+        |--------------------------------------------------------------------------
+        | Recomendaciones
+        |--------------------------------------------------------------------------
+        */
+
+        Route::get('/recomendaciones', RecommendationsManager::class)
+            ->name('recommendations');
+
+        /*
+        |--------------------------------------------------------------------------
+        | Ayuda
+        |--------------------------------------------------------------------------
+        */
+
+        Route::get('/ayuda', AdminHelpCenter::class)
+            ->name('help');
 
         /*
         |--------------------------------------------------------------------------

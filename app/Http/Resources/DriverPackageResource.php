@@ -54,6 +54,10 @@ class DriverPackageResource extends JsonResource
                 $this->is_cod,
                 fn () => $this->cod_collected_at?->toIso8601String()
             ),
+            'cod_payment_method' => $this->when(
+                $this->is_cod,
+                fn () => $this->cod_payment_method
+            ),
 
             'driver_remuneration_usd' => $this->driver_remuneration_usd !== null
                 ? (float) $this->driver_remuneration_usd

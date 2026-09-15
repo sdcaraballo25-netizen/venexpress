@@ -20,6 +20,13 @@ class PackageDetail extends Component
 
     public bool $isHub = false;
 
+    /**
+     * Forma de pago con la que el destinatario canceló el COD.
+     * Requerida por completeDelivery() cuando el paquete es COD y
+     * todavía no se había cobrado.
+     */
+    public string $codPaymentMethod = '';
+
     public function mount(int $packageId): void
     {
         $user = Auth::user();
@@ -145,13 +152,22 @@ $driver = $user?->driver;
 
             $this->package->refresh();
 
+            if ($this->package->is_cod && ! $this->package->cod_collected_at && $this->codPaymentMethod === '') {
+                throw new RuntimeException(
+                    'Este pedido es contra entrega (COD): indica la forma de pago con la que te cancelaron antes de confirmar la entrega.'
+                );
+            }
+
             $this->package =
                 app(PackageService::class)->completeDelivery(
                     package: $this->package,
                     driver: $driver,
                     locationDescription:
                         'Entrega confirmada por el repartidor',
+                    codPaymentMethod: $this->codPaymentMethod !== '' ? $this->codPaymentMethod : null,
                 );
+
+            $this->codPaymentMethod = '';
 
             session()->flash(
                 'success',

@@ -61,7 +61,7 @@
                         wire:model.live="state"
                         class="mt-2 w-full rounded-xl border border-slate-300 px-4 py-3 text-sm focus:border-blue-900 focus:ring-blue-900"
                     >
-                        <option value="">Selecciona...</option>
+                        <option value="">Seleccionar estado</option>
                         @foreach ($states as $stateOption)
                             <option value="{{ $stateOption }}">{{ $stateOption }}</option>
                         @endforeach
@@ -76,11 +76,13 @@
                         Ciudad
                     </label>
                     <select
-                        wire:model="city"
+                        wire:model.live="city"
                         @disabled($state === '')
-                        class="mt-2 w-full rounded-xl border border-slate-300 px-4 py-3 text-sm focus:border-blue-900 focus:ring-blue-900 disabled:bg-slate-50"
+                        class="mt-2 w-full rounded-xl border border-slate-300 px-4 py-3 text-sm focus:border-blue-900 focus:ring-blue-900 disabled:bg-slate-100"
                     >
-                        <option value="">Selecciona...</option>
+                        <option value="">
+                            {{ $state === '' ? 'Primero selecciona un estado' : 'Seleccionar ciudad' }}
+                        </option>
                         @foreach ($cities as $cityOption)
                             <option value="{{ $cityOption }}">{{ $cityOption }}</option>
                         @endforeach

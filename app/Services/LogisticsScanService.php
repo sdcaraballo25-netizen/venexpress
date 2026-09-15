@@ -466,4 +466,5 @@ class LogisticsScanService
             fn (RouteStop $stop) => $stop->warehouse_id === $package->destination_warehouse_id
         );
     }
+
 }

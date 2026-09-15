@@ -65,14 +65,23 @@ class DeliveryAssignmentService
             $lockedPackage->driver_id = $lockedRoute->driver_id;
             $lockedPackage->save();
 
-            $lockedPackage->histories()->create([
-                'status' => Package::STATUS_LISTO_RETIRO,
-                'event_type' => PackageHistory::EVENT_REPARTO,
-                'origin_location' => 'Agencia destino',
-                'destination_location' => 'Repartidor',
-                'location_description' => 'Paquete asignado a reparto en la ruta '.$lockedRoute->name,
-                'scanned_by_user_id' => $userId,
-            ]);
+            // LISTO_RETIRO -> EN_TRANSITO_NACIONAL: el paquete pasa a
+            // manos del repartidor de la ruta. Sin este cambio de
+            // estado, el repartidor nunca podría completar la entrega
+            // desde la app (completeDelivery exige EN_TRANSITO_NACIONAL).
+            // notifyCustomer: false porque es un traspaso interno
+            // (admin -> repartidor), no un hito que deba notificarse
+            // al cliente como si el paquete "volviera a tránsito".
+            $lockedPackage = app(PackageService::class)->changeStatus(
+                package: $lockedPackage,
+                newStatus: Package::STATUS_EN_TRANSITO_NACIONAL,
+                userId: $userId,
+                locationDescription: 'Paquete asignado a reparto en la ruta '.$lockedRoute->name,
+                eventType: PackageHistory::EVENT_REPARTO,
+                originLocation: 'Agencia destino',
+                destinationLocation: 'Repartidor',
+                notifyCustomer: false,
+            );
 
             AuditLog::create([
                 'actor_user_id' => $userId,

@@ -159,6 +159,32 @@
             </div>
 
 
+            {{-- REPARTIDORES PENDIENTES --}}
+            <div class="bg-white rounded-2xl border border-[#E2E8F0] p-6 shadow-sm">
+
+                <div class="flex justify-between items-start">
+
+                    <p class="text-xs font-bold text-[#64748B] uppercase tracking-wider">
+                        Repartidores Pendientes
+                    </p>
+
+                    <div class="p-2 bg-amber-50 rounded-lg text-amber-600">
+                        🚚
+                    </div>
+
+                </div>
+
+                <p class="font-display text-3xl font-bold mt-4 text-[#0F172A]">
+                    {{ number_format($driversPendingCount) }}
+                </p>
+
+                <a href="{{ route('admin.drivers.approval') }}" class="text-xs text-blue-700 hover:text-blue-900 mt-2 inline-block">
+                    Revisar solicitudes
+                </a>
+
+            </div>
+
+
             {{-- CLIENTES --}}
             <div class="bg-white rounded-2xl border border-[#E2E8F0] p-6 shadow-sm">
 

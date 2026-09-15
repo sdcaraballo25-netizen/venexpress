@@ -41,8 +41,15 @@ class Packages extends Component
             );
         }
 
+        $isPrincipal = $user->isAliado();
+
         $query = Package::query()
             ->where('ally_id', $ally->id)
+            // Taquilla solo ve lo que ella misma registró — no las
+            // guías de todo el negocio. El Aliado Administrador sí ve
+            // todo, y además quién la registró (ver 'registeredBy').
+            ->when(! $isPrincipal, fn ($query) => $query->where('registered_by_user_id', $user->id))
+            ->with('registeredBy:id,name')
             ->when(
                 $this->search !== '',
                 function ($query) {
@@ -73,6 +80,7 @@ class Packages extends Component
             'livewire.ally.packages',
             [
                 'packages' => $packages,
+                'isPrincipal' => $isPrincipal,
             ]
         );
     }

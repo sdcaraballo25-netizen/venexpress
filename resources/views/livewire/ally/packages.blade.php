@@ -108,6 +108,12 @@
                             Servicio
                         </th>
 
+                        @if ($isPrincipal)
+                            <th class="px-5 py-3 text-left font-semibold text-slate-600">
+                                Taquilla
+                            </th>
+                        @endif
+
                         <th class="px-5 py-3 text-left font-semibold text-slate-600">
                             Estado
                         </th>
@@ -191,6 +197,13 @@
                                 @endif
 
                             </td>
+
+                            @if ($isPrincipal)
+                                {{-- TAQUILLA --}}
+                                <td class="px-5 py-4 text-slate-500">
+                                    {{ $package->registeredBy?->name ?? '—' }}
+                                </td>
+                            @endif
 
                             {{-- ESTADO --}}
                             <td class="px-5 py-4">

@@ -79,6 +79,11 @@ class Dashboard extends Component
 
         $driversCount = Driver::count();
 
+        // Repartidores pendientes de revisión por el administrador.
+        $driversPendingCount = Driver::query()
+            ->where('status', Driver::STATUS_PENDING)
+            ->count();
+
         // Remuneraciones ya generadas pero aún no pagadas a repartidores.
         $pendingPaymentsTotal = DriverPayment::query()
             ->where('status', DriverPayment::STATUS_PENDING)
@@ -185,6 +190,7 @@ class Dashboard extends Component
 
             // Usuarios / repartidores
             'driversCount' => $driversCount,
+            'driversPendingCount' => $driversPendingCount,
             'clientsCount' => $clientsCount,
             'pendingPaymentsTotal' => $pendingPaymentsTotal,
             'pendingPaymentsCount' => $pendingPaymentsCount,

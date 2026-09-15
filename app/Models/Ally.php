@@ -41,6 +41,7 @@ class Ally extends Model
         'city',
         'state',
         'address',
+        'storefront_photo_path',
         'latitude',
         'longitude',
         'commission_percentage',

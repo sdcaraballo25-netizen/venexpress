@@ -3,7 +3,9 @@
 namespace Tests\Feature\Auth;
 
 use App\Models\User;
+use Illuminate\Auth\Notifications\ResetPassword;
 use Illuminate\Foundation\Testing\RefreshDatabase;
+use Illuminate\Support\Facades\Notification;
 use Livewire\Volt\Volt;
 use Tests\TestCase;
 
@@ -65,6 +67,25 @@ class AuthenticationTest extends TestCase
         $response
             ->assertOk()
             ->assertSeeVolt('layout.navigation');
+    }
+
+    public function test_lockout_after_five_failed_attempts_sends_a_password_reset_email(): void
+    {
+        Notification::fake();
+
+        $user = User::factory()->create();
+
+        // Las primeras 5 fallan por credenciales incorrectas y
+        // acumulan intentos; la 6ta ya está bloqueada por el rate
+        // limiter y es la que dispara el correo de recuperación.
+        for ($i = 0; $i < 6; $i++) {
+            Volt::test('pages.auth.login')
+                ->set('form.email', $user->email)
+                ->set('form.password', 'wrong-password')
+                ->call('login');
+        }
+
+        Notification::assertSentTo($user, ResetPassword::class);
     }
 
     public function test_users_can_logout(): void

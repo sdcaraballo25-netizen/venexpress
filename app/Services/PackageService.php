@@ -151,6 +151,9 @@ class PackageService
                 'tracking_number' =>
                     $this->generateTrackingNumber(),
 
+                'registered_by_user_id' =>
+                    $registeredByUserId,
+
                 'is_fragile' =>
                     $isFragile,
 
@@ -209,6 +212,28 @@ class PackageService
                 'delivery_reference' =>
                     $requiresDelivery
                         ? ($data['delivery_reference'] ?? null)
+                        : null,
+
+                // Coordenadas exactas capturadas por el Google Places
+                // Autocomplete del formulario (ver Ally\PackageCreate),
+                // cuando está configurado. Si no vienen (autocompletado
+                // no disponible, o el aliado escribió la dirección a
+                // mano sin seleccionar una sugerencia), quedan null y
+                // GeocodingService las completa después, de respaldo,
+                // la primera vez que un repartidor pida su ruta.
+                'delivery_latitude' =>
+                    $requiresDelivery
+                        ? ($data['delivery_latitude'] ?? null)
+                        : null,
+
+                'delivery_longitude' =>
+                    $requiresDelivery
+                        ? ($data['delivery_longitude'] ?? null)
+                        : null,
+
+                'delivery_geocoded_at' =>
+                    $requiresDelivery && ! empty($data['delivery_latitude'])
+                        ? now()
                         : null,
 
                 'is_cod' =>
@@ -279,6 +304,7 @@ class PackageService
         string $eventType = PackageHistory::EVENT_MOVIMIENTO,
         ?string $originLocation = null,
         ?string $destinationLocation = null,
+        bool $notifyCustomer = true,
     ): Package {
         if (! in_array(
             $newStatus,
@@ -349,7 +375,9 @@ class PackageService
             }
         );
 
-        $this->notifyStatusChange($updatedPackage, $newStatus);
+        if ($notifyCustomer) {
+            $this->notifyStatusChange($updatedPackage, $newStatus);
+        }
 
         return $updatedPackage;
     }
@@ -604,8 +632,16 @@ class PackageService
 
     /**
      * Un repartidor de entrega (driver_type = delivery) reclama un
-     * pedido que ya llegó a tránsito nacional y necesita entrega a
-     * domicilio, sin necesidad de una ruta asignada por el admin.
+     * pedido que necesita entrega a domicilio, sin necesidad de una
+     * ruta asignada por el admin.
+     *
+     * Acepta el paquete en cualquiera de los dos estados de
+     * Package::CLAIMABLE_FOR_DELIVERY_STATUSES:
+     * - EN_TRANSITO_NACIONAL: todavía no pasó por la agencia destino.
+     * - LISTO_RETIRO: la agencia destino ya lo recibió en mostrador
+     *   (Ally\PackageReception no distingue si requiere entrega a
+     *   domicilio), pero como nadie lo ha tomado, el repartidor puede
+     *   autoasignárselo igual escaneando la guía.
      *
      * "Primero en escanear, primero en repartir": el lockForUpdate()
      * garantiza que si dos repartidores escanean la misma guía casi
@@ -635,7 +671,7 @@ class PackageService
                 throw new RuntimeException('Este paquete no requiere entrega a domicilio.');
             }
 
-            if ($locked->current_status !== Package::STATUS_EN_TRANSITO_NACIONAL) {
+            if (! in_array($locked->current_status, Package::CLAIMABLE_FOR_DELIVERY_STATUSES, true)) {
                 throw new RuntimeException(
                     'Este paquete todavía no está listo para reparto. Estado actual: '
                     . $locked->statusLabel() . '.'
@@ -651,10 +687,30 @@ class PackageService
                 throw new RuntimeException('Este pedido ya fue reclamado por otro repartidor.');
             }
 
+            $wasAtDestinationAgency = $locked->current_status === Package::STATUS_LISTO_RETIRO;
+
             $locked->update([
                 'driver_id' => $driver->id,
                 'delivery_status' => Package::DELIVERY_ACCEPTED,
             ]);
+
+            if ($wasAtDestinationAgency) {
+                // LISTO_RETIRO -> EN_TRANSITO_NACIONAL: para que
+                // completeDelivery() (que exige EN_TRANSITO_NACIONAL)
+                // funcione igual sin importar de cuál estado vino.
+                // notifyCustomer: false porque esto es un traspaso
+                // interno (de "listo para retiro" a reparto a
+                // domicilio), no un hito que el cliente deba ver como
+                // que su paquete "volvió a estar en tránsito".
+                return $this->changeStatus(
+                    package: $locked,
+                    newStatus: Package::STATUS_EN_TRANSITO_NACIONAL,
+                    userId: $userId,
+                    locationDescription: 'Pedido reclamado por el repartidor desde la agencia destino',
+                    eventType: PackageHistory::EVENT_MOVIMIENTO,
+                    notifyCustomer: false,
+                );
+            }
 
             $this->recordHistory(
                 package: $locked,
@@ -683,6 +739,7 @@ class PackageService
         ?string $receiverPhone = null,
         ?string $deliveryConfirmationMethod = null,
         ?string $deliveryPhotoPath = null,
+        ?string $codPaymentMethod = null,
     ): Package {
         $updatedPackage = DB::transaction(function () use (
             $package,
@@ -692,7 +749,8 @@ class PackageService
             $receiverIdDoc,
             $receiverPhone,
             $deliveryConfirmationMethod,
-            $deliveryPhotoPath
+            $deliveryPhotoPath,
+            $codPaymentMethod
         ) {
             $lockedPackage = Package::query()
                 ->whereKey($package->id)
@@ -726,9 +784,20 @@ class PackageService
             // cliente todavía no existe en el sistema. El repartidor
             // puede completar la entrega directamente.
 
+            // Un paquete COD no puede entregarse sin que el
+            // repartidor confirme que le cobraron y con qué forma de
+            // pago. Antes se marcaba "cobrado" automáticamente al
+            // completar la entrega, sin ningún registro real del pago.
             if ($lockedPackage->is_cod && ! $lockedPackage->cod_collected_at) {
+                if (! $codPaymentMethod || ! in_array($codPaymentMethod, Package::PAYMENT_METHODS, true)) {
+                    throw new RuntimeException(
+                        'Este pedido es contra entrega (COD): indica la forma de pago con la que te cancelaron antes de confirmar la entrega.'
+                    );
+                }
+
                 $lockedPackage->cod_collected_at = now();
                 $lockedPackage->cod_collected_by_user_id = $driver->user_id;
+                $lockedPackage->cod_payment_method = $codPaymentMethod;
             }
 
             $lockedPackage->update([

@@ -125,6 +125,8 @@ class WarehousesManager extends Component
             'address',
             'cities',
         ]);
+
+        $this->cities = [];
     }
 
     public function save(): void

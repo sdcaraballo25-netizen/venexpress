@@ -1,6 +1,7 @@
-﻿<?php
+<?php
 
 use App\Models\Ally;
+use App\Models\Customer;
 use App\Models\Driver;
 use App\Models\User;
 use App\Notifications\WelcomeVerificationToken;
@@ -11,9 +12,12 @@ use Illuminate\Support\Facades\Hash;
 use Illuminate\Validation\Rules;
 use Livewire\Attributes\Layout;
 use Livewire\Volt\Component;
+use Livewire\WithFileUploads;
 
 new #[Layout('layouts.guest')] class extends Component
 {
+    use WithFileUploads;
+
     public string $name = '';
     public string $email = '';
     public string $password = '';
@@ -28,6 +32,9 @@ new #[Layout('layouts.guest')] class extends Component
     public string $state = '';
     public string $city = '';
     public string $address = '';
+    public $storefront_photo = null;
+    public ?float $latitude = null;
+    public ?float $longitude = null;
 
     public array $states = [];
     public array $cities = [];
@@ -38,6 +45,18 @@ new #[Layout('layouts.guest')] class extends Component
     public string $vehicle_plate = '';
     public string $vehicle_type = '';
     public string $phone = '';
+    public $license_photo = null;
+    public $id_photo = null;
+    public $vehicle_registration_photo = null;
+
+    /**
+     * Datos adicionales para clientes.
+     *
+     * id_doc es la clave que vincula este usuario con su(s) guía(s):
+     * los paquetes se buscan por recipient_id_doc, así que sin este
+     * dato el panel de Cliente nunca podría encontrar sus envíos.
+     */
+    public string $id_doc = '';
 
     /**
      * Carga los estados disponibles.
@@ -59,6 +78,15 @@ new #[Layout('layouts.guest')] class extends Component
         $this->cities = $this->state !== ''
             ? $locationService->citiesByState($this->state)
             : [];
+    }
+
+    /**
+     * Recibe la posición elegida por clic en el mapa (evento de Alpine/Leaflet).
+     */
+    public function setLocationFromMap(float $lat, float $lng): void
+    {
+        $this->latitude = round($lat, 7);
+        $this->longitude = round($lng, 7);
     }
 
     /**
@@ -131,6 +159,24 @@ new #[Layout('layouts.guest')] class extends Component
                     'string',
                     'max:255',
                 ],
+
+                'storefront_photo' => [
+                    'required',
+                    'image',
+                    'max:4096',
+                ],
+
+                'latitude' => [
+                    'required',
+                    'numeric',
+                    'between:-90,90',
+                ],
+
+                'longitude' => [
+                    'required',
+                    'numeric',
+                    'between:-180,180',
+                ],
             ]);
         }
 
@@ -160,6 +206,78 @@ new #[Layout('layouts.guest')] class extends Component
                     'string',
                     'max:30',
                 ],
+
+                'license_photo' => [
+                    'required',
+                    'image',
+                    'max:4096',
+                ],
+
+                'id_photo' => [
+                    'required',
+                    'image',
+                    'max:4096',
+                ],
+
+                'vehicle_registration_photo' => [
+                    'required',
+                    'image',
+                    'max:4096',
+                ],
+            ]);
+        }
+
+        /*
+        |--------------------------------------------------------------------------
+        | VALIDACIÓN DE CLIENTE
+        |--------------------------------------------------------------------------
+        */
+
+        if ($this->role === User::ROLE_CLIENTE) {
+            $rules = array_merge($rules, [
+                'id_doc' => [
+                    'required',
+                    'string',
+                    'max:30',
+
+                    /*
+                     * SEGURIDAD:
+                     * El panel de Cliente concede acceso al historial
+                     * de paquetes de una cédula únicamente por
+                     * coincidencia de id_doc. Si permitiéramos que
+                     * cualquier persona "reclame" una cédula ya
+                     * asociada a un customer con contacto real, un
+                     * atacante podría ver guías, direcciones de
+                     * entrega y aceptar/rechazar entregas de otra
+                     * persona con solo conocer o adivinar su cédula,
+                     * además de sobrescribir su nombre/teléfono/email.
+                     *
+                     * Por eso: solo permitimos crear la cuenta si la
+                     * cédula es nueva, o si el customer existente aún
+                     * NO tiene email (fue creado por un aliado al
+                     * despachar una guía y todavía nadie lo reclamó).
+                     * Si el customer ya tiene email, la cédula ya fue
+                     * reclamada por otra cuenta y bloqueamos el
+                     * registro.
+                     */
+                    function (string $attribute, mixed $value, \Closure $fail) {
+                        $existing = Customer::where('id_doc', $value)->first();
+
+                        if ($existing && $existing->email) {
+                            $fail(
+                                'Ya existe una cuenta de cliente registrada '
+                                . 'con esta cédula. Si es tuya, inicia sesión '
+                                . 'o contacta a soporte.'
+                            );
+                        }
+                    },
+                ],
+
+                'phone' => [
+                    'required',
+                    'string',
+                    'max:30',
+                ],
             ]);
         }
 
@@ -174,6 +292,7 @@ new #[Layout('layouts.guest')] class extends Component
         $user = User::create([
             'name' => $validated['name'],
             'email' => $validated['email'],
+            'phone' => $validated['phone'] ?? null,
             'password' => Hash::make($validated['password']),
             'role' => $validated['role'],
         ]);
@@ -187,6 +306,8 @@ new #[Layout('layouts.guest')] class extends Component
         */
 
         if ($user->isAliado()) {
+            $storefrontPhotoPath = $this->storefront_photo->store('allies', 'public');
+
             Ally::create([
                 'user_id' => $user->id,
                 'business_name' => $validated['business_name'],
@@ -194,6 +315,9 @@ new #[Layout('layouts.guest')] class extends Component
                 'state' => $validated['state'],
                 'city' => $validated['city'],
                 'address' => $validated['address'],
+                'storefront_photo_path' => $storefrontPhotoPath,
+                'latitude' => $validated['latitude'],
+                'longitude' => $validated['longitude'],
                 'commission_percentage' => 10.00,
 
                 // Un aliado nuevo comienza como PENDIENTE.
@@ -222,8 +346,14 @@ new #[Layout('layouts.guest')] class extends Component
                 'vehicle_plate' => $validated['vehicle_plate'],
                 'vehicle_type' => $validated['vehicle_type'],
                 'phone' => $validated['phone'],
-                'status' => Driver::STATUS_ACTIVE,
                 'driver_type' => Driver::TYPE_DELIVERY,
+                'license_photo_path' => $this->license_photo->store('drivers', 'public'),
+                'id_photo_path' => $this->id_photo->store('drivers', 'public'),
+                'vehicle_registration_photo_path' => $this->vehicle_registration_photo->store('drivers', 'public'),
+
+                // Un repartidor nuevo comienza como PENDIENTE, igual
+                // que un aliado, hasta que un admin lo apruebe.
+                'status' => Driver::STATUS_PENDING,
             ]);
 
             Auth::login($user);
@@ -241,6 +371,23 @@ new #[Layout('layouts.guest')] class extends Component
         | CLIENTE
         |--------------------------------------------------------------------------
         */
+
+        /*
+         * El panel de Cliente busca sus guías por recipient_id_doc a
+         * través de este registro en customers. Si un aliado ya había
+         * registrado a esta persona como destinatario de una guía
+         * anterior, el customer ya existe con este id_doc: lo
+         * actualizamos en vez de duplicarlo, para que el historial de
+         * paquetes previos también quede visible.
+         */
+        Customer::updateOrCreate(
+            ['id_doc' => $validated['id_doc']],
+            [
+                'name' => $validated['name'],
+                'phone' => $validated['phone'],
+                'email' => $validated['email'],
+            ]
+        );
 
         // Generar y guardar el código de verificación.
         $plainToken = $user->generateVerificationToken();
@@ -358,6 +505,66 @@ new #[Layout('layouts.guest')] class extends Component
                 class="mt-2"
             />
         </div>
+
+        {{-- ====================================================== --}}
+        {{-- DATOS DEL CLIENTE --}}
+        {{-- ====================================================== --}}
+
+        @if ($role === 'cliente')
+
+            <div class="border-t border-gray-200 pt-5">
+                <h2 class="text-sm font-semibold text-blue-950">
+                    Datos de contacto
+                </h2>
+
+                <p class="mt-1 text-xs text-gray-500">
+                    Usamos tu cédula/RIF para mostrarte los envíos donde apareces como destinatario.
+                </p>
+            </div>
+
+            {{-- CÉDULA / RIF --}}
+            <div>
+                <x-input-label
+                    for="id_doc"
+                    value="Cédula o RIF"
+                />
+
+                <x-text-input
+                    wire:model="id_doc"
+                    id="id_doc"
+                    class="block mt-1.5 w-full"
+                    type="text"
+                    placeholder="V-12345678"
+                />
+
+                <x-input-error
+                    :messages="$errors->get('id_doc')"
+                    class="mt-2"
+                />
+            </div>
+
+            {{-- TELÉFONO --}}
+            <div>
+                <x-input-label
+                    for="client_phone"
+                    value="Teléfono"
+                />
+
+                <x-text-input
+                    wire:model="phone"
+                    id="client_phone"
+                    class="block mt-1.5 w-full"
+                    type="text"
+                    placeholder="+58 412 1234567"
+                />
+
+                <x-input-error
+                    :messages="$errors->get('phone')"
+                    class="mt-2"
+                />
+            </div>
+
+        @endif
 
         {{-- ====================================================== --}}
         {{-- DATOS DEL ALIADO --}}
@@ -503,6 +710,64 @@ new #[Layout('layouts.guest')] class extends Component
                 />
             </div>
 
+            {{-- FOTO DE FACHADA --}}
+            <div>
+                <x-input-label
+                    for="storefront_photo"
+                    value="Foto de la fachada del local"
+                />
+
+                <input
+                    type="file"
+                    wire:model="storefront_photo"
+                    id="storefront_photo"
+                    accept="image/*"
+                    class="block mt-1.5 w-full text-sm text-gray-600
+                           file:mr-4 file:py-2 file:px-4 file:rounded-md
+                           file:border-0 file:text-sm file:font-semibold
+                           file:bg-blue-50 file:text-blue-700 hover:file:bg-blue-100"
+                />
+
+                <p class="mt-1 text-xs text-gray-500" wire:loading wire:target="storefront_photo">
+                    Subiendo foto...
+                </p>
+
+                @if ($storefront_photo)
+                    <img src="{{ $storefront_photo->temporaryUrl() }}" class="mt-2 h-24 rounded-lg object-cover" alt="Vista previa">
+                @endif
+
+                <x-input-error
+                    :messages="$errors->get('storefront_photo')"
+                    class="mt-2"
+                />
+            </div>
+
+            {{-- UBICACIÓN EN EL MAPA --}}
+            <div>
+                <x-input-label value="Ubicación exacta en el mapa" />
+
+                <p class="mt-1 text-xs text-gray-500">
+                    Haz clic en el mapa sobre la ubicación exacta del establecimiento.
+                </p>
+
+                <div
+                    x-data="registerLocationMap({
+                        lat: @js($latitude ?? 10.4806),
+                        lng: @js($longitude ?? -66.9036),
+                        hasPoint: @js((bool) $latitude),
+                    })"
+                    x-init="init($el)"
+                    wire:ignore
+                    class="mt-2 rounded-xl overflow-hidden border border-gray-300"
+                    style="height: 240px;"
+                ></div>
+
+                <x-input-error
+                    :messages="$errors->get('latitude')"
+                    class="mt-2"
+                />
+            </div>
+
         @endif
 
         {{-- ====================================================== --}}
@@ -580,6 +845,116 @@ new #[Layout('layouts.guest')] class extends Component
                 />
             </div>
 
+            <div class="border-t border-gray-200 pt-5">
+                <h2 class="text-sm font-semibold text-blue-950">
+                    Documentos
+                </h2>
+
+                <p class="mt-1 text-xs text-gray-500">
+                    Estos documentos serán revisados por VenExpress antes de aprobar tu cuenta.
+                </p>
+            </div>
+
+            {{-- FOTO DE LA LICENCIA --}}
+            <div>
+                <x-input-label
+                    for="license_photo"
+                    value="Foto de la licencia de conducir"
+                />
+
+                <input
+                    type="file"
+                    wire:model="license_photo"
+                    id="license_photo"
+                    accept="image/*"
+                    class="block mt-1.5 w-full text-sm text-gray-600
+                           file:mr-4 file:py-2 file:px-4 file:rounded-md
+                           file:border-0 file:text-sm file:font-semibold
+                           file:bg-blue-50 file:text-blue-700 hover:file:bg-blue-100"
+                />
+
+                <p class="mt-1 text-xs text-gray-500" wire:loading wire:target="license_photo">
+                    Subiendo foto...
+                </p>
+
+                @if ($license_photo)
+                    <img src="{{ $license_photo->temporaryUrl() }}" class="mt-2 h-24 rounded-lg object-cover" alt="Vista previa">
+                @endif
+
+                <x-input-error
+                    :messages="$errors->get('license_photo')"
+                    class="mt-2"
+                />
+            </div>
+
+            {{-- FOTO DE LA CÉDULA --}}
+            <div>
+                <x-input-label
+                    for="id_photo"
+                    value="Foto de la cédula de identidad"
+                />
+
+                <input
+                    type="file"
+                    wire:model="id_photo"
+                    id="id_photo"
+                    accept="image/*"
+                    class="block mt-1.5 w-full text-sm text-gray-600
+                           file:mr-4 file:py-2 file:px-4 file:rounded-md
+                           file:border-0 file:text-sm file:font-semibold
+                           file:bg-blue-50 file:text-blue-700 hover:file:bg-blue-100"
+                />
+
+                <p class="mt-1 text-xs text-gray-500" wire:loading wire:target="id_photo">
+                    Subiendo foto...
+                </p>
+
+                @if ($id_photo)
+                    <img src="{{ $id_photo->temporaryUrl() }}" class="mt-2 h-24 rounded-lg object-cover" alt="Vista previa">
+                @endif
+
+                <x-input-error
+                    :messages="$errors->get('id_photo')"
+                    class="mt-2"
+                />
+            </div>
+
+            {{-- CARNET DE CIRCULACIÓN --}}
+            <div>
+                <x-input-label
+                    for="vehicle_registration_photo"
+                    value="Foto del carnet de circulación"
+                />
+
+                <p class="mt-1 text-xs text-gray-500">
+                    Debe corresponder a la placa {{ $vehicle_plate !== '' ? $vehicle_plate : 'indicada arriba' }}.
+                </p>
+
+                <input
+                    type="file"
+                    wire:model="vehicle_registration_photo"
+                    id="vehicle_registration_photo"
+                    accept="image/*"
+                    class="block mt-1.5 w-full text-sm text-gray-600
+                           file:mr-4 file:py-2 file:px-4 file:rounded-md
+                           file:border-0 file:text-sm file:font-semibold
+                           file:bg-blue-50 file:text-blue-700 hover:file:bg-blue-100"
+                />
+
+                <p class="mt-1 text-xs text-gray-500" wire:loading wire:target="vehicle_registration_photo">
+                    Subiendo foto...
+                </p>
+
+                @if ($vehicle_registration_photo)
+                    <img src="{{ $vehicle_registration_photo->temporaryUrl() }}" class="mt-2 h-24 rounded-lg object-cover" alt="Vista previa">
+                @endif
+
+                <x-input-error
+                    :messages="$errors->get('vehicle_registration_photo')"
+                    class="mt-2"
+                />
+            </div>
+
         @endif
 
         {{-- ====================================================== --}}
@@ -650,4 +1025,3 @@ new #[Layout('layouts.guest')] class extends Component
         </a>
     </p>
 </div>
-
