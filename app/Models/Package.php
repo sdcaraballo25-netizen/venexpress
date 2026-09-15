@@ -61,6 +61,8 @@ class Package extends Model
         'security_hash',
         'ally_id',
         'pickup_ally_id',
+        'destination_warehouse_id',
+        'current_warehouse_id',
         'driver_id',
 
         'sender_name',
@@ -197,6 +199,31 @@ class Package extends Model
     public function pickupAlly(): BelongsTo
     {
         return $this->belongsTo(Ally::class, 'pickup_ally_id');
+    }
+
+    /**
+     * HUB propio que LogisticsResolutionService resuelve como destino
+     * logístico de este paquete (Fase 4). No se persiste
+     * automáticamente al registrar el pedido: la resolución es en
+     * vivo (ver LogisticsResolutionService::resolveForPackage), esta
+     * columna queda disponible para cuando una fase posterior decida
+     * fijarla de forma explícita.
+     */
+    public function destinationWarehouse(): BelongsTo
+    {
+        return $this->belongsTo(Warehouse::class, 'destination_warehouse_id');
+    }
+
+    /**
+     * HUB propio donde el paquete se encuentra físicamente en este
+     * momento. Todavía ningún flujo de escaneo/recepción lo
+     * actualiza (Fase 5+); por ahora solo existe para que
+     * LogisticsResolutionService::isAtDestinationWarehouse() lo pueda
+     * comparar contra el destino resuelto.
+     */
+    public function currentWarehouse(): BelongsTo
+    {
+        return $this->belongsTo(Warehouse::class, 'current_warehouse_id');
     }
 
     public function driver(): BelongsTo

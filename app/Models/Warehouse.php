@@ -35,4 +35,14 @@ class Warehouse extends Model
     {
         return $this->hasMany(RouteStop::class);
     }
+
+    /**
+     * Zonas geográficas (estado, o estado + ciudad) que este HUB
+     * atiende. Usada por LogisticsResolutionService (Fase 4) para
+     * resolver el destino logístico de un paquete.
+     */
+    public function coverages(): HasMany
+    {
+        return $this->hasMany(WarehouseCoverage::class);
+    }
 }

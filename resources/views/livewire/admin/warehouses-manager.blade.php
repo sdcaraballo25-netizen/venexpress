@@ -24,6 +24,12 @@
         </div>
     @endif
 
+    @if ($coverageError)
+        <div class="rounded-xl border border-red-200 bg-red-50 px-4 py-3 text-sm font-medium text-red-700">
+            {{ $coverageError }}
+        </div>
+    @endif
+
     @if ($showForm)
         <div class="rounded-2xl border border-slate-200 bg-white p-6 shadow-sm">
             <h3 class="font-display text-lg font-semibold text-slate-900">
@@ -168,8 +174,112 @@
                                 >
                                     {{ $warehouse->is_active ? 'Desactivar' : 'Activar' }}
                                 </button>
+                                <button
+                                    wire:click="toggleCoveragePanel({{ $warehouse->id }})"
+                                    class="rounded-lg border border-blue-200 px-3 py-2 text-xs font-semibold text-blue-900 hover:bg-blue-50"
+                                >
+                                    Cobertura ({{ $warehouse->coverages->count() }})
+                                </button>
                             </td>
                         </tr>
+
+                        @if ($coverageWarehouseId === $warehouse->id)
+                            <tr>
+                                <td colspan="5" class="bg-slate-50 px-6 py-5">
+                                    <h4 class="text-sm font-semibold text-slate-700">
+                                        Cobertura de "{{ $warehouse->name }}"
+                                    </h4>
+                                    <p class="mt-1 text-xs text-slate-500">
+                                        Estados/ciudades que este almacén atiende como destino logístico
+                                        (usado por la resolución de Fase 4, no restringe rutas ni escaneos).
+                                    </p>
+
+                                    @if ($warehouse->coverages->isEmpty())
+                                        <p class="mt-4 text-sm text-slate-500">
+                                            Este almacén todavía no tiene cobertura configurada.
+                                        </p>
+                                    @else
+                                        <ul class="mt-4 divide-y divide-slate-200 rounded-xl border border-slate-200 bg-white">
+                                            @foreach ($warehouse->coverages as $coverage)
+                                                <li class="flex items-center justify-between px-4 py-3 text-sm">
+                                                    <span class="text-slate-700">
+                                                        {{ $coverage->city ?? 'Todo el estado' }}, {{ $coverage->state }}
+                                                    </span>
+                                                    <span class="flex items-center gap-3">
+                                                        <span class="rounded-full px-3 py-1 text-xs font-semibold
+                                                            {{ $coverage->is_active
+                                                                ? 'bg-emerald-50 text-emerald-700'
+                                                                : 'bg-slate-100 text-slate-500' }}">
+                                                            {{ $coverage->is_active ? 'Activa' : 'Inactiva' }}
+                                                        </span>
+                                                        <button
+                                                            wire:click="toggleCoverageActive({{ $coverage->id }})"
+                                                            class="rounded-lg border border-slate-200 px-3 py-1.5 text-xs font-semibold text-slate-700 hover:bg-slate-50"
+                                                        >
+                                                            {{ $coverage->is_active ? 'Desactivar' : 'Activar' }}
+                                                        </button>
+                                                    </span>
+                                                </li>
+                                            @endforeach
+                                        </ul>
+                                    @endif
+
+                                    <form wire:submit.prevent="addCoverage" class="mt-5 grid grid-cols-1 gap-4 sm:grid-cols-4 sm:items-end">
+                                        <div>
+                                            <label class="text-xs font-medium text-slate-600">Estado</label>
+                                            <select
+                                                wire:model.live="coverageState"
+                                                class="mt-1 w-full rounded-xl border border-slate-300 px-3 py-2 text-sm focus:border-blue-900 focus:ring-blue-900"
+                                            >
+                                                <option value="">Selecciona...</option>
+                                                @foreach ($states as $stateOption)
+                                                    <option value="{{ $stateOption }}">{{ $stateOption }}</option>
+                                                @endforeach
+                                            </select>
+                                            @error('coverageState')
+                                                <p class="mt-1 text-xs text-red-600">{{ $message }}</p>
+                                            @enderror
+                                        </div>
+
+                                        <div>
+                                            <label class="text-xs font-medium text-slate-600">Ciudad</label>
+                                            <select
+                                                wire:model="coverageCity"
+                                                @disabled($coverageState === '' || $coverageWholeState)
+                                                class="mt-1 w-full rounded-xl border border-slate-300 px-3 py-2 text-sm focus:border-blue-900 focus:ring-blue-900 disabled:bg-slate-100"
+                                            >
+                                                <option value="">Selecciona...</option>
+                                                @foreach ($coverageCities as $cityOption)
+                                                    <option value="{{ $cityOption }}">{{ $cityOption }}</option>
+                                                @endforeach
+                                            </select>
+                                            @error('coverageCity')
+                                                <p class="mt-1 text-xs text-red-600">{{ $message }}</p>
+                                            @enderror
+                                        </div>
+
+                                        <div class="flex items-center gap-2 pb-2">
+                                            <input
+                                                type="checkbox"
+                                                wire:model.live="coverageWholeState"
+                                                id="coverageWholeState-{{ $warehouse->id }}"
+                                                class="rounded border-slate-300 text-blue-900 focus:ring-blue-900"
+                                            >
+                                            <label for="coverageWholeState-{{ $warehouse->id }}" class="text-xs font-medium text-slate-600">
+                                                Todo el estado
+                                            </label>
+                                        </div>
+
+                                        <button
+                                            type="submit"
+                                            class="rounded-xl bg-blue-900 px-4 py-2 text-sm font-semibold text-white hover:bg-blue-800"
+                                        >
+                                            + Agregar cobertura
+                                        </button>
+                                    </form>
+                                </td>
+                            </tr>
+                        @endif
                     @endforeach
                 </tbody>
             </table>
