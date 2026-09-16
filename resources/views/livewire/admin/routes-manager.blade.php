@@ -33,7 +33,7 @@
 
     {{-- FILTROS --}}
     <div class="bg-white rounded-2xl border border-[#E2E8F0] p-5 shadow-sm mb-6">
-        <div class="grid grid-cols-1 md:grid-cols-3 gap-4">
+        <div class="grid grid-cols-1 md:grid-cols-4 gap-4">
 
             <div>
                 <label class="block text-xs font-bold text-[#64748B] uppercase mb-2">
@@ -90,9 +90,29 @@
                 </select>
             </div>
 
+            <div>
+                <label class="block text-xs font-bold text-[#64748B] uppercase mb-2">
+                    Repartidor
+                </label>
+
+                <select
+                    wire:model.live="filterDriverId"
+                    class="w-full rounded-xl border-[#E2E8F0] text-sm focus:border-blue-500 focus:ring-blue-500">
+
+                    <option value="">Todos los repartidores</option>
+
+                    @foreach ($driversWithRoutes as $driverOption)
+                        <option value="{{ $driverOption->id }}">
+                            {{ $driverOption->user?->name ?? 'Repartidor #'.$driverOption->id }}
+                        </option>
+                    @endforeach
+
+                </select>
+            </div>
+
         </div>
 
-        @if ($filterState !== '' || $filterCity !== '' || $filterStatus !== '')
+        @if ($filterState !== '' || $filterCity !== '' || $filterStatus !== '' || $filterDriverId !== '')
             <div class="mt-4 flex items-center justify-between gap-3">
                 <p class="text-xs text-[#64748B]">
                     {{ $routes->total() }} {{ $routes->total() === 1 ? 'ruta encontrada' : 'rutas encontradas' }}

@@ -164,8 +164,6 @@ class PackageReception extends Component
             $this->package = $received;
 
             $this->successMessage = $this->outcomeMessage($received, $warehouse);
-
-            $this->warehouseId = null;
         } catch (RuntimeException $e) {
             $this->errorMessage = $e->getMessage();
             $this->package = $package->fresh([
@@ -213,11 +211,15 @@ class PackageReception extends Component
         };
     }
 
+    /**
+     * El almacén activo solo cambia cuando el Admin selecciona
+     * explícitamente otro almacén en el selector — "Limpiar" no debe
+     * tocarlo, así que $warehouseId queda fuera de este reset.
+     */
     public function clear(): void
     {
         $this->reset([
             'trackingNumber',
-            'warehouseId',
             'package',
             'successMessage',
             'errorMessage',

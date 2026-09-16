@@ -47,6 +47,7 @@ use App\Livewire\Driver\HelpCenter as DriverHelpCenter;
 use App\Livewire\Driver\PackageDetail;
 use App\Livewire\Driver\Packages;
 use App\Livewire\Driver\RouteDetail;
+use App\Livewire\Driver\RouteHistory;
 use App\Livewire\Driver\Scanner;
 use App\Livewire\Admin\RecommendationsManager;
 use App\Livewire\Public\HelpCenter;
@@ -251,6 +252,13 @@ Route::get(
 )
     ->middleware(['auth', 'verified', 'role:repartidor', 'account.approved'])
     ->name('repartidor.route-detail');
+
+Route::get(
+    '/repartidor/historial-rutas',
+    RouteHistory::class
+)
+    ->middleware(['auth', 'verified', 'role:repartidor', 'account.approved'])
+    ->name('repartidor.route-history');
 
 Route::post(
     '/repartidor/verificar-guia',

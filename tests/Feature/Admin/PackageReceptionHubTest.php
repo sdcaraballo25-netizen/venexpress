@@ -324,4 +324,150 @@ class PackageReceptionHubTest extends TestCase
             'destination_warehouse_id' => $warehouse->id,
         ]);
     }
+
+    /*
+    |--------------------------------------------------------------------------
+    | El almacén activo persiste en el componente mientras la pantalla está
+    | activa: solo cambia cuando el Admin selecciona explícitamente otro.
+    |--------------------------------------------------------------------------
+    */
+
+    public function test_selected_warehouse_stays_selected_after_a_successful_reception(): void
+    {
+        $admin = $this->createAdmin();
+        $ally = $this->createAlly();
+        $warehouseA = Warehouse::factory()->create();
+
+        $package = $this->createPackage($ally, [
+            'current_status' => Package::STATUS_RECOLECTADO_VENEXPRESS,
+        ]);
+
+        Livewire::actingAs($admin)
+            ->test(PackageReception::class)
+            ->set('trackingNumber', $package->tracking_number)
+            ->call('search')
+            ->set('warehouseId', $warehouseA->id)
+            ->call('receive')
+            ->assertSet('errorMessage', null)
+            ->assertSet('warehouseId', $warehouseA->id);
+    }
+
+    public function test_selected_warehouse_stays_selected_for_a_second_reception(): void
+    {
+        $admin = $this->createAdmin();
+        $ally = $this->createAlly();
+        $warehouseA = Warehouse::factory()->create();
+
+        $firstPackage = $this->createPackage($ally, [
+            'current_status' => Package::STATUS_RECOLECTADO_VENEXPRESS,
+        ]);
+        $secondPackage = $this->createPackage($ally, [
+            'current_status' => Package::STATUS_RECOLECTADO_VENEXPRESS,
+        ]);
+
+        $component = Livewire::actingAs($admin)
+            ->test(PackageReception::class)
+            ->set('trackingNumber', $firstPackage->tracking_number)
+            ->call('search')
+            ->set('warehouseId', $warehouseA->id)
+            ->call('receive')
+            ->assertSet('warehouseId', $warehouseA->id);
+
+        $component
+            ->set('trackingNumber', $secondPackage->tracking_number)
+            ->call('search')
+            ->call('receive')
+            ->assertSet('errorMessage', null)
+            ->assertSet('warehouseId', $warehouseA->id);
+
+        $this->assertDatabaseHas('packages', [
+            'id' => $secondPackage->id,
+            'current_status' => Package::STATUS_EN_HUB,
+            'current_warehouse_id' => $warehouseA->id,
+        ]);
+    }
+
+    public function test_admin_can_explicitly_switch_to_a_different_warehouse_for_the_next_reception(): void
+    {
+        $admin = $this->createAdmin();
+        $ally = $this->createAlly();
+        $warehouseA = Warehouse::factory()->create();
+        $warehouseB = Warehouse::factory()->create();
+
+        $firstPackage = $this->createPackage($ally, [
+            'current_status' => Package::STATUS_RECOLECTADO_VENEXPRESS,
+        ]);
+        $secondPackage = $this->createPackage($ally, [
+            'current_status' => Package::STATUS_RECOLECTADO_VENEXPRESS,
+        ]);
+
+        $component = Livewire::actingAs($admin)
+            ->test(PackageReception::class)
+            ->set('trackingNumber', $firstPackage->tracking_number)
+            ->call('search')
+            ->set('warehouseId', $warehouseA->id)
+            ->call('receive')
+            ->assertSet('warehouseId', $warehouseA->id);
+
+        $component
+            ->set('trackingNumber', $secondPackage->tracking_number)
+            ->call('search')
+            ->set('warehouseId', $warehouseB->id)
+            ->call('receive')
+            ->assertSet('errorMessage', null)
+            ->assertSet('warehouseId', $warehouseB->id);
+
+        $this->assertDatabaseHas('packages', [
+            'id' => $secondPackage->id,
+            'current_status' => Package::STATUS_EN_HUB,
+            'current_warehouse_id' => $warehouseB->id,
+        ]);
+    }
+
+    public function test_a_failed_reception_keeps_the_selected_warehouse(): void
+    {
+        $admin = $this->createAdmin();
+        $ally = $this->createAlly();
+        $warehouseA = Warehouse::factory()->create();
+
+        $package = $this->createPackage($ally, [
+            'current_status' => Package::STATUS_LISTO_RETIRO,
+        ]);
+
+        Livewire::actingAs($admin)
+            ->test(PackageReception::class)
+            ->set('trackingNumber', $package->tracking_number)
+            ->call('search')
+            ->set('warehouseId', $warehouseA->id)
+            ->call('receive')
+            ->assertSet('warehouseId', $warehouseA->id)
+            ->assertSet(
+                'errorMessage',
+                'Esta guía no está en un estado que permita recepción en HUB. Estado actual: '
+                    .$package->statusLabel().'.'
+            );
+    }
+
+    public function test_clear_button_keeps_the_selected_warehouse(): void
+    {
+        $admin = $this->createAdmin();
+        $ally = $this->createAlly();
+        $warehouseA = Warehouse::factory()->create();
+
+        $package = $this->createPackage($ally, [
+            'current_status' => Package::STATUS_RECOLECTADO_VENEXPRESS,
+        ]);
+
+        Livewire::actingAs($admin)
+            ->test(PackageReception::class)
+            ->set('trackingNumber', $package->tracking_number)
+            ->call('search')
+            ->set('warehouseId', $warehouseA->id)
+            ->call('receive')
+            ->assertSet('warehouseId', $warehouseA->id)
+            ->call('clear')
+            ->assertSet('warehouseId', $warehouseA->id)
+            ->assertSet('trackingNumber', '')
+            ->assertSet('package', null);
+    }
 }

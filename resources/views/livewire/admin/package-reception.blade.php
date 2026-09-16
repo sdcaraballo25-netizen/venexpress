@@ -134,7 +134,7 @@
 
                 <div>
                     <label class="text-sm font-medium text-slate-600">
-                        Almacén (HUB) que recibe
+                        Almacén de recepción
                     </label>
 
                     <select

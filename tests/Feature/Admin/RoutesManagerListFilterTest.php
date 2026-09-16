@@ -3,6 +3,7 @@
 namespace Tests\Feature\Admin;
 
 use App\Livewire\Admin\RoutesManager;
+use App\Models\Driver;
 use App\Models\Route;
 use App\Models\User;
 use Illuminate\Foundation\Testing\RefreshDatabase;
@@ -31,8 +32,13 @@ class RoutesManagerListFilterTest extends TestCase
         ]);
     }
 
-    private function createRoute(string $name, ?string $state, ?string $city, string $status): Route
-    {
+    private function createRoute(
+        string $name,
+        ?string $state,
+        ?string $city,
+        string $status,
+        ?int $driverId = null
+    ): Route {
         return Route::create([
             'name' => $name,
             'state' => $state,
@@ -40,6 +46,14 @@ class RoutesManagerListFilterTest extends TestCase
             'status' => $status,
             'route_type' => Route::TYPE_DELIVERY,
             'created_by' => $this->creator ??= $this->createAdmin()->id,
+            'driver_id' => $driverId,
+        ]);
+    }
+
+    private function createDriver(): Driver
+    {
+        return Driver::factory()->create([
+            'status' => Driver::STATUS_ACTIVE,
         ]);
     }
 
@@ -132,8 +146,68 @@ class RoutesManagerListFilterTest extends TestCase
         $component->assertSet('filterState', '')
             ->assertSet('filterCity', '')
             ->assertSet('filterStatus', '')
-            ->assertSet('filterCities', []);
+            ->assertSet('filterCities', [])
+            ->assertSet('filterDriverId', '');
 
         $this->assertCount(2, $component->viewData('routes'));
+    }
+
+    /*
+    |--------------------------------------------------------------------------
+    | Historial de rutas por driver (filtro nuevo, Admin\RoutesManager)
+    |--------------------------------------------------------------------------
+    */
+
+    public function test_routes_can_be_filtered_by_driver_across_any_status(): void
+    {
+        $driverA = $this->createDriver();
+        $driverB = $this->createDriver();
+
+        $this->createRoute('Ruta A asignada', 'Carabobo', 'Valencia', Route::STATUS_ASSIGNED, $driverA->id);
+        $this->createRoute('Ruta A completada', 'Carabobo', 'Valencia', Route::STATUS_COMPLETED, $driverA->id);
+        $this->createRoute('Ruta A cancelada', 'Carabobo', 'Valencia', Route::STATUS_CANCELLED, $driverA->id);
+        $this->createRoute('Ruta B en curso', 'Carabobo', 'Valencia', Route::STATUS_IN_PROGRESS, $driverB->id);
+
+        $component = Livewire::actingAs($this->createAdmin())
+            ->test(RoutesManager::class)
+            ->set('filterDriverId', (string) $driverA->id);
+
+        $this->assertEqualsCanonicalizing(
+            ['Ruta A asignada', 'Ruta A completada', 'Ruta A cancelada'],
+            $this->routeNames($component)
+        );
+    }
+
+    public function test_driver_filter_combines_with_status_filter(): void
+    {
+        $driverA = $this->createDriver();
+        $driverB = $this->createDriver();
+
+        $this->createRoute('Ruta A completada', 'Carabobo', 'Valencia', Route::STATUS_COMPLETED, $driverA->id);
+        $this->createRoute('Ruta A en curso', 'Carabobo', 'Valencia', Route::STATUS_IN_PROGRESS, $driverA->id);
+        $this->createRoute('Ruta B completada', 'Carabobo', 'Valencia', Route::STATUS_COMPLETED, $driverB->id);
+
+        $component = Livewire::actingAs($this->createAdmin())
+            ->test(RoutesManager::class)
+            ->set('filterDriverId', (string) $driverA->id)
+            ->set('filterStatus', Route::STATUS_COMPLETED);
+
+        $this->assertSame(['Ruta A completada'], $this->routeNames($component));
+    }
+
+    public function test_driver_filter_options_only_list_drivers_with_routes(): void
+    {
+        $driverWithRoute = $this->createDriver();
+        $driverWithoutRoute = $this->createDriver();
+
+        $this->createRoute('Ruta asignada', 'Carabobo', 'Valencia', Route::STATUS_ASSIGNED, $driverWithRoute->id);
+
+        $component = Livewire::actingAs($this->createAdmin())
+            ->test(RoutesManager::class);
+
+        $driverIds = $component->viewData('driversWithRoutes')->pluck('id')->all();
+
+        $this->assertSame([$driverWithRoute->id], $driverIds);
+        $this->assertNotContains($driverWithoutRoute->id, $driverIds);
     }
 }

@@ -3,6 +3,7 @@
 namespace App\Livewire\Admin;
 
 use App\Models\Ally;
+use App\Models\Driver;
 use App\Models\Route;
 use App\Models\RouteStop;
 use App\Models\Warehouse;
@@ -32,6 +33,13 @@ class RoutesManager extends Component
     public string $filterCity = '';
 
     public string $filterStatus = '';
+
+    /**
+     * Historial por driver (Reglas de negocio no lo cambian: solo
+     * acota el listado existente por driver_id, el mismo campo que ya
+     * usa Route::driver()). Vacío = sin filtrar.
+     */
+    public string $filterDriverId = '';
 
     /**
      * Ciudades del estado elegido en el filtro del listado. Va aparte
@@ -202,6 +210,11 @@ class RoutesManager extends Component
         $this->resetPage();
     }
 
+    public function updatedFilterDriverId(): void
+    {
+        $this->resetPage();
+    }
+
     public function clearFilters(): void
     {
         $this->reset([
@@ -209,6 +222,7 @@ class RoutesManager extends Component
             'filterCity',
             'filterStatus',
             'filterCities',
+            'filterDriverId',
         ]);
 
         $this->resetPage();
@@ -565,8 +579,22 @@ class RoutesManager extends Component
                 $this->filterStatus !== '',
                 fn ($q) => $q->where('status', $this->filterStatus)
             )
+            ->when(
+                $this->filterDriverId !== '',
+                fn ($q) => $q->where('driver_id', $this->filterDriverId)
+            )
             ->latest()
             ->paginate(10);
+
+        // Drivers con al menos una ruta, para el filtro "historial por
+        // driver" — no todos los drivers activos, solo los que ya
+        // tienen algo que mostrar en este listado.
+        $driversWithRoutes = Driver::query()
+            ->whereHas('routes')
+            ->with('user')
+            ->get()
+            ->sortBy(fn (Driver $driver) => $driver->user?->name ?? '')
+            ->values();
 
         /*
          * Fase 2: las paradas ya no se filtran por el state/city de la
@@ -642,6 +670,7 @@ class RoutesManager extends Component
             'availableWarehouses' => $availableWarehouses,
             'allWarehouses' => $allWarehouses,
             'collectiblePackages' => $collectiblePackages,
+            'driversWithRoutes' => $driversWithRoutes,
         ]);
     }
 }
