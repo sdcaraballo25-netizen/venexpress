@@ -256,11 +256,14 @@
 
                 @if ($pendingOperationView && $pendingOperationView['eligible'])
                     <div class="mt-5 rounded-xl border border-blue-200 bg-blue-50 p-4">
-                        <p class="text-sm font-semibold text-blue-900">
+                        <p class="text-xs font-semibold uppercase tracking-wide text-blue-700">
+                            Ya escaneaste esta guía hace un momento
+                        </p>
+                        <p class="mt-1 text-sm font-semibold text-blue-900">
                             {{ $pendingOperationView['label'] }}
                         </p>
                         <p class="mt-1 text-xs text-blue-700">
-                            {{ $pendingOperationView['hint'] }}
+                            {{ $pendingOperationView['hint'] }} Confirma solo si de verdad quieres repetir la operación sobre esta guía.
                         </p>
 
                         <button
@@ -417,70 +420,93 @@
 @once
     @push('scripts')
         <script>
-            document.addEventListener('livewire:init', () => {
-                let scanner = null;
-                let scanning = false;
+            let venexpressScannerState = null;
+            let venexpressScannerRunning = false;
 
-                async function startQrScanner() {
-                    const element = document.getElementById('qr-reader');
+            async function startQrScanner() {
+                const element = document.getElementById('qr-reader');
 
-                    if (!element || scanner || scanning || typeof Html5Qrcode === 'undefined') {
-                        return;
-                    }
-
-                    try {
-                        scanner = new Html5Qrcode('qr-reader');
-                        scanning = true;
-
-                        await scanner.start(
-                            { facingMode: 'environment' },
-                            {
-                                fps: 10,
-                                qrbox: { width: 250, height: 250 }
-                            },
-                            async (decodedText) => {
-                                if (!decodedText || !scanning) {
-                                    return;
-                                }
-
-                                scanning = false;
-
-                                try {
-                                    await scanner.stop();
-                                } catch (error) {
-                                    console.warn('No se pudo detener el scanner:', error);
-                                }
-
-                                try {
-                                    await scanner.clear();
-                                } catch (error) {
-                                    console.warn('No se pudo limpiar el scanner:', error);
-                                }
-
-                                scanner = null;
-
-                                $wire.scan(decodedText.trim());
-
-                                setTimeout(startQrScanner, 700);
-                            },
-                            () => {}
-                        );
-                    } catch (error) {
-                        console.error('Error iniciando la cámara:', error);
-                        scanner = null;
-                        scanning = false;
-                    }
+                if (!element || venexpressScannerState || venexpressScannerRunning || typeof Html5Qrcode === 'undefined') {
+                    return;
                 }
 
-                startQrScanner();
+                try {
+                    venexpressScannerState = new Html5Qrcode('qr-reader');
+                    venexpressScannerRunning = true;
 
+                    await venexpressScannerState.start(
+                        { facingMode: 'environment' },
+                        {
+                            fps: 10,
+                            qrbox: { width: 250, height: 250 }
+                        },
+                        async (decodedText) => {
+                            if (!decodedText || !venexpressScannerRunning) {
+                                return;
+                            }
+
+                            await stopQrScanner();
+
+                            $wire.scan(decodedText.trim());
+
+                            setTimeout(startQrScanner, 700);
+                        },
+                        () => {}
+                    );
+                } catch (error) {
+                    console.error('Error iniciando la cámara:', error);
+                    venexpressScannerState = null;
+                    venexpressScannerRunning = false;
+                }
+            }
+
+            async function stopQrScanner() {
+                if (!venexpressScannerState) {
+                    venexpressScannerRunning = false;
+
+                    return;
+                }
+
+                const instance = venexpressScannerState;
+                venexpressScannerState = null;
+                venexpressScannerRunning = false;
+
+                try {
+                    await instance.stop();
+                } catch (error) {
+                    console.warn('No se pudo detener el scanner:', error);
+                }
+
+                try {
+                    await instance.clear();
+                } catch (error) {
+                    console.warn('No se pudo limpiar el scanner:', error);
+                }
+            }
+
+            document.addEventListener('livewire:init', () => {
                 Livewire.hook('morph.updated', () => {
                     setTimeout(() => {
-                        if (!scanner && !scanning) {
+                        if (!venexpressScannerState && !venexpressScannerRunning) {
                             startQrScanner();
                         }
                     }, 300);
                 });
+            });
+
+            // livewire:navigated dispara tanto en la primera carga de la
+            // página como en cada navegación posterior vía wire:navigate.
+            // livewire:init, en cambio, solo dispara una vez por sesión
+            // SPA — por eso la cámara dejaba de arrancar al volver a esta
+            // pantalla sin refrescar el navegador.
+            document.addEventListener('livewire:navigated', () => {
+                startQrScanner();
+            });
+
+            // Libera la cámara al salir de esta pantalla vía wire:navigate,
+            // para no dejar el stream de video corriendo en segundo plano.
+            document.addEventListener('livewire:navigate', () => {
+                stopQrScanner();
             });
         </script>
     @endpush

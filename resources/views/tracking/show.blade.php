@@ -214,7 +214,7 @@
                                 class="text-xs font-semibold px-3 py-1 rounded-full bg-green-100 text-green-700"
                             >
 
-                                {{ $package->status_label }}
+                                {{ $currentStatusLabel ?? $package->status_label }}
 
                             </span>
 

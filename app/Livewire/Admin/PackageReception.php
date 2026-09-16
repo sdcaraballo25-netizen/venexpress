@@ -184,6 +184,11 @@ class PackageReception extends Component
      */
     protected function outcomeMessage(Package $received, Warehouse $warehouse): string
     {
+        if ($received->current_status === Package::STATUS_LISTO_RETIRO) {
+            return 'Recepción registrada. Este almacén es el destino final de este paquete y quedó '
+                .'LISTO PARA RETIRO automáticamente.';
+        }
+
         $resolution = app(LogisticsResolutionService::class)->resolveForPackage($received);
 
         return match ($resolution->status) {
@@ -253,7 +258,7 @@ class PackageReception extends Component
                 $released->pickup_mode === Package::PICKUP_MODE_ALLY =>
                     'Paquete despachado hacia el punto Aliado de retiro.',
 
-                default => 'Paquete despachado para su entrega a domicilio (Delivery).',
+                default => 'Paquete liberado: listo para que un repartidor de entrega lo reclame.',
             };
         } catch (RuntimeException $e) {
             $this->errorMessage = $e->getMessage();
@@ -311,7 +316,7 @@ class PackageReception extends Component
         return match (true) {
             $this->package->pickup_mode === Package::PICKUP_MODE_HUB => 'Dejar listo para retiro en este HUB',
             $this->package->pickup_mode === Package::PICKUP_MODE_ALLY => 'Despachar al punto aliado',
-            $this->package->requires_delivery => 'Despachar para delivery',
+            $this->package->requires_delivery => 'Dejar listo para entrega a domicilio',
             default => null,
         };
     }

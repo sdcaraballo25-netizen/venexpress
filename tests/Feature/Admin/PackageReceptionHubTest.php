@@ -272,4 +272,56 @@ class PackageReceptionHubTest extends TestCase
             'current_status' => Package::STATUS_EN_TRANSITO_NACIONAL,
         ]);
     }
+
+    /*
+    |--------------------------------------------------------------------------
+    | Auto-liberación encadenada — HubReceptionService ya llama a
+    | HubReleaseService cuando el HUB recibido es el destino final y
+    | pickup_mode = HUB, así que Admin ya no necesita un segundo clic.
+    |--------------------------------------------------------------------------
+    */
+
+    public function test_admin_receiving_a_hub_pickup_package_at_its_final_hub_sees_it_already_listo_retiro_and_no_release_button(): void
+    {
+        $admin = $this->createAdmin();
+        $ally = $this->createAlly();
+        $warehouse = Warehouse::factory()->create(['state' => 'Carabobo', 'city' => 'Valencia']);
+
+        WarehouseCoverage::create([
+            'warehouse_id' => $warehouse->id,
+            'state' => 'Carabobo',
+            'city' => 'Valencia',
+            'is_active' => true,
+        ]);
+
+        $package = $this->createPackage($ally, [
+            'current_status' => Package::STATUS_RECOLECTADO_VENEXPRESS,
+            'destination_state' => 'Carabobo',
+            'destination_city' => 'Valencia',
+            'requires_delivery' => false,
+            'pickup_mode' => Package::PICKUP_MODE_HUB,
+        ]);
+
+        $component = Livewire::actingAs($admin)
+            ->test(PackageReception::class)
+            ->set('trackingNumber', $package->tracking_number)
+            ->call('search')
+            ->set('warehouseId', $warehouse->id)
+            ->call('receive')
+            ->assertSet('errorMessage', null)
+            ->assertSet(
+                'successMessage',
+                'Recepción registrada. Este almacén es el destino final de este paquete y quedó '
+                    .'LISTO PARA RETIRO automáticamente.'
+            );
+
+        $this->assertFalse($component->instance()->canReleaseFromHub());
+
+        $this->assertDatabaseHas('packages', [
+            'id' => $package->id,
+            'current_status' => Package::STATUS_LISTO_RETIRO,
+            'current_warehouse_id' => $warehouse->id,
+            'destination_warehouse_id' => $warehouse->id,
+        ]);
+    }
 }

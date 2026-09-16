@@ -11,25 +11,41 @@ use RuntimeException;
 /**
  * Fase 5B-2 — Qué ocurre cuando un paquete ya llegó a su HUB destino.
  *
- * Punto de entrada único, explícito (invocado desde Admin, nunca
- * automático dentro de HubReceptionService ni de LogisticsScanService
- * — el flujo HUB -> HUB de Fase 5B-1 no cambia). Decide, según la
- * modalidad de destino final ya elegida por el cliente al registrar
- * el pedido (Package::pickup_mode / requires_delivery), qué hace con
- * un paquete EN_HUB que ya está confirmado en su HUB destino:
+ * Punto de entrada único (invocado desde Admin vía el botón "Liberar",
+ * y automáticamente desde HubReceptionService::attemptAutoRelease() en
+ * cuanto una recepción en HUB confirma el destino — el flujo HUB -> HUB
+ * de Fase 5B-1 no cambia). Decide, según la modalidad de destino final
+ * ya elegida por el cliente al registrar el pedido
+ * (Package::pickup_mode / requires_delivery), qué hace con un paquete
+ * EN_HUB que ya está confirmado en su HUB destino:
  *
  * - Retiro en HUB: EN_HUB -> LISTO_RETIRO directamente (nunca "viaja"
  *   a ningún lado, ya está donde el cliente lo retirará).
- * - Retiro en Aliado / Delivery: EN_HUB -> EN_TRANSITO_NACIONAL vía
+ * - Delivery (requires_delivery): EN_HUB -> LISTO_RETIRO directamente,
+ *   igual que el retiro en HUB — el paquete ya está en el último punto
+ *   que Venexpress controla; un repartidor de entrega lo reclama desde
+ *   ahí (PackageService::claimForDelivery() ya acepta LISTO_RETIRO como
+ *   uno de los dos estados reclamables, Package::CLAIMABLE_FOR_DELIVERY_STATUSES,
+ *   y ya lo usa hoy para el camino Aliado -> Delivery vía
+ *   DestinationReceptionService). No pasa por EN_TRANSITO_NACIONAL: ese
+ *   estado quedaría reservado para cuando SÍ hay un traslado físico
+ *   pendiente, y aquí ya no lo hay.
+ * - Retiro en Aliado: EN_HUB -> EN_TRANSITO_NACIONAL vía
  *   PackageDispatchService::dispatch() (reutilizado tal cual, sin
- *   modificarlo) — a partir de ahí, Ally\PackageReception +
- *   DestinationReceptionService (retiro en Aliado) o
- *   PackageService::claimForDelivery()/DriverDeliveryController
- *   (Delivery, Camino A) ya toman el resto del flujo sin ningún
- *   cambio.
+ *   modificarlo) — todavía falta el traslado físico hasta el Aliado de
+ *   retiro. A partir de ahí, Ally\PackageReception + DestinationReceptionService
+ *   llevan el paquete a LISTO_RETIRO cuando el Aliado lo reciba
+ *   físicamente.
  *
  * No crea ningún PackageStatus nuevo: solo usa transiciones que ya
  * existen en el sistema (EN_HUB, LISTO_RETIRO, EN_TRANSITO_NACIONAL).
+ *
+ * Antes de decidir cualquier cosa, release() vuelve a resolver el
+ * destino en vivo y sincroniza destination_warehouse_id/
+ * destination_resolution_status si habían quedado desactualizados
+ * (WarehouseCoverage corregida después de la recepción en HUB) — así
+ * "Liberar" recupera por sí solo un paquete con una resolución
+ * obsoleta, sin necesidad de una pantalla/acción aparte.
  */
 class HubReleaseService
 {
@@ -54,10 +70,32 @@ class HubReleaseService
                 );
             }
 
+            // WarehouseCoverage puede haberse corregido DESPUÉS de que
+            // este paquete fue recibido en HUB (destination_warehouse_id/
+            // destination_resolution_status quedaron congelados en ese
+            // instante — ver HubReceptionService::receiveAtWarehouse()).
+            // "Liberar" es el punto natural del flujo normal para que
+            // Admin recupere ese caso: se vuelve a resolver en vivo con
+            // LogisticsResolutionService (única fuente de verdad, sin
+            // reimplementar nada) y se sincroniza lo persistido ANTES de
+            // decidir si se puede liberar — así canReleaseFromHub() (que
+            // ya resolvía en vivo) y release() nunca vuelven a divergir.
+            $resolution = $this->logisticsResolutionService->resolveForPackage($locked);
+
             if (
-                $locked->destination_resolution_status !== LogisticsResolutionResult::STATUS_RESOLVED
-                || $locked->destination_warehouse_id === null
+                $locked->destination_resolution_status !== $resolution->status
+                || $locked->destination_warehouse_id !== $resolution->warehouseId
             ) {
+                $locked->destination_warehouse_id = $resolution->isResolved()
+                    ? $resolution->warehouseId
+                    : null;
+
+                $locked->destination_resolution_status = $resolution->status;
+
+                $locked->save();
+            }
+
+            if (! $resolution->isResolved()) {
                 throw new RuntimeException(
                     'Este paquete no tiene un HUB destino resuelto. No se puede liberar hasta que '
                     .'Admin revise su cobertura logística.'
@@ -188,19 +226,43 @@ class HubReleaseService
     }
 
     /**
-     * C) Delivery: EN_HUB -> EN_TRANSITO_NACIONAL vía
-     * PackageDispatchService::dispatch() (sin modificar). A partir de
-     * ahí, PackageService::claimForDelivery()/DriverDeliveryController
-     * (Camino A, sin cambios) ya pueden reclamar y entregar el
-     * paquete con normalidad.
+     * C) Delivery: EN_HUB -> LISTO_RETIRO directamente, igual patrón
+     * que releaseForHubPickup() — el paquete ya está en el último HUB
+     * que Venexpress controla, ahí lo recoge un repartidor de entrega.
+     * No se despacha con PackageDispatchService::dispatch() porque no
+     * hay ningún traslado físico pendiente: ese método existe para
+     * cuando SÍ falta viajar a otro punto (HUB->HUB, HUB->Aliado), y
+     * aquí no es el caso.
+     *
+     * PackageService::claimForDelivery()/DriverDeliveryController
+     * (Camino A, sin cambios) ya reclaman con normalidad desde
+     * LISTO_RETIRO — es uno de los dos estados de
+     * Package::CLAIMABLE_FOR_DELIVERY_STATUSES, y claimForDelivery()
+     * ya sabe transicionarlo a EN_TRANSITO_NACIONAL en el momento en
+     * que un repartidor lo reclama de verdad.
      */
     protected function releaseForDelivery(Package $locked, int $userId): Package
     {
-        return $this->packageDispatchService->dispatch(
-            package: $locked,
-            userId: $userId,
-            originLocation: $locked->currentWarehouse?->name ?? 'HUB destino',
-            destinationLocation: 'Flujo de Delivery',
-        );
+        $locked->current_status = Package::STATUS_LISTO_RETIRO;
+        $locked->driver_id = null;
+        $locked->save();
+
+        PackageHistory::create([
+            'package_id' => $locked->id,
+            'status' => Package::STATUS_LISTO_RETIRO,
+            'event_type' => PackageHistory::EVENT_RECEPCION,
+            'origin_location' => 'HUB destino',
+            'destination_location' => 'Listo para entrega a domicilio',
+            'location_description' => 'Paquete liberado: listo para que un repartidor de entrega lo reclame.',
+            'scanned_by_user_id' => $userId,
+        ]);
+
+        return $locked->fresh([
+            'ally',
+            'driver',
+            'histories',
+            'currentWarehouse',
+            'destinationWarehouse',
+        ]);
     }
 }

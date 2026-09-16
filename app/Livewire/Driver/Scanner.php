@@ -63,21 +63,21 @@ class Scanner extends Component
 
     /*
     |--------------------------------------------------------------------------
-    | ESCANEAR -> IDENTIFICAR -> MOSTRAR OPERACIÓN -> CONFIRMAR -> EJECUTAR
+    | UN PAQUETE = UN SOLO ESCANEO
     |--------------------------------------------------------------------------
     |
-    | Un escaneo (searchPackage) SOLO identifica la guía y calcula qué
-    | operación correspondería (resolveOperation). Nunca ejecuta una
-    | transición de estado por sí solo. La operación queda "pendiente"
-    | en estas tres propiedades hasta que el repartidor confirma
-    | explícitamente con confirmOperation(); ahí, y solo ahí, se llama a
-    | LogisticsScanService.
+    | Un escaneo (searchPackage) identifica la guía, calcula qué
+    | operación correspondería (resolveOperation) y, si es elegible, la
+    | ejecuta de inmediato vía executeResolvedOperation() — sin exigir
+    | un segundo toque del repartidor.
     |
-    | Esto evita que un segundo escaneo accidental de la misma guía (el
-    | lector dispara dos lecturas, o el repartidor la vuelve a acercar)
-    | encadene una segunda etapa distinta sin que nadie lo haya pedido:
-    | ese segundo escaneo vuelve a pasar por identificar + mostrar, no
-    | por ejecutar.
+    | La única excepción es reescanear la MISMA guía física justo
+    | después de haberla procesado ($lastProcessedPackageId): ahí no se
+    | ejecuta sola, queda "pendiente" en las tres propiedades de abajo
+    | hasta que el repartidor confirma explícitamente con
+    | confirmOperation(). Esto evita que un reescaneo accidental (el
+    | lector dispara dos lecturas, o el repartidor vuelve a acercar la
+    | misma guía) encadene sin querer la siguiente etapa distinta.
     */
 
     /**
@@ -108,9 +108,24 @@ class Scanner extends Component
     public ?string $pendingStatusSnapshot = null;
 
     /**
-     * Paso 1 y 2: ESCANEAR -> IDENTIFICAR. Busca la guía y calcula qué
-     * operación correspondería, pero no ejecuta ninguna transición de
-     * estado.
+     * Guía del último paquete procesado con éxito (auto-ejecutado o vía
+     * confirmación). Un paquete = un solo escaneo: mientras la guía
+     * escaneada sea distinta a esta, searchPackage() ejecuta la
+     * operación resuelta de inmediato. Si coincide (la MISMA guía
+     * física se vuelve a escanear justo después de procesarla), no se
+     * ejecuta sola — se exige una confirmación explícita (mismo
+     * mecanismo de pendingOperation/confirmOperation de siempre) para
+     * blindar contra un reescaneo accidental que encadenaría la
+     * siguiente etapa sin que el driver lo pidiera.
+     */
+    public ?int $lastProcessedPackageId = null;
+
+    /**
+     * Paso 1: ESCANEAR -> IDENTIFICAR -> EJECUTAR. Busca la guía,
+     * calcula qué operación corresponde y, si es elegible, la ejecuta
+     * en el mismo escaneo — salvo que sea exactamente el mismo paquete
+     * que se acaba de procesar, caso en el que queda pendiente de
+     * confirmación explícita (ver confirmOperation()).
      */
     public function searchPackage(): void
     {
@@ -182,9 +197,15 @@ class Scanner extends Component
             return;
         }
 
-        $this->pendingOperation = $resolved['key'];
-        $this->pendingPackageId = $package->id;
-        $this->pendingStatusSnapshot = $package->current_status;
+        if ($this->lastProcessedPackageId === $package->id) {
+            $this->pendingOperation = $resolved['key'];
+            $this->pendingPackageId = $package->id;
+            $this->pendingStatusSnapshot = $package->current_status;
+
+            return;
+        }
+
+        $this->executeResolvedOperation($resolved['key'], $package, $driver, (int) $user->id);
     }
 
     /**
@@ -281,10 +302,11 @@ class Scanner extends Component
     }
 
     /**
-     * Paso 5: EJECUTAR. Único punto de entrada que llama a
-     * LogisticsScanService. Solo se dispara por un clic explícito del
-     * repartidor sobre el botón de confirmación — nunca desde un
-     * escaneo.
+     * Confirmación explícita para el único caso en que searchPackage()
+     * no ejecuta la operación resuelta de inmediato: la MISMA guía
+     * física se acaba de escanear otra vez justo después de procesarla.
+     * Se dispara por un clic explícito del repartidor sobre el botón de
+     * confirmación — nunca automáticamente desde un escaneo.
      */
     public function confirmOperation(string $operation): void
     {
@@ -347,24 +369,41 @@ class Scanner extends Component
             return;
         }
 
+        $this->executeResolvedOperation($this->pendingOperation, $package, $driver, (int) $user->id);
+    }
+
+    /**
+     * Paso EJECUTAR, compartido por los dos caminos posibles hacia una
+     * operación: el automático (searchPackage(), un escaneo = una
+     * operación) y el de confirmación explícita (confirmOperation(),
+     * solo para el reescaneo inmediato de la misma guía). Único punto
+     * de entrada que llama a LogisticsScanService.
+     */
+    protected function executeResolvedOperation(
+        string $operation,
+        Package $package,
+        Driver $driver,
+        int $userId,
+    ): void {
         $service = app(LogisticsScanService::class);
 
         try {
-            $package = match ($this->pendingOperation) {
-                'collection' => $this->scanForCollection($service, $package, $driver, (int) $user->id),
-                'hub_reception' => $this->executeHubReception($service, $package, $driver, (int) $user->id),
-                'hub_departure' => $this->executeHubDeparture($service, $package, $driver, (int) $user->id),
-                'hub_arrival' => $this->executeHubArrival($service, $package, $driver, (int) $user->id),
+            $package = match ($operation) {
+                'collection' => $this->scanForCollection($service, $package, $driver, $userId),
+                'hub_reception' => $this->executeHubReception($service, $package, $driver, $userId),
+                'hub_departure' => $this->executeHubDeparture($service, $package, $driver, $userId),
+                'hub_arrival' => $this->executeHubArrival($service, $package, $driver, $userId),
                 default => throw new RuntimeException('Operación de escaneo desconocida.'),
             };
 
             $this->package = $package;
+            $this->lastProcessedPackageId = $package->id;
         } catch (RuntimeException $e) {
             $this->errorMessage = $e->getMessage();
             $this->package = $package->fresh(['ally', 'driver', 'histories']) ?? $package;
         } finally {
-            // Capa 1: se limpia siempre, haya éxito o error, para que
-            // ningún clic posterior (doble clic que se coló, botón
+            // Se limpia siempre, haya éxito o error, para que ningún
+            // clic/escaneo posterior (doble clic que se coló, botón
             // desincronizado) pueda reintentar sobre este mismo estado
             // pendiente.
             $this->clearPendingOperation();
@@ -565,6 +604,7 @@ class Scanner extends Component
             'pendingOperation',
             'pendingPackageId',
             'pendingStatusSnapshot',
+            'lastProcessedPackageId',
         ]);
     }
 

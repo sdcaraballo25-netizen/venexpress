@@ -81,9 +81,20 @@ class TrackingController extends Controller
         $statusIsKnown = true;
         $hasOpenIncident = false;
 
+        $currentStatusLabel = null;
+
         if ($package) {
             [$statusSteps, $progressPercent, $statusIsKnown] =
                 $this->buildTimeline($package);
+
+            // El badge de la cabecera debe mostrar exactamente el mismo
+            // texto que el paso "actual" del timeline (incluida la
+            // relabelación de EN_HUB/LISTO_RETIRO de arriba) — nunca el
+            // label genérico de Package::STATUS_LABELS por separado,
+            // para que ambos no puedan desincronizarse.
+            $currentStep = collect($statusSteps)->firstWhere('current', true);
+
+            $currentStatusLabel = $currentStep['label'] ?? $package->status_label;
 
             // Hallazgo de auditoría #5: los 6 estados de
             // Package::STATUSES no incluyen "devuelto"/"con
@@ -104,6 +115,7 @@ class TrackingController extends Controller
             'progressPercent' => $progressPercent,
             'statusIsKnown' => $statusIsKnown,
             'hasOpenIncident' => $hasOpenIncident,
+            'currentStatusLabel' => $currentStatusLabel,
         ]);
     }
 
@@ -213,6 +225,20 @@ class TrackingController extends Controller
             if ($key === Package::STATUS_EN_HUB && $package->current_status === Package::STATUS_EN_HUB) {
                 $label = $this->logisticsResolutionService->isAtDestinationWarehouse($package)
                     ? 'Llegó al HUB de destino'
+                    : $label;
+            }
+
+            // LISTO_RETIRO representa dos situaciones distintas para el
+            // cliente según la modalidad de su pedido: retiro en
+            // persona (Agencia/HUB) o entrega a domicilio. No es un
+            // estado nuevo — Package::CLAIMABLE_FOR_DELIVERY_STATUSES y
+            // PackageService::claimForDelivery() ya tratan LISTO_RETIRO
+            // + requires_delivery como "listo para que un repartidor lo
+            // reclame" — aquí solo se ajusta el texto que ve el
+            // cliente para ese mismo estado interno.
+            if ($key === Package::STATUS_LISTO_RETIRO && $package->current_status === Package::STATUS_LISTO_RETIRO) {
+                $label = $package->requires_delivery
+                    ? 'Listo para Entrega'
                     : $label;
             }
 

@@ -12,6 +12,7 @@ class HubReceptionService
 {
     public function __construct(
         protected LogisticsResolutionService $logisticsResolutionService,
+        protected HubReleaseService $hubReleaseService,
     ) {
     }
 
@@ -147,6 +148,38 @@ class HubReceptionService
                 'scanned_by_user_id' => $userId,
             ]);
 
+            return $this->attemptAutoRelease($locked, $userId, $warehouse, $resolution);
+        });
+    }
+
+    /**
+     * Fase 5B-2 (auto-liberación) — si el almacén donde se acaba de
+     * recibir el paquete es exactamente su HUB destino resuelto, ya no
+     * necesita seguir viajando dentro de la red de HUBs: se le entrega
+     * de una vez a HubReleaseService::release() tal cual (sin duplicar
+     * ninguna de sus validaciones de coherencia), que decide según la
+     * modalidad real (pickup_mode / requires_delivery) qué corresponde
+     * — LISTO_RETIRO (retiro en HUB o entrega a domicilio) o despacho
+     * hacia el Aliado de retiro. No se filtra por modalidad aquí: esa
+     * decisión ya vive, completa, dentro de release().
+     *
+     * En cualquier otro caso — HUB intermedio, o una condición de
+     * release() que no se cumpla (configuración inconsistente, Aliado
+     * de retiro inactivo, etc.) — el paquete se queda tal como quedó
+     * recibido (EN_HUB): la recepción física ya se completó y nunca se
+     * revierte por esto. Admin conserva el botón "Liberar" manual como
+     * respaldo para esos casos.
+     */
+    private function attemptAutoRelease(
+        Package $locked,
+        int $userId,
+        Warehouse $warehouse,
+        LogisticsResolutionResult $resolution,
+    ): Package {
+        if (
+            ! $resolution->isResolved()
+            || $resolution->warehouseId !== $warehouse->id
+        ) {
             return $locked->fresh([
                 'ally',
                 'driver',
@@ -154,7 +187,19 @@ class HubReceptionService
                 'currentWarehouse',
                 'destinationWarehouse',
             ]);
-        });
+        }
+
+        try {
+            return $this->hubReleaseService->release($locked, $userId);
+        } catch (RuntimeException $e) {
+            return $locked->fresh([
+                'ally',
+                'driver',
+                'histories',
+                'currentWarehouse',
+                'destinationWarehouse',
+            ]);
+        }
     }
 
     /**
@@ -275,13 +320,7 @@ class HubReceptionService
                 'scanned_by_user_id' => $userId,
             ]);
 
-            return $locked->fresh([
-                'ally',
-                'driver',
-                'histories',
-                'currentWarehouse',
-                'destinationWarehouse',
-            ]);
+            return $this->attemptAutoRelease($locked, $userId, $warehouse, $resolution);
         });
     }
 }

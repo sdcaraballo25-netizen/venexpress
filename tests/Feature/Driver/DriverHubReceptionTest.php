@@ -174,34 +174,30 @@ class DriverHubReceptionTest extends TestCase
 
         $component = Livewire::actingAs($user)->test(Scanner::class);
 
-        // 1er escaneo: identifica y propone "collection", sin ejecutar.
+        // 1er escaneo: un paquete = un solo escaneo, así que
+        // searchPackage() ya identifica y ejecuta "collection" en el
+        // mismo paso. scanCollection() no cambió en Fase 5A, sigue
+        // funcionando igual.
         $component
             ->set('trackingNumber', $package->tracking_number)
             ->call('searchPackage')
-            ->assertSet('errorMessage', null)
-            ->assertSet('pendingOperation', 'collection');
-
-        $this->assertSame(Package::STATUS_RECIBIDO_AGENCIA, $package->fresh()->current_status);
-
-        // Confirmación explícita: recién aquí se ejecuta la recolección.
-        // scanCollection() no cambió en Fase 5A, sigue funcionando igual.
-        $component
-            ->call('confirmOperation', 'collection')
             ->assertSet('errorMessage', null);
 
         $this->assertSame(Package::STATUS_RECOLECTADO_VENEXPRESS, $package->fresh()->current_status);
 
-        // 2do escaneo de la misma guía: el paquete ya está RECOLECTADO_
-        // VENEXPRESS, así que la siguiente etapa disponible es
-        // "hub_reception" — Scanner.php no cambió (sigue protegido) y
-        // sigue proponiéndola, pero confirmarla ahora queda bloqueada
-        // por LogisticsScanService::scanHubReception().
+        // 2do escaneo de la MISMA guía inmediatamente después: como
+        // coincide con lastProcessedPackageId, no se ejecuta sola —
+        // Scanner.php la deja pendiente de confirmación explícita en
+        // vez de encadenar la siguiente etapa ("hub_reception") sin que
+        // el driver lo pidiera.
         $component
             ->set('trackingNumber', $package->tracking_number)
             ->call('searchPackage')
             ->assertSet('errorMessage', null)
             ->assertSet('pendingOperation', 'hub_reception');
 
+        // Confirmarla ahora queda bloqueada por
+        // LogisticsScanService::scanHubReception().
         $component
             ->call('confirmOperation', 'hub_reception')
             ->assertSet('errorMessage', self::BLOCKED_MESSAGE);

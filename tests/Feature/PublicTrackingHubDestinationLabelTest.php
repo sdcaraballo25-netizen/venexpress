@@ -160,4 +160,131 @@ class PublicTrackingHubDestinationLabelTest extends TestCase
         $response->assertSee('En Hub de Clasificación');
         $response->assertDontSee('Llegó al HUB de destino');
     }
+
+    /*
+    |--------------------------------------------------------------------------
+    | LISTO_RETIRO — "Listo para Retiro en Agencia Destino" vs.
+    | "Listo para Entrega" según requires_delivery. No es un estado
+    | nuevo: mismo current_status, solo cambia el texto que ve el
+    | cliente (mismo patrón que la relabelación de EN_HUB de arriba).
+    |--------------------------------------------------------------------------
+    */
+
+    public function test_listo_retiro_without_delivery_shows_the_agency_pickup_label(): void
+    {
+        $ally = $this->createAlly();
+
+        $package = $this->createPackage($ally, [
+            'tracking_number' => 'VEN-TEST-LISTO-SIN-DELIVERY',
+            'current_status' => Package::STATUS_LISTO_RETIRO,
+            'requires_delivery' => false,
+        ]);
+
+        $response = $this->get(route('tracking.show', ['guia' => $package->tracking_number]));
+
+        $response->assertOk();
+        $response->assertSee('Listo para Retiro en Agencia Destino');
+        $response->assertDontSee('Listo para Entrega');
+    }
+
+    public function test_listo_retiro_with_delivery_shows_the_ready_for_delivery_label(): void
+    {
+        $ally = $this->createAlly();
+
+        $package = $this->createPackage($ally, [
+            'tracking_number' => 'VEN-TEST-LISTO-CON-DELIVERY',
+            'current_status' => Package::STATUS_LISTO_RETIRO,
+            'requires_delivery' => true,
+            'delivery_address' => 'Av. Bolívar, Valencia',
+        ]);
+
+        $response = $this->get(route('tracking.show', ['guia' => $package->tracking_number]));
+
+        $response->assertOk();
+        $response->assertSee('Listo para Entrega');
+        $response->assertDontSee('Listo para Retiro en Agencia Destino');
+    }
+
+    /**
+     * Un LISTO_RETIRO ya completado en el historial (no es el paso
+     * actual) conserva la etiqueta genérica — la relabelación por
+     * requires_delivery, igual que la de EN_HUB, solo aplica al paso
+     * ACTUAL del timeline.
+     */
+    public function test_a_past_listo_retiro_step_keeps_the_generic_label_even_with_delivery(): void
+    {
+        $ally = $this->createAlly();
+
+        $package = $this->createPackage($ally, [
+            'tracking_number' => 'VEN-TEST-LISTO-PASADO',
+            'current_status' => Package::STATUS_ENTREGADO,
+            'requires_delivery' => true,
+        ]);
+
+        $response = $this->get(route('tracking.show', ['guia' => $package->tracking_number]));
+
+        $response->assertOk();
+        $response->assertSee('Entregado al Cliente');
+        $response->assertSee('Listo para Retiro en Agencia Destino');
+        $response->assertDontSee('Listo para Entrega');
+    }
+
+    /*
+    |--------------------------------------------------------------------------
+    | Consistencia badge <-> timeline — ambos deben mostrar exactamente
+    | el mismo texto para el estado actual, nunca dos textos distintos
+    | en la misma pantalla.
+    |--------------------------------------------------------------------------
+    */
+
+    public function test_badge_and_timeline_show_the_same_label_when_en_hub_at_destination(): void
+    {
+        $ally = $this->createAlly();
+        $destinationHub = Warehouse::factory()->create(['state' => 'Carabobo', 'city' => 'Valencia']);
+
+        WarehouseCoverage::create([
+            'warehouse_id' => $destinationHub->id,
+            'state' => 'Carabobo',
+            'city' => 'Valencia',
+            'is_active' => true,
+        ]);
+
+        $package = $this->createPackage($ally, [
+            'tracking_number' => 'VEN-TEST-BADGE-HUB-DESTINO',
+            'current_status' => Package::STATUS_EN_HUB,
+            'destination_state' => 'Carabobo',
+            'destination_city' => 'Valencia',
+            'current_warehouse_id' => $destinationHub->id,
+            'destination_warehouse_id' => $destinationHub->id,
+            'destination_resolution_status' => 'resolved',
+        ]);
+
+        $response = $this->get(route('tracking.show', ['guia' => $package->tracking_number]));
+        $response->assertOk();
+
+        $content = $response->getContent();
+
+        $this->assertSame(2, substr_count($content, 'Llegó al HUB de destino'));
+        $this->assertStringNotContainsString('En Hub de Clasificación', $content);
+    }
+
+    public function test_badge_and_timeline_show_the_same_label_when_listo_retiro_with_delivery(): void
+    {
+        $ally = $this->createAlly();
+
+        $package = $this->createPackage($ally, [
+            'tracking_number' => 'VEN-TEST-BADGE-DELIVERY',
+            'current_status' => Package::STATUS_LISTO_RETIRO,
+            'requires_delivery' => true,
+            'delivery_address' => 'Av. Bolívar, Valencia',
+        ]);
+
+        $response = $this->get(route('tracking.show', ['guia' => $package->tracking_number]));
+        $response->assertOk();
+
+        $content = $response->getContent();
+
+        $this->assertSame(2, substr_count($content, 'Listo para Entrega'));
+        $this->assertStringNotContainsString('Listo para Retiro en Agencia Destino', $content);
+    }
 }
