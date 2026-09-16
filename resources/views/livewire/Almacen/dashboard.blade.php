@@ -63,7 +63,7 @@
         {{-- =========================================================
              LECTOR QR
         ========================================================== --}}
-        <div class="bg-white border border-[#E2E8F0] rounded-2xl shadow-sm p-6">
+        <div id="escanear" class="bg-white border border-[#E2E8F0] rounded-2xl shadow-sm p-6 scroll-mt-24">
             <div class="flex items-center gap-3 mb-1">
                 <div class="p-2 bg-purple-50 rounded-lg text-purple-700">
                     <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">

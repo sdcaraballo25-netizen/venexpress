@@ -2718,9 +2718,9 @@
     "semantic_hash": ""
   },
   "resources/views/Livewire/Almacen/dashboard.blade.php": {
-    "mtime": 1789399091.5098608,
-    "seen": 1789400457.630311,
-    "ast_hash": "4841683a6897fddc5810bb37470fd884",
+    "mtime": 1789527525.4852777,
+    "seen": 1789527561.1592093,
+    "ast_hash": "7a72fe2abb6940e1dc1bbdbe90e5a8a2",
     "semantic_hash": ""
   },
   "resources/views/Livewire/Almacen/help-center.blade.php": {
@@ -2754,9 +2754,9 @@
     "semantic_hash": ""
   },
   "resources/views/layouts/almacen.blade.php": {
-    "mtime": 1789399049.8494995,
-    "seen": 1789400457.6303535,
-    "ast_hash": "cd9e566d8fd3b70fd26b6a6cf1a3cb21",
+    "mtime": 1789527531.0379534,
+    "seen": 1789527561.1592832,
+    "ast_hash": "a37cbbeee1b62f59e310b0ce0090f60c",
     "semantic_hash": ""
   },
   "resources/views/public/help-center.blade.php": {

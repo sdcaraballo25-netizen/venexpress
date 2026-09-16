@@ -85,6 +85,20 @@
                 <span>Resumen</span>
             </a>
 
+            {{-- ESCANEAR --}}
+            <a
+                href="{{ route('almacen.dashboard') }}#escanear"
+                wire:navigate
+                @click="sidebarOpen = false"
+                class="flex items-center gap-3 px-4 py-3 rounded-xl text-sm font-medium transition-colors text-[#64748B] hover:bg-slate-50 hover:text-[#0F172A]"
+            >
+                <svg class="w-5 h-5 shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.8"
+                        d="M3 7h4V3m14 4h-4V3M3 17h4v4m14-4h-4v4M7 7h10v10H7z" />
+                </svg>
+                <span>Escanear</span>
+            </a>
+
             {{-- AYUDA --}}
             <a
                 href="{{ route('almacen.help') }}"
