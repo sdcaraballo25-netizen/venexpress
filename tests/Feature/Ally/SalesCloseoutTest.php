@@ -2,11 +2,13 @@
 
 namespace Tests\Feature\Ally;
 
+use App\Exports\SimpleArrayExport;
 use App\Livewire\Ally\SalesCloseout;
 use App\Models\Package;
 use App\Services\AllyStaffService;
 use Illuminate\Foundation\Testing\RefreshDatabase;
 use Livewire\Livewire;
+use Maatwebsite\Excel\Facades\Excel;
 use Tests\Feature\Concerns\CreatesTestPackages;
 use Tests\TestCase;
 
@@ -77,6 +79,44 @@ class SalesCloseoutTest extends TestCase
             ->set('registeredBy', (string) $taquilla->id)
             ->assertSee('25.00')
             ->assertDontSee('35.00');
+    }
+
+    public function test_export_excel_matches_the_same_filter_shown_on_screen(): void
+    {
+        Excel::fake();
+
+        $ally = $this->createAlly();
+        $taquilla = $this->createTaquilla($ally);
+
+        $this->createPackage($ally, [
+            'registered_by_user_id' => $ally->user->id,
+            'payment_method' => 'efectivo_usd',
+            'total_price_usd' => 10,
+        ]);
+
+        $this->createPackage($ally, [
+            'registered_by_user_id' => $taquilla->id,
+            'payment_method' => 'punto_venta',
+            'total_price_usd' => 25,
+        ]);
+
+        $filename = 'cierre-'.now()->format('Y-m-d').'.xlsx';
+
+        Livewire::actingAs($ally->user)
+            ->test(SalesCloseout::class)
+            ->set('registeredBy', (string) $taquilla->id)
+            ->call('exportExcel')
+            ->assertFileDownloaded();
+
+        Excel::assertDownloaded($filename, function (SimpleArrayExport $export) {
+            $rows = iterator_to_array($export->generator());
+
+            self::assertSame(['Forma de pago', 'Guías', 'Total USD'], $export->headings());
+            self::assertCount(1, $rows);
+            self::assertSame(['Punto de venta', 1, '25.00'], $rows[0]);
+
+            return true;
+        });
     }
 
     public function test_taquilla_only_sees_their_own_sales_and_cannot_switch_filter(): void

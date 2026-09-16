@@ -133,6 +133,7 @@
                 Todavía no hay almacenes registrados.
             </div>
         @else
+            <div class="overflow-x-auto">
             <table class="w-full text-sm">
                 <thead class="bg-slate-50 text-xs uppercase tracking-wide text-slate-400">
                     <tr>
@@ -285,6 +286,7 @@
                     @endforeach
                 </tbody>
             </table>
+            </div>
         @endif
     </div>
 </div>

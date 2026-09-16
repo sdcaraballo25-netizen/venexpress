@@ -99,6 +99,37 @@ class DriverPaymentService
         });
     }
 
+    /**
+     * Paga de una vez todas las remuneraciones pendientes de un
+     * repartidor (la acción "nómina": marcar como pagado lo que se le
+     * debe en total). Reutiliza markPaid() por cada una en vez de
+     * repetir su lógica, para que el resultado sea idéntico a pagarlas
+     * una por una — mismo historial, misma auditoría, mismas
+     * validaciones.
+     *
+     * @return int cantidad de remuneraciones pagadas
+     */
+    public function markAllPaidForDriver(int $driverId, int $userId, ?string $notes = null): int
+    {
+        return DB::transaction(function () use ($driverId, $userId, $notes) {
+            $payments = DriverPayment::query()
+                ->where('driver_id', $driverId)
+                ->where('status', DriverPayment::STATUS_PENDING)
+                ->lockForUpdate()
+                ->get();
+
+            if ($payments->isEmpty()) {
+                throw new RuntimeException('Este repartidor no tiene remuneraciones pendientes.');
+            }
+
+            foreach ($payments as $payment) {
+                $this->markPaid($payment, $userId, $notes);
+            }
+
+            return $payments->count();
+        });
+    }
+
     public function markPaid(DriverPayment $payment, int $userId, ?string $notes=null): DriverPayment
     {
         return DB::transaction(function () use ($payment,$userId,$notes) {

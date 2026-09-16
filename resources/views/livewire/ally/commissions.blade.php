@@ -44,10 +44,21 @@
     </div>
 
     <div class="rounded-2xl border border-[#E2E8F0] bg-white p-5 shadow-sm">
-        <h3 class="font-display text-lg font-semibold text-[#0F172A] mb-4">
-            Últimos 6 meses
-        </h3>
+        <div class="flex flex-wrap items-center justify-between gap-3 mb-4">
+            <h3 class="font-display text-lg font-semibold text-[#0F172A]">
+                Últimos 6 meses
+            </h3>
 
+            <button
+                type="button"
+                wire:click="exportExcel"
+                class="rounded-lg border border-[#E2E8F0] px-3 py-1.5 text-xs font-semibold text-slate-700 hover:bg-slate-50"
+            >
+                ⬇ Exportar Excel
+            </button>
+        </div>
+
+        <div class="overflow-x-auto">
         <table class="w-full text-sm">
             <thead>
                 <tr class="text-left text-slate-500 border-b border-slate-200">
@@ -68,6 +79,7 @@
                 @endforeach
             </tbody>
         </table>
+        </div>
     </div>
 
     <div class="rounded-xl bg-amber-50 border border-amber-200 px-4 py-3 text-sm text-amber-800">

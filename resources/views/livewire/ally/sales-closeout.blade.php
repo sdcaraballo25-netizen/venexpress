@@ -47,7 +47,19 @@
             </div>
         </div>
 
-        <h3 class="text-sm font-semibold text-[#0F172A] mb-3">Por forma de pago</h3>
+        <div class="flex flex-wrap items-center justify-between gap-3 mb-3">
+            <h3 class="text-sm font-semibold text-[#0F172A]">Por forma de pago</h3>
+
+            @if ($byPaymentMethod->isNotEmpty())
+                <button
+                    type="button"
+                    wire:click="exportExcel"
+                    class="rounded-lg border border-slate-200 px-3 py-1.5 text-xs font-semibold text-slate-700 hover:bg-slate-50"
+                >
+                    ⬇ Exportar Excel
+                </button>
+            @endif
+        </div>
 
         @if ($byPaymentMethod->isEmpty())
             <p class="text-sm text-slate-400 py-4">No hay ventas con forma de pago registrada en esta fecha.</p>

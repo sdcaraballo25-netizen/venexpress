@@ -2,21 +2,25 @@
 
 namespace App\Livewire\Admin;
 
+use App\Livewire\Concerns\ExportsSpreadsheet;
 use App\Models\Ally;
 use App\Models\AllyFinancialTransaction;
 use App\Models\AllySettlement;
 use App\Services\AllyFinancialService;
+use Illuminate\Support\Str;
 use Illuminate\Validation\Rule;
 use Livewire\Attributes\Layout;
 use Livewire\Attributes\Title;
 use Livewire\Component;
 use Livewire\WithPagination;
 use RuntimeException;
+use Symfony\Component\HttpFoundation\BinaryFileResponse;
 
 #[Layout('layouts.admin')]
 #[Title('Finanzas de Aliados')]
 class AllyFinance extends Component
 {
+    use ExportsSpreadsheet;
     use WithPagination;
 
     public string $search = '';
@@ -343,6 +347,39 @@ class AllyFinance extends Component
                 $e->getMessage()
             );
         }
+    }
+
+    /**
+     * Exporta TODO el historial financiero del aliado seleccionado
+     * (no solo los 30 más recientes que se muestran en pantalla, que
+     * son solo para vista rápida) — para un cuadre contable hace
+     * falta el historial completo.
+     */
+    public function exportExcel(): BinaryFileResponse
+    {
+        abort_unless($this->selectedAllyId, 400, 'Selecciona un aliado primero.');
+
+        $ally = Ally::findOrFail($this->selectedAllyId);
+
+        $rows = AllyFinancialTransaction::query()
+            ->where('ally_id', $ally->id)
+            ->latest('created_at')
+            ->latest('id')
+            ->cursor()
+            ->map(fn (AllyFinancialTransaction $transaction) => [
+                $transaction->created_at?->format('d/m/Y H:i'),
+                ucfirst($transaction->type),
+                $transaction->isCredit() ? 'Crédito' : 'Débito',
+                number_format((float) $transaction->amount_usd, 2, '.', ''),
+                $transaction->reference,
+                $transaction->description,
+            ]);
+
+        return $this->excelDownload(
+            'finanzas-'.Str::slug($ally->business_name).'-'.now()->format('Y-m-d').'.xlsx',
+            ['Fecha', 'Tipo', 'Movimiento', 'Monto USD', 'Referencia', 'Descripción'],
+            $rows,
+        );
     }
 
     protected function resetSettlementForm(): void

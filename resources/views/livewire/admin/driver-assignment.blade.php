@@ -49,8 +49,7 @@
                     <button wire:click="unassign" wire:loading.attr="disabled" wire:target="unassign" class="mt-3 w-full rounded-xl bg-amber-600 px-5 py-3 font-semibold text-white disabled:opacity-50">
                         Retirar asignación
                     </button>
-
-                </form>
+                @endif
             </div>
         @endif
     </div>

@@ -162,7 +162,7 @@
                     </div>
 
                     @if ($sim_package_type === 'paquete')
-                        <div class="grid grid-cols-4 gap-3">
+                        <div class="grid grid-cols-2 gap-3 sm:grid-cols-4">
                             <div>
                                 <label class="block text-xs font-bold text-[#64748B] uppercase tracking-wider mb-1">Peso (kg)</label>
                                 <input type="number" step="0.01" wire:model="sim_physical_weight_kg" class="w-full rounded-xl border-[#E2E8F0] text-sm">

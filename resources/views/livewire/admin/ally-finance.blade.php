@@ -468,9 +468,21 @@
 
         <div class="rounded-2xl border border-slate-200 bg-white p-5 shadow-sm">
 
-            <h2 class="text-lg font-semibold text-slate-900">
-                Historial financiero
-            </h2>
+            <div class="flex flex-wrap items-center justify-between gap-3">
+                <h2 class="text-lg font-semibold text-slate-900">
+                    Historial financiero
+                </h2>
+
+                @if ($transactions->isNotEmpty())
+                    <button
+                        type="button"
+                        wire:click="exportExcel"
+                        class="rounded-lg border border-slate-200 px-3 py-1.5 text-xs font-semibold text-slate-700 hover:bg-slate-50"
+                    >
+                        ⬇ Exportar Excel completo
+                    </button>
+                @endif
+            </div>
 
             <div class="mt-4 overflow-x-auto">
 

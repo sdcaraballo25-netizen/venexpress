@@ -15,6 +15,7 @@ use Illuminate\Support\Facades\Hash;
 use Illuminate\Validation\Rules;
 use Livewire\Attributes\Layout;
 use Livewire\Attributes\Title;
+use Livewire\Attributes\Url;
 use Livewire\Component;
 use Livewire\WithPagination;
 
@@ -24,6 +25,13 @@ class UsersManager extends Component
 {
     use WithPagination;
 
+    /**
+     * #[Url]: permite llegar aquí con un enlace directo tipo
+     * /admin/users?search=correo@ejemplo.com (ej. desde la Bitácora de
+     * auditoría, para revisar los datos de un usuario puntual) sin
+     * cambiar el comportamiento normal de la búsqueda en pantalla.
+     */
+    #[Url]
     public string $search = '';
 
     public string $roleFilter = '';

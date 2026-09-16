@@ -2,15 +2,37 @@
 
 namespace App\Livewire\Ally;
 
+use App\Livewire\Concerns\ExportsSpreadsheet;
 use App\Models\Package;
 use App\Services\AllyFinancialService;
 use Illuminate\Support\Carbon;
 use Livewire\Attributes\Layout;
 use Livewire\Component;
+use Symfony\Component\HttpFoundation\BinaryFileResponse;
 
 #[Layout('layouts.ally')]
 class Commissions extends Component
 {
+    use ExportsSpreadsheet;
+
+    public function exportExcel(): BinaryFileResponse
+    {
+        $ally = auth()->user()->resolveAlly();
+
+        $rows = collect($this->monthlyBreakdown($ally->id))
+            ->map(fn (array $month) => [
+                $month['label'],
+                $month['packages'],
+                number_format($month['commission_usd'], 2, '.', ''),
+            ]);
+
+        return $this->excelDownload(
+            'comisiones-'.now()->format('Y-m-d').'.xlsx',
+            ['Mes', 'Guías', 'Comisión USD'],
+            $rows,
+        );
+    }
+
     public function mount(): void
     {
         if (

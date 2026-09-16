@@ -2,12 +2,15 @@
 
 namespace App\Livewire\Ally;
 
+use App\Livewire\Concerns\ExportsSpreadsheet;
 use App\Models\Ally;
 use App\Models\Package;
+use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Support\Carbon;
 use Illuminate\Support\Facades\Auth;
 use Livewire\Attributes\Layout;
 use Livewire\Component;
+use Symfony\Component\HttpFoundation\BinaryFileResponse;
 
 /**
  * Cierre del día: cuánto se vendió y por cuál forma de pago, para que
@@ -22,6 +25,8 @@ use Livewire\Component;
 #[Layout('layouts.ally')]
 class SalesCloseout extends Component
 {
+    use ExportsSpreadsheet;
+
     public string $date;
 
     /**
@@ -60,7 +65,12 @@ class SalesCloseout extends Component
         }
     }
 
-    public function render()
+    /**
+     * Mismo filtrado (fecha + taquilla, con el mismo blindaje para
+     * Taquilla) que usan tanto render() como exportExcel() — para no
+     * repetir esta lógica en dos lugares que podrían desincronizarse.
+     */
+    protected function baseQuery(): Builder
     {
         $ally = $this->ally();
         $user = Auth::user();
@@ -69,16 +79,54 @@ class SalesCloseout extends Component
         $day = Carbon::parse($this->date);
         $range = [$day->copy()->startOfDay(), $day->copy()->endOfDay()];
 
-        $baseQuery = Package::query()
+        $query = Package::query()
             ->where('ally_id', $ally->id)
             ->whereBetween('created_at', $range);
 
         if (! $isPrincipal) {
             // Taquilla: sin excepción, solo lo suyo.
-            $baseQuery->where('registered_by_user_id', $user->id);
+            $query->where('registered_by_user_id', $user->id);
         } elseif ($this->registeredBy !== 'all') {
-            $baseQuery->where('registered_by_user_id', (int) $this->registeredBy);
+            $query->where('registered_by_user_id', (int) $this->registeredBy);
         }
+
+        return $query;
+    }
+
+    /**
+     * Exporta exactamente lo que se ve en pantalla para la fecha/
+     * taquilla elegida: el desglose por forma de pago. Reutiliza
+     * baseQuery() para no calcular los totales con un criterio
+     * distinto al que ve el usuario.
+     */
+    public function exportExcel(): BinaryFileResponse
+    {
+        $rows = (clone $this->baseQuery())
+            ->whereNotNull('payment_method')
+            ->selectRaw('payment_method, SUM(total_price_usd) as total, COUNT(*) as guides')
+            ->groupBy('payment_method')
+            ->orderByDesc('total')
+            ->get()
+            ->map(fn ($row) => [
+                Package::PAYMENT_METHOD_LABELS[$row->payment_method] ?? $row->payment_method,
+                $row->guides,
+                number_format((float) $row->total, 2, '.', ''),
+            ]);
+
+        return $this->excelDownload(
+            "cierre-{$this->date}.xlsx",
+            ['Forma de pago', 'Guías', 'Total USD'],
+            $rows,
+        );
+    }
+
+    public function render()
+    {
+        $ally = $this->ally();
+        $user = Auth::user();
+        $isPrincipal = $user->isAliado();
+
+        $baseQuery = $this->baseQuery();
 
         $totalUsd = (clone $baseQuery)->sum('total_price_usd');
         $totalGuides = (clone $baseQuery)->count();

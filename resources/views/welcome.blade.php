@@ -157,7 +157,16 @@
 
         @media (max-width: 480px) {
             .hero-title {
-                font-size: 2.65rem;
+                /* Antes era un valor fijo (2.65rem) que en pantallas
+                   angostas (~375px) hacía que "Rastrea siempre." se
+                   saliera de su contenedor sin generar scroll (el hero
+                   tiene overflow-hidden, así que el texto quedaba
+                   cortado en vez de mostrar una barra). clamp() lo
+                   escala de forma continua para que quepa en
+                   cualquier ancho de teléfono, no solo el que se
+                   probó — medido contra el ancho real de "Rastrea
+                   siempre." en Poppins 800, no a ojo. */
+                font-size: clamp(1.75rem, 8.5vw, 2.65rem);
             }
         }
     </style>
@@ -184,7 +193,7 @@
                 <img
                     src="{{ asset('images/venexpress-logo.png') }}"
                     alt="Venexpress"
-                    class="h-9 w-auto"
+                    class="h-7 w-auto sm:h-9"
                 >
 
             </a>
@@ -225,11 +234,11 @@
             </div>
 
 
-            <div class="flex items-center gap-3">
+            <div class="flex items-center gap-1.5 sm:gap-3">
 
                 <a
                     href="{{ route('login') }}"
-                    class="bg-amber-400 hover:bg-amber-500 text-blue-950 font-semibold text-sm px-6 py-2.5 rounded-lg transition inline-flex items-center justify-center shadow-sm hover:shadow-md"
+                    class="bg-amber-400 hover:bg-amber-500 text-blue-950 font-semibold text-xs sm:text-sm px-2.5 py-2 sm:px-6 sm:py-2.5 rounded-lg transition inline-flex items-center justify-center shadow-sm hover:shadow-md whitespace-nowrap"
                 >
                     Iniciar sesión
                 </a>
@@ -238,7 +247,7 @@
                 <button
                     id="mobile-menu-button"
                     type="button"
-                    class="md:hidden w-10 h-10 rounded-lg border border-gray-200 text-blue-950 flex items-center justify-center"
+                    class="md:hidden w-10 h-10 shrink-0 rounded-lg border border-gray-200 text-blue-950 flex items-center justify-center"
                     aria-label="Abrir menú"
                     aria-expanded="false"
                     aria-controls="mobile-menu"
@@ -317,8 +326,15 @@
 
             {{-- =================================================
                  TEXTO
+
+                 min-w-0: sin esto, el <h1> con whitespace-nowrap de
+                 abajo fuerza a esta columna del grid a ser tan ancha
+                 como el texto sin cortar, arrastrando con ella el
+                 párrafo y los botones fuera del viewport en móvil
+                 (el hero-section con overflow-hidden solo esconde el
+                 scroll, no evita que el contenido se corte).
             ================================================== --}}
-            <div class="relative z-20 max-w-2xl">
+            <div class="relative z-20 max-w-2xl min-w-0">
 
                 <h1 class="hero-title font-extrabold text-blue-950 leading-[0.82] tracking-tight">
 
@@ -341,7 +357,11 @@
                 {{-- =================================================
                      BOTONES
                 ================================================== --}}
-                <div class="mt-7 flex flex-nowrap items-center gap-2">
+                {{-- flex-wrap en móvil: en pantallas muy angostas (~320px)
+                     los 3 botones con ícono+texto no caben en una sola
+                     fila; de sm en adelante sí, así que ahí vuelve a
+                     una sola línea. --}}
+                <div class="mt-7 flex flex-wrap sm:flex-nowrap items-center gap-2">
 
 
                     {{-- Calcular --}}

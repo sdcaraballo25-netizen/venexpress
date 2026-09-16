@@ -598,7 +598,7 @@
                 </div>
 
                 @if ($package_type === 'paquete')
-                    <div class="grid grid-cols-3 gap-4 mt-4">
+                    <div class="grid grid-cols-1 gap-4 mt-4 sm:grid-cols-3">
                         <div>
                             <label class="text-sm text-slate-600">Largo (cm)</label>
                             <input type="number" step="0.01" wire:model.live.debounce.500ms="length_cm"
