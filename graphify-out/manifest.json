@@ -606,9 +606,9 @@
     "semantic_hash": "e1790b7d0d6e0f4a34bb7497b14eeace"
   },
   "resources/views/layouts/admin.blade.php": {
-    "mtime": 1789446624.688556,
-    "seen": 1789589531.870782,
-    "ast_hash": "a677617905d0397e905a04ad4320bbfd",
+    "mtime": 1789595007.3549693,
+    "seen": 1789595034.2394001,
+    "ast_hash": "64066131cd48e4ac75a4e0cb5cb7494b",
     "semantic_hash": ""
   },
   "resources/views/layouts/app.blade.php": {
