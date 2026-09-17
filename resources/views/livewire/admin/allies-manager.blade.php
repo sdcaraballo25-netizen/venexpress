@@ -165,7 +165,7 @@
 
                                     @if($ally->storefront_photo_path)
                                         <img
-                                            src="{{ Storage::url($ally->storefront_photo_path) }}"
+                                            src="{{ route('allies.documents.storefront', $ally) }}"
                                             alt="Fachada de {{ $ally->business_name }}"
                                             class="w-10 h-10 rounded-lg object-cover border border-[#E2E8F0] shrink-0"
                                         >

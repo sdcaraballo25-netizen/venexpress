@@ -286,10 +286,10 @@ class DriverPackageController extends Controller
             'receiver_id_doc' => ['required', 'string', 'max:30'],
             'receiver_phone' => ['nullable', 'string', 'max:30'],
             'delivery_confirmation_method' => ['required', 'in:firma,foto,cedula'],
-            'photo' => ['nullable', 'image', 'max:5120'],
+            'photo' => ['nullable', 'image', 'mimes:jpg,jpeg,png,webp', 'max:5120'],
             'cod_payment_method' => [
                 $codPaymentMethodRequired ? 'required' : 'nullable',
-                'in:' . implode(',', Package::PAYMENT_METHODS),
+                'in:'.implode(',', Package::PAYMENT_METHODS),
             ],
         ], [
             'cod_payment_method.required' => 'Este pedido es contra entrega (COD): indica la forma de pago con la que te cancelaron.',
@@ -298,7 +298,7 @@ class DriverPackageController extends Controller
         $photoPath = null;
 
         if ($request->hasFile('photo')) {
-            $photoPath = $request->file('photo')->store('delivery-evidence', 'public');
+            $photoPath = $request->file('photo')->store('delivery-evidence', 'local');
         }
 
         try {
@@ -320,7 +320,7 @@ class DriverPackageController extends Controller
             ]);
         } catch (RuntimeException $e) {
             if ($photoPath) {
-                Storage::disk('public')->delete($photoPath);
+                Storage::disk('local')->delete($photoPath);
             }
 
             return response()->json(['message' => $e->getMessage()], 422);

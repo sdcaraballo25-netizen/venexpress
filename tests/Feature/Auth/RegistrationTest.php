@@ -56,7 +56,7 @@ class RegistrationTest extends TestCase
 
     public function test_new_ally_registers_as_pending_with_storefront_photo_and_location(): void
     {
-        Storage::fake('public');
+        Storage::fake('local');
 
         $component = Volt::test('pages.auth.register')
             ->set('name', 'Dueño Agencia')
@@ -85,12 +85,12 @@ class RegistrationTest extends TestCase
         $this->assertEquals(10.5, (float) $ally->latitude);
         $this->assertEquals(-66.9, (float) $ally->longitude);
 
-        Storage::disk('public')->assertExists($ally->storefront_photo_path);
+        Storage::disk('local')->assertExists($ally->storefront_photo_path);
     }
 
     public function test_new_driver_registers_as_pending_with_documents(): void
     {
-        Storage::fake('public');
+        Storage::fake('local');
 
         $component = Volt::test('pages.auth.register')
             ->set('name', 'Repartidor Nuevo')
@@ -117,14 +117,14 @@ class RegistrationTest extends TestCase
         $this->assertNotNull($user->driver->id_photo_path);
         $this->assertNotNull($user->driver->vehicle_registration_photo_path);
 
-        Storage::disk('public')->assertExists($user->driver->license_photo_path);
-        Storage::disk('public')->assertExists($user->driver->id_photo_path);
-        Storage::disk('public')->assertExists($user->driver->vehicle_registration_photo_path);
+        Storage::disk('local')->assertExists($user->driver->license_photo_path);
+        Storage::disk('local')->assertExists($user->driver->id_photo_path);
+        Storage::disk('local')->assertExists($user->driver->vehicle_registration_photo_path);
     }
 
     public function test_driver_registration_requires_all_three_documents(): void
     {
-        Storage::fake('public');
+        Storage::fake('local');
 
         Volt::test('pages.auth.register')
             ->set('name', 'Repartidor Incompleto')

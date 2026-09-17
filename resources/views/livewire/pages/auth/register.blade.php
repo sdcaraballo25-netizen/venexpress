@@ -163,6 +163,7 @@ new #[Layout('layouts.guest')] class extends Component
                 'storefront_photo' => [
                     'required',
                     'image',
+                    'mimes:jpg,jpeg,png,webp',
                     'max:4096',
                 ],
 
@@ -210,18 +211,21 @@ new #[Layout('layouts.guest')] class extends Component
                 'license_photo' => [
                     'required',
                     'image',
+                    'mimes:jpg,jpeg,png,webp',
                     'max:4096',
                 ],
 
                 'id_photo' => [
                     'required',
                     'image',
+                    'mimes:jpg,jpeg,png,webp',
                     'max:4096',
                 ],
 
                 'vehicle_registration_photo' => [
                     'required',
                     'image',
+                    'mimes:jpg,jpeg,png,webp',
                     'max:4096',
                 ],
             ]);
@@ -306,7 +310,7 @@ new #[Layout('layouts.guest')] class extends Component
         */
 
         if ($user->isAliado()) {
-            $storefrontPhotoPath = $this->storefront_photo->store('allies', 'public');
+            $storefrontPhotoPath = $this->storefront_photo->store('allies', 'local');
 
             Ally::create([
                 'user_id' => $user->id,
@@ -347,9 +351,9 @@ new #[Layout('layouts.guest')] class extends Component
                 'vehicle_type' => $validated['vehicle_type'],
                 'phone' => $validated['phone'],
                 'driver_type' => Driver::TYPE_DELIVERY,
-                'license_photo_path' => $this->license_photo->store('drivers', 'public'),
-                'id_photo_path' => $this->id_photo->store('drivers', 'public'),
-                'vehicle_registration_photo_path' => $this->vehicle_registration_photo->store('drivers', 'public'),
+                'license_photo_path' => $this->license_photo->store('drivers', 'local'),
+                'id_photo_path' => $this->id_photo->store('drivers', 'local'),
+                'vehicle_registration_photo_path' => $this->vehicle_registration_photo->store('drivers', 'local'),
 
                 // Un repartidor nuevo comienza como PENDIENTE, igual
                 // que un aliado, hasta que un admin lo apruebe.

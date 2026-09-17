@@ -210,7 +210,7 @@
                                 <div class="flex items-center gap-2">
 
                                     @if ($driver->license_photo_path)
-                                        <a href="{{ \Illuminate\Support\Facades\Storage::url($driver->license_photo_path) }}" target="_blank" rel="noopener"
+                                        <a href="{{ route('drivers.documents.license', $driver) }}" target="_blank" rel="noopener noreferrer"
                                             class="px-2.5 py-1.5 rounded-lg bg-slate-50 text-slate-600 hover:bg-slate-100 text-xs font-semibold transition"
                                             title="Ver licencia">
                                             Licencia
@@ -218,7 +218,7 @@
                                     @endif
 
                                     @if ($driver->id_photo_path)
-                                        <a href="{{ \Illuminate\Support\Facades\Storage::url($driver->id_photo_path) }}" target="_blank" rel="noopener"
+                                        <a href="{{ route('drivers.documents.id', $driver) }}" target="_blank" rel="noopener noreferrer"
                                             class="px-2.5 py-1.5 rounded-lg bg-slate-50 text-slate-600 hover:bg-slate-100 text-xs font-semibold transition"
                                             title="Ver cédula">
                                             Cédula
@@ -226,7 +226,7 @@
                                     @endif
 
                                     @if ($driver->vehicle_registration_photo_path)
-                                        <a href="{{ \Illuminate\Support\Facades\Storage::url($driver->vehicle_registration_photo_path) }}" target="_blank" rel="noopener"
+                                        <a href="{{ route('drivers.documents.vehicle-registration', $driver) }}" target="_blank" rel="noopener noreferrer"
                                             class="px-2.5 py-1.5 rounded-lg bg-slate-50 text-slate-600 hover:bg-slate-100 text-xs font-semibold transition"
                                             title="Ver carnet de circulación">
                                             Carnet

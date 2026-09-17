@@ -1,5 +1,6 @@
 <?php
 
+use App\Http\Controllers\DocumentPhotoController;
 use App\Http\Controllers\DriverScanController;
 use App\Http\Controllers\PackageLabelController;
 use App\Http\Controllers\PaymentWebhookController;
@@ -11,20 +12,19 @@ use App\Livewire\Admin\BcvRateManager;
 use App\Livewire\Admin\CityDistanceManager;
 use App\Livewire\Admin\Dashboard as AdminDashboard;
 use App\Livewire\Admin\DriverAssignment;
-use App\Livewire\Admin\DriversApprovalManager;
 use App\Livewire\Admin\DriverPayments;
 use App\Livewire\Admin\DriverRemunerationManager;
+use App\Livewire\Admin\DriversApprovalManager;
+use App\Livewire\Admin\HelpCenter as AdminHelpCenter;
 use App\Livewire\Admin\IncidentsManager;
 use App\Livewire\Admin\PackageDispatch;
 use App\Livewire\Admin\PaymentOrders;
 use App\Livewire\Admin\RateMatrixManager;
+use App\Livewire\Admin\RecommendationsManager;
 use App\Livewire\Admin\RoutesDashboard;
 use App\Livewire\Admin\RoutesManager;
 use App\Livewire\Admin\UsersManager;
-use App\Livewire\Admin\HelpCenter as AdminHelpCenter;
 use App\Livewire\Admin\WarehousesManager;
-use App\Livewire\Almacen\Dashboard as AlmacenDashboard;
-use App\Livewire\Almacen\HelpCenter as AlmacenHelpCenter;
 use App\Livewire\Ally\Cod as AllyCod;
 use App\Livewire\Ally\Commissions as AllyCommissions;
 use App\Livewire\Ally\DailyCashCut;
@@ -38,6 +38,8 @@ use App\Livewire\Ally\PackageReception;
 use App\Livewire\Ally\Packages as AllyPackages;
 use App\Livewire\Ally\SalesCloseout as AllySalesCloseout;
 use App\Livewire\Ally\StaffManager as AllyStaffManager;
+use App\Livewire\Almacen\Dashboard as AlmacenDashboard;
+use App\Livewire\Almacen\HelpCenter as AlmacenHelpCenter;
 use App\Livewire\Client\Dashboard as ClientDashboard;
 use App\Livewire\Client\Incidents as ClientIncidents;
 use App\Livewire\Client\PendingPayments as ClientPendingPayments;
@@ -49,7 +51,6 @@ use App\Livewire\Driver\Packages;
 use App\Livewire\Driver\RouteDetail;
 use App\Livewire\Driver\RouteHistory;
 use App\Livewire\Driver\Scanner;
-use App\Livewire\Admin\RecommendationsManager;
 use App\Livewire\Public\HelpCenter;
 use App\Livewire\Public\OfficeLocator;
 use App\Livewire\Public\PriceCalculator;
@@ -534,6 +535,53 @@ Route::get(
 )
     ->middleware(['auth'])
     ->name('packages.label');
+
+/*
+|--------------------------------------------------------------------------
+| Documentos de identidad (privados)
+|--------------------------------------------------------------------------
+|
+| Fotos de cédula, licencia, carnet de circulación, fachada de agencia
+| y evidencia de entrega. Se guardan en el disco privado ("local") y
+| solo se sirven a través de estas rutas autenticadas; la autorización
+| fina se realiza dentro de DocumentPhotoController.
+|
+*/
+
+Route::get(
+    '/aliados/{ally}/documentos/fachada',
+    [DocumentPhotoController::class, 'allyStorefront']
+)
+    ->middleware(['auth'])
+    ->name('allies.documents.storefront');
+
+Route::get(
+    '/repartidores/{driver}/documentos/licencia',
+    [DocumentPhotoController::class, 'driverLicense']
+)
+    ->middleware(['auth'])
+    ->name('drivers.documents.license');
+
+Route::get(
+    '/repartidores/{driver}/documentos/cedula',
+    [DocumentPhotoController::class, 'driverId']
+)
+    ->middleware(['auth'])
+    ->name('drivers.documents.id');
+
+Route::get(
+    '/repartidores/{driver}/documentos/carnet-circulacion',
+    [DocumentPhotoController::class, 'driverVehicleRegistration']
+)
+    ->middleware(['auth'])
+    ->name('drivers.documents.vehicle-registration');
+
+Route::get(
+    '/paquetes/{package}/evidencia-entrega',
+    [DocumentPhotoController::class, 'packageDeliveryEvidence']
+)
+    ->middleware(['auth'])
+    ->name('packages.delivery-evidence');
 
 /*
 |--------------------------------------------------------------------------
