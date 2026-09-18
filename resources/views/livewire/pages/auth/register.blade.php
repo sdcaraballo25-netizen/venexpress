@@ -4,6 +4,7 @@ use App\Models\Ally;
 use App\Models\Customer;
 use App\Models\Driver;
 use App\Models\User;
+use App\Notifications\AccountPendingApproval;
 use App\Notifications\WelcomeVerificationToken;
 use App\Services\VenezuelaLocationService;
 use Illuminate\Auth\Events\Registered;
@@ -367,6 +368,8 @@ new #[Layout('layouts.guest')] class extends Component
                 'status' => Ally::STATUS_PENDING,
             ]);
 
+            $user->notify(new AccountPendingApproval('Aliado'));
+
             Auth::login($user);
 
             $this->redirect(
@@ -398,6 +401,8 @@ new #[Layout('layouts.guest')] class extends Component
                 // que un aliado, hasta que un admin lo apruebe.
                 'status' => Driver::STATUS_PENDING,
             ]);
+
+            $user->notify(new AccountPendingApproval('Repartidor'));
 
             Auth::login($user);
 
@@ -757,38 +762,6 @@ new #[Layout('layouts.guest')] class extends Component
                 />
             </div>
 
-            {{-- FOTO DE FACHADA --}}
-            <div>
-                <x-input-label
-                    for="storefront_photo"
-                    value="Foto de la fachada del local"
-                />
-
-                <input
-                    type="file"
-                    wire:model="storefront_photo"
-                    id="storefront_photo"
-                    accept="image/*"
-                    class="block mt-1.5 w-full text-sm text-gray-600
-                           file:mr-4 file:py-2 file:px-4 file:rounded-md
-                           file:border-0 file:text-sm file:font-semibold
-                           file:bg-blue-50 file:text-blue-700 hover:file:bg-blue-100"
-                />
-
-                <p class="mt-1 text-xs text-gray-500" wire:loading wire:target="storefront_photo">
-                    Subiendo foto...
-                </p>
-
-                @if ($storefront_photo)
-                    <img src="{{ $storefront_photo->temporaryUrl() }}" class="mt-2 h-24 rounded-lg object-cover" alt="Vista previa">
-                @endif
-
-                <x-input-error
-                    :messages="$errors->get('storefront_photo')"
-                    class="mt-2"
-                />
-            </div>
-
             {{--
                 DOCUMENTOS DE VERIFICACIÓN (RIF, registro mercantil,
                 cédula del titular). A diferencia de la foto de
@@ -911,6 +884,38 @@ new #[Layout('layouts.guest')] class extends Component
 
                 <x-input-error
                     :messages="$errors->get('owner_id_document')"
+                    class="mt-2"
+                />
+            </div>
+
+            {{-- FOTO DE FACHADA --}}
+            <div>
+                <x-input-label
+                    for="storefront_photo"
+                    value="Foto de la fachada del local"
+                />
+
+                <input
+                    type="file"
+                    wire:model="storefront_photo"
+                    id="storefront_photo"
+                    accept="image/*"
+                    class="block mt-1.5 w-full text-sm text-gray-600
+                           file:mr-4 file:py-2 file:px-4 file:rounded-md
+                           file:border-0 file:text-sm file:font-semibold
+                           file:bg-blue-50 file:text-blue-700 hover:file:bg-blue-100"
+                />
+
+                <p class="mt-1 text-xs text-gray-500" wire:loading wire:target="storefront_photo">
+                    Subiendo foto...
+                </p>
+
+                @if ($storefront_photo)
+                    <img src="{{ $storefront_photo->temporaryUrl() }}" class="mt-2 h-24 rounded-lg object-cover" alt="Vista previa">
+                @endif
+
+                <x-input-error
+                    :messages="$errors->get('storefront_photo')"
                     class="mt-2"
                 />
             </div>

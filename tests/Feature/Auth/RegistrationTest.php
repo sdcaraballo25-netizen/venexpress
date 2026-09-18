@@ -6,8 +6,10 @@ use App\Models\Ally;
 use App\Models\Customer;
 use App\Models\Driver;
 use App\Models\User;
+use App\Notifications\AccountPendingApproval;
 use Illuminate\Foundation\Testing\RefreshDatabase;
 use Illuminate\Http\UploadedFile;
+use Illuminate\Support\Facades\Notification;
 use Illuminate\Support\Facades\Storage;
 use Livewire\Volt\Volt;
 use Tests\TestCase;
@@ -141,6 +143,7 @@ class RegistrationTest extends TestCase
     public function test_new_ally_registers_as_pending_with_storefront_photo_and_location(): void
     {
         Storage::fake('local');
+        Notification::fake();
 
         $component = Volt::test('pages.auth.register')
             ->set('name', 'Dueño Agencia')
@@ -179,6 +182,8 @@ class RegistrationTest extends TestCase
         Storage::disk('local')->assertExists($ally->rif_document_path);
         Storage::disk('local')->assertExists($ally->mercantile_registry_document_path);
         Storage::disk('local')->assertExists($ally->owner_id_document_path);
+
+        Notification::assertSentTo($ally->user, AccountPendingApproval::class);
     }
 
     public function test_ally_registration_requires_the_verification_documents(): void
@@ -247,6 +252,7 @@ class RegistrationTest extends TestCase
     public function test_new_driver_registers_as_pending_with_documents(): void
     {
         Storage::fake('local');
+        Notification::fake();
 
         $component = Volt::test('pages.auth.register')
             ->set('name', 'Repartidor Nuevo')
@@ -276,6 +282,8 @@ class RegistrationTest extends TestCase
         Storage::disk('local')->assertExists($user->driver->license_photo_path);
         Storage::disk('local')->assertExists($user->driver->id_photo_path);
         Storage::disk('local')->assertExists($user->driver->vehicle_registration_photo_path);
+
+        Notification::assertSentTo($user, AccountPendingApproval::class);
     }
 
     public function test_driver_registration_requires_all_three_documents(): void
