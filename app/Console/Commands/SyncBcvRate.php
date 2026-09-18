@@ -15,15 +15,18 @@ class SyncBcvRate extends Command
     protected $description = 'Consulta la tasa oficial del BCV y guarda un nuevo valor si cambió';
 
     /**
-     * Este comando corre cada 15 minutos (routes/console.php). Sin
-     * este límite, una caída sostenida de la API del BCV mandaría un
-     * correo de alerta cada 15 minutos hasta que alguien la resuelva.
-     * Una vez cada 4 horas es suficiente para que un admin se entere
-     * el mismo día sin saturarle la bandeja de entrada.
+     * Este comando corre cada 15 minutos, pero solo dentro de la
+     * ventana diaria donde el BCV suele publicar (1:30pm-6:30pm VET,
+     * routes/console.php) — hasta 20 intentos por tarde. Sin este
+     * límite, una falla sostenida de la API durante toda esa ventana
+     * mandaría hasta 20 correos el mismo día. Con 6 horas de
+     * throttle (más que la ventana completa) queda como mucho un
+     * aviso por día hábil, y se resetea solo apenas un intento tenga
+     * éxito.
      */
     private const NOTIFICATION_THROTTLE_KEY = 'bcv_sync_failure_notified_at';
 
-    private const NOTIFICATION_THROTTLE_HOURS = 4;
+    private const NOTIFICATION_THROTTLE_HOURS = 6;
 
     public function handle(BcvRateService $service): int
     {

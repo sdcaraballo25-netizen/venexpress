@@ -12,12 +12,20 @@ Artisan::command('inspire', function () {
 // (app/Console/Commands/SyncBcvRate.php) pero nunca estaba programado,
 // así que la tasa solo se actualizaba si un admin la cargaba a mano.
 //
-// Cada 15 minutos (en vez de cada hora) para que una falla puntual de
-// la API del BCV (red, timeout, la propia API caída un rato) se
-// autocorrija en minutos en el próximo intento, no en una hora. El
-// propio comando ya evita crear una fila duplicada si la tasa no
-// cambió (BcvRateService::syncFromApi()), así que correrlo más
-// seguido no genera ruido en la tabla bcv_rates.
+// El BCV publica la tasa oficial una vez al día, solo en días
+// hábiles bancarios (lunes a viernes; nunca fines de semana ni
+// feriados, cuando simplemente sigue vigente la última publicada) —
+// según fuentes públicas, en algún momento entre la 1:30pm y las
+// 6:30pm hora de Venezuela, sin un minuto exacto fijo (varía día a
+// día). En vez de adivinar una sola hora y arriesgarnos a que ese día
+// el BCV publique más tarde, consultamos cada 15 minutos pero SOLO
+// dentro de esa ventana y SOLO en días de semana: así se detecta la
+// publicación real del día a los pocos minutos de ocurrir, sin
+// martillar la API el resto del día ni los fines de semana, cuando no
+// hay nada nuevo que buscar.
 Schedule::command('bcv:sync')
+    ->weekdays()
     ->everyFifteenMinutes()
+    ->between('13:30', '18:30')
+    ->timezone('America/Caracas')
     ->withoutOverlapping();

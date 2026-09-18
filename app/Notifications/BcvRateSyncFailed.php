@@ -7,8 +7,9 @@ use Illuminate\Notifications\Notification;
 
 /**
  * Avisa a los administradores que la sincronización automática de la
- * tasa BCV (bcv:sync, cada 15 minutos) falló, para que se enteren el
- * mismo día en vez de descubrirlo cuando BcvRateService::getCurrentRate()
+ * tasa BCV (bcv:sync, cada 15 minutos entre 1:30pm y 6:30pm VET en
+ * días hábiles — ver routes/console.php) falló, para que se enteren
+ * el mismo día en vez de descubrirlo cuando BcvRateService::getCurrentRate()
  * empiece a bloquear cotizaciones por tasa vencida (services.bcv_api.
  * max_age_hours) o, peor, cuando un cliente reclame un cobro mal
  * calculado.

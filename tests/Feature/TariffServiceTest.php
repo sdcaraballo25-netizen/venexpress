@@ -7,6 +7,7 @@ use App\Models\CityDistance;
 use App\Models\Package;
 use App\Models\RateMatrix;
 use App\Services\TariffService;
+use Carbon\Carbon;
 use Illuminate\Foundation\Testing\RefreshDatabase;
 use InvalidArgumentException;
 use RuntimeException;
@@ -199,23 +200,33 @@ class TariffServiceTest extends TestCase
      */
     public function test_calculate_rejects_a_stale_bcv_rate(): void
     {
-        config(['services.bcv_api.max_age_hours' => 72]);
+        config(['services.bcv_api.max_age_hours' => 48]);
+
+        // Miércoles 3pm, tasa del lunes 1pm de la misma semana: 50
+        // horas, todas hábiles (sin fin de semana de por medio), para
+        // que el resultado no dependa de qué día real corra la suite.
+        Carbon::setTestNow(Carbon::parse('next Wednesday 15:00:00'));
+        $effectiveAt = Carbon::now()->subHours(50);
 
         BcvRate::query()->update([
-            'effective_at' => now()->subHours(80),
-            'effective_date' => now()->subHours(80)->toDateString(),
+            'effective_at' => $effectiveAt,
+            'effective_date' => $effectiveAt->toDateString(),
         ]);
 
         $this->expectException(RuntimeException::class);
         $this->expectExceptionMessage('La tasa BCV vigente tiene');
 
-        $this->service->calculate(
-            originCity: 'Caracas',
-            destinationCity: 'Valencia',
-            packageType: Package::TYPE_PAQUETE,
-            physicalWeightKg: 3.0,
-            originState: 'Distrito Capital',
-            destinationState: 'Carabobo',
-        );
+        try {
+            $this->service->calculate(
+                originCity: 'Caracas',
+                destinationCity: 'Valencia',
+                packageType: Package::TYPE_PAQUETE,
+                physicalWeightKg: 3.0,
+                originState: 'Distrito Capital',
+                destinationState: 'Carabobo',
+            );
+        } finally {
+            Carbon::setTestNow();
+        }
     }
 }

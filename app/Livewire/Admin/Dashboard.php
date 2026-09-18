@@ -9,6 +9,7 @@ use App\Models\DriverPayment;
 use App\Models\Incident;
 use App\Models\Package;
 use App\Models\User;
+use App\Services\BcvRateService;
 use Illuminate\Support\Facades\DB;
 use Livewire\Attributes\Layout;
 use Livewire\Attributes\Title;
@@ -175,15 +176,16 @@ class Dashboard extends Component
 
         $currentRate = BcvRate::current();
 
-        // Mismo umbral de advertencia (6h) que ya usa
-        // CheckProductionReadiness: bcv:sync corre cada 15 minutos,
-        // así que 6 horas sin una tasa nueva ya es señal real de que
-        // algo está fallando (más allá del correo de aviso que manda
-        // SyncBcvRate al fallar — esto se ve incluso si el cron del
-        // scheduler nunca llegó a correr, algo que ese correo no
-        // puede detectar por sí solo).
+        // 24 horas HÁBILES (BcvRateService::businessHoursAge() no
+        // cuenta fin de semana, porque el BCV no publica esos días):
+        // un día hábil entero completo sin ninguna sincronización
+        // exitosa ya es señal real de que algo está fallando — más
+        // allá del correo de aviso que manda SyncBcvRate al fallar,
+        // esto se ve incluso si el cron del scheduler nunca llegó a
+        // correr en el servidor, algo que ese correo no puede
+        // detectar por sí solo.
         $bcvRateIsStale = $currentRate
-            && $currentRate->effective_at->diffInHours(now()) >= 6;
+            && app(BcvRateService::class)->businessHoursAge($currentRate) >= 24;
 
         return view('livewire.admin.dashboard', [
 
