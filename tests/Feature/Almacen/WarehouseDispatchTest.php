@@ -175,6 +175,99 @@ class WarehouseDispatchTest extends TestCase
     }
 
     /**
+     * searchDispatch()/deliverToClient()/assignToDriver() solo
+     * validaban tracking_number + estado, sin verificar que el
+     * paquete tuviera como destino ESTE almacén — a diferencia de
+     * scanArrival(), que sí lo hacía. Cualquier empleado de almacén
+     * podía despachar (a cliente o a repartidor) una guía destinada a
+     * otro almacén en cualquier parte del país.
+     */
+    public function test_search_dispatch_rejects_a_package_destined_to_another_warehouse(): void
+    {
+        $warehouse = Warehouse::factory()->create(['city' => 'Valencia', 'state' => 'Carabobo']);
+        $almacenUser = $this->createWarehouseUser($warehouse);
+        $ally = $this->createAlly();
+
+        $package = $this->createPackage($ally, [
+            'destination_city' => 'Maracaibo',
+            'destination_state' => 'Zulia',
+            'current_status' => Package::STATUS_LISTO_RETIRO,
+        ]);
+
+        Livewire::actingAs($almacenUser)
+            ->test(Dashboard::class)
+            ->set('dispatchTrackingNumber', $package->tracking_number)
+            ->call('searchDispatch')
+            ->assertSet('dispatchPackage', null)
+            ->assertSet('dispatchError', fn ($value) => ! empty($value));
+    }
+
+    public function test_warehouse_staff_from_a_different_warehouse_cannot_deliver_to_client(): void
+    {
+        $warehouse = Warehouse::factory()->create(['city' => 'Valencia', 'state' => 'Carabobo']);
+        $almacenUser = $this->createWarehouseUser($warehouse);
+        $ally = $this->createAlly();
+
+        $package = $this->createPackage($ally, [
+            'destination_city' => 'Maracaibo',
+            'destination_state' => 'Zulia',
+            'current_status' => Package::STATUS_LISTO_RETIRO,
+            'requires_delivery' => false,
+            'recipient_id_doc' => 'V-87654321',
+        ]);
+
+        Livewire::actingAs($almacenUser)
+            ->test(Dashboard::class)
+            ->set('dispatchTrackingNumber', $package->tracking_number)
+            ->set('recipientIdDoc', 'V-87654321')
+            ->call('deliverToClient');
+
+        $this->assertSame(Package::STATUS_LISTO_RETIRO, $package->fresh()->current_status);
+    }
+
+    public function test_warehouse_staff_from_a_different_warehouse_cannot_assign_to_a_driver(): void
+    {
+        $warehouse = Warehouse::factory()->create(['city' => 'Valencia', 'state' => 'Carabobo']);
+        $almacenUser = $this->createWarehouseUser($warehouse);
+        $ally = $this->createAlly();
+
+        $driverUser = User::factory()->create(['role' => User::ROLE_REPARTIDOR, 'status' => User::STATUS_ACTIVE]);
+        $driver = Driver::factory()->create([
+            'user_id' => $driverUser->id,
+            'driver_type' => Driver::TYPE_DELIVERY,
+            'status' => Driver::STATUS_ACTIVE,
+        ]);
+
+        $route = Route::create([
+            'name' => 'Ruta Maracaibo',
+            'city' => 'Maracaibo',
+            'route_type' => Route::TYPE_DELIVERY,
+            'status' => Route::STATUS_IN_PROGRESS,
+            'driver_id' => $driver->id,
+            'created_by' => $almacenUser->id,
+            'started_at' => now(),
+        ]);
+
+        $package = $this->createPackage($ally, [
+            'destination_city' => 'Maracaibo',
+            'destination_state' => 'Zulia',
+            'current_status' => Package::STATUS_LISTO_RETIRO,
+            'requires_delivery' => true,
+            'delivery_status' => Package::DELIVERY_ACCEPTED,
+        ]);
+
+        Livewire::actingAs($almacenUser)
+            ->test(Dashboard::class)
+            ->set('dispatchTrackingNumber', $package->tracking_number)
+            ->call('assignToDriver', $route->id);
+
+        $package->refresh();
+
+        $this->assertSame(Package::STATUS_LISTO_RETIRO, $package->current_status);
+        $this->assertNull($package->driver_id);
+    }
+
+    /**
      * El lector QR usa un único punto de entrada (scanGuide) que
      * decide sola la acción: si la guía todavía no llegó, la recibe;
      * si ya está LISTO_RETIRO, abre el panel de despacho.
