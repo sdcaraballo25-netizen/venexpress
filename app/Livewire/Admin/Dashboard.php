@@ -173,13 +173,26 @@ class Dashboard extends Component
         |--------------------------------------------------------------------------
         */
 
+        $currentRate = BcvRate::current();
+
+        // Mismo umbral de advertencia (6h) que ya usa
+        // CheckProductionReadiness: bcv:sync corre cada 15 minutos,
+        // así que 6 horas sin una tasa nueva ya es señal real de que
+        // algo está fallando (más allá del correo de aviso que manda
+        // SyncBcvRate al fallar — esto se ve incluso si el cron del
+        // scheduler nunca llegó a correr, algo que ese correo no
+        // puede detectar por sí solo).
+        $bcvRateIsStale = $currentRate
+            && $currentRate->effective_at->diffInHours(now()) >= 6;
+
         return view('livewire.admin.dashboard', [
 
             // Paquetes
             'totalPackages' => $totalPackages,
             'statusCounts' => $statusCounts,
             'statuses' => Package::STATUSES,
-            'currentRate' => BcvRate::current(),
+            'currentRate' => $currentRate,
+            'bcvRateIsStale' => $bcvRateIsStale,
             'recentPackages' => $recentPackages,
 
             // Aliados

@@ -544,6 +544,21 @@
 
                     </div>
 
+                    @if($bcvRateIsStale || ! $currentRate)
+                        <a
+                            href="{{ route('admin.bcv-rates') }}"
+                            wire:navigate
+                            class="mt-4 flex items-center gap-2 rounded-xl border border-red-200 bg-red-50 px-3 py-2 text-xs font-semibold text-red-700 hover:bg-red-100"
+                        >
+                            <span>⚠</span>
+                            @if($currentRate)
+                                Sin actualizar desde {{ $currentRate->effective_at->diffForHumans() }} — revisa la sincronización
+                            @else
+                                No hay ninguna tasa BCV registrada — carga una para poder cotizar
+                            @endif
+                        </a>
+                    @endif
+
                 </div>
 
 
