@@ -4,6 +4,8 @@ namespace App\Livewire\Admin;
 
 use App\Models\Ally;
 use App\Models\AuditLog;
+use App\Notifications\AccountApproved;
+use App\Notifications\AccountRejected;
 use App\Services\VenezuelaLocationService;
 use Illuminate\Validation\Rule;
 use Livewire\Attributes\Layout;
@@ -146,6 +148,8 @@ class AlliesManager extends Component
             ['previous_status' => $previousStatus, 'new_status' => Ally::STATUS_ACTIVE]
         );
 
+        $ally->user?->notify(new AccountApproved('Aliado'));
+
         session()->flash('success', 'El aliado fue aprobado correctamente.');
     }
 
@@ -167,6 +171,8 @@ class AlliesManager extends Component
             "Rechazó al aliado {$ally->business_name}.",
             ['previous_status' => $previousStatus, 'new_status' => Ally::STATUS_REJECTED]
         );
+
+        $ally->user?->notify(new AccountRejected('Aliado'));
 
         session()->flash('success', 'El aliado fue rechazado.');
     }

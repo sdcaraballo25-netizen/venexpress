@@ -4,6 +4,8 @@ namespace App\Livewire\Admin;
 
 use App\Models\AuditLog;
 use App\Models\Driver;
+use App\Notifications\AccountApproved;
+use App\Notifications\AccountRejected;
 use Livewire\Attributes\Layout;
 use Livewire\Attributes\Title;
 use Livewire\Component;
@@ -36,6 +38,8 @@ class DriversApprovalManager extends Component
             ['previous_status' => $previousStatus, 'new_status' => Driver::STATUS_ACTIVE]
         );
 
+        $driver->user?->notify(new AccountApproved('Repartidor'));
+
         session()->flash('success', 'El repartidor fue aprobado correctamente.');
     }
 
@@ -59,6 +63,8 @@ class DriversApprovalManager extends Component
             "Rechazó al repartidor {$driver->user?->name}.",
             ['previous_status' => $previousStatus, 'new_status' => Driver::STATUS_REJECTED]
         );
+
+        $driver->user?->notify(new AccountRejected('Repartidor'));
 
         session()->flash('success', 'El repartidor fue rechazado.');
     }
