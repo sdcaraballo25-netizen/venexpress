@@ -33,6 +33,30 @@ class AlliesManager extends Component
     public ?float $location_longitude = null;
 
     /**
+     * Estado del modal de detalle (solo lectura) de un aliado.
+     */
+    public bool $showDetailsModal = false;
+
+    public ?int $viewingAllyId = null;
+
+    /**
+     * Abre el modal de detalle con los datos completos del aliado,
+     * incluyendo la foto de fachada en tamaño grande, para que el
+     * Admin pueda revisarlos antes de aprobar/rechazar la postulación.
+     */
+    public function viewDetails(int $allyId): void
+    {
+        $this->viewingAllyId = $allyId;
+        $this->showDetailsModal = true;
+    }
+
+    public function closeDetails(): void
+    {
+        $this->showDetailsModal = false;
+        $this->viewingAllyId = null;
+    }
+
+    /**
      * Abre el modal de ubicación con los datos actuales del aliado.
      */
     public function editLocation(int $allyId): void
@@ -274,6 +298,9 @@ class AlliesManager extends Component
         return view('livewire.admin.allies-manager', [
             'allies' => $allies,
             'venezuelaStates' => app(VenezuelaLocationService::class)->states(),
+            'viewingAlly' => $this->viewingAllyId
+                ? Ally::with('user')->find($this->viewingAllyId)
+                : null,
         ]);
     }
 }

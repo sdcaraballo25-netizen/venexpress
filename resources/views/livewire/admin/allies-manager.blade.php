@@ -1,6 +1,34 @@
 @php
     use App\Models\Ally;
     use Illuminate\Support\Facades\Storage;
+
+    $statusStyles = [
+
+        'PENDIENTE' => [
+            'bg' => 'bg-amber-50',
+            'text' => 'text-amber-700',
+            'dot' => 'bg-amber-500',
+        ],
+
+        'ACTIVO' => [
+            'bg' => 'bg-blue-50',
+            'text' => 'text-blue-700',
+            'dot' => 'bg-blue-600',
+        ],
+
+        'RECHAZADO' => [
+            'bg' => 'bg-red-50',
+            'text' => 'text-red-700',
+            'dot' => 'bg-red-500',
+        ],
+
+        'SUSPENDIDO' => [
+            'bg' => 'bg-slate-100',
+            'text' => 'text-slate-700',
+            'dot' => 'bg-slate-500',
+        ],
+
+    ];
 @endphp
 
 <div class="min-h-screen">
@@ -116,34 +144,6 @@
 
                         @php
 
-                            $statusStyles = [
-
-                                'PENDIENTE' => [
-                                    'bg' => 'bg-amber-50',
-                                    'text' => 'text-amber-700',
-                                    'dot' => 'bg-amber-500',
-                                ],
-
-                                'ACTIVO' => [
-                                    'bg' => 'bg-blue-50',
-                                    'text' => 'text-blue-700',
-                                    'dot' => 'bg-blue-600',
-                                ],
-
-                                'RECHAZADO' => [
-                                    'bg' => 'bg-red-50',
-                                    'text' => 'text-red-700',
-                                    'dot' => 'bg-red-500',
-                                ],
-
-                                'SUSPENDIDO' => [
-                                    'bg' => 'bg-slate-100',
-                                    'text' => 'text-slate-700',
-                                    'dot' => 'bg-slate-500',
-                                ],
-
-                            ];
-
                             $style = $statusStyles[$ally->status] ?? [
                                 'bg' => 'bg-slate-50',
                                 'text' => 'text-slate-600',
@@ -164,11 +164,18 @@
                                 <div class="flex items-center gap-3">
 
                                     @if($ally->storefront_photo_path)
-                                        <img
-                                            src="{{ route('allies.documents.storefront', $ally) }}"
-                                            alt="Fachada de {{ $ally->business_name }}"
-                                            class="w-10 h-10 rounded-lg object-cover border border-[#E2E8F0] shrink-0"
+                                        <button
+                                            type="button"
+                                            wire:click="viewDetails({{ $ally->id }})"
+                                            title="Ver detalles del aliado"
+                                            class="shrink-0"
                                         >
+                                            <img
+                                                src="{{ route('allies.documents.storefront', $ally) }}"
+                                                alt="Fachada de {{ $ally->business_name }}"
+                                                class="w-10 h-10 rounded-lg object-cover border border-[#E2E8F0] hover:opacity-80 transition"
+                                            >
+                                        </button>
                                     @endif
 
                                     <div>
@@ -249,6 +256,21 @@
                             <td class="px-6 py-4">
 
                                 <div class="flex justify-end items-center gap-2">
+
+                                    {{-- =========================================
+                                         VER DETALLES
+                                    ========================================== --}}
+                                    <button
+                                        wire:click="viewDetails({{ $ally->id }})"
+                                        class="px-3 py-2 rounded-lg
+                                               bg-slate-50 text-slate-600
+                                               hover:bg-slate-100
+                                               text-xs font-semibold
+                                               transition inline-flex items-center gap-1.5"
+                                    >
+                                        <i class="fa-solid fa-eye"></i>
+                                        Ver detalles
+                                    </button>
 
                                     {{-- =========================================
                                          UBICACIÓN (para el localizador público)
@@ -512,6 +534,156 @@
                 </div>
 
             </div>
+
+        </div>
+
+    @endif
+
+
+    {{-- =========================================================
+         MODAL: DETALLE DEL ALIADO (solo lectura)
+    ========================================================== --}}
+    @if($showDetailsModal && $viewingAlly)
+
+        @php
+            $detailStyle = $statusStyles[$viewingAlly->status] ?? [
+                'bg' => 'bg-slate-50',
+                'text' => 'text-slate-600',
+                'dot' => 'bg-slate-400',
+            ];
+        @endphp
+
+        <div
+            x-data="{ photoOpen: false }"
+            class="fixed inset-0 z-50 flex items-center justify-center bg-black/40 px-4"
+            wire:key="details-modal-{{ $viewingAlly->id }}"
+        >
+
+            <div class="bg-white rounded-2xl shadow-xl w-full max-w-lg p-6 max-h-[90vh] overflow-y-auto">
+
+                <div class="flex items-center justify-between mb-4">
+                    <h3 class="font-display text-lg font-bold text-[#0F172A]">
+                        Detalle del aliado
+                    </h3>
+                    <button wire:click="closeDetails" class="text-slate-400 hover:text-slate-600">
+                        ✕
+                    </button>
+                </div>
+
+                @if($viewingAlly->storefront_photo_path)
+                    <button
+                        type="button"
+                        @click="photoOpen = true"
+                        title="Ver foto en grande"
+                        class="block w-full mb-4"
+                    >
+                        <img
+                            src="{{ route('allies.documents.storefront', $viewingAlly) }}"
+                            alt="Fachada de {{ $viewingAlly->business_name }}"
+                            class="w-full h-48 object-cover rounded-xl border border-[#E2E8F0] hover:opacity-90 transition"
+                        >
+                    </button>
+                @else
+                    <div class="w-full h-32 rounded-xl border border-dashed border-[#E2E8F0] bg-slate-50 flex items-center justify-center text-xs text-[#94A3B8] mb-4">
+                        Sin foto de fachada
+                    </div>
+                @endif
+
+                <div class="flex items-center justify-between mb-4">
+                    <p class="font-display text-xl font-bold text-[#0F172A]">
+                        {{ $viewingAlly->business_name }}
+                    </p>
+
+                    <span
+                        class="inline-flex items-center gap-2 px-3 py-1.5 rounded-lg text-xs font-semibold
+                               {{ $detailStyle['bg'] }} {{ $detailStyle['text'] }}"
+                    >
+                        <span class="w-1.5 h-1.5 rounded-full {{ $detailStyle['dot'] }}"></span>
+                        {{ str_replace('_', ' ', $viewingAlly->status) }}
+                    </span>
+                </div>
+
+                @if($viewingAlly->is_verified_destination)
+                    <div class="mb-4">
+                        <span class="inline-flex items-center gap-1 rounded-md bg-emerald-50 px-2 py-0.5 text-[10px] font-semibold text-emerald-700">
+                            Punto de retiro verificado
+                        </span>
+                    </div>
+                @endif
+
+                <dl class="grid grid-cols-2 gap-x-4 gap-y-3 text-sm mb-2">
+
+                    <div class="col-span-2">
+                        <dt class="text-xs font-medium text-[#64748B]">RIF</dt>
+                        <dd class="text-[#0F172A]">{{ $viewingAlly->rif }}</dd>
+                    </div>
+
+                    <div>
+                        <dt class="text-xs font-medium text-[#64748B]">Contacto</dt>
+                        <dd class="text-[#0F172A]">{{ $viewingAlly->user?->name ?? '—' }}</dd>
+                    </div>
+
+                    <div>
+                        <dt class="text-xs font-medium text-[#64748B]">Teléfono</dt>
+                        <dd class="text-[#0F172A]">{{ $viewingAlly->user?->phone ?? '—' }}</dd>
+                    </div>
+
+                    <div class="col-span-2">
+                        <dt class="text-xs font-medium text-[#64748B]">Correo</dt>
+                        <dd class="text-[#0F172A]">{{ $viewingAlly->user?->email ?? '—' }}</dd>
+                    </div>
+
+                    <div>
+                        <dt class="text-xs font-medium text-[#64748B]">Ciudad</dt>
+                        <dd class="text-[#0F172A]">{{ $viewingAlly->city }}</dd>
+                    </div>
+
+                    <div>
+                        <dt class="text-xs font-medium text-[#64748B]">Estado (región)</dt>
+                        <dd class="text-[#0F172A]">{{ $viewingAlly->state ?? '—' }}</dd>
+                    </div>
+
+                    <div class="col-span-2">
+                        <dt class="text-xs font-medium text-[#64748B]">Dirección</dt>
+                        <dd class="text-[#0F172A]">{{ $viewingAlly->address }}</dd>
+                    </div>
+
+                    <div>
+                        <dt class="text-xs font-medium text-[#64748B]">Comisión</dt>
+                        <dd class="text-[#0F172A]">{{ $viewingAlly->commission_percentage }}%</dd>
+                    </div>
+
+                    <div>
+                        <dt class="text-xs font-medium text-[#64748B]">Postulado el</dt>
+                        <dd class="text-[#0F172A]">{{ $viewingAlly->created_at?->format('d/m/Y h:i A') }}</dd>
+                    </div>
+
+                </dl>
+
+                <div class="flex justify-end mt-4">
+                    <button wire:click="closeDetails"
+                        class="px-4 py-2 rounded-lg text-sm font-semibold text-slate-600 hover:bg-slate-50">
+                        Cerrar
+                    </button>
+                </div>
+
+            </div>
+
+            {{-- Lightbox: foto de fachada a tamaño completo --}}
+            @if($viewingAlly->storefront_photo_path)
+                <div
+                    x-show="photoOpen"
+                    x-cloak
+                    @click="photoOpen = false"
+                    class="fixed inset-0 z-[60] flex items-center justify-center bg-black/80 p-6 cursor-zoom-out"
+                >
+                    <img
+                        src="{{ route('allies.documents.storefront', $viewingAlly) }}"
+                        alt="Fachada de {{ $viewingAlly->business_name }} (tamaño completo)"
+                        class="max-w-full max-h-full rounded-xl object-contain"
+                    >
+                </div>
+            @endif
 
         </div>
 
