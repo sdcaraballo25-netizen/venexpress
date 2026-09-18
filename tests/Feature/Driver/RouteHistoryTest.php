@@ -111,6 +111,12 @@ class RouteHistoryTest extends TestCase
             ->assertSee(route('repartidor.route-detail', $route->id), false);
     }
 
+    /**
+     * Un usuario con rol repartidor pero sin Driver asociado ahora lo
+     * bloquea EnsureAccountIsApproved (lo trata como PENDIENTE, no
+     * como aprobado) antes de que la petición llegue a este
+     * componente — ver EnsureAccountIsApprovedTest.
+     */
     public function test_route_history_requires_a_driver_profile(): void
     {
         $user = User::factory()->create([
@@ -121,6 +127,6 @@ class RouteHistoryTest extends TestCase
 
         $this->actingAs($user)
             ->get(route('repartidor.route-history'))
-            ->assertForbidden();
+            ->assertRedirect(route('account.pending'));
     }
 }

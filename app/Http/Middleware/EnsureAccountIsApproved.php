@@ -25,10 +25,18 @@ class EnsureAccountIsApproved
             return $next($request);
         }
 
+        /*
+         * Si el rol exige un Ally/Driver asociado y no lo tiene (ej.
+         * un registro que falló a mitad de camino antes de que
+         * existiera la transacción en register.blade.php), tratamos
+         * eso como PENDIENTE en vez de dejarlo pasar: sin esto, un
+         * User huérfano quedaba con acceso libre a las rutas de
+         * aliado/repartidor porque $status era null.
+         */
         $status = match (true) {
-            $user->isAliado() => $user->ally?->status,
-            $user->isAliadoTaquilla() => $user->alliedAgency?->status,
-            $user->isRepartidor() => $user->driver?->status,
+            $user->isAliado() => $user->ally?->status ?? Ally::STATUS_PENDING,
+            $user->isAliadoTaquilla() => $user->alliedAgency?->status ?? Ally::STATUS_PENDING,
+            $user->isRepartidor() => $user->driver?->status ?? Ally::STATUS_PENDING,
             default => null,
         };
 

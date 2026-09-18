@@ -9,6 +9,7 @@ use App\Notifications\WelcomeVerificationToken;
 use App\Services\VenezuelaLocationService;
 use Illuminate\Auth\Events\Registered;
 use Illuminate\Support\Facades\Auth;
+use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Hash;
 use Illuminate\Validation\Rules;
 use Livewire\Attributes\Layout;
@@ -347,26 +348,43 @@ new #[Layout('layouts.guest')] class extends Component
         */
 
         if ($user->isAliado()) {
-            $storefrontPhotoPath = $this->storefront_photo->store('allies', 'local');
+            /*
+             * Si Ally::create() falla a mitad de camino (ej. un error
+             * al guardar alguno de los documentos), sin esta
+             * transacción quedaría un User con rol "aliado" ya creado
+             * pero sin su Ally correspondiente: una cuenta huérfana
+             * que podría iniciar sesión normalmente después. Si eso
+             * pasa, deshacemos también la creación del User en vez de
+             * dejarlo a medio registrar.
+             */
+            try {
+                DB::transaction(function () use ($user, $validated) {
+                    $storefrontPhotoPath = $this->storefront_photo->store('allies', 'local');
 
-            Ally::create([
-                'user_id' => $user->id,
-                'business_name' => $validated['business_name'],
-                'rif' => $validated['rif'],
-                'state' => $validated['state'],
-                'city' => $validated['city'],
-                'address' => $validated['address'],
-                'storefront_photo_path' => $storefrontPhotoPath,
-                'rif_document_path' => $this->rif_document->store('allies', 'local'),
-                'mercantile_registry_document_path' => $this->mercantile_registry_document->store('allies', 'local'),
-                'owner_id_document_path' => $this->owner_id_document->store('allies', 'local'),
-                'latitude' => $validated['latitude'],
-                'longitude' => $validated['longitude'],
-                'commission_percentage' => 10.00,
+                    Ally::create([
+                        'user_id' => $user->id,
+                        'business_name' => $validated['business_name'],
+                        'rif' => $validated['rif'],
+                        'state' => $validated['state'],
+                        'city' => $validated['city'],
+                        'address' => $validated['address'],
+                        'storefront_photo_path' => $storefrontPhotoPath,
+                        'rif_document_path' => $this->rif_document->store('allies', 'local'),
+                        'mercantile_registry_document_path' => $this->mercantile_registry_document->store('allies', 'local'),
+                        'owner_id_document_path' => $this->owner_id_document->store('allies', 'local'),
+                        'latitude' => $validated['latitude'],
+                        'longitude' => $validated['longitude'],
+                        'commission_percentage' => 10.00,
 
-                // Un aliado nuevo comienza como PENDIENTE.
-                'status' => Ally::STATUS_PENDING,
-            ]);
+                        // Un aliado nuevo comienza como PENDIENTE.
+                        'status' => Ally::STATUS_PENDING,
+                    ]);
+                });
+            } catch (\Throwable $e) {
+                $user->delete();
+
+                throw $e;
+            }
 
             $user->notify(new AccountPendingApproval('Aliado'));
 
@@ -387,20 +405,31 @@ new #[Layout('layouts.guest')] class extends Component
         */
 
         if ($user->isChofer()) {
-            Driver::create([
-                'user_id' => $user->id,
-                'vehicle_plate' => $validated['vehicle_plate'],
-                'vehicle_type' => $validated['vehicle_type'],
-                'phone' => $validated['phone'],
-                'driver_type' => Driver::TYPE_DELIVERY,
-                'license_photo_path' => $this->license_photo->store('drivers', 'local'),
-                'id_photo_path' => $this->id_photo->store('drivers', 'local'),
-                'vehicle_registration_photo_path' => $this->vehicle_registration_photo->store('drivers', 'local'),
+            // Ver comentario equivalente en la rama de Aliado: sin
+            // esta transacción, un fallo a mitad de camino dejaría un
+            // User con rol "repartidor" sin su Driver correspondiente.
+            try {
+                DB::transaction(function () use ($user, $validated) {
+                    Driver::create([
+                        'user_id' => $user->id,
+                        'vehicle_plate' => $validated['vehicle_plate'],
+                        'vehicle_type' => $validated['vehicle_type'],
+                        'phone' => $validated['phone'],
+                        'driver_type' => Driver::TYPE_DELIVERY,
+                        'license_photo_path' => $this->license_photo->store('drivers', 'local'),
+                        'id_photo_path' => $this->id_photo->store('drivers', 'local'),
+                        'vehicle_registration_photo_path' => $this->vehicle_registration_photo->store('drivers', 'local'),
 
-                // Un repartidor nuevo comienza como PENDIENTE, igual
-                // que un aliado, hasta que un admin lo apruebe.
-                'status' => Driver::STATUS_PENDING,
-            ]);
+                        // Un repartidor nuevo comienza como PENDIENTE, igual
+                        // que un aliado, hasta que un admin lo apruebe.
+                        'status' => Driver::STATUS_PENDING,
+                    ]);
+                });
+            } catch (\Throwable $e) {
+                $user->delete();
+
+                throw $e;
+            }
 
             $user->notify(new AccountPendingApproval('Repartidor'));
 
