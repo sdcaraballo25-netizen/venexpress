@@ -68,8 +68,12 @@
                                 @if ($status === 'pendiente')
                                     <button
                                         type="button"
-                                        wire:click.stop="markAllPaidForDriver({{ $row->driver_id }})"
-                                        wire:confirm="¿Confirmas que deseas marcar como pagadas las {{ $row->payments_count }} remuneración(es) pendientes de este repartidor, por un total de ${{ number_format((float) $row->total_usd, 2) }}?"
+                                        @click.stop.prevent="$store.confirm.open({
+                                            message: {{ Js::from('¿Confirmas que deseas marcar como pagadas las ' . $row->payments_count . ' remuneración(es) pendientes de este repartidor, por un total de $' . number_format((float) $row->total_usd, 2) . '?') }},
+                                            confirmText: 'Marcar todo pagado',
+                                            variant: 'primary',
+                                            onConfirm: () => $wire.markAllPaidForDriver({{ $row->driver_id }}),
+                                        })"
                                         class="rounded-xl bg-blue-900 px-4 py-2.5 text-sm font-semibold text-white hover:bg-blue-800"
                                     >
                                         Marcar todo pagado
@@ -113,14 +117,22 @@
 
                                                 @if ($payment->status === \App\Models\DriverPayment::STATUS_PENDING)
                                                     <button type="button"
-                                                            wire:click="markPaid({{ $payment->id }})"
-                                                            wire:confirm="¿Confirmas que deseas registrar este pago?"
+                                                            @click.prevent="$store.confirm.open({
+                                                                message: '¿Confirmas que deseas registrar este pago?',
+                                                                confirmText: 'Marcar pagado',
+                                                                variant: 'primary',
+                                                                onConfirm: () => $wire.markPaid({{ $payment->id }}),
+                                                            })"
                                                             class="rounded-lg bg-blue-900 px-3 py-1.5 text-xs font-semibold text-white hover:bg-blue-800">
                                                         Marcar pagado
                                                     </button>
                                                     <button type="button"
-                                                            wire:click="cancelPayment({{ $payment->id }})"
-                                                            wire:confirm="¿Confirmas que deseas cancelar esta remuneración pendiente?"
+                                                            @click.prevent="$store.confirm.open({
+                                                                message: '¿Confirmas que deseas cancelar esta remuneración pendiente?',
+                                                                confirmText: 'Cancelar',
+                                                                variant: 'danger',
+                                                                onConfirm: () => $wire.cancelPayment({{ $payment->id }}),
+                                                            })"
                                                             class="rounded-lg border border-red-200 bg-white px-3 py-1.5 text-xs font-semibold text-red-700 hover:bg-red-50">
                                                         Cancelar
                                                     </button>

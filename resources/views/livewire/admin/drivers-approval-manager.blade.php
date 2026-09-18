@@ -280,8 +280,12 @@
 
                                         {{-- Aprobar --}}
                                         <button
-                                            wire:click="approve({{ $driver->id }})"
-                                            wire:confirm="¿Estás seguro de que deseas aprobar a este repartidor?"
+                                            @click.prevent="$store.confirm.open({
+                                                message: '¿Estás seguro de que deseas aprobar a este repartidor?',
+                                                confirmText: 'Aprobar',
+                                                variant: 'primary',
+                                                onConfirm: () => $wire.approve({{ $driver->id }}),
+                                            })"
                                             class="px-3 py-2 rounded-lg
                                                    bg-blue-600 text-white
                                                    hover:bg-blue-700
@@ -294,8 +298,12 @@
 
                                         {{-- Rechazar --}}
                                         <button
-                                            wire:click="reject({{ $driver->id }})"
-                                            wire:confirm="¿Estás seguro de que deseas rechazar a este repartidor?"
+                                            @click.prevent="$store.confirm.open({
+                                                message: '¿Estás seguro de que deseas rechazar a este repartidor?',
+                                                confirmText: 'Rechazar',
+                                                variant: 'danger',
+                                                onConfirm: () => $wire.reject({{ $driver->id }}),
+                                            })"
                                             class="px-3 py-2 rounded-lg
                                                    bg-red-50 text-red-700
                                                    hover:bg-red-100
@@ -312,8 +320,12 @@
                                     @elseif($driver->status === Driver::STATUS_ACTIVE)
 
                                         <button
-                                            wire:click="suspend({{ $driver->id }})"
-                                            wire:confirm="¿Estás seguro de que deseas suspender a este repartidor?"
+                                            @click.prevent="$store.confirm.open({
+                                                message: '¿Estás seguro de que deseas suspender a este repartidor?',
+                                                confirmText: 'Suspender',
+                                                variant: 'warning',
+                                                onConfirm: () => $wire.suspend({{ $driver->id }}),
+                                            })"
                                             class="px-3 py-2 rounded-lg
                                                    bg-amber-50 text-amber-700
                                                    hover:bg-amber-100
@@ -330,8 +342,12 @@
                                     @elseif($driver->status === Driver::STATUS_SUSPENDED)
 
                                         <button
-                                            wire:click="activate({{ $driver->id }})"
-                                            wire:confirm="¿Deseas activar nuevamente a este repartidor?"
+                                            @click.prevent="$store.confirm.open({
+                                                message: '¿Deseas activar nuevamente a este repartidor?',
+                                                confirmText: 'Activar',
+                                                variant: 'primary',
+                                                onConfirm: () => $wire.activate({{ $driver->id }}),
+                                            })"
                                             class="px-3 py-2 rounded-lg
                                                    bg-blue-50 text-blue-700
                                                    hover:bg-blue-100

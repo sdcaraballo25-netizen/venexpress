@@ -194,9 +194,13 @@
 
                                 <button
                                     type="button"
-                                    wire:click="releaseRoute"
                                     wire:loading.attr="disabled"
-                                    wire:confirm="¿Confirmas que quieres liberar esta ruta? Volverá a estar disponible para otros repartidores."
+                                    @click.prevent="$store.confirm.open({
+                                        message: '¿Confirmas que quieres liberar esta ruta? Volverá a estar disponible para otros repartidores.',
+                                        confirmText: 'Liberar ruta',
+                                        variant: 'warning',
+                                        onConfirm: () => $wire.releaseRoute(),
+                                    })"
                                     class="inline-flex items-center justify-center rounded-xl border border-[#E2E8F0] px-5 py-3 text-sm font-semibold text-[#0F172A] transition hover:border-amber-300 hover:bg-amber-50 disabled:cursor-not-allowed disabled:opacity-50"
                                 >
                                     <span wire:loading.remove wire:target="releaseRoute">
@@ -217,9 +221,13 @@
 
                                 <button
                                     type="button"
-                                    wire:click="completeRoute"
                                     wire:loading.attr="disabled"
-                                    wire:confirm="¿Confirmas que quieres finalizar esta ruta? Las paradas pendientes quedarán marcadas como omitidas."
+                                    @click.prevent="$store.confirm.open({
+                                        message: '¿Confirmas que quieres finalizar esta ruta? Las paradas pendientes quedarán marcadas como omitidas.',
+                                        confirmText: 'Finalizar ruta',
+                                        variant: 'danger',
+                                        onConfirm: () => $wire.completeRoute(),
+                                    })"
                                     class="inline-flex items-center justify-center rounded-xl border border-[#E2E8F0] px-5 py-3 text-sm font-semibold text-[#0F172A] transition hover:border-red-300 hover:bg-red-50 disabled:cursor-not-allowed disabled:opacity-50"
                                 >
                                     <span wire:loading.remove wire:target="completeRoute">
@@ -769,9 +777,13 @@
 
                             <button
                                 type="button"
-                                wire:click="releaseRoute"
                                 wire:loading.attr="disabled"
-                                wire:confirm="¿Confirmas que quieres liberar esta ruta? Volverá a estar disponible para otros repartidores."
+                                @click.prevent="$store.confirm.open({
+                                    message: '¿Confirmas que quieres liberar esta ruta? Volverá a estar disponible para otros repartidores.',
+                                    confirmText: 'Liberar ruta',
+                                    variant: 'warning',
+                                    onConfirm: () => $wire.releaseRoute(),
+                                })"
                                 class="inline-flex items-center justify-center rounded-xl border border-[#E2E8F0] px-5 py-3 text-sm font-semibold text-[#0F172A] transition hover:border-amber-300 hover:bg-amber-50 disabled:cursor-not-allowed disabled:opacity-50"
                             >
                                 <span wire:loading.remove wire:target="releaseRoute">

@@ -187,8 +187,12 @@
                                     <p class="text-xs text-[#64748B]">{{ $route->name }} · {{ $route->city }}</p>
                                 </div>
                                 <button
-                                    wire:click="assignToDriver({{ $route->id }})"
-                                    wire:confirm="¿Asignar este paquete a este repartidor?"
+                                    @click.prevent="$store.confirm.open({
+                                        message: '¿Asignar este paquete a este repartidor?',
+                                        confirmText: 'Asignar',
+                                        variant: 'primary',
+                                        onConfirm: () => $wire.assignToDriver({{ $route->id }}),
+                                    })"
                                     class="px-3 py-2 rounded-lg bg-blue-600 text-white hover:bg-blue-700 text-xs font-semibold transition shrink-0"
                                 >
                                     Asignar

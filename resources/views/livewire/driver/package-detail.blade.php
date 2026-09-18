@@ -533,10 +533,14 @@
 
                     <button
                         type="button"
-                        wire:click="completeDelivery"
                         wire:loading.attr="disabled"
                         wire:target="completeDelivery"
-                        wire:confirm="¿Confirmas que la entrega fue realizada correctamente?"
+                        @click.prevent="$store.confirm.open({
+                            message: '¿Confirmas que la entrega fue realizada correctamente?',
+                            confirmText: 'Confirmar entrega',
+                            variant: 'primary',
+                            onConfirm: () => $wire.completeDelivery(),
+                        })"
                         class="rounded-xl bg-emerald-600 px-5 py-3 text-sm font-semibold text-white transition hover:bg-emerald-700 disabled:cursor-not-allowed disabled:opacity-60"
                     >
                         <span wire:loading.remove wire:target="completeDelivery">
@@ -630,10 +634,14 @@
 
             <button
                 type="button"
-                wire:click="collectCod"
                 wire:loading.attr="disabled"
                 wire:target="collectCod"
-                wire:confirm="¿Confirmas que recolectaste el cobro en destino?"
+                @click.prevent="$store.confirm.open({
+                    message: '¿Confirmas que recolectaste el cobro en destino?',
+                    confirmText: 'Registrar cobro',
+                    variant: 'primary',
+                    onConfirm: () => $wire.collectCod(),
+                })"
                 class="mt-4 rounded-xl bg-amber-600 px-5 py-3 text-sm font-semibold text-white transition hover:bg-amber-700 disabled:cursor-not-allowed disabled:opacity-60"
             >
                 <span wire:loading.remove wire:target="collectCod">

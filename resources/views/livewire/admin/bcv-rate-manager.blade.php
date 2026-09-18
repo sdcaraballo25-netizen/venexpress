@@ -68,8 +68,13 @@
                                                 class="text-sm font-medium text-blue-800 hover:text-blue-900">
                                             Editar
                                         </button>
-                                        <button wire:click="delete({{ $bcvRate->id }})"
-                                                wire:confirm="¿Eliminar esta tasa? Esta acción no se puede deshacer."
+                                        <button
+                                                @click.prevent="$store.confirm.open({
+                                                    message: '¿Eliminar esta tasa? Esta acción no se puede deshacer.',
+                                                    confirmText: 'Eliminar',
+                                                    variant: 'danger',
+                                                    onConfirm: () => $wire.delete({{ $bcvRate->id }}),
+                                                })"
                                                 class="text-sm font-medium text-red-600 hover:text-red-700">
                                             Eliminar
                                         </button>

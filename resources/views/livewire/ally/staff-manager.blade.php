@@ -125,8 +125,12 @@
                                     </button>
                                     <button
                                         type="button"
-                                        wire:click="toggleActive({{ $member->id }})"
-                                        wire:confirm="¿{{ $member->isActive() ? 'Desactivar' : 'Reactivar' }} a {{ $member->name }}?"
+                                        @click.prevent="$store.confirm.open({
+                                            message: {{ Js::from('¿' . ($member->isActive() ? 'Desactivar' : 'Reactivar') . ' a ' . $member->name . '?') }},
+                                            confirmText: {{ Js::from($member->isActive() ? 'Desactivar' : 'Reactivar') }},
+                                            variant: {{ Js::from($member->isActive() ? 'danger' : 'primary') }},
+                                            onConfirm: () => $wire.toggleActive({{ $member->id }}),
+                                        })"
                                         class="text-xs font-medium {{ $member->isActive() ? 'text-red-600' : 'text-emerald-700' }} hover:underline"
                                     >
                                         {{ $member->isActive() ? 'Desactivar' : 'Reactivar' }}

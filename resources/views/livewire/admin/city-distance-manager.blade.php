@@ -88,8 +88,13 @@
                                             class="text-sm font-medium text-blue-800 hover:text-blue-900">
                                         Editar
                                     </button>
-                                    <button wire:click="delete({{ $distance->id }})"
-                                            wire:confirm="¿Eliminar esta distancia?"
+                                    <button
+                                            @click.prevent="$store.confirm.open({
+                                                message: '¿Eliminar esta distancia?',
+                                                confirmText: 'Eliminar',
+                                                variant: 'danger',
+                                                onConfirm: () => $wire.delete({{ $distance->id }}),
+                                            })"
                                             class="text-sm font-medium text-red-600 hover:text-red-700">
                                         Eliminar
                                     </button>

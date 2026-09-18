@@ -147,7 +147,12 @@
 
 
                 <form
-                    wire:submit.prevent="deliver"
+                    @submit.prevent="$store.confirm.open({
+                        message: '¿Confirmas la identidad y entrega del paquete?',
+                        confirmText: 'Confirmar retiro',
+                        variant: 'primary',
+                        onConfirm: () => $wire.deliver(),
+                    })"
                     class="mt-5 space-y-3"
                 >
 
@@ -159,7 +164,6 @@
 
                     <button
                         wire:loading.attr="disabled"
-                        wire:confirm="¿Confirmas la identidad y entrega del paquete?"
                         class="w-full rounded-xl bg-emerald-600 px-5 py-3 font-semibold text-white"
                     >
                         Confirmar retiro

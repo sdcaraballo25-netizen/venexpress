@@ -43,8 +43,12 @@
                         @endif
 
                         <button
-                            wire:click="archive({{ $recommendation->id }})"
-                            wire:confirm="¿Archivar esta recomendación?"
+                            @click.prevent="$store.confirm.open({
+                                message: '¿Archivar esta recomendación?',
+                                confirmText: 'Archivar',
+                                variant: 'primary',
+                                onConfirm: () => $wire.archive({{ $recommendation->id }}),
+                            })"
                             class="px-3 py-1.5 rounded-lg bg-slate-50 text-slate-600 hover:bg-slate-100 text-xs font-semibold transition"
                         >
                             Archivar

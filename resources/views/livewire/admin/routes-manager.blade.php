@@ -225,16 +225,24 @@
 
                             @if ($route->status !== 'completed' && $route->status !== 'cancelled')
                                 <button
-                                    wire:click="cancelRoute({{ $route->id }})"
-                                    wire:confirm="¿Quieres cancelar esta ruta?"
+                                    @click.prevent="$store.confirm.open({
+                                        message: '¿Quieres cancelar esta ruta?',
+                                        confirmText: 'Cancelar ruta',
+                                        variant: 'danger',
+                                        onConfirm: () => $wire.cancelRoute({{ $route->id }}),
+                                    })"
                                     class="px-3 py-2 rounded-lg bg-red-50 text-red-700 text-sm hover:bg-red-100">
                                     Cancelar
                                 </button>
                             @endif
 
                             <button
-    wire:click="duplicateRoute({{ $route->id }})"
-    wire:confirm="¿Quieres crear una nueva ruta a partir de esta?"
+    @click.prevent="$store.confirm.open({
+        message: '¿Quieres crear una nueva ruta a partir de esta?',
+        confirmText: 'Duplicar',
+        variant: 'primary',
+        onConfirm: () => $wire.duplicateRoute({{ $route->id }}),
+    })"
     class="px-3 py-2 rounded-lg border border-[#E2E8F0] text-sm text-[#475569] hover:bg-slate-50">
     Duplicar
 </button>

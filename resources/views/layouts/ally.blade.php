@@ -644,6 +644,7 @@
 
 </div>
 
+<x-confirm-dialog />
 
 @livewireScripts
 

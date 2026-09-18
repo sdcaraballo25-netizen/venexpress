@@ -296,10 +296,14 @@
                                     ========================================== --}}
                                     @if($ally->status !== Ally::STATUS_REJECTED)
                                         <button
-                                            wire:click="toggleVerifiedDestination({{ $ally->id }})"
-                                            wire:confirm="{{ $ally->is_verified_destination
-                                                ? '¿Quitar la verificación de punto de entrega/retiro de este aliado?'
-                                                : 'Esto es una configuración administrativa temporal (todavía no existe el flujo de verificación documental). ¿Marcar este aliado como punto verificado de entrega/retiro?' }}"
+                                            @click.prevent="$store.confirm.open({
+                                                message: {{ Js::from($ally->is_verified_destination
+                                                    ? '¿Quitar la verificación de punto de entrega/retiro de este aliado?'
+                                                    : 'Esto es una configuración administrativa temporal (todavía no existe el flujo de verificación documental). ¿Marcar este aliado como punto verificado de entrega/retiro?') }},
+                                                confirmText: {{ Js::from($ally->is_verified_destination ? 'Quitar verificación' : 'Marcar verificado') }},
+                                                variant: {{ Js::from($ally->is_verified_destination ? 'warning' : 'primary') }},
+                                                onConfirm: () => $wire.toggleVerifiedDestination({{ $ally->id }}),
+                                            })"
                                             title="Configuración administrativa temporal"
                                             class="px-3 py-2 rounded-lg
                                                    {{ $ally->is_verified_destination
@@ -321,8 +325,12 @@
 
                                         {{-- Aprobar --}}
                                         <button
-                                            wire:click="approve({{ $ally->id }})"
-                                            wire:confirm="¿Estás seguro de que deseas aprobar este aliado?"
+                                            @click.prevent="$store.confirm.open({
+                                                message: '¿Estás seguro de que deseas aprobar este aliado?',
+                                                confirmText: 'Aprobar',
+                                                variant: 'primary',
+                                                onConfirm: () => $wire.approve({{ $ally->id }}),
+                                            })"
                                             class="px-3 py-2 rounded-lg
                                                    bg-blue-600 text-white
                                                    hover:bg-blue-700
@@ -335,8 +343,12 @@
 
                                         {{-- Rechazar --}}
                                         <button
-                                            wire:click="reject({{ $ally->id }})"
-                                            wire:confirm="¿Estás seguro de que deseas rechazar este aliado?"
+                                            @click.prevent="$store.confirm.open({
+                                                message: '¿Estás seguro de que deseas rechazar este aliado?',
+                                                confirmText: 'Rechazar',
+                                                variant: 'danger',
+                                                onConfirm: () => $wire.reject({{ $ally->id }}),
+                                            })"
                                             class="px-3 py-2 rounded-lg
                                                    bg-red-50 text-red-700
                                                    hover:bg-red-100
@@ -353,8 +365,12 @@
                                     @elseif($ally->status === Ally::STATUS_ACTIVE)
 
                                         <button
-                                            wire:click="suspend({{ $ally->id }})"
-                                            wire:confirm="¿Estás seguro de que deseas suspender este aliado?"
+                                            @click.prevent="$store.confirm.open({
+                                                message: '¿Estás seguro de que deseas suspender este aliado?',
+                                                confirmText: 'Suspender',
+                                                variant: 'warning',
+                                                onConfirm: () => $wire.suspend({{ $ally->id }}),
+                                            })"
                                             class="px-3 py-2 rounded-lg
                                                    bg-amber-50 text-amber-700
                                                    hover:bg-amber-100
@@ -371,8 +387,12 @@
                                     @elseif($ally->status === Ally::STATUS_SUSPENDED)
 
                                         <button
-                                            wire:click="activate({{ $ally->id }})"
-                                            wire:confirm="¿Deseas activar nuevamente este aliado?"
+                                            @click.prevent="$store.confirm.open({
+                                                message: '¿Deseas activar nuevamente este aliado?',
+                                                confirmText: 'Activar',
+                                                variant: 'primary',
+                                                onConfirm: () => $wire.activate({{ $ally->id }}),
+                                            })"
                                             class="px-3 py-2 rounded-lg
                                                    bg-blue-50 text-blue-700
                                                    hover:bg-blue-100
