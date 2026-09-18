@@ -9,6 +9,7 @@ use App\Models\RateMatrix;
 use App\Services\TariffService;
 use Illuminate\Foundation\Testing\RefreshDatabase;
 use InvalidArgumentException;
+use RuntimeException;
 use Tests\TestCase;
 
 class TariffServiceTest extends TestCase
@@ -186,5 +187,35 @@ class TariffServiceTest extends TestCase
         );
 
         $this->assertSame(0, $result['distance_km']);
+    }
+
+    /**
+     * calculate() obtiene la tasa BCV a través de
+     * BcvRateService::getCurrentRate(), que ahora bloquea con una
+     * excepción si esa tasa es demasiado vieja (ver
+     * BcvRateServiceTest). Este test confirma que el bloqueo
+     * realmente se propaga hasta calculate(), no solo hasta el
+     * servicio de la tasa.
+     */
+    public function test_calculate_rejects_a_stale_bcv_rate(): void
+    {
+        config(['services.bcv_api.max_age_hours' => 72]);
+
+        BcvRate::query()->update([
+            'effective_at' => now()->subHours(80),
+            'effective_date' => now()->subHours(80)->toDateString(),
+        ]);
+
+        $this->expectException(RuntimeException::class);
+        $this->expectExceptionMessage('La tasa BCV vigente tiene');
+
+        $this->service->calculate(
+            originCity: 'Caracas',
+            destinationCity: 'Valencia',
+            packageType: Package::TYPE_PAQUETE,
+            physicalWeightKg: 3.0,
+            originState: 'Distrito Capital',
+            destinationState: 'Carabobo',
+        );
     }
 }

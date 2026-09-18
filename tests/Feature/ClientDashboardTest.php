@@ -279,6 +279,62 @@ class ClientDashboardTest extends TestCase
     }
 
     /**
+     * Antes, cuando el cliente no tenía ningún Customer asociado
+     * todavía (cuenta recién creada, o email/id_doc que no coincide
+     * con nada), render() dejaba $historyPackages en null en vez de
+     * un paginador vacío. La pestaña "Historial" siempre llama
+     * $historyPackages->isEmpty() sin verificar null primero, así que
+     * la página completa reventaba con un 500 en vez de mostrar un
+     * estado vacío.
+     */
+    public function test_history_tab_does_not_crash_for_a_client_with_no_associated_customer(): void
+    {
+        $user = $this->createClientUser('sin-paquetes@example.com');
+
+        Livewire::actingAs($user)
+            ->test(Dashboard::class)
+            ->call('showHistory')
+            ->assertOk()
+            ->assertViewHas('historyPackages', function ($historyPackages) {
+                return $historyPackages !== null && $historyPackages->isEmpty();
+            });
+    }
+
+    /**
+     * user_id ancla el vínculo del cliente con su propia cédula de
+     * forma durable: si más tarde cambia el email de su cuenta desde
+     * su perfil, el Customer se queda con el email viejo, pero el
+     * cliente no debe perder acceso a su propio historial.
+     */
+    public function test_dashboard_still_shows_packages_after_the_account_email_changes(): void
+    {
+        $ally = $this->createAlly();
+
+        $user = $this->createClientUser('viejo@example.com');
+
+        Customer::create([
+            'id_doc' => 'V-66666666',
+            'user_id' => $user->id,
+            'name' => 'Cliente Real',
+            'phone' => '0414-0000005',
+            'email' => 'viejo@example.com',
+        ]);
+
+        $package = $this->createPackage($ally, [
+            'tracking_number' => 'VEN-TEST-EMAILCHANGE',
+            'recipient_id_doc' => 'V-66666666',
+        ]);
+
+        $user->update(['email' => 'nuevo@example.com']);
+
+        Livewire::actingAs($user->fresh())
+            ->test(Dashboard::class)
+            ->assertViewHas('packages', function ($packages) use ($package) {
+                return $packages->pluck('id')->contains($package->id);
+            });
+    }
+
+    /**
      * La pestaña "Pendientes" (vista por defecto) nunca debe incluir
      * paquetes ya ENTREGADO: esos viven en "Historial".
      */

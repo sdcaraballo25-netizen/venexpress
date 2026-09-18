@@ -3,6 +3,7 @@
 namespace Tests\Feature\Auth;
 
 use App\Models\Ally;
+use App\Models\Customer;
 use App\Models\Driver;
 use App\Models\User;
 use Illuminate\Foundation\Testing\RefreshDatabase;
@@ -52,6 +53,89 @@ class RegistrationTest extends TestCase
 
         $this->assertNotNull($user);
         $this->assertNull($user->email_verified_at);
+
+        // El registro debe dejar el Customer vinculado a esta cuenta
+        // (ver migración add_user_id_to_customers_table), no solo con
+        // el email.
+        $this->assertSame(
+            $user->id,
+            Customer::where('id_doc', 'V-12345678')->value('user_id')
+        );
+    }
+
+    /**
+     * Antes, esta validación solo miraba si el Customer ya tenía un
+     * email — pero un aliado puede haber tecleado el email real de
+     * esa persona al despachar una guía sin que ella hubiera
+     * reclamado la cédula todavía. Eso bloqueaba injustamente el
+     * registro de su verdadero dueño. Ahora la decisión es por
+     * user_id: si nadie ha reclamado la cédula todavía, el registro
+     * debe poder completarse aunque el Customer ya tenga un email.
+     */
+    public function test_registering_with_an_id_doc_that_has_an_unclaimed_email_succeeds(): void
+    {
+        Customer::create([
+            'id_doc' => 'V-99999999',
+            'name' => 'Cliente Real',
+            'phone' => '0414-0000000',
+            'email' => 'real@example.com',
+        ]);
+
+        $component = Volt::test('pages.auth.register')
+            ->set('name', 'Cliente Real')
+            ->set('email', 'real@example.com')
+            ->set('password', 'password')
+            ->set('password_confirmation', 'password')
+            ->set('id_doc', 'V-99999999')
+            ->set('phone', '+58 412 1234567');
+
+        $component->call('register');
+
+        $component->assertHasNoErrors();
+
+        $user = User::where('email', 'real@example.com')->first();
+        $this->assertNotNull($user);
+
+        $this->assertSame(
+            $user->id,
+            Customer::where('id_doc', 'V-99999999')->value('user_id')
+        );
+    }
+
+    /**
+     * Una vez que una cuenta reclamó una cédula (user_id fijado), un
+     * segundo registro con la misma cédula debe rechazarse, sin
+     * importar qué email use el atacante.
+     */
+    public function test_registering_with_an_already_claimed_id_doc_is_rejected(): void
+    {
+        $owner = User::factory()->create([
+            'role' => User::ROLE_CLIENTE,
+        ]);
+
+        Customer::create([
+            'id_doc' => 'V-11111111',
+            'user_id' => $owner->id,
+            'name' => 'Dueño Real',
+            'phone' => '0414-1111111',
+            'email' => $owner->email,
+        ]);
+
+        $component = Volt::test('pages.auth.register')
+            ->set('name', 'Atacante')
+            ->set('email', 'atacante@example.com')
+            ->set('password', 'password')
+            ->set('password_confirmation', 'password')
+            ->set('id_doc', 'V-11111111')
+            ->set('phone', '+58 412 9999999');
+
+        $component->call('register');
+
+        $component->assertHasErrors(['id_doc']);
+
+        $this->assertDatabaseMissing('users', [
+            'email' => 'atacante@example.com',
+        ]);
     }
 
     public function test_new_ally_registers_as_pending_with_storefront_photo_and_location(): void

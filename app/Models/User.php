@@ -195,6 +195,15 @@ class User extends Authenticatable
     }
 
     /**
+     * Registro de Customer que este usuario reclamó al registrarse
+     * como cliente con su cédula (ver register.blade.php).
+     */
+    public function customer(): HasOne
+    {
+        return $this->hasOne(Customer::class);
+    }
+
+    /**
      * Almacén propio de Venexpress al que pertenece este usuario
      * cuando es personal de almacén (role 'almacen').
      */

@@ -256,18 +256,20 @@ new #[Layout('layouts.guest')] class extends Component
                      * persona con solo conocer o adivinar su cédula,
                      * además de sobrescribir su nombre/teléfono/email.
                      *
-                     * Por eso: solo permitimos crear la cuenta si la
-                     * cédula es nueva, o si el customer existente aún
-                     * NO tiene email (fue creado por un aliado al
-                     * despachar una guía y todavía nadie lo reclamó).
-                     * Si el customer ya tiene email, la cédula ya fue
-                     * reclamada por otra cuenta y bloqueamos el
-                     * registro.
+                     * Antes esto se decidía mirando si el Customer ya
+                     * tenía un email — pero un aliado puede haber
+                     * tecleado el email real de esa persona al
+                     * despachar una guía sin que nadie haya
+                     * "reclamado" la cédula todavía, lo que bloqueaba
+                     * el registro de su verdadero dueño. Ahora se
+                     * decide por user_id: solo bloqueamos si otra
+                     * cuenta ya demostró ser dueña de esta cédula
+                     * registrándose con ella.
                      */
                     function (string $attribute, mixed $value, \Closure $fail) {
                         $existing = Customer::where('id_doc', $value)->first();
 
-                        if ($existing && $existing->email) {
+                        if ($existing && $existing->user_id !== null) {
                             $fail(
                                 'Ya existe una cuenta de cliente registrada '
                                 . 'con esta cédula. Si es tuya, inicia sesión '
@@ -383,10 +385,14 @@ new #[Layout('layouts.guest')] class extends Component
          * anterior, el customer ya existe con este id_doc: lo
          * actualizamos en vez de duplicarlo, para que el historial de
          * paquetes previos también quede visible.
+         *
+         * user_id queda fijado a ESTE usuario: la validación de arriba
+         * ya garantizó que nadie más lo había reclamado todavía.
          */
         Customer::updateOrCreate(
             ['id_doc' => $validated['id_doc']],
             [
+                'user_id' => $user->id,
                 'name' => $validated['name'],
                 'phone' => $validated['phone'],
                 'email' => $validated['email'],

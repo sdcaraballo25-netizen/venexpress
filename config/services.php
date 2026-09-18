@@ -4,6 +4,15 @@ return [
 
     'bcv_api' => [
         'url' => env('BCV_API_URL', 'https://ve.dolarapi.com/v1/dolares/oficial'),
+
+        // Antigüedad máxima aceptada para la tasa BCV vigente antes de
+        // bloquear cotizaciones (BcvRateService::getCurrentRate()). El
+        // BCV no publica en fines de semana ni feriados, así que el
+        // valor por defecto cubre un fin de semana completo sin
+        // bloquear la operación normal de la agencia; si bcv:sync
+        // (corre cada hora, ver routes/console.php) falla por más de
+        // este tiempo, es una señal real de que algo está roto.
+        'max_age_hours' => env('BCV_MAX_RATE_AGE_HOURS', 72),
     ],
 
     'google_maps' => [
