@@ -111,10 +111,6 @@ class PackageService
             $declaredValueUsd = $data['declared_value_usd'] ?? null;
             $isCod = $data['is_cod'] ?? false;
 
-            $codAmountUsd = $isCod
-                ? ($data['cod_amount_usd'] ?? null)
-                : null;
-
             $requiresDelivery =
                 $data['requires_delivery'] ?? false;
 
@@ -139,6 +135,15 @@ class PackageService
                     $data['destination_state'] ?? null,
                 requiresDelivery: $requiresDelivery,
             );
+
+            // El monto COD siempre es el total calculado por
+            // TariffService, nunca lo que venga en $data: ese valor
+            // viene de un campo del formulario (Ally\PackageCreate)
+            // que un request manipulado podría alterar para cobrar de
+            // más o de menos en destino.
+            $codAmountUsd = $isCod
+                ? $pricing['total_price_usd']
+                : null;
 
             $commission = $this->calculateCommission(
                 $data['ally_id'],
@@ -487,6 +492,10 @@ class PackageService
 
             Package::STATUS_RECOLECTADO_VENEXPRESS => [
                 Package::STATUS_EN_HUB,
+                // Un repartidor de tipo Delivery recolecta directo en
+                // la agencia y arranca el reparto a domicilio sin pasar
+                // por el HUB (PackageDetail::startDelivery()).
+                Package::STATUS_EN_TRANSITO_NACIONAL,
             ],
 
             Package::STATUS_EN_HUB => [
@@ -678,7 +687,16 @@ class PackageService
                 );
             }
 
-            if ($locked->isClaimedForDelivery()) {
+            // isClaimedForDelivery() no basta aquí: solo es cierto
+            // cuando delivery_status === DELIVERY_ACCEPTED, pero un
+            // paquete también puede tener driver_id asignado por la
+            // ruta de un chofer de HUB/reparto (registerCollection(),
+            // DeliveryAssignmentService::assign()) sin tocar
+            // delivery_status. Si solo miráramos isClaimedForDelivery()
+            // aquí, ese paquete se vería como "libre" y otro repartidor
+            // distinto podría reclamarlo mientras el primero todavía lo
+            // tiene físicamente.
+            if ($locked->driver_id !== null) {
                 if ((int) $locked->driver_id === (int) $driver->id) {
                     // Ya lo tenía él mismo: no es un error, solo lo devolvemos.
                     return $locked->fresh();
@@ -922,6 +940,13 @@ class PackageService
                 throw new RuntimeException(
                     'Este paquete no está asignado a este repartidor.'
                 );
+            }
+
+            // Igual que completeDelivery(): un repartidor suspendido o
+            // rechazado no puede seguir registrando cobros aunque su
+            // token todavía no se haya revocado.
+            if ($driver !== null && $driver->status !== Driver::STATUS_ACTIVE) {
+                throw new RuntimeException('El repartidor no está activo.');
             }
 
             if (! $locked->is_cod) {

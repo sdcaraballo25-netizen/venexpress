@@ -51,6 +51,8 @@ class DriversApprovalManager extends Component
             'status' => Driver::STATUS_REJECTED,
         ]);
 
+        $driver->user?->tokens()->delete();
+
         $this->logDriverAction(
             $driver,
             'driver.rejected',
@@ -72,6 +74,8 @@ class DriversApprovalManager extends Component
         $driver->update([
             'status' => Driver::STATUS_SUSPENDED,
         ]);
+
+        $driver->user?->tokens()->delete();
 
         $this->logDriverAction(
             $driver,

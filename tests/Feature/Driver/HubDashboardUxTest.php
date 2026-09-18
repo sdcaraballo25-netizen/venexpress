@@ -520,7 +520,13 @@ class HubDashboardUxTest extends TestCase
         Livewire::actingAs($user)
             ->test(PackageDetail::class, ['packageId' => $recolectado->id])
             ->assertSee('Iniciar entrega')
-            ->assertDontSee('Volver a mi ruta');
+            ->assertDontSee('Volver a mi ruta')
+            ->call('startDelivery');
+
+        $this->assertSame(
+            Package::STATUS_EN_TRANSITO_NACIONAL,
+            $recolectado->fresh()->current_status
+        );
 
         // "Confirmar entrega" sigue siendo una acción real y funcional
         // para Delivery, usando exactamente el flujo/servicio existente.

@@ -208,6 +208,64 @@ class AllyFinancialServiceTest extends TestCase
         );
     }
 
+    /**
+     * Antes, createAdjustment() solo miraba getBalance() sin
+     * descontar liquidaciones pendientes (a diferencia de
+     * createSettlement(), que sí lo hace). Eso permitía crear un
+     * ajuste de débito que dejaba sin fondos una liquidación pendiente
+     * ya aprobada, varándola: markSettlementPaid() fallaría después
+     * por "saldo insuficiente" sin que nada lo hubiera anunciado al
+     * crear el ajuste.
+     */
+    public function test_debit_adjustment_respects_balance_already_reserved_by_pending_settlements(): void
+    {
+        $ally = $this->createAlly();
+
+        $this->createPackage($ally, [
+            'commission_percentage_used' => 10.00,
+            'commission_amount_usd' => 100.00,
+        ]);
+
+        $settlement = $this->service->createSettlement(
+            allyId: $ally->id,
+            amountUsd: 100.00,
+            paymentMethod: null,
+            reference: null,
+            notes: null,
+            userId: null,
+        );
+
+        $admin = User::factory()->create([
+            'role' => User::ROLE_ADMIN_PRINCIPAL,
+            'status' => User::STATUS_ACTIVE,
+        ]);
+
+        $this->expectException(RuntimeException::class);
+
+        try {
+            $this->service->createAdjustment(
+                allyId: $ally->id,
+                amountUsd: 100.00,
+                direction: AllyFinancialTransaction::DIRECTION_DEBIT,
+                description: 'Ajuste que no debería poder crearse',
+                adminUserId: $admin->id,
+            );
+        } finally {
+            // La liquidación pendiente debe seguir siendo pagable con
+            // el saldo que tenía reservado, pase lo que pase con el
+            // intento de ajuste.
+            $this->service->markSettlementPaid(
+                settlementId: $settlement->id,
+                adminUserId: $admin->id,
+            );
+
+            $this->assertSame(
+                AllySettlement::STATUS_PAID,
+                $settlement->fresh()->status
+            );
+        }
+    }
+
     public function test_credit_adjustment_increases_balance(): void
     {
         $ally = $this->createAlly();

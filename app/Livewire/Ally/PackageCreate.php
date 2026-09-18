@@ -619,23 +619,8 @@ class PackageCreate extends Component
         // Registramos o actualizamos al remitente y destinatario como
         // clientes conocidos, para que la próxima vez que se use su
         // documento se autocompleten sus datos.
-        Customer::updateOrCreate(
-            ['id_doc' => $this->sender_id_doc],
-            [
-                'name' => $this->sender_name,
-                'phone' => $this->sender_phone,
-                'email' => $this->sender_email ?: null,
-            ],
-        );
-
-        Customer::updateOrCreate(
-            ['id_doc' => $this->recipient_id_doc],
-            [
-                'name' => $this->recipient_name,
-                'phone' => $this->recipient_phone,
-                'email' => $this->recipient_email ?: null,
-            ],
-        );
+        $this->syncCustomer($this->sender_id_doc, $this->sender_name, $this->sender_phone, $this->sender_email);
+        $this->syncCustomer($this->recipient_id_doc, $this->recipient_name, $this->recipient_phone, $this->recipient_email);
 
         $package = $packageService->createPackage([
             ...$data,
@@ -689,6 +674,28 @@ class PackageCreate extends Component
         $this->dispatch('package-created', trackingNumber: $package->tracking_number);
 
         $this->resetForm();
+    }
+
+    /**
+     * Crea o actualiza el Customer de un id_doc. El nombre y el teléfono
+     * siempre se refrescan, pero el email nunca se sobrescribe si el
+     * cliente ya tenía uno distinto registrado: Client\Dashboard,
+     * Incidents y PendingPayments usan ese email para decidir qué
+     * paquetes le pertenecen a quién, así que cambiarlo aquí sin
+     * verificación podría transferir la visibilidad de los paquetes de
+     * un id_doc a un email ajeno.
+     */
+    protected function syncCustomer(string $idDoc, string $name, ?string $phone, ?string $email): void
+    {
+        $customer = Customer::firstOrNew(['id_doc' => $idDoc]);
+        $customer->name = $name;
+        $customer->phone = $phone;
+
+        if (! $customer->exists || blank($customer->email)) {
+            $customer->email = $email ?: null;
+        }
+
+        $customer->save();
     }
 
     public function registerAnother(): void

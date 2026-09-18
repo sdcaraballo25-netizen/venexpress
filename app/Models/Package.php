@@ -371,7 +371,8 @@ class Package extends Model
 
     public function isAvailableForDeliveryClaim(): bool
     {
-        return $this->requires_delivery
+        return $this->driver_id === null
+            && $this->requires_delivery
             && in_array($this->current_status, self::CLAIMABLE_FOR_DELIVERY_STATUSES, true)
             && ($this->delivery_status === null || $this->delivery_status === self::DELIVERY_PENDING);
     }
@@ -379,12 +380,16 @@ class Package extends Model
     /**
      * Paquetes listos para que cualquier repartidor de entrega los
      * reclame: requieren entrega a domicilio, están en un estado
-     * reclamable (ver CLAIMABLE_FOR_DELIVERY_STATUSES) y todavía nadie
-     * los ha tomado.
+     * reclamable (ver CLAIMABLE_FOR_DELIVERY_STATUSES), nadie los ha
+     * tomado por delivery_status (isClaimedForDelivery() usa esa
+     * marca) y tampoco tienen ya un driver_id asignado — por ejemplo,
+     * uno que RouteService::cancel() acaba de liberar pero que otro
+     * repartidor podría estar sosteniendo físicamente todavía.
      */
     public function scopeAvailableForDeliveryClaim($query)
     {
         return $query
+            ->whereNull('driver_id')
             ->where('requires_delivery', true)
             ->whereIn('current_status', self::CLAIMABLE_FOR_DELIVERY_STATUSES)
             ->where(function ($q) {

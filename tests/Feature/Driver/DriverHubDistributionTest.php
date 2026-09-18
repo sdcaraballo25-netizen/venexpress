@@ -11,6 +11,7 @@ use App\Models\User;
 use App\Models\Warehouse;
 use App\Models\WarehouseCoverage;
 use App\Services\LogisticsScanService;
+use App\Services\RouteService;
 use Illuminate\Foundation\Testing\RefreshDatabase;
 use Tests\Feature\Concerns\CreatesTestPackages;
 use Tests\TestCase;
@@ -459,5 +460,61 @@ class DriverHubDistributionTest extends TestCase
             'tracking_number' => 'VEN-TEST-INEXISTENTE',
         ], $this->authHeaders($user))
             ->assertStatus(403);
+    }
+
+    /**
+     * Antes, cancelar una ruta hub_distribution en curso dejaba el
+     * paquete ya despachado "pegado" al driver (driver_id sin cambios)
+     * y la parada en PENDING para siempre, aunque la ruta que lo
+     * transportaba ya no existiera. RouteService::cancel() ahora
+     * libera esa custodia y cierra la parada, igual que hace
+     * complete() con las paradas no visitadas.
+     */
+    public function test_cancelling_an_in_progress_route_releases_dispatched_package_custody(): void
+    {
+        [$user, $driver] = $this->createHubDriverUser();
+        $warehouse = $this->createWarehouse();
+        $this->coverWarehouse($warehouse);
+        $route = $this->startDistributionRoute($driver, $warehouse);
+        $stop = $route->stops()->first();
+
+        $ally = $this->createAlly();
+        $package = $this->createPackage($ally, [
+            'current_status' => Package::STATUS_EN_HUB,
+            'destination_city' => 'Valencia',
+            'destination_state' => 'Carabobo',
+            'destination_warehouse_id' => $warehouse->id,
+            'destination_resolution_status' => 'resolved',
+        ]);
+
+        $this->postJson('/api/driver/hub/dispatch', [
+            'tracking_number' => $package->tracking_number,
+        ], $this->authHeaders($user))->assertOk();
+
+        $package->refresh();
+        $this->assertSame($driver->id, $package->driver_id);
+        $this->assertSame(Package::STATUS_EN_TRANSITO_NACIONAL, $package->current_status);
+
+        app(RouteService::class)->cancel($route, $user->id);
+
+        $package->refresh();
+        $this->assertNull($package->driver_id);
+        // El estado no se toca: la recepción manual del paquete sigue
+        // el camino de Admin\PackageReception, igual que antes.
+        $this->assertSame(Package::STATUS_EN_TRANSITO_NACIONAL, $package->current_status);
+
+        $stop->refresh();
+        $this->assertSame(RouteStop::STATUS_SKIPPED, $stop->status);
+
+        $this->assertSame(Route::STATUS_CANCELLED, $route->fresh()->status);
+
+        // El driver ya no aparece bloqueado esperando la llegada de un
+        // paquete cuya ruta ya no existe.
+        $this->assertFalse(
+            Package::query()
+                ->where('driver_id', $driver->id)
+                ->where('current_status', Package::STATUS_EN_TRANSITO_NACIONAL)
+                ->exists()
+        );
     }
 }

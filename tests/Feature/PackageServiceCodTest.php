@@ -232,6 +232,33 @@ class PackageServiceCodTest extends TestCase
      * que el repartidor confirme con qué forma de pago le cancelaron
      * — antes lo asumía automáticamente, sin ningún registro real.
      */
+    /**
+     * Igual que completeDelivery(), collectCod() ahora rechaza a un
+     * repartidor que ya no está activo, aunque su token todavía no
+     * haya sido revocado (defensa en profundidad además de la
+     * revocación de tokens en DriversApprovalManager).
+     */
+    public function test_collect_cod_rejects_a_suspended_driver(): void
+    {
+        $ally = $this->createAlly();
+        $driver = $this->createActiveDriver();
+
+        $package = $this->createPackage($ally, [
+            'requires_delivery' => true,
+            'driver_id' => $driver->id,
+            'current_status' => Package::STATUS_ENTREGADO,
+            'is_cod' => true,
+            'cod_amount_usd' => 15.00,
+        ]);
+
+        $driver->update(['status' => Driver::STATUS_SUSPENDED]);
+
+        $this->expectException(RuntimeException::class);
+        $this->expectExceptionMessage('El repartidor no está activo.');
+
+        $this->service->collectCod($package, $driver->user_id, $driver);
+    }
+
     public function test_complete_delivery_requires_a_payment_method_for_cod_packages(): void
     {
         $ally = $this->createAlly();

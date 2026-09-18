@@ -458,6 +458,12 @@ class RouteService
             );
         }
 
+        if ($route->driver?->status !== Driver::STATUS_ACTIVE) {
+            throw new RuntimeException(
+                'Solo un repartidor activo puede iniciar una ruta.'
+            );
+        }
+
         if ($route->status === Route::STATUS_COMPLETED) {
             throw new RuntimeException(
                 'Esta ruta ya fue finalizada.'
@@ -470,19 +476,38 @@ class RouteService
             );
         }
 
-        $route->update([
-            'status' => Route::STATUS_IN_PROGRESS,
-            'started_at' => now(),
-        ]);
+        return DB::transaction(function () use ($route, $actingUserId) {
+            $lockedRoute = Route::query()
+                ->whereKey($route->id)
+                ->lockForUpdate()
+                ->firstOrFail();
 
-        $this->log(
-            $actingUserId,
-            'route.started',
-            $route,
-            "Inició el recorrido de \"{$route->name}\"."
-        );
+            if ($lockedRoute->status === Route::STATUS_COMPLETED) {
+                throw new RuntimeException(
+                    'Esta ruta ya fue finalizada.'
+                );
+            }
 
-        return $route->fresh();
+            if ($lockedRoute->status === Route::STATUS_CANCELLED) {
+                throw new RuntimeException(
+                    'Esta ruta está cancelada.'
+                );
+            }
+
+            $lockedRoute->update([
+                'status' => Route::STATUS_IN_PROGRESS,
+                'started_at' => now(),
+            ]);
+
+            $this->log(
+                $actingUserId,
+                'route.started',
+                $lockedRoute,
+                "Inició el recorrido de \"{$lockedRoute->name}\"."
+            );
+
+            return $lockedRoute->fresh();
+        });
     }
 
     /**
@@ -655,6 +680,25 @@ class RouteService
     }
 
     /**
+     * IDs de Package asignados directamente a esta ruta delivery vía
+     * DeliveryAssignmentService::assign() — esa asignación es por
+     * ciudad desde Admin, sin pasar por ninguna RouteStop, así que
+     * packageIdsCollectedOnRoute() (que exige un route_stop_id) nunca
+     * los ve. En vez de inventar una RouteStop artificial, reusamos el
+     * AuditLog que assign() ya escribe con metadata.route_id.
+     */
+    public function packageIdsAssignedDirectlyOnRoute(Route $route): \Illuminate\Support\Collection
+    {
+        return AuditLog::query()
+            ->where('action', 'package.delivery_assigned')
+            ->where('target_type', Package::class)
+            ->where('metadata->route_id', $route->id)
+            ->pluck('target_id')
+            ->unique()
+            ->values();
+    }
+
+    /**
      * IDs de Package despachados en el tramo HUB -> HUB de esta ruta
      * (route_type hub_distribution): el evento EVENT_SALIDA que
      * PackageDispatchService::dispatch() registra al salir del HUB
@@ -704,7 +748,9 @@ class RouteService
     {
         return match ($route->route_type) {
             Route::TYPE_DELIVERY => Package::query()
-                ->whereIn('id', $this->packageIdsCollectedOnRoute($route))
+                ->whereIn('id', $this->packageIdsCollectedOnRoute($route)
+                    ->merge($this->packageIdsAssignedDirectlyOnRoute($route))
+                    ->unique())
                 ->where(
                     'current_status',
                     '!=',
@@ -771,6 +817,12 @@ class RouteService
             );
         }
 
+        if ($route->driver?->status !== Driver::STATUS_ACTIVE) {
+            throw new RuntimeException(
+                'Solo un repartidor activo puede finalizar una ruta.'
+            );
+        }
+
         return DB::transaction(function () use (
             $route,
             $actingUserId
@@ -783,6 +835,12 @@ class RouteService
             if (! $lockedRoute->isInProgress()) {
                 throw new RuntimeException(
                     'Solo se puede finalizar una ruta que está en curso.'
+                );
+            }
+
+            if ($lockedRoute->driver?->status !== Driver::STATUS_ACTIVE) {
+                throw new RuntimeException(
+                    'Solo un repartidor activo puede finalizar una ruta.'
                 );
             }
 
@@ -832,6 +890,18 @@ class RouteService
 
     /**
      * Cancela una ruta.
+     *
+     * A diferencia de complete(), cancel() puede aplicarse a una ruta
+     * ASSIGNED o IN_PROGRESS que todavía tenga paquetes bajo custodia
+     * del driver (pendingPackagesCountFor() > 0) — cancelar no exige
+     * que la ruta haya terminado su trabajo. Por eso, al cancelar,
+     * liberamos esa misma custodia (driver_id = null, igual que hace
+     * la recepción normal en HubReceptionService) para que esos
+     * paquetes no queden "pegados" a un driver cuya ruta ya no existe,
+     * y cerramos las paradas pendientes como SKIPPED igual que hace
+     * complete(). No tocamos current_status: la recepción/reasignación
+     * de esos paquetes sigue el camino manual que ya existe (Admin\
+     * PackageReception, etc.).
      */
     public function cancel(
         Route $route,
@@ -849,18 +919,76 @@ class RouteService
             );
         }
 
-        $route->update([
-            'status' => Route::STATUS_CANCELLED,
-        ]);
+        return DB::transaction(function () use ($route, $actingUserId) {
+            $lockedRoute = Route::query()
+                ->whereKey($route->id)
+                ->lockForUpdate()
+                ->firstOrFail();
 
-        $this->log(
-            $actingUserId,
-            'route.cancelled',
-            $route,
-            "Canceló la ruta \"{$route->name}\"."
-        );
+            if ($lockedRoute->status === Route::STATUS_COMPLETED) {
+                throw new RuntimeException(
+                    'Una ruta completada no se puede cancelar.'
+                );
+            }
 
-        return $route->fresh();
+            if ($lockedRoute->status === Route::STATUS_CANCELLED) {
+                throw new RuntimeException(
+                    'Esta ruta ya está cancelada.'
+                );
+            }
+
+            $this->releasePendingCustodyFor($lockedRoute);
+
+            $lockedRoute->stops()
+                ->where('status', RouteStop::STATUS_PENDING)
+                ->update(['status' => RouteStop::STATUS_SKIPPED]);
+
+            $lockedRoute->update([
+                'status' => Route::STATUS_CANCELLED,
+            ]);
+
+            $this->log(
+                $actingUserId,
+                'route.cancelled',
+                $lockedRoute,
+                "Canceló la ruta \"{$lockedRoute->name}\"."
+            );
+
+            return $lockedRoute->fresh();
+        });
+    }
+
+    /**
+     * Libera la custodia (driver_id) de los paquetes que todavía
+     * estaban bajo responsabilidad de esta ruta al cancelarla — el
+     * mismo conjunto, por route_type, que pendingPackagesCountFor()
+     * bloquearía si se intentara complete() en vez de cancel().
+     */
+    protected function releasePendingCustodyFor(Route $route): void
+    {
+        match ($route->route_type) {
+            Route::TYPE_DELIVERY => Package::query()
+                ->whereIn('id', $this->packageIdsCollectedOnRoute($route)
+                    ->merge($this->packageIdsAssignedDirectlyOnRoute($route))
+                    ->unique())
+                ->where('driver_id', $route->driver_id)
+                ->where('current_status', '!=', Package::STATUS_ENTREGADO)
+                ->update(['driver_id' => null]),
+
+            Route::TYPE_HUB_TRANSFER => Package::query()
+                ->whereIn('id', $this->packageIdsCollectedOnRoute($route))
+                ->where('driver_id', $route->driver_id)
+                ->where('current_status', Package::STATUS_RECOLECTADO_VENEXPRESS)
+                ->update(['driver_id' => null]),
+
+            Route::TYPE_HUB_DISTRIBUTION => Package::query()
+                ->whereIn('id', $this->packageIdsDispatchedOnRoute($route))
+                ->where('driver_id', $route->driver_id)
+                ->where('current_status', Package::STATUS_EN_TRANSITO_NACIONAL)
+                ->update(['driver_id' => null]),
+
+            default => null,
+        };
     }
 
     /**
