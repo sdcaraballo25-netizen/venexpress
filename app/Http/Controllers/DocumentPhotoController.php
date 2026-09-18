@@ -25,6 +25,27 @@ class DocumentPhotoController extends Controller
         return $this->serve($ally->storefront_photo_path);
     }
 
+    public function allyRifDocument(Request $request, Ally $ally): StreamedResponse
+    {
+        $this->authorizeAllyDocument($request->user(), $ally);
+
+        return $this->serve($ally->rif_document_path);
+    }
+
+    public function allyMercantileRegistry(Request $request, Ally $ally): StreamedResponse
+    {
+        $this->authorizeAllyDocument($request->user(), $ally);
+
+        return $this->serve($ally->mercantile_registry_document_path);
+    }
+
+    public function allyOwnerIdDocument(Request $request, Ally $ally): StreamedResponse
+    {
+        $this->authorizeAllyDocument($request->user(), $ally);
+
+        return $this->serve($ally->owner_id_document_path);
+    }
+
     public function driverLicense(Request $request, Driver $driver): StreamedResponse
     {
         $this->authorizeDriverDocument($request->user(), $driver);

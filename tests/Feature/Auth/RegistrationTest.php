@@ -154,6 +154,9 @@ class RegistrationTest extends TestCase
             ->set('city', 'Caracas')
             ->set('address', 'Av. Principal, local 1')
             ->set('storefront_photo', UploadedFile::fake()->create('fachada.jpg', 100, 'image/jpeg'))
+            ->set('rif_document', UploadedFile::fake()->create('rif.pdf', 200, 'application/pdf'))
+            ->set('mercantile_registry_document', UploadedFile::fake()->create('registro.pdf', 200, 'application/pdf'))
+            ->set('owner_id_document', UploadedFile::fake()->create('cedula.jpg', 100, 'image/jpeg'))
             ->set('latitude', 10.5)
             ->set('longitude', -66.9);
 
@@ -166,10 +169,79 @@ class RegistrationTest extends TestCase
         $this->assertNotNull($ally);
         $this->assertSame(Ally::STATUS_PENDING, $ally->status);
         $this->assertNotNull($ally->storefront_photo_path);
+        $this->assertNotNull($ally->rif_document_path);
+        $this->assertNotNull($ally->mercantile_registry_document_path);
+        $this->assertNotNull($ally->owner_id_document_path);
         $this->assertEquals(10.5, (float) $ally->latitude);
         $this->assertEquals(-66.9, (float) $ally->longitude);
 
         Storage::disk('local')->assertExists($ally->storefront_photo_path);
+        Storage::disk('local')->assertExists($ally->rif_document_path);
+        Storage::disk('local')->assertExists($ally->mercantile_registry_document_path);
+        Storage::disk('local')->assertExists($ally->owner_id_document_path);
+    }
+
+    public function test_ally_registration_requires_the_verification_documents(): void
+    {
+        Storage::fake('local');
+
+        $component = Volt::test('pages.auth.register')
+            ->set('name', 'Dueño Agencia')
+            ->set('email', 'agencia2@example.com')
+            ->set('password', 'password')
+            ->set('password_confirmation', 'password')
+            ->set('role', 'aliado')
+            ->set('business_name', 'Agencia de Prueba 2')
+            ->set('rif', 'J-99999999-1')
+            ->set('state', 'Distrito Capital')
+            ->set('city', 'Caracas')
+            ->set('address', 'Av. Principal, local 2')
+            ->set('storefront_photo', UploadedFile::fake()->create('fachada.jpg', 100, 'image/jpeg'))
+            ->set('latitude', 10.5)
+            ->set('longitude', -66.9);
+
+        $component->call('register');
+
+        $component->assertHasErrors([
+            'rif_document',
+            'mercantile_registry_document',
+            'owner_id_document',
+        ]);
+
+        $this->assertDatabaseMissing('allies', [
+            'rif' => 'J-99999999-1',
+        ]);
+    }
+
+    public function test_ally_registration_rejects_a_dangerous_file_extension_for_verification_documents(): void
+    {
+        Storage::fake('local');
+
+        $component = Volt::test('pages.auth.register')
+            ->set('name', 'Dueño Agencia')
+            ->set('email', 'agencia3@example.com')
+            ->set('password', 'password')
+            ->set('password_confirmation', 'password')
+            ->set('role', 'aliado')
+            ->set('business_name', 'Agencia de Prueba 3')
+            ->set('rif', 'J-88888888-2')
+            ->set('state', 'Distrito Capital')
+            ->set('city', 'Caracas')
+            ->set('address', 'Av. Principal, local 3')
+            ->set('storefront_photo', UploadedFile::fake()->create('fachada.jpg', 100, 'image/jpeg'))
+            ->set('rif_document', UploadedFile::fake()->create('rif.exe', 100, 'application/x-msdownload'))
+            ->set('mercantile_registry_document', UploadedFile::fake()->create('registro.pdf', 200, 'application/pdf'))
+            ->set('owner_id_document', UploadedFile::fake()->create('cedula.jpg', 100, 'image/jpeg'))
+            ->set('latitude', 10.5)
+            ->set('longitude', -66.9);
+
+        $component->call('register');
+
+        $component->assertHasErrors(['rif_document']);
+
+        $this->assertDatabaseMissing('allies', [
+            'rif' => 'J-88888888-2',
+        ]);
     }
 
     public function test_new_driver_registers_as_pending_with_documents(): void

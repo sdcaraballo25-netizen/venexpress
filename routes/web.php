@@ -556,6 +556,27 @@ Route::get(
     ->name('allies.documents.storefront');
 
 Route::get(
+    '/aliados/{ally}/documentos/rif',
+    [DocumentPhotoController::class, 'allyRifDocument']
+)
+    ->middleware(['auth'])
+    ->name('allies.documents.rif');
+
+Route::get(
+    '/aliados/{ally}/documentos/registro-mercantil',
+    [DocumentPhotoController::class, 'allyMercantileRegistry']
+)
+    ->middleware(['auth'])
+    ->name('allies.documents.mercantile-registry');
+
+Route::get(
+    '/aliados/{ally}/documentos/cedula-titular',
+    [DocumentPhotoController::class, 'allyOwnerIdDocument']
+)
+    ->middleware(['auth'])
+    ->name('allies.documents.owner-id');
+
+Route::get(
     '/repartidores/{driver}/documentos/licencia',
     [DocumentPhotoController::class, 'driverLicense']
 )

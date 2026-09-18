@@ -33,6 +33,9 @@ new #[Layout('layouts.guest')] class extends Component
     public string $city = '';
     public string $address = '';
     public $storefront_photo = null;
+    public $rif_document = null;
+    public $mercantile_registry_document = null;
+    public $owner_id_document = null;
     public ?float $latitude = null;
     public ?float $longitude = null;
 
@@ -165,6 +168,37 @@ new #[Layout('layouts.guest')] class extends Component
                     'image',
                     'mimes:jpg,jpeg,png,webp',
                     'max:4096',
+                ],
+
+                /*
+                 * Documentos de verificación (RIF, registro
+                 * mercantil, cédula del titular). No forzamos
+                 * 'image' aquí: el aliado puede subir una foto o un
+                 * PDF/documento escaneado, según lo que tenga a
+                 * mano. 'mimes' es una lista blanca, así que
+                 * cualquier otro tipo de archivo (.exe, .zip, .rar,
+                 * etc.) queda rechazado automáticamente sin
+                 * necesidad de una lista negra.
+                 */
+                'rif_document' => [
+                    'required',
+                    'file',
+                    'mimes:jpg,jpeg,png,webp,pdf,doc,docx',
+                    'max:8192',
+                ],
+
+                'mercantile_registry_document' => [
+                    'required',
+                    'file',
+                    'mimes:jpg,jpeg,png,webp,pdf,doc,docx',
+                    'max:8192',
+                ],
+
+                'owner_id_document' => [
+                    'required',
+                    'file',
+                    'mimes:jpg,jpeg,png,webp,pdf,doc,docx',
+                    'max:8192',
                 ],
 
                 'latitude' => [
@@ -322,6 +356,9 @@ new #[Layout('layouts.guest')] class extends Component
                 'city' => $validated['city'],
                 'address' => $validated['address'],
                 'storefront_photo_path' => $storefrontPhotoPath,
+                'rif_document_path' => $this->rif_document->store('allies', 'local'),
+                'mercantile_registry_document_path' => $this->mercantile_registry_document->store('allies', 'local'),
+                'owner_id_document_path' => $this->owner_id_document->store('allies', 'local'),
                 'latitude' => $validated['latitude'],
                 'longitude' => $validated['longitude'],
                 'commission_percentage' => 10.00,
@@ -748,6 +785,132 @@ new #[Layout('layouts.guest')] class extends Component
 
                 <x-input-error
                     :messages="$errors->get('storefront_photo')"
+                    class="mt-2"
+                />
+            </div>
+
+            {{--
+                DOCUMENTOS DE VERIFICACIÓN (RIF, registro mercantil,
+                cédula del titular). A diferencia de la foto de
+                fachada, aquí el aliado puede subir una foto o un
+                PDF/documento escaneado según lo que tenga a mano, así
+                que no forzamos accept="image/*" ni mostramos una
+                vista previa de imagen para cualquier archivo (un PDF
+                no se puede previsualizar como <img>).
+            --}}
+            <div>
+                <p class="text-sm font-medium text-gray-700">
+                    Documentos de verificación
+                </p>
+                <p class="mt-1 text-xs text-gray-500">
+                    Foto o documento escaneado (imagen, PDF o Word). Máx. 8MB por archivo.
+                </p>
+            </div>
+
+            {{-- RIF --}}
+            <div>
+                <x-input-label
+                    for="rif_document"
+                    value="RIF"
+                />
+
+                <input
+                    type="file"
+                    wire:model="rif_document"
+                    id="rif_document"
+                    accept="image/*,.pdf,.doc,.docx"
+                    class="block mt-1.5 w-full text-sm text-gray-600
+                           file:mr-4 file:py-2 file:px-4 file:rounded-md
+                           file:border-0 file:text-sm file:font-semibold
+                           file:bg-blue-50 file:text-blue-700 hover:file:bg-blue-100"
+                />
+
+                <p class="mt-1 text-xs text-gray-500" wire:loading wire:target="rif_document">
+                    Subiendo archivo...
+                </p>
+
+                @if ($rif_document)
+                    @if (str_starts_with($rif_document->getMimeType(), 'image/'))
+                        <img src="{{ $rif_document->temporaryUrl() }}" class="mt-2 h-24 rounded-lg object-cover" alt="Vista previa">
+                    @else
+                        <p class="mt-2 text-xs text-gray-600">📄 {{ $rif_document->getClientOriginalName() }}</p>
+                    @endif
+                @endif
+
+                <x-input-error
+                    :messages="$errors->get('rif_document')"
+                    class="mt-2"
+                />
+            </div>
+
+            {{-- REGISTRO MERCANTIL --}}
+            <div>
+                <x-input-label
+                    for="mercantile_registry_document"
+                    value="Registro mercantil"
+                />
+
+                <input
+                    type="file"
+                    wire:model="mercantile_registry_document"
+                    id="mercantile_registry_document"
+                    accept="image/*,.pdf,.doc,.docx"
+                    class="block mt-1.5 w-full text-sm text-gray-600
+                           file:mr-4 file:py-2 file:px-4 file:rounded-md
+                           file:border-0 file:text-sm file:font-semibold
+                           file:bg-blue-50 file:text-blue-700 hover:file:bg-blue-100"
+                />
+
+                <p class="mt-1 text-xs text-gray-500" wire:loading wire:target="mercantile_registry_document">
+                    Subiendo archivo...
+                </p>
+
+                @if ($mercantile_registry_document)
+                    @if (str_starts_with($mercantile_registry_document->getMimeType(), 'image/'))
+                        <img src="{{ $mercantile_registry_document->temporaryUrl() }}" class="mt-2 h-24 rounded-lg object-cover" alt="Vista previa">
+                    @else
+                        <p class="mt-2 text-xs text-gray-600">📄 {{ $mercantile_registry_document->getClientOriginalName() }}</p>
+                    @endif
+                @endif
+
+                <x-input-error
+                    :messages="$errors->get('mercantile_registry_document')"
+                    class="mt-2"
+                />
+            </div>
+
+            {{-- CÉDULA DEL TITULAR --}}
+            <div>
+                <x-input-label
+                    for="owner_id_document"
+                    value="Cédula del titular"
+                />
+
+                <input
+                    type="file"
+                    wire:model="owner_id_document"
+                    id="owner_id_document"
+                    accept="image/*,.pdf,.doc,.docx"
+                    class="block mt-1.5 w-full text-sm text-gray-600
+                           file:mr-4 file:py-2 file:px-4 file:rounded-md
+                           file:border-0 file:text-sm file:font-semibold
+                           file:bg-blue-50 file:text-blue-700 hover:file:bg-blue-100"
+                />
+
+                <p class="mt-1 text-xs text-gray-500" wire:loading wire:target="owner_id_document">
+                    Subiendo archivo...
+                </p>
+
+                @if ($owner_id_document)
+                    @if (str_starts_with($owner_id_document->getMimeType(), 'image/'))
+                        <img src="{{ $owner_id_document->temporaryUrl() }}" class="mt-2 h-24 rounded-lg object-cover" alt="Vista previa">
+                    @else
+                        <p class="mt-2 text-xs text-gray-600">📄 {{ $owner_id_document->getClientOriginalName() }}</p>
+                    @endif
+                @endif
+
+                <x-input-error
+                    :messages="$errors->get('owner_id_document')"
                     class="mt-2"
                 />
             </div>

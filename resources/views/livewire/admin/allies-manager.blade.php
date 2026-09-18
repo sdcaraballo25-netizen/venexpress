@@ -680,6 +680,39 @@
 
                 </dl>
 
+                @if($viewingAlly->rif_document_path || $viewingAlly->mercantile_registry_document_path || $viewingAlly->owner_id_document_path)
+                    <div class="border-t border-[#E2E8F0] mt-4 pt-4">
+                        <p class="text-xs font-medium text-[#64748B] mb-2">Documentos de verificación</p>
+
+                        <div class="flex flex-col gap-1.5 text-sm">
+                            @if($viewingAlly->rif_document_path)
+                                <a href="{{ route('allies.documents.rif', $viewingAlly) }}" target="_blank"
+                                   class="inline-flex items-center gap-1.5 text-blue-700 hover:underline">
+                                    <i class="fa-solid fa-file"></i> RIF
+                                </a>
+                            @endif
+
+                            @if($viewingAlly->mercantile_registry_document_path)
+                                <a href="{{ route('allies.documents.mercantile-registry', $viewingAlly) }}" target="_blank"
+                                   class="inline-flex items-center gap-1.5 text-blue-700 hover:underline">
+                                    <i class="fa-solid fa-file"></i> Registro mercantil
+                                </a>
+                            @endif
+
+                            @if($viewingAlly->owner_id_document_path)
+                                <a href="{{ route('allies.documents.owner-id', $viewingAlly) }}" target="_blank"
+                                   class="inline-flex items-center gap-1.5 text-blue-700 hover:underline">
+                                    <i class="fa-solid fa-file"></i> Cédula del titular
+                                </a>
+                            @endif
+                        </div>
+                    </div>
+                @else
+                    <p class="text-xs text-[#94A3B8] mt-4 pt-4 border-t border-[#E2E8F0]">
+                        Este aliado no tiene documentos de verificación cargados (se registró antes de que este requisito existiera).
+                    </p>
+                @endif
+
                 <div class="flex justify-end mt-4">
                     <button wire:click="closeDetails"
                         class="px-4 py-2 rounded-lg text-sm font-semibold text-slate-600 hover:bg-slate-50">
