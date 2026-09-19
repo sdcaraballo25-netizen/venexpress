@@ -2,6 +2,9 @@
 
 namespace App\Support;
 
+use Brick\Math\BigDecimal;
+use Brick\Math\RoundingMode;
+
 /**
  * Aritmética decimal exacta para cálculos financieros.
  *
@@ -15,12 +18,22 @@ namespace App\Support;
  * manual esperada, especialmente al mezclar tasas USD->VES con 6
  * decimales que cambian a diario.
  *
- * Esta clase envuelve la extensión bcmath (aritmética decimal en
- * strings, sin binario de por medio) para que toda la aritmética
- * intermedia sea exacta. Los valores de entrada y salida siguen
- * siendo float/string normales -para no romper los casts
+ * Esta clase usa brick/math (aritmética decimal de precisión
+ * arbitraria en strings, sin binario de por medio) para que toda la
+ * aritmética intermedia sea exacta. Los valores de entrada y salida
+ * siguen siendo float/string normales -para no romper los casts
  * `decimal:2` de Eloquent ni las firmas de métodos existentes-, pero
  * el cálculo interno nunca pasa por una operación float.
+ *
+ * brick/math ya viene instalado como dependencia transitiva de
+ * laravel/framework (no se agregó solo para esto), y elige
+ * automáticamente la implementación más rápida disponible en el
+ * servidor: GMP, luego bcmath, y si ninguna extensión está instalada,
+ * una implementación 100% en PHP puro igual de exacta (más lenta,
+ * pero nunca falla por falta de una extensión). Antes esta clase
+ * llamaba directo a bcadd/bcmul/etc., así que en cualquier entorno sin
+ * la extensión bcmath habilitada (algunos XAMPP/WAMP no la traen
+ * activada por defecto) toda la cotización de tarifas quedaba rota.
  */
 final class Money
 {
@@ -35,28 +48,32 @@ final class Money
 
     public static function add(float|string $a, float|string $b): string
     {
-        return bcadd(self::str($a), self::str($b), self::INTERNAL_SCALE);
+        return self::truncate(self::big($a)->plus(self::big($b)));
     }
 
     public static function sub(float|string $a, float|string $b): string
     {
-        return bcsub(self::str($a), self::str($b), self::INTERNAL_SCALE);
+        return self::truncate(self::big($a)->minus(self::big($b)));
     }
 
     public static function mul(float|string $a, float|string $b): string
     {
-        return bcmul(self::str($a), self::str($b), self::INTERNAL_SCALE);
+        return self::truncate(self::big($a)->multipliedBy(self::big($b)));
     }
 
     public static function div(float|string $a, float|string $b): string
     {
-        if (bccomp(self::str($b), '0', self::INTERNAL_SCALE) === 0) {
+        $divisor = self::big($b);
+
+        if ($divisor->isZero()) {
             throw new \DivisionByZeroError(
                 'División entre cero en un cálculo monetario.'
             );
         }
 
-        return bcdiv(self::str($a), self::str($b), self::INTERNAL_SCALE);
+        return self::big($a)
+            ->dividedBy($divisor, self::INTERNAL_SCALE, RoundingMode::Down)
+            ->__toString();
     }
 
     /**
@@ -75,25 +92,35 @@ final class Money
     }
 
     /**
-     * Redondeo decimal exacto (half-up), sin pasar por floats en
-     * ningún momento del cálculo. Devuelve float porque es lo que
-     * consumen los casts `decimal:2` de Eloquent y el resto del
-     * sistema, pero el propio redondeo ocurre en bcmath.
+     * Redondeo decimal exacto (half-up, es decir, "hacia afuera" del
+     * cero en el punto medio), sin pasar por floats en ningún momento
+     * del cálculo. Devuelve float porque es lo que consumen los casts
+     * `decimal:2` de Eloquent y el resto del sistema, pero el propio
+     * redondeo ocurre en aritmética decimal exacta.
      */
     public static function round(float|string $value, int $precision = 2): float
     {
-        $value = self::str($value);
+        return (float) self::big($value)
+            ->toScale($precision, RoundingMode::HalfUp)
+            ->__toString();
+    }
 
-        // Trico estándar de bcmath para redondeo half-up: sumar medio
-        // "último dígito" y truncar a la precisión deseada usando el
-        // parámetro de escala de bcadd (que trunca, no redondea).
-        $halfUnit = '0.' . str_repeat('0', $precision) . '5';
+    /**
+     * Trunca (no redondea) a INTERNAL_SCALE decimales, igual que
+     * hacían bcadd/bcsub/bcmul con el parámetro de escala explícito:
+     * son solo pasos intermedios de una cadena de cálculo, el
+     * redondeo real ocurre al final con round().
+     */
+    private static function truncate(BigDecimal $value): string
+    {
+        return $value
+            ->toScale(self::INTERNAL_SCALE, RoundingMode::Down)
+            ->__toString();
+    }
 
-        $rounded = bccomp($value, '0', self::INTERNAL_SCALE) >= 0
-            ? bcadd($value, $halfUnit, $precision)
-            : bcsub($value, $halfUnit, $precision);
-
-        return (float) $rounded;
+    private static function big(float|string $value): BigDecimal
+    {
+        return BigDecimal::of(self::str($value));
     }
 
     private static function str(float|string $value): string
@@ -106,7 +133,7 @@ final class Money
 
         // number_format evita que PHP convierta floats muy pequeños
         // o muy grandes a notación científica (p. ej. 1.0E-5), que
-        // bcmath no puede interpretar.
+        // BigDecimal no puede interpretar.
         return number_format($value, self::INTERNAL_SCALE, '.', '');
     }
 }
