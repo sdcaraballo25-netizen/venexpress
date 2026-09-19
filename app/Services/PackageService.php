@@ -8,6 +8,7 @@ use App\Models\Customer;
 use App\Models\Driver;
 use App\Models\Package;
 use App\Models\PackageHistory;
+use App\Notifications\PackageCreated;
 use App\Notifications\PackageStatusUpdated;
 use App\Support\Money;
 use Illuminate\Database\QueryException;
@@ -56,6 +57,44 @@ class PackageService
                 [
                     'package_id' => $package->id,
                     'status' => $status,
+                    'error' => $e->getMessage(),
+                ]
+            );
+        }
+    }
+
+    /**
+     * Avisa por correo al remitente y al destinatario que la guía
+     * quedó registrada, cada uno con un mensaje distinto (ver
+     * PackageCreated). El correo de cada uno se busca en customers
+     * por su id_doc, igual que notifyStatusChange(): si no tiene uno
+     * registrado, simplemente no se le envía nada.
+     */
+    protected function notifyPackageCreated(Package $package): void
+    {
+        try {
+            $senderEmail = Customer::query()
+                ->where('id_doc', $package->sender_id_doc)
+                ->value('email');
+
+            if ($senderEmail) {
+                Notification::route('mail', $senderEmail)
+                    ->notify(new PackageCreated($package, PackageCreated::ROLE_SENDER));
+            }
+
+            $recipientEmail = Customer::query()
+                ->where('id_doc', $package->recipient_id_doc)
+                ->value('email');
+
+            if ($recipientEmail) {
+                Notification::route('mail', $recipientEmail)
+                    ->notify(new PackageCreated($package, PackageCreated::ROLE_RECIPIENT));
+            }
+        } catch (Throwable $e) {
+            Log::warning(
+                'No se pudo enviar la notificación de guía registrada.',
+                [
+                    'package_id' => $package->id,
                     'error' => $e->getMessage(),
                 ]
             );
@@ -289,7 +328,7 @@ class PackageService
             return $package;
         });
 
-        $this->notifyStatusChange($package, Package::STATUS_RECIBIDO_AGENCIA);
+        $this->notifyPackageCreated($package);
 
         return $package;
     }

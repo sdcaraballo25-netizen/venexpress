@@ -209,14 +209,14 @@ class PackageCreate extends Component
             'sender_id_doc' => ['required', 'string', 'max:30'],
             'sender_name' => ['required', 'string', 'max:150'],
             'sender_phone' => ['required', 'string', 'max:30'],
-            'sender_email' => ['nullable', 'email', 'max:150'],
+            'sender_email' => [$this->senderCustomerFound ? 'nullable' : 'required', 'email', 'max:150'],
 
             'recipient_doc_type' => ['required', Rule::in(self::DOC_TYPES)],
             'recipient_doc_number' => ['required', 'string', 'max:20'],
             'recipient_id_doc' => ['required', 'string', 'max:30'],
             'recipient_name' => ['required', 'string', 'max:150'],
             'recipient_phone' => ['required', 'string', 'max:30'],
-            'recipient_email' => ['nullable', 'email', 'max:150'],
+            'recipient_email' => [$this->recipientCustomerFound ? 'nullable' : 'required', 'email', 'max:150'],
 
             'destination_state' => ['required', 'string', Rule::in($this->destinationStates)],
             'destination_city' => [
@@ -274,7 +274,9 @@ class PackageCreate extends Component
         return [
             'sender_doc_number.required' => 'Ingresa el número de documento del remitente.',
             'recipient_doc_number.required' => 'Ingresa el número de documento del destinatario.',
+            'sender_email.required' => 'El correo del remitente es obligatorio para clientes nuevos: ahí le llegarán los datos de la guía.',
             'sender_email.email' => 'El correo del remitente no es válido.',
+            'recipient_email.required' => 'El correo del destinatario es obligatorio para clientes nuevos: ahí le llegarán los datos de la guía.',
             'recipient_email.email' => 'El correo del destinatario no es válido.',
             'declared_value_usd.required_if' => 'Indica el valor declarado para asegurar el envío.',
             'cod_amount_usd.required_if' => 'Completa ciudad destino y peso para calcular el monto a cobrar.',
@@ -489,7 +491,7 @@ class PackageCreate extends Component
         $this->validate([
             'sender_name' => ['required', 'string', 'max:150'],
             'sender_phone' => ['required', 'string', 'max:30'],
-            'sender_email' => ['nullable', 'email', 'max:150'],
+            'sender_email' => ['required', 'email', 'max:150'],
         ]);
 
         $this->showSenderCustomerModal = false;
@@ -500,7 +502,7 @@ class PackageCreate extends Component
         $this->validate([
             'recipient_name' => ['required', 'string', 'max:150'],
             'recipient_phone' => ['required', 'string', 'max:30'],
-            'recipient_email' => ['nullable', 'email', 'max:150'],
+            'recipient_email' => ['required', 'email', 'max:150'],
         ]);
 
         $this->showRecipientCustomerModal = false;

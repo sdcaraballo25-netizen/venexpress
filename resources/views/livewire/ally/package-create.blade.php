@@ -461,9 +461,10 @@
                                 @error('sender_phone') <p class="text-xs text-red-600 mt-1">{{ $message }}</p> @enderror
                             </div>
                             <div>
-                                <label class="text-sm text-slate-600">Correo (opcional)</label>
-                                <input type="email" wire:model="sender_email"
+                                <label class="text-sm text-slate-600">Correo *</label>
+                                <input type="email" wire:model="sender_email" required
                                     class="mt-1 w-full rounded-xl border border-slate-300 px-3 py-2 text-sm shadow-sm focus:border-blue-900 focus:ring-blue-900">
+                                <p class="text-xs text-slate-400 mt-1">Le enviaremos ahí los datos de la guía.</p>
                                 @error('sender_email') <p class="text-xs text-red-600 mt-1">{{ $message }}</p> @enderror
                             </div>
                         </div>
@@ -512,9 +513,10 @@
                                 @error('recipient_phone') <p class="text-xs text-red-600 mt-1">{{ $message }}</p> @enderror
                             </div>
                             <div>
-                                <label class="text-sm text-slate-600">Correo (opcional)</label>
-                                <input type="email" wire:model="recipient_email"
+                                <label class="text-sm text-slate-600">Correo *</label>
+                                <input type="email" wire:model="recipient_email" required
                                     class="mt-1 w-full rounded-xl border border-slate-300 px-3 py-2 text-sm shadow-sm focus:border-blue-900 focus:ring-blue-900">
+                                <p class="text-xs text-slate-400 mt-1">Le enviaremos ahí los datos de la guía.</p>
                                 @error('recipient_email') <p class="text-xs text-red-600 mt-1">{{ $message }}</p> @enderror
                             </div>
                         </div>
