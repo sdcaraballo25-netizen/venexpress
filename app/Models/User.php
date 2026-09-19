@@ -48,6 +48,7 @@ class User extends Authenticatable
         'password',
         'remember_token',
         'verification_token',
+        'password_change_code',
     ];
 
     protected function casts(): array
@@ -57,6 +58,8 @@ class User extends Authenticatable
             'account_verified_at' => 'datetime',
             'verification_token_expires_at' => 'datetime',
             'verification_token_last_sent_at' => 'datetime',
+            'password_change_code_expires_at' => 'datetime',
+            'password_change_code_last_sent_at' => 'datetime',
             'password' => 'hashed',
         ];
     }
@@ -166,6 +169,93 @@ class User extends Authenticatable
         return (int) now()->diffInSeconds(
             $this->verification_token_last_sent_at->addSeconds(
                 self::VERIFICATION_RESEND_COOLDOWN_SECONDS
+            ),
+            false
+        );
+    }
+
+    /*
+    |--------------------------------------------------------------------------
+    | CÓDIGO PARA CAMBIAR CONTRASEÑA
+    |--------------------------------------------------------------------------
+    |
+    | Cambiar la contraseña desde el perfil ya no basta con escribir la
+    | contraseña actual: si alguien más la conoce (o la cuenta ya está
+    | comprometida), podría bloquear al dueño real cambiándola. Este
+    | código de 6 dígitos enviado al correo registrado exige acceso a
+    | ese correo, igual que el token de verificación de cuenta, pero
+    | en columnas separadas porque son propósitos distintos.
+    |
+    */
+
+    public const PASSWORD_CHANGE_CODE_TTL_MINUTES = 15;
+
+    public const PASSWORD_CHANGE_CODE_RESEND_COOLDOWN_SECONDS = 60;
+
+    public function generatePasswordChangeCode(): string
+    {
+        $plainCode = (string) random_int(100000, 999999);
+
+        $this->forceFill([
+            'password_change_code' => Hash::make($plainCode),
+            'password_change_code_expires_at' => now()->addMinutes(
+                self::PASSWORD_CHANGE_CODE_TTL_MINUTES
+            ),
+            'password_change_code_last_sent_at' => now(),
+        ])->save();
+
+        return $plainCode;
+    }
+
+    public function passwordChangeCodeIsValid(string $plainCode): bool
+    {
+        if (! $this->password_change_code) {
+            return false;
+        }
+
+        if (
+            $this->password_change_code_expires_at
+            && $this->password_change_code_expires_at->isPast()
+        ) {
+            return false;
+        }
+
+        return Hash::check($plainCode, $this->password_change_code);
+    }
+
+    /**
+     * Invalida el código para que no pueda reutilizarse, ya sea
+     * porque se usó para cambiar la contraseña o porque el usuario
+     * canceló el proceso.
+     */
+    public function clearPasswordChangeCode(): void
+    {
+        $this->forceFill([
+            'password_change_code' => null,
+            'password_change_code_expires_at' => null,
+        ])->save();
+    }
+
+    public function canResendPasswordChangeCode(): bool
+    {
+        if (! $this->password_change_code_last_sent_at) {
+            return true;
+        }
+
+        return $this->password_change_code_last_sent_at
+            ->addSeconds(self::PASSWORD_CHANGE_CODE_RESEND_COOLDOWN_SECONDS)
+            ->isPast();
+    }
+
+    public function secondsUntilCanResendPasswordChangeCode(): int
+    {
+        if ($this->canResendPasswordChangeCode()) {
+            return 0;
+        }
+
+        return (int) now()->diffInSeconds(
+            $this->password_change_code_last_sent_at->addSeconds(
+                self::PASSWORD_CHANGE_CODE_RESEND_COOLDOWN_SECONDS
             ),
             false
         );
