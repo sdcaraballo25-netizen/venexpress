@@ -23,10 +23,10 @@ class SalesCloseoutTest extends TestCase
     use RefreshDatabase;
     use CreatesTestPackages;
 
-    private function createTaquilla($ally, string $username = 'taquilla1')
+    private function createTaquilla($ally, string $username = 'taquilla1', string $name = 'Taquilla 1')
     {
         return app(AllyStaffService::class)->create($ally, [
-            'name' => 'Taquilla 1',
+            'name' => $name,
             'username' => $username,
             'password' => 'password-seguro',
         ]);
@@ -165,6 +165,70 @@ class SalesCloseoutTest extends TestCase
             ->assertSee('No hay ventas con forma de pago registrada')
             ->assertSee('1')
             ->assertSee('15.00');
+    }
+
+    public function test_ally_sees_a_per_taquilla_summary_including_staff_with_no_sales_today(): void
+    {
+        $ally = $this->createAlly();
+        $activeTaquilla = $this->createTaquilla($ally, 'activa', 'Taquilla Activa');
+        $idleTaquilla = $this->createTaquilla($ally, 'inactiva', 'Taquilla Sin Ventas');
+
+        $this->createPackage($ally, [
+            'registered_by_user_id' => $activeTaquilla->id,
+            'payment_method' => 'punto_venta',
+            'total_price_usd' => 25,
+        ]);
+
+        Livewire::actingAs($ally->user)
+            ->test(SalesCloseout::class)
+            ->assertSee('Resumen por taquilla')
+            ->assertSee('Taquilla Activa')
+            ->assertSee('25.00')
+            // La taquilla sin ventas hoy también aparece, en cero.
+            ->assertSee('Taquilla Sin Ventas');
+    }
+
+    public function test_clicking_a_taquilla_in_the_summary_filters_the_closeout_to_that_person(): void
+    {
+        $ally = $this->createAlly();
+        $taquilla = $this->createTaquilla($ally);
+
+        $this->createPackage($ally, [
+            'registered_by_user_id' => $ally->user->id,
+            'payment_method' => 'efectivo_usd',
+            'total_price_usd' => 10,
+        ]);
+
+        $this->createPackage($ally, [
+            'registered_by_user_id' => $taquilla->id,
+            'payment_method' => 'punto_venta',
+            'total_price_usd' => 25,
+        ]);
+
+        Livewire::actingAs($ally->user)
+            ->test(SalesCloseout::class)
+            // Simula el wire:click="$set('registeredBy', ...)" del botón
+            // "Ver detalle" en la fila de esa taquilla.
+            ->set('registeredBy', (string) $taquilla->id)
+            ->assertSet('registeredBy', (string) $taquilla->id)
+            ->assertSee('25.00')
+            ->assertDontSee('35.00');
+    }
+
+    public function test_the_per_taquilla_summary_is_never_shown_to_a_taquilla_user(): void
+    {
+        $ally = $this->createAlly();
+        $taquilla = $this->createTaquilla($ally);
+
+        $this->createPackage($ally, [
+            'registered_by_user_id' => $ally->user->id,
+            'payment_method' => 'efectivo_usd',
+            'total_price_usd' => 10,
+        ]);
+
+        Livewire::actingAs($taquilla)
+            ->test(SalesCloseout::class)
+            ->assertDontSee('Resumen por taquilla');
     }
 
     public function test_taquilla_cannot_access_the_general_dashboard_or_staff_manager(): void

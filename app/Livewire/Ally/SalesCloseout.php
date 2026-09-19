@@ -94,6 +94,48 @@ class SalesCloseout extends Component
     }
 
     /**
+     * Resumen del día por cada persona que puede registrar guías en
+     * esta agencia (el Aliado Administrador y todas sus Taquillas,
+     * activas o no), para que el Administrador vea de un vistazo quién
+     * vendió cuánto hoy sin tener que ir cambiando el filtro uno por
+     * uno. Incluye a quienes no registraron nada hoy (en cero), porque
+     * esa ausencia también es información relevante para el dueño del
+     * negocio. Cada fila permite entrar al detalle (por forma de pago)
+     * de esa persona reutilizando el mismo filtro `registeredBy`.
+     *
+     * @return \Illuminate\Support\Collection<int, array{user_id:int, name:string, total:float, guides:int, is_self:bool}>
+     */
+    protected function perStaffSummary(Ally $ally): \Illuminate\Support\Collection
+    {
+        $day = Carbon::parse($this->date);
+        $range = [$day->copy()->startOfDay(), $day->copy()->endOfDay()];
+
+        $totals = Package::query()
+            ->where('ally_id', $ally->id)
+            ->whereBetween('created_at', $range)
+            ->whereNotNull('registered_by_user_id')
+            ->selectRaw('registered_by_user_id, SUM(total_price_usd) as total, COUNT(*) as guides')
+            ->groupBy('registered_by_user_id')
+            ->get()
+            ->keyBy('registered_by_user_id');
+
+        $people = collect([Auth::user()])
+            ->merge($ally->staffUsers()->orderBy('name')->get());
+
+        return $people->map(function ($person) use ($totals) {
+            $row = $totals->get($person->id);
+
+            return [
+                'user_id' => $person->id,
+                'name' => $person->name,
+                'is_self' => $person->id === Auth::id(),
+                'total' => (float) ($row->total ?? 0),
+                'guides' => (int) ($row->guides ?? 0),
+            ];
+        })->values();
+    }
+
+    /**
      * Exporta exactamente lo que se ve en pantalla para la fecha/
      * taquilla elegida: el desglose por forma de pago. Reutiliza
      * baseQuery() para no calcular los totales con un criterio
@@ -154,6 +196,7 @@ class SalesCloseout extends Component
             'ally' => $ally,
             'isPrincipal' => $isPrincipal,
             'staffOptions' => $staffOptions,
+            'staffSummary' => $isPrincipal ? $this->perStaffSummary($ally) : collect(),
             'totalUsd' => $totalUsd,
             'totalGuides' => $totalGuides,
             'byPaymentMethod' => $byPaymentMethod,
