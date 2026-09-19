@@ -142,7 +142,7 @@ class RegistrationTest extends TestCase
 
     public function test_new_ally_registers_as_pending_with_storefront_photo_and_location(): void
     {
-        Storage::fake('local');
+        Storage::fake('documents');
         Notification::fake();
 
         $component = Volt::test('pages.auth.register')
@@ -178,17 +178,17 @@ class RegistrationTest extends TestCase
         $this->assertEquals(10.5, (float) $ally->latitude);
         $this->assertEquals(-66.9, (float) $ally->longitude);
 
-        Storage::disk('local')->assertExists($ally->storefront_photo_path);
-        Storage::disk('local')->assertExists($ally->rif_document_path);
-        Storage::disk('local')->assertExists($ally->mercantile_registry_document_path);
-        Storage::disk('local')->assertExists($ally->owner_id_document_path);
+        Storage::disk('documents')->assertExists($ally->storefront_photo_path);
+        Storage::disk('documents')->assertExists($ally->rif_document_path);
+        Storage::disk('documents')->assertExists($ally->mercantile_registry_document_path);
+        Storage::disk('documents')->assertExists($ally->owner_id_document_path);
 
         Notification::assertSentTo($ally->user, AccountPendingApproval::class);
     }
 
     public function test_ally_registration_requires_the_verification_documents(): void
     {
-        Storage::fake('local');
+        Storage::fake('documents');
 
         $component = Volt::test('pages.auth.register')
             ->set('name', 'Dueño Agencia')
@@ -220,7 +220,7 @@ class RegistrationTest extends TestCase
 
     public function test_ally_registration_rejects_a_dangerous_file_extension_for_verification_documents(): void
     {
-        Storage::fake('local');
+        Storage::fake('documents');
 
         $component = Volt::test('pages.auth.register')
             ->set('name', 'Dueño Agencia')
@@ -251,7 +251,7 @@ class RegistrationTest extends TestCase
 
     public function test_new_driver_registers_as_pending_with_documents(): void
     {
-        Storage::fake('local');
+        Storage::fake('documents');
         Notification::fake();
 
         $component = Volt::test('pages.auth.register')
@@ -279,16 +279,16 @@ class RegistrationTest extends TestCase
         $this->assertNotNull($user->driver->id_photo_path);
         $this->assertNotNull($user->driver->vehicle_registration_photo_path);
 
-        Storage::disk('local')->assertExists($user->driver->license_photo_path);
-        Storage::disk('local')->assertExists($user->driver->id_photo_path);
-        Storage::disk('local')->assertExists($user->driver->vehicle_registration_photo_path);
+        Storage::disk('documents')->assertExists($user->driver->license_photo_path);
+        Storage::disk('documents')->assertExists($user->driver->id_photo_path);
+        Storage::disk('documents')->assertExists($user->driver->vehicle_registration_photo_path);
 
         Notification::assertSentTo($user, AccountPendingApproval::class);
     }
 
     public function test_driver_registration_requires_all_three_documents(): void
     {
-        Storage::fake('local');
+        Storage::fake('documents');
 
         Volt::test('pages.auth.register')
             ->set('name', 'Repartidor Incompleto')

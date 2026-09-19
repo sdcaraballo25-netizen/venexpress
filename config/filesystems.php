@@ -60,6 +60,39 @@ return [
             'report' => false,
         ],
 
+        /*
+        |----------------------------------------------------------------
+        | Documentos y fotos privadas (verificación de Aliado/Repartidor,
+        | evidencia de entrega)
+        |----------------------------------------------------------------
+        |
+        | Un solo disco lógico para todo lo que hoy vive en
+        | storage/app/private, servido siempre a través de
+        | DocumentPhotoController (nunca con URL pública directa). En
+        | un servidor solo, "local" basta; si el sistema crece a varios
+        | servidores de aplicación o necesita no llenar el disco de la
+        | app, basta con poner DOCUMENTS_DISK_DRIVER=s3 en el .env
+        | (con credenciales de S3 o de un proveedor compatible, como
+        | DigitalOcean Spaces) sin tocar código: DocumentPhotoController
+        | y register.blade.php ya apuntan a este disco por nombre.
+        */
+
+        'documents' => [
+            'driver' => env('DOCUMENTS_DISK_DRIVER', 'local'),
+            'root' => storage_path('app/private'),
+            'serve' => true,
+            'throw' => false,
+            'report' => false,
+            'visibility' => 'private',
+            'key' => env('AWS_ACCESS_KEY_ID'),
+            'secret' => env('AWS_SECRET_ACCESS_KEY'),
+            'region' => env('AWS_DEFAULT_REGION'),
+            'bucket' => env('AWS_BUCKET'),
+            'url' => env('AWS_URL'),
+            'endpoint' => env('AWS_ENDPOINT'),
+            'use_path_style_endpoint' => env('AWS_USE_PATH_STYLE_ENDPOINT', false),
+        ],
+
     ],
 
     /*

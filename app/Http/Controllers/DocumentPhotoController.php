@@ -13,8 +13,9 @@ use Symfony\Component\HttpFoundation\StreamedResponse;
 /**
  * Sirve documentos de identidad (fotos de cédula, licencia, carnet de
  * circulación, fachada de agencia, evidencia de entrega) guardados en
- * el disco privado ("local"), verificando primero que el usuario
- * autenticado tenga permiso para verlos.
+ * el disco "documents" (config/filesystems.php — local por defecto,
+ * o S3/Spaces si DOCUMENTS_DISK_DRIVER=s3 en producción), verificando
+ * primero que el usuario autenticado tenga permiso para verlos.
  */
 class DocumentPhotoController extends Controller
 {
@@ -143,10 +144,10 @@ class DocumentPhotoController extends Controller
 
     protected function serve(?string $path): StreamedResponse
     {
-        if (! $path || ! Storage::disk('local')->exists($path)) {
+        if (! $path || ! Storage::disk('documents')->exists($path)) {
             abort(404);
         }
 
-        return Storage::disk('local')->response($path);
+        return Storage::disk('documents')->response($path);
     }
 }

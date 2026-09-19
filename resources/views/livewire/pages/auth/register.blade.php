@@ -359,7 +359,7 @@ new #[Layout('layouts.guest')] class extends Component
              */
             try {
                 DB::transaction(function () use ($user, $validated) {
-                    $storefrontPhotoPath = $this->storefront_photo->store('allies', 'local');
+                    $storefrontPhotoPath = $this->storefront_photo->store('allies', 'documents');
 
                     Ally::create([
                         'user_id' => $user->id,
@@ -369,9 +369,9 @@ new #[Layout('layouts.guest')] class extends Component
                         'city' => $validated['city'],
                         'address' => $validated['address'],
                         'storefront_photo_path' => $storefrontPhotoPath,
-                        'rif_document_path' => $this->rif_document->store('allies', 'local'),
-                        'mercantile_registry_document_path' => $this->mercantile_registry_document->store('allies', 'local'),
-                        'owner_id_document_path' => $this->owner_id_document->store('allies', 'local'),
+                        'rif_document_path' => $this->rif_document->store('allies', 'documents'),
+                        'mercantile_registry_document_path' => $this->mercantile_registry_document->store('allies', 'documents'),
+                        'owner_id_document_path' => $this->owner_id_document->store('allies', 'documents'),
                         'latitude' => $validated['latitude'],
                         'longitude' => $validated['longitude'],
                         'commission_percentage' => 10.00,
@@ -416,9 +416,9 @@ new #[Layout('layouts.guest')] class extends Component
                         'vehicle_type' => $validated['vehicle_type'],
                         'phone' => $validated['phone'],
                         'driver_type' => Driver::TYPE_DELIVERY,
-                        'license_photo_path' => $this->license_photo->store('drivers', 'local'),
-                        'id_photo_path' => $this->id_photo->store('drivers', 'local'),
-                        'vehicle_registration_photo_path' => $this->vehicle_registration_photo->store('drivers', 'local'),
+                        'license_photo_path' => $this->license_photo->store('drivers', 'documents'),
+                        'id_photo_path' => $this->id_photo->store('drivers', 'documents'),
+                        'vehicle_registration_photo_path' => $this->vehicle_registration_photo->store('drivers', 'documents'),
 
                         // Un repartidor nuevo comienza como PENDIENTE, igual
                         // que un aliado, hasta que un admin lo apruebe.

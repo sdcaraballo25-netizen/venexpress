@@ -298,7 +298,7 @@ class DriverPackageController extends Controller
         $photoPath = null;
 
         if ($request->hasFile('photo')) {
-            $photoPath = $request->file('photo')->store('delivery-evidence', 'local');
+            $photoPath = $request->file('photo')->store('delivery-evidence', 'documents');
         }
 
         try {
@@ -320,7 +320,7 @@ class DriverPackageController extends Controller
             ]);
         } catch (RuntimeException $e) {
             if ($photoPath) {
-                Storage::disk('local')->delete($photoPath);
+                Storage::disk('documents')->delete($photoPath);
             }
 
             return response()->json(['message' => $e->getMessage()], 422);

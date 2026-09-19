@@ -33,14 +33,14 @@ class DocumentPhotoControllerTest extends TestCase
 
     private function createAllyWithStorefrontPhoto(): Ally
     {
-        Storage::fake('local');
+        Storage::fake('documents');
 
         $ally = $this->createAlly();
 
         $ally->update([
             'storefront_photo_path' => UploadedFile::fake()
                 ->image('fachada.jpg')
-                ->store('allies', 'local'),
+                ->store('allies', 'documents'),
         ]);
 
         return $ally;
@@ -48,7 +48,7 @@ class DocumentPhotoControllerTest extends TestCase
 
     private function createDriverWithDocuments(): Driver
     {
-        Storage::fake('local');
+        Storage::fake('documents');
 
         $user = User::factory()->create([
             'role' => User::ROLE_REPARTIDOR,
@@ -58,9 +58,9 @@ class DocumentPhotoControllerTest extends TestCase
         return Driver::factory()->create([
             'user_id' => $user->id,
             'status' => Driver::STATUS_ACTIVE,
-            'license_photo_path' => UploadedFile::fake()->image('licencia.jpg')->store('drivers', 'local'),
-            'id_photo_path' => UploadedFile::fake()->image('cedula.jpg')->store('drivers', 'local'),
-            'vehicle_registration_photo_path' => UploadedFile::fake()->image('carnet.jpg')->store('drivers', 'local'),
+            'license_photo_path' => UploadedFile::fake()->image('licencia.jpg')->store('drivers', 'documents'),
+            'id_photo_path' => UploadedFile::fake()->image('cedula.jpg')->store('drivers', 'documents'),
+            'vehicle_registration_photo_path' => UploadedFile::fake()->image('carnet.jpg')->store('drivers', 'documents'),
         ]);
     }
 
@@ -135,14 +135,14 @@ class DocumentPhotoControllerTest extends TestCase
 
     public function test_assigned_driver_can_view_package_delivery_evidence(): void
     {
-        Storage::fake('local');
+        Storage::fake('documents');
 
         $ally = $this->createAlly();
         $driver = $this->createDriverWithDocuments();
 
         $package = $this->createPackage($ally, [
             'driver_id' => $driver->id,
-            'delivery_photo_path' => UploadedFile::fake()->image('evidencia.jpg')->store('delivery-evidence', 'local'),
+            'delivery_photo_path' => UploadedFile::fake()->image('evidencia.jpg')->store('delivery-evidence', 'documents'),
         ]);
 
         $this->actingAs($driver->user)
@@ -152,7 +152,7 @@ class DocumentPhotoControllerTest extends TestCase
 
     public function test_unrelated_driver_cannot_view_package_delivery_evidence(): void
     {
-        Storage::fake('local');
+        Storage::fake('documents');
 
         $ally = $this->createAlly();
         $driver = $this->createDriverWithDocuments();
@@ -160,7 +160,7 @@ class DocumentPhotoControllerTest extends TestCase
 
         $package = $this->createPackage($ally, [
             'driver_id' => $driver->id,
-            'delivery_photo_path' => UploadedFile::fake()->image('evidencia.jpg')->store('delivery-evidence', 'local'),
+            'delivery_photo_path' => UploadedFile::fake()->image('evidencia.jpg')->store('delivery-evidence', 'documents'),
         ]);
 
         $this->actingAs($otherDriver->user)
