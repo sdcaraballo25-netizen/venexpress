@@ -21,6 +21,7 @@ use App\Livewire\Admin\PackageDispatch;
 use App\Livewire\Admin\PaymentOrders;
 use App\Livewire\Admin\RateMatrixManager;
 use App\Livewire\Admin\RecommendationsManager;
+use App\Livewire\Admin\RemunerationsSummary;
 use App\Livewire\Admin\RoutesDashboard;
 use App\Livewire\Admin\RoutesManager;
 use App\Livewire\Admin\UsersManager;
@@ -450,6 +451,15 @@ Route::prefix('admin')
 
         Route::get('/remuneraciones', DriverPayments::class)
             ->name('driver-payments');
+
+        /*
+        |--------------------------------------------------------------------------
+        | Resumen de pagos pendientes (Aliados + Repartidores juntos)
+        |--------------------------------------------------------------------------
+        */
+
+        Route::get('/remuneraciones/resumen', RemunerationsSummary::class)
+            ->name('remunerations-summary');
 
         Route::get('/repartidores/aprobacion', DriversApprovalManager::class)
             ->name('drivers.approval');
