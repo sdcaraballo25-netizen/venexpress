@@ -313,7 +313,48 @@
         @endonce
     @else
         {{-- FORMULARIO --}}
-        <form wire:submit="save" class="space-y-6">
+        <form wire:submit="save" class="space-y-6"
+            x-on:keydown.enter="
+                const field = $event.target;
+
+                // Deja pasar Enter tal cual en botones, el submit final
+                // y el textarea de dirección (ahí Enter selecciona la
+                // sugerencia del autocompletado de Google Maps).
+                if (field.tagName === 'TEXTAREA' || field.type === 'submit' || field.type === 'button') {
+                    return;
+                }
+
+                $event.preventDefault();
+
+                // Si hay un modal de cliente nuevo abierto (remitente o
+                // destinatario), el recorrido queda acotado a sus campos:
+                // si no, Enter saltaría el modal recién abierto porque en
+                // el HTML está más abajo que la sección de destinatario.
+                const scope = $el.querySelector('[data-enter-scope]') ?? $el;
+
+                const focusable = Array.from(
+                    scope.querySelectorAll('input:not([type=hidden]), select, textarea')
+                ).filter((el) => ! el.disabled && el.offsetParent !== null);
+
+                const index = focusable.indexOf(field);
+                let next = null;
+
+                if (index > -1 && index < focusable.length - 1) {
+                    // Campo dentro del recorrido actual: sigue al que viene.
+                    next = focusable[index + 1];
+                } else if (index === -1 && scope !== $el && focusable.length > 0) {
+                    // El campo que tenía el foco (ej. número de documento)
+                    // quedó fuera del modal que se acaba de abrir: entra
+                    // directo a su primer campo en vez de no hacer nada.
+                    next = focusable[0];
+                }
+
+                if (next) {
+                    next.focus();
+                    if (typeof next.select === 'function') next.select();
+                }
+            "
+        >
 
             {{-- REMITENTE --}}
             <div class="rounded-2xl border border-[#E2E8F0] bg-white p-5 shadow-sm">
@@ -433,7 +474,7 @@
 
             {{-- MODAL: DATOS DE CLIENTE NUEVO — REMITENTE --}}
             @if ($showSenderCustomerModal)
-                <div class="fixed inset-0 z-50 flex items-center justify-center bg-black/40 px-4">
+                <div class="fixed inset-0 z-50 flex items-center justify-center bg-black/40 px-4" data-enter-scope>
                     <div class="w-full max-w-md rounded-2xl bg-white p-6 shadow-xl">
                         <h3 class="font-display text-lg font-semibold text-[#0F172A]">
                             Registrar datos del remitente
@@ -485,7 +526,7 @@
 
             {{-- MODAL: DATOS DE CLIENTE NUEVO — DESTINATARIO --}}
             @if ($showRecipientCustomerModal)
-                <div class="fixed inset-0 z-50 flex items-center justify-center bg-black/40 px-4">
+                <div class="fixed inset-0 z-50 flex items-center justify-center bg-black/40 px-4" data-enter-scope>
                     <div class="w-full max-w-md rounded-2xl bg-white p-6 shadow-xl">
                         <h3 class="font-display text-lg font-semibold text-[#0F172A]">
                             Registrar datos del destinatario
