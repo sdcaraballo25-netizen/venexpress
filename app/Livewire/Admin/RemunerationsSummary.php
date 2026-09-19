@@ -15,11 +15,14 @@ use Livewire\Component;
 use Symfony\Component\HttpFoundation\BinaryFileResponse;
 
 /**
- * Resumen consolidado de todo lo que el negocio debe pagar hoy, tanto
- * a Aliados (comisión, vía AllyFinancialService::getBalance()) como a
- * Repartidores (remuneración por entrega, vía DriverPayment pendientes)
- * — juntos en una sola tabla, porque AllyFinance solo muestra un
- * aliado a la vez y DriverPayments solo cubre repartidores.
+ * Resumen de todo lo que el negocio debe pagar hoy, en dos tablas
+ * separadas: Aliados (comisión, vía AllyFinancialService::getBalance())
+ * y Repartidores (una remuneración fija por paquete entregado, vía
+ * DriverPayment pendientes) — son dos negocios distintos (porcentaje
+ * de venta vs. tarifa fija) y no deben mezclarse en una sola tabla.
+ * AllyFinance solo muestra un aliado a la vez y DriverPayments solo
+ * cubre repartidores, así que tampoco hay hoy una vista de conjunto
+ * de cada uno.
  *
  * No persiste nada nuevo: "sincronizar" es simplemente recalcular esta
  * vista con los datos más recientes (los saldos ya se calculan al
@@ -44,37 +47,41 @@ class RemunerationsSummary extends Component
         session()->flash('success', 'Resumen sincronizado con los datos más recientes.');
     }
 
+    protected function currentBcvRate(): ?BcvRate
+    {
+        return BcvRate::current();
+    }
+
+    protected function toVesConverter(): \Closure
+    {
+        $bcvRateService = app(BcvRateService::class);
+        $rate = $this->currentBcvRate();
+
+        return fn (float $usd): ?float => $rate
+            ? $bcvRateService->convertUsdToVes($usd, $rate)
+            : null;
+    }
+
     /**
-     * Un renglón por Aliado con saldo pendiente y por Repartidor con
-     * remuneraciones pendientes, en el mismo formato para poder
-     * exportarse juntos.
-     *
-     * "Paquetes"/"producido" reflejan actividad distinta según el rol:
-     * para el Aliado es el histórico completo de guías que registró
-     * (no hay, en el modelo actual, un vínculo 1-a-1 entre una
-     * liquidación y las guías puntuales que la generaron — el saldo es
-     * un balance de libro mayor, no una asignación por guía); para el
-     * Repartidor son exactamente las guías detrás de sus pagos
-     * pendientes (eso sí tiene un estado por guía). El "saldo a pagar"
+     * Un renglón por Aliado con saldo de comisión pendiente. "Paquetes"/
+     * "producido" son el histórico completo de guías que registró: no
+     * hay, en el modelo actual, un vínculo 1-a-1 entre una liquidación
+     * y las guías puntuales que la generaron — el saldo es un balance
+     * de libro mayor, no una asignación por guía. El "saldo a pagar" sí
      * es siempre la cifra que realmente se le debe hoy.
      *
      * @return Collection<int, array{
-     *   role: string, doc: ?string, name: ?string, email: ?string,
-     *   account_number: ?string, holder_id: ?string, packages: int,
-     *   produced_usd: float, balance_usd: float, balance_ves: ?float,
+     *   doc: ?string, name: ?string, email: ?string, account_number: ?string,
+     *   holder_id: ?string, packages: int, produced_usd: float,
+     *   balance_usd: float, balance_ves: ?float,
      * }>
      */
-    protected function rows(): Collection
+    protected function allyRows(): Collection
     {
         $allyFinancialService = app(AllyFinancialService::class);
-        $bcvRateService = app(BcvRateService::class);
-        $rate = BcvRate::current();
+        $toVes = $this->toVesConverter();
 
-        $toVes = fn (float $usd): ?float => $rate
-            ? $bcvRateService->convertUsdToVes($usd, $rate)
-            : null;
-
-        $allyRows = Ally::query()
+        return Ally::query()
             ->where('status', Ally::STATUS_ACTIVE)
             ->with('user')
             ->get()
@@ -86,7 +93,6 @@ class RemunerationsSummary extends Component
                 }
 
                 return [
-                    'role' => 'Aliado',
                     'doc' => $ally->rif,
                     'name' => $ally->business_name,
                     'email' => $ally->user?->email,
@@ -98,9 +104,28 @@ class RemunerationsSummary extends Component
                     'balance_ves' => $toVes($balanceUsd),
                 ];
             })
-            ->filter();
+            ->filter()
+            ->values();
+    }
 
-        $driverRows = Driver::query()
+    /**
+     * Un renglón por Repartidor con remuneraciones pendientes — la
+     * tarifa fija por paquete entregado (DriverRemunerationRate), no
+     * un porcentaje como el Aliado. Aquí "paquetes"/"producido" sí son
+     * exactamente las guías detrás de los pagos pendientes, porque
+     * DriverPayment sí tiene un estado por guía.
+     *
+     * @return Collection<int, array{
+     *   doc: ?string, name: ?string, email: ?string, account_number: ?string,
+     *   holder_id: ?string, packages: int, produced_usd: float,
+     *   balance_usd: float, balance_ves: ?float,
+     * }>
+     */
+    protected function driverRows(): Collection
+    {
+        $toVes = $this->toVesConverter();
+
+        return Driver::query()
             ->where('status', Driver::STATUS_ACTIVE)
             ->with('user')
             ->get()
@@ -118,7 +143,6 @@ class RemunerationsSummary extends Component
                 $balanceUsd = (float) $pendingPayments->sum('amount_usd');
 
                 return [
-                    'role' => 'Repartidor',
                     'doc' => $driver->cedula,
                     'name' => $driver->user?->name,
                     'email' => $driver->user?->email,
@@ -132,17 +156,13 @@ class RemunerationsSummary extends Component
                     'balance_ves' => $toVes($balanceUsd),
                 ];
             })
-            ->filter();
-
-        return $allyRows->concat($driverRows)->values();
+            ->filter()
+            ->values();
     }
 
-    public function exportExcel(): BinaryFileResponse
+    protected function exportRowsFor(Collection $rows): Collection
     {
-        $rows = $this->rows();
-
         $exportRows = $rows->map(fn (array $row) => [
-            $row['role'],
             $row['doc'],
             $row['name'],
             $row['email'],
@@ -155,49 +175,68 @@ class RemunerationsSummary extends Component
         ]);
 
         $totalUsd = $rows->sum('balance_usd');
-        $totalVes = $rows->every(fn (array $row) => $row['balance_ves'] !== null)
+        $totalVes = $rows->isNotEmpty() && $rows->every(fn (array $row) => $row['balance_ves'] !== null)
             ? $rows->sum('balance_ves')
             : null;
 
-        $totalProducedByAllies = $rows
-            ->where('role', 'Aliado')
-            ->sum('produced_usd');
-
-        $exportRows->push(['', '', '', '', '', '', '', '', '', '']);
+        $exportRows->push(['', '', '', '', '', '', '', '', '']);
         $exportRows->push([
             'TOTAL A PAGAR', '', '', '', '', '', '',
-            '',
             number_format($totalUsd, 2, '.', ''),
             $totalVes !== null ? number_format($totalVes, 2, '.', '') : 'N/A',
         ]);
-        $exportRows->push([
-            'TOTAL PRODUCIDO POR ALIADOS (USD)', '', '', '', '', '', '',
-            number_format($totalProducedByAllies, 2, '.', ''),
-            '', '',
-        ]);
 
+        return $exportRows;
+    }
+
+    protected function exportHeadings(): array
+    {
+        return [
+            'RIF o Cédula', 'Nombre', 'Correo', 'Número de cuenta',
+            'Cédula del titular', 'Paquetes', 'Producido USD', 'Saldo USD a pagar', 'Saldo Bs a pagar',
+        ];
+    }
+
+    public function exportAlliesExcel(): BinaryFileResponse
+    {
         return $this->excelDownload(
-            'resumen-pagos-'.now()->format('Y-m-d').'.xlsx',
-            [
-                'Rol', 'RIF o Cédula', 'Nombre', 'Correo', 'Número de cuenta',
-                'Cédula del titular', 'Paquetes', 'Producido USD', 'Saldo USD a pagar', 'Saldo Bs a pagar',
-            ],
-            $exportRows,
+            'pagos-aliados-'.now()->format('Y-m-d').'.xlsx',
+            $this->exportHeadings(),
+            $this->exportRowsFor($this->allyRows()),
+        );
+    }
+
+    public function exportDriversExcel(): BinaryFileResponse
+    {
+        return $this->excelDownload(
+            'pagos-repartidores-'.now()->format('Y-m-d').'.xlsx',
+            $this->exportHeadings(),
+            $this->exportRowsFor($this->driverRows()),
         );
     }
 
     public function render()
     {
-        $rows = $this->rows();
+        $allyRows = $this->allyRows();
+        $driverRows = $this->driverRows();
+
+        $sumVesOrNull = function (Collection $rows) {
+            if ($rows->isEmpty() || ! $rows->every(fn (array $row) => $row['balance_ves'] !== null)) {
+                return null;
+            }
+
+            return $rows->sum('balance_ves');
+        };
 
         return view('livewire.admin.remunerations-summary', [
-            'rows' => $rows,
-            'totalUsd' => $rows->sum('balance_usd'),
-            'totalVes' => $rows->every(fn (array $row) => $row['balance_ves'] !== null)
-                ? $rows->sum('balance_ves')
-                : null,
-            'totalProducedByAllies' => $rows->where('role', 'Aliado')->sum('produced_usd'),
-            'bcvRate' => BcvRate::current(),
+            'allyRows' => $allyRows,
+            'driverRows' => $driverRows,
+            'allyTotalUsd' => $allyRows->sum('balance_usd'),
+            'allyTotalVes' => $sumVesOrNull($allyRows),
+            'allyTotalProducedUsd' => $allyRows->sum('produced_usd'),
+            'driverTotalUsd' => $driverRows->sum('balance_usd'),
+            'driverTotalVes' => $sumVesOrNull($driverRows),
+            'bcvRate' => $this->currentBcvRate(),
         ]);
     }
 }

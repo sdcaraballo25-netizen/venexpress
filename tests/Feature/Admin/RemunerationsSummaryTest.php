@@ -16,10 +16,13 @@ use Tests\Feature\Concerns\CreatesTestPackages;
 use Tests\TestCase;
 
 /**
- * Resumen consolidado de lo que se debe pagar hoy a Aliados
- * (comisión) y Repartidores (remuneración), en una sola tabla — a
- * diferencia de AllyFinance (un aliado a la vez) y DriverPayments
- * (solo repartidores).
+ * Resumen de lo que se debe pagar hoy a Aliados (comisión por
+ * porcentaje) y a Repartidores (tarifa fija por entrega), en DOS
+ * tablas separadas — son negocios distintos y no deben mezclarse en
+ * una sola. AllyFinance solo muestra un aliado a la vez y
+ * DriverPayments solo cubre repartidores; esta pantalla da la vista
+ * de conjunto de cada uno, con su propio total y su propia
+ * exportación a Excel.
  */
 class RemunerationsSummaryTest extends TestCase
 {
@@ -62,7 +65,7 @@ class RemunerationsSummaryTest extends TestCase
         return $driver;
     }
 
-    public function test_admin_sees_ally_and_driver_rows_together(): void
+    public function test_admin_sees_allies_and_drivers_in_separate_tables(): void
     {
         $admin = $this->createAdmin();
 
@@ -74,10 +77,10 @@ class RemunerationsSummaryTest extends TestCase
         Livewire::actingAs($admin)
             ->test(RemunerationsSummary::class)
             ->assertSee('Agencia Con Saldo')
-            ->assertSee('Aliado')
+            ->assertSee('Total a pagar a Aliados')
             ->assertSee($driver->user->name)
-            ->assertSee('Repartidor')
-            ->assertSee('40.00'); // total a pagar: 25 + 15
+            ->assertSee('Total a pagar a Repartidores')
+            ->assertSeeInOrder(['Aliados', 'Repartidores']);
     }
 
     public function test_ally_with_zero_balance_is_excluded(): void
@@ -103,7 +106,7 @@ class RemunerationsSummaryTest extends TestCase
             ->assertDontSee('Repartidor Sin Pagos');
     }
 
-    public function test_export_excel_includes_bank_details_and_totals(): void
+    public function test_export_allies_excel_includes_bank_details_and_totals(): void
     {
         Excel::fake();
 
@@ -123,36 +126,81 @@ class RemunerationsSummaryTest extends TestCase
             'source' => 'manual',
         ]);
 
-        $filename = 'resumen-pagos-'.now()->format('Y-m-d').'.xlsx';
+        $filename = 'pagos-aliados-'.now()->format('Y-m-d').'.xlsx';
 
         Livewire::actingAs($admin)
             ->test(RemunerationsSummary::class)
-            ->call('exportExcel')
+            ->call('exportAlliesExcel')
             ->assertFileDownloaded();
 
         Excel::assertDownloaded($filename, function (SimpleArrayExport $export) {
             $rows = iterator_to_array($export->generator());
 
             self::assertSame(
-                ['Rol', 'RIF o Cédula', 'Nombre', 'Correo', 'Número de cuenta', 'Cédula del titular', 'Paquetes', 'Producido USD', 'Saldo USD a pagar', 'Saldo Bs a pagar'],
+                ['RIF o Cédula', 'Nombre', 'Correo', 'Número de cuenta', 'Cédula del titular', 'Paquetes', 'Producido USD', 'Saldo USD a pagar', 'Saldo Bs a pagar'],
                 $export->headings()
             );
 
-            self::assertSame('Aliado', $rows[0][0]);
-            self::assertSame('Agencia Exportable', $rows[0][2]);
-            self::assertSame('0102-1234-56-1234567890', $rows[0][4]);
-            self::assertSame('J-11111111-1', $rows[0][5]);
-            self::assertSame('25.00', $rows[0][8]);
-            self::assertSame('1000.00', $rows[0][9]); // 25 * 40
+            self::assertSame('Agencia Exportable', $rows[0][1]);
+            self::assertSame('0102-1234-56-1234567890', $rows[0][3]);
+            self::assertSame('J-11111111-1', $rows[0][4]);
+            self::assertSame('25.00', $rows[0][7]);
+            self::assertSame('1000.00', $rows[0][8]); // 25 * 40
 
-            self::assertSame('TOTAL A PAGAR', $rows[count($rows) - 2][0]);
-            self::assertSame('TOTAL PRODUCIDO POR ALIADOS (USD)', $rows[count($rows) - 1][0]);
+            self::assertSame('TOTAL A PAGAR', $rows[count($rows) - 1][0]);
 
             return true;
         });
     }
 
-    public function test_ally_cannot_access_the_consolidated_summary(): void
+    public function test_export_drivers_excel_includes_bank_details_and_totals(): void
+    {
+        Excel::fake();
+
+        $admin = $this->createAdmin();
+
+        $driver = $this->createDriverWithPendingPayment(15.0, 30.0);
+        $driver->update([
+            'cedula' => 'V-12345678',
+            'bank_account_number' => '0134-5678-90-1234567890',
+            'bank_account_holder_id' => 'V-12345678',
+        ]);
+
+        BcvRate::create([
+            'rate' => 40.0,
+            'effective_date' => now()->toDateString(),
+            'effective_at' => now(),
+            'source' => 'manual',
+        ]);
+
+        $filename = 'pagos-repartidores-'.now()->format('Y-m-d').'.xlsx';
+
+        Livewire::actingAs($admin)
+            ->test(RemunerationsSummary::class)
+            ->call('exportDriversExcel')
+            ->assertFileDownloaded();
+
+        Excel::assertDownloaded($filename, function (SimpleArrayExport $export) use ($driver) {
+            $rows = iterator_to_array($export->generator());
+
+            self::assertSame(
+                ['RIF o Cédula', 'Nombre', 'Correo', 'Número de cuenta', 'Cédula del titular', 'Paquetes', 'Producido USD', 'Saldo USD a pagar', 'Saldo Bs a pagar'],
+                $export->headings()
+            );
+
+            self::assertSame('V-12345678', $rows[0][0]);
+            self::assertSame($driver->user->name, $rows[0][1]);
+            self::assertSame('0134-5678-90-1234567890', $rows[0][3]);
+            self::assertSame('15.00', $rows[0][7]);
+            self::assertSame('600.00', $rows[0][8]); // 15 * 40
+
+            self::assertSame('TOTAL A PAGAR', $rows[count($rows) - 1][0]);
+
+            return true;
+        });
+    }
+
+    public function test_ally_cannot_access_the_remunerations_summary(): void
     {
         $ally = $this->createAlly();
 
