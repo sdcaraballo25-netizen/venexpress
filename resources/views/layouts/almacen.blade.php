@@ -132,7 +132,14 @@
                 </div>
             </div>
 
-            <form method="POST" action="{{ route('logout') }}" class="mt-4">
+            <a
+                href="{{ route('profile') }}"
+                class="block w-full mt-4 rounded-xl px-3 py-2 text-sm font-medium text-[#64748B] hover:bg-slate-50 hover:text-[#0F172A] transition-colors"
+            >
+                Mi Perfil
+            </a>
+
+            <form method="POST" action="{{ route('logout') }}" class="mt-2">
                 @csrf
                 <button type="submit"
                     class="w-full rounded-xl px-3 py-2 text-left text-sm font-medium text-red-500 hover:bg-red-50 hover:text-red-700 transition-colors">
@@ -177,6 +184,13 @@
                     <p class="text-sm font-semibold text-[#0F172A]">{{ auth()->user()->name ?? 'Almacén' }}</p>
                     <p class="text-xs text-[#64748B]">Panel de almacén</p>
                 </div>
+
+                <a
+                    href="{{ route('profile') }}"
+                    class="h-10 px-4 inline-flex items-center rounded-xl text-sm font-medium text-[#64748B] border border-[#E2E8F0] hover:bg-slate-50 hover:text-[#0F172A] transition-colors"
+                >
+                    Mi Perfil
+                </a>
 
                 <form method="POST" action="{{ route('logout') }}">
                     @csrf

@@ -613,10 +613,30 @@
             </div>
 
 
+            <a
+                href="{{ route('profile') }}"
+                class="
+                    block
+                    w-full
+                    mt-4
+                    rounded-xl
+                    px-3
+                    py-2
+                    text-sm
+                    font-medium
+                    text-[#64748B]
+                    hover:bg-slate-50
+                    hover:text-[#0F172A]
+                    transition-colors
+                "
+            >
+                Mi Perfil
+            </a>
+
             <form
                 method="POST"
                 action="{{ route('logout') }}"
-                class="mt-4"
+                class="mt-2"
             >
 
                 @csrf
@@ -784,6 +804,27 @@
                     </p>
 
                 </div>
+
+
+                <a
+                    href="{{ route('profile') }}"
+                    class="
+                        h-10
+                        px-4
+                        inline-flex
+                        items-center
+                        rounded-xl
+                        text-sm
+                        font-medium
+                        text-[#64748B]
+                        border border-[#E2E8F0]
+                        hover:bg-slate-50
+                        hover:text-[#0F172A]
+                        transition-colors
+                    "
+                >
+                    Mi Perfil
+                </a>
 
 
                 <form

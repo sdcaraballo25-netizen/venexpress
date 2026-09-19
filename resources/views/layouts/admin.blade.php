@@ -909,11 +909,19 @@
                 </div>
 
 
+                {{-- Perfil --}}
+                <a
+                    href="{{ route('profile') }}"
+                    class="block w-full mt-4 px-2 text-sm text-[#64748B] font-medium hover:text-[#0F172A] transition-colors"
+                >
+                    Mi Perfil
+                </a>
+
                 {{-- Cerrar sesión --}}
                 <form
                     method="POST"
                     action="{{ route('logout') }}"
-                    class="w-full mt-4"
+                    class="w-full mt-2"
                 >
 
                     @csrf
@@ -973,6 +981,14 @@
                         {{ auth()->user()->name ?? 'Admin' }}
 
                     </span>
+
+
+                    <a
+                        href="{{ route('profile') }}"
+                        class="text-sm font-medium text-[#64748B] hover:text-[#0F172A] transition-colors"
+                    >
+                        Mi Perfil
+                    </a>
 
 
                     <form

@@ -51,6 +51,7 @@ use App\Livewire\Driver\Packages;
 use App\Livewire\Driver\RouteDetail;
 use App\Livewire\Driver\RouteHistory;
 use App\Livewire\Driver\Scanner;
+use App\Livewire\Profile\Show as ProfileShow;
 use App\Livewire\Public\HelpCenter;
 use App\Livewire\Public\OfficeLocator;
 use App\Livewire\Public\PriceCalculator;
@@ -183,7 +184,7 @@ Route::view('dashboard', 'dashboard')
 |--------------------------------------------------------------------------
 */
 
-Route::view('profile', 'profile')
+Route::get('profile', ProfileShow::class)
     ->middleware(['auth'])
     ->name('profile');
 
