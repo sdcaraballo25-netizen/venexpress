@@ -3,6 +3,8 @@
 namespace App\Notifications;
 
 use App\Models\Package;
+use Illuminate\Bus\Queueable;
+use Illuminate\Contracts\Queue\ShouldQueue;
 use Illuminate\Notifications\Messages\MailMessage;
 use Illuminate\Notifications\Notification;
 
@@ -11,19 +13,28 @@ use Illuminate\Notifications\Notification;
  * al destinatario — cada uno con un mensaje distinto ($role) aunque
  * comparten los mismos datos de la guía.
  *
- * Se envía de forma síncrona (no implementa ShouldQueue), igual
- * criterio que PackageStatusUpdated: quien llama a esto
- * (PackageService) lo envuelve en try/catch para que un fallo de
- * correo nunca revierta ni bloquee una guía ya guardada.
+ * En cola, igual criterio que PackageStatusUpdated: una taquilla
+ * registrando pedidos seguidos no debería esperar dos viajes de
+ * correo (remitente + destinatario) en cada uno. Quien llama a esto
+ * (PackageService) lo envuelve en try/catch para que un fallo al
+ * encolar nunca revierta ni bloquee una guía ya guardada.
+ *
+ * Guarda solo packageId (no el modelo Package completo), igual
+ * convención que Jobs\GeocodePackageDeliveryAddress: evita depender de
+ * SerializesModels y siempre lee el estado más reciente de la guía en
+ * el momento en que el worker realmente procesa el correo, no el que
+ * tenía cuando se encoló.
  */
-class PackageCreated extends Notification
+class PackageCreated extends Notification implements ShouldQueue
 {
+    use Queueable;
+
     public const ROLE_SENDER = 'sender';
 
     public const ROLE_RECIPIENT = 'recipient';
 
     public function __construct(
-        protected Package $package,
+        protected int $packageId,
         protected string $role,
     ) {
     }
@@ -38,30 +49,32 @@ class PackageCreated extends Notification
 
     public function toMail(object $notifiable): MailMessage
     {
+        $package = Package::findOrFail($this->packageId);
+
         $trackingUrl = route('tracking.show', [
-            'guia' => $this->package->tracking_number,
+            'guia' => $package->tracking_number,
         ]);
 
         $mail = (new MailMessage)
-            ->subject("Guía {$this->package->tracking_number} registrada — VenExpress")
+            ->subject("Guía {$package->tracking_number} registrada — VenExpress")
             ->greeting('¡Hola!');
 
         if ($this->role === self::ROLE_SENDER) {
             $mail->line(
-                "Tu paquete fue enviado bajo la guía {$this->package->tracking_number}, "
-                . "dirigido a {$this->package->recipient_name}."
+                "Tu paquete fue enviado bajo la guía {$package->tracking_number}, "
+                . "dirigido a {$package->recipient_name}."
             );
         } else {
             $mail->line(
-                "{$this->package->sender_name} te ha enviado un paquete bajo la guía "
-                . "{$this->package->tracking_number}."
+                "{$package->sender_name} te ha enviado un paquete bajo la guía "
+                . "{$package->tracking_number}."
             );
         }
 
         $mail
-            ->line("Origen: {$this->package->origin_city} → Destino: {$this->package->destination_city}")
-            ->line("Remitente: {$this->package->sender_name}")
-            ->line("Destinatario: {$this->package->recipient_name}")
+            ->line("Origen: {$package->origin_city} → Destino: {$package->destination_city}")
+            ->line("Remitente: {$package->sender_name}")
+            ->line("Destinatario: {$package->recipient_name}")
             ->action('Rastrear mi envío', $trackingUrl)
             ->line('Gracias por confiar en VenExpress para tus envíos a nivel nacional.');
 
@@ -74,8 +87,7 @@ class PackageCreated extends Notification
     public function toArray(object $notifiable): array
     {
         return [
-            'package_id' => $this->package->id,
-            'tracking_number' => $this->package->tracking_number,
+            'package_id' => $this->packageId,
             'role' => $this->role,
         ];
     }

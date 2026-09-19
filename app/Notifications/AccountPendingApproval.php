@@ -2,6 +2,8 @@
 
 namespace App\Notifications;
 
+use Illuminate\Bus\Queueable;
+use Illuminate\Contracts\Queue\ShouldQueue;
 use Illuminate\Notifications\Messages\MailMessage;
 use Illuminate\Notifications\Notification;
 
@@ -16,12 +18,14 @@ use Illuminate\Notifications\Notification;
  * 'account.approved'), así que este correo solo confirma que la
  * solicitud se recibió y está en revisión.
  *
- * No implementa ShouldQueue: si la cola no tiene worker corriendo
- * (QUEUE_CONNECTION=sync es el caso más común en este proyecto), un
- * envío en cola nunca llegaría a salir.
+ * En cola: el registro no necesita esperar a que salga este correo
+ * para terminar. Hay un worker corriendo en producción (ver
+ * supervisor-venexpress-worker.conf).
  */
-class AccountPendingApproval extends Notification
+class AccountPendingApproval extends Notification implements ShouldQueue
 {
+    use Queueable;
+
     public function __construct(
         protected string $roleLabel,
     ) {

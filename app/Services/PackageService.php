@@ -50,7 +50,7 @@ class PackageService
             }
 
             Notification::route('mail', $customer->email)
-                ->notify(new PackageStatusUpdated($package, $status));
+                ->notify(new PackageStatusUpdated($package->id, $status));
         } catch (Throwable $e) {
             Log::warning(
                 'No se pudo enviar la notificación de cambio de estado.',
@@ -79,7 +79,7 @@ class PackageService
 
             if ($senderEmail) {
                 Notification::route('mail', $senderEmail)
-                    ->notify(new PackageCreated($package, PackageCreated::ROLE_SENDER));
+                    ->notify(new PackageCreated($package->id, PackageCreated::ROLE_SENDER));
             }
 
             $recipientEmail = Customer::query()
@@ -88,7 +88,7 @@ class PackageService
 
             if ($recipientEmail) {
                 Notification::route('mail', $recipientEmail)
-                    ->notify(new PackageCreated($package, PackageCreated::ROLE_RECIPIENT));
+                    ->notify(new PackageCreated($package->id, PackageCreated::ROLE_RECIPIENT));
             }
         } catch (Throwable $e) {
             Log::warning(

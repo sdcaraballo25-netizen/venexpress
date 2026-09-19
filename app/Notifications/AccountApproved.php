@@ -2,6 +2,8 @@
 
 namespace App\Notifications;
 
+use Illuminate\Bus\Queueable;
+use Illuminate\Contracts\Queue\ShouldQueue;
 use Illuminate\Notifications\Messages\MailMessage;
 use Illuminate\Notifications\Notification;
 
@@ -10,12 +12,14 @@ use Illuminate\Notifications\Notification;
  * (Ally::STATUS_ACTIVE / Driver::STATUS_ACTIVE) y ya puede usar su
  * panel con normalidad.
  *
- * No implementa ShouldQueue: si la cola no tiene worker corriendo
- * (QUEUE_CONNECTION=sync es el caso más común en este proyecto), un
- * envío en cola nunca llegaría a salir.
+ * En cola: el Admin no necesita esperar a que salga el correo para
+ * que su acción de aprobar termine. Hay un worker corriendo en
+ * producción (ver supervisor-venexpress-worker.conf).
  */
-class AccountApproved extends Notification
+class AccountApproved extends Notification implements ShouldQueue
 {
+    use Queueable;
+
     public function __construct(
         protected string $roleLabel,
     ) {

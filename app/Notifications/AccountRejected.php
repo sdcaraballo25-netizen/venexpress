@@ -2,6 +2,8 @@
 
 namespace App\Notifications;
 
+use Illuminate\Bus\Queueable;
+use Illuminate\Contracts\Queue\ShouldQueue;
 use Illuminate\Notifications\Messages\MailMessage;
 use Illuminate\Notifications\Notification;
 
@@ -9,12 +11,14 @@ use Illuminate\Notifications\Notification;
  * Avisa a un Aliado o Repartidor que un Admin rechazó su solicitud
  * (Ally::STATUS_REJECTED / Driver::STATUS_REJECTED).
  *
- * No implementa ShouldQueue: si la cola no tiene worker corriendo
- * (QUEUE_CONNECTION=sync es el caso más común en este proyecto), un
- * envío en cola nunca llegaría a salir.
+ * En cola: el Admin no necesita esperar a que salga el correo para
+ * que su acción de rechazar termine. Hay un worker corriendo en
+ * producción (ver supervisor-venexpress-worker.conf).
  */
-class AccountRejected extends Notification
+class AccountRejected extends Notification implements ShouldQueue
 {
+    use Queueable;
+
     public function __construct(
         protected string $roleLabel,
     ) {
