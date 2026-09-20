@@ -240,7 +240,7 @@
                 <form
                     action="{{ route('tracking.show') }}"
                     method="GET"
-                    class="hidden lg:flex items-center"
+                    class="hidden lg:flex items-center ml-6 xl:ml-10 pl-6 xl:pl-10 border-l border-gray-200"
                 >
                     <div class="flex items-center border border-[#111111]/15 rounded-lg overflow-hidden">
 
