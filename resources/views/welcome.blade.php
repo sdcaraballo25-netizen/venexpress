@@ -236,6 +236,42 @@
 
             <div class="flex items-center gap-1.5 sm:gap-3">
 
+                {{-- Rastrea tu envío --}}
+                <form
+                    action="{{ route('tracking.show') }}"
+                    method="GET"
+                    class="hidden lg:flex items-center"
+                >
+                    <div class="flex items-center border border-[#111111]/15 rounded-lg overflow-hidden">
+
+                        <input
+                            type="text"
+                            name="guia"
+                            placeholder="Rastrea tu envío"
+                            autocomplete="off"
+                            spellcheck="false"
+                            class="w-40 xl:w-48 border-0 text-sm placeholder:text-gray-400 focus:ring-0 py-2 pl-3 pr-1"
+                        >
+
+                        <button
+                            type="submit"
+                            aria-label="Rastrear envío"
+                            class="shrink-0 h-full px-3 py-2 bg-[#111111] hover:bg-amber-400 text-white hover:text-[#111111] transition"
+                        >
+                            <i class="fa-solid fa-magnifying-glass text-xs"></i>
+                        </button>
+
+                    </div>
+                </form>
+
+
+                <a
+                    href="{{ route('register') }}"
+                    class="hidden sm:inline-flex items-center justify-center border border-[#111111] text-[#111111] hover:bg-[#111111] hover:text-white font-semibold text-xs sm:text-sm px-2.5 py-2 sm:px-5 sm:py-2.5 rounded-lg transition whitespace-nowrap"
+                >
+                    Regístrate
+                </a>
+
                 <a
                     href="{{ route('login') }}"
                     class="bg-amber-400 hover:bg-amber-500 text-blue-950 font-semibold text-xs sm:text-sm px-2.5 py-2 sm:px-6 sm:py-2.5 rounded-lg transition inline-flex items-center justify-center shadow-sm hover:shadow-md whitespace-nowrap"
@@ -294,6 +330,11 @@
                 <a href="#ayuda"
                    class="mobile-menu-link block py-3 text-sm text-gray-600">
                     Ayuda
+                </a>
+
+                <a href="{{ route('register') }}"
+                   class="mobile-menu-link block py-3 text-sm font-semibold text-[#111111] border-t border-gray-100 mt-1">
+                    Regístrate
                 </a>
 
             </div>
