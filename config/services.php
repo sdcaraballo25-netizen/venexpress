@@ -25,6 +25,17 @@ return [
         'api_key' => env('GOOGLE_MAPS_API_KEY'),
     ],
 
+    // "Continuar con Google" (login/registro). Client ID/Secret se
+    // obtienen en https://console.cloud.google.com/apis/credentials
+    // (tipo "OAuth client ID" > "Web application"); el redirect debe
+    // registrarse ahí tal cual, incluyendo el dominio real en
+    // producción.
+    'google' => [
+        'client_id' => env('GOOGLE_CLIENT_ID'),
+        'client_secret' => env('GOOGLE_CLIENT_SECRET'),
+        'redirect' => env('GOOGLE_REDIRECT_URI'),
+    ],
+
     /*
     |--------------------------------------------------------------------------
     | Third Party Services

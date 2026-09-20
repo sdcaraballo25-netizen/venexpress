@@ -11,6 +11,7 @@ use Illuminate\Auth\Events\Registered;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Hash;
+use Illuminate\Support\Str;
 use Illuminate\Validation\Rules;
 use Livewire\Attributes\Layout;
 use Livewire\Volt\Component;
@@ -25,6 +26,16 @@ new #[Layout('layouts.guest')] class extends Component
     public string $password = '';
     public string $password_confirmation = '';
     public string $role = 'cliente';
+
+    /**
+     * Cuando viene de "Continuar con Google" (ver mount()): nombre y
+     * correo ya están confirmados por Google, así que se ocultan los
+     * campos de nombre/correo/contraseña y se completa el resto del
+     * formulario (rol + datos que Google no entrega) normalmente.
+     */
+    public bool $viaGoogle = false;
+
+    public ?string $googleId = null;
 
     /**
      * Datos adicionales para aliados.
@@ -76,6 +87,15 @@ new #[Layout('layouts.guest')] class extends Component
         if (in_array($requestedRole, ['cliente', 'repartidor', 'aliado'], true)) {
             $this->role = $requestedRole;
         }
+
+        $googlePending = session('google_pending');
+
+        if (is_array($googlePending)) {
+            $this->viaGoogle = true;
+            $this->googleId = $googlePending['google_id'];
+            $this->name = $googlePending['name'];
+            $this->email = $googlePending['email'];
+        }
     }
 
     /**
@@ -125,14 +145,19 @@ new #[Layout('layouts.guest')] class extends Component
                 'required',
                 'in:cliente,repartidor,aliado',
             ],
+        ];
 
-            'password' => [
+        // Una cuenta que llega por "Continuar con Google" no crea
+        // contraseña propia (ver GoogleAuthController y mount()): la
+        // que se guarda es una aleatoria que nadie usa para entrar.
+        if (! $this->viaGoogle) {
+            $rules['password'] = [
                 'required',
                 'string',
                 'confirmed',
                 Rules\Password::defaults(),
-            ],
-        ];
+            ];
+        }
 
         /*
         |--------------------------------------------------------------------------
@@ -341,7 +366,9 @@ new #[Layout('layouts.guest')] class extends Component
             'name' => $validated['name'],
             'email' => $validated['email'],
             'phone' => $validated['phone'] ?? null,
-            'password' => Hash::make($validated['password']),
+            'password' => Hash::make($this->viaGoogle ? Str::random(40) : $validated['password']),
+            'google_id' => $this->viaGoogle ? $this->googleId : null,
+            'email_verified_at' => $this->viaGoogle ? now() : null,
             'role' => $validated['role'],
         ]);
 
@@ -396,6 +423,8 @@ new #[Layout('layouts.guest')] class extends Component
 
             Auth::login($user);
 
+            session()->forget('google_pending');
+
             $this->redirect(
                 route('ally.dashboard', absolute: false),
                 navigate: true
@@ -441,6 +470,8 @@ new #[Layout('layouts.guest')] class extends Component
 
             Auth::login($user);
 
+            session()->forget('google_pending');
+
             $this->redirect(
                 route('repartidor.dashboard', absolute: false),
                 navigate: true
@@ -476,6 +507,22 @@ new #[Layout('layouts.guest')] class extends Component
             ]
         );
 
+        // Un correo de Google ya viene verificado por Google (y
+        // email_verified_at ya quedó marcado al crear el User arriba),
+        // así que el código de 6 dígitos por correo sería redundante.
+        if ($this->viaGoogle) {
+            session()->forget('google_pending');
+
+            Auth::login($user);
+
+            $this->redirect(
+                route('cliente.dashboard', absolute: false),
+                navigate: true
+            );
+
+            return;
+        }
+
         // Generar y guardar el código de verificación.
         $plainToken = $user->generateVerificationToken();
 
@@ -509,56 +556,90 @@ new #[Layout('layouts.guest')] class extends Component
         Regístrate para gestionar tus guías, tarifas o entregas en VenExpress.
     </p>
 
-    <form wire:submit="register" class="mt-8 space-y-5">
+    @if ($viaGoogle)
 
-        {{-- NOMBRE --}}
-        <div>
-            <x-input-label
-                for="name"
-                value="Nombre completo"
-            />
-
-            <x-text-input
-                wire:model="name"
-                id="name"
-                class="block mt-1.5 w-full"
-                type="text"
-                name="name"
-                required
-                autofocus
-                autocomplete="name"
-                placeholder="Tu nombre"
-            />
-
-            <x-input-error
-                :messages="$errors->get('name')"
-                class="mt-2"
-            />
+        {{-- Nombre/correo ya confirmados por Google: solo falta el
+             resto de datos que Google no entrega. --}}
+        <div class="mt-6 flex items-center gap-3 rounded-xl border border-[#E5E5E0] bg-[#F7F7F4] px-4 py-3">
+            <svg class="h-4 w-4 shrink-0" viewBox="0 0 18 18" xmlns="http://www.w3.org/2000/svg"><path fill="#4285F4" d="M17.64 9.2c0-.637-.057-1.251-.164-1.84H9v3.481h4.844a4.14 4.14 0 01-1.796 2.716v2.259h2.908c1.702-1.567 2.684-3.874 2.684-6.615z"/><path fill="#34A853" d="M9 18c2.43 0 4.467-.806 5.956-2.184l-2.908-2.259c-.806.54-1.837.86-3.048.86-2.344 0-4.328-1.584-5.036-3.711H.957v2.332A8.997 8.997 0 009 18z"/><path fill="#FBBC05" d="M3.964 10.706A5.41 5.41 0 013.682 9c0-.593.102-1.17.282-1.706V4.962H.957A8.996 8.996 0 000 9c0 1.452.348 2.827.957 4.038l3.007-2.332z"/><path fill="#EA4335" d="M9 3.58c1.321 0 2.508.454 3.44 1.345l2.582-2.581C13.463.891 11.426 0 9 0A8.997 8.997 0 00.957 4.962L3.964 7.294C4.672 5.167 6.656 3.58 9 3.58z"/></svg>
+            <div class="text-sm">
+                <p class="font-semibold text-[#111111]">{{ $name }}</p>
+                <p class="text-gray-500">{{ $email }}</p>
+            </div>
         </div>
 
-        {{-- EMAIL --}}
-        <div>
-            <x-input-label
-                for="email"
-                value="Correo electrónico"
-            />
+    @elseif (config('services.google.client_id'))
 
-            <x-text-input
-                wire:model="email"
-                id="email"
-                class="block mt-1.5 w-full"
-                type="email"
-                name="email"
-                required
-                autocomplete="username"
-                placeholder="tu@correo.com"
-            />
+        <a
+            href="{{ route('auth.google.redirect') }}"
+            class="mt-6 flex items-center justify-center gap-2 rounded-lg border border-[#E5E5E0] bg-white px-4 py-2.5 text-sm font-semibold text-[#111111] transition hover:bg-[#F7F7F4]"
+        >
+            <svg class="h-4 w-4 shrink-0" viewBox="0 0 18 18" xmlns="http://www.w3.org/2000/svg"><path fill="#4285F4" d="M17.64 9.2c0-.637-.057-1.251-.164-1.84H9v3.481h4.844a4.14 4.14 0 01-1.796 2.716v2.259h2.908c1.702-1.567 2.684-3.874 2.684-6.615z"/><path fill="#34A853" d="M9 18c2.43 0 4.467-.806 5.956-2.184l-2.908-2.259c-.806.54-1.837.86-3.048.86-2.344 0-4.328-1.584-5.036-3.711H.957v2.332A8.997 8.997 0 009 18z"/><path fill="#FBBC05" d="M3.964 10.706A5.41 5.41 0 013.682 9c0-.593.102-1.17.282-1.706V4.962H.957A8.996 8.996 0 000 9c0 1.452.348 2.827.957 4.038l3.007-2.332z"/><path fill="#EA4335" d="M9 3.58c1.321 0 2.508.454 3.44 1.345l2.582-2.581C13.463.891 11.426 0 9 0A8.997 8.997 0 00.957 4.962L3.964 7.294C4.672 5.167 6.656 3.58 9 3.58z"/></svg>
+            Continuar con Google
+        </a>
 
-            <x-input-error
-                :messages="$errors->get('email')"
-                class="mt-2"
-            />
+        <div class="mt-6 flex items-center gap-3 text-xs text-gray-400">
+            <span class="h-px flex-1 bg-[#E5E5E0]"></span>
+            o regístrate con tu correo
+            <span class="h-px flex-1 bg-[#E5E5E0]"></span>
         </div>
+
+    @endif
+
+    <form wire:submit="register" class="mt-6 space-y-5">
+
+        @unless ($viaGoogle)
+
+            {{-- NOMBRE --}}
+            <div>
+                <x-input-label
+                    for="name"
+                    value="Nombre completo"
+                />
+
+                <x-text-input
+                    wire:model="name"
+                    id="name"
+                    class="block mt-1.5 w-full"
+                    type="text"
+                    name="name"
+                    required
+                    autofocus
+                    autocomplete="name"
+                    placeholder="Tu nombre"
+                />
+
+                <x-input-error
+                    :messages="$errors->get('name')"
+                    class="mt-2"
+                />
+            </div>
+
+            {{-- EMAIL --}}
+            <div>
+                <x-input-label
+                    for="email"
+                    value="Correo electrónico"
+                />
+
+                <x-text-input
+                    wire:model="email"
+                    id="email"
+                    class="block mt-1.5 w-full"
+                    type="email"
+                    name="email"
+                    required
+                    autocomplete="username"
+                    placeholder="tu@correo.com"
+                />
+
+                <x-input-error
+                    :messages="$errors->get('email')"
+                    class="mt-2"
+                />
+            </div>
+
+        @endunless
 
         {{-- ROL --}}
         <div>
@@ -1170,54 +1251,58 @@ new #[Layout('layouts.guest')] class extends Component
 
         @endif
 
-        {{-- ====================================================== --}}
-        {{-- CONTRASEÑA --}}
-        {{-- ====================================================== --}}
+        @unless ($viaGoogle)
 
-        <div>
-            <x-input-label
-                for="password"
-                value="Contraseña"
-            />
+            {{-- ====================================================== --}}
+            {{-- CONTRASEÑA --}}
+            {{-- ====================================================== --}}
 
-            <x-password-input
-                wire:model="password"
-                id="password"
-                class="block mt-1.5"
-                name="password"
-                required
-                autocomplete="new-password"
-                placeholder="••••••••"
-            />
+            <div>
+                <x-input-label
+                    for="password"
+                    value="Contraseña"
+                />
 
-            <x-input-error
-                :messages="$errors->get('password')"
-                class="mt-2"
-            />
-        </div>
+                <x-password-input
+                    wire:model="password"
+                    id="password"
+                    class="block mt-1.5"
+                    name="password"
+                    required
+                    autocomplete="new-password"
+                    placeholder="••••••••"
+                />
 
-        {{-- CONFIRMAR CONTRASEÑA --}}
-        <div>
-            <x-input-label
-                for="password_confirmation"
-                value="Confirmar contraseña"
-            />
+                <x-input-error
+                    :messages="$errors->get('password')"
+                    class="mt-2"
+                />
+            </div>
 
-            <x-password-input
-                wire:model="password_confirmation"
-                id="password_confirmation"
-                class="block mt-1.5"
-                name="password_confirmation"
-                required
-                autocomplete="new-password"
-                placeholder="••••••••"
-            />
+            {{-- CONFIRMAR CONTRASEÑA --}}
+            <div>
+                <x-input-label
+                    for="password_confirmation"
+                    value="Confirmar contraseña"
+                />
 
-            <x-input-error
-                :messages="$errors->get('password_confirmation')"
-                class="mt-2"
-            />
-        </div>
+                <x-password-input
+                    wire:model="password_confirmation"
+                    id="password_confirmation"
+                    class="block mt-1.5"
+                    name="password_confirmation"
+                    required
+                    autocomplete="new-password"
+                    placeholder="••••••••"
+                />
+
+                <x-input-error
+                    :messages="$errors->get('password_confirmation')"
+                    class="mt-2"
+                />
+            </div>
+
+        @endunless
 
         {{-- BOTÓN --}}
         <x-primary-button class="w-full py-3">
