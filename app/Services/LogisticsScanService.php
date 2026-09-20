@@ -33,6 +33,42 @@ class LogisticsScanService
      * - El escaneo cambia el estado a RECOLECTADO_VENEXPRESS.
      * - Se crea un evento SALIDA inmutable.
      */
+    /**
+     * Un repartidor solo debería poder ver los datos (remitente,
+     * destinatario, COD) de una guía que realmente le toca: ya es
+     * suya, está en una agencia parada de su ruta activa, o está
+     * EN_HUB con él llevando una ruta de distribución en curso. Sin
+     * este filtro, cualquier repartidor autenticado podía enumerar
+     * números de guía y leer la PII de paquetes ajenos vía
+     * lookup()/scan()/hubReception(), aunque la propia acción de
+     * escaneo fuera a fallar después.
+     */
+    public function canDriverAccessPackage(Package $package, Driver $driver): bool
+    {
+        if ((int) $package->driver_id === (int) $driver->id) {
+            return true;
+        }
+
+        $activeRoute = Route::query()
+            ->where('driver_id', $driver->id)
+            ->where('status', Route::STATUS_IN_PROGRESS)
+            ->with('stops')
+            ->latest('started_at')
+            ->first();
+
+        if (! $activeRoute) {
+            return false;
+        }
+
+        if ($activeRoute->stops->contains('ally_id', $package->ally_id)) {
+            return true;
+        }
+
+        return $package->current_status === Package::STATUS_EN_HUB
+            && $driver->driver_type === Driver::TYPE_HUB
+            && $activeRoute->isHubDistribution();
+    }
+
     public function scanCollection(
         Package $package,
         Driver $driver,

@@ -56,12 +56,15 @@ class DriverPackageController extends Controller
             ], 404);
         }
 
+        $scanService = app(LogisticsScanService::class);
+        $canAccess = $scanService->canDriverAccessPackage($package, $driver);
+
         $securityWarning = $package->security_hash
             ? ! $package->verifySecurityHash()
             : false;
 
         try {
-            $package = app(LogisticsScanService::class)->scanCollection(
+            $package = $scanService->scanCollection(
                 package: $package,
                 driver: $driver,
                 userId: (int) Auth::id(),
@@ -87,11 +90,14 @@ class DriverPackageController extends Controller
                 ], 200);
             }
 
-            return response()->json([
+            // No se filtra la PII del paquete (remitente/destinatario,
+            // COD) en una respuesta de error a menos que el paquete
+            // realmente le toque a este repartidor.
+            return response()->json(array_filter([
                 'message' => $e->getMessage(),
                 'security_warning' => $securityWarning,
-                'package' => new DriverPackageResource($package),
-            ], 422);
+                'package' => $canAccess ? new DriverPackageResource($package) : null,
+            ], fn ($v) => $v !== null), 422);
         }
     }
 
@@ -126,8 +132,11 @@ class DriverPackageController extends Controller
             ], 404);
         }
 
+        $scanService = app(LogisticsScanService::class);
+        $canAccess = $scanService->canDriverAccessPackage($package, $driver);
+
         try {
-            $package = app(LogisticsScanService::class)->scanHubReception(
+            $package = $scanService->scanHubReception(
                 package: $package,
                 driver: $driver,
                 userId: (int) Auth::id(),
@@ -138,10 +147,10 @@ class DriverPackageController extends Controller
                 'package' => new DriverPackageResource($package),
             ]);
         } catch (RuntimeException $e) {
-            return response()->json([
+            return response()->json(array_filter([
                 'message' => $e->getMessage(),
-                'package' => new DriverPackageResource($package),
-            ], 422);
+                'package' => $canAccess ? new DriverPackageResource($package) : null,
+            ], fn ($v) => $v !== null), 422);
         }
     }
 
@@ -159,14 +168,14 @@ class DriverPackageController extends Controller
             'tracking_number' => ['required', 'string'],
         ]);
 
-        $this->driver();
+        $driver = $this->driver();
 
         $package = Package::query()
             ->where('tracking_number', trim($validated['tracking_number']))
             ->with(['ally', 'driver', 'histories'])
             ->first();
 
-        if (! $package) {
+        if (! $package || ! app(LogisticsScanService::class)->canDriverAccessPackage($package, $driver)) {
             return response()->json([
                 'message' => "No existe una guía con número: {$validated['tracking_number']}",
             ], 404);
