@@ -1211,7 +1211,7 @@
         <img
             src="{{ asset('images/skyline-hero.png') }}"
             alt=""
-            class="absolute inset-0 w-full h-full object-cover object-right opacity-70"
+            class="absolute inset-0 w-full h-full object-cover object-right opacity-60 grayscale"
         >
 
     </div>
@@ -1241,11 +1241,12 @@
             </div>
 
 
-            <h1 class="tracking-title font-extrabold text-blue-950">
+            <h1 class="tracking-title font-extrabold text-[#111111]">
 
                 Rastrea tu
 
-                <span class="block text-amber-700">
+                <span class="relative inline-block">
+                    <span class="absolute inset-x-0 bottom-1 h-[0.32em] bg-amber-400 -z-10"></span>
                     envío.
                 </span>
 

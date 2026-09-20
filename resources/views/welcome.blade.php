@@ -326,7 +326,7 @@
                 <img
                     src="{{ asset('images/skyline-hero.png') }}"
                     alt=""
-                    class="absolute inset-0 w-full h-full object-cover object-right opacity-75"
+                    class="absolute inset-0 w-full h-full object-cover object-right opacity-60 grayscale"
                 >
 
             </div>
@@ -347,13 +347,14 @@
                 ================================================== --}}
                 <div class="relative z-20 max-w-2xl min-w-0">
 
-                    <h1 class="hero-title font-extrabold text-blue-950 leading-[0.82] tracking-tight">
+                    <h1 class="hero-title font-extrabold text-[#111111] leading-[0.82] tracking-tight">
 
         <span class="block whitespace-nowrap">
             Envía fácil.
         </span>
 
-        <span class="block text-amber-700 whitespace-nowrap">
+        <span class="relative inline-block whitespace-nowrap">
+            <span class="absolute inset-x-0 bottom-1 h-[0.32em] bg-amber-400 -z-10"></span>
             Rastrea siempre.
         </span>
 
@@ -378,16 +379,16 @@
                         {{-- Calcular --}}
                         <a
                             href="{{ route('public.calculator') }}"
-                            class="group inline-flex items-center gap-1.5 bg-white/50 hover:bg-white/80 backdrop-blur-sm border border-blue-900/20 hover:border-blue-900/40 text-blue-950 text-sm font-bold px-3 py-2 rounded-lg transition duration-200 shadow-sm hover:shadow-md"
+                            class="group inline-flex items-center gap-1.5 bg-white hover:bg-[#111111] border border-[#111111] text-[#111111] hover:text-white text-sm font-bold px-3 py-2 rounded-lg transition duration-200 shadow-sm"
                         >
 
-                            <span class="w-5.5 h-5.5 rounded-md bg-blue-50/80 flex items-center justify-center shrink-0">
-                                <i class="fa-solid fa-calculator text-[10px] text-blue-900"></i>
+                            <span class="w-5.5 h-5.5 rounded-md bg-amber-400 flex items-center justify-center shrink-0">
+                                <i class="fa-solid fa-calculator text-[10px] text-[#111111]"></i>
                             </span>
 
                             Calcular precio
 
-                            <i class="fa-solid fa-arrow-right text-[10px] text-blue-900/60 transition-transform group-hover:translate-x-0.5"></i>
+                            <i class="fa-solid fa-arrow-right text-[10px] opacity-60 transition-transform group-hover:translate-x-0.5"></i>
 
                         </a>
 
@@ -395,16 +396,16 @@
                         {{-- Agencias --}}
                         <a
                             href="{{ route('public.offices') }}"
-                            class="group inline-flex items-center gap-1.5 bg-white/50 hover:bg-white/80 backdrop-blur-sm border border-blue-900/20 hover:border-blue-900/40 text-blue-950 text-sm font-bold px-3 py-2 rounded-lg transition duration-200 shadow-sm hover:shadow-md"
+                            class="group inline-flex items-center gap-1.5 bg-white hover:bg-[#111111] border border-[#111111] text-[#111111] hover:text-white text-sm font-bold px-3 py-2 rounded-lg transition duration-200 shadow-sm"
                         >
 
-                            <span class="w-5.5 h-5.5 rounded-md bg-blue-50/80 flex items-center justify-center shrink-0">
-                                <i class="fa-solid fa-location-dot text-amber-500 text-[10px]"></i>
+                            <span class="w-5.5 h-5.5 rounded-md bg-amber-400 flex items-center justify-center shrink-0">
+                                <i class="fa-solid fa-location-dot text-[10px] text-[#111111]"></i>
                             </span>
 
                             Agencias cercanas
 
-                            <i class="fa-solid fa-arrow-right text-[10px] text-blue-900/60 transition-transform group-hover:translate-x-0.5"></i>
+                            <i class="fa-solid fa-arrow-right text-[10px] opacity-60 transition-transform group-hover:translate-x-0.5"></i>
 
                         </a>
 
@@ -412,16 +413,16 @@
                         {{-- Rastreo --}}
                         <a
                             href="{{ route('tracking.index') }}"
-                            class="group inline-flex items-center gap-1.5 bg-white/50 hover:bg-white/80 backdrop-blur-sm border border-blue-900/20 hover:border-blue-900/40 text-blue-950 text-sm font-bold px-3 py-2 rounded-lg transition duration-200 shadow-sm hover:shadow-md"
+                            class="group inline-flex items-center gap-1.5 bg-[#111111] hover:bg-amber-400 border border-[#111111] text-white hover:text-[#111111] text-sm font-bold px-3 py-2 rounded-lg transition duration-200 shadow-sm"
                         >
 
-                            <span class="w-5.5 h-5.5 rounded-md bg-blue-50/80 flex items-center justify-center shrink-0">
-                                <i class="fa-solid fa-location-crosshairs text-blue-900 text-[10px]"></i>
+                            <span class="w-5.5 h-5.5 rounded-md bg-white/15 group-hover:bg-[#111111]/10 flex items-center justify-center shrink-0">
+                                <i class="fa-solid fa-location-crosshairs text-[10px]"></i>
                             </span>
 
                             Rastrear envío
 
-                            <i class="fa-solid fa-arrow-right text-[10px] text-blue-900/60 transition-transform group-hover:translate-x-0.5"></i>
+                            <i class="fa-solid fa-arrow-right text-[10px] opacity-60 transition-transform group-hover:translate-x-0.5"></i>
 
                         </a>
 
