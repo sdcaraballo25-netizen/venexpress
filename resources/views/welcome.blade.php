@@ -76,11 +76,11 @@
         ====================================================== */
 
         .hero-section {
-            min-height: 500px;
+            min-height: calc(100vh - 74px);
         }
 
         .hero-content {
-            min-height: 500px;
+            min-height: calc(100vh - 74px);
         }
 
         .hero-vehicle {
