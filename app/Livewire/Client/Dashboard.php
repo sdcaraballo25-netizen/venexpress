@@ -4,6 +4,7 @@ namespace App\Livewire\Client;
 
 use App\Models\AuditLog;
 use App\Models\Customer;
+use App\Models\Incident;
 use App\Models\Package;
 use Illuminate\Support\Facades\Auth;
 use Livewire\Attributes\Layout;
@@ -249,11 +250,32 @@ class Dashboard extends Component
                 ->map(fn (Package $package) => $this->withClientRole($package, $idDocs));
         }
 
+        // Datos para la franja de accesos rápidos del encabezado
+        // (mismo criterio que PendingPayments.php/Incidents.php, no se
+        // duplica la lógica de negocio, solo el conteo).
+        $pendingPaymentsPackages = empty($idDocs)
+            ? collect()
+            : Package::query()
+                ->whereIn('recipient_id_doc', $idDocs)
+                ->where('is_cod', true)
+                ->where('cod_status', Package::COD_PENDIENTE)
+                ->get();
+
+        $openIncidentsCount = Incident::query()
+            ->where('reported_by_user_id', Auth::id())
+            ->where('status', Incident::STATUS_OPEN)
+            ->count();
+
         return view(
             'livewire.client.dashboard',
             [
                 'packages' => $packages,
                 'historyPackages' => $historyPackages,
+                'pendingPaymentsCount' => $pendingPaymentsPackages->count(),
+                'pendingPaymentsTotalUsd' => $pendingPaymentsPackages->sum(
+                    fn (Package $package) => (float) $package->cod_amount_usd
+                ),
+                'openIncidentsCount' => $openIncidentsCount,
             ]
         );
     }

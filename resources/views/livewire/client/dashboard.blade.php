@@ -39,6 +39,72 @@
         </p>
     </div>
 
+    {{-- Accesos rápidos --}}
+    <div class="grid divide-y divide-slate-100 overflow-hidden rounded-2xl border border-slate-200 bg-white sm:grid-cols-3 sm:divide-x sm:divide-y-0">
+        <a
+            href="{{ route('cliente.pending-payments') }}"
+            wire:navigate
+            class="flex items-center gap-3 px-5 py-4 transition hover:bg-slate-50"
+        >
+            <span class="flex h-9 w-9 shrink-0 items-center justify-center rounded-lg bg-amber-100 text-amber-700">
+                <svg class="h-5 w-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8c-1.657 0-3 .895-3 2s1.343 2 3 2 3 .895 3 2-1.343 2-3 2m0-8c1.11 0 2.08.402 2.599 1M12 8V6m0 10v2m9-8a9 9 0 11-18 0 9 9 0 0118 0z" />
+                </svg>
+            </span>
+
+            <span class="min-w-0 flex-1">
+                <span class="block text-sm font-semibold text-slate-900">Pagos pendientes</span>
+                <span class="block text-xs text-slate-500">
+                    @if ($pendingPaymentsCount > 0)
+                        {{ $pendingPaymentsCount }} {{ Str::plural('guía', $pendingPaymentsCount) }} · ${{ number_format($pendingPaymentsTotalUsd, 2) }}
+                    @else
+                        Al día
+                    @endif
+                </span>
+            </span>
+        </a>
+
+        <a
+            href="{{ route('cliente.incidents') }}"
+            wire:navigate
+            class="flex items-center gap-3 px-5 py-4 transition hover:bg-slate-50"
+        >
+            <span class="flex h-9 w-9 shrink-0 items-center justify-center rounded-lg bg-blue-50 text-blue-900">
+                <svg class="h-5 w-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z" />
+                </svg>
+            </span>
+
+            <span class="min-w-0 flex-1">
+                <span class="block text-sm font-semibold text-slate-900">Reportar incidencia</span>
+                <span class="block text-xs text-slate-500">
+                    @if ($openIncidentsCount > 0)
+                        {{ $openIncidentsCount }} {{ Str::plural('abierta', $openIncidentsCount) }}
+                    @else
+                        Sin reportes abiertos
+                    @endif
+                </span>
+            </span>
+        </a>
+
+        <a
+            href="{{ route('recommendations.create') }}"
+            wire:navigate
+            class="flex items-center gap-3 px-5 py-4 transition hover:bg-slate-50"
+        >
+            <span class="flex h-9 w-9 shrink-0 items-center justify-center rounded-lg bg-emerald-50 text-emerald-700">
+                <svg class="h-5 w-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 10h.01M12 10h.01M16 10h.01M9 16H5a2 2 0 01-2-2V6a2 2 0 012-2h14a2 2 0 012 2v8a2 2 0 01-2 2h-6l-4 4v-4z" />
+                </svg>
+            </span>
+
+            <span class="min-w-0 flex-1">
+                <span class="block text-sm font-semibold text-slate-900">Recomendaciones</span>
+                <span class="block text-xs text-slate-500">Ayúdanos a mejorar</span>
+            </span>
+        </a>
+    </div>
+
     {{-- Pestañas --}}
     <div class="flex gap-2 border-b border-slate-200">
         <button

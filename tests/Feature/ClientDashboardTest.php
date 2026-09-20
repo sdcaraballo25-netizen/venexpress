@@ -513,4 +513,40 @@ class ClientDashboardTest extends TestCase
             method_exists(Dashboard::class, 'rejectDelivery')
         );
     }
+
+    public function test_quick_access_strip_shows_pending_cod_total_and_open_incidents_count(): void
+    {
+        $ally = $this->createAlly();
+
+        $user = $this->createClientUser('cliente-accesos@example.com');
+
+        Customer::create([
+            'id_doc' => 'V-20202020',
+            'name' => 'Cliente Accesos Rápidos',
+            'phone' => '0414-0000009',
+            'email' => $user->email,
+        ]);
+
+        $this->createPackage($ally, [
+            'recipient_id_doc' => 'V-20202020',
+            'is_cod' => true,
+            'cod_amount_usd' => 15.00,
+            'cod_status' => Package::COD_PENDIENTE,
+        ]);
+
+        \App\Models\Incident::create([
+            'ally_id' => $ally->id,
+            'reported_by_user_id' => $user->id,
+            'type' => \App\Models\Incident::TYPE_RECLAMO_CLIENTE,
+            'description' => 'Prueba',
+            'status' => \App\Models\Incident::STATUS_OPEN,
+        ]);
+
+        Livewire::actingAs($user)
+            ->test(Dashboard::class)
+            ->assertSet('activeTab', Dashboard::TAB_PENDING)
+            ->assertSee('1 guía')
+            ->assertSee('$15.00')
+            ->assertSee('1 abierta');
+    }
 }
