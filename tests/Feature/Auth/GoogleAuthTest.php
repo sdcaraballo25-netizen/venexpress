@@ -138,4 +138,13 @@ class GoogleAuthTest extends TestCase
 
         $this->assertGuest();
     }
+
+    public function test_canceling_the_google_prompt_redirects_to_login_without_crashing(): void
+    {
+        $response = $this->get(route('auth.google.callback', ['error' => 'access_denied']));
+
+        $response->assertRedirect(route('login'));
+
+        $this->assertGuest();
+    }
 }

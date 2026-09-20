@@ -5,6 +5,7 @@ namespace App\Http\Controllers\Auth;
 use App\Http\Controllers\Controller;
 use App\Models\User;
 use Illuminate\Http\RedirectResponse;
+use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Session;
 use Laravel\Socialite\Facades\Socialite;
@@ -28,8 +29,17 @@ class GoogleAuthController extends Controller
         return Socialite::driver('google')->redirect();
     }
 
-    public function callback(): RedirectResponse
+    public function callback(Request $request): RedirectResponse
     {
+        // El usuario canceló o rechazó el permiso en la pantalla de Google:
+        // Google redirige aquí con "error" en vez de "code", y sin esto
+        // Socialite intenta canjear un código que no existe.
+        if ($request->has('error')) {
+            return redirect()->route('login')->withErrors([
+                'form.email' => 'No se completó el inicio de sesión con Google.',
+            ]);
+        }
+
         $googleUser = Socialite::driver('google')->stateless()->user();
 
         $user = User::where('google_id', $googleUser->getId())
