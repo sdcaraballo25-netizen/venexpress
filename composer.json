@@ -19,7 +19,8 @@
         "livewire/volt": "^1.7.0",
         "maatwebsite/excel": "^3.1",
         "picqer/php-barcode-generator": "^3.3",
-        "symfony/postmark-mailer": "^8.1"
+        "symfony/filesystem": "^7.4",
+        "symfony/postmark-mailer": "^7.4"
     },
     "require-dev": {
         "doctrine/dbal": "^4.0",
