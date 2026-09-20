@@ -305,143 +305,258 @@
 
 
     {{-- =========================================================
-         HERO
+         HERO (carrusel: envío / reclutamiento de flota)
     ========================================================== --}}
-    <section class="hero-section relative overflow-hidden bg-white">
+    <section
+        id="hero-carousel"
+        class="hero-section relative overflow-hidden"
+    >
 
-        {{-- Fondo --}}
-        <div class="absolute inset-0 z-0 pointer-events-none">
+        {{-- =================================================
+             SLIDE 1: Envío / rastreo
+        ================================================== --}}
+        <div
+            id="hero-slide-0"
+            class="hero-slide relative bg-white"
+        >
 
-            <img
-                src="{{ asset('images/skyline-hero.png') }}"
-                alt=""
-                class="absolute inset-0 w-full h-full object-cover object-right opacity-75"
-            >
+            {{-- Fondo --}}
+            <div class="absolute inset-0 z-0 pointer-events-none">
+
+                <img
+                    src="{{ asset('images/skyline-hero.png') }}"
+                    alt=""
+                    class="absolute inset-0 w-full h-full object-cover object-right opacity-75"
+                >
+
+            </div>
+
+
+            <div class="hero-content relative z-10 max-w-7xl mx-auto px-6 py-10 md:py-12 grid md:grid-cols-2 gap-6 lg:gap-10 items-center">
+
+
+                {{-- =================================================
+                     TEXTO
+
+                     min-w-0: sin esto, el <h1> con whitespace-nowrap de
+                     abajo fuerza a esta columna del grid a ser tan ancha
+                     como el texto sin cortar, arrastrando con ella el
+                     párrafo y los botones fuera del viewport en móvil
+                     (el hero-section con overflow-hidden solo esconde el
+                     scroll, no evita que el contenido se corte).
+                ================================================== --}}
+                <div class="relative z-20 max-w-2xl min-w-0">
+
+                    <h1 class="hero-title font-extrabold text-blue-950 leading-[0.82] tracking-tight">
+
+        <span class="block whitespace-nowrap">
+            Envía fácil.
+        </span>
+
+        <span class="block text-amber-700 whitespace-nowrap">
+            Rastrea siempre.
+        </span>
+
+    </h1>
+
+
+                    <p class="hero-description mt-6 text-gray-600 text-lg leading-7.5 font-medium">
+                        Calcula el precio de tu envío, encuentra una agencia y consulta el estado de tu paquete de forma sencilla.
+                    </p>
+
+
+                    {{-- =================================================
+                         BOTONES
+                    ================================================== --}}
+                    {{-- flex-wrap en móvil: en pantallas muy angostas (~320px)
+                         los 3 botones con ícono+texto no caben en una sola
+                         fila; de sm en adelante sí, así que ahí vuelve a
+                         una sola línea. --}}
+                    <div class="mt-7 flex flex-wrap sm:flex-nowrap items-center gap-2">
+
+
+                        {{-- Calcular --}}
+                        <a
+                            href="{{ route('public.calculator') }}"
+                            class="group inline-flex items-center gap-1.5 bg-white/50 hover:bg-white/80 backdrop-blur-sm border border-blue-900/20 hover:border-blue-900/40 text-blue-950 text-sm font-bold px-3 py-2 rounded-lg transition duration-200 shadow-sm hover:shadow-md"
+                        >
+
+                            <span class="w-5.5 h-5.5 rounded-md bg-blue-50/80 flex items-center justify-center shrink-0">
+                                <i class="fa-solid fa-calculator text-[10px] text-blue-900"></i>
+                            </span>
+
+                            Calcular precio
+
+                            <i class="fa-solid fa-arrow-right text-[10px] text-blue-900/60 transition-transform group-hover:translate-x-0.5"></i>
+
+                        </a>
+
+
+                        {{-- Agencias --}}
+                        <a
+                            href="{{ route('public.offices') }}"
+                            class="group inline-flex items-center gap-1.5 bg-white/50 hover:bg-white/80 backdrop-blur-sm border border-blue-900/20 hover:border-blue-900/40 text-blue-950 text-sm font-bold px-3 py-2 rounded-lg transition duration-200 shadow-sm hover:shadow-md"
+                        >
+
+                            <span class="w-5.5 h-5.5 rounded-md bg-blue-50/80 flex items-center justify-center shrink-0">
+                                <i class="fa-solid fa-location-dot text-amber-500 text-[10px]"></i>
+                            </span>
+
+                            Agencias cercanas
+
+                            <i class="fa-solid fa-arrow-right text-[10px] text-blue-900/60 transition-transform group-hover:translate-x-0.5"></i>
+
+                        </a>
+
+
+                        {{-- Rastreo --}}
+                        <a
+                            href="{{ route('tracking.index') }}"
+                            class="group inline-flex items-center gap-1.5 bg-white/50 hover:bg-white/80 backdrop-blur-sm border border-blue-900/20 hover:border-blue-900/40 text-blue-950 text-sm font-bold px-3 py-2 rounded-lg transition duration-200 shadow-sm hover:shadow-md"
+                        >
+
+                            <span class="w-5.5 h-5.5 rounded-md bg-blue-50/80 flex items-center justify-center shrink-0">
+                                <i class="fa-solid fa-location-crosshairs text-blue-900 text-[10px]"></i>
+                            </span>
+
+                            Rastrear envío
+
+                            <i class="fa-solid fa-arrow-right text-[10px] text-blue-900/60 transition-transform group-hover:translate-x-0.5"></i>
+
+                        </a>
+
+                    </div>
+
+                </div>
+
+
+
+                {{-- =================================================
+                     VEHÍCULO
+                ================================================== --}}
+                <div class="relative flex justify-center md:justify-end items-end">
+
+                    <div class="hero-vehicle relative w-full max-w-md lg:max-w-2xl">
+
+                        <img
+                            src="{{ asset('images/van-hero.png') }}"
+                            alt="Furgoneta Venexpress"
+                            class="w-full relative z-10 drop-shadow-[0_30px_25px_rgba(15,23,55,0.25)]"
+                        >
+
+
+                        {{-- Sombra debajo de la camioneta --}}
+                        <div
+                            class="absolute left-1/2 bottom-1 -translate-x-1/2 w-[68%] h-5 bg-blue-950/25 rounded-full blur-md"
+                        ></div>
+
+                    </div>
+
+                </div>
+
+            </div>
 
         </div>
 
 
-        <div class="hero-content relative z-10 max-w-7xl mx-auto px-6 py-10 md:py-12 grid md:grid-cols-2 gap-6 lg:gap-10 items-center">
+        {{-- =================================================
+             SLIDE 2: Reclutamiento de flota (repartidores)
+        ================================================== --}}
+        <div
+            id="hero-slide-1"
+            class="hero-slide hidden bg-[#111111]"
+        >
 
+            <div class="max-w-7xl mx-auto px-6 py-10 md:py-12 grid md:grid-cols-2 gap-6 lg:gap-10 items-center">
 
-            {{-- =================================================
-                 TEXTO
+                <div>
 
-                 min-w-0: sin esto, el <h1> con whitespace-nowrap de
-                 abajo fuerza a esta columna del grid a ser tan ancha
-                 como el texto sin cortar, arrastrando con ella el
-                 párrafo y los botones fuera del viewport en móvil
-                 (el hero-section con overflow-hidden solo esconde el
-                 scroll, no evita que el contenido se corte).
-            ================================================== --}}
-            <div class="relative z-20 max-w-2xl min-w-0">
+                    <span class="inline-block bg-amber-400 text-[#111111] text-xs font-bold tracking-wide uppercase px-3 py-1 rounded-full mb-4">
+                        Reclutamiento abierto
+                    </span>
 
-                <h1 class="hero-title font-extrabold text-blue-950 leading-[0.82] tracking-tight">
+                    <h1 class="hero-title font-extrabold text-white leading-[0.95] tracking-tight text-[2.6rem] md:text-[3rem]">
+                        ¿Tienes moto<br>
+                        o vehículo?<br>
+                        <span class="text-amber-400">Únete a la flota.</span>
+                    </h1>
 
-    <span class="block whitespace-nowrap">
-        Envía fácil.
-    </span>
+                    <p class="hero-description mt-6 text-gray-300 text-lg leading-7.5 font-medium">
+                        Genera ingresos extra entregando paquetes en tu ciudad. Tú decides tu horario, nosotros te asignamos las rutas.
+                    </p>
 
-    <span class="block text-amber-700 whitespace-nowrap">
-        Rastrea siempre.
-    </span>
+                    <div class="mt-7 flex flex-wrap items-center gap-4">
 
-</h1>
+                        <div class="flex items-center gap-2 text-white text-sm font-semibold">
+                            <i class="fa-solid fa-sack-dollar text-amber-400"></i>
+                            Comisión por entrega
+                        </div>
 
+                        <div class="flex items-center gap-2 text-white text-sm font-semibold">
+                            <i class="fa-regular fa-clock text-amber-400"></i>
+                            Horario flexible
+                        </div>
 
-                <p class="hero-description mt-6 text-gray-600 text-lg leading-7.5 font-medium">
-                    Calcula el precio de tu envío, encuentra una agencia y consulta el estado de tu paquete de forma sencilla.
-                </p>
+                        <div class="flex items-center gap-2 text-white text-sm font-semibold">
+                            <i class="fa-solid fa-route text-amber-400"></i>
+                            Rutas cerca de ti
+                        </div>
 
+                    </div>
 
-                {{-- =================================================
-                     BOTONES
-                ================================================== --}}
-                {{-- flex-wrap en móvil: en pantallas muy angostas (~320px)
-                     los 3 botones con ícono+texto no caben en una sola
-                     fila; de sm en adelante sí, así que ahí vuelve a
-                     una sola línea. --}}
-                <div class="mt-7 flex flex-wrap sm:flex-nowrap items-center gap-2">
-
-
-                    {{-- Calcular --}}
                     <a
-                        href="{{ route('public.calculator') }}"
-                        class="group inline-flex items-center gap-1.5 bg-white/50 hover:bg-white/80 backdrop-blur-sm border border-blue-900/20 hover:border-blue-900/40 text-blue-950 text-sm font-bold px-3 py-2 rounded-lg transition duration-200 shadow-sm hover:shadow-md"
+                        href="{{ route('register', ['role' => 'repartidor']) }}"
+                        class="mt-7 inline-flex items-center justify-center gap-2 bg-amber-400 hover:bg-amber-500 text-[#111111] font-bold text-sm px-6 py-3 rounded-lg transition"
                     >
-
-                        <span class="w-5.5 h-5.5 rounded-md bg-blue-50/80 flex items-center justify-center shrink-0">
-                            <i class="fa-solid fa-calculator text-[10px] text-blue-900"></i>
-                        </span>
-
-                        Calcular precio
-
-                        <i class="fa-solid fa-arrow-right text-[10px] text-blue-900/60 transition-transform group-hover:translate-x-0.5"></i>
-
+                        Regístrate como repartidor
+                        <i class="fa-solid fa-arrow-right text-xs"></i>
                     </a>
 
+                </div>
 
-                    {{-- Agencias --}}
-                    <a
-                        href="{{ route('public.offices') }}"
-                        class="group inline-flex items-center gap-1.5 bg-white/50 hover:bg-white/80 backdrop-blur-sm border border-blue-900/20 hover:border-blue-900/40 text-blue-950 text-sm font-bold px-3 py-2 rounded-lg transition duration-200 shadow-sm hover:shadow-md"
-                    >
+                <div class="relative flex justify-center md:justify-end items-end">
 
-                        <span class="w-5.5 h-5.5 rounded-md bg-blue-50/80 flex items-center justify-center shrink-0">
-                            <i class="fa-solid fa-location-dot text-amber-500 text-[10px]"></i>
-                        </span>
+                    <div class="hero-vehicle relative w-full max-w-md lg:max-w-2xl">
 
-                        Agencias cercanas
+                        <img
+                            src="{{ asset('images/van-hero.png') }}"
+                            alt="Repartidor Venexpress"
+                            class="w-full relative z-10 drop-shadow-[0_30px_25px_rgba(0,0,0,0.45)]"
+                        >
 
-                        <i class="fa-solid fa-arrow-right text-[10px] text-blue-900/60 transition-transform group-hover:translate-x-0.5"></i>
+                        <div
+                            class="absolute left-1/2 bottom-1 -translate-x-1/2 w-[68%] h-5 bg-black/50 rounded-full blur-md"
+                        ></div>
 
-                    </a>
-
-
-                    {{-- Rastreo --}}
-                    <a
-                        href="{{ route('tracking.index') }}"
-                        class="group inline-flex items-center gap-1.5 bg-white/50 hover:bg-white/80 backdrop-blur-sm border border-blue-900/20 hover:border-blue-900/40 text-blue-950 text-sm font-bold px-3 py-2 rounded-lg transition duration-200 shadow-sm hover:shadow-md"
-                    >
-
-                        <span class="w-5.5 h-5.5 rounded-md bg-blue-50/80 flex items-center justify-center shrink-0">
-                            <i class="fa-solid fa-location-crosshairs text-blue-900 text-[10px]"></i>
-                        </span>
-
-                        Rastrear envío
-
-                        <i class="fa-solid fa-arrow-right text-[10px] text-blue-900/60 transition-transform group-hover:translate-x-0.5"></i>
-
-                    </a>
+                    </div>
 
                 </div>
 
             </div>
 
+        </div>
 
 
-            {{-- =================================================
-                 VEHÍCULO
-            ================================================== --}}
-            <div class="relative flex justify-center md:justify-end items-end">
+        {{-- =================================================
+             NAVEGACIÓN DEL CARRUSEL
+        ================================================== --}}
+        <div class="absolute bottom-4 left-1/2 -translate-x-1/2 z-30 flex items-center gap-2 bg-[#111111]/70 backdrop-blur px-3 py-2 rounded-full">
 
-                <div class="hero-vehicle relative w-full max-w-md lg:max-w-2xl">
+            <button
+                type="button"
+                id="hero-dot-0"
+                data-hero-dot="0"
+                class="hero-dot h-2 rounded-full transition-all w-6 bg-white"
+                aria-label="Ver envío y rastreo"
+            ></button>
 
-                    <img
-                        src="{{ asset('images/van-hero.png') }}"
-                        alt="Furgoneta Venexpress"
-                        class="w-full relative z-10 drop-shadow-[0_30px_25px_rgba(15,23,55,0.25)]"
-                    >
-
-
-                    {{-- Sombra debajo de la camioneta --}}
-                    <div
-                        class="absolute left-1/2 bottom-1 -translate-x-1/2 w-[68%] h-5 bg-blue-950/25 rounded-full blur-md"
-                    ></div>
-
-                </div>
-
-            </div>
+            <button
+                type="button"
+                id="hero-dot-1"
+                data-hero-dot="1"
+                class="hero-dot h-2 rounded-full transition-all w-2 bg-white/40 hover:bg-white/70"
+                aria-label="Ver reclutamiento de flota"
+            ></button>
 
         </div>
 
@@ -927,83 +1042,6 @@
 
 
     {{-- =========================================================
-         ÚNETE A LA FLOTA
-    ========================================================== --}}
-    <section id="flota" class="bg-[#111111] overflow-hidden">
-
-        <div class="max-w-7xl mx-auto px-6 py-16 grid md:grid-cols-2 gap-10 items-center">
-
-            <div>
-
-                <span class="inline-block bg-amber-400 text-[#111111] text-xs font-bold tracking-wide uppercase px-3 py-1 rounded-full mb-4">
-                    Reclutamiento abierto
-                </span>
-
-                <h2 class="text-3xl md:text-4xl font-extrabold text-white leading-tight">
-                    ¿Tienes moto o vehículo?<br>
-                    <span class="text-amber-400">Únete a la flota Venexpress.</span>
-                </h2>
-
-                <p class="mt-4 text-sm text-gray-300 max-w-md">
-                    Genera ingresos extra entregando paquetes en tu ciudad. Tú decides tu horario, nosotros te asignamos las rutas.
-                </p>
-
-                <div class="grid sm:grid-cols-3 gap-4 mt-8">
-
-                    <div>
-                        <div class="w-9 h-9 rounded-lg bg-white/10 flex items-center justify-center mb-2">
-                            <i class="fa-solid fa-sack-dollar text-amber-400"></i>
-                        </div>
-                        <p class="text-xs font-semibold text-white">
-                            Comisión por entrega
-                        </p>
-                    </div>
-
-                    <div>
-                        <div class="w-9 h-9 rounded-lg bg-white/10 flex items-center justify-center mb-2">
-                            <i class="fa-regular fa-clock text-amber-400"></i>
-                        </div>
-                        <p class="text-xs font-semibold text-white">
-                            Horario flexible
-                        </p>
-                    </div>
-
-                    <div>
-                        <div class="w-9 h-9 rounded-lg bg-white/10 flex items-center justify-center mb-2">
-                            <i class="fa-solid fa-route text-amber-400"></i>
-                        </div>
-                        <p class="text-xs font-semibold text-white">
-                            Rutas cerca de ti
-                        </p>
-                    </div>
-
-                </div>
-
-                <a
-                    href="{{ route('register', ['role' => 'repartidor']) }}"
-                    class="mt-8 inline-flex items-center justify-center gap-2 bg-amber-400 hover:bg-amber-500 text-[#111111] font-semibold text-sm px-6 py-3 rounded-lg transition"
-                >
-                    Regístrate como repartidor
-                    <i class="fa-solid fa-arrow-right text-xs"></i>
-                </a>
-
-            </div>
-
-            <div class="relative">
-                <img
-                    src="{{ asset('images/van-hero.png') }}"
-                    alt="Repartidor Venexpress"
-                    class="w-full max-w-md mx-auto"
-                >
-            </div>
-
-        </div>
-
-    </section>
-
-
-
-    {{-- =========================================================
          FOOTER
     ========================================================== --}}
     <footer id="ayuda" class="bg-blue-950">
@@ -1086,7 +1124,7 @@
                     </li>
 
                     <li>
-                        <a href="#flota" class="hover:text-white transition">
+                        <a href="{{ route('register', ['role' => 'repartidor']) }}" class="hover:text-white transition">
                             Únete a la flota
                         </a>
                     </li>
@@ -1286,6 +1324,52 @@
                         link.addEventListener('click', closeMenu);
                     });
 
+            }
+
+
+            {{-- =================================================
+                 CARRUSEL DEL HERO (envío / reclutamiento de flota)
+            ================================================== --}}
+            const heroSlides = document.querySelectorAll('.hero-slide');
+            const heroDots = document.querySelectorAll('.hero-dot');
+            let heroCurrent = 0;
+            let heroTimer = null;
+
+            function showHeroSlide(index) {
+
+                heroSlides.forEach((slide, i) => {
+                    slide.classList.toggle('hidden', i !== index);
+                });
+
+                heroDots.forEach((dot, i) => {
+                    dot.classList.toggle('w-6', i === index);
+                    dot.classList.toggle('bg-white', i === index);
+                    dot.classList.toggle('w-2', i !== index);
+                    dot.classList.toggle('bg-white/40', i !== index);
+                });
+
+                heroCurrent = index;
+            }
+
+            function startHeroAutoplay() {
+
+                clearInterval(heroTimer);
+
+                heroTimer = setInterval(function () {
+                    showHeroSlide((heroCurrent + 1) % heroSlides.length);
+                }, 6000);
+            }
+
+            if (heroSlides.length && heroDots.length) {
+
+                heroDots.forEach(dot => {
+                    dot.addEventListener('click', function () {
+                        showHeroSlide(Number(dot.dataset.heroDot));
+                        startHeroAutoplay();
+                    });
+                });
+
+                startHeroAutoplay();
             }
 
         });
