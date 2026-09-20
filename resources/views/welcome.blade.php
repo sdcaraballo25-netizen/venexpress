@@ -461,15 +461,35 @@
 
         {{-- =================================================
              SLIDE 2: Reclutamiento de flota (repartidores)
+
+             A diferencia del slide 1 (dos columnas), este imita el
+             banner fotográfico de referencia: imagen a pantalla
+             completa con degradado oscuro y el texto sobrepuesto
+             directo encima, no separado en una columna aparte.
         ================================================== --}}
         <div
             id="hero-slide-1"
-            class="hero-slide hidden bg-[#111111]"
+            class="hero-slide hidden relative bg-[#111111]"
         >
 
-            <div class="max-w-7xl mx-auto px-6 py-10 md:py-12 grid md:grid-cols-2 gap-6 lg:gap-10 items-center">
+            {{-- Fondo: furgoneta a pantalla completa --}}
+            <div class="absolute inset-0">
 
-                <div>
+                <img
+                    src="{{ asset('images/van-hero.png') }}"
+                    alt=""
+                    class="absolute right-0 bottom-0 h-[115%] w-auto max-w-none object-contain opacity-95"
+                >
+
+                {{-- Degradado para que el texto se lea sobre la imagen --}}
+                <div class="absolute inset-0 bg-gradient-to-r from-[#111111] via-[#111111]/85 to-[#111111]/10"></div>
+                <div class="absolute inset-0 bg-gradient-to-t from-[#111111] via-transparent to-transparent"></div>
+
+            </div>
+
+            <div class="relative z-10 max-w-7xl mx-auto px-6 py-10 md:py-12">
+
+                <div class="max-w-xl">
 
                     <span class="inline-block bg-amber-400 text-[#111111] text-xs font-bold tracking-wide uppercase px-3 py-1 rounded-full mb-4">
                         Reclutamiento abierto
@@ -481,7 +501,7 @@
                         <span class="text-amber-400">Únete a la flota.</span>
                     </h1>
 
-                    <p class="hero-description mt-6 text-gray-300 text-lg leading-7.5 font-medium">
+                    <p class="hero-description mt-6 text-gray-200 text-lg leading-7.5 font-medium">
                         Genera ingresos extra entregando paquetes en tu ciudad. Tú decides tu horario, nosotros te asignamos las rutas.
                     </p>
 
@@ -514,21 +534,77 @@
 
                 </div>
 
-                <div class="relative flex justify-center md:justify-end items-end">
+            </div>
 
-                    <div class="hero-vehicle relative w-full max-w-md lg:max-w-2xl">
+        </div>
 
-                        <img
-                            src="{{ asset('images/van-hero.png') }}"
-                            alt="Repartidor Venexpress"
-                            class="w-full relative z-10 drop-shadow-[0_30px_25px_rgba(0,0,0,0.45)]"
-                        >
 
-                        <div
-                            class="absolute left-1/2 bottom-1 -translate-x-1/2 w-[68%] h-5 bg-black/50 rounded-full blur-md"
-                        ></div>
+        {{-- =================================================
+             SLIDE 3: Reclutamiento de agencias aliadas
+        ================================================== --}}
+        <div
+            id="hero-slide-2"
+            class="hero-slide hidden relative bg-[#111111]"
+        >
+
+            {{-- Fondo: skyline a pantalla completa --}}
+            <div class="absolute inset-0">
+
+                <img
+                    src="{{ asset('images/skyline-hero.png') }}"
+                    alt=""
+                    class="absolute inset-0 w-full h-full object-cover opacity-60"
+                >
+
+                <div class="absolute inset-0 bg-gradient-to-r from-[#111111] via-[#111111]/80 to-[#111111]/20"></div>
+                <div class="absolute inset-0 bg-gradient-to-t from-[#111111] via-transparent to-transparent"></div>
+
+            </div>
+
+            <div class="relative z-10 max-w-7xl mx-auto px-6 py-10 md:py-12">
+
+                <div class="max-w-xl">
+
+                    <span class="inline-block bg-amber-400 text-[#111111] text-xs font-bold tracking-wide uppercase px-3 py-1 rounded-full mb-4">
+                        Alianza comercial abierta
+                    </span>
+
+                    <h1 class="hero-title font-extrabold text-white leading-[0.95] tracking-tight text-[2.6rem] md:text-[3rem]">
+                        ¿Tienes un local<br>
+                        o negocio?<br>
+                        <span class="text-amber-400">Sé agencia aliada.</span>
+                    </h1>
+
+                    <p class="hero-description mt-6 text-gray-200 text-lg leading-7.5 font-medium">
+                        Recibe y despacha paquetes desde tu negocio y genera una comisión por cada guía que proceses.
+                    </p>
+
+                    <div class="mt-7 flex flex-wrap items-center gap-4">
+
+                        <div class="flex items-center gap-2 text-white text-sm font-semibold">
+                            <i class="fa-solid fa-sack-dollar text-amber-400"></i>
+                            Comisión por guía
+                        </div>
+
+                        <div class="flex items-center gap-2 text-white text-sm font-semibold">
+                            <i class="fa-solid fa-store text-amber-400"></i>
+                            Sin inversión inicial
+                        </div>
+
+                        <div class="flex items-center gap-2 text-white text-sm font-semibold">
+                            <i class="fa-solid fa-people-group text-amber-400"></i>
+                            Más tráfico a tu local
+                        </div>
 
                     </div>
+
+                    <a
+                        href="{{ route('register', ['role' => 'aliado']) }}"
+                        class="mt-7 inline-flex items-center justify-center gap-2 bg-amber-400 hover:bg-amber-500 text-[#111111] font-bold text-sm px-6 py-3 rounded-lg transition"
+                    >
+                        Regístrate como agencia aliada
+                        <i class="fa-solid fa-arrow-right text-xs"></i>
+                    </a>
 
                 </div>
 
@@ -556,6 +632,14 @@
                 data-hero-dot="1"
                 class="hero-dot h-2 rounded-full transition-all w-2 bg-white/40 hover:bg-white/70"
                 aria-label="Ver reclutamiento de flota"
+            ></button>
+
+            <button
+                type="button"
+                id="hero-dot-2"
+                data-hero-dot="2"
+                class="hero-dot h-2 rounded-full transition-all w-2 bg-white/40 hover:bg-white/70"
+                aria-label="Ver reclutamiento de agencias aliadas"
             ></button>
 
         </div>
