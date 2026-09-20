@@ -76,11 +76,11 @@
         ====================================================== */
 
         .hero-section {
-            min-height: calc(100vh - 74px);
+            min-height: 500px;
         }
 
         .hero-content {
-            min-height: calc(100vh - 74px);
+            min-height: 500px;
         }
 
         .hero-vehicle {
@@ -184,7 +184,7 @@
     ========================================================== --}}
     <nav id="main-navbar" class="bg-white border-b border-gray-100 sticky top-0 z-50">
 
-        <div class="max-w-7xl mx-auto px-6 py-4 flex items-center gap-4 lg:gap-6">
+        <div class="w-full px-6 lg:px-12 py-4 flex items-center gap-4 lg:gap-6">
 
             <a href="{{ route('home') }}"
                class="shrink-0"
@@ -373,7 +373,7 @@
             </div>
 
 
-            <div class="hero-content relative z-10 max-w-7xl mx-auto px-6 py-10 md:py-12 grid md:grid-cols-2 gap-6 lg:gap-10 items-center">
+            <div class="hero-content relative z-10 w-full px-6 lg:px-12 py-10 md:py-12 grid md:grid-cols-2 gap-6 lg:gap-10 items-center">
 
 
                 {{-- =================================================
@@ -529,7 +529,7 @@
 
             </div>
 
-            <div class="relative z-10 max-w-7xl mx-auto px-6 py-10 md:py-12">
+            <div class="relative z-10 w-full px-6 lg:px-12 py-10 md:py-12">
 
                 <div class="max-w-xl">
 
@@ -603,7 +603,7 @@
 
             </div>
 
-            <div class="relative z-10 max-w-7xl mx-auto px-6 py-10 md:py-12">
+            <div class="relative z-10 w-full px-6 lg:px-12 py-10 md:py-12">
 
                 <div class="max-w-xl">
 
