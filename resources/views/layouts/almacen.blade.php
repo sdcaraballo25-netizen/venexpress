@@ -46,7 +46,7 @@
         <div class="px-6 pt-7 pb-8">
             <div class="flex items-center gap-3">
 
-                <div class="h-11 w-11 rounded-xl bg-purple-900 flex items-center justify-center text-white shrink-0">
+                <div class="h-11 w-11 rounded-xl bg-amber-400 flex items-center justify-center text-[#111111] shrink-0">
                     <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                         <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
                             d="M3 7l9-4 9 4M3 7l9 4m-9-4v10l9 4m0-10l9-4m-9 4v10m9-14v10l-9 4" />
@@ -122,7 +122,7 @@
         <div class="border-t border-[#E5E5E0] px-5 py-5 bg-white">
 
             <div class="flex items-center gap-3">
-                <div class="h-10 w-10 rounded-full bg-purple-900 text-white flex items-center justify-center font-bold uppercase shrink-0">
+                <div class="h-10 w-10 rounded-full bg-amber-400 text-[#111111] flex items-center justify-center font-bold uppercase shrink-0">
                     {{ strtoupper(substr(auth()->user()->name ?? 'A', 0, 1)) }}
                 </div>
 

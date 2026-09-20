@@ -101,7 +101,7 @@
             {{-- Perfil del Admin --}}
             <div class="mt-auto pt-8 border-t border-[#E5E5E0]">
                 <div class="flex items-center gap-3 px-2">
-                    <div class="w-10 h-10 rounded-full bg-blue-900 flex items-center justify-center text-white font-bold uppercase">
+                    <div class="w-10 h-10 rounded-full bg-amber-400 flex items-center justify-center text-[#111111] font-bold uppercase">
                         {{ substr(Auth::user()->name ?? 'A', 0, 1) }}
                     </div>
                     <div class="overflow-hidden">

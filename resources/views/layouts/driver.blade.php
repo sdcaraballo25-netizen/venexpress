@@ -118,9 +118,9 @@
                     class="
                         h-11 w-11
                         rounded-xl
-                        bg-blue-900
+                        bg-amber-400
                         flex items-center justify-center
-                        text-white
+                        text-[#111111]
                         shrink-0
                     "
                 >
@@ -573,8 +573,8 @@
                     class="
                         h-10 w-10
                         rounded-full
-                        bg-blue-900
-                        text-white
+                        bg-amber-400
+                        text-[#111111]
                         flex items-center justify-center
                         font-bold
                         uppercase
