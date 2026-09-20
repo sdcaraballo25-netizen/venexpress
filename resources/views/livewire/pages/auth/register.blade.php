@@ -14,6 +14,7 @@ use Illuminate\Support\Facades\Hash;
 use Illuminate\Support\Str;
 use Illuminate\Validation\Rules;
 use Livewire\Attributes\Layout;
+use Livewire\Attributes\Locked;
 use Livewire\Volt\Component;
 use Livewire\WithFileUploads;
 
@@ -32,9 +33,18 @@ new #[Layout('layouts.guest')] class extends Component
      * correo ya están confirmados por Google, así que se ocultan los
      * campos de nombre/correo/contraseña y se completa el resto del
      * formulario (rol + datos que Google no entrega) normalmente.
+     *
+     * #[Locked] impide que el cliente pueda enviar un valor propio
+     * para estas dos props en la petición de Livewire que dispara
+     * register() (sin esto, alguien podría forzar viaGoogle=true con
+     * un googleId inventado). $name y $email no se bloquean aquí
+     * porque siguen siendo editables en el registro manual; su
+     * verificación va dentro de register() releyendo la sesión.
      */
+    #[Locked]
     public bool $viaGoogle = false;
 
+    #[Locked]
     public ?string $googleId = null;
 
     /**
@@ -125,6 +135,24 @@ new #[Layout('layouts.guest')] class extends Component
      */
     public function register(): void
     {
+        // El cliente puede tener modificado $email/$name antes de
+        // enviar el formulario (son props públicas editables en el
+        // registro manual). Cuando viene de Google, la identidad
+        // confirmada es la que quedó en sesión al volver del OAuth
+        // callback (ver GoogleAuthController), así que se restaura
+        // aquí para que no se pueda crear la cuenta con un correo
+        // distinto al que Google realmente verificó.
+        if ($this->viaGoogle) {
+            $googlePending = session('google_pending');
+
+            if (! is_array($googlePending) || ($googlePending['google_id'] ?? null) !== $this->googleId) {
+                abort(403);
+            }
+
+            $this->email = $googlePending['email'];
+            $this->name = $googlePending['name'];
+        }
+
         $rules = [
             'name' => [
                 'required',

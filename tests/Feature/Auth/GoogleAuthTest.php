@@ -122,6 +122,38 @@ class GoogleAuthTest extends TestCase
         $this->assertSame('google-xyz', $user->fresh()->google_id);
     }
 
+    public function test_tampering_with_the_email_property_cannot_spoof_a_different_account(): void
+    {
+        session([
+            'google_pending' => [
+                'google_id' => 'google-abc',
+                'name' => 'Nuevo Usuario',
+                'email' => 'nuevo@example.com',
+            ],
+        ]);
+
+        $component = Volt::test('pages.auth.register')
+            ->set('id_doc', 'V-12345678')
+            ->set('phone', '+58 412 1234567')
+            // $email es una prop pública editable (necesaria para el
+            // registro manual); un cliente manipulado podría intentar
+            // cambiarla antes de enviar el formulario.
+            ->set('email', 'atacante@evil.com');
+
+        $component->call('register');
+
+        $component->assertRedirect('/cliente/dashboard');
+
+        $this->assertDatabaseHas('users', [
+            'email' => 'nuevo@example.com',
+            'google_id' => 'google-abc',
+        ]);
+
+        $this->assertDatabaseMissing('users', [
+            'email' => 'atacante@evil.com',
+        ]);
+    }
+
     public function test_an_admin_account_cannot_log_in_through_google(): void
     {
         User::factory()->create([
