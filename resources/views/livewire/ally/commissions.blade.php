@@ -1,7 +1,7 @@
 <div class="space-y-6">
 
     <div>
-        <h2 class="font-display text-2xl font-semibold text-[#0F172A]">
+        <h2 class="font-display text-2xl font-semibold text-[#111111]">
             Comisiones y saldo
         </h2>
         <p class="text-sm text-slate-500">
@@ -10,7 +10,7 @@
     </div>
 
     <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
-        <div class="rounded-2xl border border-[#E2E8F0] bg-white p-5 shadow-sm">
+        <div class="rounded-2xl border border-[#E5E5E0] bg-white p-5 shadow-sm">
             <p class="text-sm text-slate-500">Comisión acumulada (histórico)</p>
             <p class="mt-1 font-display text-2xl font-semibold text-blue-900">
                 ${{ number_format($totalCommissionUsd, 2) }}
@@ -18,41 +18,41 @@
             <p class="text-xs text-slate-400 mt-1">{{ $totalPackages }} guías registradas</p>
         </div>
 
-        <div class="rounded-2xl border border-[#E2E8F0] bg-white p-5 shadow-sm">
+        <div class="rounded-2xl border border-[#E5E5E0] bg-white p-5 shadow-sm">
             <p class="text-sm text-slate-500">Comisión este mes</p>
-            <p class="mt-1 font-display text-2xl font-semibold text-[#0F172A]">
+            <p class="mt-1 font-display text-2xl font-semibold text-[#111111]">
                 ${{ number_format($monthCommissionUsd, 2) }}
             </p>
             <p class="text-xs text-slate-400 mt-1">{{ $monthPackages }} guías este mes</p>
         </div>
 
-        <div class="rounded-2xl border border-[#E2E8F0] bg-white p-5 shadow-sm">
+        <div class="rounded-2xl border border-[#E5E5E0] bg-white p-5 shadow-sm">
             <p class="text-sm text-slate-500">Promedio por guía</p>
-            <p class="mt-1 font-display text-2xl font-semibold text-[#0F172A]">
+            <p class="mt-1 font-display text-2xl font-semibold text-[#111111]">
                 ${{ number_format($averageCommissionUsd, 2) }}
             </p>
             <p class="text-xs text-slate-400 mt-1">sobre el histórico total</p>
         </div>
 
-        <div class="rounded-2xl border border-[#E2E8F0] bg-white p-5 shadow-sm">
+        <div class="rounded-2xl border border-[#E5E5E0] bg-white p-5 shadow-sm">
             <p class="text-sm text-slate-500">% de comisión actual</p>
-            <p class="mt-1 font-display text-2xl font-semibold text-[#0F172A]">
+            <p class="mt-1 font-display text-2xl font-semibold text-[#111111]">
                 {{ number_format($ally->commission_percentage, 2) }}%
             </p>
             <p class="text-xs text-slate-400 mt-1">definido por Venexpress</p>
         </div>
     </div>
 
-    <div class="rounded-2xl border border-[#E2E8F0] bg-white p-5 shadow-sm">
+    <div class="rounded-2xl border border-[#E5E5E0] bg-white p-5 shadow-sm">
         <div class="flex flex-wrap items-center justify-between gap-3 mb-4">
-            <h3 class="font-display text-lg font-semibold text-[#0F172A]">
+            <h3 class="font-display text-lg font-semibold text-[#111111]">
                 Últimos 6 meses
             </h3>
 
             <button
                 type="button"
                 wire:click="exportExcel"
-                class="rounded-lg border border-[#E2E8F0] px-3 py-1.5 text-xs font-semibold text-slate-700 hover:bg-slate-50"
+                class="rounded-lg border border-[#E5E5E0] px-3 py-1.5 text-xs font-semibold text-slate-700 hover:bg-slate-50"
             >
                 ⬇ Exportar Excel
             </button>
@@ -70,9 +70,9 @@
             <tbody>
                 @foreach ($monthlyBreakdown as $month)
                     <tr class="border-b border-slate-100 last:border-0">
-                        <td class="py-2 capitalize text-[#0F172A]">{{ $month['label'] }}</td>
+                        <td class="py-2 capitalize text-[#111111]">{{ $month['label'] }}</td>
                         <td class="py-2 text-slate-600">{{ $month['packages'] }}</td>
-                        <td class="py-2 text-right font-medium text-[#0F172A]">
+                        <td class="py-2 text-right font-medium text-[#111111]">
                             ${{ number_format($month['commission_usd'], 2) }}
                         </td>
                     </tr>

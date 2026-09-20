@@ -11,7 +11,7 @@
                 ← Resumen
             </a>
 
-            <h1 class="mt-2 font-display text-2xl font-bold text-[#0F172A]">
+            <h1 class="mt-2 font-display text-2xl font-bold text-[#111111]">
                 {{ $route->name }}
             </h1>
 
@@ -151,7 +151,7 @@
 
 
     {{-- Tipo de ruta / Origen - Destino --}}
-    <div class="rounded-2xl border border-[#E2E8F0] bg-white p-5">
+    <div class="rounded-2xl border border-[#E5E5E0] bg-white p-5">
 
         <div class="grid grid-cols-1 gap-4 sm:grid-cols-2">
 
@@ -160,7 +160,7 @@
                     Tipo de ruta
                 </p>
 
-                <p class="mt-1 text-sm font-semibold text-[#0F172A]">
+                <p class="mt-1 text-sm font-semibold text-[#111111]">
 
                     @if ($route->route_type === \App\Models\Route::TYPE_HUB_TRANSFER)
                         Traslado a hub
@@ -180,7 +180,7 @@
                     Origen → Destino
                 </p>
 
-                <p class="mt-1 text-sm font-semibold text-[#0F172A]">
+                <p class="mt-1 text-sm font-semibold text-[#111111]">
 
                     @if ($route->route_type === \App\Models\Route::TYPE_HUB_TRANSFER)
                         Agencias aliadas → Hub Venexpress
@@ -201,7 +201,7 @@
 
 
     {{-- Progreso --}}
-    <div class="rounded-2xl border border-[#E2E8F0] bg-white p-5">
+    <div class="rounded-2xl border border-[#E5E5E0] bg-white p-5">
 
         <div class="mb-2 flex items-center justify-between">
 
@@ -209,7 +209,7 @@
                 Paradas completadas
             </span>
 
-            <span class="text-sm font-bold text-[#0F172A]">
+            <span class="text-sm font-bold text-[#111111]">
                 {{ $visitedStopsCount }} de {{ $totalStopsCount }} · {{ $routeProgress }}%
             </span>
 
@@ -228,7 +228,7 @@
                 {{ $pendingStopsCount }} paradas pendientes
             </span>
 
-            <span class="font-semibold text-[#0F172A]">
+            <span class="font-semibold text-[#111111]">
 
                 Estado:
 
@@ -252,9 +252,9 @@
 
 
     {{-- Paradas --}}
-    <div class="rounded-2xl border border-[#E2E8F0] bg-white p-5">
+    <div class="rounded-2xl border border-[#E5E5E0] bg-white p-5">
 
-        <h2 class="font-display text-lg font-semibold text-[#0F172A]">
+        <h2 class="font-display text-lg font-semibold text-[#111111]">
             Paradas
         </h2>
 
@@ -274,7 +274,7 @@
 
                 @foreach ($route->stops as $index => $stop)
 
-                    <div class="flex flex-col gap-3 rounded-xl border border-[#E2E8F0] p-4 sm:flex-row sm:items-center sm:justify-between">
+                    <div class="flex flex-col gap-3 rounded-xl border border-[#E5E5E0] p-4 sm:flex-row sm:items-center sm:justify-between">
 
                         <div class="flex items-center gap-4">
 
@@ -283,7 +283,7 @@
                             </div>
 
                             <div>
-                                <p class="font-semibold text-sm text-[#0F172A]">
+                                <p class="font-semibold text-sm text-[#111111]">
                                     {{ $stop->ally?->business_name ?? $stop->warehouse?->name ?? 'Parada' }}
                                 </p>
 

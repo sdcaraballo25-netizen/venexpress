@@ -9,7 +9,7 @@
             ← Resumen
         </a>
 
-        <h1 class="mt-2 font-display text-2xl font-bold text-[#0F172A]">
+        <h1 class="mt-2 font-display text-2xl font-bold text-[#111111]">
             Historial de rutas
         </h1>
 
@@ -25,13 +25,13 @@
 
             <div
                 wire:key="route-history-{{ $route->id }}"
-                class="rounded-2xl border border-[#E2E8F0] bg-white p-5"
+                class="rounded-2xl border border-[#E5E5E0] bg-white p-5"
             >
 
                 <div class="flex flex-col gap-3 sm:flex-row sm:items-start sm:justify-between">
 
                     <div>
-                        <p class="font-display text-base font-bold text-[#0F172A]">
+                        <p class="font-display text-base font-bold text-[#111111]">
                             Ruta #{{ $route->id }} · {{ $route->name }}
                         </p>
 
@@ -123,7 +123,7 @@
 
         @empty
 
-            <div class="rounded-2xl border border-[#E2E8F0] bg-white p-8 text-center">
+            <div class="rounded-2xl border border-[#E5E5E0] bg-white p-8 text-center">
                 <p class="text-sm text-slate-500">
                     Todavía no has tomado ninguna ruta.
                 </p>

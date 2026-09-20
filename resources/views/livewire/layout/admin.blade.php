@@ -18,10 +18,10 @@
         .font-tracking { font-family: 'JetBrains Mono', ui-monospace, monospace; }
     </style>
 </head>
-<body class="bg-[#F3F5F7] text-[#0B1220] antialiased">
+<body class="bg-[#F7F7F4] text-[#111111] antialiased">
     <div class="min-h-screen flex">
         {{-- Sidebar --}}
-        <aside class="w-64 border-r border-[#E2E8F0] px-5 py-8 flex flex-col justify-between hidden md:flex bg-white h-screen sticky top-0">
+        <aside class="w-64 border-r border-[#E5E5E0] px-5 py-8 flex flex-col justify-between hidden md:flex bg-white h-screen sticky top-0">
             <div>
                 {{-- Logo --}}
                 <div class="flex items-center gap-3 px-2 mb-10">
@@ -30,12 +30,12 @@
                             <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m5.618-4.016A11.955 11.955 0 0112 2.944a11.955 11.955 0 01-8.618 3.04A12.02 12.02 0 003 9c0 5.591 3.824 10.29 9 11.622 5.176-1.332 9-6.03 9-11.622 0-1.042-.133-2.052-.382-3.016z"></path>
                         </svg>
                     </div>
-                    <span class="font-display font-bold text-xl text-[#0F172A]">Venexpress</span>
+                    <span class="font-display font-bold text-xl text-[#111111]">Venexpress</span>
                 </div>
 
                 {{-- Menú de Navegación --}}
                 <nav class="space-y-1">
-                    <p class="px-2 text-xs font-semibold text-[#94A3B8] uppercase tracking-wider mb-3">Principal</p>
+                    <p class="px-2 text-xs font-semibold text-[#B8B8B2] uppercase tracking-wider mb-3">Principal</p>
 
                     {{-- Enlace Activo (Resumen) --}}
                     {{-- Nota: Puedes cambiar la clase condicionalmente usando request()->routeIs('nombre.ruta') --}}
@@ -43,7 +43,7 @@
    class="flex items-center gap-3 px-4 py-3 rounded-xl font-medium transition-colors
           {{ request()->routeIs('admin.dashboard')
               ? 'bg-blue-50 text-blue-900'
-              : 'text-[#64748B] hover:bg-slate-50 hover:text-[#0F172A]' }}">
+              : 'text-[#6B6B66] hover:bg-slate-50 hover:text-[#111111]' }}">
                         <svg class="w-5 h-5 text-blue-700" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 6a2 2 0 012-2h2a2 2 0 012 2v2a2 2 0 01-2 2H6a2 2 0 01-2-2V6zM14 6a2 2 0 012-2h2a2 2 0 012 2v2a2 2 0 01-2 2h-2a2 2 0 01-2-2V6zM4 16a2 2 0 012-2h2a2 2 0 012 2v2a2 2 0 01-2 2H6a2 2 0 01-2-2v-2zM14 16a2 2 0 012-2h2a2 2 0 012 2v2a2 2 0 01-2 2h-2a2 2 0 01-2-2v-2z"></path></svg>
                         Resumen
                     </a>
@@ -53,7 +53,7 @@
    class="flex items-center gap-3 px-4 py-3 rounded-xl font-medium transition-colors
           {{ request()->routeIs('admin.allies')
               ? 'bg-blue-50 text-blue-900'
-              : 'text-[#64748B] hover:bg-slate-50 hover:text-[#0F172A]' }}">
+              : 'text-[#6B6B66] hover:bg-slate-50 hover:text-[#111111]' }}">
                         <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 20h5v-2a3 3 0 00-5.356-1.857M17 20H7m10 0v-2c0-.656-.126-1.283-.356-1.857M7 20H2v-2a3 3 0 015.356-1.857M7 20v-2c0-.656.126-1.283.356-1.857m0 0a5.002 5.002 0 019.288 0M15 7a3 3 0 11-6 0 3 3 0 016 0zm6 3a2 2 0 11-4 0 2 2 0 014 0zM7 10a2 2 0 11-4 0 2 2 0 014 0z"></path></svg>
                         Aliados
                     </a>
@@ -61,7 +61,7 @@
                     {{-- Enlace Gestión de tarifas --}}
                     <a href="{{ route('admin.rate-matrices') }}"
                        class="flex items-center gap-3 px-4 py-3 rounded-xl font-medium transition-colors
-                              {{ request()->routeIs('admin.rate-matrices') ? 'bg-blue-50 text-blue-900' : 'text-[#64748B] hover:bg-slate-50 hover:text-[#0F172A]' }}">
+                              {{ request()->routeIs('admin.rate-matrices') ? 'bg-blue-50 text-blue-900' : 'text-[#6B6B66] hover:bg-slate-50 hover:text-[#111111]' }}">
                         <svg class="w-5 h-5 {{ request()->routeIs('admin.rate-matrices') ? 'text-blue-700' : '' }}" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8c-1.657 0-3 .895-3 2s1.343 2 3 2 3 .895 3 2-1.343 2-3 2m0-8c1.11 0 2.08.402 2.599 1M12 8V7m0 1v8m0 0v1m0-1c-1.11 0-2.08-.402-2.599-1M21 12a9 9 0 11-18 0 9 9 0 0118 0z"></path></svg>
                         Gestión de tarifas
                     </a>
@@ -71,7 +71,7 @@
                        class="flex items-center gap-3 px-4 py-3 rounded-xl font-medium transition-colors
                               {{ request()->routeIs('admin.routes')
                                   ? 'bg-blue-50 text-blue-900'
-                                  : 'text-[#64748B] hover:bg-slate-50 hover:text-[#0F172A]' }}">
+                                  : 'text-[#6B6B66] hover:bg-slate-50 hover:text-[#111111]' }}">
                         <svg class="w-5 h-5 {{ request()->routeIs('admin.routes') ? 'text-blue-700' : '' }}" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 20l-5.447-2.724A1 1 0 013 16.382V5.618a1 1 0 011.447-.894L9 7l6-2.572 5.447 2.724A1 1 0 0121 8.053v10.764a1 1 0 01-1.447.894L15 17l-6 2.572zM9 7v13M15 4v13"></path></svg>
                         Control de rutas
                     </a>
@@ -81,17 +81,17 @@
                        class="flex items-center gap-3 px-4 py-3 rounded-xl font-medium transition-colors
                               {{ request()->routeIs('admin.routes.dashboard')
                                   ? 'bg-blue-50 text-blue-900'
-                                  : 'text-[#64748B] hover:bg-slate-50 hover:text-[#0F172A]' }}">
+                                  : 'text-[#6B6B66] hover:bg-slate-50 hover:text-[#111111]' }}">
                         <svg class="w-5 h-5 {{ request()->routeIs('admin.routes.dashboard') ? 'text-blue-700' : '' }}" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 6a2 2 0 012-2h2a2 2 0 012 2v2a2 2 0 01-2 2H6a2 2 0 01-2-2V6zM14 6a2 2 0 012-2h2a2 2 0 012 2v2a2 2 0 01-2 2h-2a2 2 0 01-2-2V6zM4 16a2 2 0 012-2h2a2 2 0 012 2v2a2 2 0 01-2 2H6a2 2 0 01-2-2v-2zM14 16a2 2 0 012-2h2a2 2 0 012 2v2a2 2 0 01-2 2h-2a2 2 0 01-2-2v-2z"></path></svg>
                         Dashboard de Rutas
                     </a>
 
-                    <p class="px-2 text-xs font-semibold text-[#94A3B8] uppercase tracking-wider mb-3 mt-6">Administración</p>
+                    <p class="px-2 text-xs font-semibold text-[#B8B8B2] uppercase tracking-wider mb-3 mt-6">Administración</p>
 
                     {{-- Gestión de usuarios --}}
                     <a href="{{ route('admin.users') }}"
                        class="flex items-center gap-3 px-4 py-3 rounded-xl font-medium transition-colors
-                              {{ request()->routeIs('admin.users') ? 'bg-blue-50 text-blue-900' : 'text-[#64748B] hover:bg-slate-50 hover:text-[#0F172A]' }}">
+                              {{ request()->routeIs('admin.users') ? 'bg-blue-50 text-blue-900' : 'text-[#6B6B66] hover:bg-slate-50 hover:text-[#111111]' }}">
                         <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M18 9v3m0 0v3m0-3h3m-3 0h-3m-2-5a4 4 0 11-8 0 4 4 0 018 0zM3 20a6 6 0 0112 0v1H3v-1z"></path></svg>
                         Gestión de usuarios
                     </a>
@@ -99,14 +99,14 @@
             </div>
 
             {{-- Perfil del Admin --}}
-            <div class="mt-auto pt-8 border-t border-[#E2E8F0]">
+            <div class="mt-auto pt-8 border-t border-[#E5E5E0]">
                 <div class="flex items-center gap-3 px-2">
                     <div class="w-10 h-10 rounded-full bg-blue-900 flex items-center justify-center text-white font-bold uppercase">
                         {{ substr(Auth::user()->name ?? 'A', 0, 1) }}
                     </div>
                     <div class="overflow-hidden">
-                        <p class="text-sm font-semibold text-[#0F172A] truncate">{{ Auth::user()->name ?? 'Administrador' }}</p>
-                        <p class="text-xs text-[#64748B] truncate">{{ Auth::user()->email ?? 'admin@venexpress.com' }}</p>
+                        <p class="text-sm font-semibold text-[#111111] truncate">{{ Auth::user()->name ?? 'Administrador' }}</p>
+                        <p class="text-xs text-[#6B6B66] truncate">{{ Auth::user()->email ?? 'admin@venexpress.com' }}</p>
                     </div>
                 </div>
 
@@ -130,15 +130,15 @@
 
         {{-- Contenido --}}
         <div class="flex-1 lg:ml-0 min-w-0">
-            <header class="h-16 bg-white border-b border-[#E2E8F0] flex items-center justify-between px-4 lg:px-8">
-                <button @click="sidebarOpen = !sidebarOpen" class="lg:hidden text-[#0B1220]">
+            <header class="h-16 bg-white border-b border-[#E5E5E0] flex items-center justify-between px-4 lg:px-8">
+                <button @click="sidebarOpen = !sidebarOpen" class="lg:hidden text-[#111111]">
                     ☰
                 </button>
                 <div class="flex items-center gap-4 ml-auto">
-                    <span class="text-sm text-[#64748B]">{{ auth()->user()->name ?? 'Admin' }}</span>
+                    <span class="text-sm text-[#6B6B66]">{{ auth()->user()->name ?? 'Admin' }}</span>
                     <form method="POST" action="{{ route('logout') }}">
                         @csrf
-                        <button type="submit" class="text-sm font-medium text-[#64748B] hover:text-[#FF6A1A] transition-colors">Salir</button>
+                        <button type="submit" class="text-sm font-medium text-[#6B6B66] hover:text-[#FF6A1A] transition-colors">Salir</button>
                     </form>
                 </div>
             </header>

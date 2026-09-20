@@ -2,7 +2,7 @@
 
     <div class="flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
         <div>
-            <h2 class="font-display text-2xl font-semibold text-[#0F172A]">
+            <h2 class="font-display text-2xl font-semibold text-[#111111]">
                 Almacenes
             </h2>
             <p class="text-sm text-slate-500">

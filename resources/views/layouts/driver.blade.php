@@ -73,7 +73,7 @@
 </head>
 
 
-<body class="bg-[#F3F5F7] text-[#0B1220] antialiased">
+<body class="bg-[#F7F7F4] text-[#111111] antialiased">
 
 
 <div class="min-h-screen flex">
@@ -88,7 +88,7 @@
             fixed inset-y-0 left-0 z-40
             w-72
             bg-white
-            border-r border-[#E2E8F0]
+            border-r border-[#E5E5E0]
             flex flex-col
             transform transition-transform duration-200
             md:relative
@@ -166,7 +166,7 @@
                             font-display
                             font-bold
                             text-xl
-                            text-[#0F172A]
+                            text-[#111111]
                             block
                             leading-none
                         "
@@ -177,7 +177,7 @@
                     <span
                         class="
                             text-xs
-                            text-[#94A3B8]
+                            text-[#B8B8B2]
                             block
                             mt-1
                         "
@@ -224,7 +224,7 @@
                     font-semibold
                     uppercase
                     tracking-wider
-                    text-[#94A3B8]
+                    text-[#B8B8B2]
                 "
             >
                 Principal
@@ -245,8 +245,8 @@
                     font-medium
                     transition-colors
                     {{ request()->routeIs('repartidor.dashboard')
-                        ? 'bg-blue-50 text-blue-900'
-                        : 'text-[#64748B] hover:bg-slate-50 hover:text-[#0F172A]' }}
+                        ? 'bg-amber-400 text-[#111111]'
+                        : 'text-[#6B6B66] hover:bg-slate-50 hover:text-[#111111]' }}
                 "
             >
 
@@ -289,8 +289,8 @@
                         font-medium
                         transition-colors
                         {{ request()->routeIs('repartidor.route-detail')
-                            ? 'bg-blue-50 text-blue-900'
-                            : 'text-[#64748B] hover:bg-slate-50 hover:text-[#0F172A]' }}
+                            ? 'bg-amber-400 text-[#111111]'
+                            : 'text-[#6B6B66] hover:bg-slate-50 hover:text-[#111111]' }}
                     "
                 >
 
@@ -333,8 +333,8 @@
                     font-medium
                     transition-colors
                     {{ request()->routeIs('repartidor.route-history')
-                        ? 'bg-blue-50 text-blue-900'
-                        : 'text-[#64748B] hover:bg-slate-50 hover:text-[#0F172A]' }}
+                        ? 'bg-amber-400 text-[#111111]'
+                        : 'text-[#6B6B66] hover:bg-slate-50 hover:text-[#111111]' }}
                 "
             >
 
@@ -375,8 +375,8 @@
                     font-medium
                     transition-colors
                     {{ request()->routeIs('repartidor.scanner')
-                        ? 'bg-blue-50 text-blue-900'
-                        : 'text-[#64748B] hover:bg-slate-50 hover:text-[#0F172A]' }}
+                        ? 'bg-amber-400 text-[#111111]'
+                        : 'text-[#6B6B66] hover:bg-slate-50 hover:text-[#111111]' }}
                 "
             >
 
@@ -416,7 +416,7 @@
                     font-semibold
                     uppercase
                     tracking-wider
-                    text-[#94A3B8]
+                    text-[#B8B8B2]
                 "
             >
                 Operaciones
@@ -438,8 +438,8 @@
                     transition-colors
                     {{ request()->routeIs('repartidor.packages')
                         || request()->routeIs('repartidor.package-detail')
-                        ? 'bg-blue-50 text-blue-900'
-                        : 'text-[#64748B] hover:bg-slate-50 hover:text-[#0F172A]' }}
+                        ? 'bg-amber-400 text-[#111111]'
+                        : 'text-[#6B6B66] hover:bg-slate-50 hover:text-[#111111]' }}
                 "
             >
 
@@ -480,8 +480,8 @@
                     font-medium
                     transition-colors
                     {{ request()->routeIs('repartidor.app-download')
-                        ? 'bg-blue-50 text-blue-900'
-                        : 'text-[#64748B] hover:bg-slate-50 hover:text-[#0F172A]' }}
+                        ? 'bg-amber-400 text-[#111111]'
+                        : 'text-[#6B6B66] hover:bg-slate-50 hover:text-[#111111]' }}
                 "
             >
 
@@ -522,8 +522,8 @@
                     font-medium
                     transition-colors
                     {{ request()->routeIs('repartidor.help')
-                        ? 'bg-blue-50 text-blue-900'
-                        : 'text-[#64748B] hover:bg-slate-50 hover:text-[#0F172A]' }}
+                        ? 'bg-amber-400 text-[#111111]'
+                        : 'text-[#6B6B66] hover:bg-slate-50 hover:text-[#111111]' }}
                 "
             >
 
@@ -560,7 +560,7 @@
         <div
             class="
                 border-t
-                border-[#E2E8F0]
+                border-[#E5E5E0]
                 px-5
                 py-5
                 bg-white
@@ -591,7 +591,7 @@
                         class="
                             text-sm
                             font-semibold
-                            text-[#0F172A]
+                            text-[#111111]
                             truncate
                         "
                     >
@@ -601,7 +601,7 @@
                     <p
                         class="
                             text-xs
-                            text-[#64748B]
+                            text-[#6B6B66]
                             truncate
                         "
                     >
@@ -624,9 +624,9 @@
                     py-2
                     text-sm
                     font-medium
-                    text-[#64748B]
+                    text-[#6B6B66]
                     hover:bg-slate-50
-                    hover:text-[#0F172A]
+                    hover:text-[#111111]
                     transition-colors
                 "
             >
@@ -698,7 +698,7 @@
             class="
                 h-16
                 bg-white
-                border-b border-[#E2E8F0]
+                border-b border-[#E5E5E0]
                 flex items-center
                 justify-between
                 px-4 lg:px-8
@@ -717,7 +717,7 @@
                         h-10 w-10
                         rounded-xl
                         flex items-center justify-center
-                        text-[#0F172A]
+                        text-[#111111]
                         hover:bg-slate-100
                     "
                     aria-label="Abrir menú"
@@ -788,7 +788,7 @@
                         class="
                             text-sm
                             font-semibold
-                            text-[#0F172A]
+                            text-[#111111]
                         "
                     >
                         {{ auth()->user()->name ?? 'Repartidor' }}
@@ -797,7 +797,7 @@
                     <p
                         class="
                             text-xs
-                            text-[#64748B]
+                            text-[#6B6B66]
                         "
                     >
                         Panel de repartidor
@@ -816,10 +816,10 @@
                         rounded-xl
                         text-sm
                         font-medium
-                        text-[#64748B]
-                        border border-[#E2E8F0]
+                        text-[#6B6B66]
+                        border border-[#E5E5E0]
                         hover:bg-slate-50
-                        hover:text-[#0F172A]
+                        hover:text-[#111111]
                         transition-colors
                     "
                 >

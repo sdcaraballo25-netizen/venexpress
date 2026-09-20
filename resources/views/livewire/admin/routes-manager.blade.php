@@ -3,17 +3,17 @@
     {{-- HEADER --}}
     <div class="flex flex-col md:flex-row justify-between items-start md:items-center mb-8 gap-4">
         <div>
-            <h1 class="font-display text-3xl font-bold tracking-tight text-[#0F172A]">
+            <h1 class="font-display text-3xl font-bold tracking-tight text-[#111111]">
                 Gestión de Rutas
             </h1>
-            <p class="text-sm text-[#64748B] mt-1">
+            <p class="text-sm text-[#6B6B66] mt-1">
                 Crea, organiza y administra los recorridos de los repartidores.
             </p>
         </div>
 
         <button
             wire:click="startCreating"
-            class="bg-[#0F172A] hover:bg-slate-800 text-white px-5 py-3 rounded-xl text-sm font-semibold transition">
+            class="bg-[#111111] hover:bg-slate-800 text-white px-5 py-3 rounded-xl text-sm font-semibold transition">
             + Nueva ruta
         </button>
     </div>
@@ -32,17 +32,17 @@
     @endif
 
     {{-- FILTROS --}}
-    <div class="bg-white rounded-2xl border border-[#E2E8F0] p-5 shadow-sm mb-6">
+    <div class="bg-white rounded-2xl border border-[#E5E5E0] p-5 shadow-sm mb-6">
         <div class="grid grid-cols-1 md:grid-cols-4 gap-4">
 
             <div>
-                <label class="block text-xs font-bold text-[#64748B] uppercase mb-2">
+                <label class="block text-xs font-bold text-[#6B6B66] uppercase mb-2">
                     Estado
                 </label>
 
                 <select
                     wire:model.live="filterState"
-                    class="w-full rounded-xl border-[#E2E8F0] text-sm focus:border-blue-500 focus:ring-blue-500">
+                    class="w-full rounded-xl border-[#E5E5E0] text-sm focus:border-blue-500 focus:ring-blue-500">
                     <option value="">Todos los estados</option>
 
                     @foreach ($states as $stateOption)
@@ -54,13 +54,13 @@
             </div>
 
             <div>
-                <label class="block text-xs font-bold text-[#64748B] uppercase mb-2">
+                <label class="block text-xs font-bold text-[#6B6B66] uppercase mb-2">
                     Ciudad
                 </label>
 
                 <select
                     wire:model.live="filterCity"
-                    class="w-full rounded-xl border-[#E2E8F0] text-sm focus:border-blue-500 focus:ring-blue-500">
+                    class="w-full rounded-xl border-[#E5E5E0] text-sm focus:border-blue-500 focus:ring-blue-500">
                     <option value="">Todas las ciudades</option>
 
                     @foreach ($filterState !== '' ? $filterCities : $citiesWithAllies as $cityOption)
@@ -72,13 +72,13 @@
             </div>
 
             <div>
-                <label class="block text-xs font-bold text-[#64748B] uppercase mb-2">
+                <label class="block text-xs font-bold text-[#6B6B66] uppercase mb-2">
                     Estatus de la ruta
                 </label>
 
                 <select
                     wire:model.live="filterStatus"
-                    class="w-full rounded-xl border-[#E2E8F0] text-sm focus:border-blue-500 focus:ring-blue-500">
+                    class="w-full rounded-xl border-[#E5E5E0] text-sm focus:border-blue-500 focus:ring-blue-500">
 
                     <option value="">Todos los estatus</option>
                     <option value="draft">Borrador</option>
@@ -91,13 +91,13 @@
             </div>
 
             <div>
-                <label class="block text-xs font-bold text-[#64748B] uppercase mb-2">
+                <label class="block text-xs font-bold text-[#6B6B66] uppercase mb-2">
                     Repartidor
                 </label>
 
                 <select
                     wire:model.live="filterDriverId"
-                    class="w-full rounded-xl border-[#E2E8F0] text-sm focus:border-blue-500 focus:ring-blue-500">
+                    class="w-full rounded-xl border-[#E5E5E0] text-sm focus:border-blue-500 focus:ring-blue-500">
 
                     <option value="">Todos los repartidores</option>
 
@@ -114,7 +114,7 @@
 
         @if ($filterState !== '' || $filterCity !== '' || $filterStatus !== '' || $filterDriverId !== '')
             <div class="mt-4 flex items-center justify-between gap-3">
-                <p class="text-xs text-[#64748B]">
+                <p class="text-xs text-[#6B6B66]">
                     {{ $routes->total() }} {{ $routes->total() === 1 ? 'ruta encontrada' : 'rutas encontradas' }}
                 </p>
 
@@ -135,16 +135,16 @@
 
             <div
                 wire:key="route-{{ $route->id }}"
-                class="bg-white rounded-2xl border border-[#E2E8F0] shadow-sm overflow-hidden">
+                class="bg-white rounded-2xl border border-[#E5E5E0] shadow-sm overflow-hidden">
 
                 {{-- CABECERA DE RUTA --}}
-                <div class="p-6 border-b border-[#E2E8F0]">
+                <div class="p-6 border-b border-[#E5E5E0]">
 
                     <div class="flex flex-col lg:flex-row lg:items-center justify-between gap-4">
 
                         <div>
                             <div class="flex items-center gap-3">
-                                <h2 class="text-lg font-bold text-[#0F172A]">
+                                <h2 class="text-lg font-bold text-[#111111]">
                                     {{ $route->name }}
                                 </h2>
 
@@ -175,7 +175,7 @@
                                 </span>
                             </div>
 
-                            <p class="text-sm text-[#64748B] mt-1">
+                            <p class="text-sm text-[#6B6B66] mt-1">
                                 @php
                                     $routeLocation = trim(implode(', ', array_filter([$route->city, $route->state])));
                                 @endphp
@@ -184,8 +184,8 @@
                             </p>
 
                             {{-- TIPO DE RUTA --}}
-                            <p class="text-xs text-[#64748B] mt-2">
-                                <span class="font-semibold text-[#475569]">
+                            <p class="text-xs text-[#6B6B66] mt-2">
+                                <span class="font-semibold text-[#4A4A45]">
                                     Tipo:
                                 </span>
 
@@ -199,16 +199,16 @@
                             </p>
 
                             @if ($route->originWarehouse || $route->returnWarehouse)
-                                <p class="text-xs text-[#64748B] mt-1">
+                                <p class="text-xs text-[#6B6B66] mt-1">
                                     @if ($route->originWarehouse)
-                                        <span class="font-semibold text-[#475569]">Parte de:</span>
+                                        <span class="font-semibold text-[#4A4A45]">Parte de:</span>
                                         {{ $route->originWarehouse->name }}
                                     @endif
                                     @if ($route->originWarehouse && $route->returnWarehouse)
                                         &middot;
                                     @endif
                                     @if ($route->returnWarehouse)
-                                        <span class="font-semibold text-[#475569]">Regresa a:</span>
+                                        <span class="font-semibold text-[#4A4A45]">Regresa a:</span>
                                         {{ $route->returnWarehouse->name }}
                                     @endif
                                 </p>
@@ -219,7 +219,7 @@
 
                             <button
                                 wire:click="editRoute({{ $route->id }})"
-                                class="px-3 py-2 rounded-lg border border-[#E2E8F0] text-sm text-[#475569] hover:bg-slate-50">
+                                class="px-3 py-2 rounded-lg border border-[#E5E5E0] text-sm text-[#4A4A45] hover:bg-slate-50">
                                 Editar
                             </button>
 
@@ -243,7 +243,7 @@
         variant: 'primary',
         onConfirm: () => $wire.duplicateRoute({{ $route->id }}),
     })"
-    class="px-3 py-2 rounded-lg border border-[#E2E8F0] text-sm text-[#475569] hover:bg-slate-50">
+    class="px-3 py-2 rounded-lg border border-[#E5E5E0] text-sm text-[#4A4A45] hover:bg-slate-50">
     Duplicar
 </button>
 
@@ -254,31 +254,31 @@
                     <div class="grid grid-cols-1 sm:grid-cols-3 gap-4 mt-5">
 
                         <div class="bg-slate-50 rounded-xl p-4">
-                            <p class="text-xs text-[#64748B] uppercase font-bold">
+                            <p class="text-xs text-[#6B6B66] uppercase font-bold">
                                 Paradas
                             </p>
 
-                            <p class="text-xl font-bold text-[#0F172A] mt-1">
+                            <p class="text-xl font-bold text-[#111111] mt-1">
                                 {{ $route->stops->count() }}
                             </p>
                         </div>
 
                         <div class="bg-slate-50 rounded-xl p-4">
-                            <p class="text-xs text-[#64748B] uppercase font-bold">
+                            <p class="text-xs text-[#6B6B66] uppercase font-bold">
                                 Repartidor
                             </p>
 
-                            <p class="text-sm font-semibold text-[#0F172A] mt-2">
+                            <p class="text-sm font-semibold text-[#111111] mt-2">
                                 {{ $route->driver?->user?->name ?? 'Sin asignar' }}
                             </p>
                         </div>
 
                         <div class="bg-slate-50 rounded-xl p-4">
-                            <p class="text-xs text-[#64748B] uppercase font-bold">
+                            <p class="text-xs text-[#6B6B66] uppercase font-bold">
                                 Vehículo
                             </p>
 
-                            <p class="text-sm font-semibold text-[#0F172A] mt-2">
+                            <p class="text-sm font-semibold text-[#111111] mt-2">
                                 {{ $route->driver?->vehicle_plate ?? '—' }}
                             </p>
                         </div>
@@ -289,7 +289,7 @@
                 {{-- PARADAS --}}
                 <div class="p-6">
 
-                    <p class="text-xs font-bold text-[#64748B] uppercase tracking-wider mb-4">
+                    <p class="text-xs font-bold text-[#6B6B66] uppercase tracking-wider mb-4">
                         Recorrido
                     </p>
 
@@ -297,7 +297,7 @@
 
                         @foreach ($route->stops as $index => $stop)
 
-                            <div class="flex items-center justify-between border border-[#E2E8F0] rounded-xl p-4">
+                            <div class="flex items-center justify-between border border-[#E5E5E0] rounded-xl p-4">
 
                                 <div class="flex items-center gap-4">
 
@@ -306,7 +306,7 @@
                                     </div>
 
                                     <div>
-                                        <p class="font-semibold text-sm text-[#0F172A]">
+                                        <p class="font-semibold text-sm text-[#111111]">
                                             {{ $stop->ally?->business_name ?? $stop->warehouse?->name ?? 'Parada' }}
                                         </p>
 
@@ -315,7 +315,7 @@
                                             $stopState = $stop->ally?->state ?? $stop->warehouse?->state ?? $route->state;
                                         @endphp
 
-                                        <p class="text-xs text-[#64748B]">
+                                        <p class="text-xs text-[#6B6B66]">
                                             {{ $stopCity }}{{ $stopState ? ', '.$stopState : '' }}
                                         </p>
                                     </div>
@@ -342,19 +342,19 @@
 
         @empty
 
-            <div class="bg-white rounded-2xl border border-[#E2E8F0] p-12 text-center">
+            <div class="bg-white rounded-2xl border border-[#E5E5E0] p-12 text-center">
 
-                <p class="text-lg font-semibold text-[#0F172A]">
+                <p class="text-lg font-semibold text-[#111111]">
                     No hay rutas registradas
                 </p>
 
-                <p class="text-sm text-[#64748B] mt-2">
+                <p class="text-sm text-[#6B6B66] mt-2">
                     Crea tu primera ruta para comenzar.
                 </p>
 
                 <button
                     wire:click="startCreating"
-                    class="mt-5 bg-[#0F172A] text-white px-5 py-3 rounded-xl text-sm font-semibold">
+                    class="mt-5 bg-[#111111] text-white px-5 py-3 rounded-xl text-sm font-semibold">
                     Crear primera ruta
                 </button>
 
@@ -377,15 +377,15 @@
 
             <div class="bg-white rounded-2xl shadow-xl w-full max-w-4xl max-h-[90vh] overflow-y-auto">
 
-                <div class="p-6 border-b border-[#E2E8F0] flex justify-between items-center">
+                <div class="p-6 border-b border-[#E5E5E0] flex justify-between items-center">
 
                     <div>
 
-                        <h2 class="text-xl font-bold text-[#0F172A]">
+                        <h2 class="text-xl font-bold text-[#111111]">
                             {{ $editingRouteId ? 'Editar ruta' : 'Crear nueva ruta' }}
                         </h2>
 
-                        <p class="text-sm text-[#64748B] mt-1">
+                        <p class="text-sm text-[#6B6B66] mt-1">
                             Ordena las paradas — pueden pertenecer a distintos estados o ciudades.
                         </p>
 
@@ -407,13 +407,13 @@
                         {{-- TIPO DE RUTA --}}
                         <div>
 
-                            <label class="block text-xs font-bold text-[#64748B] uppercase mb-2">
+                            <label class="block text-xs font-bold text-[#6B6B66] uppercase mb-2">
                                 Tipo de ruta
                             </label>
 
                             <select
                                 wire:model.live="routeType"
-                                class="w-full rounded-xl border-[#E2E8F0]">
+                                class="w-full rounded-xl border-[#E5E5E0]">
 
                                 <option value="{{ \App\Models\Route::TYPE_DELIVERY }}">
                                     Delivery → Cliente
@@ -440,13 +440,13 @@
                         {{-- ESTADO (referencial, no limita las paradas) --}}
                         <div>
 
-                            <label class="block text-xs font-bold text-[#64748B] uppercase mb-2">
+                            <label class="block text-xs font-bold text-[#6B6B66] uppercase mb-2">
                                 Estado <span class="normal-case font-normal text-[10px]">(opcional, solo referencial)</span>
                             </label>
 
                             <select
                                 wire:model.live="state"
-                                class="w-full rounded-xl border-[#E2E8F0]">
+                                class="w-full rounded-xl border-[#E5E5E0]">
 
                                 <option value="">
                                     Sin especificar
@@ -471,14 +471,14 @@
                         {{-- CIUDAD (referencial, no limita las paradas) --}}
                         <div>
 
-                            <label class="block text-xs font-bold text-[#64748B] uppercase mb-2">
+                            <label class="block text-xs font-bold text-[#6B6B66] uppercase mb-2">
                                 Ciudad <span class="normal-case font-normal text-[10px]">(opcional, solo referencial)</span>
                             </label>
 
                             <select
                                 wire:model.live="city"
                                 @disabled($state === '')
-                                class="w-full rounded-xl border-[#E2E8F0]">
+                                class="w-full rounded-xl border-[#E5E5E0]">
 
                                 <option value="">
                                     {{ $state === ''
@@ -505,7 +505,7 @@
                         {{-- NOMBRE --}}
                         <div>
 
-                            <label class="block text-xs font-bold text-[#64748B] uppercase mb-2">
+                            <label class="block text-xs font-bold text-[#6B6B66] uppercase mb-2">
                                 Nombre de la ruta
                             </label>
 
@@ -513,7 +513,7 @@
                                 type="text"
                                 wire:model="name"
                                 placeholder="Ej. Ruta Caracas Centro"
-                                class="w-full rounded-xl border-[#E2E8F0]">
+                                class="w-full rounded-xl border-[#E5E5E0]">
 
                             @error('name')
                                 <p class="text-xs text-red-600 mt-1">
@@ -530,13 +530,13 @@
 
                         <div>
 
-                            <label class="block text-xs font-bold text-[#64748B] uppercase mb-2">
+                            <label class="block text-xs font-bold text-[#6B6B66] uppercase mb-2">
                                 HUB de origen <span class="normal-case font-normal text-[10px]">(opcional)</span>
                             </label>
 
                             <select
                                 wire:model="originWarehouseId"
-                                class="w-full rounded-xl border-[#E2E8F0]">
+                                class="w-full rounded-xl border-[#E5E5E0]">
 
                                 <option value="">Sin especificar</option>
 
@@ -556,13 +556,13 @@
 
                         <div>
 
-                            <label class="block text-xs font-bold text-[#64748B] uppercase mb-2">
+                            <label class="block text-xs font-bold text-[#6B6B66] uppercase mb-2">
                                 HUB de retorno <span class="normal-case font-normal text-[10px]">(opcional)</span>
                             </label>
 
                             <select
                                 wire:model="returnWarehouseId"
-                                class="w-full rounded-xl border-[#E2E8F0]">
+                                class="w-full rounded-xl border-[#E5E5E0]">
 
                                 <option value="">Sin especificar</option>
 
@@ -585,19 +585,19 @@
                     {{-- BUSCADOR DE PARADAS --}}
                     <div>
 
-                        <label class="block text-xs font-bold text-[#64748B] uppercase mb-2">
+                        <label class="block text-xs font-bold text-[#6B6B66] uppercase mb-2">
                             Buscar parada
                         </label>
 
                         <div class="grid grid-cols-1 sm:grid-cols-3 gap-3">
 
                             <div>
-                                <label class="block text-[10px] font-semibold text-[#94A3B8] uppercase mb-1">
+                                <label class="block text-[10px] font-semibold text-[#B8B8B2] uppercase mb-1">
                                     Estado
                                 </label>
                                 <select
                                     wire:model.live="stopFilterState"
-                                    class="w-full rounded-xl border-[#E2E8F0] text-sm">
+                                    class="w-full rounded-xl border-[#E5E5E0] text-sm">
 
                                     <option value="">Selecciona un estado</option>
 
@@ -611,13 +611,13 @@
                             </div>
 
                             <div>
-                                <label class="block text-[10px] font-semibold text-[#94A3B8] uppercase mb-1">
+                                <label class="block text-[10px] font-semibold text-[#B8B8B2] uppercase mb-1">
                                     Ciudad
                                 </label>
                                 <select
                                     wire:model.live="stopFilterCity"
                                     @disabled($stopFilterState === '')
-                                    class="w-full rounded-xl border-[#E2E8F0] text-sm disabled:bg-slate-50">
+                                    class="w-full rounded-xl border-[#E5E5E0] text-sm disabled:bg-slate-50">
 
                                     <option value="">
                                         {{ $stopFilterState === ''
@@ -635,19 +635,19 @@
                             </div>
 
                             <div>
-                                <label class="block text-[10px] font-semibold text-[#94A3B8] uppercase mb-1">
+                                <label class="block text-[10px] font-semibold text-[#B8B8B2] uppercase mb-1">
                                     Buscar
                                 </label>
                                 <input
                                     type="text"
                                     wire:model.live.debounce.300ms="stopSearch"
                                     placeholder="Nombre, ciudad o estado..."
-                                    class="w-full rounded-xl border-[#E2E8F0] text-sm">
+                                    class="w-full rounded-xl border-[#E5E5E0] text-sm">
                             </div>
 
                         </div>
 
-                        <p class="text-xs text-[#94A3B8] mt-1">
+                        <p class="text-xs text-[#B8B8B2] mt-1">
                             Solo acotan la lista de abajo — no limitan qué paradas puedes agregar a la ruta.
                         </p>
 
@@ -658,7 +658,7 @@
                         {{-- ALMACENES DISPONIBLES --}}
                         <div>
 
-                            <p class="text-xs font-bold text-[#64748B] uppercase mb-3">
+                            <p class="text-xs font-bold text-[#6B6B66] uppercase mb-3">
                                 Almacenes disponibles
                             </p>
 
@@ -685,15 +685,15 @@
                                             class="w-full flex items-center justify-between rounded-xl border p-4 text-left transition
                                             {{ in_array($warehouse->id, $selectedStops, true)
                                                 ? 'border-blue-500 bg-blue-50'
-                                                : 'border-[#E2E8F0] hover:bg-slate-50' }}">
+                                                : 'border-[#E5E5E0] hover:bg-slate-50' }}">
 
                                             <div>
 
-                                                <p class="text-sm font-semibold text-[#0F172A]">
+                                                <p class="text-sm font-semibold text-[#111111]">
                                                     {{ $warehouse->name }}
                                                 </p>
 
-                                                <p class="text-xs text-[#64748B]">
+                                                <p class="text-xs text-[#6B6B66]">
                                                     {{ $warehouse->city }}{{ $warehouse->state ? ', '.$warehouse->state : '' }}
                                                 </p>
 
@@ -718,7 +718,7 @@
                         {{-- AGENCIAS DISPONIBLES --}}
                         <div>
 
-                            <p class="text-xs font-bold text-[#64748B] uppercase mb-3">
+                            <p class="text-xs font-bold text-[#6B6B66] uppercase mb-3">
                                 Agencias disponibles
                             </p>
 
@@ -744,15 +744,15 @@
                                             class="w-full flex items-center justify-between rounded-xl border p-4 text-left transition
                                             {{ in_array($ally->id, $selectedStops, true)
                                                 ? 'border-blue-500 bg-blue-50'
-                                                : 'border-[#E2E8F0] hover:bg-slate-50' }}">
+                                                : 'border-[#E5E5E0] hover:bg-slate-50' }}">
 
                                             <div>
 
-                                                <p class="text-sm font-semibold text-[#0F172A]">
+                                                <p class="text-sm font-semibold text-[#111111]">
                                                     {{ $ally->business_name }}
                                                 </p>
 
-                                                <p class="text-xs text-[#64748B]">
+                                                <p class="text-xs text-[#6B6B66]">
                                                     {{ $ally->city }}{{ $ally->state ? ', '.$ally->state : '' }}
                                                 </p>
 
@@ -777,13 +777,13 @@
                     {{-- ORDEN --}}
                     <div>
 
-                        <p class="text-xs font-bold text-[#64748B] uppercase mb-3">
+                        <p class="text-xs font-bold text-[#6B6B66] uppercase mb-3">
                             Orden del recorrido
                         </p>
 
                         @if (empty($selectedStops))
 
-                            <div class="rounded-xl bg-slate-50 p-5 text-sm text-[#64748B]">
+                            <div class="rounded-xl bg-slate-50 p-5 text-sm text-[#6B6B66]">
                                 @if ($routeType === \App\Models\Route::TYPE_HUB_DISTRIBUTION)
                                     Selecciona los almacenes que formarán parte de la ruta.
                                 @else
@@ -807,7 +807,7 @@
                                         $selectedLabel ??= ($isDistribution ? 'Almacén #' : 'Agencia #') . $locationId;
                                     @endphp
 
-                                    <div class="flex items-center justify-between rounded-xl border border-[#E2E8F0] p-3">
+                                    <div class="flex items-center justify-between rounded-xl border border-[#E5E5E0] p-3">
 
                                         <div class="flex items-center gap-3">
 
@@ -815,7 +815,7 @@
                                                 {{ $index + 1 }}
                                             </span>
 
-                                            <span class="text-sm font-semibold text-[#0F172A]">
+                                            <span class="text-sm font-semibold text-[#111111]">
                                                 {{ $selectedLabel }}
                                             </span>
 
@@ -864,17 +864,17 @@
 
                 </div>
 
-                <div class="p-6 border-t border-[#E2E8F0] flex justify-end gap-3">
+                <div class="p-6 border-t border-[#E5E5E0] flex justify-end gap-3">
 
                     <button
                         wire:click="cancelBuilder"
-                        class="px-5 py-2.5 rounded-xl border border-[#E2E8F0] text-sm font-semibold">
+                        class="px-5 py-2.5 rounded-xl border border-[#E5E5E0] text-sm font-semibold">
                         Cancelar
                     </button>
 
                     <button
                         wire:click="saveRoute"
-                        class="px-5 py-2.5 rounded-xl bg-[#0F172A] text-white text-sm font-semibold">
+                        class="px-5 py-2.5 rounded-xl bg-[#111111] text-white text-sm font-semibold">
                         {{ $editingRouteId ? 'Guardar cambios' : 'Crear ruta' }}
                     </button>
 
@@ -898,13 +898,13 @@
 
             <div class="bg-white rounded-2xl shadow-xl w-full max-w-lg max-h-[85vh] overflow-y-auto">
 
-                <div class="p-6 border-b border-[#E2E8F0]">
+                <div class="p-6 border-b border-[#E5E5E0]">
 
-                    <h2 class="text-lg font-bold text-[#0F172A]">
+                    <h2 class="text-lg font-bold text-[#111111]">
                         Registrar recolección
                     </h2>
 
-                    <p class="text-sm text-[#64748B] mt-1">
+                    <p class="text-sm text-[#6B6B66] mt-1">
                         Selecciona los paquetes recolectados en esta agencia.
                     </p>
 
@@ -914,7 +914,7 @@
 
                     @if ($collectiblePackages->isEmpty())
 
-                        <div class="rounded-xl bg-slate-50 p-5 text-sm text-[#64748B]">
+                        <div class="rounded-xl bg-slate-50 p-5 text-sm text-[#6B6B66]">
                             No hay paquetes pendientes de recolección.
                         </div>
 
@@ -924,7 +924,7 @@
 
                             @foreach ($collectiblePackages as $package)
 
-                                <label class="flex items-center gap-3 border border-[#E2E8F0] rounded-xl p-4 cursor-pointer hover:bg-slate-50">
+                                <label class="flex items-center gap-3 border border-[#E5E5E0] rounded-xl p-4 cursor-pointer hover:bg-slate-50">
 
                                     <input
                                         type="checkbox"
@@ -934,7 +934,7 @@
 
                                     <div>
 
-                                        <p class="text-sm font-semibold text-[#0F172A]">
+                                        <p class="text-sm font-semibold text-[#111111]">
                                             Paquete #{{ $package->id }}
                                         </p>
 
@@ -950,17 +950,17 @@
 
                 </div>
 
-                <div class="p-6 border-t border-[#E2E8F0] flex justify-end gap-3">
+                <div class="p-6 border-t border-[#E5E5E0] flex justify-end gap-3">
 
                     <button
                         wire:click="$set('showCollectionModal', false)"
-                        class="px-4 py-2 rounded-xl border border-[#E2E8F0] text-sm">
+                        class="px-4 py-2 rounded-xl border border-[#E5E5E0] text-sm">
                         Cancelar
                     </button>
 
                     <button
                         wire:click="registerCollection"
-                        class="px-4 py-2 rounded-xl bg-[#0F172A] text-white text-sm font-semibold">
+                        class="px-4 py-2 rounded-xl bg-[#111111] text-white text-sm font-semibold">
                         Registrar
                     </button>
 

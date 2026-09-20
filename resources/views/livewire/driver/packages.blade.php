@@ -3,7 +3,7 @@
     {{-- Encabezado --}}
     <div class="flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between">
         <div>
-            <h2 class="font-display text-2xl font-semibold text-[#0F172A]">
+            <h2 class="font-display text-2xl font-semibold text-[#111111]">
                 Mis paquetes
             </h2>
 
@@ -21,12 +21,12 @@
     </div>
 
     {{-- Buscador --}}
-    <div class="rounded-2xl border border-[#E2E8F0] bg-white p-4">
+    <div class="rounded-2xl border border-[#E5E5E0] bg-white p-4">
         <input
             type="search"
             wire:model.live.debounce.300ms="search"
             placeholder="Buscar guía, destinatario o ciudad..."
-            class="w-full rounded-xl border border-[#E2E8F0] px-4 py-3 text-sm text-[#0F172A] outline-none transition focus:border-blue-900 focus:ring-2 focus:ring-blue-900/10"
+            class="w-full rounded-xl border border-[#E5E5E0] px-4 py-3 text-sm text-[#111111] outline-none transition focus:border-blue-900 focus:ring-2 focus:ring-blue-900/10"
         >
     </div>
 
@@ -49,7 +49,7 @@
                 class="rounded-xl px-4 py-2 text-sm font-medium transition
                     {{ $status === $key
                         ? 'bg-blue-900 text-white'
-                        : 'border border-[#E2E8F0] bg-white text-slate-600 hover:bg-slate-50' }}"
+                        : 'border border-[#E5E5E0] bg-white text-slate-600 hover:bg-slate-50' }}"
             >
                 {{ $label }}
             </button>
@@ -57,7 +57,7 @@
     </div>
 
     {{-- Lista --}}
-    <div class="overflow-hidden rounded-2xl border border-[#E2E8F0] bg-white">
+    <div class="overflow-hidden rounded-2xl border border-[#E5E5E0] bg-white">
 
         @if ($packages->isEmpty())
 
@@ -73,7 +73,7 @@
 
         @else
 
-            <div class="divide-y divide-[#E2E8F0]">
+            <div class="divide-y divide-[#E5E5E0]">
 
                 @foreach ($packages as $package)
 
@@ -82,7 +82,7 @@
                         <div class="min-w-0">
 
                             <div class="flex flex-wrap items-center gap-2">
-                                <p class="text-sm font-semibold text-[#0F172A]">
+                                <p class="text-sm font-semibold text-[#111111]">
                                     {{ $package->tracking_number }}
                                 </p>
 
@@ -131,7 +131,7 @@
 
                             <a
     href="{{ route('repartidor.package-detail', $package->id) }}"
-    class="rounded-xl border border-[#E2E8F0] px-4 py-2 text-xs font-medium text-[#0F172A] transition hover:bg-slate-50"
+    class="rounded-xl border border-[#E5E5E0] px-4 py-2 text-xs font-medium text-[#111111] transition hover:bg-slate-50"
 >
     Ver
 </a>
@@ -144,7 +144,7 @@
 
             </div>
 
-            <div class="border-t border-[#E2E8F0] px-5 py-4">
+            <div class="border-t border-[#E5E5E0] px-5 py-4">
                 {{ $packages->links() }}
             </div>
 

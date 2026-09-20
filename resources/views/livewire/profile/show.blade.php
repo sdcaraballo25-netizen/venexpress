@@ -1,20 +1,20 @@
 <div class="max-w-2xl">
 
     <div class="mb-8">
-        <h1 class="font-display text-3xl font-bold text-[#0F172A]">
+        <h1 class="font-display text-3xl font-bold text-[#111111]">
             Mi Perfil
         </h1>
 
-        <p class="text-sm text-[#64748B] mt-1">
+        <p class="text-sm text-[#6B6B66] mt-1">
             Actualiza tus datos personales y tu contraseña.
         </p>
     </div>
 
-    <div class="bg-white border border-[#E2E8F0] rounded-2xl p-6 shadow-sm mb-6">
+    <div class="bg-white border border-[#E5E5E0] rounded-2xl p-6 shadow-sm mb-6">
         <livewire:profile.update-profile-information-form />
     </div>
 
-    <div class="bg-white border border-[#E2E8F0] rounded-2xl p-6 shadow-sm mb-6">
+    <div class="bg-white border border-[#E5E5E0] rounded-2xl p-6 shadow-sm mb-6">
         <livewire:profile.update-password-form />
     </div>
 
@@ -24,7 +24,7 @@
     @endphp
 
     @if ($payoutEligible)
-        <div class="bg-white border border-[#E2E8F0] rounded-2xl p-6 shadow-sm">
+        <div class="bg-white border border-[#E5E5E0] rounded-2xl p-6 shadow-sm">
             <livewire:profile.payout-account-form />
         </div>
     @endif

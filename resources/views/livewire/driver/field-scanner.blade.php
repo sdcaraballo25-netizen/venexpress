@@ -14,7 +14,7 @@
 
     <div class="flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
         <div>
-            <h2 class="font-display text-2xl font-semibold text-[#0F172A]">
+            <h2 class="font-display text-2xl font-semibold text-[#111111]">
                 Escanear guía
             </h2>
             <p class="text-sm text-slate-500">
@@ -24,7 +24,7 @@
 
         <a
             href="{{ route('repartidor.dashboard') }}"
-            class="inline-flex items-center justify-center rounded-xl border border-[#E2E8F0] bg-white px-4 py-2 text-sm font-medium text-[#0F172A] transition hover:bg-slate-50"
+            class="inline-flex items-center justify-center rounded-xl border border-[#E5E5E0] bg-white px-4 py-2 text-sm font-medium text-[#111111] transition hover:bg-slate-50"
         >
             ← Volver al dashboard
         </a>
@@ -32,8 +32,8 @@
 
     <div class="grid grid-cols-1 gap-6 lg:grid-cols-2">
 
-        <div class="rounded-2xl border border-[#E2E8F0] bg-white p-6 shadow-sm">
-            <h3 class="font-display text-lg font-semibold text-[#0F172A]">
+        <div class="rounded-2xl border border-[#E5E5E0] bg-white p-6 shadow-sm">
+            <h3 class="font-display text-lg font-semibold text-[#111111]">
                 Lector QR
             </h3>
 
@@ -81,7 +81,7 @@
             </form>
         </div>
 
-        <div class="rounded-2xl border border-[#E2E8F0] bg-white p-6 shadow-sm">
+        <div class="rounded-2xl border border-[#E5E5E0] bg-white p-6 shadow-sm">
 
             @if ($package)
 
@@ -90,7 +90,7 @@
                         <p class="text-xs font-medium uppercase tracking-wide text-slate-400">
                             Guía
                         </p>
-                        <h3 class="mt-1 font-display text-xl font-semibold text-[#0F172A]">
+                        <h3 class="mt-1 font-display text-xl font-semibold text-[#111111]">
                             {{ $package->tracking_number }}
                         </h3>
                     </div>
@@ -209,7 +209,7 @@
                         </svg>
                     </div>
 
-                    <h3 class="mt-5 font-display text-lg font-semibold text-[#0F172A]">
+                    <h3 class="mt-5 font-display text-lg font-semibold text-[#111111]">
                         Ninguna guía seleccionada
                     </h3>
 

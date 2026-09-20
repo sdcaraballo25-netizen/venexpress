@@ -43,7 +43,7 @@
             align-items: center;
             white-space: nowrap;
             padding: 0.45rem 0;
-            color: #64748b;
+            color: #6B6B66;
             font-size: 0.875rem;
             font-weight: 500;
             transition:
@@ -53,7 +53,7 @@
 
         .main-nav-link:hover,
         .main-nav-link.is-active {
-            color: #172554;
+            color: #0A0A09;
         }
 
         .main-nav-link:hover {
@@ -68,7 +68,7 @@
             bottom: -0.1rem;
             height: 2px;
             border-radius: 999px;
-            background: #dc2626;
+            background: #F7FF00;
         }
 
         /* =====================================================
@@ -342,7 +342,7 @@
         Envía fácil.
     </span>
 
-    <span class="block text-red-600 whitespace-nowrap">
+    <span class="block text-amber-700 whitespace-nowrap">
         Rastrea siempre.
     </span>
 
@@ -526,7 +526,7 @@
                 <h2 class="text-3xl font-extrabold text-blue-950 inline-block relative pb-3">
                     ¿Qué necesitas hacer?
 
-                    <span class="absolute left-1/2 -translate-x-1/2 bottom-0 w-14 h-1 bg-red-600 rounded-full"></span>
+                    <span class="absolute left-1/2 -translate-x-1/2 bottom-0 w-14 h-1 bg-amber-400 rounded-full"></span>
                 </h2>
 
                 <p class="mt-4 text-sm text-gray-500">
@@ -567,7 +567,7 @@
 
                     </div>
 
-                    <span class="inline-flex items-center mt-auto pt-6 text-sm font-semibold text-blue-900 group-hover:text-red-600 transition">
+                    <span class="inline-flex items-center mt-auto pt-6 text-sm font-semibold text-blue-900 group-hover:text-amber-700 transition">
                         Calcular precio
                         <i class="fa-solid fa-arrow-right ml-2 text-xs transition-transform group-hover:translate-x-1"></i>
                     </span>
@@ -604,7 +604,7 @@
 
                     </div>
 
-                    <span class="inline-flex items-center mt-auto pt-6 text-sm font-semibold text-blue-900 group-hover:text-red-600 transition">
+                    <span class="inline-flex items-center mt-auto pt-6 text-sm font-semibold text-blue-900 group-hover:text-amber-700 transition">
                         Descubrir agencias
                         <i class="fa-solid fa-arrow-right ml-2 text-xs transition-transform group-hover:translate-x-1"></i>
                     </span>
@@ -641,7 +641,7 @@
 
                     </div>
 
-                    <span class="inline-flex items-center mt-auto pt-6 text-sm font-semibold text-blue-900 group-hover:text-red-600 transition">
+                    <span class="inline-flex items-center mt-auto pt-6 text-sm font-semibold text-blue-900 group-hover:text-amber-700 transition">
                         Ir al rastreo
                         <i class="fa-solid fa-arrow-right ml-2 text-xs transition-transform group-hover:translate-x-1"></i>
                     </span>
@@ -666,7 +666,7 @@
             <h2 class="text-3xl font-extrabold text-blue-950 inline-block relative pb-3">
                 ¿Cómo funciona?
 
-                <span class="absolute left-1/2 -translate-x-1/2 bottom-0 w-14 h-1 bg-red-600 rounded-full"></span>
+                <span class="absolute left-1/2 -translate-x-1/2 bottom-0 w-14 h-1 bg-amber-400 rounded-full"></span>
             </h2>
 
             <p class="mt-4 text-sm text-gray-500">
@@ -810,9 +810,9 @@
 
                 <h2 class="text-3xl font-extrabold text-blue-950 inline-block relative pb-3">
                     ¿Por qué elegir
-                    <span class="text-red-600">Venexpress</span>?
+                    <span class="text-amber-700">Venexpress</span>?
 
-                    <span class="absolute left-1/2 -translate-x-1/2 bottom-0 w-14 h-1 bg-red-600 rounded-full"></span>
+                    <span class="absolute left-1/2 -translate-x-1/2 bottom-0 w-14 h-1 bg-amber-400 rounded-full"></span>
                 </h2>
 
             </div>

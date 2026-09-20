@@ -82,7 +82,7 @@
     </style>
 </head>
 
-<body class="bg-[#F3F5F7] text-[#0B1220] antialiased">
+<body class="bg-[#F7F7F4] text-[#111111] antialiased">
 
     <div class="min-h-screen flex">
 
@@ -91,7 +91,7 @@
         ============================================================= --}}
 
         <aside
-            class="w-64 border-r border-[#E2E8F0] px-5 py-8 flex flex-col justify-between hidden md:flex bg-white h-screen sticky top-0"
+            class="w-64 border-r border-[#E5E5E0] px-5 py-8 flex flex-col justify-between hidden md:flex bg-white h-screen sticky top-0"
         >
 
             <div>
@@ -117,7 +117,7 @@
 
                     </div>
 
-                    <span class="font-display font-bold text-xl text-[#0F172A]">
+                    <span class="font-display font-bold text-xl text-[#111111]">
                         Venexpress
                     </span>
 
@@ -190,7 +190,7 @@
                          PRINCIPAL
                     ================================================== --}}
 
-                    <p class="px-2 text-xs font-semibold text-[#94A3B8] uppercase tracking-wider mb-3">
+                    <p class="px-2 text-xs font-semibold text-[#B8B8B2] uppercase tracking-wider mb-3">
                         Principal
                     </p>
 
@@ -200,12 +200,12 @@
                         href="{{ route('admin.dashboard') }}"
                         class="flex items-center gap-3 px-4 py-3 rounded-xl font-medium transition-colors
                         {{ request()->routeIs('admin.dashboard')
-                            ? 'bg-blue-50 text-blue-900'
-                            : 'text-[#64748B] hover:bg-slate-50 hover:text-[#0F172A]' }}"
+                            ? 'bg-amber-400 text-[#111111]'
+                            : 'text-[#6B6B66] hover:bg-slate-50 hover:text-[#111111]' }}"
                     >
 
                         <svg
-                            class="w-5 h-5 {{ request()->routeIs('admin.dashboard') ? 'text-blue-700' : '' }}"
+                            class="w-5 h-5 {{ request()->routeIs('admin.dashboard') ? 'text-[#111111]' : '' }}"
                             fill="none"
                             stroke="currentColor"
                             viewBox="0 0 24 24"
@@ -232,7 +232,7 @@
                         <button
                             type="button"
                             @click="toggleGroup('operaciones')"
-                            class="w-full flex items-center justify-between px-2 py-2 text-xs font-semibold text-[#94A3B8] uppercase tracking-wider hover:text-[#475569] transition-colors"
+                            class="w-full flex items-center justify-between px-2 py-2 text-xs font-semibold text-[#B8B8B2] uppercase tracking-wider hover:text-[#4A4A45] transition-colors"
                         >
 
                             <span>
@@ -268,8 +268,8 @@
                                 href="{{ route('admin.packages.reception') }}"
                                 class="flex items-center gap-3 px-4 py-3 rounded-xl font-medium transition-colors
                                 {{ request()->routeIs('admin.packages.reception')
-                                    ? 'bg-blue-50 text-blue-900'
-                                    : 'text-[#64748B] hover:bg-slate-50 hover:text-[#0F172A]' }}"
+                                    ? 'bg-amber-400 text-[#111111]'
+                                    : 'text-[#6B6B66] hover:bg-slate-50 hover:text-[#111111]' }}"
                             >
 
                                 <svg
@@ -296,8 +296,8 @@
                                 href="{{ route('admin.packages.assignment') }}"
                                 class="flex items-center gap-3 px-4 py-3 rounded-xl font-medium transition-colors
                                 {{ request()->routeIs('admin.packages.assignment')
-                                    ? 'bg-blue-50 text-blue-900'
-                                    : 'text-[#64748B] hover:bg-slate-50 hover:text-[#0F172A]' }}"
+                                    ? 'bg-amber-400 text-[#111111]'
+                                    : 'text-[#6B6B66] hover:bg-slate-50 hover:text-[#111111]' }}"
                             >
 
                                 <svg
@@ -324,8 +324,8 @@
                                 href="{{ route('admin.packages.dispatch') }}"
                                 class="flex items-center gap-3 px-4 py-3 rounded-xl font-medium transition-colors
                                 {{ request()->routeIs('admin.packages.dispatch')
-                                    ? 'bg-blue-50 text-blue-900'
-                                    : 'text-[#64748B] hover:bg-slate-50 hover:text-[#0F172A]' }}"
+                                    ? 'bg-amber-400 text-[#111111]'
+                                    : 'text-[#6B6B66] hover:bg-slate-50 hover:text-[#111111]' }}"
                             >
 
                                 <svg
@@ -352,8 +352,8 @@
                                 href="{{ route('admin.routes') }}"
                                 class="flex items-center gap-3 px-4 py-3 rounded-xl font-medium transition-colors
                                 {{ request()->routeIs('admin.routes')
-                                    ? 'bg-blue-50 text-blue-900'
-                                    : 'text-[#64748B] hover:bg-slate-50 hover:text-[#0F172A]' }}"
+                                    ? 'bg-amber-400 text-[#111111]'
+                                    : 'text-[#6B6B66] hover:bg-slate-50 hover:text-[#111111]' }}"
                             >
 
                                 <svg
@@ -380,8 +380,8 @@
                                 href="{{ route('admin.routes.dashboard') }}"
                                 class="flex items-center gap-3 px-4 py-3 rounded-xl font-medium transition-colors
                                 {{ request()->routeIs('admin.routes.dashboard')
-                                    ? 'bg-blue-50 text-blue-900'
-                                    : 'text-[#64748B] hover:bg-slate-50 hover:text-[#0F172A]' }}"
+                                    ? 'bg-amber-400 text-[#111111]'
+                                    : 'text-[#6B6B66] hover:bg-slate-50 hover:text-[#111111]' }}"
                             >
 
                                 <svg
@@ -408,8 +408,8 @@
                                 href="{{ route('admin.warehouses') }}"
                                 class="flex items-center gap-3 px-4 py-3 rounded-xl font-medium transition-colors
                                 {{ request()->routeIs('admin.warehouses')
-                                    ? 'bg-blue-50 text-blue-900'
-                                    : 'text-[#64748B] hover:bg-slate-50 hover:text-[#0F172A]' }}"
+                                    ? 'bg-amber-400 text-[#111111]'
+                                    : 'text-[#6B6B66] hover:bg-slate-50 hover:text-[#111111]' }}"
                             >
 
                                 <svg
@@ -436,8 +436,8 @@
                                 href="{{ route('admin.payments') }}"
                                 class="flex items-center gap-3 px-4 py-3 rounded-xl font-medium transition-colors
                                 {{ request()->routeIs('admin.payments')
-                                    ? 'bg-blue-50 text-blue-900'
-                                    : 'text-[#64748B] hover:bg-slate-50 hover:text-[#0F172A]' }}"
+                                    ? 'bg-amber-400 text-[#111111]'
+                                    : 'text-[#6B6B66] hover:bg-slate-50 hover:text-[#111111]' }}"
                             >
                                 <svg class="w-5 h-5 shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                                     <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.8" d="M3 7h18M3 7l2 13h14l2-13M8 7V5a4 4 0 018 0v2M8 12h8" />
@@ -459,7 +459,7 @@
                         <button
                             type="button"
                             @click="toggleGroup('aliados')"
-                            class="w-full flex items-center justify-between px-2 py-2 text-xs font-semibold text-[#94A3B8] uppercase tracking-wider hover:text-[#475569] transition-colors"
+                            class="w-full flex items-center justify-between px-2 py-2 text-xs font-semibold text-[#B8B8B2] uppercase tracking-wider hover:text-[#4A4A45] transition-colors"
                         >
 
                             <span>
@@ -495,8 +495,8 @@
                                 href="{{ route('admin.allies') }}"
                                 class="flex items-center gap-3 px-4 py-3 rounded-xl font-medium transition-colors
                                 {{ request()->routeIs('admin.allies')
-                                    ? 'bg-blue-50 text-blue-900'
-                                    : 'text-[#64748B] hover:bg-slate-50 hover:text-[#0F172A]' }}"
+                                    ? 'bg-amber-400 text-[#111111]'
+                                    : 'text-[#6B6B66] hover:bg-slate-50 hover:text-[#111111]' }}"
                             >
 
                                 <svg
@@ -523,8 +523,8 @@
                                 href="{{ route('admin.rate-matrices') }}"
                                 class="flex items-center gap-3 px-4 py-3 rounded-xl font-medium transition-colors
                                 {{ request()->routeIs('admin.rate-matrices')
-                                    ? 'bg-blue-50 text-blue-900'
-                                    : 'text-[#64748B] hover:bg-slate-50 hover:text-[#0F172A]' }}"
+                                    ? 'bg-amber-400 text-[#111111]'
+                                    : 'text-[#6B6B66] hover:bg-slate-50 hover:text-[#111111]' }}"
                             >
 
                                 <svg
@@ -551,8 +551,8 @@
                                 href="{{ route('admin.ally-finance') }}"
                                 class="flex items-center gap-3 px-4 py-3 rounded-xl font-medium transition-colors
                                 {{ request()->routeIs('admin.ally-finance')
-                                    ? 'bg-blue-50 text-blue-900'
-                                    : 'text-[#64748B] hover:bg-slate-50 hover:text-[#0F172A]' }}"
+                                    ? 'bg-amber-400 text-[#111111]'
+                                    : 'text-[#6B6B66] hover:bg-slate-50 hover:text-[#111111]' }}"
                             >
 
                                 <svg
@@ -587,7 +587,7 @@
                         <button
                             type="button"
                             @click="toggleGroup('personal')"
-                            class="w-full flex items-center justify-between px-2 py-2 text-xs font-semibold text-[#94A3B8] uppercase tracking-wider hover:text-[#475569] transition-colors"
+                            class="w-full flex items-center justify-between px-2 py-2 text-xs font-semibold text-[#B8B8B2] uppercase tracking-wider hover:text-[#4A4A45] transition-colors"
                         >
 
                             <span>
@@ -623,8 +623,8 @@
                                 href="{{ route('admin.users') }}"
                                 class="flex items-center gap-3 px-4 py-3 rounded-xl font-medium transition-colors
                                 {{ request()->routeIs('admin.users')
-                                    ? 'bg-blue-50 text-blue-900'
-                                    : 'text-[#64748B] hover:bg-slate-50 hover:text-[#0F172A]' }}"
+                                    ? 'bg-amber-400 text-[#111111]'
+                                    : 'text-[#6B6B66] hover:bg-slate-50 hover:text-[#111111]' }}"
                             >
 
                                 <svg
@@ -651,8 +651,8 @@
                                 href="{{ route('admin.driver-payments') }}"
                                 class="flex items-center gap-3 px-4 py-3 rounded-xl font-medium transition-colors
                                 {{ request()->routeIs('admin.driver-payments')
-                                    ? 'bg-blue-50 text-blue-900'
-                                    : 'text-[#64748B] hover:bg-slate-50 hover:text-[#0F172A]' }}"
+                                    ? 'bg-amber-400 text-[#111111]'
+                                    : 'text-[#6B6B66] hover:bg-slate-50 hover:text-[#111111]' }}"
                             >
 
                                 <svg
@@ -679,8 +679,8 @@
                                 href="{{ route('admin.remunerations-summary') }}"
                                 class="flex items-center gap-3 px-4 py-3 rounded-xl font-medium transition-colors
                                 {{ request()->routeIs('admin.remunerations-summary')
-                                    ? 'bg-blue-50 text-blue-900'
-                                    : 'text-[#64748B] hover:bg-slate-50 hover:text-[#0F172A]' }}"
+                                    ? 'bg-amber-400 text-[#111111]'
+                                    : 'text-[#6B6B66] hover:bg-slate-50 hover:text-[#111111]' }}"
                             >
 
                                 <svg
@@ -707,8 +707,8 @@
                                 href="{{ route('admin.drivers.approval') }}"
                                 class="flex items-center gap-3 px-4 py-3 rounded-xl font-medium transition-colors
                                 {{ request()->routeIs('admin.drivers.approval')
-                                    ? 'bg-blue-50 text-blue-900'
-                                    : 'text-[#64748B] hover:bg-slate-50 hover:text-[#0F172A]' }}"
+                                    ? 'bg-amber-400 text-[#111111]'
+                                    : 'text-[#6B6B66] hover:bg-slate-50 hover:text-[#111111]' }}"
                             >
 
                                 <svg
@@ -743,7 +743,7 @@
                         <button
                             type="button"
                             @click="toggleGroup('control')"
-                            class="w-full flex items-center justify-between px-2 py-2 text-xs font-semibold text-[#94A3B8] uppercase tracking-wider hover:text-[#475569] transition-colors"
+                            class="w-full flex items-center justify-between px-2 py-2 text-xs font-semibold text-[#B8B8B2] uppercase tracking-wider hover:text-[#4A4A45] transition-colors"
                         >
 
                             <span>
@@ -779,8 +779,8 @@
                                 href="{{ route('admin.incidents') }}"
                                 class="flex items-center gap-3 px-4 py-3 rounded-xl font-medium transition-colors
                                 {{ request()->routeIs('admin.incidents')
-                                    ? 'bg-blue-50 text-blue-900'
-                                    : 'text-[#64748B] hover:bg-slate-50 hover:text-[#0F172A]' }}"
+                                    ? 'bg-amber-400 text-[#111111]'
+                                    : 'text-[#6B6B66] hover:bg-slate-50 hover:text-[#111111]' }}"
                             >
 
                                 <svg
@@ -807,8 +807,8 @@
                                 href="{{ route('admin.recommendations') }}"
                                 class="flex items-center gap-3 px-4 py-3 rounded-xl font-medium transition-colors
                                 {{ request()->routeIs('admin.recommendations')
-                                    ? 'bg-blue-50 text-blue-900'
-                                    : 'text-[#64748B] hover:bg-slate-50 hover:text-[#0F172A]' }}"
+                                    ? 'bg-amber-400 text-[#111111]'
+                                    : 'text-[#6B6B66] hover:bg-slate-50 hover:text-[#111111]' }}"
                             >
 
                                 <svg
@@ -837,8 +837,8 @@
                                     href="{{ route('admin.audit-log') }}"
                                     class="flex items-center gap-3 px-4 py-3 rounded-xl font-medium transition-colors
                                     {{ request()->routeIs('admin.audit-log')
-                                        ? 'bg-blue-50 text-blue-900'
-                                        : 'text-[#64748B] hover:bg-slate-50 hover:text-[#0F172A]' }}"
+                                        ? 'bg-amber-400 text-[#111111]'
+                                        : 'text-[#6B6B66] hover:bg-slate-50 hover:text-[#111111]' }}"
                                 >
 
                                     <svg
@@ -872,18 +872,18 @@
                      AYUDA (opción secundaria / soporte)
                 ================================================== --}}
 
-                <div class="mt-6 pt-4 border-t border-[#E2E8F0]">
+                <div class="mt-6 pt-4 border-t border-[#E5E5E0]">
 
                     <a
                         href="{{ route('admin.help') }}"
                         class="flex items-center gap-3 px-4 py-2.5 rounded-xl text-sm font-medium transition-colors
                         {{ request()->routeIs('admin.help')
-                            ? 'bg-blue-50 text-blue-900'
-                            : 'text-[#94A3B8] hover:bg-slate-50 hover:text-[#64748B]' }}"
+                            ? 'bg-amber-400 text-[#111111]'
+                            : 'text-[#B8B8B2] hover:bg-slate-50 hover:text-[#6B6B66]' }}"
                     >
 
                         <svg
-                            class="w-5 h-5 {{ request()->routeIs('admin.help') ? 'text-blue-700' : '' }}"
+                            class="w-5 h-5 {{ request()->routeIs('admin.help') ? 'text-[#111111]' : '' }}"
                             fill="none"
                             stroke="currentColor"
                             viewBox="0 0 24 24"
@@ -909,7 +909,7 @@
                  PERFIL ADMINISTRADOR
             ============================================================= --}}
 
-            <div class="mt-auto pt-8 border-t border-[#E2E8F0]">
+            <div class="mt-auto pt-8 border-t border-[#E5E5E0]">
 
                 <div class="flex items-center gap-3 px-2">
 
@@ -921,13 +921,13 @@
 
                     <div class="overflow-hidden">
 
-                        <p class="text-sm font-semibold text-[#0F172A] truncate">
+                        <p class="text-sm font-semibold text-[#111111] truncate">
 
                             {{ Auth::user()->name ?? 'Administrador' }}
 
                         </p>
 
-                        <p class="text-xs text-[#64748B] truncate">
+                        <p class="text-xs text-[#6B6B66] truncate">
 
                             {{ Auth::user()->email ?? 'admin@venexpress.com' }}
 
@@ -941,7 +941,7 @@
                 {{-- Perfil --}}
                 <a
                     href="{{ route('profile') }}"
-                    class="block w-full mt-4 px-2 text-sm text-[#64748B] font-medium hover:text-[#0F172A] transition-colors"
+                    class="block w-full mt-4 px-2 text-sm text-[#6B6B66] font-medium hover:text-[#111111] transition-colors"
                 >
                     Mi Perfil
                 </a>
@@ -989,13 +989,13 @@
 
             {{-- Header --}}
             <header
-                class="h-16 bg-white border-b border-[#E2E8F0] flex items-center justify-between px-4 lg:px-8"
+                class="h-16 bg-white border-b border-[#E5E5E0] flex items-center justify-between px-4 lg:px-8"
             >
 
                 {{-- Botón menú móvil --}}
                 <button
                     @click="sidebarOpen = !sidebarOpen"
-                    class="lg:hidden text-[#0B1220] text-xl"
+                    class="lg:hidden text-[#111111] text-xl"
                     type="button"
                     aria-label="Abrir menú"
                 >
@@ -1005,7 +1005,7 @@
 
                 <div class="flex items-center gap-4 ml-auto">
 
-                    <span class="text-sm text-[#64748B]">
+                    <span class="text-sm text-[#6B6B66]">
 
                         {{ auth()->user()->name ?? 'Admin' }}
 
@@ -1014,7 +1014,7 @@
 
                     <a
                         href="{{ route('profile') }}"
-                        class="text-sm font-medium text-[#64748B] hover:text-[#0F172A] transition-colors"
+                        class="text-sm font-medium text-[#6B6B66] hover:text-[#111111] transition-colors"
                     >
                         Mi Perfil
                     </a>
@@ -1029,7 +1029,7 @@
 
                         <button
                             type="submit"
-                            class="text-sm font-medium text-[#64748B] hover:text-[#FF6A1A] transition-colors"
+                            class="text-sm font-medium text-[#6B6B66] hover:text-[#FF6A1A] transition-colors"
                         >
                             Salir
                         </button>

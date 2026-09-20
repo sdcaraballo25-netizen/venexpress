@@ -43,7 +43,7 @@
             align-items: center;
             white-space: nowrap;
             padding: 0.45rem 0;
-            color: #64748b;
+            color: #6B6B66;
             font-size: 0.875rem;
             font-weight: 500;
             transition: color 0.2s ease;
@@ -51,7 +51,7 @@
 
         .main-nav-link:hover,
         .main-nav-link.is-active {
-            color: #172554;
+            color: #0A0A09;
         }
 
         .main-nav-link.is-active::after {
@@ -62,7 +62,7 @@
             bottom: -0.1rem;
             height: 2px;
             border-radius: 999px;
-            background: #dc2626;
+            background: #F7FF00;
         }
 
         @media (max-width: 767px) {

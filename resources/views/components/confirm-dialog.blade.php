@@ -68,10 +68,10 @@
         class="bg-white rounded-2xl shadow-xl w-full max-w-sm p-6"
     >
         <template x-if="$store.confirm.title">
-            <h3 class="font-display text-lg font-bold text-[#0F172A] mb-2" x-text="$store.confirm.title"></h3>
+            <h3 class="font-display text-lg font-bold text-[#111111] mb-2" x-text="$store.confirm.title"></h3>
         </template>
 
-        <p class="text-sm text-[#475569] mb-6 whitespace-pre-line" x-text="$store.confirm.message"></p>
+        <p class="text-sm text-[#4A4A45] mb-6 whitespace-pre-line" x-text="$store.confirm.message"></p>
 
         <div class="flex justify-end gap-2">
             <button

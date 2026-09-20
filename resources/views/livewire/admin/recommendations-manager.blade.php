@@ -6,10 +6,10 @@
 
     <div class="flex flex-col md:flex-row md:items-center md:justify-between gap-4 mb-8">
         <div>
-            <h1 class="font-display text-3xl font-bold text-[#0F172A]">
+            <h1 class="font-display text-3xl font-bold text-[#111111]">
                 Recomendaciones
             </h1>
-            <p class="text-sm text-[#64748B] mt-1">
+            <p class="text-sm text-[#6B6B66] mt-1">
                 Sugerencias enviadas por visitantes desde la página pública.
             </p>
         </div>
@@ -27,13 +27,13 @@
             <div
                 wire:key="recommendation-{{ $recommendation->id }}"
                 wire:mouseenter="markRead({{ $recommendation->id }})"
-                class="bg-white border border-[#E2E8F0] rounded-2xl p-5 shadow-sm"
+                class="bg-white border border-[#E5E5E0] rounded-2xl p-5 shadow-sm"
             >
                 <div class="flex items-start justify-between gap-4">
                     <div>
-                        <p class="font-semibold text-[#0F172A]">{{ $recommendation->name }}</p>
+                        <p class="font-semibold text-[#111111]">{{ $recommendation->name }}</p>
                         @if ($recommendation->email)
-                            <p class="text-xs text-[#64748B] mt-0.5">{{ $recommendation->email }}</p>
+                            <p class="text-xs text-[#6B6B66] mt-0.5">{{ $recommendation->email }}</p>
                         @endif
                     </div>
 
@@ -56,12 +56,12 @@
                     </div>
                 </div>
 
-                <p class="mt-3 text-sm text-[#334155] whitespace-pre-line">{{ $recommendation->message }}</p>
+                <p class="mt-3 text-sm text-[#2A2A26] whitespace-pre-line">{{ $recommendation->message }}</p>
 
-                <p class="mt-3 text-xs text-[#94A3B8]">{{ $recommendation->created_at->diffForHumans() }}</p>
+                <p class="mt-3 text-xs text-[#B8B8B2]">{{ $recommendation->created_at->diffForHumans() }}</p>
             </div>
         @empty
-            <div class="bg-white border border-[#E2E8F0] rounded-2xl p-12 text-center text-sm text-[#94A3B8]">
+            <div class="bg-white border border-[#E5E5E0] rounded-2xl p-12 text-center text-sm text-[#B8B8B2]">
                 No hay recomendaciones por revisar.
             </div>
         @endforelse

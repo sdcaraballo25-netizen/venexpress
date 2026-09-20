@@ -11,7 +11,7 @@
                 ← Volver a mis paquetes
             </a>
 
-            <h1 class="mt-2 font-display text-2xl font-bold text-[#0F172A]">
+            <h1 class="mt-2 font-display text-2xl font-bold text-[#111111]">
                 Detalle de guía
             </h1>
 
@@ -60,9 +60,9 @@
     <div class="grid grid-cols-1 gap-6 lg:grid-cols-2">
 
         {{-- Remitente --}}
-        <div class="rounded-2xl border border-[#E2E8F0] bg-white p-5">
+        <div class="rounded-2xl border border-[#E5E5E0] bg-white p-5">
 
-            <h2 class="font-display text-lg font-semibold text-[#0F172A]">
+            <h2 class="font-display text-lg font-semibold text-[#111111]">
                 Remitente
             </h2>
 
@@ -104,9 +104,9 @@
 
 
         {{-- Destinatario --}}
-        <div class="rounded-2xl border border-[#E2E8F0] bg-white p-5">
+        <div class="rounded-2xl border border-[#E5E5E0] bg-white p-5">
 
-            <h2 class="font-display text-lg font-semibold text-[#0F172A]">
+            <h2 class="font-display text-lg font-semibold text-[#111111]">
                 Destinatario
             </h2>
 
@@ -150,9 +150,9 @@
 
 
     {{-- Ruta --}}
-    <div class="rounded-2xl border border-[#E2E8F0] bg-white p-5">
+    <div class="rounded-2xl border border-[#E5E5E0] bg-white p-5">
 
-        <h2 class="font-display text-lg font-semibold text-[#0F172A]">
+        <h2 class="font-display text-lg font-semibold text-[#111111]">
             Ruta
         </h2>
 
@@ -250,9 +250,9 @@
     {{-- Estado de aceptación --}}
     @if ($package->requires_delivery)
 
-        <div class="rounded-2xl border border-[#E2E8F0] bg-white p-5">
+        <div class="rounded-2xl border border-[#E5E5E0] bg-white p-5">
 
-            <h2 class="font-display text-lg font-semibold text-[#0F172A]">
+            <h2 class="font-display text-lg font-semibold text-[#111111]">
                 Estado de entrega
             </h2>
 
@@ -344,9 +344,9 @@
 
 
     {{-- Historial --}}
-    <div class="rounded-2xl border border-[#E2E8F0] bg-white p-5">
+    <div class="rounded-2xl border border-[#E5E5E0] bg-white p-5">
 
-        <h2 class="font-display text-lg font-semibold text-[#0F172A]">
+        <h2 class="font-display text-lg font-semibold text-[#111111]">
             Historial de la guía
         </h2>
 
@@ -436,9 +436,9 @@
 
 
     {{-- Acciones --}}
-    <div class="rounded-2xl border border-[#E2E8F0] bg-white p-5">
+    <div class="rounded-2xl border border-[#E5E5E0] bg-white p-5">
 
-        <h2 class="font-display text-lg font-semibold text-[#0F172A]">
+        <h2 class="font-display text-lg font-semibold text-[#111111]">
             Acciones
         </h2>
 
@@ -454,7 +454,7 @@
 
                 <a
                     href="{{ $activeRouteId ? route('repartidor.route-detail', $activeRouteId) : route('repartidor.dashboard') }}"
-                    class="inline-flex items-center justify-center rounded-xl border border-[#E2E8F0] px-5 py-3 text-sm font-medium text-[#0F172A] transition hover:border-blue-300 hover:bg-blue-50"
+                    class="inline-flex items-center justify-center rounded-xl border border-[#E5E5E0] px-5 py-3 text-sm font-medium text-[#111111] transition hover:border-blue-300 hover:bg-blue-50"
                 >
                     Volver a mi ruta
                 </a>

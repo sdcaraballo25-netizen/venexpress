@@ -57,7 +57,7 @@
             </div>
             <div class="rounded-2xl bg-slate-50 border border-slate-200 px-5 py-4">
                 <p class="text-xs text-slate-500 uppercase tracking-wide">Producido por Aliados (USD)</p>
-                <p class="font-display text-3xl font-bold text-[#0F172A] mt-1">${{ number_format($allyTotalProducedUsd, 2) }}</p>
+                <p class="font-display text-3xl font-bold text-[#111111] mt-1">${{ number_format($allyTotalProducedUsd, 2) }}</p>
             </div>
         </div>
 
@@ -84,7 +84,7 @@
                             @foreach ($allyRows as $row)
                                 <tr wire:key="ally-row-{{ $loop->index }}" class="border-b border-slate-100 last:border-0">
                                     <td class="py-3 px-4 text-slate-600">{{ $row['doc'] ?: '—' }}</td>
-                                    <td class="py-3 px-4 font-medium text-[#0F172A]">{{ $row['name'] ?: '—' }}</td>
+                                    <td class="py-3 px-4 font-medium text-[#111111]">{{ $row['name'] ?: '—' }}</td>
                                     <td class="py-3 px-4 text-slate-500">{{ $row['email'] ?: '—' }}</td>
                                     <td class="py-3 px-4 text-slate-600">
                                         @if ($row['account_number'])
@@ -96,8 +96,8 @@
                                     <td class="py-3 px-4 text-slate-600">{{ $row['holder_id'] ?: '—' }}</td>
                                     <td class="py-3 px-4 text-slate-500">{{ $row['packages'] }}</td>
                                     <td class="py-3 px-4 text-slate-600">${{ number_format($row['produced_usd'], 2) }}</td>
-                                    <td class="py-3 px-4 font-semibold text-[#0F172A]">${{ number_format($row['balance_usd'], 2) }}</td>
-                                    <td class="py-3 px-4 font-semibold text-[#0F172A]">
+                                    <td class="py-3 px-4 font-semibold text-[#111111]">${{ number_format($row['balance_usd'], 2) }}</td>
+                                    <td class="py-3 px-4 font-semibold text-[#111111]">
                                         {{ $row['balance_ves'] !== null ? 'Bs. '.number_format($row['balance_ves'], 2) : 'N/A' }}
                                     </td>
                                 </tr>
@@ -161,7 +161,7 @@
                             @foreach ($driverRows as $row)
                                 <tr wire:key="driver-row-{{ $loop->index }}" class="border-b border-slate-100 last:border-0">
                                     <td class="py-3 px-4 text-slate-600">{{ $row['doc'] ?: '—' }}</td>
-                                    <td class="py-3 px-4 font-medium text-[#0F172A]">{{ $row['name'] ?: '—' }}</td>
+                                    <td class="py-3 px-4 font-medium text-[#111111]">{{ $row['name'] ?: '—' }}</td>
                                     <td class="py-3 px-4 text-slate-500">{{ $row['email'] ?: '—' }}</td>
                                     <td class="py-3 px-4 text-slate-600">
                                         @if ($row['account_number'])
@@ -173,8 +173,8 @@
                                     <td class="py-3 px-4 text-slate-600">{{ $row['holder_id'] ?: '—' }}</td>
                                     <td class="py-3 px-4 text-slate-500">{{ $row['packages'] }}</td>
                                     <td class="py-3 px-4 text-slate-600">${{ number_format($row['produced_usd'], 2) }}</td>
-                                    <td class="py-3 px-4 font-semibold text-[#0F172A]">${{ number_format($row['balance_usd'], 2) }}</td>
-                                    <td class="py-3 px-4 font-semibold text-[#0F172A]">
+                                    <td class="py-3 px-4 font-semibold text-[#111111]">${{ number_format($row['balance_usd'], 2) }}</td>
+                                    <td class="py-3 px-4 font-semibold text-[#111111]">
                                         {{ $row['balance_ves'] !== null ? 'Bs. '.number_format($row['balance_ves'], 2) : 'N/A' }}
                                     </td>
                                 </tr>

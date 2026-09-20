@@ -3,7 +3,7 @@
     {{-- Encabezado + selector de período --}}
     <div class="flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between">
         <div>
-            <h2 class="font-display text-2xl font-semibold text-[#0F172A]">
+            <h2 class="font-display text-2xl font-semibold text-[#111111]">
                 {{ $ally->business_name }}
             </h2>
 
@@ -12,13 +12,13 @@
             </p>
         </div>
 
-        <div class="inline-flex rounded-2xl border border-[#E2E8F0] bg-white p-1">
+        <div class="inline-flex rounded-2xl border border-[#E5E5E0] bg-white p-1">
             <button
                 wire:click="setPeriod('today')"
                 class="rounded-xl px-4 py-1.5 text-sm font-medium transition
                 {{ $period === 'today'
                     ? 'bg-blue-900 text-white'
-                    : 'text-slate-500 hover:text-[#0F172A]' }}"
+                    : 'text-slate-500 hover:text-[#111111]' }}"
             >
                 Hoy
             </button>
@@ -28,7 +28,7 @@
                 class="rounded-xl px-4 py-1.5 text-sm font-medium transition
                 {{ $period === 'week'
                     ? 'bg-blue-900 text-white'
-                    : 'text-slate-500 hover:text-[#0F172A]' }}"
+                    : 'text-slate-500 hover:text-[#111111]' }}"
             >
                 Esta semana
             </button>
@@ -38,7 +38,7 @@
                 class="rounded-xl px-4 py-1.5 text-sm font-medium transition
                 {{ $period === 'month'
                     ? 'bg-blue-900 text-white'
-                    : 'text-slate-500 hover:text-[#0F172A]' }}"
+                    : 'text-slate-500 hover:text-[#111111]' }}"
             >
                 Este mes
             </button>
@@ -49,40 +49,40 @@
     {{-- Tarjetas de resumen --}}
     <div class="grid grid-cols-1 gap-4 sm:grid-cols-2 lg:grid-cols-4">
 
-        <div class="rounded-2xl border border-[#E2E8F0] bg-white p-5">
+        <div class="rounded-2xl border border-[#E5E5E0] bg-white p-5">
             <p class="text-sm text-slate-500">
                 Total facturado
             </p>
 
-            <p class="mt-2 font-display text-2xl font-semibold text-[#0F172A]">
+            <p class="mt-2 font-display text-2xl font-semibold text-[#111111]">
                 ${{ number_format($totalBilledUsd, 2) }}
             </p>
         </div>
 
 
-        <div class="rounded-2xl border border-[#E2E8F0] bg-white p-5">
+        <div class="rounded-2xl border border-[#E5E5E0] bg-white p-5">
             <p class="text-sm text-slate-500">
                 Guías procesadas
             </p>
 
-            <p class="mt-2 font-display text-2xl font-semibold text-[#0F172A]">
+            <p class="mt-2 font-display text-2xl font-semibold text-[#111111]">
                 {{ $processedCount }}
             </p>
         </div>
 
 
-        <div class="rounded-2xl border border-[#E2E8F0] bg-white p-5">
+        <div class="rounded-2xl border border-[#E5E5E0] bg-white p-5">
             <p class="text-sm text-slate-500">
                 Comisión del período
             </p>
 
-            <p class="mt-2 font-display text-2xl font-semibold text-[#0F172A]">
+            <p class="mt-2 font-display text-2xl font-semibold text-[#111111]">
                 ${{ number_format($commissionBalanceUsd, 2) }}
             </p>
         </div>
 
 
-        <div class="rounded-2xl border border-[#E2E8F0] bg-blue-900 p-5">
+        <div class="rounded-2xl border border-[#E5E5E0] bg-blue-900 p-5">
             <p class="text-sm text-blue-200">
                 Saldo total por comisiones
             </p>
@@ -98,9 +98,9 @@
     <div class="grid grid-cols-1 gap-4 lg:grid-cols-2">
 
         {{-- Cuadre de caja --}}
-        <div class="rounded-2xl border border-[#E2E8F0] bg-white p-5">
+        <div class="rounded-2xl border border-[#E5E5E0] bg-white p-5">
 
-            <h3 class="mb-4 font-display text-lg font-semibold text-[#0F172A]">
+            <h3 class="mb-4 font-display text-lg font-semibold text-[#111111]">
                 Cuadre de caja
             </h3>
 
@@ -136,7 +136,7 @@
                                 </span>
                             </span>
 
-                            <span class="font-medium text-[#0F172A]">
+                            <span class="font-medium text-[#111111]">
                                 ${{ number_format($row->total, 2) }}
                             </span>
 
@@ -152,9 +152,9 @@
 
 
         {{-- Cobro en destino --}}
-        <div class="rounded-2xl border border-[#E2E8F0] bg-white p-5">
+        <div class="rounded-2xl border border-[#E5E5E0] bg-white p-5">
 
-            <h3 class="mb-4 font-display text-lg font-semibold text-[#0F172A]">
+            <h3 class="mb-4 font-display text-lg font-semibold text-[#111111]">
                 Cobro en destino (COD)
             </h3>
 

@@ -52,7 +52,7 @@
             align-items: center;
             white-space: nowrap;
             padding: 0.45rem 0;
-            color: #64748b;
+            color: #6B6B66;
             font-size: 0.875rem;
             font-weight: 500;
             transition:
@@ -62,7 +62,7 @@
 
         .main-nav-link:hover,
         .main-nav-link.is-active {
-            color: #172554;
+            color: #0A0A09;
         }
 
         .main-nav-link:hover {
@@ -77,7 +77,7 @@
             bottom: -0.1rem;
             height: 2px;
             border-radius: 999px;
-            background: #dc2626;
+            background: #F7FF00;
         }
 
         /* =====================================================
@@ -160,13 +160,13 @@
             border: 0;
             outline: none;
             background: transparent;
-            color: #172554;
+            color: #0A0A09;
             font-size: 14px;
             font-weight: 500;
         }
 
         .tracking-input::placeholder {
-            color: #94a3b8;
+            color: #B8B8B2;
         }
 
         .tracking-search-button {
@@ -174,7 +174,7 @@
             min-width: 128px;
             border: 0;
             border-radius: 11px;
-            background: #172554;
+            background: #0A0A09;
             color: #ffffff;
             font-size: 14px;
             font-weight: 700;
@@ -187,7 +187,7 @@
         }
 
         .tracking-search-button:hover {
-            background: #1e3a8a;
+            background: #111111;
             transform: translateY(-1px);
             box-shadow: 0 8px 18px rgba(23, 37, 84, 0.18);
         }
@@ -212,8 +212,8 @@
             display: flex;
             align-items: center;
             gap: 12px;
-            border: 1px solid #e2e8f0;
-            background: #f8fafc;
+            border: 1px solid #E5E5E0;
+            background: #F7F7F4;
             border-radius: 12px;
             padding: 10px 13px;
             cursor: pointer;
@@ -231,8 +231,8 @@
         }
 
         .scan-button:hover {
-            border-color: #bfdbfe;
-            background: #eff6ff;
+            border-color: #D9D9D3;
+            background: #F7F7F4;
             transform: translateY(-1px);
             box-shadow: 0 5px 15px rgba(15, 23, 42, 0.05);
         }
@@ -243,8 +243,8 @@
         }
 
         .scan-button.photo:hover {
-            border-color: #fde68a;
-            background: #fffbeb;
+            border-color: #FFFC70;
+            background: #FFFEEB;
         }
 
         .scan-icon {
@@ -255,25 +255,25 @@
             align-items: center;
             justify-content: center;
             border-radius: 10px;
-            background: #172554;
+            background: #0A0A09;
             color: #ffffff;
         }
 
         .scan-button.photo .scan-icon {
-            background: #fef3c7;
-            color: #d97706;
+            background: #FFFDBA;
+            color: #B8BF00;
         }
 
         .scan-title {
             display: block;
-            color: #172554;
+            color: #0A0A09;
             font-size: 12px;
             font-weight: 700;
         }
 
         .scan-subtitle {
             display: block;
-            color: #64748b;
+            color: #6B6B66;
             font-size: 10px;
             margin-top: 2px;
         }
@@ -297,9 +297,9 @@
 
         .ocr-status.show {
             display: block;
-            background: #eff6ff;
-            border: 1px solid #bfdbfe;
-            color: #1d4ed8;
+            background: #F7F7F4;
+            border: 1px solid #D9D9D3;
+            color: #2A2A26;
         }
 
         .ocr-status.success {
@@ -529,7 +529,7 @@
             border: 0;
             border-radius: 999px;
             background: #ffffff;
-            color: #172554;
+            color: #0A0A09;
             padding: 7px 22px 7px 8px;
             font-family: inherit;
             font-size: 13px;
@@ -542,7 +542,7 @@
         }
 
         .camera-take-button:hover {
-            background: #f1f5f9;
+            background: #F0F0EC;
             transform: translateY(-1px);
         }
 
@@ -550,7 +550,7 @@
             width: 44px;
             height: 44px;
             border-radius: 50%;
-            background: #172554;
+            background: #0A0A09;
             color: #ffffff;
             display: flex;
             align-items: center;
@@ -577,7 +577,7 @@
         }
 
         .format-label {
-            color: #94a3b8;
+            color: #B8B8B2;
             font-size: 10px;
             font-weight: 600;
         }
@@ -587,10 +587,10 @@
             align-items: center;
             min-height: 27px;
             padding: 4px 9px;
-            border: 1px solid #e2e8f0;
+            border: 1px solid #E5E5E0;
             border-radius: 7px;
             background: #ffffff;
-            color: #1e3a8a;
+            color: #111111;
             font-family: 'Courier New', monospace;
             font-size: 10px;
             font-weight: 700;
@@ -669,7 +669,7 @@
             gap: 10px;
             padding: 11px 14px;
             background: rgba(255,255,255,0.95);
-            border: 1px solid #e2e8f0;
+            border: 1px solid #E5E5E0;
             border-radius: 12px;
             box-shadow: 0 12px 25px rgba(15, 23, 42, 0.08);
         }
@@ -678,8 +678,8 @@
             width: 34px;
             height: 34px;
             border-radius: 9px;
-            background: #eff6ff;
-            color: #1e3a8a;
+            background: #F7F7F4;
+            color: #111111;
             display: flex;
             align-items: center;
             justify-content: center;
@@ -687,7 +687,7 @@
 
         .tracking-badge strong {
             display: block;
-            color: #172554;
+            color: #0A0A09;
             font-size: 11px;
             line-height: 1.3;
         }
@@ -695,7 +695,7 @@
         .tracking-badge span {
             display: block;
             margin-top: 2px;
-            color: #64748b;
+            color: #6B6B66;
             font-size: 9px;
         }
 
@@ -709,10 +709,10 @@
             gap: 8px;
             padding: 9px 12px;
             background: rgba(255,255,255,0.96);
-            border: 1px solid #e2e8f0;
+            border: 1px solid #E5E5E0;
             border-radius: 10px;
             box-shadow: 0 12px 25px rgba(15, 23, 42, 0.08);
-            color: #334155;
+            color: #2A2A26;
             font-size: 10px;
             font-weight: 600;
         }
@@ -730,7 +730,7 @@
         ====================================================== */
 
         .benefits-section {
-            background: #172554;
+            background: #0A0A09;
         }
 
         .benefit-item {
@@ -748,7 +748,7 @@
             display: flex;
             align-items: center;
             justify-content: center;
-            color: #fbbf24;
+            color: #F7FF00;
         }
 
         .benefit-text {
@@ -760,7 +760,7 @@
         .benefit-text small {
             display: block;
             margin-top: 2px;
-            color: #bfdbfe;
+            color: #D9D9D3;
             font-size: 9px;
         }
 
@@ -783,7 +783,7 @@
             height: 80px;
             margin: 0 auto;
             border-radius: 50%;
-            background: #f1f5f9;
+            background: #F0F0EC;
             display: flex;
             align-items: center;
             justify-content: center;
@@ -796,7 +796,7 @@
             width: 27px;
             height: 27px;
             border-radius: 50%;
-            background: #172554;
+            background: #0A0A09;
             color: #ffffff;
             display: flex;
             align-items: center;
@@ -807,14 +807,14 @@
 
         .step-title {
             margin-top: 15px;
-            color: #172554;
+            color: #0A0A09;
             font-size: 14px;
             font-weight: 600;
         }
 
         .step-description {
             margin-top: 3px;
-            color: #64748b;
+            color: #6B6B66;
             font-size: 11px;
             line-height: 1.55;
         }
@@ -1245,7 +1245,7 @@
 
                 Rastrea tu
 
-                <span class="block text-red-600">
+                <span class="block text-amber-700">
                     envío.
                 </span>
 
@@ -1577,7 +1577,7 @@
                 Sigue tu paquete en pocos pasos
 
                 <span
-                    class="absolute left-1/2 -translate-x-1/2 bottom-0 w-14 h-1 bg-red-600 rounded-full"
+                    class="absolute left-1/2 -translate-x-1/2 bottom-0 w-14 h-1 bg-amber-400 rounded-full"
                 ></span>
 
             </h2>

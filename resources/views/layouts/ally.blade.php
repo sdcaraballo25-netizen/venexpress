@@ -39,7 +39,7 @@
     </style>
 </head>
 
-<body class="bg-[#F3F5F7] text-[#0B1220] antialiased">
+<body class="bg-[#F7F7F4] text-[#111111] antialiased">
 
 <div class="min-h-screen flex">
 
@@ -47,7 +47,7 @@
          SIDEBAR
     =========================================================== --}}
     <aside
-        class="fixed inset-y-0 left-0 z-40 w-64 border-r border-[#E2E8F0] bg-white px-5 py-8 flex flex-col justify-between transform transition-transform duration-200 md:relative md:translate-x-0"
+        class="fixed inset-y-0 left-0 z-40 w-64 border-r border-[#E5E5E0] bg-white px-5 py-8 flex flex-col justify-between transform transition-transform duration-200 md:relative md:translate-x-0"
         :class="sidebarOpen ? 'translate-x-0' : '-translate-x-full md:translate-x-0'"
     >
 
@@ -73,11 +73,11 @@
                 </div>
 
                 <div>
-                    <span class="font-display font-bold text-xl text-[#0F172A] block leading-none">
+                    <span class="font-display font-bold text-xl text-[#111111] block leading-none">
                         Venexpress
                     </span>
 
-                    <span class="text-xs text-[#94A3B8]">
+                    <span class="text-xs text-[#B8B8B2]">
                         Agencia Aliada
                     </span>
                 </div>
@@ -91,7 +91,7 @@
             <nav class="space-y-1 overflow-y-auto">
 
                 {{-- PRINCIPAL --}}
-                <p class="px-2 text-xs font-semibold text-[#94A3B8] uppercase tracking-wider mb-3">
+                <p class="px-2 text-xs font-semibold text-[#B8B8B2] uppercase tracking-wider mb-3">
                     Principal
                 </p>
 
@@ -104,8 +104,8 @@
                         @click="sidebarOpen = false"
                         class="flex items-center gap-3 px-4 py-3 rounded-xl font-medium transition-colors
                         {{ request()->routeIs('ally.dashboard')
-                            ? 'bg-blue-50 text-blue-900'
-                            : 'text-[#64748B] hover:bg-slate-50 hover:text-[#0F172A]' }}"
+                            ? 'bg-amber-400 text-[#111111]'
+                            : 'text-[#6B6B66] hover:bg-slate-50 hover:text-[#111111]' }}"
                     >
 
                         <svg
@@ -137,8 +137,8 @@
                     @click="sidebarOpen = false"
                     class="flex items-center gap-3 px-4 py-3 rounded-xl font-medium transition-colors
                     {{ request()->routeIs('ally.help')
-                        ? 'bg-blue-50 text-blue-900'
-                        : 'text-[#64748B] hover:bg-slate-50 hover:text-[#0F172A]' }}"
+                        ? 'bg-amber-400 text-[#111111]'
+                        : 'text-[#6B6B66] hover:bg-slate-50 hover:text-[#111111]' }}"
                 >
 
                     <svg
@@ -165,7 +165,7 @@
                 {{-- ==================================================
                      OPERACIONES
                 =================================================== --}}
-                <p class="px-2 text-xs font-semibold text-[#94A3B8] uppercase tracking-wider mb-3 mt-6">
+                <p class="px-2 text-xs font-semibold text-[#B8B8B2] uppercase tracking-wider mb-3 mt-6">
                     Operaciones
                 </p>
 
@@ -177,8 +177,8 @@
                     @click="sidebarOpen = false"
                     class="flex items-center gap-3 px-4 py-3 rounded-xl font-medium transition-colors
                     {{ request()->routeIs('ally.packages.create')
-                        ? 'bg-blue-50 text-blue-900'
-                        : 'text-[#64748B] hover:bg-slate-50 hover:text-[#0F172A]' }}"
+                        ? 'bg-amber-400 text-[#111111]'
+                        : 'text-[#6B6B66] hover:bg-slate-50 hover:text-[#111111]' }}"
                 >
 
                     <svg
@@ -208,8 +208,8 @@
     @click="sidebarOpen = false"
     class="flex items-center gap-3 px-4 py-3 rounded-xl font-medium transition-colors
     {{ request()->routeIs('ally.packages.index')
-        ? 'bg-blue-50 text-blue-900'
-        : 'text-[#64748B] hover:bg-slate-50 hover:text-[#0F172A]' }}"
+        ? 'bg-amber-400 text-[#111111]'
+        : 'text-[#6B6B66] hover:bg-slate-50 hover:text-[#111111]' }}"
 >
     <svg
         class="w-5 h-5"
@@ -238,8 +238,8 @@
                     @click="sidebarOpen = false"
                     class="flex items-center gap-3 px-4 py-3 rounded-xl font-medium transition-colors
                     {{ request()->routeIs('ally.packages.reception')
-                        ? 'bg-blue-50 text-blue-900'
-                        : 'text-[#64748B] hover:bg-slate-50 hover:text-[#0F172A]' }}"
+                        ? 'bg-amber-400 text-[#111111]'
+                        : 'text-[#6B6B66] hover:bg-slate-50 hover:text-[#111111]' }}"
                 >
 
                     <svg
@@ -270,8 +270,8 @@
                     @click="sidebarOpen = false"
                     class="flex items-center gap-3 px-4 py-3 rounded-xl font-medium transition-colors
                     {{ request()->routeIs('ally.packages.pickup')
-                        ? 'bg-blue-50 text-blue-900'
-                        : 'text-[#64748B] hover:bg-slate-50 hover:text-[#0F172A]' }}"
+                        ? 'bg-amber-400 text-[#111111]'
+                        : 'text-[#6B6B66] hover:bg-slate-50 hover:text-[#111111]' }}"
                 >
 
                     <svg
@@ -307,8 +307,8 @@
                     @click="sidebarOpen = false"
                     class="flex items-center gap-3 px-4 py-3 rounded-xl font-medium transition-colors
                     {{ request()->routeIs('ally.sales-closeout')
-                        ? 'bg-blue-50 text-blue-900'
-                        : 'text-[#64748B] hover:bg-slate-50 hover:text-[#0F172A]' }}"
+                        ? 'bg-amber-400 text-[#111111]'
+                        : 'text-[#6B6B66] hover:bg-slate-50 hover:text-[#111111]' }}"
                 >
 
                     <svg
@@ -344,8 +344,8 @@
                     @click="sidebarOpen = false"
                     class="flex items-center gap-3 px-4 py-3 rounded-xl font-medium transition-colors
                     {{ request()->routeIs('ally.cod')
-                        ? 'bg-blue-50 text-blue-900'
-                        : 'text-[#64748B] hover:bg-slate-50 hover:text-[#0F172A]' }}"
+                        ? 'bg-amber-400 text-[#111111]'
+                        : 'text-[#6B6B66] hover:bg-slate-50 hover:text-[#111111]' }}"
                 >
 
                     <svg
@@ -380,8 +380,8 @@
                     @click="sidebarOpen = false"
                     class="flex items-center gap-3 px-4 py-3 rounded-xl font-medium transition-colors
                     {{ request()->routeIs('ally.incidents')
-                        ? 'bg-blue-50 text-blue-900'
-                        : 'text-[#64748B] hover:bg-slate-50 hover:text-[#0F172A]' }}"
+                        ? 'bg-amber-400 text-[#111111]'
+                        : 'text-[#6B6B66] hover:bg-slate-50 hover:text-[#111111]' }}"
                 >
 
                     <svg
@@ -410,7 +410,7 @@
                     {{-- ==================================================
                          ADMINISTRACIÓN
                     =================================================== --}}
-                    <p class="px-2 text-xs font-semibold text-[#94A3B8] uppercase tracking-wider mb-3 mt-6">
+                    <p class="px-2 text-xs font-semibold text-[#B8B8B2] uppercase tracking-wider mb-3 mt-6">
                         Administración
                     </p>
 
@@ -422,8 +422,8 @@
                         @click="sidebarOpen = false"
                         class="flex items-center gap-3 px-4 py-3 rounded-xl font-medium transition-colors
                         {{ request()->routeIs('ally.staff')
-                            ? 'bg-blue-50 text-blue-900'
-                            : 'text-[#64748B] hover:bg-slate-50 hover:text-[#0F172A]' }}"
+                            ? 'bg-amber-400 text-[#111111]'
+                            : 'text-[#6B6B66] hover:bg-slate-50 hover:text-[#111111]' }}"
                     >
 
                         <svg
@@ -453,7 +453,7 @@
                         wire:navigate
                         class="mb-1 flex items-center gap-3 rounded-xl px-3 py-2.5 text-sm font-medium transition
                         {{ request()->routeIs('ally.commissions')
-                            ? 'bg-blue-50 text-blue-900'
+                            ? 'bg-amber-400 text-[#111111]'
                             : 'text-slate-600 hover:bg-slate-50' }}"
                     >
                         <svg class="h-5 w-5"
@@ -476,7 +476,7 @@
                         wire:navigate
                         class="mb-1 flex items-center gap-3 rounded-xl px-3 py-2.5 text-sm font-medium transition
                         {{ request()->routeIs('ally.cash-cut')
-                            ? 'bg-blue-50 text-blue-900'
+                            ? 'bg-amber-400 text-[#111111]'
                             : 'text-slate-600 hover:bg-slate-50' }}"
                     >
                         <svg class="h-5 w-5"
@@ -502,7 +502,7 @@
         {{-- ==========================================================
              PERFIL
         =========================================================== --}}
-        <div class="mt-8 pt-6 border-t border-[#E2E8F0] shrink-0">
+        <div class="mt-8 pt-6 border-t border-[#E5E5E0] shrink-0">
 
             <div class="flex items-center gap-3 px-2">
 
@@ -514,11 +514,11 @@
 
                 <div class="overflow-hidden min-w-0">
 
-                    <p class="text-sm font-semibold text-[#0F172A] truncate">
+                    <p class="text-sm font-semibold text-[#111111] truncate">
                         {{ Auth::user()->name ?? 'Aliado' }}
                     </p>
 
-                    <p class="text-xs text-[#64748B] truncate">
+                    <p class="text-xs text-[#6B6B66] truncate">
                         {{ Auth::user()->email ?? '' }}
                     </p>
 
@@ -529,7 +529,7 @@
 
             <a
                 href="{{ route('profile') }}"
-                class="block w-full mt-4 px-2 text-sm text-[#64748B] font-medium hover:text-[#0F172A] transition-colors"
+                class="block w-full mt-4 px-2 text-sm text-[#6B6B66] font-medium hover:text-[#111111] transition-colors"
             >
                 Mi Perfil
             </a>
@@ -573,13 +573,13 @@
 
         {{-- HEADER --}}
         <header
-            class="h-16 bg-white border-b border-[#E2E8F0] flex items-center justify-between px-4 lg:px-8 sticky top-0 z-20"
+            class="h-16 bg-white border-b border-[#E5E5E0] flex items-center justify-between px-4 lg:px-8 sticky top-0 z-20"
         >
 
             <button
                 type="button"
                 @click="sidebarOpen = !sidebarOpen"
-                class="md:hidden inline-flex items-center justify-center w-10 h-10 rounded-xl text-[#0B1220] hover:bg-slate-100"
+                class="md:hidden inline-flex items-center justify-center w-10 h-10 rounded-xl text-[#111111] hover:bg-slate-100"
                 aria-label="Abrir menú"
             >
                 <svg
@@ -602,11 +602,11 @@
 
                 <div class="hidden sm:block text-right">
 
-                    <p class="text-sm font-semibold text-[#0F172A]">
+                    <p class="text-sm font-semibold text-[#111111]">
                         {{ auth()->user()->name ?? 'Aliado' }}
                     </p>
 
-                    <p class="text-xs text-[#64748B]">
+                    <p class="text-xs text-[#6B6B66]">
                         Agencia Aliada
                     </p>
 
@@ -614,7 +614,7 @@
 
                 <a
                     href="{{ route('profile') }}"
-                    class="text-sm font-medium text-[#64748B] hover:text-[#0F172A] transition-colors"
+                    class="text-sm font-medium text-[#6B6B66] hover:text-[#111111] transition-colors"
                 >
                     Mi Perfil
                 </a>
@@ -627,7 +627,7 @@
 
                     <button
                         type="submit"
-                        class="text-sm font-medium text-[#64748B] hover:text-red-600 transition-colors"
+                        class="text-sm font-medium text-[#6B6B66] hover:text-red-600 transition-colors"
                     >
                         Salir
                     </button>

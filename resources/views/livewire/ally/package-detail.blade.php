@@ -11,7 +11,7 @@
                 ← Volver a mis pedidos
             </a>
 
-            <h1 class="mt-2 font-display text-2xl font-bold text-[#0F172A]">
+            <h1 class="mt-2 font-display text-2xl font-bold text-[#111111]">
                 Detalle del pedido
             </h1>
 
@@ -59,9 +59,9 @@
     <div class="grid grid-cols-1 gap-6 lg:grid-cols-2">
 
         {{-- Remitente --}}
-        <div class="rounded-2xl border border-[#E2E8F0] bg-white p-5">
+        <div class="rounded-2xl border border-[#E5E5E0] bg-white p-5">
 
-            <h2 class="font-display text-lg font-semibold text-[#0F172A]">
+            <h2 class="font-display text-lg font-semibold text-[#111111]">
                 Remitente
             </h2>
 
@@ -103,9 +103,9 @@
 
 
         {{-- Destinatario --}}
-        <div class="rounded-2xl border border-[#E2E8F0] bg-white p-5">
+        <div class="rounded-2xl border border-[#E5E5E0] bg-white p-5">
 
-            <h2 class="font-display text-lg font-semibold text-[#0F172A]">
+            <h2 class="font-display text-lg font-semibold text-[#111111]">
                 Destinatario
             </h2>
 
@@ -149,9 +149,9 @@
 
 
     {{-- RUTA Y PAQUETE --}}
-    <div class="rounded-2xl border border-[#E2E8F0] bg-white p-5">
+    <div class="rounded-2xl border border-[#E5E5E0] bg-white p-5">
 
-        <h2 class="font-display text-lg font-semibold text-[#0F172A]">
+        <h2 class="font-display text-lg font-semibold text-[#111111]">
             Ruta y paquete
         </h2>
 
@@ -223,9 +223,9 @@
 
 
     {{-- TARIFA --}}
-    <div class="rounded-2xl border border-[#E2E8F0] bg-white p-5">
+    <div class="rounded-2xl border border-[#E5E5E0] bg-white p-5">
 
-        <h2 class="font-display text-lg font-semibold text-[#0F172A]">
+        <h2 class="font-display text-lg font-semibold text-[#111111]">
             Tarifa
         </h2>
 
@@ -376,9 +376,9 @@
     {{-- REPARTIDOR --}}
     @if ($package->driver)
 
-        <div class="rounded-2xl border border-[#E2E8F0] bg-white p-5">
+        <div class="rounded-2xl border border-[#E5E5E0] bg-white p-5">
 
-            <h2 class="font-display text-lg font-semibold text-[#0F172A]">
+            <h2 class="font-display text-lg font-semibold text-[#111111]">
                 Repartidor asignado
             </h2>
 
@@ -412,9 +412,9 @@
 
 
     {{-- HISTORIAL --}}
-    <div class="rounded-2xl border border-[#E2E8F0] bg-white p-5">
+    <div class="rounded-2xl border border-[#E5E5E0] bg-white p-5">
 
-        <h2 class="font-display text-lg font-semibold text-[#0F172A]">
+        <h2 class="font-display text-lg font-semibold text-[#111111]">
             Historial de movimientos
         </h2>
 

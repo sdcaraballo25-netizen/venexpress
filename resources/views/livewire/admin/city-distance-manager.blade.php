@@ -1,8 +1,8 @@
 <div class="min-h-screen">
     <div class="mb-8 flex flex-col gap-5 md:flex-row md:items-center md:justify-between">
         <div>
-            <h1 class="font-display text-3xl font-bold text-[#0F172A]">Distancias entre ciudades</h1>
-            <p class="mt-1 text-sm text-[#64748B]">Estas distancias alimentan el cálculo de precio por kilómetro de cada guía.</p>
+            <h1 class="font-display text-3xl font-bold text-[#111111]">Distancias entre ciudades</h1>
+            <p class="mt-1 text-sm text-[#6B6B66]">Estas distancias alimentan el cálculo de precio por kilómetro de cada guía.</p>
         </div>
 
         @unless ($showForm)
@@ -22,40 +22,40 @@
     @endif
 
     @if ($showForm)
-        <div class="mb-6 rounded-2xl border border-[#E2E8F0] bg-white p-6 shadow-sm">
-            <h2 class="font-display text-lg font-bold text-[#0F172A] mb-5">
+        <div class="mb-6 rounded-2xl border border-[#E5E5E0] bg-white p-6 shadow-sm">
+            <h2 class="font-display text-lg font-bold text-[#111111] mb-5">
                 {{ $editingId ? 'Editar distancia' : 'Registrar distancia' }}
             </h2>
 
             <form wire:submit="save" class="space-y-4">
                 <div class="grid grid-cols-1 gap-4 md:grid-cols-3">
                     <div>
-                        <label class="mb-1 block text-xs font-bold uppercase tracking-wider text-[#64748B]">Ciudad A</label>
+                        <label class="mb-1 block text-xs font-bold uppercase tracking-wider text-[#6B6B66]">Ciudad A</label>
                         <input type="text" wire:model="city_one" placeholder="Caracas"
-                               class="w-full rounded-xl border-[#E2E8F0] text-sm focus:border-blue-500 focus:ring-blue-500">
+                               class="w-full rounded-xl border-[#E5E5E0] text-sm focus:border-blue-500 focus:ring-blue-500">
                         @error('city_one') <p class="mt-1 text-xs text-red-600">{{ $message }}</p> @enderror
                     </div>
                     <div>
-                        <label class="mb-1 block text-xs font-bold uppercase tracking-wider text-[#64748B]">Ciudad B</label>
+                        <label class="mb-1 block text-xs font-bold uppercase tracking-wider text-[#6B6B66]">Ciudad B</label>
                         <input type="text" wire:model="city_two" placeholder="Valencia"
-                               class="w-full rounded-xl border-[#E2E8F0] text-sm focus:border-blue-500 focus:ring-blue-500">
+                               class="w-full rounded-xl border-[#E5E5E0] text-sm focus:border-blue-500 focus:ring-blue-500">
                         @error('city_two') <p class="mt-1 text-xs text-red-600">{{ $message }}</p> @enderror
                     </div>
                     <div>
-                        <label class="mb-1 block text-xs font-bold uppercase tracking-wider text-[#64748B]">Distancia (km)</label>
+                        <label class="mb-1 block text-xs font-bold uppercase tracking-wider text-[#6B6B66]">Distancia (km)</label>
                         <input type="number" wire:model="distance_km" placeholder="180"
-                               class="w-full rounded-xl border-[#E2E8F0] text-sm focus:border-blue-500 focus:ring-blue-500">
+                               class="w-full rounded-xl border-[#E5E5E0] text-sm focus:border-blue-500 focus:ring-blue-500">
                         @error('distance_km') <p class="mt-1 text-xs text-red-600">{{ $message }}</p> @enderror
                     </div>
                 </div>
 
                 <div class="flex items-center gap-3 pt-2">
                     <button type="submit"
-                            class="rounded-xl bg-[#0F172A] px-5 py-2.5 text-sm font-medium text-white transition-colors hover:bg-slate-800">
+                            class="rounded-xl bg-[#111111] px-5 py-2.5 text-sm font-medium text-white transition-colors hover:bg-slate-800">
                         {{ $editingId ? 'Guardar cambios' : 'Registrar distancia' }}
                     </button>
                     <button type="button" wire:click="cancelEdit"
-                            class="px-5 py-2.5 text-sm font-medium text-[#64748B] transition-colors hover:text-[#0F172A]">
+                            class="px-5 py-2.5 text-sm font-medium text-[#6B6B66] transition-colors hover:text-[#111111]">
                         Cancelar
                     </button>
                 </div>
@@ -63,23 +63,23 @@
         </div>
     @endif
 
-    <div class="overflow-hidden rounded-2xl border border-[#E2E8F0] bg-white shadow-sm">
+    <div class="overflow-hidden rounded-2xl border border-[#E5E5E0] bg-white shadow-sm">
         <div class="overflow-x-auto">
             <table class="w-full text-sm">
-                <thead class="border-b border-[#E2E8F0] bg-slate-50">
+                <thead class="border-b border-[#E5E5E0] bg-slate-50">
                     <tr>
-                        <th class="px-6 py-4 text-left text-xs font-semibold uppercase text-[#64748B]">Ciudad A</th>
-                        <th class="px-6 py-4 text-left text-xs font-semibold uppercase text-[#64748B]">Ciudad B</th>
-                        <th class="px-6 py-4 text-right text-xs font-semibold uppercase text-[#64748B]">Distancia</th>
-                        <th class="px-6 py-4 text-right text-xs font-semibold uppercase text-[#64748B]">Acciones</th>
+                        <th class="px-6 py-4 text-left text-xs font-semibold uppercase text-[#6B6B66]">Ciudad A</th>
+                        <th class="px-6 py-4 text-left text-xs font-semibold uppercase text-[#6B6B66]">Ciudad B</th>
+                        <th class="px-6 py-4 text-right text-xs font-semibold uppercase text-[#6B6B66]">Distancia</th>
+                        <th class="px-6 py-4 text-right text-xs font-semibold uppercase text-[#6B6B66]">Acciones</th>
                     </tr>
                 </thead>
                 <tbody>
                     @forelse ($distances as $distance)
-                        <tr class="border-b border-[#F1F5F9] last:border-0 hover:bg-slate-50">
-                            <td class="px-6 py-4 font-medium text-[#0F172A]">{{ $distance->city_a }}</td>
-                            <td class="px-6 py-4 font-medium text-[#0F172A]">{{ $distance->city_b }}</td>
-                            <td class="px-6 py-4 text-right font-display font-bold text-[#0F172A]">
+                        <tr class="border-b border-[#F0F0EC] last:border-0 hover:bg-slate-50">
+                            <td class="px-6 py-4 font-medium text-[#111111]">{{ $distance->city_a }}</td>
+                            <td class="px-6 py-4 font-medium text-[#111111]">{{ $distance->city_b }}</td>
+                            <td class="px-6 py-4 text-right font-display font-bold text-[#111111]">
                                 {{ number_format($distance->distance_km) }} km
                             </td>
                             <td class="px-6 py-4 text-right">
@@ -103,7 +103,7 @@
                         </tr>
                     @empty
                         <tr>
-                            <td colspan="4" class="px-6 py-10 text-center text-[#64748B]">
+                            <td colspan="4" class="px-6 py-10 text-center text-[#6B6B66]">
                                 Aún no hay distancias registradas.
                             </td>
                         </tr>
@@ -113,7 +113,7 @@
         </div>
 
         @if ($distances->hasPages())
-            <div class="border-t border-[#E2E8F0] px-6 py-4">
+            <div class="border-t border-[#E5E5E0] px-6 py-4">
                 {{ $distances->links() }}
             </div>
         @endif

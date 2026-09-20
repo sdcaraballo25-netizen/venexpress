@@ -39,11 +39,11 @@
     <div class="flex flex-col md:flex-row md:items-center md:justify-between gap-4 mb-8">
 
         <div>
-            <h1 class="font-display text-3xl font-bold text-[#0F172A]">
+            <h1 class="font-display text-3xl font-bold text-[#111111]">
                 Gestión de Aliados
             </h1>
 
-            <p class="text-sm text-[#64748B] mt-1">
+            <p class="text-sm text-[#6B6B66] mt-1">
                 Administra las taquillas aliadas de Venexpress.
             </p>
         </div>
@@ -77,7 +77,7 @@
     {{-- =========================================================
          BUSCADOR
     ========================================================== --}}
-    <div class="bg-white border border-[#E2E8F0] rounded-2xl p-5 shadow-sm mb-6">
+    <div class="bg-white border border-[#E5E5E0] rounded-2xl p-5 shadow-sm mb-6">
 
         <div class="relative max-w-md">
 
@@ -85,10 +85,10 @@
                 type="text"
                 wire:model.live="search"
                 placeholder="Buscar por empresa, RIF o ciudad..."
-                class="w-full rounded-xl border border-[#E2E8F0]
+                class="w-full rounded-xl border border-[#E5E5E0]
                        px-4 py-3 text-sm
-                       text-[#0F172A]
-                       placeholder:text-[#94A3B8]
+                       text-[#111111]
+                       placeholder:text-[#B8B8B2]
                        focus:border-blue-500
                        focus:ring-blue-500"
             >
@@ -101,7 +101,7 @@
     {{-- =========================================================
          TABLA
     ========================================================== --}}
-    <div class="bg-white border border-[#E2E8F0] rounded-2xl shadow-sm overflow-hidden">
+    <div class="bg-white border border-[#E5E5E0] rounded-2xl shadow-sm overflow-hidden">
 
         <div class="overflow-x-auto">
 
@@ -110,25 +110,25 @@
                 {{-- CABECERA --}}
                 <thead>
 
-                    <tr class="bg-slate-50 border-b border-[#E2E8F0]">
+                    <tr class="bg-slate-50 border-b border-[#E5E5E0]">
 
-                        <th class="px-6 py-4 text-left text-xs font-semibold text-[#64748B] uppercase">
+                        <th class="px-6 py-4 text-left text-xs font-semibold text-[#6B6B66] uppercase">
                             Aliado / Empresa
                         </th>
 
-                        <th class="px-6 py-4 text-left text-xs font-semibold text-[#64748B] uppercase">
+                        <th class="px-6 py-4 text-left text-xs font-semibold text-[#6B6B66] uppercase">
                             RIF
                         </th>
 
-                        <th class="px-6 py-4 text-left text-xs font-semibold text-[#64748B] uppercase">
+                        <th class="px-6 py-4 text-left text-xs font-semibold text-[#6B6B66] uppercase">
                             Ciudad
                         </th>
 
-                        <th class="px-6 py-4 text-center text-xs font-semibold text-[#64748B] uppercase">
+                        <th class="px-6 py-4 text-center text-xs font-semibold text-[#6B6B66] uppercase">
                             Estado
                         </th>
 
-                        <th class="px-6 py-4 text-right text-xs font-semibold text-[#64748B] uppercase">
+                        <th class="px-6 py-4 text-right text-xs font-semibold text-[#6B6B66] uppercase">
                             Acción
                         </th>
 
@@ -153,7 +153,7 @@
                         @endphp
 
 
-                        <tr class="border-b border-[#F1F5F9] last:border-0 hover:bg-slate-50 transition">
+                        <tr class="border-b border-[#F0F0EC] last:border-0 hover:bg-slate-50 transition">
 
 
                             {{-- =================================================
@@ -173,18 +173,18 @@
                                             <img
                                                 src="{{ route('allies.documents.storefront', $ally) }}"
                                                 alt="Fachada de {{ $ally->business_name }}"
-                                                class="w-10 h-10 rounded-lg object-cover border border-[#E2E8F0] hover:opacity-80 transition"
+                                                class="w-10 h-10 rounded-lg object-cover border border-[#E5E5E0] hover:opacity-80 transition"
                                             >
                                         </button>
                                     @endif
 
                                     <div>
 
-                                        <p class="font-semibold text-[#0F172A]">
+                                        <p class="font-semibold text-[#111111]">
                                             {{ $ally->business_name }}
                                         </p>
 
-                                        <p class="text-xs text-[#64748B] mt-1">
+                                        <p class="text-xs text-[#6B6B66] mt-1">
                                             {{ $ally->user?->email }}
                                         </p>
 
@@ -198,7 +198,7 @@
                             {{-- =================================================
                                  RIF
                             ================================================== --}}
-                            <td class="px-6 py-4 text-[#475569]">
+                            <td class="px-6 py-4 text-[#4A4A45]">
 
                                 {{ $ally->rif }}
 
@@ -208,7 +208,7 @@
                             {{-- =================================================
                                  CIUDAD
                             ================================================== --}}
-                            <td class="px-6 py-4 text-[#475569]">
+                            <td class="px-6 py-4 text-[#4A4A45]">
 
                                 {{ $ally->city }}
 
@@ -408,7 +408,7 @@
                                     ========================================== --}}
                                     @elseif($ally->status === Ally::STATUS_REJECTED)
 
-                                        <span class="text-xs text-[#94A3B8]">
+                                        <span class="text-xs text-[#B8B8B2]">
                                             Sin acciones
                                         </span>
 
@@ -439,11 +439,11 @@
                                         👥
                                     </div>
 
-                                    <p class="font-semibold text-[#0F172A]">
+                                    <p class="font-semibold text-[#111111]">
                                         No hay aliados registrados
                                     </p>
 
-                                    <p class="text-sm text-[#64748B] mt-1">
+                                    <p class="text-sm text-[#6B6B66] mt-1">
                                         Los aliados aparecerán aquí cuando sean registrados.
                                     </p>
 
@@ -467,7 +467,7 @@
         ========================================================== --}}
         @if($allies->hasPages())
 
-            <div class="px-6 py-4 border-t border-[#E2E8F0]">
+            <div class="px-6 py-4 border-t border-[#E5E5E0]">
 
                 {{ $allies->links() }}
 
@@ -491,7 +491,7 @@
             <div class="bg-white rounded-2xl shadow-xl w-full max-w-lg p-6">
 
                 <div class="flex items-center justify-between mb-4">
-                    <h3 class="font-display text-lg font-bold text-[#0F172A]">
+                    <h3 class="font-display text-lg font-bold text-[#111111]">
                         Ubicación de la agencia
                     </h3>
                     <button wire:click="$set('showLocationModal', false)" class="text-slate-400 hover:text-slate-600">
@@ -499,7 +499,7 @@
                     </button>
                 </div>
 
-                <p class="text-xs text-[#64748B] mb-3">
+                <p class="text-xs text-[#6B6B66] mb-3">
                     Haz clic en el mapa sobre la ubicación exacta de la agencia. Estas coordenadas
                     son las que se muestran a los clientes en el localizador público de oficinas.
                 </p>
@@ -512,14 +512,14 @@
                     })"
                     x-init="init($el)"
                     wire:ignore
-                    class="rounded-xl overflow-hidden border border-[#E2E8F0] mb-4"
+                    class="rounded-xl overflow-hidden border border-[#E5E5E0] mb-4"
                     style="height: 280px;"
                 ></div>
 
                 <div class="grid grid-cols-2 gap-3 mb-4">
                     <div>
-                        <label class="block text-xs font-medium text-[#64748B] mb-1">Estado</label>
-                        <select wire:model="location_state" class="w-full rounded-lg border-[#E2E8F0] text-sm focus:ring-blue-500 focus:border-blue-500">
+                        <label class="block text-xs font-medium text-[#6B6B66] mb-1">Estado</label>
+                        <select wire:model="location_state" class="w-full rounded-lg border-[#E5E5E0] text-sm focus:ring-blue-500 focus:border-blue-500">
                             <option value="">Selecciona...</option>
                             @foreach ($venezuelaStates as $state)
                                 <option value="{{ $state }}">{{ $state }}</option>
@@ -529,14 +529,14 @@
                     </div>
                     <div class="grid grid-cols-2 gap-2">
                         <div>
-                            <label class="block text-xs font-medium text-[#64748B] mb-1">Latitud</label>
+                            <label class="block text-xs font-medium text-[#6B6B66] mb-1">Latitud</label>
                             <input type="text" wire:model="location_latitude" readonly
-                                class="w-full rounded-lg border-[#E2E8F0] text-sm bg-slate-50 text-slate-500">
+                                class="w-full rounded-lg border-[#E5E5E0] text-sm bg-slate-50 text-slate-500">
                         </div>
                         <div>
-                            <label class="block text-xs font-medium text-[#64748B] mb-1">Longitud</label>
+                            <label class="block text-xs font-medium text-[#6B6B66] mb-1">Longitud</label>
                             <input type="text" wire:model="location_longitude" readonly
-                                class="w-full rounded-lg border-[#E2E8F0] text-sm bg-slate-50 text-slate-500">
+                                class="w-full rounded-lg border-[#E5E5E0] text-sm bg-slate-50 text-slate-500">
                         </div>
                     </div>
                 </div>
@@ -582,7 +582,7 @@
             <div class="bg-white rounded-2xl shadow-xl w-full max-w-lg p-6 max-h-[90vh] overflow-y-auto">
 
                 <div class="flex items-center justify-between mb-4">
-                    <h3 class="font-display text-lg font-bold text-[#0F172A]">
+                    <h3 class="font-display text-lg font-bold text-[#111111]">
                         Detalle del aliado
                     </h3>
                     <button wire:click="closeDetails" class="text-slate-400 hover:text-slate-600">
@@ -600,17 +600,17 @@
                         <img
                             src="{{ route('allies.documents.storefront', $viewingAlly) }}"
                             alt="Fachada de {{ $viewingAlly->business_name }}"
-                            class="w-full h-48 object-cover rounded-xl border border-[#E2E8F0] hover:opacity-90 transition"
+                            class="w-full h-48 object-cover rounded-xl border border-[#E5E5E0] hover:opacity-90 transition"
                         >
                     </button>
                 @else
-                    <div class="w-full h-32 rounded-xl border border-dashed border-[#E2E8F0] bg-slate-50 flex items-center justify-center text-xs text-[#94A3B8] mb-4">
+                    <div class="w-full h-32 rounded-xl border border-dashed border-[#E5E5E0] bg-slate-50 flex items-center justify-center text-xs text-[#B8B8B2] mb-4">
                         Sin foto de fachada
                     </div>
                 @endif
 
                 <div class="flex items-center justify-between mb-4">
-                    <p class="font-display text-xl font-bold text-[#0F172A]">
+                    <p class="font-display text-xl font-bold text-[#111111]">
                         {{ $viewingAlly->business_name }}
                     </p>
 
@@ -634,55 +634,55 @@
                 <dl class="grid grid-cols-2 gap-x-4 gap-y-3 text-sm mb-2">
 
                     <div class="col-span-2">
-                        <dt class="text-xs font-medium text-[#64748B]">RIF</dt>
-                        <dd class="text-[#0F172A]">{{ $viewingAlly->rif }}</dd>
+                        <dt class="text-xs font-medium text-[#6B6B66]">RIF</dt>
+                        <dd class="text-[#111111]">{{ $viewingAlly->rif }}</dd>
                     </div>
 
                     <div>
-                        <dt class="text-xs font-medium text-[#64748B]">Contacto</dt>
-                        <dd class="text-[#0F172A]">{{ $viewingAlly->user?->name ?? '—' }}</dd>
+                        <dt class="text-xs font-medium text-[#6B6B66]">Contacto</dt>
+                        <dd class="text-[#111111]">{{ $viewingAlly->user?->name ?? '—' }}</dd>
                     </div>
 
                     <div>
-                        <dt class="text-xs font-medium text-[#64748B]">Teléfono</dt>
-                        <dd class="text-[#0F172A]">{{ $viewingAlly->user?->phone ?? '—' }}</dd>
+                        <dt class="text-xs font-medium text-[#6B6B66]">Teléfono</dt>
+                        <dd class="text-[#111111]">{{ $viewingAlly->user?->phone ?? '—' }}</dd>
                     </div>
 
                     <div class="col-span-2">
-                        <dt class="text-xs font-medium text-[#64748B]">Correo</dt>
-                        <dd class="text-[#0F172A]">{{ $viewingAlly->user?->email ?? '—' }}</dd>
+                        <dt class="text-xs font-medium text-[#6B6B66]">Correo</dt>
+                        <dd class="text-[#111111]">{{ $viewingAlly->user?->email ?? '—' }}</dd>
                     </div>
 
                     <div>
-                        <dt class="text-xs font-medium text-[#64748B]">Ciudad</dt>
-                        <dd class="text-[#0F172A]">{{ $viewingAlly->city }}</dd>
+                        <dt class="text-xs font-medium text-[#6B6B66]">Ciudad</dt>
+                        <dd class="text-[#111111]">{{ $viewingAlly->city }}</dd>
                     </div>
 
                     <div>
-                        <dt class="text-xs font-medium text-[#64748B]">Estado (región)</dt>
-                        <dd class="text-[#0F172A]">{{ $viewingAlly->state ?? '—' }}</dd>
+                        <dt class="text-xs font-medium text-[#6B6B66]">Estado (región)</dt>
+                        <dd class="text-[#111111]">{{ $viewingAlly->state ?? '—' }}</dd>
                     </div>
 
                     <div class="col-span-2">
-                        <dt class="text-xs font-medium text-[#64748B]">Dirección</dt>
-                        <dd class="text-[#0F172A]">{{ $viewingAlly->address }}</dd>
+                        <dt class="text-xs font-medium text-[#6B6B66]">Dirección</dt>
+                        <dd class="text-[#111111]">{{ $viewingAlly->address }}</dd>
                     </div>
 
                     <div>
-                        <dt class="text-xs font-medium text-[#64748B]">Comisión</dt>
-                        <dd class="text-[#0F172A]">{{ $viewingAlly->commission_percentage }}%</dd>
+                        <dt class="text-xs font-medium text-[#6B6B66]">Comisión</dt>
+                        <dd class="text-[#111111]">{{ $viewingAlly->commission_percentage }}%</dd>
                     </div>
 
                     <div>
-                        <dt class="text-xs font-medium text-[#64748B]">Postulado el</dt>
-                        <dd class="text-[#0F172A]">{{ $viewingAlly->created_at?->format('d/m/Y h:i A') }}</dd>
+                        <dt class="text-xs font-medium text-[#6B6B66]">Postulado el</dt>
+                        <dd class="text-[#111111]">{{ $viewingAlly->created_at?->format('d/m/Y h:i A') }}</dd>
                     </div>
 
                 </dl>
 
                 @if($viewingAlly->rif_document_path || $viewingAlly->mercantile_registry_document_path || $viewingAlly->owner_id_document_path)
-                    <div class="border-t border-[#E2E8F0] mt-4 pt-4">
-                        <p class="text-xs font-medium text-[#64748B] mb-2">Documentos de verificación</p>
+                    <div class="border-t border-[#E5E5E0] mt-4 pt-4">
+                        <p class="text-xs font-medium text-[#6B6B66] mb-2">Documentos de verificación</p>
 
                         <div class="flex flex-col gap-1.5 text-sm">
                             @if($viewingAlly->rif_document_path)
@@ -708,7 +708,7 @@
                         </div>
                     </div>
                 @else
-                    <p class="text-xs text-[#94A3B8] mt-4 pt-4 border-t border-[#E2E8F0]">
+                    <p class="text-xs text-[#B8B8B2] mt-4 pt-4 border-t border-[#E5E5E0]">
                         Este aliado no tiene documentos de verificación cargados (se registró antes de que este requisito existiera).
                     </p>
                 @endif
