@@ -184,7 +184,7 @@
     ========================================================== --}}
     <nav id="main-navbar" class="bg-white border-b border-gray-100 sticky top-0 z-50">
 
-        <div class="max-w-7xl mx-auto px-6 py-4 flex items-center justify-between">
+        <div class="max-w-7xl mx-auto px-6 py-4 flex items-center gap-4 lg:gap-6">
 
             <a href="{{ route('home') }}"
                class="shrink-0"
@@ -234,13 +234,13 @@
             </div>
 
 
-            <div class="flex items-center gap-1.5 sm:gap-3">
+            <div class="flex items-center gap-1.5 sm:gap-3 ml-auto">
 
                 {{-- Rastrea tu envío --}}
                 <form
                     action="{{ route('tracking.show') }}"
                     method="GET"
-                    class="hidden lg:flex items-center ml-6 xl:ml-10 pl-6 xl:pl-10 border-l border-gray-200"
+                    class="hidden xl:flex items-center ml-4 pl-4 border-l border-gray-200"
                 >
                     <div class="flex items-center border border-[#111111]/15 rounded-lg overflow-hidden">
 
@@ -250,7 +250,7 @@
                             placeholder="Rastrea tu envío"
                             autocomplete="off"
                             spellcheck="false"
-                            class="w-40 xl:w-48 border-0 text-sm placeholder:text-gray-400 focus:ring-0 py-2 pl-3 pr-1"
+                            class="w-32 2xl:w-40 border-0 text-sm placeholder:text-gray-400 focus:ring-0 py-2 pl-3 pr-1"
                         >
 
                         <button
