@@ -42,6 +42,7 @@ use App\Livewire\Ally\StaffManager as AllyStaffManager;
 use App\Livewire\Almacen\Dashboard as AlmacenDashboard;
 use App\Livewire\Almacen\HelpCenter as AlmacenHelpCenter;
 use App\Livewire\Client\Dashboard as ClientDashboard;
+use App\Livewire\Client\HelpCenter as ClientHelpCenter;
 use App\Livewire\Client\Incidents as ClientIncidents;
 use App\Livewire\Client\PendingPayments as ClientPendingPayments;
 use App\Livewire\Driver\AppDownload;
@@ -227,6 +228,9 @@ Route::prefix('cliente')
 
         Route::get('/pagos-pendientes', ClientPendingPayments::class)
             ->name('pending-payments');
+
+        Route::get('/ayuda', ClientHelpCenter::class)
+            ->name('help');
     });
 
 /*

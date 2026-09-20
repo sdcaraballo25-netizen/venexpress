@@ -90,39 +90,42 @@
 
                  Reutiliza la página pública de rastreo (TrackingController
                  / /rastreo/resultado) tal cual, en vez de duplicar aquí
-                 la lógica de la línea de tiempo. Se abre en pestaña
-                 nueva para no sacar al cliente de su cuenta.
+                 la lógica de la línea de tiempo — pero en un modal con
+                 un iframe en vez de una pestaña nueva, para que el
+                 cliente vea el resultado sin salir de su panel.
             =================================================== --}}
-            <form
-                method="GET"
-                action="{{ route('tracking.show') }}"
-                target="_blank"
-                class="px-2 mb-8"
-            >
-                <label class="block text-xs font-semibold text-[#B8B8B2] uppercase tracking-wider mb-2">
-                    Rastrear guía
-                </label>
+            <div class="px-2 mb-8">
+                <form
+                    @submit.prevent="
+                        $store.tracking.src = '{{ route('tracking.show') }}?guia=' + encodeURIComponent($event.target.guia.value);
+                        $dispatch('open-modal', 'tracking-result');
+                    "
+                >
+                    <label class="block text-xs font-semibold text-[#B8B8B2] uppercase tracking-wider mb-2">
+                        Rastrear guía
+                    </label>
 
-                <div class="flex gap-2">
-                    <input
-                        type="text"
-                        name="guia"
-                        required
-                        placeholder="VEN-..."
-                        class="w-full min-w-0 rounded-xl border-[#E5E5E0] text-sm focus:border-blue-900 focus:ring-blue-900"
-                    >
+                    <div class="flex gap-2">
+                        <input
+                            type="text"
+                            name="guia"
+                            required
+                            placeholder="VEN-..."
+                            class="w-full min-w-0 rounded-xl border-[#E5E5E0] text-sm focus:border-blue-900 focus:ring-blue-900"
+                        >
 
-                    <button
-                        type="submit"
-                        class="shrink-0 rounded-xl bg-blue-900 px-3 text-white hover:bg-blue-800"
-                        aria-label="Buscar guía"
-                    >
-                        <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 21l-4.35-4.35M17 10.5A6.5 6.5 0 114 10.5a6.5 6.5 0 0113 0z" />
-                        </svg>
-                    </button>
-                </div>
-            </form>
+                        <button
+                            type="submit"
+                            class="shrink-0 rounded-xl bg-blue-900 px-3 text-white hover:bg-blue-800"
+                            aria-label="Buscar guía"
+                        >
+                            <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 21l-4.35-4.35M17 10.5A6.5 6.5 0 114 10.5a6.5 6.5 0 0113 0z" />
+                            </svg>
+                        </button>
+                    </div>
+                </form>
+            </div>
 
             {{-- ==================================================
                  NAVEGACIÓN
@@ -160,6 +163,37 @@
 
                     <span>
                         Mis pedidos
+                    </span>
+
+                </a>
+
+                {{-- COTIZAR --}}
+                <a
+                    href="{{ route('public.calculator') }}"
+                    wire:navigate
+                    @click="sidebarOpen = false"
+                    class="flex items-center gap-3 px-4 py-3 rounded-xl font-medium transition-colors
+                    {{ request()->routeIs('public.calculator')
+                        ? 'bg-amber-400 text-[#111111]'
+                        : 'text-[#6B6B66] hover:bg-slate-50 hover:text-[#111111]' }}"
+                >
+
+                    <svg
+                        class="w-5 h-5"
+                        fill="none"
+                        stroke="currentColor"
+                        viewBox="0 0 24 24"
+                    >
+                        <path
+                            stroke-linecap="round"
+                            stroke-linejoin="round"
+                            stroke-width="2"
+                            d="M9 7h6m0 3H9m3 3h.01M9 19l-4-4V7a2 2 0 012-2h10a2 2 0 012 2v8a2 2 0 01-2 2h-6l-2 2z"
+                        />
+                    </svg>
+
+                    <span>
+                        Cotizar
                     </span>
 
                 </a>
@@ -226,7 +260,7 @@
 
                 </a>
 
-                {{-- PAGOS PENDIENTES --}}
+                {{-- PAGOS --}}
                 <a
                     href="{{ route('cliente.pending-payments') }}"
                     wire:navigate
@@ -251,8 +285,80 @@
                         />
                     </svg>
 
+                    <span class="flex flex-1 items-center justify-between">
+                        Pagos
+
+                        @if (auth()->user()->hasPendingCodPayments())
+                            <span class="h-2 w-2 shrink-0 rounded-full bg-red-500"></span>
+                        @endif
+                    </span>
+
+                </a>
+
+                {{-- SUCURSALES --}}
+                <a
+                    href="{{ route('public.offices') }}"
+                    wire:navigate
+                    @click="sidebarOpen = false"
+                    class="flex items-center gap-3 px-4 py-3 rounded-xl font-medium transition-colors
+                    {{ request()->routeIs('public.offices')
+                        ? 'bg-amber-400 text-[#111111]'
+                        : 'text-[#6B6B66] hover:bg-slate-50 hover:text-[#111111]' }}"
+                >
+
+                    <svg
+                        class="w-5 h-5"
+                        fill="none"
+                        stroke="currentColor"
+                        viewBox="0 0 24 24"
+                    >
+                        <path
+                            stroke-linecap="round"
+                            stroke-linejoin="round"
+                            stroke-width="2"
+                            d="M17.657 16.657L13.414 20.9a1.998 1.998 0 01-2.827 0l-4.244-4.243a8 8 0 1111.314 0z"
+                        />
+                        <path
+                            stroke-linecap="round"
+                            stroke-linejoin="round"
+                            stroke-width="2"
+                            d="M15 11a3 3 0 11-6 0 3 3 0 016 0z"
+                        />
+                    </svg>
+
                     <span>
-                        Pagos pendientes
+                        Sucursales
+                    </span>
+
+                </a>
+
+                {{-- CENTRO DE AYUDA --}}
+                <a
+                    href="{{ route('cliente.help') }}"
+                    wire:navigate
+                    @click="sidebarOpen = false"
+                    class="flex items-center gap-3 px-4 py-3 rounded-xl font-medium transition-colors
+                    {{ request()->routeIs('cliente.help')
+                        ? 'bg-amber-400 text-[#111111]'
+                        : 'text-[#6B6B66] hover:bg-slate-50 hover:text-[#111111]' }}"
+                >
+
+                    <svg
+                        class="w-5 h-5"
+                        fill="none"
+                        stroke="currentColor"
+                        viewBox="0 0 24 24"
+                    >
+                        <path
+                            stroke-linecap="round"
+                            stroke-linejoin="round"
+                            stroke-width="2"
+                            d="M8.228 9c.549-1.165 2.03-2 3.772-2 2.21 0 4 1.343 4 3 0 1.4-1.278 2.575-3.006 2.907-.542.104-.994.54-.994 1.093m0 3h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"
+                        />
+                    </svg>
+
+                    <span>
+                        Centro de Ayuda
                     </span>
 
                 </a>
@@ -315,6 +421,37 @@
         </div>
 
     </aside>
+
+
+    {{-- ==========================================================
+         MODAL DE RASTREO
+
+         Fuera del <aside> a propósito: ese contenedor usa `transform`
+         (para el slide-in del sidebar en móvil), y un ancestro con
+         `transform` crea un nuevo contenedor de posicionamiento que
+         rompe `position: fixed` — el modal quedaba encajonado dentro
+         del sidebar en vez de cubrir toda la pantalla.
+    =========================================================== --}}
+    <x-modal name="tracking-result" maxWidth="2xl">
+        <div class="flex items-center justify-between border-b border-[#E5E5E0] px-4 py-3">
+            <span class="text-sm font-semibold text-[#111111]">Resultado del rastreo</span>
+
+            <button
+                @click="$dispatch('close-modal', 'tracking-result')"
+                class="text-[#B8B8B2] hover:text-[#111111]"
+                aria-label="Cerrar"
+            >
+                <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12" />
+                </svg>
+            </button>
+        </div>
+
+        <iframe
+            :src="$store.tracking.src"
+            class="h-[75vh] w-full"
+        ></iframe>
+    </x-modal>
 
 
     {{-- ==========================================================
@@ -415,6 +552,18 @@
     </div>
 
 </div>
+
+{{-- Estado del modal de rastreo (ver más abajo). Se registra como
+     Alpine.store en vez de x-data en <html> — mismo patrón que
+     $store.confirm (confirm-dialog.blade.php) — para no depender de
+     que Alpine procese datos declarados en la raíz del documento. --}}
+<script>
+    document.addEventListener('alpine:init', () => {
+        Alpine.store('tracking', {
+            src: '',
+        });
+    });
+</script>
 
 @livewireScripts
 
