@@ -70,6 +70,12 @@ new #[Layout('layouts.guest')] class extends Component
         VenezuelaLocationService $locationService
     ): void {
         $this->states = $locationService->states();
+
+        $requestedRole = request()->query('role');
+
+        if (in_array($requestedRole, ['cliente', 'repartidor', 'aliado'], true)) {
+            $this->role = $requestedRole;
+        }
     }
 
     /**

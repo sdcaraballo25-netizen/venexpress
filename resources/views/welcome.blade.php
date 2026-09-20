@@ -926,6 +926,82 @@
     </section>
 
 
+    {{-- =========================================================
+         ÚNETE A LA FLOTA
+    ========================================================== --}}
+    <section id="flota" class="bg-[#111111] overflow-hidden">
+
+        <div class="max-w-7xl mx-auto px-6 py-16 grid md:grid-cols-2 gap-10 items-center">
+
+            <div>
+
+                <span class="inline-block bg-amber-400 text-[#111111] text-xs font-bold tracking-wide uppercase px-3 py-1 rounded-full mb-4">
+                    Reclutamiento abierto
+                </span>
+
+                <h2 class="text-3xl md:text-4xl font-extrabold text-white leading-tight">
+                    ¿Tienes moto o vehículo?<br>
+                    <span class="text-amber-400">Únete a la flota Venexpress.</span>
+                </h2>
+
+                <p class="mt-4 text-sm text-gray-300 max-w-md">
+                    Genera ingresos extra entregando paquetes en tu ciudad. Tú decides tu horario, nosotros te asignamos las rutas.
+                </p>
+
+                <div class="grid sm:grid-cols-3 gap-4 mt-8">
+
+                    <div>
+                        <div class="w-9 h-9 rounded-lg bg-white/10 flex items-center justify-center mb-2">
+                            <i class="fa-solid fa-sack-dollar text-amber-400"></i>
+                        </div>
+                        <p class="text-xs font-semibold text-white">
+                            Comisión por entrega
+                        </p>
+                    </div>
+
+                    <div>
+                        <div class="w-9 h-9 rounded-lg bg-white/10 flex items-center justify-center mb-2">
+                            <i class="fa-regular fa-clock text-amber-400"></i>
+                        </div>
+                        <p class="text-xs font-semibold text-white">
+                            Horario flexible
+                        </p>
+                    </div>
+
+                    <div>
+                        <div class="w-9 h-9 rounded-lg bg-white/10 flex items-center justify-center mb-2">
+                            <i class="fa-solid fa-route text-amber-400"></i>
+                        </div>
+                        <p class="text-xs font-semibold text-white">
+                            Rutas cerca de ti
+                        </p>
+                    </div>
+
+                </div>
+
+                <a
+                    href="{{ route('register', ['role' => 'repartidor']) }}"
+                    class="mt-8 inline-flex items-center justify-center gap-2 bg-amber-400 hover:bg-amber-500 text-[#111111] font-semibold text-sm px-6 py-3 rounded-lg transition"
+                >
+                    Regístrate como repartidor
+                    <i class="fa-solid fa-arrow-right text-xs"></i>
+                </a>
+
+            </div>
+
+            <div class="relative">
+                <img
+                    src="{{ asset('images/van-hero.png') }}"
+                    alt="Repartidor Venexpress"
+                    class="w-full max-w-md mx-auto"
+                >
+            </div>
+
+        </div>
+
+    </section>
+
+
 
     {{-- =========================================================
          FOOTER
@@ -1006,6 +1082,12 @@
                     <li>
                         <a href="#aliados" class="hover:text-white transition">
                             Aliados
+                        </a>
+                    </li>
+
+                    <li>
+                        <a href="#flota" class="hover:text-white transition">
+                            Únete a la flota
                         </a>
                     </li>
 
