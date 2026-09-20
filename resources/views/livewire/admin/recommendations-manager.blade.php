@@ -10,7 +10,7 @@
                 Recomendaciones
             </h1>
             <p class="text-sm text-[#6B6B66] mt-1">
-                Sugerencias enviadas por visitantes desde la página pública.
+                Sugerencias enviadas desde la página pública y por usuarios del sistema.
             </p>
         </div>
     </div>
@@ -38,6 +38,14 @@
                     </div>
 
                     <div class="flex items-center gap-2 shrink-0">
+                        @if ($recommendation->user)
+                            <span class="px-2.5 py-1 rounded-lg bg-amber-50 text-amber-700 text-xs font-semibold">
+                                {{ \App\Models\User::roleLabels()[$recommendation->user->role] ?? 'Usuario' }}
+                            </span>
+                        @else
+                            <span class="px-2.5 py-1 rounded-lg bg-slate-50 text-slate-600 text-xs font-semibold">Visitante</span>
+                        @endif
+
                         @if ($recommendation->status === Recommendation::STATUS_NEW)
                             <span class="px-2.5 py-1 rounded-lg bg-blue-50 text-blue-700 text-xs font-semibold">Nueva</span>
                         @endif

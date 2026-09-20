@@ -36,6 +36,7 @@ class RecommendationsManager extends Component
     {
         return view('livewire.admin.recommendations-manager', [
             'recommendations' => Recommendation::query()
+                ->with('user')
                 ->where('status', '!=', Recommendation::STATUS_ARCHIVED)
                 ->latest()
                 ->paginate(15),

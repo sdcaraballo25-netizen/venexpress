@@ -53,6 +53,7 @@ use App\Livewire\Driver\RouteDetail;
 use App\Livewire\Driver\RouteHistory;
 use App\Livewire\Driver\Scanner;
 use App\Livewire\Profile\Show as ProfileShow;
+use App\Livewire\Recommendations\Create as RecommendationCreate;
 use App\Livewire\Public\HelpCenter;
 use App\Livewire\Public\OfficeLocator;
 use App\Livewire\Public\PriceCalculator;
@@ -188,6 +189,16 @@ Route::view('dashboard', 'dashboard')
 Route::get('profile', ProfileShow::class)
     ->middleware(['auth'])
     ->name('profile');
+
+/*
+|--------------------------------------------------------------------------
+| Recomendaciones (usuario autenticado)
+|--------------------------------------------------------------------------
+*/
+
+Route::get('mis-recomendaciones', RecommendationCreate::class)
+    ->middleware(['auth'])
+    ->name('recommendations.create');
 
 /*
 |--------------------------------------------------------------------------
