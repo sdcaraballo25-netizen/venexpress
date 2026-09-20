@@ -1011,6 +1011,19 @@ class PackageService
                 'cod_collected_by_user_id' => $userId,
             ]);
 
+            // Igual que completeDelivery()/scanCollection(): toda
+            // acción que cambia algo relevante del paquete deja un
+            // renglón en el historial, para que el cierre de caja y
+            // la conciliación tengan de dónde reconstruir cuándo se
+            // cobró el COD.
+            $this->recordHistory(
+                package: $locked,
+                status: $locked->current_status,
+                userId: $userId,
+                locationDescription: 'Cobro COD registrado',
+                eventType: PackageHistory::EVENT_MOVIMIENTO,
+            );
+
             return $locked->fresh();
         });
     }

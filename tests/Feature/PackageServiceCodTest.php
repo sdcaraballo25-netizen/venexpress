@@ -5,6 +5,7 @@ namespace Tests\Feature;
 use App\Models\AuditLog;
 use App\Models\Driver;
 use App\Models\Package;
+use App\Models\PackageHistory;
 use App\Models\User;
 use App\Services\PackageService;
 use Illuminate\Foundation\Testing\RefreshDatabase;
@@ -87,6 +88,18 @@ class PackageServiceCodTest extends TestCase
         $this->assertNotNull($package->cod_collected_at);
         $this->assertSame($user->id, $package->cod_collected_by_user_id);
         $this->assertSame(Package::COD_PENDIENTE, $package->cod_status);
+
+        // Cobrar el COD debe dejar un renglón en el historial, igual
+        // que cualquier otro movimiento relevante del paquete —
+        // necesario para reconstruir el cierre de caja/conciliación.
+        $this->assertSame(
+            1,
+            $package->histories()
+                ->where('event_type', PackageHistory::EVENT_MOVIMIENTO)
+                ->where('location_description', 'Cobro COD registrado')
+                ->where('scanned_by_user_id', $user->id)
+                ->count()
+        );
 
         $package = $this->service->liquidateCod($package, $user->id);
         $this->assertSame(Package::COD_LIQUIDADO, $package->cod_status);
