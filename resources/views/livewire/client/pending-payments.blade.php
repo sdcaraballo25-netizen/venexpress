@@ -5,7 +5,7 @@
 
         <div>
             <h1 class="font-display text-2xl font-bold text-slate-900">
-                Pagos pendientes
+                Pagos
             </h1>
 
             <p class="mt-1 text-sm text-slate-500">

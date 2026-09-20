@@ -6,6 +6,7 @@ use App\Models\Customer;
 use App\Models\Package;
 use Illuminate\Support\Facades\Auth;
 use Livewire\Attributes\Layout;
+use Livewire\Attributes\Title;
 use Livewire\Component;
 
 /**
@@ -30,6 +31,7 @@ use Livewire\Component;
  * de extensión documentado.
  */
 #[Layout('layouts.client')]
+#[Title('Pagos')]
 class PendingPayments extends Component
 {
     /**

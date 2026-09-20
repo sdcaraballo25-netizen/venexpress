@@ -296,6 +296,30 @@ class User extends Authenticatable
     }
 
     /**
+     * Mismo criterio que Client\Dashboard/Client\PendingPayments
+     * (customerIdDocsForCurrentUser): un cliente puede tener varios
+     * id_doc asociados a su cuenta. Se usa para el puntito de aviso en
+     * "Pagos" del panel de Cliente.
+     */
+    public function hasPendingCodPayments(): bool
+    {
+        $idDocs = Customer::query()
+            ->where('email', $this->email)
+            ->orWhere('user_id', $this->id)
+            ->pluck('id_doc');
+
+        if ($idDocs->isEmpty()) {
+            return false;
+        }
+
+        return Package::query()
+            ->whereIn('recipient_id_doc', $idDocs)
+            ->where('is_cod', true)
+            ->where('cod_status', Package::COD_PENDIENTE)
+            ->exists();
+    }
+
+    /**
      * Almacén propio de Venexpress al que pertenece este usuario
      * cuando es personal de almacén (role 'almacen').
      */
