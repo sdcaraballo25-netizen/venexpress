@@ -22,6 +22,7 @@ use App\Livewire\Admin\PaymentOrders;
 use App\Livewire\Admin\RateMatrixManager;
 use App\Livewire\Admin\RecommendationsManager;
 use App\Livewire\Admin\RemunerationsSummary;
+use App\Livewire\Admin\Reports as AdminReports;
 use App\Livewire\Admin\RoutesDashboard;
 use App\Livewire\Admin\RoutesManager;
 use App\Livewire\Admin\UsersManager;
@@ -390,6 +391,15 @@ Route::prefix('admin')
 
         Route::get('/', AdminDashboard::class)
             ->name('dashboard');
+
+        /*
+        |--------------------------------------------------------------------------
+        | Reportes
+        |--------------------------------------------------------------------------
+        */
+
+        Route::get('/reportes', AdminReports::class)
+            ->name('reports');
 
         /*
         |--------------------------------------------------------------------------
