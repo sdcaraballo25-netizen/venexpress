@@ -221,6 +221,11 @@
                     Agencias aliadas
                 </a>
 
+                <a href="{{ route('public.marketplace') }}"
+                   class="main-nav-link">
+                    Tienda
+                </a>
+
                 <a href="{{ route('tracking.index') }}"
                    class="main-nav-link">
                     Rastreo

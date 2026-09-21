@@ -5,6 +5,7 @@ namespace Tests\Feature\Auth;
 use App\Models\Ally;
 use App\Models\Customer;
 use App\Models\Driver;
+use App\Models\Emprendedor;
 use App\Models\User;
 use App\Notifications\AccountPendingApproval;
 use Illuminate\Foundation\Testing\RefreshDatabase;
@@ -301,5 +302,70 @@ class RegistrationTest extends TestCase
             ->set('phone', '+58 412 1234567')
             ->call('register')
             ->assertHasErrors(['license_photo', 'id_photo', 'vehicle_registration_photo']);
+    }
+
+    private function createActiveAlly(): Ally
+    {
+        $user = User::factory()->create(['role' => User::ROLE_ALIADO]);
+
+        return Ally::create([
+            'user_id' => $user->id,
+            'business_name' => 'Agencia Aliada de Prueba',
+            'rif' => 'J-' . random_int(10000000, 99999999) . '-0',
+            'city' => 'Caracas',
+            'state' => 'Distrito Capital',
+            'address' => 'Av. Principal',
+            'commission_percentage' => 10.00,
+            'status' => Ally::STATUS_ACTIVE,
+        ]);
+    }
+
+    public function test_new_emprendedor_registers_as_pending_with_a_pickup_ally(): void
+    {
+        Notification::fake();
+
+        $pickupAlly = $this->createActiveAlly();
+
+        $component = Volt::test('pages.auth.register')
+            ->set('name', 'Dueño de Tienda')
+            ->set('email', 'emprendedor@example.com')
+            ->set('password', 'password')
+            ->set('password_confirmation', 'password')
+            ->set('role', 'emprendedor')
+            ->set('business_name', 'Tienda de Prueba')
+            ->set('document_id', 'V-12345678')
+            ->set('pickup_ally_id', $pickupAlly->id);
+
+        $component->call('register');
+
+        $component->assertRedirect(route('emprendedor.dashboard', absolute: false));
+
+        $user = User::where('email', 'emprendedor@example.com')->first();
+
+        $this->assertNotNull($user);
+        $this->assertNotNull($user->emprendedor);
+        $this->assertSame(Emprendedor::STATUS_PENDING, $user->emprendedor->status);
+        $this->assertSame('Tienda de Prueba', $user->emprendedor->business_name);
+        $this->assertSame($pickupAlly->id, $user->emprendedor->pickup_ally_id);
+
+        Notification::assertSentTo($user, AccountPendingApproval::class);
+    }
+
+    public function test_emprendedor_registration_requires_an_active_pickup_ally(): void
+    {
+        Volt::test('pages.auth.register')
+            ->set('name', 'Dueño de Tienda')
+            ->set('email', 'sinagencia@example.com')
+            ->set('password', 'password')
+            ->set('password_confirmation', 'password')
+            ->set('role', 'emprendedor')
+            ->set('business_name', 'Tienda Sin Agencia')
+            ->set('document_id', 'V-87654321')
+            ->call('register')
+            ->assertHasErrors(['pickup_ally_id']);
+
+        $this->assertDatabaseMissing('users', [
+            'email' => 'sinagencia@example.com',
+        ]);
     }
 }

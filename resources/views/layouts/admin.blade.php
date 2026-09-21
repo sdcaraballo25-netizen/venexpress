@@ -161,7 +161,8 @@
                                     'admin.users',
                                     'admin.driver-payments',
                                     'admin.remunerations-summary',
-                                    'admin.drivers.approval'
+                                    'admin.drivers.approval',
+                                    'admin.emprendedores.approval'
                                 ) ? 'true' : 'false' }}
                             ) {
                                 this.openGroup = 'personal';
@@ -754,6 +755,34 @@
                                 </svg>
 
                                 Aprobar repartidores
+
+                            </a>
+
+
+                            {{-- Aprobación de emprendedores --}}
+                            <a
+                                href="{{ route('admin.emprendedores.approval') }}"
+                                class="flex items-center gap-3 px-4 py-3 rounded-xl font-medium transition-colors
+                                {{ request()->routeIs('admin.emprendedores.approval')
+                                    ? 'bg-amber-400 text-[#111111]'
+                                    : 'text-[#6B6B66] hover:bg-slate-50 hover:text-[#111111]' }}"
+                            >
+
+                                <svg
+                                    class="w-5 h-5"
+                                    fill="none"
+                                    stroke="currentColor"
+                                    viewBox="0 0 24 24"
+                                >
+                                    <path
+                                        stroke-linecap="round"
+                                        stroke-linejoin="round"
+                                        stroke-width="2"
+                                        d="M3 21h18M5 21V7l8-4v18M13 21V11l6 3v7M9 9h.01M9 12h.01M9 15h.01"
+                                    />
+                                </svg>
+
+                                Aprobar emprendedores
 
                             </a>
 

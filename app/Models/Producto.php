@@ -15,6 +15,7 @@ class Producto extends Model
         'emprendedor_id',
         'nombre',
         'descripcion',
+        'foto_path',
         'precio_usd',
         'peso_kg',
         'stock',

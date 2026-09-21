@@ -15,6 +15,7 @@ use App\Livewire\Admin\DriverAssignment;
 use App\Livewire\Admin\DriverPayments;
 use App\Livewire\Admin\DriverRemunerationManager;
 use App\Livewire\Admin\DriversApprovalManager;
+use App\Livewire\Admin\EmprendedoresApprovalManager;
 use App\Livewire\Admin\HelpCenter as AdminHelpCenter;
 use App\Livewire\Admin\IncidentsManager;
 use App\Livewire\Admin\PackageDispatch;
@@ -42,6 +43,10 @@ use App\Livewire\Ally\SalesCloseout as AllySalesCloseout;
 use App\Livewire\Ally\StaffManager as AllyStaffManager;
 use App\Livewire\Almacen\Dashboard as AlmacenDashboard;
 use App\Livewire\Almacen\HelpCenter as AlmacenHelpCenter;
+use App\Livewire\Emprendedor\Dashboard as EmprendedorDashboard;
+use App\Livewire\Emprendedor\Pedidos as EmprendedorPedidos;
+use App\Livewire\Emprendedor\Productos as EmprendedorProductos;
+use App\Livewire\Public\Marketplace;
 use App\Livewire\Client\Dashboard as ClientDashboard;
 use App\Livewire\Client\HelpCenter as ClientHelpCenter;
 use App\Livewire\Client\Incidents as ClientIncidents;
@@ -316,6 +321,33 @@ Route::get('/almacen/ayuda', AlmacenHelpCenter::class)
 
 /*
 |--------------------------------------------------------------------------
+| Emprendedor (marketplace)
+|--------------------------------------------------------------------------
+*/
+
+Route::get('/emprendedor/dashboard', EmprendedorDashboard::class)
+    ->middleware(['auth', 'verified', 'role:emprendedor', 'account.approved'])
+    ->name('emprendedor.dashboard');
+
+Route::get('/emprendedor/productos', EmprendedorProductos::class)
+    ->middleware(['auth', 'verified', 'role:emprendedor', 'account.approved'])
+    ->name('emprendedor.productos');
+
+Route::get('/emprendedor/pedidos', EmprendedorPedidos::class)
+    ->middleware(['auth', 'verified', 'role:emprendedor', 'account.approved'])
+    ->name('emprendedor.pedidos');
+
+/*
+|--------------------------------------------------------------------------
+| Tienda pública (marketplace)
+|--------------------------------------------------------------------------
+*/
+
+Route::get('/tienda', Marketplace::class)
+    ->name('public.marketplace');
+
+/*
+|--------------------------------------------------------------------------
 | Rastreo público
 |--------------------------------------------------------------------------
 */
@@ -502,6 +534,9 @@ Route::prefix('admin')
 
         Route::get('/repartidores/aprobacion', DriversApprovalManager::class)
             ->name('drivers.approval');
+
+        Route::get('/emprendedores/aprobacion', EmprendedoresApprovalManager::class)
+            ->name('emprendedores.approval');
 
         Route::get('/remuneraciones/tarifa', DriverRemunerationManager::class)
             ->name('driver-remuneration-rate');

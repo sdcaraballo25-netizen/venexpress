@@ -3,6 +3,7 @@
 use App\Models\Ally;
 use App\Models\Customer;
 use App\Models\Driver;
+use App\Models\Emprendedor;
 use App\Models\User;
 use App\Notifications\AccountPendingApproval;
 use App\Notifications\WelcomeVerificationToken;
@@ -12,6 +13,7 @@ use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Hash;
 use Illuminate\Support\Str;
+use Illuminate\Validation\Rule;
 use Illuminate\Validation\Rules;
 use Livewire\Attributes\Layout;
 use Livewire\Attributes\Locked;
@@ -85,6 +87,21 @@ new #[Layout('layouts.guest')] class extends Component
     public string $id_doc = '';
 
     /**
+     * Datos adicionales para emprendedores (módulo de marketplace).
+     * business_name se reutiliza tal cual de la sección de Aliado
+     * (mismo concepto: nombre del negocio).
+     */
+    public string $document_id = '';
+
+    public ?int $pickup_ally_id = null;
+
+    /**
+     * Agencias aliadas activas, para que el emprendedor elija dónde
+     * entregará su mercancía (no hay recolección a domicilio).
+     */
+    public array $allies = [];
+
+    /**
      * Carga los estados disponibles.
      */
     public function mount(
@@ -92,9 +109,15 @@ new #[Layout('layouts.guest')] class extends Component
     ): void {
         $this->states = $locationService->states();
 
+        $this->allies = Ally::query()
+            ->where('status', Ally::STATUS_ACTIVE)
+            ->orderBy('business_name')
+            ->get(['id', 'business_name', 'city', 'state'])
+            ->toArray();
+
         $requestedRole = request()->query('role');
 
-        if (in_array($requestedRole, ['cliente', 'repartidor', 'aliado'], true)) {
+        if (in_array($requestedRole, ['cliente', 'repartidor', 'aliado', 'emprendedor'], true)) {
             $this->role = $requestedRole;
         }
 
@@ -171,7 +194,7 @@ new #[Layout('layouts.guest')] class extends Component
 
             'role' => [
                 'required',
-                'in:cliente,repartidor,aliado',
+                'in:cliente,repartidor,aliado,emprendedor',
             ],
         ];
 
@@ -322,6 +345,34 @@ new #[Layout('layouts.guest')] class extends Component
                     'image',
                     'mimes:jpg,jpeg,png,webp',
                     'max:4096',
+                ],
+            ]);
+        }
+
+        /*
+        |--------------------------------------------------------------------------
+        | VALIDACIÓN DE EMPRENDEDOR
+        |--------------------------------------------------------------------------
+        */
+
+        if ($this->role === User::ROLE_EMPRENDEDOR) {
+            $rules = array_merge($rules, [
+                'business_name' => [
+                    'required',
+                    'string',
+                    'max:255',
+                ],
+
+                'document_id' => [
+                    'required',
+                    'string',
+                    'max:20',
+                ],
+
+                'pickup_ally_id' => [
+                    'required',
+                    'integer',
+                    Rule::exists('allies', 'id')->where('status', Ally::STATUS_ACTIVE),
                 ],
             ]);
         }
@@ -502,6 +553,50 @@ new #[Layout('layouts.guest')] class extends Component
 
             $this->redirect(
                 route('repartidor.dashboard', absolute: false),
+                navigate: true
+            );
+
+            return;
+        }
+
+        /*
+        |--------------------------------------------------------------------------
+        | CREAR EMPRENDEDOR
+        |--------------------------------------------------------------------------
+        */
+
+        if ($user->isEmprendedor()) {
+            // Ver comentario equivalente en la rama de Aliado: sin
+            // esta transacción, un fallo a mitad de camino dejaría un
+            // User con rol "emprendedor" sin su Emprendedor correspondiente.
+            try {
+                DB::transaction(function () use ($user, $validated) {
+                    Emprendedor::create([
+                        'user_id' => $user->id,
+                        'pickup_ally_id' => $validated['pickup_ally_id'],
+                        'business_name' => $validated['business_name'],
+                        'document_id' => $validated['document_id'],
+
+                        // Un emprendedor nuevo comienza como PENDIENTE,
+                        // igual que un aliado o repartidor, hasta que
+                        // un admin lo apruebe.
+                        'status' => Emprendedor::STATUS_PENDING,
+                    ]);
+                });
+            } catch (\Throwable $e) {
+                $user->delete();
+
+                throw $e;
+            }
+
+            $user->notify(new AccountPendingApproval('Emprendedor'));
+
+            Auth::login($user);
+
+            session()->forget('google_pending');
+
+            $this->redirect(
+                route('emprendedor.dashboard', absolute: false),
                 navigate: true
             );
 
@@ -693,6 +788,10 @@ new #[Layout('layouts.guest')] class extends Component
 
                 <option value="aliado">
                     Punto aliado
+                </option>
+
+                <option value="emprendedor">
+                    Emprendedor
                 </option>
             </select>
 
@@ -1273,6 +1372,95 @@ new #[Layout('layouts.guest')] class extends Component
 
                 <x-input-error
                     :messages="$errors->get('vehicle_registration_photo')"
+                    class="mt-2"
+                />
+            </div>
+
+        @endif
+
+        @if ($role === 'emprendedor')
+
+            <div class="border-t border-gray-200 pt-5">
+                <h2 class="text-sm font-semibold text-blue-950">
+                    Información del negocio
+                </h2>
+
+                <p class="mt-1 text-xs text-gray-500">
+                    Tú entregas la mercancía en la agencia aliada que elijas — Venexpress no recolecta a domicilio.
+                </p>
+            </div>
+
+            {{-- NOMBRE DEL NEGOCIO --}}
+            <div>
+                <x-input-label
+                    for="business_name"
+                    value="Nombre del negocio"
+                />
+
+                <x-text-input
+                    wire:model="business_name"
+                    id="business_name"
+                    class="block mt-1.5 w-full"
+                    type="text"
+                    placeholder="Mi Tienda"
+                />
+
+                <x-input-error
+                    :messages="$errors->get('business_name')"
+                    class="mt-2"
+                />
+            </div>
+
+            {{-- CÉDULA O RIF --}}
+            <div>
+                <x-input-label
+                    for="document_id"
+                    value="Cédula o RIF"
+                />
+
+                <x-text-input
+                    wire:model="document_id"
+                    id="document_id"
+                    class="block mt-1.5 w-full"
+                    type="text"
+                    placeholder="V-12345678 o J-12345678-9"
+                />
+
+                <x-input-error
+                    :messages="$errors->get('document_id')"
+                    class="mt-2"
+                />
+            </div>
+
+            {{-- AGENCIA DE RETIRO --}}
+            <div>
+                <x-input-label
+                    for="pickup_ally_id"
+                    value="Agencia aliada donde entregarás tu mercancía"
+                />
+
+                <select
+                    wire:model="pickup_ally_id"
+                    id="pickup_ally_id"
+                    class="block mt-1.5 w-full rounded-md border-gray-300 shadow-sm focus:border-blue-500 focus:ring-blue-500"
+                >
+                    <option value="">Selecciona una agencia</option>
+
+                    @foreach ($allies as $ally)
+                        <option value="{{ $ally['id'] }}">
+                            {{ $ally['business_name'] }} — {{ $ally['city'] }}, {{ $ally['state'] }}
+                        </option>
+                    @endforeach
+                </select>
+
+                @if (count($allies) === 0)
+                    <p class="mt-1 text-xs text-amber-600">
+                        Todavía no hay agencias aliadas activas disponibles.
+                    </p>
+                @endif
+
+                <x-input-error
+                    :messages="$errors->get('pickup_ally_id')"
                     class="mt-2"
                 />
             </div>
