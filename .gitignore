@@ -22,3 +22,7 @@
 Homestead.json
 Homestead.yaml
 Thumbs.db
+/tests/Browser/console
+/tests/Browser/screenshots
+/tests/Browser/source
+.env.dusk.local
