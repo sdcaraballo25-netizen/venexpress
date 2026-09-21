@@ -58,7 +58,9 @@ use App\Livewire\Recommendations\Create as RecommendationCreate;
 use App\Livewire\Public\HelpCenter;
 use App\Livewire\Public\OfficeLocator;
 use App\Livewire\Public\PriceCalculator;
+use App\Livewire\Public\PrivacyPolicy;
 use App\Livewire\Public\RecommendationForm;
+use App\Livewire\Public\TermsAndConditions;
 use Illuminate\Support\Facades\Route;
 
 /*
@@ -341,6 +343,18 @@ Route::get('/calcular-precio', PriceCalculator::class)
 
 Route::get('/agencias', OfficeLocator::class)
     ->name('public.offices');
+
+/*
+|--------------------------------------------------------------------------
+| Legal (público)
+|--------------------------------------------------------------------------
+*/
+
+Route::get('/terminos-y-condiciones', TermsAndConditions::class)
+    ->name('public.terms');
+
+Route::get('/politica-de-privacidad', PrivacyPolicy::class)
+    ->name('public.privacy');
 
 /*
 |--------------------------------------------------------------------------

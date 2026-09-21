@@ -1318,13 +1318,13 @@
                     </li>
 
                     <li>
-                        <a href="#" class="hover:text-white transition">
+                        <a href="{{ route('public.privacy') }}" wire:navigate class="hover:text-white transition">
                             Políticas
                         </a>
                     </li>
 
                     <li>
-                        <a href="#" class="hover:text-white transition">
+                        <a href="{{ route('public.terms') }}" wire:navigate class="hover:text-white transition">
                             Términos y condiciones
                         </a>
                     </li>
