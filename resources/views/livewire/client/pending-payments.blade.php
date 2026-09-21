@@ -17,8 +17,8 @@
 
             <div class="flex flex-col items-stretch gap-3 sm:flex-row sm:items-center">
 
-                <div class="rounded-2xl bg-blue-900 px-5 py-3 text-white">
-                    <p class="text-xs uppercase tracking-wide text-blue-200">
+                <div class="rounded-2xl bg-black px-5 py-3 text-white">
+                    <p class="text-xs uppercase tracking-wide text-gray-400">
                         Total pendiente · {{ $packages->count() }} {{ $packages->count() === 1 ? 'paquete' : 'paquetes' }}
                     </p>
 
@@ -70,7 +70,7 @@
                             {{ $package->origin_city }} → {{ $package->destination_city }}
                         </p>
 
-                        <span class="mt-2 inline-flex w-fit rounded-full bg-blue-50 px-3 py-1 text-xs font-medium text-blue-700">
+                        <span class="mt-2 inline-flex w-fit rounded-full bg-gray-100 px-3 py-1 text-xs font-medium text-black">
                             {{ $package->statusLabel() }}
                         </span>
                     </div>

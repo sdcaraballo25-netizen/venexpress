@@ -18,14 +18,14 @@
             <div>
                 <label class="text-sm text-slate-600">Fecha</label>
                 <input type="date" wire:model.live="date"
-                    class="mt-1 rounded-xl border border-slate-300 px-3 py-2 text-sm shadow-sm focus:border-blue-900 focus:ring-blue-900">
+                    class="mt-1 rounded-xl border border-slate-300 px-3 py-2 text-sm shadow-sm focus:border-black focus:ring-black">
             </div>
 
             @if ($isPrincipal)
                 <div>
                     <label class="text-sm text-slate-600">Taquilla</label>
                     <select wire:model.live="registeredBy"
-                        class="mt-1 rounded-xl border border-slate-300 px-3 py-2 text-sm shadow-sm focus:border-blue-900 focus:ring-blue-900">
+                        class="mt-1 rounded-xl border border-slate-300 px-3 py-2 text-sm shadow-sm focus:border-black focus:ring-black">
                         <option value="all">Todo el negocio</option>
                         <option value="{{ auth()->id() }}">Tú (registrado directamente)</option>
                         @foreach ($staffOptions as $option)
@@ -37,8 +37,8 @@
         </div>
 
         <div class="grid grid-cols-1 sm:grid-cols-2 gap-4 mb-6">
-            <div class="rounded-xl bg-blue-900 px-5 py-4 text-white">
-                <p class="text-xs text-blue-200 uppercase tracking-wide">Total vendido</p>
+            <div class="rounded-xl bg-black px-5 py-4 text-white">
+                <p class="text-xs text-gray-400 uppercase tracking-wide">Total vendido</p>
                 <p class="font-display text-3xl font-bold mt-1">${{ number_format((float) $totalUsd, 2) }}</p>
             </div>
             <div class="rounded-xl bg-slate-50 border border-slate-200 px-5 py-4">

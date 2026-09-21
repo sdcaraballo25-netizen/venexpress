@@ -27,7 +27,7 @@
                     type="text"
                     wire:model.live.debounce.400ms="search"
                     placeholder="Guía, remitente, destinatario o documento..."
-                    class="mt-1 w-full rounded-xl border border-slate-300 px-3 py-2 text-sm shadow-sm focus:border-blue-900 focus:ring-blue-900"
+                    class="mt-1 w-full rounded-xl border border-slate-300 px-3 py-2 text-sm shadow-sm focus:border-black focus:ring-black"
                 >
 
             </div>
@@ -41,7 +41,7 @@
 
                 <select
                     wire:model.live="status"
-                    class="mt-1 w-full rounded-xl border border-slate-300 px-3 py-2 text-sm shadow-sm focus:border-blue-900 focus:ring-blue-900"
+                    class="mt-1 w-full rounded-xl border border-slate-300 px-3 py-2 text-sm shadow-sm focus:border-black focus:ring-black"
                 >
                     <option value="">
                         Todos
@@ -138,7 +138,7 @@
                             {{-- GUÍA --}}
                             <td class="px-5 py-4">
 
-                                <div class="font-tracking text-xs font-medium text-blue-900">
+                                <div class="font-tracking text-xs font-medium text-black">
                                     {{ $package->tracking_number }}
                                 </div>
 
@@ -187,7 +187,7 @@
                             <td class="px-5 py-4">
 
                                 @if ($package->requires_delivery)
-                                    <span class="inline-flex rounded-full bg-blue-50 px-2.5 py-1 text-xs font-medium text-blue-700">
+                                    <span class="inline-flex rounded-full bg-amber-50 px-2.5 py-1 text-xs font-medium text-amber-700">
                                         Delivery
                                     </span>
                                 @else
@@ -247,7 +247,7 @@
 
                                     <a
                                         href="{{ route('ally.packages.show', $package->id) }}"
-                                        class="inline-flex items-center rounded-lg bg-blue-900 px-3 py-2 text-xs font-medium text-white hover:bg-blue-800"
+                                        class="inline-flex items-center rounded-lg bg-black px-3 py-2 text-xs font-medium text-white hover:bg-gray-800"
                                     >
                                         Ver
                                     </a>
@@ -256,7 +256,7 @@
                                         <a
                                             href="{{ route('packages.label', $package->id) }}"
                                             target="_blank"
-                                            class="inline-flex items-center rounded-lg border border-blue-900 px-3 py-2 text-xs font-medium text-blue-900 hover:bg-blue-50"
+                                            class="inline-flex items-center rounded-lg border border-black px-3 py-2 text-xs font-medium text-black hover:bg-gray-100"
                                         >
                                             Ver guía
                                         </a>

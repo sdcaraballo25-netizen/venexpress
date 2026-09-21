@@ -130,7 +130,7 @@
         ========================================================== --}}
         <div class="bg-white border border-[#E2E8F0] rounded-2xl shadow-sm p-6">
             <div class="flex items-center gap-3 mb-1">
-                <div class="p-2 bg-blue-50 rounded-lg text-blue-700">
+                <div class="p-2 bg-amber-50 rounded-lg text-black">
                     <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                         <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M20 12H4m0 0l6-6m-6 6l6 6" />
                     </svg>
@@ -146,11 +146,11 @@
                     type="text"
                     wire:model="dispatchTrackingNumber"
                     placeholder="Ej. VEN-2026-000123"
-                    class="flex-1 rounded-xl border border-[#E2E8F0] px-4 py-3 text-sm focus:border-blue-900 focus:ring-blue-900"
+                    class="flex-1 rounded-xl border border-[#E2E8F0] px-4 py-3 text-sm focus:border-black focus:ring-black"
                 >
                 <button
                     type="submit"
-                    class="rounded-xl bg-blue-900 hover:bg-blue-800 text-white font-semibold text-sm px-6 py-3 transition"
+                    class="rounded-xl bg-black hover:bg-gray-800 text-white font-semibold text-sm px-6 py-3 transition"
                 >
                     Buscar guía
                 </button>
@@ -189,7 +189,7 @@
                                 <button
                                     wire:click="assignToDriver({{ $route->id }})"
                                     wire:confirm="¿Asignar este paquete a este repartidor?"
-                                    class="px-3 py-2 rounded-lg bg-blue-600 text-white hover:bg-blue-700 text-xs font-semibold transition shrink-0"
+                                    class="px-3 py-2 rounded-lg bg-black text-white hover:bg-gray-800 text-xs font-semibold transition shrink-0"
                                 >
                                     Asignar
                                 </button>

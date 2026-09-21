@@ -4,7 +4,7 @@
         <x-venexpress-logo size="md" />
     </div>
 
-    <h1 class="font-display text-2xl font-bold text-blue-950">
+    <h1 class="font-display text-2xl font-bold text-black">
         Verifica tu cuenta
     </h1>
 
@@ -61,7 +61,7 @@
                 type="button"
                 wire:click="resend"
                 wire:loading.attr="disabled"
-                class="font-semibold text-blue-700 hover:text-blue-950"
+                class="font-semibold text-black hover:text-black"
             >
                 Reenviar código
             </button>

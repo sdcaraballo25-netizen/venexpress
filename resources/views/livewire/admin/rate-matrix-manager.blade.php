@@ -68,43 +68,43 @@
                             <div>
                                 <label class="block text-xs font-bold text-[#64748B] uppercase tracking-wider mb-1">Precio por volumen (USD)</label>
                                 <input type="number" step="0.01" wire:model="base_price_usd"
-                                       class="w-full rounded-xl border-[#E2E8F0] focus:border-blue-500 focus:ring-blue-500 text-sm">
+                                       class="w-full rounded-xl border-[#E2E8F0] focus:border-black focus:ring-black text-sm">
                                 @error('base_price_usd') <p class="text-red-600 text-xs mt-1">{{ $message }}</p> @enderror
                             </div>
                             <div>
                                 <label class="block text-xs font-bold text-[#64748B] uppercase tracking-wider mb-1">Por kg (USD)</label>
                                 <input type="number" step="0.01" wire:model="price_per_kg_usd"
-                                       class="w-full rounded-xl border-[#E2E8F0] focus:border-blue-500 focus:ring-blue-500 text-sm">
+                                       class="w-full rounded-xl border-[#E2E8F0] focus:border-black focus:ring-black text-sm">
                                 @error('price_per_kg_usd') <p class="text-red-600 text-xs mt-1">{{ $message }}</p> @enderror
                             </div>
                             <div>
                                 <label class="block text-xs font-bold text-[#64748B] uppercase tracking-wider mb-1">Por km (USD)</label>
                                 <input type="number" step="0.01" wire:model="price_per_km_usd"
-                                       class="w-full rounded-xl border-[#E2E8F0] focus:border-blue-500 focus:ring-blue-500 text-sm">
+                                       class="w-full rounded-xl border-[#E2E8F0] focus:border-black focus:ring-black text-sm">
                                 @error('price_per_km_usd') <p class="text-red-600 text-xs mt-1">{{ $message }}</p> @enderror
                             </div>
                             <div>
                                 <label class="block text-xs font-bold text-[#64748B] uppercase tracking-wider mb-1">Sobre, fijo (USD)</label>
                                 <input type="number" step="0.01" wire:model="envelope_price_usd"
-                                       class="w-full rounded-xl border-[#E2E8F0] focus:border-blue-500 focus:ring-blue-500 text-sm">
+                                       class="w-full rounded-xl border-[#E2E8F0] focus:border-black focus:ring-black text-sm">
                                 @error('envelope_price_usd') <p class="text-red-600 text-xs mt-1">{{ $message }}</p> @enderror
                             </div>
                             <div>
                                 <label class="block text-xs font-bold text-[#64748B] uppercase tracking-wider mb-1">Recargo frágil (USD)</label>
                                 <input type="number" step="0.01" wire:model="fragile_surcharge_usd"
-                                       class="w-full rounded-xl border-[#E2E8F0] focus:border-blue-500 focus:ring-blue-500 text-sm">
+                                       class="w-full rounded-xl border-[#E2E8F0] focus:border-black focus:ring-black text-sm">
                                 @error('fragile_surcharge_usd') <p class="text-red-600 text-xs mt-1">{{ $message }}</p> @enderror
                             </div>
                             <div>
                                 <label class="block text-xs font-bold text-[#64748B] uppercase tracking-wider mb-1">Seguro (%)</label>
                                 <input type="number" step="0.01" wire:model="insurance_percentage"
-                                       class="w-full rounded-xl border-[#E2E8F0] focus:border-blue-500 focus:ring-blue-500 text-sm">
+                                       class="w-full rounded-xl border-[#E2E8F0] focus:border-black focus:ring-black text-sm">
                                 @error('insurance_percentage') <p class="text-red-600 text-xs mt-1">{{ $message }}</p> @enderror
                             </div>
                             <div>
                                 <label class="block text-xs font-bold text-[#64748B] uppercase tracking-wider mb-1">Delivery fijo (USD)</label>
                                 <input type="number" step="0.01" wire:model="delivery_price_usd"
-                                       class="w-full rounded-xl border-[#E2E8F0] focus:border-blue-500 focus:ring-blue-500 text-sm">
+                                       class="w-full rounded-xl border-[#E2E8F0] focus:border-black focus:ring-black text-sm">
                                 @error('delivery_price_usd') <p class="text-red-600 text-xs mt-1">{{ $message }}</p> @enderror
                             </div>
                         </div>
@@ -115,13 +115,13 @@
                             </label>
                             <input type="password" wire:model="confirm_password"
                                    placeholder="Tu contraseña de administrador"
-                                   class="w-full rounded-xl border-[#E2E8F0] focus:border-blue-500 focus:ring-blue-500 text-sm">
+                                   class="w-full rounded-xl border-[#E2E8F0] focus:border-black focus:ring-black text-sm">
                             @error('confirm_password') <p class="text-red-600 text-xs mt-1">{{ $message }}</p> @enderror
                         </div>
 
                         <div class="flex items-center gap-3 pt-2">
                             <button type="submit"
-                                    class="bg-blue-600 hover:bg-blue-500 text-white px-5 py-2.5 rounded-xl text-sm font-medium transition-colors">
+                                    class="bg-black hover:bg-gray-800 text-white px-5 py-2.5 rounded-xl text-sm font-medium transition-colors">
                                 Guardar cambios
                             </button>
                             <button type="button" wire:click="cancelEditing"
@@ -203,7 +203,7 @@
 
                     <div class="flex items-center gap-3 pt-2">
                         <button type="submit"
-                                class="bg-blue-900 hover:bg-blue-800 text-white px-5 py-2.5 rounded-xl text-sm font-medium transition-colors">
+                                class="bg-black hover:bg-gray-800 text-white px-5 py-2.5 rounded-xl text-sm font-medium transition-colors">
                             Simular
                         </button>
                         <button type="button" wire:click="resetSimulation"
@@ -220,8 +220,8 @@
                 @endif
 
                 @if ($simulationResult)
-                    <div class="mt-5 bg-blue-900 rounded-2xl p-5 text-white">
-                        <p class="text-blue-200 text-xs uppercase tracking-wider font-bold mb-3">Resultado de la simulación</p>
+                    <div class="mt-5 bg-black rounded-2xl p-5 text-white">
+                        <p class="text-gray-400 text-xs uppercase tracking-wider font-bold mb-3">Resultado de la simulación</p>
                         <div class="grid grid-cols-2 gap-3 text-sm">
                             <div>Distancia: <span class="font-semibold">{{ $simulationResult['distance_km'] }} km</span></div>
                             <div>Peso facturable: <span class="font-semibold">{{ $simulationResult['billable_weight_kg'] }} kg</span></div>
@@ -230,11 +230,11 @@
                             <div>Seguro: <span class="font-semibold">${{ number_format($simulationResult['insurance_price_usd'], 2) }}</span></div>
                             <div>Tasa BCV usada: <span class="font-semibold">{{ number_format($simulationResult['bcv_rate_used'], 2) }}</span></div>
                         </div>
-                        <div class="mt-4 pt-4 border-t border-blue-800 flex justify-between items-center">
-                            <span class="text-blue-200 text-sm">Total a cobrar</span>
+                        <div class="mt-4 pt-4 border-t border-white/20 flex justify-between items-center">
+                            <span class="text-gray-400 text-sm">Total a cobrar</span>
                             <span class="font-display text-2xl font-bold">
                                 ${{ number_format($simulationResult['total_price_usd'], 2) }}
-                                <span class="text-blue-200 text-sm font-normal">/ Bs. {{ number_format($simulationResult['total_price_ves'], 2) }}</span>
+                                <span class="text-gray-400 text-sm font-normal">/ Bs. {{ number_format($simulationResult['total_price_ves'], 2) }}</span>
                             </span>
                         </div>
                     </div>

@@ -12,7 +12,7 @@
 
         <button
             wire:click="startCreating"
-            class="rounded-xl bg-blue-900 px-5 py-3 text-sm font-semibold text-white hover:bg-blue-800"
+            class="rounded-xl bg-black px-5 py-3 text-sm font-semibold text-white hover:bg-gray-800"
         >
             + Nuevo almacén
         </button>
@@ -46,7 +46,7 @@
                         type="text"
                         wire:model="name"
                         placeholder="Ej. Almacén Valencia"
-                        class="mt-2 w-full rounded-xl border border-slate-300 px-4 py-3 text-sm focus:border-blue-900 focus:ring-blue-900"
+                        class="mt-2 w-full rounded-xl border border-slate-300 px-4 py-3 text-sm focus:border-black focus:ring-black"
                     >
                     @error('name')
                         <p class="mt-1 text-xs text-red-600">{{ $message }}</p>
@@ -59,7 +59,7 @@
                     </label>
                     <select
                         wire:model.live="state"
-                        class="mt-2 w-full rounded-xl border border-slate-300 px-4 py-3 text-sm focus:border-blue-900 focus:ring-blue-900"
+                        class="mt-2 w-full rounded-xl border border-slate-300 px-4 py-3 text-sm focus:border-black focus:ring-black"
                     >
                         <option value="">Seleccionar estado</option>
                         @foreach ($states as $stateOption)
@@ -78,7 +78,7 @@
                     <select
                         wire:model.live="city"
                         @disabled($state === '')
-                        class="mt-2 w-full rounded-xl border border-slate-300 px-4 py-3 text-sm focus:border-blue-900 focus:ring-blue-900 disabled:bg-slate-100"
+                        class="mt-2 w-full rounded-xl border border-slate-300 px-4 py-3 text-sm focus:border-black focus:ring-black disabled:bg-slate-100"
                     >
                         <option value="">
                             {{ $state === '' ? 'Primero selecciona un estado' : 'Seleccionar ciudad' }}
@@ -100,7 +100,7 @@
                         type="text"
                         wire:model="address"
                         placeholder="Av. Principal, Zona Industrial"
-                        class="mt-2 w-full rounded-xl border border-slate-300 px-4 py-3 text-sm focus:border-blue-900 focus:ring-blue-900"
+                        class="mt-2 w-full rounded-xl border border-slate-300 px-4 py-3 text-sm focus:border-black focus:ring-black"
                     >
                     @error('address')
                         <p class="mt-1 text-xs text-red-600">{{ $message }}</p>
@@ -118,7 +118,7 @@
 
                     <button
                         type="submit"
-                        class="rounded-xl bg-blue-900 px-5 py-3 text-sm font-semibold text-white hover:bg-blue-800"
+                        class="rounded-xl bg-black px-5 py-3 text-sm font-semibold text-white hover:bg-gray-800"
                     >
                         Guardar
                     </button>
@@ -179,7 +179,7 @@
                                 </button>
                                 <button
                                     wire:click="toggleCoveragePanel({{ $warehouse->id }})"
-                                    class="rounded-lg border border-blue-200 px-3 py-2 text-xs font-semibold text-blue-900 hover:bg-blue-50"
+                                    class="rounded-lg border border-amber-200 px-3 py-2 text-xs font-semibold text-black hover:bg-amber-50"
                                 >
                                     Cobertura ({{ $warehouse->coverages->count() }})
                                 </button>
@@ -232,7 +232,7 @@
                                             <label class="text-xs font-medium text-slate-600">Estado</label>
                                             <select
                                                 wire:model.live="coverageState"
-                                                class="mt-1 w-full rounded-xl border border-slate-300 px-3 py-2 text-sm focus:border-blue-900 focus:ring-blue-900"
+                                                class="mt-1 w-full rounded-xl border border-slate-300 px-3 py-2 text-sm focus:border-black focus:ring-black"
                                             >
                                                 <option value="">Selecciona...</option>
                                                 @foreach ($states as $stateOption)
@@ -249,7 +249,7 @@
                                             <select
                                                 wire:model="coverageCity"
                                                 @disabled($coverageState === '' || $coverageWholeState)
-                                                class="mt-1 w-full rounded-xl border border-slate-300 px-3 py-2 text-sm focus:border-blue-900 focus:ring-blue-900 disabled:bg-slate-100"
+                                                class="mt-1 w-full rounded-xl border border-slate-300 px-3 py-2 text-sm focus:border-black focus:ring-black disabled:bg-slate-100"
                                             >
                                                 <option value="">Selecciona...</option>
                                                 @foreach ($coverageCities as $cityOption)
@@ -266,7 +266,7 @@
                                                 type="checkbox"
                                                 wire:model.live="coverageWholeState"
                                                 id="coverageWholeState-{{ $warehouse->id }}"
-                                                class="rounded border-slate-300 text-blue-900 focus:ring-blue-900"
+                                                class="rounded border-slate-300 text-black focus:ring-black"
                                             >
                                             <label for="coverageWholeState-{{ $warehouse->id }}" class="text-xs font-medium text-slate-600">
                                                 Todo el estado
@@ -275,7 +275,7 @@
 
                                         <button
                                             type="submit"
-                                            class="rounded-xl bg-blue-900 px-4 py-2 text-sm font-semibold text-white hover:bg-blue-800"
+                                            class="rounded-xl bg-black px-4 py-2 text-sm font-semibold text-white hover:bg-gray-800"
                                         >
                                             + Agregar cobertura
                                         </button>

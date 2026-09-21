@@ -67,7 +67,7 @@
 
     @vite(['resources/css/app.css', 'resources/js/app.js'])
 </head>
-<body class="font-sans text-blue-950 antialiased bg-[#F3F5F7]">
+<body class="font-sans text-black antialiased bg-[#F3F5F7]">
 
     <div class="min-h-screen flex flex-col items-center justify-center px-6 py-12">
 
@@ -97,7 +97,7 @@
                 {{ $copy['badge'] }}
             </span>
 
-            <h1 class="mt-4 font-display text-xl font-bold text-blue-950">
+            <h1 class="mt-4 font-display text-xl font-bold text-black">
                 {{ $copy['title'] }}
             </h1>
 
@@ -107,14 +107,14 @@
 
             <div class="mt-6 pt-6 border-t border-[#E2E8F0] flex items-center justify-between text-left">
                 <div class="min-w-0">
-                    <p class="text-sm font-semibold text-blue-950 truncate">{{ $user->name }}</p>
+                    <p class="text-sm font-semibold text-black truncate">{{ $user->name }}</p>
                     <p class="text-xs text-gray-400 truncate">{{ $user->email }}</p>
                 </div>
 
                 <form method="POST" action="{{ route('logout') }}" class="shrink-0">
                     @csrf
                     <button type="submit"
-                        class="text-sm font-semibold text-blue-700 hover:text-blue-900 transition">
+                        class="text-sm font-semibold text-black hover:text-gray-700 transition">
                         Cerrar sesión
                     </button>
                 </form>
@@ -124,7 +124,7 @@
 
         <p class="mt-8 text-xs text-gray-400">
             ¿Necesitas ayuda? Escríbenos a
-            <a href="mailto:info@venexpress.com" class="font-semibold text-blue-700 hover:underline">info@venexpress.com</a>
+            <a href="mailto:info@venexpress.com" class="font-semibold text-black hover:underline">info@venexpress.com</a>
         </p>
 
     </div>

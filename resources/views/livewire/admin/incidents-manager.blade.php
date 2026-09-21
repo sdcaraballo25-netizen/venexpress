@@ -24,12 +24,12 @@
                 <label class="mb-2 block text-xs font-semibold uppercase tracking-wide text-[#64748B]">Buscar</label>
                 <input wire:model.live.debounce.300ms="search" type="text"
                        placeholder="Tipo, descripción o número de guía..."
-                       class="w-full rounded-xl border border-[#E2E8F0] px-4 py-3 text-sm text-[#0F172A] placeholder:text-[#94A3B8] focus:border-blue-500 focus:ring-blue-500">
+                       class="w-full rounded-xl border border-[#E2E8F0] px-4 py-3 text-sm text-[#0F172A] placeholder:text-[#94A3B8] focus:border-black focus:ring-black">
             </div>
 
             <div>
                 <label class="mb-2 block text-xs font-semibold uppercase tracking-wide text-[#64748B]">Estado</label>
-                <select wire:model.live="status" class="w-full rounded-xl border border-[#E2E8F0] px-4 py-3 text-sm focus:border-blue-500 focus:ring-blue-500">
+                <select wire:model.live="status" class="w-full rounded-xl border border-[#E2E8F0] px-4 py-3 text-sm focus:border-black focus:ring-black">
                     <option value="all">Todos</option>
                     @foreach (\App\Livewire\Admin\IncidentsManager::STATUS_LABELS as $value => $label)
                         <option value="{{ $value }}">{{ $label }}</option>
@@ -77,7 +77,7 @@
                                     </span>
                                 @else
                                     <select wire:change="updateStatus({{ $incident->id }}, $event.target.value)"
-                                            class="rounded-xl border-[#E2E8F0] text-xs font-semibold focus:border-blue-500 focus:ring-blue-500">
+                                            class="rounded-xl border-[#E2E8F0] text-xs font-semibold focus:border-black focus:ring-black">
                                         @foreach (\App\Livewire\Admin\IncidentsManager::STATUS_LABELS as $value => $label)
                                             <option value="{{ $value }}" @selected($incident->status === $value)>
                                                 {{ $label }}
@@ -133,7 +133,7 @@
                         Notas de resolución
                     </label>
                     <textarea wire:model="resolutionNotesInput" rows="4"
-                              class="w-full rounded-xl border-[#E2E8F0] text-sm focus:border-blue-500 focus:ring-blue-500"
+                              class="w-full rounded-xl border-[#E2E8F0] text-sm focus:border-black focus:ring-black"
                               placeholder="Ej: Se contactó al destinatario y se reprogramó la entrega el 05/09..."></textarea>
                     @error('resolutionNotesInput')
                         <p class="mt-2 text-xs text-red-600">{{ $message }}</p>

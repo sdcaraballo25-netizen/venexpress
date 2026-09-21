@@ -50,11 +50,11 @@
 
 
         {{-- Aviso principal --}}
-        <div class="mb-6 overflow-hidden rounded-2xl border border-blue-100 bg-white shadow-sm">
+        <div class="mb-6 overflow-hidden rounded-2xl border border-amber-100 bg-white shadow-sm">
 
             <div class="flex flex-col gap-6 p-6 sm:flex-row sm:items-center sm:p-8">
 
-                <div class="flex h-16 w-16 shrink-0 items-center justify-center rounded-2xl bg-blue-50 text-blue-700">
+                <div class="flex h-16 w-16 shrink-0 items-center justify-center rounded-2xl bg-amber-50 text-black">
                     <svg
                         class="h-8 w-8"
                         fill="none"

@@ -20,12 +20,12 @@
                 <label class="mb-2 block text-xs font-semibold uppercase tracking-wide text-[#64748B]">Buscar</label>
                 <input wire:model.live.debounce.300ms="search" type="text"
                        placeholder="Descripción o nombre del administrador..."
-                       class="w-full rounded-xl border border-[#E2E8F0] px-4 py-3 text-sm text-[#0F172A] placeholder:text-[#94A3B8] focus:border-blue-500 focus:ring-blue-500">
+                       class="w-full rounded-xl border border-[#E2E8F0] px-4 py-3 text-sm text-[#0F172A] placeholder:text-[#94A3B8] focus:border-black focus:ring-black">
             </div>
 
             <div>
                 <label class="mb-2 block text-xs font-semibold uppercase tracking-wide text-[#64748B]">Acción</label>
-                <select wire:model.live="actionFilter" class="w-full rounded-xl border border-[#E2E8F0] px-4 py-3 text-sm focus:border-blue-500 focus:ring-blue-500">
+                <select wire:model.live="actionFilter" class="w-full rounded-xl border border-[#E2E8F0] px-4 py-3 text-sm focus:border-black focus:ring-black">
                     <option value="">Todas</option>
                     @foreach ($actions as $action)
                         <option value="{{ $action }}">{{ \App\Models\AuditLog::labelFor($action) }}</option>
@@ -35,7 +35,7 @@
 
             <div>
                 <label class="mb-2 block text-xs font-semibold uppercase tracking-wide text-[#64748B]">Periodo</label>
-                <select wire:model.live="dateRange" class="w-full rounded-xl border border-[#E2E8F0] px-4 py-3 text-sm focus:border-blue-500 focus:ring-blue-500">
+                <select wire:model.live="dateRange" class="w-full rounded-xl border border-[#E2E8F0] px-4 py-3 text-sm focus:border-black focus:ring-black">
                     <option value="all">Todo</option>
                     <option value="3d">Últimos 3 días</option>
                     <option value="7d">Última semana</option>
@@ -51,13 +51,13 @@
                 <div>
                     <label class="mb-2 block text-xs font-semibold uppercase tracking-wide text-[#64748B]">Desde</label>
                     <input type="date" wire:model.live="customFrom"
-                           class="w-full rounded-xl border border-[#E2E8F0] px-4 py-3 text-sm focus:border-blue-500 focus:ring-blue-500">
+                           class="w-full rounded-xl border border-[#E2E8F0] px-4 py-3 text-sm focus:border-black focus:ring-black">
                 </div>
 
                 <div>
                     <label class="mb-2 block text-xs font-semibold uppercase tracking-wide text-[#64748B]">Hasta</label>
                     <input type="date" wire:model.live="customTo"
-                           class="w-full rounded-xl border border-[#E2E8F0] px-4 py-3 text-sm focus:border-blue-500 focus:ring-blue-500">
+                           class="w-full rounded-xl border border-[#E2E8F0] px-4 py-3 text-sm focus:border-black focus:ring-black">
                 </div>
             </div>
         @endif
@@ -89,7 +89,7 @@
                                 @if ($log->actor)
                                     <a
                                         href="{{ route('admin.users', ['search' => $log->actor->email]) }}"
-                                        class="font-semibold text-blue-700 hover:text-blue-900 hover:underline"
+                                        class="font-semibold text-black hover:text-gray-700 hover:underline"
                                         title="Ver los datos de este usuario"
                                     >
                                         {{ $log->actor->name }}

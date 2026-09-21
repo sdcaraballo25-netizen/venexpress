@@ -7,7 +7,7 @@
 
         @unless ($showForm)
             <button wire:click="create"
-                    class="inline-flex items-center justify-center gap-2 rounded-xl bg-blue-900 px-5 py-3 text-sm font-semibold text-white shadow-sm transition hover:bg-blue-800">
+                    class="inline-flex items-center justify-center gap-2 rounded-xl bg-black px-5 py-3 text-sm font-semibold text-white shadow-sm transition hover:bg-gray-800">
                 <span class="text-lg leading-none">+</span>
                 Nueva distancia
             </button>
@@ -32,19 +32,19 @@
                     <div>
                         <label class="mb-1 block text-xs font-bold uppercase tracking-wider text-[#64748B]">Ciudad A</label>
                         <input type="text" wire:model="city_one" placeholder="Caracas"
-                               class="w-full rounded-xl border-[#E2E8F0] text-sm focus:border-blue-500 focus:ring-blue-500">
+                               class="w-full rounded-xl border-[#E2E8F0] text-sm focus:border-black focus:ring-black">
                         @error('city_one') <p class="mt-1 text-xs text-red-600">{{ $message }}</p> @enderror
                     </div>
                     <div>
                         <label class="mb-1 block text-xs font-bold uppercase tracking-wider text-[#64748B]">Ciudad B</label>
                         <input type="text" wire:model="city_two" placeholder="Valencia"
-                               class="w-full rounded-xl border-[#E2E8F0] text-sm focus:border-blue-500 focus:ring-blue-500">
+                               class="w-full rounded-xl border-[#E2E8F0] text-sm focus:border-black focus:ring-black">
                         @error('city_two') <p class="mt-1 text-xs text-red-600">{{ $message }}</p> @enderror
                     </div>
                     <div>
                         <label class="mb-1 block text-xs font-bold uppercase tracking-wider text-[#64748B]">Distancia (km)</label>
                         <input type="number" wire:model="distance_km" placeholder="180"
-                               class="w-full rounded-xl border-[#E2E8F0] text-sm focus:border-blue-500 focus:ring-blue-500">
+                               class="w-full rounded-xl border-[#E2E8F0] text-sm focus:border-black focus:ring-black">
                         @error('distance_km') <p class="mt-1 text-xs text-red-600">{{ $message }}</p> @enderror
                     </div>
                 </div>
@@ -85,7 +85,7 @@
                             <td class="px-6 py-4 text-right">
                                 <div class="flex justify-end gap-3">
                                     <button wire:click="edit({{ $distance->id }})"
-                                            class="text-sm font-medium text-blue-800 hover:text-blue-900">
+                                            class="text-sm font-medium text-black hover:text-gray-700">
                                         Editar
                                     </button>
                                     <button wire:click="delete({{ $distance->id }})"

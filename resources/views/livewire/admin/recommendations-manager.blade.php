@@ -39,7 +39,7 @@
 
                     <div class="flex items-center gap-2 shrink-0">
                         @if ($recommendation->status === Recommendation::STATUS_NEW)
-                            <span class="px-2.5 py-1 rounded-lg bg-blue-50 text-blue-700 text-xs font-semibold">Nueva</span>
+                            <span class="px-2.5 py-1 rounded-lg bg-amber-50 text-amber-700 text-xs font-semibold">Nueva</span>
                         @endif
 
                         <button

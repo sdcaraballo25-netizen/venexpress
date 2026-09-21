@@ -71,7 +71,7 @@ $this->redirect(route('dashboard', absolute: false), navigate: true);
         <x-venexpress-logo size="md" />
     </div>
 
-    <h1 class="font-display text-2xl font-bold text-blue-950">Iniciar sesión</h1>
+    <h1 class="font-display text-2xl font-bold text-black">Iniciar sesión</h1>
     <p class="mt-1.5 text-sm text-gray-500">
         Ingresa tus credenciales para acceder a tu panel.
     </p>
@@ -89,7 +89,7 @@ $this->redirect(route('dashboard', absolute: false), navigate: true);
             <div class="flex items-center justify-between">
                 <x-input-label for="password" value="Contraseña" />
                 @if (Route::has('password.request'))
-                    <a class="text-xs font-medium text-blue-700 hover:text-blue-950" href="{{ route('password.request') }}" wire:navigate>
+                    <a class="text-xs font-medium text-black hover:text-black" href="{{ route('password.request') }}" wire:navigate>
                         ¿Olvidaste tu contraseña?
                     </a>
                 @endif
@@ -103,7 +103,7 @@ $this->redirect(route('dashboard', absolute: false), navigate: true);
         </div>
 
         <label for="remember" class="flex items-center gap-2 text-sm text-gray-600">
-            <input wire:model="form.remember" id="remember" type="checkbox" class="rounded border-gray-300 text-blue-600 shadow-sm focus:ring-blue-600" name="remember">
+            <input wire:model="form.remember" id="remember" type="checkbox" class="rounded border-gray-300 text-black shadow-sm focus:ring-black" name="remember">
             Recordarme en este dispositivo
         </label>
 
@@ -115,7 +115,7 @@ $this->redirect(route('dashboard', absolute: false), navigate: true);
     @if (Route::has('register'))
         <p class="mt-8 text-center text-sm text-gray-500">
             ¿Todavía no tienes cuenta?
-            <a href="{{ route('register') }}" class="font-semibold text-blue-700 hover:text-blue-950" wire:navigate>Regístrate</a>
+            <a href="{{ route('register') }}" class="font-semibold text-black hover:text-black" wire:navigate>Regístrate</a>
         </p>
     @endif
 </div>

@@ -6,7 +6,7 @@
         <div>
             <a
                 href="{{ route('repartidor.dashboard') }}"
-                class="text-sm font-medium text-blue-700 hover:text-blue-900"
+                class="text-sm font-medium text-black hover:text-gray-700"
             >
                 ← Resumen
             </a>
@@ -25,7 +25,7 @@
         </div>
 
         <div>
-            <span class="inline-flex rounded-full bg-blue-50 px-3 py-1 text-sm font-medium text-blue-700">
+            <span class="inline-flex rounded-full bg-gray-100 px-3 py-1 text-sm font-medium text-black">
 
                 @if ($route->status === \App\Models\Route::STATUS_DRAFT)
                     Borrador
@@ -68,7 +68,7 @@
 
             <a
                 href="{{ route('repartidor.scanner') }}"
-                class="group flex flex-col gap-4 rounded-2xl border border-blue-900 bg-blue-900 p-5 shadow-sm transition hover:bg-blue-800 sm:flex-row sm:items-center sm:justify-between"
+                class="group flex flex-col gap-4 rounded-2xl border border-black bg-black p-5 shadow-sm transition hover:bg-gray-800 sm:flex-row sm:items-center sm:justify-between"
             >
 
                 <div class="flex items-center gap-4">
@@ -83,19 +83,19 @@
                         </span>
 
                         @if ($hubScanOperation === 'collection')
-                            <p class="mt-1.5 text-sm text-blue-100">
+                            <p class="mt-1.5 text-sm text-gray-300">
                                 Siguiente parada:
                                 <span class="font-semibold text-white">
                                     {{ $nextPendingStop?->ally?->business_name ?? '—' }}
                                 </span>
                             </p>
                         @elseif ($hubScanOperation === \App\Livewire\Driver\Support\HubDistributionPhase::DEPARTURE)
-                            <p class="mt-1.5 text-sm text-blue-100">
+                            <p class="mt-1.5 text-sm text-gray-300">
                                 Paquetes pendientes:
                                 <span class="font-semibold text-white">{{ $hubScanPendingCount }}</span>
                             </p>
                         @else
-                            <p class="mt-1.5 text-sm text-blue-100">
+                            <p class="mt-1.5 text-sm text-gray-300">
                                 Almacén:
                                 <span class="font-semibold text-white">{{ $hubScanWarehouseName ?? '—' }}</span>
                                 · Por recibir:
@@ -106,7 +106,7 @@
 
                 </div>
 
-                <span class="inline-flex shrink-0 items-center justify-center rounded-xl bg-white px-5 py-3 text-sm font-semibold text-blue-900 transition group-hover:bg-blue-50">
+                <span class="inline-flex shrink-0 items-center justify-center rounded-xl bg-white px-5 py-3 text-sm font-semibold text-black transition group-hover:bg-amber-50">
                     {{ $hubScanCta }}
                 </span>
 
@@ -118,7 +118,7 @@
                  acceso genérico, sin tocar el vocabulario de Delivery. --}}
             <a
                 href="{{ route('repartidor.scanner') }}"
-                class="group flex flex-col gap-4 rounded-2xl border border-blue-900 bg-blue-900 p-5 shadow-sm transition hover:bg-blue-800 sm:flex-row sm:items-center sm:justify-between"
+                class="group flex flex-col gap-4 rounded-2xl border border-black bg-black p-5 shadow-sm transition hover:bg-gray-800 sm:flex-row sm:items-center sm:justify-between"
             >
 
                 <div class="flex items-center gap-4">
@@ -132,14 +132,14 @@
                             Escanear paquetes
                         </h2>
 
-                        <p class="mt-1 text-sm text-blue-100">
+                        <p class="mt-1 text-sm text-gray-300">
                             Continúa procesando las paradas de esta ruta.
                         </p>
                     </div>
 
                 </div>
 
-                <span class="inline-flex shrink-0 items-center justify-center rounded-xl bg-white px-5 py-3 text-sm font-semibold text-blue-900 transition group-hover:bg-blue-50">
+                <span class="inline-flex shrink-0 items-center justify-center rounded-xl bg-white px-5 py-3 text-sm font-semibold text-black transition group-hover:bg-amber-50">
                     Abrir escáner
                 </span>
 
@@ -217,7 +217,7 @@
 
         <div class="h-2.5 w-full rounded-full bg-slate-100">
             <div
-                class="h-2.5 rounded-full bg-blue-700 transition-all duration-500"
+                class="h-2.5 rounded-full bg-black transition-all duration-500"
                 @style(['width' => $routeProgress . '%'])
             ></div>
         </div>
@@ -278,7 +278,7 @@
 
                         <div class="flex items-center gap-4">
 
-                            <div class="flex h-9 w-9 shrink-0 items-center justify-center rounded-full bg-blue-50 text-sm font-bold text-blue-700">
+                            <div class="flex h-9 w-9 shrink-0 items-center justify-center rounded-full bg-amber-50 text-sm font-bold text-black">
                                 {{ $index + 1 }}
                             </div>
 
@@ -303,8 +303,8 @@
                         <div>
 
                             @if ($stop->status === \App\Models\RouteStop::STATUS_PENDING)
-                                <span class="inline-flex items-center gap-1.5 rounded-full bg-blue-50 px-3 py-1 text-xs font-semibold text-blue-700">
-                                    <span class="h-1.5 w-1.5 rounded-full bg-blue-600"></span>
+                                <span class="inline-flex items-center gap-1.5 rounded-full bg-amber-50 px-3 py-1 text-xs font-semibold text-amber-700">
+                                    <span class="h-1.5 w-1.5 rounded-full bg-amber-500"></span>
                                     Pendiente
                                 </span>
                             @elseif ($stop->status === \App\Models\RouteStop::STATUS_VISITED)

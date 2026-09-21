@@ -15,7 +15,7 @@
     <div class="flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
         <div>
             @if ($operationTitle)
-                <span class="inline-flex items-center gap-1.5 rounded-full bg-blue-900 px-3 py-1 text-xs font-bold uppercase tracking-wide text-white">
+                <span class="inline-flex items-center gap-1.5 rounded-full bg-black px-3 py-1 text-xs font-bold uppercase tracking-wide text-white">
                     {{ $operationTitle }}
                 </span>
             @endif
@@ -36,7 +36,7 @@
 
         <a
             href="{{ route('repartidor.dashboard') }}"
-            class="text-sm font-medium text-blue-700 hover:text-blue-900"
+            class="text-sm font-medium text-black hover:text-gray-700"
         >
             ← Resumen
         </a>
@@ -141,13 +141,13 @@
                         wire:model="trackingNumber"
                         placeholder="Ej. VEN-20260902-000123"
                         autocomplete="off"
-                        class="min-w-0 flex-1 rounded-xl border border-slate-300 px-4 py-3 text-sm shadow-sm focus:border-blue-900 focus:ring-blue-900"
+                        class="min-w-0 flex-1 rounded-xl border border-slate-300 px-4 py-3 text-sm shadow-sm focus:border-black focus:ring-black"
                     >
 
                     <button
                         type="submit"
                         wire:loading.attr="disabled"
-                        class="rounded-xl bg-blue-900 px-5 py-3 text-sm font-semibold text-white transition hover:bg-blue-800 disabled:opacity-50"
+                        class="rounded-xl bg-black px-5 py-3 text-sm font-semibold text-white transition hover:bg-gray-800 disabled:opacity-50"
                     >
                         <span wire:loading.remove>Escanear</span>
                         <span wire:loading>Procesando...</span>
@@ -221,15 +221,15 @@
 
                 @unless ($operation)
                     @if ($package->requires_delivery)
-                        <div class="mt-4 rounded-xl border border-blue-100 bg-blue-50 p-4">
-                            <p class="text-xs font-medium uppercase tracking-wide text-blue-700">
+                        <div class="mt-4 rounded-xl border border-amber-100 bg-amber-50 p-4">
+                            <p class="text-xs font-medium uppercase tracking-wide text-amber-700">
                                 Entrega a domicilio
                             </p>
-                            <p class="mt-1 text-sm font-semibold text-blue-900">
+                            <p class="mt-1 text-sm font-semibold text-black">
                                 {{ $package->delivery_address ?: 'Dirección no especificada' }}
                             </p>
                             @if ($package->delivery_sector)
-                                <p class="mt-1 text-xs text-blue-700">
+                                <p class="mt-1 text-xs text-amber-700">
                                     Sector: {{ $package->delivery_sector }}
                                 </p>
                             @endif
@@ -255,14 +255,14 @@
                 @endunless
 
                 @if ($pendingOperationView && $pendingOperationView['eligible'])
-                    <div class="mt-5 rounded-xl border border-blue-200 bg-blue-50 p-4">
-                        <p class="text-xs font-semibold uppercase tracking-wide text-blue-700">
+                    <div class="mt-5 rounded-xl border border-amber-200 bg-amber-50 p-4">
+                        <p class="text-xs font-semibold uppercase tracking-wide text-amber-700">
                             Ya escaneaste esta guía hace un momento
                         </p>
-                        <p class="mt-1 text-sm font-semibold text-blue-900">
+                        <p class="mt-1 text-sm font-semibold text-black">
                             {{ $pendingOperationView['label'] }}
                         </p>
-                        <p class="mt-1 text-xs text-blue-700">
+                        <p class="mt-1 text-xs text-amber-700">
                             {{ $pendingOperationView['hint'] }} Confirma solo si de verdad quieres repetir la operación sobre esta guía.
                         </p>
 
@@ -270,7 +270,7 @@
                             type="button"
                             wire:click="confirmOperation('{{ $pendingOperationView['key'] }}')"
                             wire:loading.attr="disabled"
-                            class="mt-4 inline-flex w-full items-center justify-center rounded-xl bg-blue-900 px-5 py-3 text-sm font-semibold text-white transition hover:bg-blue-800 disabled:opacity-50 sm:w-auto"
+                            class="mt-4 inline-flex w-full items-center justify-center rounded-xl bg-black px-5 py-3 text-sm font-semibold text-white transition hover:bg-gray-800 disabled:opacity-50 sm:w-auto"
                         >
                             <span wire:loading.remove wire:target="confirmOperation">{{ $pendingOperationView['cta'] }}</span>
                             <span wire:loading wire:target="confirmOperation">Procesando...</span>
@@ -396,7 +396,7 @@
             @else
 
                 <div class="flex min-h-[420px] flex-col items-center justify-center text-center">
-                    <div class="flex h-16 w-16 items-center justify-center rounded-2xl bg-blue-50 text-blue-900">
+                    <div class="flex h-16 w-16 items-center justify-center rounded-2xl bg-amber-50 text-black">
                         <svg class="h-8 w-8" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                             <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.8"
                                   d="M3 7h4V3m14 4h-4V3M3 17h4v4m14-4h-4v4M7 7h10v10H7z" />

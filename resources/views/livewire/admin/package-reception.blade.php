@@ -49,12 +49,12 @@
                             wire:model="trackingNumber"
                             placeholder="VEN-..."
                             autocomplete="off"
-                            class="min-w-0 flex-1 rounded-xl border border-slate-300 px-4 py-3 text-sm focus:border-blue-900 focus:ring-blue-900"
+                            class="min-w-0 flex-1 rounded-xl border border-slate-300 px-4 py-3 text-sm focus:border-black focus:ring-black"
                         >
 
                         <button
                             type="submit"
-                            class="rounded-xl bg-blue-900 px-5 py-3 text-sm font-semibold text-white hover:bg-blue-800"
+                            class="rounded-xl bg-black px-5 py-3 text-sm font-semibold text-white hover:bg-gray-800"
                         >
                             Buscar
                         </button>
@@ -66,7 +66,7 @@
                 <div wire:ignore class="rounded-xl border border-slate-200 bg-slate-50 p-4">
                     <div class="flex flex-wrap items-center justify-between gap-3">
                         <div class="flex items-center gap-2">
-                            <span class="rounded-lg bg-blue-50 p-2 text-blue-900">
+                            <span class="rounded-lg bg-amber-50 p-2 text-black">
                                 <svg class="h-5 w-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                                     <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.8"
                                         d="M3 7h4V3m14 4h-4V3M3 17h4v4m14-4h-4v4M7 7h10v10H7z" />
@@ -139,7 +139,7 @@
 
                     <select
                         wire:model="warehouseId"
-                        class="mt-2 w-full rounded-xl border border-slate-300 px-4 py-3 text-sm focus:border-blue-900 focus:ring-blue-900"
+                        class="mt-2 w-full rounded-xl border border-slate-300 px-4 py-3 text-sm focus:border-black focus:ring-black"
                     >
                         <option value="">Selecciona...</option>
                         @foreach ($warehouses as $warehouse)

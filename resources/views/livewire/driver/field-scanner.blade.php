@@ -66,13 +66,13 @@
                         wire:model="trackingNumber"
                         placeholder="Ej. VEN-20260902-000123"
                         autocomplete="off"
-                        class="min-w-0 flex-1 rounded-xl border border-slate-300 px-4 py-3 text-sm shadow-sm focus:border-blue-900 focus:ring-blue-900"
+                        class="min-w-0 flex-1 rounded-xl border border-slate-300 px-4 py-3 text-sm shadow-sm focus:border-black focus:ring-black"
                     >
 
                     <button
                         type="submit"
                         wire:loading.attr="disabled"
-                        class="rounded-xl bg-blue-900 px-5 py-3 text-sm font-semibold text-white transition hover:bg-blue-800 disabled:opacity-50"
+                        class="rounded-xl bg-black px-5 py-3 text-sm font-semibold text-white transition hover:bg-gray-800 disabled:opacity-50"
                     >
                         <span wire:loading.remove>Escanear</span>
                         <span wire:loading>Procesando...</span>
@@ -145,15 +145,15 @@
                 </div>
 
                 @if ($package->requires_delivery)
-                    <div class="mt-4 rounded-xl border border-blue-100 bg-blue-50 p-4">
-                        <p class="text-xs font-medium uppercase tracking-wide text-blue-700">
+                    <div class="mt-4 rounded-xl border border-amber-100 bg-amber-50 p-4">
+                        <p class="text-xs font-medium uppercase tracking-wide text-amber-700">
                             Entrega a domicilio
                         </p>
-                        <p class="mt-1 text-sm font-semibold text-blue-900">
+                        <p class="mt-1 text-sm font-semibold text-black">
                             {{ $package->delivery_address ?: 'Dirección no especificada' }}
                         </p>
                         @if ($package->delivery_sector)
-                            <p class="mt-1 text-xs text-blue-700">
+                            <p class="mt-1 text-xs text-amber-700">
                                 Sector: {{ $package->delivery_sector }}
                             </p>
                         @endif
@@ -202,7 +202,7 @@
             @else
 
                 <div class="flex min-h-[420px] flex-col items-center justify-center text-center">
-                    <div class="flex h-16 w-16 items-center justify-center rounded-2xl bg-blue-50 text-blue-900">
+                    <div class="flex h-16 w-16 items-center justify-center rounded-2xl bg-amber-50 text-black">
                         <svg class="h-8 w-8" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                             <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.8"
                                   d="M3 7h4V3m14 4h-4V3M3 17h4v4m14-4h-4v4M7 7h10v10H7z" />

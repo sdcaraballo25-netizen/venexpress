@@ -84,7 +84,7 @@
                                 document.getElementById('dynamic-page-size').textContent = '@page { size: 80mm auto; margin: 3mm; }';
                                 window.print();
                             "
-                            class="rounded-xl border border-blue-900 px-4 py-2 text-sm font-medium text-blue-900"
+                            class="rounded-xl border border-black px-4 py-2 text-sm font-medium text-black"
                         >
                             Imprimir factura cliente (tickera 80mm)
                         </button>
@@ -95,7 +95,7 @@
                                 document.getElementById('dynamic-page-size').textContent = '@page { size: auto; margin: 10mm; }';
                                 window.print();
                             "
-                            class="rounded-xl border border-blue-900 px-4 py-2 text-sm font-medium text-blue-900"
+                            class="rounded-xl border border-black px-4 py-2 text-sm font-medium text-black"
                         >
                             Imprimir etiqueta paquete (impresora normal)
                         </button>
@@ -103,14 +103,14 @@
                             <a
                                 href="{{ route('packages.label', $createdPackageId) }}"
                                 target="_blank"
-                                class="rounded-xl border border-blue-900 px-4 py-2 text-sm font-medium text-blue-900"
+                                class="rounded-xl border border-black px-4 py-2 text-sm font-medium text-black"
                             >
                                 Descargar guía (PDF)
                             </a>
                         @endif
                         <button
                             wire:click="registerAnother"
-                            class="rounded-xl bg-blue-900 px-4 py-2 text-sm font-medium text-white"
+                            class="rounded-xl bg-black px-4 py-2 text-sm font-medium text-white"
                         >
                             Registrar otro pedido
                         </button>
@@ -324,7 +324,7 @@
                     <div>
                         <label class="text-sm text-slate-600">Tipo de documento</label>
                         <select wire:model.live="sender_doc_type"
-                            class="mt-1 w-full rounded-xl border border-slate-300 px-3 py-2 text-sm shadow-sm focus:border-blue-900 focus:ring-blue-900">
+                            class="mt-1 w-full rounded-xl border border-slate-300 px-3 py-2 text-sm shadow-sm focus:border-black focus:ring-black">
                             @foreach (\App\Livewire\Ally\PackageCreate::DOC_TYPE_LABELS as $value => $label)
                                 <option value="{{ $value }}">{{ $label }}</option>
                             @endforeach
@@ -333,7 +333,7 @@
                     <div class="sm:col-span-2">
                         <label class="text-sm text-slate-600">Número de documento</label>
                         <input type="text" wire:model.live.debounce.500ms="sender_doc_number" placeholder="12345678"
-                            class="mt-1 w-full rounded-xl border border-slate-300 px-3 py-2 text-sm shadow-sm focus:border-blue-900 focus:ring-blue-900">
+                            class="mt-1 w-full rounded-xl border border-slate-300 px-3 py-2 text-sm shadow-sm focus:border-black focus:ring-black">
                         @error('sender_doc_number') <p class="text-xs text-red-600 mt-1">{{ $message }}</p> @enderror
                         @error('sender_id_doc') <p class="text-xs text-red-600 mt-1">{{ $message }}</p> @enderror
                     </div>
@@ -363,7 +363,7 @@
                             <p class="text-slate-500">{{ $sender_phone }}{{ $sender_email ? ' · '.$sender_email : '' }}</p>
                         </div>
                         <button type="button" wire:click="openSenderCustomerModal"
-                            class="shrink-0 text-xs font-medium text-blue-900 underline hover:text-blue-700">
+                            class="shrink-0 text-xs font-medium text-black underline hover:text-gray-700">
                             Editar
                         </button>
                     </div>
@@ -382,7 +382,7 @@
                     <div>
                         <label class="text-sm text-slate-600">Tipo de documento</label>
                         <select wire:model.live="recipient_doc_type"
-                            class="mt-1 w-full rounded-xl border border-slate-300 px-3 py-2 text-sm shadow-sm focus:border-blue-900 focus:ring-blue-900">
+                            class="mt-1 w-full rounded-xl border border-slate-300 px-3 py-2 text-sm shadow-sm focus:border-black focus:ring-black">
                             @foreach (\App\Livewire\Ally\PackageCreate::DOC_TYPE_LABELS as $value => $label)
                                 <option value="{{ $value }}">{{ $label }}</option>
                             @endforeach
@@ -391,7 +391,7 @@
                     <div class="sm:col-span-2">
                         <label class="text-sm text-slate-600">Número de documento</label>
                         <input type="text" wire:model.live.debounce.500ms="recipient_doc_number" placeholder="12345678"
-                            class="mt-1 w-full rounded-xl border border-slate-300 px-3 py-2 text-sm shadow-sm focus:border-blue-900 focus:ring-blue-900">
+                            class="mt-1 w-full rounded-xl border border-slate-300 px-3 py-2 text-sm shadow-sm focus:border-black focus:ring-black">
                         @error('recipient_doc_number') <p class="text-xs text-red-600 mt-1">{{ $message }}</p> @enderror
                         @error('recipient_id_doc') <p class="text-xs text-red-600 mt-1">{{ $message }}</p> @enderror
                     </div>
@@ -421,7 +421,7 @@
                             <p class="text-slate-500">{{ $recipient_phone }}{{ $recipient_email ? ' · '.$recipient_email : '' }}</p>
                         </div>
                         <button type="button" wire:click="openRecipientCustomerModal"
-                            class="shrink-0 text-xs font-medium text-blue-900 underline hover:text-blue-700">
+                            class="shrink-0 text-xs font-medium text-black underline hover:text-gray-700">
                             Editar
                         </button>
                     </div>
@@ -446,7 +446,7 @@
                             <div>
                                 <label class="text-sm text-slate-600">Nombre completo</label>
                                 <input type="text" wire:model="sender_name" autofocus
-                                    class="mt-1 w-full rounded-xl border border-slate-300 px-3 py-2 text-sm shadow-sm focus:border-blue-900 focus:ring-blue-900">
+                                    class="mt-1 w-full rounded-xl border border-slate-300 px-3 py-2 text-sm shadow-sm focus:border-black focus:ring-black">
                                 @error('sender_name') <p class="text-xs text-red-600 mt-1">{{ $message }}</p> @enderror
                             </div>
                             <div>
@@ -457,13 +457,13 @@
                             <div>
                                 <label class="text-sm text-slate-600">Teléfono</label>
                                 <input type="text" wire:model="sender_phone"
-                                    class="mt-1 w-full rounded-xl border border-slate-300 px-3 py-2 text-sm shadow-sm focus:border-blue-900 focus:ring-blue-900">
+                                    class="mt-1 w-full rounded-xl border border-slate-300 px-3 py-2 text-sm shadow-sm focus:border-black focus:ring-black">
                                 @error('sender_phone') <p class="text-xs text-red-600 mt-1">{{ $message }}</p> @enderror
                             </div>
                             <div>
                                 <label class="text-sm text-slate-600">Correo (opcional)</label>
                                 <input type="email" wire:model="sender_email"
-                                    class="mt-1 w-full rounded-xl border border-slate-300 px-3 py-2 text-sm shadow-sm focus:border-blue-900 focus:ring-blue-900">
+                                    class="mt-1 w-full rounded-xl border border-slate-300 px-3 py-2 text-sm shadow-sm focus:border-black focus:ring-black">
                                 @error('sender_email') <p class="text-xs text-red-600 mt-1">{{ $message }}</p> @enderror
                             </div>
                         </div>
@@ -474,7 +474,7 @@
                                 Cancelar
                             </button>
                             <button type="button" wire:click="saveSenderCustomer"
-                                class="rounded-xl bg-blue-900 px-4 py-2 text-sm font-medium text-white hover:bg-blue-800">
+                                class="rounded-xl bg-black px-4 py-2 text-sm font-medium text-white hover:bg-gray-800">
                                 Guardar
                             </button>
                         </div>
@@ -497,7 +497,7 @@
                             <div>
                                 <label class="text-sm text-slate-600">Nombre completo</label>
                                 <input type="text" wire:model="recipient_name" autofocus
-                                    class="mt-1 w-full rounded-xl border border-slate-300 px-3 py-2 text-sm shadow-sm focus:border-blue-900 focus:ring-blue-900">
+                                    class="mt-1 w-full rounded-xl border border-slate-300 px-3 py-2 text-sm shadow-sm focus:border-black focus:ring-black">
                                 @error('recipient_name') <p class="text-xs text-red-600 mt-1">{{ $message }}</p> @enderror
                             </div>
                             <div>
@@ -508,13 +508,13 @@
                             <div>
                                 <label class="text-sm text-slate-600">Teléfono</label>
                                 <input type="text" wire:model="recipient_phone"
-                                    class="mt-1 w-full rounded-xl border border-slate-300 px-3 py-2 text-sm shadow-sm focus:border-blue-900 focus:ring-blue-900">
+                                    class="mt-1 w-full rounded-xl border border-slate-300 px-3 py-2 text-sm shadow-sm focus:border-black focus:ring-black">
                                 @error('recipient_phone') <p class="text-xs text-red-600 mt-1">{{ $message }}</p> @enderror
                             </div>
                             <div>
                                 <label class="text-sm text-slate-600">Correo (opcional)</label>
                                 <input type="email" wire:model="recipient_email"
-                                    class="mt-1 w-full rounded-xl border border-slate-300 px-3 py-2 text-sm shadow-sm focus:border-blue-900 focus:ring-blue-900">
+                                    class="mt-1 w-full rounded-xl border border-slate-300 px-3 py-2 text-sm shadow-sm focus:border-black focus:ring-black">
                                 @error('recipient_email') <p class="text-xs text-red-600 mt-1">{{ $message }}</p> @enderror
                             </div>
                         </div>
@@ -525,7 +525,7 @@
                                 Cancelar
                             </button>
                             <button type="button" wire:click="saveRecipientCustomer"
-                                class="rounded-xl bg-blue-900 px-4 py-2 text-sm font-medium text-white hover:bg-blue-800">
+                                class="rounded-xl bg-black px-4 py-2 text-sm font-medium text-white hover:bg-gray-800">
                                 Guardar
                             </button>
                         </div>
@@ -542,7 +542,7 @@
                     <div>
                         <label class="text-sm text-slate-600">Estado destino</label>
                         <select wire:model.live="destination_state"
-                            class="mt-1 w-full rounded-xl border border-slate-300 px-3 py-2 text-sm shadow-sm focus:border-blue-900 focus:ring-blue-900">
+                            class="mt-1 w-full rounded-xl border border-slate-300 px-3 py-2 text-sm shadow-sm focus:border-black focus:ring-black">
                             <option value="">Selecciona un estado...</option>
                             @foreach ($destinationStates as $state)
                                 <option value="{{ $state }}">{{ $state }}</option>
@@ -555,7 +555,7 @@
                         <label class="text-sm text-slate-600">Ciudad destino</label>
                         <select wire:model.live="destination_city"
                             @disabled(empty($destination_state))
-                            class="mt-1 w-full rounded-xl border border-slate-300 px-3 py-2 text-sm shadow-sm focus:border-blue-900 focus:ring-blue-900 disabled:bg-slate-50">
+                            class="mt-1 w-full rounded-xl border border-slate-300 px-3 py-2 text-sm shadow-sm focus:border-black focus:ring-black disabled:bg-slate-50">
                             <option value="">Selecciona una ciudad...</option>
                             @foreach ($destinationCities as $city)
                                 <option value="{{ $city }}">{{ $city }}</option>
@@ -566,7 +566,7 @@
 
                     <div>
                         <label class="text-sm text-slate-600">Tipo</label>
-                        <select wire:model.live="package_type" class="mt-1 w-full rounded-xl border border-slate-300 px-3 py-2 text-sm shadow-sm focus:border-blue-900 focus:ring-blue-900">
+                        <select wire:model.live="package_type" class="mt-1 w-full rounded-xl border border-slate-300 px-3 py-2 text-sm shadow-sm focus:border-black focus:ring-black">
                             <option value="sobre">Sobre</option>
                             <option value="paquete">Paquete</option>
                         </select>
@@ -575,12 +575,12 @@
                     <div>
                         <label class="text-sm text-slate-600">Peso físico (kg)</label>
                         <input type="number" step="0.001" wire:model.live.debounce.500ms="physical_weight_kg"
-                            class="mt-1 w-full rounded-xl border border-slate-300 px-3 py-2 text-sm shadow-sm focus:border-blue-900 focus:ring-blue-900">
+                            class="mt-1 w-full rounded-xl border border-slate-300 px-3 py-2 text-sm shadow-sm focus:border-black focus:ring-black">
                         @error('physical_weight_kg') <p class="text-xs text-red-600 mt-1">{{ $message }}</p> @enderror
                     </div>
                 </div>
 
-                <div class="mt-4 rounded-xl border border-blue-100 bg-blue-50 px-4 py-3 text-sm text-blue-900">
+                <div class="mt-4 rounded-xl border border-amber-100 bg-amber-50 px-4 py-3 text-sm text-black">
                     <div class="flex flex-wrap items-center justify-between gap-2">
                         <span>
                             <strong>Origen:</strong>
@@ -602,28 +602,28 @@
                         <div>
                             <label class="text-sm text-slate-600">Largo (cm)</label>
                             <input type="number" step="0.01" wire:model.live.debounce.500ms="length_cm"
-                                class="mt-1 w-full rounded-xl border border-slate-300 px-3 py-2 text-sm shadow-sm focus:border-blue-900 focus:ring-blue-900">
+                                class="mt-1 w-full rounded-xl border border-slate-300 px-3 py-2 text-sm shadow-sm focus:border-black focus:ring-black">
                         </div>
                         <div>
                             <label class="text-sm text-slate-600">Ancho (cm)</label>
                             <input type="number" step="0.01" wire:model.live.debounce.500ms="width_cm"
-                                class="mt-1 w-full rounded-xl border border-slate-300 px-3 py-2 text-sm shadow-sm focus:border-blue-900 focus:ring-blue-900">
+                                class="mt-1 w-full rounded-xl border border-slate-300 px-3 py-2 text-sm shadow-sm focus:border-black focus:ring-black">
                         </div>
                         <div>
                             <label class="text-sm text-slate-600">Alto (cm)</label>
                             <input type="number" step="0.01" wire:model.live.debounce.500ms="height_cm"
-                                class="mt-1 w-full rounded-xl border border-slate-300 px-3 py-2 text-sm shadow-sm focus:border-blue-900 focus:ring-blue-900">
+                                class="mt-1 w-full rounded-xl border border-slate-300 px-3 py-2 text-sm shadow-sm focus:border-black focus:ring-black">
                         </div>
                     </div>
                 @endif
 
                 <div class="flex flex-wrap gap-6 mt-4">
                     <label class="flex items-center gap-2 text-sm text-slate-600">
-                        <input type="checkbox" wire:model.live="is_fragile" class="h-4 w-4 rounded border border-slate-300 text-blue-900 focus:ring-blue-900">
+                        <input type="checkbox" wire:model.live="is_fragile" class="h-4 w-4 rounded border border-slate-300 text-black focus:ring-black">
                         Frágil
                     </label>
                     <label class="flex items-center gap-2 text-sm text-slate-600">
-                        <input type="checkbox" wire:model.live="has_insurance" class="h-4 w-4 rounded border border-slate-300 text-blue-900 focus:ring-blue-900">
+                        <input type="checkbox" wire:model.live="has_insurance" class="h-4 w-4 rounded border border-slate-300 text-black focus:ring-black">
                         Asegurar envío
                     </label>
                 </div>
@@ -632,7 +632,7 @@
                     <div class="mt-4 max-w-xs">
                         <label class="text-sm text-slate-600">Valor declarado (USD)</label>
                         <input type="number" step="0.01" wire:model.live.debounce.500ms="declared_value_usd"
-                            class="mt-1 w-full rounded-xl border border-slate-300 px-3 py-2 text-sm shadow-sm focus:border-blue-900 focus:ring-blue-900">
+                            class="mt-1 w-full rounded-xl border border-slate-300 px-3 py-2 text-sm shadow-sm focus:border-black focus:ring-black">
                         @error('declared_value_usd') <p class="text-xs text-red-600 mt-1">{{ $message }}</p> @enderror
                     </div>
                 @endif
@@ -650,8 +650,8 @@
                         wire:click="selectHubPickup"
                         class="rounded-xl border px-4 py-3 text-left text-sm font-medium transition
                             {{ (! $requires_delivery && $pickup_mode === 'hub')
-                                ? 'border-blue-900 bg-blue-50 text-blue-900'
-                                : 'border-slate-300 text-slate-600 hover:border-blue-300' }}"
+                                ? 'border-amber-400 bg-amber-50 text-black'
+                                : 'border-slate-300 text-slate-600 hover:border-amber-300' }}"
                     >
                         Retiro en HUB
                     </button>
@@ -661,8 +661,8 @@
                         wire:click="selectAllyPickup"
                         class="rounded-xl border px-4 py-3 text-left text-sm font-medium transition
                             {{ (! $requires_delivery && $pickup_mode === 'ally')
-                                ? 'border-blue-900 bg-blue-50 text-blue-900'
-                                : 'border-slate-300 text-slate-600 hover:border-blue-300' }}"
+                                ? 'border-amber-400 bg-amber-50 text-black'
+                                : 'border-slate-300 text-slate-600 hover:border-amber-300' }}"
                     >
                         Retiro en Punto Aliado
                     </button>
@@ -672,8 +672,8 @@
                         wire:click="selectDelivery"
                         class="rounded-xl border px-4 py-3 text-left text-sm font-medium transition
                             {{ $requires_delivery
-                                ? 'border-blue-900 bg-blue-50 text-blue-900'
-                                : 'border-slate-300 text-slate-600 hover:border-blue-300' }}"
+                                ? 'border-amber-400 bg-amber-50 text-black'
+                                : 'border-slate-300 text-slate-600 hover:border-amber-300' }}"
                     >
                         Delivery
                     </button>
@@ -682,7 +682,7 @@
                 @error('pickup_mode') <p class="text-xs text-red-600 mt-2">{{ $message }}</p> @enderror
 
                 @if (! $requires_delivery && $pickup_mode === 'hub')
-                    <div class="mt-4 rounded-xl border border-blue-100 bg-blue-50 px-4 py-3 text-sm text-blue-900">
+                    <div class="mt-4 rounded-xl border border-amber-100 bg-amber-50 px-4 py-3 text-sm text-black">
                         El cliente retirará su paquete directamente en el HUB de destino.
                     </div>
                 @endif
@@ -701,7 +701,7 @@
                             </p>
                         @else
                             <select wire:model.live="pickup_ally_id"
-                                class="mt-1 w-full rounded-xl border border-slate-300 px-3 py-2 text-sm shadow-sm focus:border-blue-900 focus:ring-blue-900">
+                                class="mt-1 w-full rounded-xl border border-slate-300 px-3 py-2 text-sm shadow-sm focus:border-black focus:ring-black">
                                 <option value="">Selecciona un punto de retiro...</option>
                                 @foreach ($pickupAllies as $pickupAlly)
                                     <option value="{{ $pickupAlly['id'] }}">
@@ -723,7 +723,7 @@
                                 wire:model.live="delivery_address"
                                 rows="2"
                                 placeholder="{{ config('services.google_maps.api_key') ? 'Empieza a escribir y elige la sugerencia del mapa...' : 'Calle/avenida, edificio o casa, número, piso, apartamento...' }}"
-                                class="mt-1 w-full rounded-xl border border-slate-300 px-3 py-2 text-sm shadow-sm focus:border-blue-900 focus:ring-blue-900"
+                                class="mt-1 w-full rounded-xl border border-slate-300 px-3 py-2 text-sm shadow-sm focus:border-black focus:ring-black"
                                 @if (config('services.google_maps.api_key'))
                                     x-data="{
                                         initAutocomplete(el) {
@@ -775,7 +775,7 @@
                             <label class="text-sm text-slate-600">Sector / urbanización</label>
                             <input type="text" wire:model.live="delivery_sector"
                                 placeholder="Ej. La Floresta"
-                                class="mt-1 w-full rounded-xl border border-slate-300 px-3 py-2 text-sm shadow-sm focus:border-blue-900 focus:ring-blue-900">
+                                class="mt-1 w-full rounded-xl border border-slate-300 px-3 py-2 text-sm shadow-sm focus:border-black focus:ring-black">
                             @error('delivery_sector') <p class="text-xs text-red-600 mt-1">{{ $message }}</p> @enderror
                         </div>
 
@@ -783,7 +783,7 @@
                             <label class="text-sm text-slate-600">Punto de referencia</label>
                             <input type="text" wire:model.live="delivery_reference"
                                 placeholder="Ej. Frente al centro comercial..."
-                                class="mt-1 w-full rounded-xl border border-slate-300 px-3 py-2 text-sm shadow-sm focus:border-blue-900 focus:ring-blue-900">
+                                class="mt-1 w-full rounded-xl border border-slate-300 px-3 py-2 text-sm shadow-sm focus:border-black focus:ring-black">
                             @error('delivery_reference') <p class="text-xs text-red-600 mt-1">{{ $message }}</p> @enderror
                         </div>
                     </div>
@@ -805,7 +805,7 @@
 
                 <label class="flex items-center gap-2 text-sm text-slate-600 mb-4">
                     <input type="checkbox" wire:model.live="is_cod"
-                        class="h-4 w-4 rounded border border-slate-300 text-blue-900 focus:ring-blue-900">
+                        class="h-4 w-4 rounded border border-slate-300 text-black focus:ring-black">
                     Cobro contra entrega (COD) — se cobra en destino, no en esta agencia
                 </label>
 
@@ -813,7 +813,7 @@
                     <div class="max-w-sm">
                         <label class="text-sm text-slate-600">Método de pago del envío</label>
                         <select wire:model="payment_method"
-                            class="mt-1 w-full rounded-xl border border-slate-300 px-3 py-2 text-sm shadow-sm focus:border-blue-900 focus:ring-blue-900">
+                            class="mt-1 w-full rounded-xl border border-slate-300 px-3 py-2 text-sm shadow-sm focus:border-black focus:ring-black">
                             <option value="">Selecciona...</option>
                             @foreach (\App\Models\Package::PAYMENT_METHOD_LABELS as $value => $label)
                                 <option value="{{ $value }}">{{ $label }}</option>
@@ -881,7 +881,7 @@
                         @endif
                         <div>
                             <p class="text-slate-500">Total USD</p>
-                            <p class="font-display text-lg font-semibold text-blue-900">
+                            <p class="font-display text-lg font-semibold text-black">
                                 ${{ number_format($pricePreview['total_price_usd'], 2) }}
                             </p>
                         </div>
@@ -913,7 +913,7 @@
                 </span>
 
                 <button type="submit"
-                    class="rounded-xl bg-blue-900 px-6 py-3 text-sm font-medium text-white disabled:opacity-50"
+                    class="rounded-xl bg-black px-6 py-3 text-sm font-medium text-white disabled:opacity-50"
                     wire:loading.attr="disabled"
                 >
                     <span wire:loading.remove wire:target="save">Registrar guía</span>

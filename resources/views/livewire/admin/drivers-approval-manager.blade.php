@@ -60,8 +60,8 @@
                        px-4 py-3 text-sm
                        text-[#0F172A]
                        placeholder:text-[#94A3B8]
-                       focus:border-blue-500
-                       focus:ring-blue-500"
+                       focus:border-black
+                       focus:ring-black"
             >
 
         </div>

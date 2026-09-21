@@ -68,7 +68,7 @@ new #[Layout('layouts.guest')] class extends Component
         <x-venexpress-logo size="md" />
     </div>
 
-    <h1 class="font-display text-2xl font-bold text-blue-950">Restablecer contraseña</h1>
+    <h1 class="font-display text-2xl font-bold text-black">Restablecer contraseña</h1>
     <p class="mt-1.5 text-sm text-gray-500">
         Elige una nueva contraseña para tu cuenta.
     </p>

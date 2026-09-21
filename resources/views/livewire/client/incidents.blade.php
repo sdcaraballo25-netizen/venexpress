@@ -47,7 +47,7 @@
                     wire:model="trackingNumber"
                     id="trackingNumber"
                     type="text"
-                    class="mt-1.5 w-full rounded-xl border-slate-300 text-sm focus:border-blue-500 focus:ring-blue-500"
+                    class="mt-1.5 w-full rounded-xl border-slate-300 text-sm focus:border-black focus:ring-black"
                     placeholder="Ej. VEN-000123"
                 >
 
@@ -68,7 +68,7 @@
                     wire:model="description"
                     id="description"
                     rows="4"
-                    class="mt-1.5 w-full rounded-xl border-slate-300 text-sm focus:border-blue-500 focus:ring-blue-500"
+                    class="mt-1.5 w-full rounded-xl border-slate-300 text-sm focus:border-black focus:ring-black"
                     placeholder="Cuéntanos qué pasó con tu envío..."
                 ></textarea>
 
@@ -80,7 +80,7 @@
             <button
                 type="submit"
                 wire:loading.attr="disabled"
-                class="rounded-xl bg-blue-900 px-5 py-3 text-sm font-semibold text-white hover:bg-blue-800 disabled:opacity-60"
+                class="rounded-xl bg-black px-5 py-3 text-sm font-semibold text-white hover:bg-gray-800 disabled:opacity-60"
             >
                 Enviar reporte
             </button>

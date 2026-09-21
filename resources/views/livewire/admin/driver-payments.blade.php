@@ -70,7 +70,7 @@
                                         type="button"
                                         wire:click.stop="markAllPaidForDriver({{ $row->driver_id }})"
                                         wire:confirm="¿Confirmas que deseas marcar como pagadas las {{ $row->payments_count }} remuneración(es) pendientes de este repartidor, por un total de ${{ number_format((float) $row->total_usd, 2) }}?"
-                                        class="rounded-xl bg-blue-900 px-4 py-2.5 text-sm font-semibold text-white hover:bg-blue-800"
+                                        class="rounded-xl bg-black px-4 py-2.5 text-sm font-semibold text-white hover:bg-gray-800"
                                     >
                                         Marcar todo pagado
                                     </button>
@@ -115,7 +115,7 @@
                                                     <button type="button"
                                                             wire:click="markPaid({{ $payment->id }})"
                                                             wire:confirm="¿Confirmas que deseas registrar este pago?"
-                                                            class="rounded-lg bg-blue-900 px-3 py-1.5 text-xs font-semibold text-white hover:bg-blue-800">
+                                                            class="rounded-lg bg-black px-3 py-1.5 text-xs font-semibold text-white hover:bg-gray-800">
                                                         Marcar pagado
                                                     </button>
                                                     <button type="button"

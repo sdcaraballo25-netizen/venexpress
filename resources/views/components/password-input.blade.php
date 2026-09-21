@@ -4,14 +4,14 @@
     <input
         :type="show ? 'text' : 'password'"
         @disabled($disabled)
-        {{ $attributes->merge(['class' => 'w-full rounded-lg border-gray-300 bg-white text-blue-950 text-sm placeholder:text-gray-400 shadow-sm focus:border-blue-600 focus:ring-blue-600 disabled:bg-gray-50 disabled:text-gray-400 pr-10']) }}
+        {{ $attributes->merge(['class' => 'w-full rounded-lg border-gray-300 bg-white text-black text-sm placeholder:text-gray-400 shadow-sm focus:border-black focus:ring-black disabled:bg-gray-50 disabled:text-gray-400 pr-10']) }}
     >
 
     <button
         type="button"
         @click="show = !show"
         tabindex="-1"
-        class="absolute right-0 inset-y-0 flex w-10 items-center justify-center text-gray-400 hover:text-blue-950 focus:outline-none focus:text-blue-950"
+        class="absolute right-0 inset-y-0 flex w-10 items-center justify-center text-gray-400 hover:text-black focus:outline-none focus:text-black"
         :aria-label="show ? 'Ocultar contraseña' : 'Mostrar contraseña'"
     >
         <!-- Ojo abierto (mostrar) -->

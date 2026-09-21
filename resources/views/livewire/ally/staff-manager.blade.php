@@ -25,7 +25,7 @@
                 <button
                     type="button"
                     wire:click="startCreate"
-                    class="rounded-xl bg-blue-900 px-4 py-2 text-sm font-medium text-white hover:bg-blue-800"
+                    class="rounded-xl bg-black px-4 py-2 text-sm font-medium text-white hover:bg-gray-800"
                 >
                     + Nueva taquilla
                 </button>
@@ -44,7 +44,7 @@
                     <label class="text-sm text-slate-600">Nombre</label>
                     <input type="text" wire:model="name"
                         placeholder="Ej. Taquilla Los Próceres"
-                        class="mt-1 w-full rounded-xl border border-slate-300 px-3 py-2 text-sm shadow-sm focus:border-blue-900 focus:ring-blue-900">
+                        class="mt-1 w-full rounded-xl border border-slate-300 px-3 py-2 text-sm shadow-sm focus:border-black focus:ring-black">
                     @error('name') <p class="text-xs text-red-600 mt-1">{{ $message }}</p> @enderror
                 </div>
 
@@ -53,7 +53,7 @@
                     <input type="text" wire:model="username"
                         placeholder="taquilla1"
                         autocapitalize="off" autocorrect="off"
-                        class="mt-1 w-full rounded-xl border border-slate-300 px-3 py-2 text-sm shadow-sm focus:border-blue-900 focus:ring-blue-900">
+                        class="mt-1 w-full rounded-xl border border-slate-300 px-3 py-2 text-sm shadow-sm focus:border-black focus:ring-black">
                     <p class="text-xs text-slate-400 mt-1">Solo minúsculas, números, puntos y guiones — sin correo.</p>
                     @error('username') <p class="text-xs text-red-600 mt-1">{{ $message }}</p> @enderror
                 </div>
@@ -63,18 +63,18 @@
                         Contraseña {{ $editingId ? '(déjala vacía para no cambiarla)' : '' }}
                     </label>
                     <input type="password" wire:model="password"
-                        class="mt-1 w-full rounded-xl border border-slate-300 px-3 py-2 text-sm shadow-sm focus:border-blue-900 focus:ring-blue-900">
+                        class="mt-1 w-full rounded-xl border border-slate-300 px-3 py-2 text-sm shadow-sm focus:border-black focus:ring-black">
                     @error('password') <p class="text-xs text-red-600 mt-1">{{ $message }}</p> @enderror
                 </div>
 
                 <div>
                     <label class="text-sm text-slate-600">Confirmar contraseña</label>
                     <input type="password" wire:model="password_confirmation"
-                        class="mt-1 w-full rounded-xl border border-slate-300 px-3 py-2 text-sm shadow-sm focus:border-blue-900 focus:ring-blue-900">
+                        class="mt-1 w-full rounded-xl border border-slate-300 px-3 py-2 text-sm shadow-sm focus:border-black focus:ring-black">
                 </div>
 
                 <div class="md:col-span-2 flex items-center gap-3">
-                    <button type="submit" class="rounded-xl bg-blue-900 px-5 py-2.5 text-sm font-medium text-white hover:bg-blue-800">
+                    <button type="submit" class="rounded-xl bg-black px-5 py-2.5 text-sm font-medium text-white hover:bg-gray-800">
                         {{ $editingId ? 'Guardar cambios' : 'Crear taquilla' }}
                     </button>
                     <button type="button" wire:click="cancel" class="text-sm font-medium text-slate-500 hover:text-slate-700">
@@ -120,7 +120,7 @@
                                     @endif
                                 </td>
                                 <td class="py-3 pr-4 text-right whitespace-nowrap">
-                                    <button type="button" wire:click="edit({{ $member->id }})" class="text-blue-900 hover:underline text-xs font-medium mr-3">
+                                    <button type="button" wire:click="edit({{ $member->id }})" class="text-black hover:underline text-xs font-medium mr-3">
                                         Editar
                                     </button>
                                     <button

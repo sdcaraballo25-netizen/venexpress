@@ -31,14 +31,14 @@
                 <input
                     id="pickup-tracking-number"
                     wire:model="trackingNumber"
-                    class="flex-1 rounded-xl border px-4 py-3 outline-none transition focus:border-blue-800 focus:ring-2 focus:ring-blue-100"
+                    class="flex-1 rounded-xl border px-4 py-3 outline-none transition focus:border-black focus:ring-2 focus:ring-black/10"
                     placeholder="Número de guía"
                     autocomplete="off"
                 >
 
                 <button
                     type="submit"
-                    class="rounded-xl bg-blue-900 px-5 py-3 font-semibold text-white"
+                    class="rounded-xl bg-black px-5 py-3 font-semibold text-white"
                 >
                     Buscar
                 </button>
@@ -52,14 +52,14 @@
                 <!-- Cámara -->
                 <label
                     for="pickup-camera"
-                    class="flex cursor-pointer items-center justify-center gap-3 rounded-xl border-2 border-dashed border-blue-200 bg-blue-50 px-4 py-4 text-sm font-semibold text-blue-900 transition hover:border-blue-400 hover:bg-blue-100"
+                    class="flex cursor-pointer items-center justify-center gap-3 rounded-xl border-2 border-dashed border-gray-300 bg-gray-50 px-4 py-4 text-sm font-semibold text-black transition hover:border-gray-400 hover:bg-gray-100"
                 >
 
                     <span class="text-2xl">📷</span>
 
                     <span>
                         Usar cámara
-                        <small class="block font-normal text-blue-700">
+                        <small class="block font-normal text-gray-500">
                             Fotografiar la guía
                         </small>
                     </span>
@@ -105,7 +105,7 @@
             <!-- ESTADO OCR -->
             <div
                 id="pickup-ocr-status"
-                class="hidden rounded-xl border border-blue-200 bg-blue-50 p-4 text-sm text-blue-800"
+                class="hidden rounded-xl border border-gray-200 bg-gray-50 p-4 text-sm text-black"
             ></div>
 
 

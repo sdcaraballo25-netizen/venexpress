@@ -4,7 +4,7 @@
     <div>
         <a
             href="{{ route('repartidor.dashboard') }}"
-            class="text-sm font-medium text-blue-700 hover:text-blue-900"
+            class="text-sm font-medium text-black hover:text-gray-700"
         >
             ← Resumen
         </a>
@@ -110,7 +110,7 @@
                         <a
                             href="{{ route('repartidor.route-detail', $route->id) }}"
                             wire:navigate
-                            class="text-sm font-semibold text-blue-700 hover:text-blue-900"
+                            class="text-sm font-semibold text-black hover:text-gray-700"
                         >
                             Ver detalle →
                         </a>
