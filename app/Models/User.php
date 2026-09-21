@@ -23,6 +23,7 @@ class User extends Authenticatable
     public const ROLE_REPARTIDOR = 'repartidor';
     public const ROLE_CLIENTE = 'cliente';
     public const ROLE_ALMACEN = 'almacen';
+    public const ROLE_EMPRENDEDOR = 'emprendedor';
 
     // Alias de compatibilidad para código existente.
     public const ROLE_ADMIN = self::ROLE_ADMIN_PRINCIPAL;
@@ -287,6 +288,15 @@ class User extends Authenticatable
     }
 
     /**
+     * Perfil de negocio del marketplace (role 'emprendedor'). Mismo
+     * patrón 1-a-1 que ally()/driver().
+     */
+    public function emprendedor(): HasOne
+    {
+        return $this->hasOne(Emprendedor::class);
+    }
+
+    /**
      * Registro de Customer que este usuario reclamó al registrarse
      * como cliente con su cédula (ver register.blade.php).
      */
@@ -390,6 +400,11 @@ class User extends Authenticatable
     public function isCliente(): bool
     {
         return $this->role === self::ROLE_CLIENTE;
+    }
+
+    public function isEmprendedor(): bool
+    {
+        return $this->role === self::ROLE_EMPRENDEDOR;
     }
 
     public function isActive(): bool
