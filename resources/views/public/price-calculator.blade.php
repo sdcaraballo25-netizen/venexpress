@@ -6,7 +6,7 @@
                 <span class="inline-block bg-amber-100 text-amber-700 text-xs font-semibold tracking-wide uppercase px-3 py-1 rounded-full mb-4">
                     Antes de enviar
                 </span>
-                <h1 class="text-3xl md:text-4xl font-extrabold text-blue-950">Calcula el precio de tu envío</h1>
+                <h1 class="text-3xl md:text-4xl font-extrabold text-black">Calcula el precio de tu envío</h1>
                 <p class="text-gray-500 mt-3 max-w-xl mx-auto">
                     Simula el costo real de tu paquete o sobre entre dos ciudades de Venezuela,
                     con la tasa BCV del día. Sin registrarte, sin compromiso.
@@ -20,22 +20,22 @@
 
                     {{-- Tipo de envío --}}
                     <div>
-                        <label class="block text-sm font-semibold text-blue-950 mb-2">Tipo de envío</label>
+                        <label class="block text-sm font-semibold text-black mb-2">Tipo de envío</label>
                         <div class="grid grid-cols-2 gap-3">
                             <button type="button"
                                 wire:click="$set('package_type', '{{ \App\Models\Package::TYPE_PAQUETE }}')"
                                 class="py-2.5 rounded-lg text-sm font-medium border transition
                                     {{ $package_type === \App\Models\Package::TYPE_PAQUETE
-                                        ? 'bg-blue-950 text-white border-blue-950'
-                                        : 'bg-white text-gray-600 border-gray-200 hover:border-blue-950' }}">
+                                        ? 'bg-black text-white border-black'
+                                        : 'bg-white text-gray-600 border-gray-200 hover:border-black' }}">
                                 <i class="fa-solid fa-box mr-1.5"></i> Paquete
                             </button>
                             <button type="button"
                                 wire:click="$set('package_type', '{{ \App\Models\Package::TYPE_SOBRE }}')"
                                 class="py-2.5 rounded-lg text-sm font-medium border transition
                                     {{ $package_type === \App\Models\Package::TYPE_SOBRE
-                                        ? 'bg-blue-950 text-white border-blue-950'
-                                        : 'bg-white text-gray-600 border-gray-200 hover:border-blue-950' }}">
+                                        ? 'bg-black text-white border-black'
+                                        : 'bg-white text-gray-600 border-gray-200 hover:border-black' }}">
                                 <i class="fa-solid fa-envelope mr-1.5"></i> Sobre
                             </button>
                         </div>
@@ -46,7 +46,7 @@
                         <div>
                             <label class="block text-xs font-medium text-gray-500 mb-1">Estado de origen</label>
                             <select wire:model.live="origin_state"
-                                class="w-full rounded-lg border-gray-200 text-sm focus:ring-blue-950 focus:border-blue-950">
+                                class="w-full rounded-lg border-gray-200 text-sm focus:ring-black focus:border-black">
                                 <option value="">Selecciona...</option>
                                 @foreach ($this->states as $state)
                                     <option value="{{ $state }}">{{ $state }}</option>
@@ -56,7 +56,7 @@
                         <div>
                             <label class="block text-xs font-medium text-gray-500 mb-1">Ciudad de origen</label>
                             <select wire:model.live="origin_city" @disabled(! $origin_state)
-                                class="w-full rounded-lg border-gray-200 text-sm focus:ring-blue-950 focus:border-blue-950 disabled:bg-gray-100">
+                                class="w-full rounded-lg border-gray-200 text-sm focus:ring-black focus:border-black disabled:bg-gray-100">
                                 <option value="">Selecciona...</option>
                                 @foreach ($this->originCities as $city)
                                     <option value="{{ $city }}">{{ $city }}</option>
@@ -70,7 +70,7 @@
                         <div>
                             <label class="block text-xs font-medium text-gray-500 mb-1">Estado de destino</label>
                             <select wire:model.live="destination_state"
-                                class="w-full rounded-lg border-gray-200 text-sm focus:ring-blue-950 focus:border-blue-950">
+                                class="w-full rounded-lg border-gray-200 text-sm focus:ring-black focus:border-black">
                                 <option value="">Selecciona...</option>
                                 @foreach ($this->states as $state)
                                     <option value="{{ $state }}">{{ $state }}</option>
@@ -80,7 +80,7 @@
                         <div>
                             <label class="block text-xs font-medium text-gray-500 mb-1">Ciudad de destino</label>
                             <select wire:model.live="destination_city" @disabled(! $destination_state)
-                                class="w-full rounded-lg border-gray-200 text-sm focus:ring-blue-950 focus:border-blue-950 disabled:bg-gray-100">
+                                class="w-full rounded-lg border-gray-200 text-sm focus:ring-black focus:border-black disabled:bg-gray-100">
                                 <option value="">Selecciona...</option>
                                 @foreach ($this->destinationCities as $city)
                                     <option value="{{ $city }}">{{ $city }}</option>
@@ -95,17 +95,17 @@
                             <label class="block text-xs font-medium text-gray-500 mb-1">Peso físico (kg)</label>
                             <input type="number" step="0.1" min="0" wire:model.live.debounce.500ms="physical_weight_kg"
                                 placeholder="Ej. 2.5"
-                                class="w-full rounded-lg border-gray-200 text-sm focus:ring-blue-950 focus:border-blue-950">
+                                class="w-full rounded-lg border-gray-200 text-sm focus:ring-black focus:border-black">
                         </div>
                         <div>
                             <label class="block text-xs font-medium text-gray-500 mb-1">Dimensiones (cm) — opcional</label>
                             <div class="grid grid-cols-3 gap-3">
                                 <input type="number" min="0" wire:model.live.debounce.500ms="length_cm" placeholder="Largo"
-                                    class="w-full rounded-lg border-gray-200 text-sm focus:ring-blue-950 focus:border-blue-950">
+                                    class="w-full rounded-lg border-gray-200 text-sm focus:ring-black focus:border-black">
                                 <input type="number" min="0" wire:model.live.debounce.500ms="width_cm" placeholder="Ancho"
-                                    class="w-full rounded-lg border-gray-200 text-sm focus:ring-blue-950 focus:border-blue-950">
+                                    class="w-full rounded-lg border-gray-200 text-sm focus:ring-black focus:border-black">
                                 <input type="number" min="0" wire:model.live.debounce.500ms="height_cm" placeholder="Alto"
-                                    class="w-full rounded-lg border-gray-200 text-sm focus:ring-blue-950 focus:border-blue-950">
+                                    class="w-full rounded-lg border-gray-200 text-sm focus:ring-black focus:border-black">
                             </div>
                         </div>
                     @endif
@@ -113,27 +113,27 @@
                     {{-- Opciones --}}
                     <div class="space-y-3 pt-1">
                         <label class="flex items-center gap-2.5 text-sm text-gray-600">
-                            <input type="checkbox" wire:model.live="is_fragile" class="rounded border-gray-300 text-blue-950 focus:ring-blue-950">
+                            <input type="checkbox" wire:model.live="is_fragile" class="rounded border-gray-300 text-black focus:ring-black">
                             Es frágil
                         </label>
                         <label class="flex items-center gap-2.5 text-sm text-gray-600">
-                            <input type="checkbox" wire:model.live="requires_delivery" class="rounded border-gray-300 text-blue-950 focus:ring-blue-950">
+                            <input type="checkbox" wire:model.live="requires_delivery" class="rounded border-gray-300 text-black focus:ring-black">
                             Necesito entrega a domicilio en destino
                         </label>
                         <label class="flex items-center gap-2.5 text-sm text-gray-600">
-                            <input type="checkbox" wire:model.live="has_insurance" class="rounded border-gray-300 text-blue-950 focus:ring-blue-950">
+                            <input type="checkbox" wire:model.live="has_insurance" class="rounded border-gray-300 text-black focus:ring-black">
                             Quiero asegurar mi envío
                         </label>
                         @if ($has_insurance)
                             <input type="number" step="0.01" min="0" wire:model.live.debounce.500ms="declared_value_usd"
                                 placeholder="Valor declarado en USD"
-                                class="w-full rounded-lg border-gray-200 text-sm focus:ring-blue-950 focus:border-blue-950">
+                                class="w-full rounded-lg border-gray-200 text-sm focus:ring-black focus:border-black">
                         @endif
                     </div>
                 </div>
 
                 {{-- RESULTADO --}}
-                <div class="bg-blue-950 rounded-2xl p-6 text-white flex flex-col">
+                <div class="bg-black rounded-2xl p-6 text-white flex flex-col">
                     <h2 class="font-semibold text-lg mb-4 flex items-center gap-2">
                         <i class="fa-solid fa-calculator text-amber-400"></i> Resultado estimado
                     </h2>
@@ -170,7 +170,7 @@
                             </div>
                         </div>
 
-                        <a href="{{ route('public.offices') }}" class="mt-5 block text-center bg-amber-400 hover:bg-amber-500 text-blue-950 font-semibold text-sm py-2.5 rounded-lg transition">
+                        <a href="{{ route('public.offices') }}" class="mt-5 block text-center bg-amber-400 hover:bg-amber-500 text-black font-semibold text-sm py-2.5 rounded-lg transition">
                             Buscar agencia aliada más cercana
                         </a>
                     @else

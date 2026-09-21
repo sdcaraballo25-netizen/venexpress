@@ -11,7 +11,7 @@
                 <span class="inline-block bg-amber-100 text-amber-700 text-xs font-semibold tracking-wide uppercase px-3 py-1 rounded-full mb-4">
                     Red nacional
                 </span>
-                <h1 class="text-3xl md:text-4xl font-extrabold text-blue-950">Encuentra tu agencia aliada</h1>
+                <h1 class="text-3xl md:text-4xl font-extrabold text-black">Encuentra tu agencia aliada</h1>
                 <p class="text-gray-500 mt-3 max-w-xl mx-auto">
                     Ubica la agencia Venexpress más cercana para entregar o retirar tu paquete.
                 </p>
@@ -23,9 +23,9 @@
                     <i class="fa-solid fa-magnifying-glass absolute left-4 top-1/2 -translate-y-1/2 text-gray-400 text-sm"></i>
                     <input type="text" wire:model.live.debounce.400ms="search"
                         placeholder="Buscar por nombre, ciudad o dirección..."
-                        class="w-full rounded-lg border-gray-200 pl-10 text-sm focus:ring-blue-950 focus:border-blue-950">
+                        class="w-full rounded-lg border-gray-200 pl-10 text-sm focus:ring-black focus:border-black">
                 </div>
-                <select wire:model.live="state" class="rounded-lg border-gray-200 text-sm focus:ring-blue-950 focus:border-blue-950 md:w-64">
+                <select wire:model.live="state" class="rounded-lg border-gray-200 text-sm focus:ring-black focus:border-black md:w-64">
                     <option value="">Todos los estados</option>
                     @foreach ($states as $s)
                         <option value="{{ $s }}">{{ $s }}</option>
@@ -34,7 +34,7 @@
                 <button
                     type="button"
                     onclick="window.venexpressUseMyLocation && window.venexpressUseMyLocation()"
-                    class="shrink-0 inline-flex items-center justify-center gap-2 rounded-lg border border-blue-950 text-blue-950 hover:bg-blue-950 hover:text-white text-sm font-semibold px-5 transition"
+                    class="shrink-0 inline-flex items-center justify-center gap-2 rounded-lg border border-black text-black hover:bg-black hover:text-white text-sm font-semibold px-5 transition"
                 >
                     <i class="fa-solid fa-location-crosshairs"></i>
                     Cerca de mí
@@ -69,11 +69,11 @@
                 <div class="lg:col-span-2 space-y-3 max-h-[520px] overflow-y-auto pr-1">
                     @forelse ($allies as $ally)
                         <div wire:key="ally-{{ $ally->id }}"
-                            class="border border-gray-100 rounded-xl p-4 hover:border-blue-950 transition cursor-pointer"
+                            class="border border-gray-100 rounded-xl p-4 hover:border-black transition cursor-pointer"
                             onclick="window.venexpressFocusOffice && window.venexpressFocusOffice({{ $ally->id }})">
                             <div class="flex items-start justify-between gap-3">
                                 <div>
-                                    <p class="font-semibold text-blue-950">{{ $ally->business_name }}</p>
+                                    <p class="font-semibold text-black">{{ $ally->business_name }}</p>
                                     <p class="text-sm text-gray-500 mt-0.5">{{ $ally->address }}</p>
                                     <p class="text-xs text-gray-400 mt-1">
                                         {{ $ally->city }}, {{ $ally->state }}
@@ -85,7 +85,7 @@
                                 <a href="https://www.google.com/maps/dir/?api=1&destination={{ $ally->latitude }},{{ $ally->longitude }}"
                                     target="_blank" rel="noopener"
                                     onclick="event.stopPropagation()"
-                                    class="shrink-0 w-9 h-9 rounded-full bg-blue-950 text-white flex items-center justify-center hover:bg-blue-900 transition">
+                                    class="shrink-0 w-9 h-9 rounded-full bg-black text-white flex items-center justify-center hover:bg-gray-800 transition">
                                     <i class="fa-solid fa-diamond-turn-right text-sm"></i>
                                 </a>
                             </div>

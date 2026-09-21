@@ -53,7 +53,7 @@
 
         .main-nav-link:hover,
         .main-nav-link.is-active {
-            color: #172554;
+            color: #000000;
         }
 
         .main-nav-link:hover {
@@ -68,7 +68,7 @@
             bottom: -0.1rem;
             height: 2px;
             border-radius: 999px;
-            background: #dc2626;
+            background: #f0a80d;
         }
 
         /* =====================================================
@@ -238,7 +238,7 @@
 
                 <a
                     href="{{ route('login') }}"
-                    class="bg-amber-400 hover:bg-amber-500 text-blue-950 font-semibold text-xs sm:text-sm px-2.5 py-2 sm:px-6 sm:py-2.5 rounded-lg transition inline-flex items-center justify-center shadow-sm hover:shadow-md whitespace-nowrap"
+                    class="bg-amber-400 hover:bg-amber-500 text-black font-semibold text-xs sm:text-sm px-2.5 py-2 sm:px-6 sm:py-2.5 rounded-lg transition inline-flex items-center justify-center shadow-sm hover:shadow-md whitespace-nowrap"
                 >
                     Iniciar sesión
                 </a>
@@ -247,7 +247,7 @@
                 <button
                     id="mobile-menu-button"
                     type="button"
-                    class="md:hidden w-10 h-10 shrink-0 rounded-lg border border-gray-200 text-blue-950 flex items-center justify-center"
+                    class="md:hidden w-10 h-10 shrink-0 rounded-lg border border-gray-200 text-black flex items-center justify-center"
                     aria-label="Abrir menú"
                     aria-expanded="false"
                     aria-controls="mobile-menu"
@@ -267,7 +267,7 @@
             <div class="max-w-7xl mx-auto px-6 py-3">
 
                 <a href="{{ route('home') }}"
-                   class="mobile-menu-link block py-3 text-sm font-semibold text-blue-950">
+                   class="mobile-menu-link block py-3 text-sm font-semibold text-black">
                     Inicio
                 </a>
 
@@ -336,14 +336,14 @@
             ================================================== --}}
             <div class="relative z-20 max-w-2xl min-w-0">
 
-                <h1 class="hero-title font-extrabold text-blue-950 leading-[0.82] tracking-tight">
+                <h1 class="hero-title font-extrabold text-black leading-[0.82] tracking-tight">
 
     <span class="block whitespace-nowrap">
         Envía fácil.
     </span>
 
-    <span class="block text-red-600 whitespace-nowrap">
-        Rastrea siempre.
+    <span class="block whitespace-nowrap">
+        Rastrea <span class="bg-amber-400 px-2">siempre</span>.
     </span>
 
 </h1>
@@ -367,16 +367,16 @@
                     {{-- Calcular --}}
                     <a
                         href="{{ route('public.calculator') }}"
-                        class="group inline-flex items-center gap-1.5 bg-white/50 hover:bg-white/80 backdrop-blur-sm border border-blue-900/20 hover:border-blue-900/40 text-blue-950 text-sm font-bold px-3 py-2 rounded-lg transition duration-200 shadow-sm hover:shadow-md"
+                        class="group inline-flex items-center gap-1.5 bg-white/60 hover:bg-white/90 backdrop-blur-sm border border-black/15 hover:border-black/30 text-black text-sm font-bold px-3 py-2 rounded-lg transition duration-200 shadow-sm hover:shadow-md"
                     >
 
-                        <span class="w-5.5 h-5.5 rounded-md bg-blue-50/80 flex items-center justify-center shrink-0">
-                            <i class="fa-solid fa-calculator text-[10px] text-blue-900"></i>
+                        <span class="w-5.5 h-5.5 rounded-md bg-amber-50 flex items-center justify-center shrink-0">
+                            <i class="fa-solid fa-calculator text-[10px] text-black"></i>
                         </span>
 
                         Calcular precio
 
-                        <i class="fa-solid fa-arrow-right text-[10px] text-blue-900/60 transition-transform group-hover:translate-x-0.5"></i>
+                        <i class="fa-solid fa-arrow-right text-[10px] text-black/50 transition-transform group-hover:translate-x-0.5"></i>
 
                     </a>
 
@@ -384,16 +384,16 @@
                     {{-- Agencias --}}
                     <a
                         href="{{ route('public.offices') }}"
-                        class="group inline-flex items-center gap-1.5 bg-white/50 hover:bg-white/80 backdrop-blur-sm border border-blue-900/20 hover:border-blue-900/40 text-blue-950 text-sm font-bold px-3 py-2 rounded-lg transition duration-200 shadow-sm hover:shadow-md"
+                        class="group inline-flex items-center gap-1.5 bg-white/60 hover:bg-white/90 backdrop-blur-sm border border-black/15 hover:border-black/30 text-black text-sm font-bold px-3 py-2 rounded-lg transition duration-200 shadow-sm hover:shadow-md"
                     >
 
-                        <span class="w-5.5 h-5.5 rounded-md bg-blue-50/80 flex items-center justify-center shrink-0">
+                        <span class="w-5.5 h-5.5 rounded-md bg-amber-50 flex items-center justify-center shrink-0">
                             <i class="fa-solid fa-location-dot text-amber-500 text-[10px]"></i>
                         </span>
 
                         Agencias cercanas
 
-                        <i class="fa-solid fa-arrow-right text-[10px] text-blue-900/60 transition-transform group-hover:translate-x-0.5"></i>
+                        <i class="fa-solid fa-arrow-right text-[10px] text-black/50 transition-transform group-hover:translate-x-0.5"></i>
 
                     </a>
 
@@ -401,16 +401,16 @@
                     {{-- Rastreo --}}
                     <a
                         href="{{ route('tracking.index') }}"
-                        class="group inline-flex items-center gap-1.5 bg-white/50 hover:bg-white/80 backdrop-blur-sm border border-blue-900/20 hover:border-blue-900/40 text-blue-950 text-sm font-bold px-3 py-2 rounded-lg transition duration-200 shadow-sm hover:shadow-md"
+                        class="group inline-flex items-center gap-1.5 bg-white/60 hover:bg-white/90 backdrop-blur-sm border border-black/15 hover:border-black/30 text-black text-sm font-bold px-3 py-2 rounded-lg transition duration-200 shadow-sm hover:shadow-md"
                     >
 
-                        <span class="w-5.5 h-5.5 rounded-md bg-blue-50/80 flex items-center justify-center shrink-0">
-                            <i class="fa-solid fa-location-crosshairs text-blue-900 text-[10px]"></i>
+                        <span class="w-5.5 h-5.5 rounded-md bg-amber-50 flex items-center justify-center shrink-0">
+                            <i class="fa-solid fa-location-crosshairs text-black text-[10px]"></i>
                         </span>
 
                         Rastrear envío
 
-                        <i class="fa-solid fa-arrow-right text-[10px] text-blue-900/60 transition-transform group-hover:translate-x-0.5"></i>
+                        <i class="fa-solid fa-arrow-right text-[10px] text-black/50 transition-transform group-hover:translate-x-0.5"></i>
 
                     </a>
 
@@ -436,7 +436,7 @@
 
                     {{-- Sombra debajo de la camioneta --}}
                     <div
-                        class="absolute left-1/2 bottom-1 -translate-x-1/2 w-[68%] h-5 bg-blue-950/25 rounded-full blur-md"
+                        class="absolute left-1/2 bottom-1 -translate-x-1/2 w-[68%] h-5 bg-black/25 rounded-full blur-md"
                     ></div>
 
                 </div>
@@ -452,7 +452,7 @@
     {{-- =========================================================
          FRANJA DE BENEFICIOS
     ========================================================== --}}
-    <section class="bg-blue-950">
+    <section class="bg-black">
 
         <div class="max-w-7xl mx-auto px-6 py-6 grid grid-cols-2 md:grid-cols-4 gap-6">
 
@@ -523,10 +523,10 @@
 
             <div class="text-center mb-10">
 
-                <h2 class="text-3xl font-extrabold text-blue-950 inline-block relative pb-3">
+                <h2 class="text-3xl font-extrabold text-black inline-block relative pb-3">
                     ¿Qué necesitas hacer?
 
-                    <span class="absolute left-1/2 -translate-x-1/2 bottom-0 w-14 h-1 bg-red-600 rounded-full"></span>
+                    <span class="absolute left-1/2 -translate-x-1/2 bottom-0 w-14 h-1 bg-amber-400 rounded-full"></span>
                 </h2>
 
                 <p class="mt-4 text-sm text-gray-500">
@@ -542,22 +542,22 @@
                 {{-- CALCULAR --}}
                 <a
                     href="{{ route('public.calculator') }}"
-                    class="group relative overflow-hidden bg-white rounded-2xl border border-gray-200 p-6 md:p-7 flex flex-col min-h-[245px] transition duration-300 hover:-translate-y-1 hover:border-blue-200 hover:shadow-xl focus:outline-none focus:ring-2 focus:ring-blue-900/20"
+                    class="group relative overflow-hidden bg-white rounded-2xl border border-gray-200 p-6 md:p-7 flex flex-col min-h-[245px] transition duration-300 hover:-translate-y-1 hover:border-gray-400 hover:shadow-xl focus:outline-none focus:ring-2 focus:ring-black/15"
                 >
 
-                    <div class="absolute top-0 left-0 right-0 h-1 bg-blue-900"></div>
+                    <div class="absolute top-0 left-0 right-0 h-1 bg-black"></div>
 
-                    <div class="w-12 h-12 rounded-xl bg-blue-50 flex items-center justify-center mb-6 transition duration-300 group-hover:bg-blue-900">
-                        <i class="fa-solid fa-calculator text-blue-900 text-lg transition duration-300 group-hover:text-white"></i>
+                    <div class="w-12 h-12 rounded-xl bg-amber-50 flex items-center justify-center mb-6 transition duration-300 group-hover:bg-black">
+                        <i class="fa-solid fa-calculator text-black text-lg transition duration-300 group-hover:text-amber-400"></i>
                     </div>
 
                     <div>
 
-                        <p class="text-[11px] font-bold uppercase tracking-[0.16em] text-blue-900 mb-2">
+                        <p class="text-[11px] font-bold uppercase tracking-[0.16em] text-black mb-2">
                             Tu envío
                         </p>
 
-                        <h3 class="text-lg font-bold text-blue-950">
+                        <h3 class="text-lg font-bold text-black">
                             Calcula tu envío
                         </h3>
 
@@ -567,7 +567,7 @@
 
                     </div>
 
-                    <span class="inline-flex items-center mt-auto pt-6 text-sm font-semibold text-blue-900 group-hover:text-red-600 transition">
+                    <span class="inline-flex items-center mt-auto pt-6 text-sm font-semibold text-black group-hover:text-amber-600 transition">
                         Calcular precio
                         <i class="fa-solid fa-arrow-right ml-2 text-xs transition-transform group-hover:translate-x-1"></i>
                     </span>
@@ -579,13 +579,13 @@
                 {{-- AGENCIAS --}}
                 <a
                     href="{{ route('public.offices') }}"
-                    class="group relative overflow-hidden bg-white rounded-2xl border border-gray-200 p-6 md:p-7 flex flex-col min-h-[245px] transition duration-300 hover:-translate-y-1 hover:border-amber-200 hover:shadow-xl focus:outline-none focus:ring-2 focus:ring-amber-400/20"
+                    class="group relative overflow-hidden bg-white rounded-2xl border border-gray-200 p-6 md:p-7 flex flex-col min-h-[245px] transition duration-300 hover:-translate-y-1 hover:border-amber-300 hover:shadow-xl focus:outline-none focus:ring-2 focus:ring-amber-400/30"
                 >
 
                     <div class="absolute top-0 left-0 right-0 h-1 bg-amber-400"></div>
 
                     <div class="w-12 h-12 rounded-xl bg-amber-50 flex items-center justify-center mb-6 transition duration-300 group-hover:bg-amber-400">
-                        <i class="fa-solid fa-location-dot text-amber-600 text-lg transition duration-300 group-hover:text-blue-950"></i>
+                        <i class="fa-solid fa-location-dot text-amber-600 text-lg transition duration-300 group-hover:text-black"></i>
                     </div>
 
                     <div>
@@ -594,7 +594,7 @@
                             Punto cercano
                         </p>
 
-                        <h3 class="text-lg font-bold text-blue-950">
+                        <h3 class="text-lg font-bold text-black">
                             Encuentra una agencia
                         </h3>
 
@@ -604,7 +604,7 @@
 
                     </div>
 
-                    <span class="inline-flex items-center mt-auto pt-6 text-sm font-semibold text-blue-900 group-hover:text-red-600 transition">
+                    <span class="inline-flex items-center mt-auto pt-6 text-sm font-semibold text-black group-hover:text-amber-600 transition">
                         Descubrir agencias
                         <i class="fa-solid fa-arrow-right ml-2 text-xs transition-transform group-hover:translate-x-1"></i>
                     </span>
@@ -616,22 +616,22 @@
                 {{-- RASTREO --}}
                 <a
                     href="{{ route('tracking.index') }}"
-                    class="group relative overflow-hidden bg-white rounded-2xl border border-gray-200 p-6 md:p-7 flex flex-col min-h-[245px] transition duration-300 hover:-translate-y-1 hover:border-blue-200 hover:shadow-xl focus:outline-none focus:ring-2 focus:ring-blue-900/20"
+                    class="group relative overflow-hidden bg-white rounded-2xl border border-gray-200 p-6 md:p-7 flex flex-col min-h-[245px] transition duration-300 hover:-translate-y-1 hover:border-gray-400 hover:shadow-xl focus:outline-none focus:ring-2 focus:ring-black/15"
                 >
 
-                    <div class="absolute top-0 left-0 right-0 h-1 bg-blue-900"></div>
+                    <div class="absolute top-0 left-0 right-0 h-1 bg-black"></div>
 
-                    <div class="w-12 h-12 rounded-xl bg-blue-50 flex items-center justify-center mb-6 transition duration-300 group-hover:bg-blue-900">
-                        <i class="fa-solid fa-location-crosshairs text-blue-900 text-lg transition duration-300 group-hover:text-white"></i>
+                    <div class="w-12 h-12 rounded-xl bg-amber-50 flex items-center justify-center mb-6 transition duration-300 group-hover:bg-black">
+                        <i class="fa-solid fa-location-crosshairs text-black text-lg transition duration-300 group-hover:text-amber-400"></i>
                     </div>
 
                     <div>
 
-                        <p class="text-[11px] font-bold uppercase tracking-[0.16em] text-blue-900 mb-2">
+                        <p class="text-[11px] font-bold uppercase tracking-[0.16em] text-black mb-2">
                             Seguimiento
                         </p>
 
-                        <h3 class="text-lg font-bold text-blue-950">
+                        <h3 class="text-lg font-bold text-black">
                             Rastrea tu envío
                         </h3>
 
@@ -641,7 +641,7 @@
 
                     </div>
 
-                    <span class="inline-flex items-center mt-auto pt-6 text-sm font-semibold text-blue-900 group-hover:text-red-600 transition">
+                    <span class="inline-flex items-center mt-auto pt-6 text-sm font-semibold text-black group-hover:text-amber-600 transition">
                         Ir al rastreo
                         <i class="fa-solid fa-arrow-right ml-2 text-xs transition-transform group-hover:translate-x-1"></i>
                     </span>
@@ -663,10 +663,10 @@
 
         <div class="text-center mb-16">
 
-            <h2 class="text-3xl font-extrabold text-blue-950 inline-block relative pb-3">
+            <h2 class="text-3xl font-extrabold text-black inline-block relative pb-3">
                 ¿Cómo funciona?
 
-                <span class="absolute left-1/2 -translate-x-1/2 bottom-0 w-14 h-1 bg-red-600 rounded-full"></span>
+                <span class="absolute left-1/2 -translate-x-1/2 bottom-0 w-14 h-1 bg-amber-400 rounded-full"></span>
             </h2>
 
             <p class="mt-4 text-sm text-gray-500">
@@ -686,16 +686,16 @@
                 <div class="relative w-20 h-20 mx-auto">
 
                     <div class="w-20 h-20 rounded-full bg-gray-100 flex items-center justify-center">
-                        <i class="fa-solid fa-calculator text-blue-950 text-2xl"></i>
+                        <i class="fa-solid fa-calculator text-black text-2xl"></i>
                     </div>
 
-                    <span class="absolute -top-2 -left-1 w-7 h-7 rounded-full bg-blue-950 text-white text-xs font-bold flex items-center justify-center">
+                    <span class="absolute -top-2 -left-1 w-7 h-7 rounded-full bg-black text-white text-xs font-bold flex items-center justify-center">
                         1
                     </span>
 
                 </div>
 
-                <h3 class="font-semibold text-blue-950 mt-4">
+                <h3 class="font-semibold text-black mt-4">
                     Cotiza
                 </h3>
 
@@ -711,16 +711,16 @@
                 <div class="relative w-20 h-20 mx-auto">
 
                     <div class="w-20 h-20 rounded-full bg-gray-100 flex items-center justify-center">
-                        <i class="fa-solid fa-clipboard-list text-blue-950 text-2xl"></i>
+                        <i class="fa-solid fa-clipboard-list text-black text-2xl"></i>
                     </div>
 
-                    <span class="absolute -top-2 -left-1 w-7 h-7 rounded-full bg-blue-950 text-white text-xs font-bold flex items-center justify-center">
+                    <span class="absolute -top-2 -left-1 w-7 h-7 rounded-full bg-black text-white text-xs font-bold flex items-center justify-center">
                         2
                     </span>
 
                 </div>
 
-                <h3 class="font-semibold text-blue-950 mt-4">
+                <h3 class="font-semibold text-black mt-4">
                     Registra
                 </h3>
 
@@ -736,16 +736,16 @@
                 <div class="relative w-20 h-20 mx-auto">
 
                     <div class="w-20 h-20 rounded-full bg-gray-100 flex items-center justify-center">
-                        <i class="fa-solid fa-box text-blue-950 text-2xl"></i>
+                        <i class="fa-solid fa-box text-black text-2xl"></i>
                     </div>
 
-                    <span class="absolute -top-2 -left-1 w-7 h-7 rounded-full bg-blue-950 text-white text-xs font-bold flex items-center justify-center">
+                    <span class="absolute -top-2 -left-1 w-7 h-7 rounded-full bg-black text-white text-xs font-bold flex items-center justify-center">
                         3
                     </span>
 
                 </div>
 
-                <h3 class="font-semibold text-blue-950 mt-4">
+                <h3 class="font-semibold text-black mt-4">
                     Entrega
                 </h3>
 
@@ -761,16 +761,16 @@
                 <div class="relative w-20 h-20 mx-auto">
 
                     <div class="w-20 h-20 rounded-full bg-amber-400 flex items-center justify-center">
-                        <i class="fa-solid fa-location-dot text-blue-950 text-2xl"></i>
+                        <i class="fa-solid fa-location-dot text-black text-2xl"></i>
                     </div>
 
-                    <span class="absolute -top-2 -left-1 w-7 h-7 rounded-full bg-blue-950 text-white text-xs font-bold flex items-center justify-center">
+                    <span class="absolute -top-2 -left-1 w-7 h-7 rounded-full bg-black text-white text-xs font-bold flex items-center justify-center">
                         4
                     </span>
 
                 </div>
 
-                <h3 class="font-semibold text-blue-950 mt-4">
+                <h3 class="font-semibold text-black mt-4">
                     Rastrea
                 </h3>
 
@@ -787,10 +787,10 @@
 
             <a
                 href="{{ route('public.calculator') }}"
-                class="bg-blue-950 hover:bg-blue-900 text-white text-sm font-semibold px-5 py-2.5 rounded-lg transition inline-flex items-center justify-center"
+                class="bg-black hover:bg-gray-800 text-white text-sm font-semibold px-5 py-2.5 rounded-lg transition inline-flex items-center justify-center"
             >
                 Comenzar ahora
-                <i class="fa-solid fa-arrow-right ml-2"></i>
+                <i class="fa-solid fa-arrow-right ml-2 text-amber-400"></i>
             </a>
 
         </div>
@@ -808,11 +808,11 @@
 
             <div class="text-center mb-14">
 
-                <h2 class="text-3xl font-extrabold text-blue-950 inline-block relative pb-3">
+                <h2 class="text-3xl font-extrabold text-black inline-block relative pb-3">
                     ¿Por qué elegir
-                    <span class="text-red-600">Venexpress</span>?
+                    <span class="text-amber-600">Venexpress</span>?
 
-                    <span class="absolute left-1/2 -translate-x-1/2 bottom-0 w-14 h-1 bg-red-600 rounded-full"></span>
+                    <span class="absolute left-1/2 -translate-x-1/2 bottom-0 w-14 h-1 bg-amber-400 rounded-full"></span>
                 </h2>
 
             </div>
@@ -826,11 +826,11 @@
 
                     <div class="bg-white rounded-xl border border-gray-100 p-5">
 
-                        <div class="w-10 h-10 rounded-lg bg-blue-50 flex items-center justify-center mb-3">
-                            <i class="fa-solid fa-earth-americas text-blue-900"></i>
+                        <div class="w-10 h-10 rounded-lg bg-amber-50 flex items-center justify-center mb-3">
+                            <i class="fa-solid fa-earth-americas text-black"></i>
                         </div>
 
-                        <h3 class="font-semibold text-blue-950 text-sm">
+                        <h3 class="font-semibold text-black text-sm">
                             Cobertura nacional
                         </h3>
 
@@ -844,10 +844,10 @@
                     <div class="bg-white rounded-xl border border-gray-100 p-5">
 
                         <div class="w-10 h-10 rounded-lg bg-amber-50 flex items-center justify-center mb-3">
-                            <i class="fa-solid fa-box text-amber-500"></i>
+                            <i class="fa-solid fa-box text-black"></i>
                         </div>
 
-                        <h3 class="font-semibold text-blue-950 text-sm">
+                        <h3 class="font-semibold text-black text-sm">
                             Envíos seguros
                         </h3>
 
@@ -860,11 +860,11 @@
 
                     <div class="bg-white rounded-xl border border-gray-100 p-5">
 
-                        <div class="w-10 h-10 rounded-lg bg-blue-50 flex items-center justify-center mb-3">
-                            <i class="fa-solid fa-people-group text-blue-900"></i>
+                        <div class="w-10 h-10 rounded-lg bg-amber-50 flex items-center justify-center mb-3">
+                            <i class="fa-solid fa-people-group text-black"></i>
                         </div>
 
-                        <h3 class="font-semibold text-blue-950 text-sm">
+                        <h3 class="font-semibold text-black text-sm">
                             Alianzas confiables
                         </h3>
 
@@ -877,11 +877,11 @@
 
                     <div class="bg-white rounded-xl border border-gray-100 p-5">
 
-                        <div class="w-10 h-10 rounded-lg bg-blue-50 flex items-center justify-center mb-3">
-                            <i class="fa-regular fa-clock text-blue-900"></i>
+                        <div class="w-10 h-10 rounded-lg bg-amber-50 flex items-center justify-center mb-3">
+                            <i class="fa-regular fa-clock text-black"></i>
                         </div>
 
-                        <h3 class="font-semibold text-blue-950 text-sm">
+                        <h3 class="font-semibold text-black text-sm">
                             Entrega puntual
                         </h3>
 
@@ -906,7 +906,7 @@
 
                     <a
                         href="{{ route('public.offices') }}"
-                        class="mt-5 bg-blue-950 hover:bg-blue-900 text-white text-sm font-semibold px-5 py-3 rounded-lg transition inline-flex items-center justify-center shadow-sm"
+                        class="mt-5 bg-black hover:bg-gray-800 text-white text-sm font-semibold px-5 py-3 rounded-lg transition inline-flex items-center justify-center shadow-sm"
                     >
 
                         <i class="fa-solid fa-location-dot mr-2 text-amber-400"></i>
@@ -930,7 +930,7 @@
     {{-- =========================================================
          FOOTER
     ========================================================== --}}
-    <footer id="ayuda" class="bg-blue-950">
+    <footer id="ayuda" class="bg-black">
 
         <div class="max-w-7xl mx-auto px-6 py-14 grid md:grid-cols-5 gap-10">
 
@@ -943,7 +943,7 @@
                     class="h-8 mb-4"
                 >
 
-                <p class="text-sm text-blue-200">
+                <p class="text-sm text-gray-400">
                     Conectamos a Venezuela con soluciones de envío rápidas, seguras y confiables.
                 </p>
 
@@ -989,7 +989,7 @@
                     Enlaces rápidos
                 </h4>
 
-                <ul class="space-y-2 text-sm text-blue-200">
+                <ul class="space-y-2 text-sm text-gray-400">
 
                     <li>
                         <a href="{{ route('home') }}" class="hover:text-white transition">
@@ -1032,7 +1032,7 @@
                     Servicios
                 </h4>
 
-                <ul class="space-y-2 text-sm text-blue-200">
+                <ul class="space-y-2 text-sm text-gray-400">
 
                     <li>
                         <a href="{{ route('public.calculator') }}" class="hover:text-white transition">
@@ -1063,7 +1063,7 @@
                     Ayuda
                 </h4>
 
-                <ul class="space-y-2 text-sm text-blue-200">
+                <ul class="space-y-2 text-sm text-gray-400">
 
                     <li>
                         <a href="#ayuda" class="hover:text-white transition">
@@ -1100,7 +1100,7 @@
                     Contáctanos
                 </h4>
 
-                <ul class="space-y-3 text-sm text-blue-200">
+                <ul class="space-y-3 text-sm text-gray-400">
 
                     <li class="flex items-start gap-2">
 
@@ -1144,7 +1144,7 @@
 
         <div class="border-t border-white/10">
 
-            <div class="max-w-7xl mx-auto px-6 py-6 text-center text-sm text-blue-300">
+            <div class="max-w-7xl mx-auto px-6 py-6 text-center text-sm text-gray-500">
                 &copy; {{ date('Y') }} Venexpress. Todos los derechos reservados.
             </div>
 
