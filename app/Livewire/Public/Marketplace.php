@@ -7,6 +7,7 @@ use App\Models\Emprendedor;
 use App\Models\Pedido;
 use App\Models\Producto;
 use App\Services\VenezuelaLocationService;
+use Illuminate\Support\Str;
 use Livewire\Attributes\Title;
 use Livewire\Component;
 use Livewire\WithPagination;
@@ -109,6 +110,7 @@ class Marketplace extends Component
             'destino_ciudad' => $this->destino_ciudad,
             'destino_estado' => $this->destino_estado,
             'status' => Pedido::STATUS_PENDIENTE,
+            'chat_token' => Str::random(40),
         ]);
 
         $this->pedidoCreado = $pedido->load('emprendedor.user', 'producto');

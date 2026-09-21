@@ -45,8 +45,10 @@ use App\Livewire\Almacen\Dashboard as AlmacenDashboard;
 use App\Livewire\Almacen\HelpCenter as AlmacenHelpCenter;
 use App\Livewire\Emprendedor\Dashboard as EmprendedorDashboard;
 use App\Livewire\Emprendedor\Pedidos as EmprendedorPedidos;
+use App\Livewire\Emprendedor\PedidoShow as EmprendedorPedidoShow;
 use App\Livewire\Emprendedor\Productos as EmprendedorProductos;
 use App\Livewire\Public\Marketplace;
+use App\Livewire\Public\PedidoChat;
 use App\Livewire\Client\Dashboard as ClientDashboard;
 use App\Livewire\Client\HelpCenter as ClientHelpCenter;
 use App\Livewire\Client\Incidents as ClientIncidents;
@@ -337,6 +339,10 @@ Route::get('/emprendedor/pedidos', EmprendedorPedidos::class)
     ->middleware(['auth', 'verified', 'role:emprendedor', 'account.approved'])
     ->name('emprendedor.pedidos');
 
+Route::get('/emprendedor/pedidos/{pedidoId}', EmprendedorPedidoShow::class)
+    ->middleware(['auth', 'verified', 'role:emprendedor', 'account.approved'])
+    ->name('emprendedor.pedidos.show');
+
 /*
 |--------------------------------------------------------------------------
 | Tienda pública (marketplace)
@@ -345,6 +351,9 @@ Route::get('/emprendedor/pedidos', EmprendedorPedidos::class)
 
 Route::get('/tienda', Marketplace::class)
     ->name('public.marketplace');
+
+Route::get('/tienda/pedido/{token}', PedidoChat::class)
+    ->name('public.marketplace.pedido');
 
 /*
 |--------------------------------------------------------------------------

@@ -29,9 +29,20 @@
                         por {{ $pedidoCreado->cantidad }} unidad(es) de "{{ $pedidoCreado->producto->nombre }}".
                         Una vez pagues, el emprendedor confirmará tu pedido y te llegará la guía de envío.
                     </p>
-                    <button wire:click="$set('pedidoCreado', null)" class="mt-4 text-sm font-semibold text-emerald-800 underline">
-                        Seguir comprando
-                    </button>
+
+                    <div class="mt-4 flex items-center justify-center gap-4">
+                        <a href="{{ route('public.marketplace.pedido', $pedidoCreado->chat_token) }}"
+                           class="text-sm font-semibold text-white bg-blue-950 hover:bg-blue-900 px-4 py-2 rounded-lg transition">
+                            Chatear con el vendedor
+                        </a>
+                        <button wire:click="$set('pedidoCreado', null)" class="text-sm font-semibold text-emerald-800 underline">
+                            Seguir comprando
+                        </button>
+                    </div>
+
+                    <p class="mt-3 text-xs text-emerald-600">
+                        Guarda este enlace: es la única forma de volver a esta conversación.
+                    </p>
                 </div>
 
             @endif

@@ -88,7 +88,24 @@
                 </section>
 
                 <section>
-                    <h2 class="text-lg font-bold text-blue-950 mb-2">8. Modificaciones</h2>
+                    <h2 class="text-lg font-bold text-blue-950 mb-2">8. Marketplace de Emprendedores</h2>
+                    <p>
+                        Venexpress también opera una tienda ("marketplace") donde emprendedores independientes
+                        publican productos. El pago de una compra se acuerda directamente entre el cliente y el
+                        emprendedor; Venexpress no procesa ni retiene ese dinero, y su responsabilidad se limita
+                        al transporte del producto desde la agencia aliada del emprendedor hasta el cliente.
+                    </p>
+                    <p class="mt-2">
+                        Si un producto llega defectuoso o dañado, el cliente tiene derecho a un <strong>cambio</strong>,
+                        no a la devolución del dinero pagado (esa devolución, de aplicar, es responsabilidad
+                        exclusiva del emprendedor). Venexpress cubre sin costo adicional el flete de la
+                        devolución del producto defectuoso y el reenvío del reemplazo, siempre que el reclamo se
+                        reporte con evidencia y sea aprobado tras la revisión correspondiente.
+                    </p>
+                </section>
+
+                <section>
+                    <h2 class="text-lg font-bold text-blue-950 mb-2">9. Modificaciones</h2>
                     <p>
                         Podemos actualizar estos Términos y Condiciones para reflejar cambios en el servicio o
                         en la normativa aplicable. Notificaremos cambios relevantes a través de la plataforma.
@@ -96,7 +113,7 @@
                 </section>
 
                 <section>
-                    <h2 class="text-lg font-bold text-blue-950 mb-2">9. Contacto</h2>
+                    <h2 class="text-lg font-bold text-blue-950 mb-2">10. Contacto</h2>
                     <p>
                         Para dudas sobre estos términos, escríbenos a
                         <a href="mailto:info@venexpress.com" class="text-blue-700 hover:text-blue-950 font-semibold">info@venexpress.com</a>.

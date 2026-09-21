@@ -63,21 +63,26 @@
                                 @endif
                             </td>
                             <td class="px-6 py-4 text-right">
-                                @if ($pedido->status === Pedido::STATUS_PENDIENTE)
-                                    <button
-                                        @click.prevent="$store.confirm.open({
-                                            message: '¿Ya recibiste el pago de este cliente? Al confirmar se genera la guía de envío.',
-                                            confirmText: 'Confirmar pedido',
-                                            variant: 'primary',
-                                            onConfirm: () => $wire.confirmar({{ $pedido->id }}),
-                                        })"
-                                        class="px-3 py-2 rounded-lg bg-blue-600 text-white hover:bg-blue-700 text-xs font-semibold transition"
-                                    >
-                                        Confirmar
-                                    </button>
-                                @else
-                                    <span class="text-xs text-[#B8B8B2]">Sin acciones</span>
-                                @endif
+                                <div class="flex justify-end items-center gap-2">
+                                    <a href="{{ route('emprendedor.pedidos.show', $pedido->id) }}" wire:navigate
+                                       class="px-3 py-2 rounded-lg border border-[#E5E5E0] text-xs font-semibold text-[#111111] hover:bg-slate-50 transition">
+                                        Chat
+                                    </a>
+
+                                    @if ($pedido->status === Pedido::STATUS_PENDIENTE)
+                                        <button
+                                            @click.prevent="$store.confirm.open({
+                                                message: '¿Ya recibiste el pago de este cliente? Al confirmar se genera la guía de envío.',
+                                                confirmText: 'Confirmar pedido',
+                                                variant: 'primary',
+                                                onConfirm: () => $wire.confirmar({{ $pedido->id }}),
+                                            })"
+                                            class="px-3 py-2 rounded-lg bg-blue-600 text-white hover:bg-blue-700 text-xs font-semibold transition"
+                                        >
+                                            Confirmar
+                                        </button>
+                                    @endif
+                                </div>
                             </td>
                         </tr>
                     @empty
