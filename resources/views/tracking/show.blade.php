@@ -51,42 +51,42 @@
 
                 <a
                     href="{{ route('home') }}"
-                    class="hover:text-black transition"
+                    class="hover:text-blue-950 transition"
                 >
                     Inicio
                 </a>
 
                 <a
                     href="{{ route('home') }}#servicios"
-                    class="hover:text-black transition"
+                    class="hover:text-blue-950 transition"
                 >
                     Servicios
                 </a>
 
                 <a
                     href="{{ route('public.calculator') }}"
-                    class="hover:text-black transition"
+                    class="hover:text-blue-950 transition"
                 >
                     Calcular precio
                 </a>
 
                 <a
                     href="{{ route('public.offices') }}"
-                    class="hover:text-black transition"
+                    class="hover:text-blue-950 transition"
                 >
                     Agencias aliadas
                 </a>
 
                 <a
                     href="{{ route('tracking.index') }}"
-                    class="text-black font-semibold"
+                    class="text-blue-950 font-semibold"
                 >
                     Rastreo
                 </a>
 
                 <a
                     href="{{ route('home') }}#ayuda"
-                    class="hover:text-black transition"
+                    class="hover:text-blue-950 transition"
                 >
                     Ayuda
                 </a>
@@ -96,7 +96,7 @@
 
             <a
                 href="{{ route('login') }}"
-                class="bg-amber-400 hover:bg-amber-500 text-black font-semibold text-sm px-6 py-2.5 rounded-lg transition"
+                class="bg-amber-400 hover:bg-amber-500 text-blue-950 font-semibold text-sm px-6 py-2.5 rounded-lg transition"
             >
                 Iniciar sesión
             </a>
@@ -120,12 +120,12 @@
                 name="guia"
                 value="{{ $guia }}"
                 placeholder="Ej. VE-2026-0001258"
-                class="flex-1 rounded-lg border-gray-300 text-sm focus:ring-black focus:border-black"
+                class="flex-1 rounded-lg border-gray-300 text-sm focus:ring-blue-600 focus:border-blue-600"
             >
 
             <button
                 type="submit"
-                class="bg-black hover:bg-gray-800 text-white text-sm font-semibold px-6 rounded-lg transition"
+                class="bg-blue-900 hover:bg-blue-800 text-white text-sm font-semibold px-6 rounded-lg transition"
             >
                 Rastrear
             </button>
@@ -151,7 +151,7 @@
                 </div>
 
 
-                <h2 class="font-semibold text-black text-lg">
+                <h2 class="font-semibold text-blue-950 text-lg">
                     No encontramos esa guía
                 </h2>
 
@@ -171,7 +171,7 @@
                     <a
                         href="{{ route('tracking.index') }}"
                         class="inline-flex items-center justify-center gap-2
-                               bg-black hover:bg-gray-800
+                               bg-blue-950 hover:bg-blue-900
                                text-white font-semibold
                                text-sm px-5 py-3 rounded-lg
                                transition"
@@ -202,7 +202,7 @@
 
                         <div class="flex items-center gap-3">
 
-                            <span class="font-semibold text-black">
+                            <span class="font-semibold text-blue-950">
 
                                 Guía:
                                 {{ $package->tracking_number }}
@@ -242,7 +242,7 @@
                             Última actualización:
                         </p>
 
-                        <p class="text-sm font-semibold text-black">
+                        <p class="text-sm font-semibold text-blue-950">
 
                             {{ $package->updated_at->format('d/m/Y H:i') }}
 
@@ -293,7 +293,7 @@
 
 
                     <div
-    class="h-2 rounded-full bg-black"
+    class="h-2 rounded-full bg-blue-600"
     @style(['width' => $progressPercent . '%'])
 ></div>
 
@@ -308,10 +308,10 @@
                                 @class([
                                     'w-12 h-12 rounded-full flex items-center justify-center',
 
-                                    'bg-black text-white'
+                                    'bg-blue-900 text-white'
                                         => $step['done'],
 
-                                    'bg-amber-400 text-black'
+                                    'bg-amber-400 text-blue-950'
                                         => $step['current'],
 
                                     'bg-gray-200 text-gray-400'
@@ -331,7 +331,7 @@
                                 @class([
                                     'text-xs font-semibold mt-3',
 
-                                    'text-black'
+                                    'text-blue-950'
                                         => $step['done']
                                         || $step['current'],
 
@@ -373,7 +373,7 @@
                     <a
                         href="{{ route('tracking.index') }}"
                         class="inline-flex items-center justify-center gap-2
-                               bg-black hover:bg-gray-800
+                               bg-blue-950 hover:bg-blue-900
                                text-white font-semibold
                                text-sm px-5 py-3 rounded-lg
                                transition"

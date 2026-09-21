@@ -25,7 +25,7 @@
             <div>
                 {{-- Logo --}}
                 <div class="flex items-center gap-3 px-2 mb-10">
-                    <div class="bg-black text-white p-2 rounded-xl">
+                    <div class="bg-blue-900 text-white p-2 rounded-xl">
                         <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                             <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m5.618-4.016A11.955 11.955 0 0112 2.944a11.955 11.955 0 01-8.618 3.04A12.02 12.02 0 003 9c0 5.591 3.824 10.29 9 11.622 5.176-1.332 9-6.03 9-11.622 0-1.042-.133-2.052-.382-3.016z"></path>
                         </svg>
@@ -42,9 +42,9 @@
                     <a href="{{ route('admin.dashboard') }}"
    class="flex items-center gap-3 px-4 py-3 rounded-xl font-medium transition-colors
           {{ request()->routeIs('admin.dashboard')
-              ? 'bg-amber-50 text-black'
+              ? 'bg-blue-50 text-blue-900'
               : 'text-[#64748B] hover:bg-slate-50 hover:text-[#0F172A]' }}">
-                        <svg class="w-5 h-5 text-black" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 6a2 2 0 012-2h2a2 2 0 012 2v2a2 2 0 01-2 2H6a2 2 0 01-2-2V6zM14 6a2 2 0 012-2h2a2 2 0 012 2v2a2 2 0 01-2 2h-2a2 2 0 01-2-2V6zM4 16a2 2 0 012-2h2a2 2 0 012 2v2a2 2 0 01-2 2H6a2 2 0 01-2-2v-2zM14 16a2 2 0 012-2h2a2 2 0 012 2v2a2 2 0 01-2 2h-2a2 2 0 01-2-2v-2z"></path></svg>
+                        <svg class="w-5 h-5 text-blue-700" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 6a2 2 0 012-2h2a2 2 0 012 2v2a2 2 0 01-2 2H6a2 2 0 01-2-2V6zM14 6a2 2 0 012-2h2a2 2 0 012 2v2a2 2 0 01-2 2h-2a2 2 0 01-2-2V6zM4 16a2 2 0 012-2h2a2 2 0 012 2v2a2 2 0 01-2 2H6a2 2 0 01-2-2v-2zM14 16a2 2 0 012-2h2a2 2 0 012 2v2a2 2 0 01-2 2h-2a2 2 0 01-2-2v-2z"></path></svg>
                         Resumen
                     </a>
 
@@ -52,7 +52,7 @@
                     <a href="{{ route('admin.allies') }}"
    class="flex items-center gap-3 px-4 py-3 rounded-xl font-medium transition-colors
           {{ request()->routeIs('admin.allies')
-              ? 'bg-amber-50 text-black'
+              ? 'bg-blue-50 text-blue-900'
               : 'text-[#64748B] hover:bg-slate-50 hover:text-[#0F172A]' }}">
                         <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 20h5v-2a3 3 0 00-5.356-1.857M17 20H7m10 0v-2c0-.656-.126-1.283-.356-1.857M7 20H2v-2a3 3 0 015.356-1.857M7 20v-2c0-.656.126-1.283.356-1.857m0 0a5.002 5.002 0 019.288 0M15 7a3 3 0 11-6 0 3 3 0 016 0zm6 3a2 2 0 11-4 0 2 2 0 014 0zM7 10a2 2 0 11-4 0 2 2 0 014 0z"></path></svg>
                         Aliados
@@ -61,8 +61,8 @@
                     {{-- Enlace Gestión de tarifas --}}
                     <a href="{{ route('admin.rate-matrices') }}"
                        class="flex items-center gap-3 px-4 py-3 rounded-xl font-medium transition-colors
-                              {{ request()->routeIs('admin.rate-matrices') ? 'bg-amber-50 text-black' : 'text-[#64748B] hover:bg-slate-50 hover:text-[#0F172A]' }}">
-                        <svg class="w-5 h-5 {{ request()->routeIs('admin.rate-matrices') ? 'text-black' : '' }}" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8c-1.657 0-3 .895-3 2s1.343 2 3 2 3 .895 3 2-1.343 2-3 2m0-8c1.11 0 2.08.402 2.599 1M12 8V7m0 1v8m0 0v1m0-1c-1.11 0-2.08-.402-2.599-1M21 12a9 9 0 11-18 0 9 9 0 0118 0z"></path></svg>
+                              {{ request()->routeIs('admin.rate-matrices') ? 'bg-blue-50 text-blue-900' : 'text-[#64748B] hover:bg-slate-50 hover:text-[#0F172A]' }}">
+                        <svg class="w-5 h-5 {{ request()->routeIs('admin.rate-matrices') ? 'text-blue-700' : '' }}" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8c-1.657 0-3 .895-3 2s1.343 2 3 2 3 .895 3 2-1.343 2-3 2m0-8c1.11 0 2.08.402 2.599 1M12 8V7m0 1v8m0 0v1m0-1c-1.11 0-2.08-.402-2.599-1M21 12a9 9 0 11-18 0 9 9 0 0118 0z"></path></svg>
                         Gestión de tarifas
                     </a>
 
@@ -70,9 +70,9 @@
                     <a href="{{ route('admin.routes') }}"
                        class="flex items-center gap-3 px-4 py-3 rounded-xl font-medium transition-colors
                               {{ request()->routeIs('admin.routes')
-                                  ? 'bg-amber-50 text-black'
+                                  ? 'bg-blue-50 text-blue-900'
                                   : 'text-[#64748B] hover:bg-slate-50 hover:text-[#0F172A]' }}">
-                        <svg class="w-5 h-5 {{ request()->routeIs('admin.routes') ? 'text-black' : '' }}" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 20l-5.447-2.724A1 1 0 013 16.382V5.618a1 1 0 011.447-.894L9 7l6-2.572 5.447 2.724A1 1 0 0121 8.053v10.764a1 1 0 01-1.447.894L15 17l-6 2.572zM9 7v13M15 4v13"></path></svg>
+                        <svg class="w-5 h-5 {{ request()->routeIs('admin.routes') ? 'text-blue-700' : '' }}" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 20l-5.447-2.724A1 1 0 013 16.382V5.618a1 1 0 011.447-.894L9 7l6-2.572 5.447 2.724A1 1 0 0121 8.053v10.764a1 1 0 01-1.447.894L15 17l-6 2.572zM9 7v13M15 4v13"></path></svg>
                         Control de rutas
                     </a>
 
@@ -80,9 +80,9 @@
                     <a href="{{ route('admin.routes.dashboard') }}"
                        class="flex items-center gap-3 px-4 py-3 rounded-xl font-medium transition-colors
                               {{ request()->routeIs('admin.routes.dashboard')
-                                  ? 'bg-amber-50 text-black'
+                                  ? 'bg-blue-50 text-blue-900'
                                   : 'text-[#64748B] hover:bg-slate-50 hover:text-[#0F172A]' }}">
-                        <svg class="w-5 h-5 {{ request()->routeIs('admin.routes.dashboard') ? 'text-black' : '' }}" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 6a2 2 0 012-2h2a2 2 0 012 2v2a2 2 0 01-2 2H6a2 2 0 01-2-2V6zM14 6a2 2 0 012-2h2a2 2 0 012 2v2a2 2 0 01-2 2h-2a2 2 0 01-2-2V6zM4 16a2 2 0 012-2h2a2 2 0 012 2v2a2 2 0 01-2 2H6a2 2 0 01-2-2v-2zM14 16a2 2 0 012-2h2a2 2 0 012 2v2a2 2 0 01-2 2h-2a2 2 0 01-2-2v-2z"></path></svg>
+                        <svg class="w-5 h-5 {{ request()->routeIs('admin.routes.dashboard') ? 'text-blue-700' : '' }}" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 6a2 2 0 012-2h2a2 2 0 012 2v2a2 2 0 01-2 2H6a2 2 0 01-2-2V6zM14 6a2 2 0 012-2h2a2 2 0 012 2v2a2 2 0 01-2 2h-2a2 2 0 01-2-2V6zM4 16a2 2 0 012-2h2a2 2 0 012 2v2a2 2 0 01-2 2H6a2 2 0 01-2-2v-2zM14 16a2 2 0 012-2h2a2 2 0 012 2v2a2 2 0 01-2 2h-2a2 2 0 01-2-2v-2z"></path></svg>
                         Dashboard de Rutas
                     </a>
 
@@ -91,7 +91,7 @@
                     {{-- Gestión de usuarios --}}
                     <a href="{{ route('admin.users') }}"
                        class="flex items-center gap-3 px-4 py-3 rounded-xl font-medium transition-colors
-                              {{ request()->routeIs('admin.users') ? 'bg-amber-50 text-black' : 'text-[#64748B] hover:bg-slate-50 hover:text-[#0F172A]' }}">
+                              {{ request()->routeIs('admin.users') ? 'bg-blue-50 text-blue-900' : 'text-[#64748B] hover:bg-slate-50 hover:text-[#0F172A]' }}">
                         <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M18 9v3m0 0v3m0-3h3m-3 0h-3m-2-5a4 4 0 11-8 0 4 4 0 018 0zM3 20a6 6 0 0112 0v1H3v-1z"></path></svg>
                         Gestión de usuarios
                     </a>
@@ -101,7 +101,7 @@
             {{-- Perfil del Admin --}}
             <div class="mt-auto pt-8 border-t border-[#E2E8F0]">
                 <div class="flex items-center gap-3 px-2">
-                    <div class="w-10 h-10 rounded-full bg-black flex items-center justify-center text-white font-bold uppercase">
+                    <div class="w-10 h-10 rounded-full bg-blue-900 flex items-center justify-center text-white font-bold uppercase">
                         {{ substr(Auth::user()->name ?? 'A', 0, 1) }}
                     </div>
                     <div class="overflow-hidden">

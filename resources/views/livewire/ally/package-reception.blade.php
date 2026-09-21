@@ -31,14 +31,14 @@
                 <input
                     id="reception-tracking-number"
                     wire:model="trackingNumber"
-                    class="min-w-0 flex-1 rounded-xl border border-slate-300 px-4 py-3 outline-none transition focus:border-black focus:ring-2 focus:ring-black/10"
+                    class="min-w-0 flex-1 rounded-xl border border-slate-300 px-4 py-3 outline-none transition focus:border-blue-800 focus:ring-2 focus:ring-blue-100"
                     placeholder="VEN-..."
                     autocomplete="off"
                 >
 
                 <button
                     type="submit"
-                    class="rounded-xl bg-black px-6 py-3 font-semibold text-white transition hover:bg-gray-800"
+                    class="rounded-xl bg-blue-900 px-6 py-3 font-semibold text-white transition hover:bg-blue-800"
                 >
                     Buscar
                 </button>
@@ -51,13 +51,13 @@
                 <!-- Cámara -->
                 <label
                     for="reception-camera"
-                    class="flex cursor-pointer items-center justify-center gap-3 rounded-xl border-2 border-dashed border-gray-300 bg-gray-50 px-4 py-4 text-sm font-semibold text-black transition hover:border-gray-400 hover:bg-gray-100"
+                    class="flex cursor-pointer items-center justify-center gap-3 rounded-xl border-2 border-dashed border-blue-200 bg-blue-50 px-4 py-4 text-sm font-semibold text-blue-900 transition hover:border-blue-400 hover:bg-blue-100"
                 >
                     <span class="text-2xl">📷</span>
 
                     <span>
                         Usar cámara
-                        <small class="block font-normal text-gray-500">
+                        <small class="block font-normal text-blue-700">
                             Fotografiar la guía
                         </small>
                     </span>
@@ -98,7 +98,7 @@
             <!-- Estado del reconocimiento -->
             <div
                 id="reception-ocr-status"
-                class="hidden rounded-xl border border-gray-200 bg-gray-50 p-4 text-sm text-black"
+                class="hidden rounded-xl border border-blue-200 bg-blue-50 p-4 text-sm text-blue-800"
             ></div>
 
             <!-- Vista previa -->

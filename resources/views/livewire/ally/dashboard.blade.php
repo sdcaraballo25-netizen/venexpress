@@ -17,7 +17,7 @@
                 wire:click="setPeriod('today')"
                 class="rounded-xl px-4 py-1.5 text-sm font-medium transition
                 {{ $period === 'today'
-                    ? 'bg-black text-white'
+                    ? 'bg-blue-900 text-white'
                     : 'text-slate-500 hover:text-[#0F172A]' }}"
             >
                 Hoy
@@ -27,7 +27,7 @@
                 wire:click="setPeriod('week')"
                 class="rounded-xl px-4 py-1.5 text-sm font-medium transition
                 {{ $period === 'week'
-                    ? 'bg-black text-white'
+                    ? 'bg-blue-900 text-white'
                     : 'text-slate-500 hover:text-[#0F172A]' }}"
             >
                 Esta semana
@@ -37,7 +37,7 @@
                 wire:click="setPeriod('month')"
                 class="rounded-xl px-4 py-1.5 text-sm font-medium transition
                 {{ $period === 'month'
-                    ? 'bg-black text-white'
+                    ? 'bg-blue-900 text-white'
                     : 'text-slate-500 hover:text-[#0F172A]' }}"
             >
                 Este mes
@@ -82,8 +82,8 @@
         </div>
 
 
-        <div class="rounded-2xl border border-[#E2E8F0] bg-black p-5">
-            <p class="text-sm text-gray-400">
+        <div class="rounded-2xl border border-[#E2E8F0] bg-blue-900 p-5">
+            <p class="text-sm text-blue-200">
                 Saldo total por comisiones
             </p>
 

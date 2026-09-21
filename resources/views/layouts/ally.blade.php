@@ -56,7 +56,7 @@
             {{-- LOGO --}}
             <div class="flex items-center gap-3 px-2 mb-10">
 
-                <div class="bg-black text-white p-2 rounded-xl shrink-0">
+                <div class="bg-blue-900 text-white p-2 rounded-xl shrink-0">
                     <svg
                         class="w-6 h-6"
                         fill="none"
@@ -104,7 +104,7 @@
                         @click="sidebarOpen = false"
                         class="flex items-center gap-3 px-4 py-3 rounded-xl font-medium transition-colors
                         {{ request()->routeIs('ally.dashboard')
-                            ? 'bg-amber-50 text-black'
+                            ? 'bg-blue-50 text-blue-900'
                             : 'text-[#64748B] hover:bg-slate-50 hover:text-[#0F172A]' }}"
                     >
 
@@ -137,7 +137,7 @@
                     @click="sidebarOpen = false"
                     class="flex items-center gap-3 px-4 py-3 rounded-xl font-medium transition-colors
                     {{ request()->routeIs('ally.help')
-                        ? 'bg-amber-50 text-black'
+                        ? 'bg-blue-50 text-blue-900'
                         : 'text-[#64748B] hover:bg-slate-50 hover:text-[#0F172A]' }}"
                 >
 
@@ -177,7 +177,7 @@
                     @click="sidebarOpen = false"
                     class="flex items-center gap-3 px-4 py-3 rounded-xl font-medium transition-colors
                     {{ request()->routeIs('ally.packages.create')
-                        ? 'bg-amber-50 text-black'
+                        ? 'bg-blue-50 text-blue-900'
                         : 'text-[#64748B] hover:bg-slate-50 hover:text-[#0F172A]' }}"
                 >
 
@@ -208,7 +208,7 @@
     @click="sidebarOpen = false"
     class="flex items-center gap-3 px-4 py-3 rounded-xl font-medium transition-colors
     {{ request()->routeIs('ally.packages.index')
-        ? 'bg-amber-50 text-black'
+        ? 'bg-blue-50 text-blue-900'
         : 'text-[#64748B] hover:bg-slate-50 hover:text-[#0F172A]' }}"
 >
     <svg
@@ -238,7 +238,7 @@
                     @click="sidebarOpen = false"
                     class="flex items-center gap-3 px-4 py-3 rounded-xl font-medium transition-colors
                     {{ request()->routeIs('ally.packages.reception')
-                        ? 'bg-amber-50 text-black'
+                        ? 'bg-blue-50 text-blue-900'
                         : 'text-[#64748B] hover:bg-slate-50 hover:text-[#0F172A]' }}"
                 >
 
@@ -270,7 +270,7 @@
                     @click="sidebarOpen = false"
                     class="flex items-center gap-3 px-4 py-3 rounded-xl font-medium transition-colors
                     {{ request()->routeIs('ally.packages.pickup')
-                        ? 'bg-amber-50 text-black'
+                        ? 'bg-blue-50 text-blue-900'
                         : 'text-[#64748B] hover:bg-slate-50 hover:text-[#0F172A]' }}"
                 >
 
@@ -307,7 +307,7 @@
                     @click="sidebarOpen = false"
                     class="flex items-center gap-3 px-4 py-3 rounded-xl font-medium transition-colors
                     {{ request()->routeIs('ally.sales-closeout')
-                        ? 'bg-amber-50 text-black'
+                        ? 'bg-blue-50 text-blue-900'
                         : 'text-[#64748B] hover:bg-slate-50 hover:text-[#0F172A]' }}"
                 >
 
@@ -344,7 +344,7 @@
                     @click="sidebarOpen = false"
                     class="flex items-center gap-3 px-4 py-3 rounded-xl font-medium transition-colors
                     {{ request()->routeIs('ally.cod')
-                        ? 'bg-amber-50 text-black'
+                        ? 'bg-blue-50 text-blue-900'
                         : 'text-[#64748B] hover:bg-slate-50 hover:text-[#0F172A]' }}"
                 >
 
@@ -380,7 +380,7 @@
                     @click="sidebarOpen = false"
                     class="flex items-center gap-3 px-4 py-3 rounded-xl font-medium transition-colors
                     {{ request()->routeIs('ally.incidents')
-                        ? 'bg-amber-50 text-black'
+                        ? 'bg-blue-50 text-blue-900'
                         : 'text-[#64748B] hover:bg-slate-50 hover:text-[#0F172A]' }}"
                 >
 
@@ -422,7 +422,7 @@
                         @click="sidebarOpen = false"
                         class="flex items-center gap-3 px-4 py-3 rounded-xl font-medium transition-colors
                         {{ request()->routeIs('ally.staff')
-                            ? 'bg-amber-50 text-black'
+                            ? 'bg-blue-50 text-blue-900'
                             : 'text-[#64748B] hover:bg-slate-50 hover:text-[#0F172A]' }}"
                     >
 
@@ -453,7 +453,7 @@
                         wire:navigate
                         class="mb-1 flex items-center gap-3 rounded-xl px-3 py-2.5 text-sm font-medium transition
                         {{ request()->routeIs('ally.commissions')
-                            ? 'bg-amber-50 text-black'
+                            ? 'bg-blue-50 text-blue-900'
                             : 'text-slate-600 hover:bg-slate-50' }}"
                     >
                         <svg class="h-5 w-5"
@@ -476,7 +476,7 @@
                         wire:navigate
                         class="mb-1 flex items-center gap-3 rounded-xl px-3 py-2.5 text-sm font-medium transition
                         {{ request()->routeIs('ally.cash-cut')
-                            ? 'bg-amber-50 text-black'
+                            ? 'bg-blue-50 text-blue-900'
                             : 'text-slate-600 hover:bg-slate-50' }}"
                     >
                         <svg class="h-5 w-5"
@@ -507,7 +507,7 @@
             <div class="flex items-center gap-3 px-2">
 
                 <div
-                    class="w-10 h-10 rounded-full bg-black flex items-center justify-center text-white font-bold uppercase shrink-0"
+                    class="w-10 h-10 rounded-full bg-blue-900 flex items-center justify-center text-white font-bold uppercase shrink-0"
                 >
                     {{ strtoupper(substr(Auth::user()->name ?? 'A', 0, 1)) }}
                 </div>

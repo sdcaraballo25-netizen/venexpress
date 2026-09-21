@@ -51,7 +51,7 @@
 
         .main-nav-link:hover,
         .main-nav-link.is-active {
-            color: #000000;
+            color: #172554;
         }
 
         .main-nav-link.is-active::after {
@@ -62,7 +62,7 @@
             bottom: -0.1rem;
             height: 2px;
             border-radius: 999px;
-            background: #f0a80d;
+            background: #dc2626;
         }
 
         @media (max-width: 767px) {
@@ -168,7 +168,7 @@
 
                 <a
                     href="{{ route('login') }}"
-                    class="bg-amber-400 hover:bg-amber-500 text-black font-semibold text-sm px-6 py-2.5 rounded-lg transition inline-flex items-center justify-center"
+                    class="bg-amber-400 hover:bg-amber-500 text-blue-950 font-semibold text-sm px-6 py-2.5 rounded-lg transition inline-flex items-center justify-center"
                 >
                     Iniciar sesión
                 </a>
@@ -177,7 +177,7 @@
                 <button
                     id="mobile-menu-button"
                     type="button"
-                    class="md:hidden w-10 h-10 rounded-lg border border-gray-200 text-black flex items-center justify-center"
+                    class="md:hidden w-10 h-10 rounded-lg border border-gray-200 text-blue-950 flex items-center justify-center"
                     aria-label="Abrir menú"
                     aria-expanded="false"
                     aria-controls="mobile-menu"
@@ -204,7 +204,7 @@
 
                 <a
                     href="{{ route('home') }}"
-                    class="mobile-menu-link block py-3 text-sm font-semibold {{ request()->routeIs('home') ? 'text-black' : 'text-gray-600' }}"
+                    class="mobile-menu-link block py-3 text-sm font-semibold {{ request()->routeIs('home') ? 'text-blue-950' : 'text-gray-600' }}"
                 >
                     Inicio
                 </a>
@@ -220,7 +220,7 @@
 
                 <a
                     href="{{ route('public.calculator') }}"
-                    class="mobile-menu-link block py-3 text-sm {{ request()->routeIs('public.calculator') ? 'font-semibold text-black' : 'text-gray-600' }}"
+                    class="mobile-menu-link block py-3 text-sm {{ request()->routeIs('public.calculator') ? 'font-semibold text-blue-950' : 'text-gray-600' }}"
                 >
                     Calcular precio
                 </a>
@@ -228,7 +228,7 @@
 
                 <a
                     href="{{ route('public.offices') }}"
-                    class="mobile-menu-link block py-3 text-sm {{ request()->routeIs('public.offices') ? 'font-semibold text-black' : 'text-gray-600' }}"
+                    class="mobile-menu-link block py-3 text-sm {{ request()->routeIs('public.offices') ? 'font-semibold text-blue-950' : 'text-gray-600' }}"
                 >
                     Agencias aliadas
                 </a>
@@ -236,7 +236,7 @@
 
                 <a
                     href="{{ route('tracking.index') }}"
-                    class="mobile-menu-link block py-3 text-sm {{ request()->routeIs('tracking.*') ? 'font-semibold text-black' : 'text-gray-600' }}"
+                    class="mobile-menu-link block py-3 text-sm {{ request()->routeIs('tracking.*') ? 'font-semibold text-blue-950' : 'text-gray-600' }}"
                 >
                     Rastreo
                 </a>
@@ -244,7 +244,7 @@
 
                 <a
                     href="{{ route('public.help') }}"
-                    class="mobile-menu-link block py-3 text-sm {{ request()->routeIs('public.help') ? 'font-semibold text-black' : 'text-gray-600' }}"
+                    class="mobile-menu-link block py-3 text-sm {{ request()->routeIs('public.help') ? 'font-semibold text-blue-950' : 'text-gray-600' }}"
                 >
                     Ayuda
                 </a>
@@ -265,7 +265,7 @@
     {{-- =========================================================
          FOOTER
     ========================================================== --}}
-    <footer class="bg-black text-white/70 pt-14 pb-8">
+    <footer class="bg-blue-950 text-white/70 pt-14 pb-8">
 
         <div class="max-w-7xl mx-auto px-6">
 

@@ -42,7 +42,7 @@
 
                 <select
                     wire:model.live="filterState"
-                    class="w-full rounded-xl border-[#E2E8F0] text-sm focus:border-black focus:ring-black">
+                    class="w-full rounded-xl border-[#E2E8F0] text-sm focus:border-blue-500 focus:ring-blue-500">
                     <option value="">Todos los estados</option>
 
                     @foreach ($states as $stateOption)
@@ -60,7 +60,7 @@
 
                 <select
                     wire:model.live="filterCity"
-                    class="w-full rounded-xl border-[#E2E8F0] text-sm focus:border-black focus:ring-black">
+                    class="w-full rounded-xl border-[#E2E8F0] text-sm focus:border-blue-500 focus:ring-blue-500">
                     <option value="">Todas las ciudades</option>
 
                     @foreach ($filterState !== '' ? $filterCities : $citiesWithAllies as $cityOption)
@@ -78,7 +78,7 @@
 
                 <select
                     wire:model.live="filterStatus"
-                    class="w-full rounded-xl border-[#E2E8F0] text-sm focus:border-black focus:ring-black">
+                    class="w-full rounded-xl border-[#E2E8F0] text-sm focus:border-blue-500 focus:ring-blue-500">
 
                     <option value="">Todos los estatus</option>
                     <option value="draft">Borrador</option>
@@ -97,7 +97,7 @@
 
                 <select
                     wire:model.live="filterDriverId"
-                    class="w-full rounded-xl border-[#E2E8F0] text-sm focus:border-black focus:ring-black">
+                    class="w-full rounded-xl border-[#E2E8F0] text-sm focus:border-blue-500 focus:ring-blue-500">
 
                     <option value="">Todos los repartidores</option>
 
@@ -121,7 +121,7 @@
                 <button
                     type="button"
                     wire:click="clearFilters"
-                    class="text-xs font-semibold text-black hover:text-gray-700">
+                    class="text-xs font-semibold text-blue-700 hover:text-blue-900">
                     Limpiar filtros
                 </button>
             </div>
@@ -293,7 +293,7 @@
 
                                 <div class="flex items-center gap-4">
 
-                                    <div class="w-9 h-9 rounded-full bg-amber-50 text-black flex items-center justify-center font-bold text-sm">
+                                    <div class="w-9 h-9 rounded-full bg-blue-50 text-blue-700 flex items-center justify-center font-bold text-sm">
                                         {{ $index + 1 }}
                                     </div>
 
@@ -676,7 +676,7 @@
                                             wire:click="toggleStop({{ $warehouse->id }})"
                                             class="w-full flex items-center justify-between rounded-xl border p-4 text-left transition
                                             {{ in_array($warehouse->id, $selectedStops, true)
-                                                ? 'border-amber-400 bg-amber-50'
+                                                ? 'border-blue-500 bg-blue-50'
                                                 : 'border-[#E2E8F0] hover:bg-slate-50' }}">
 
                                             <div>
@@ -735,7 +735,7 @@
                                             wire:click="toggleStop({{ $ally->id }})"
                                             class="w-full flex items-center justify-between rounded-xl border p-4 text-left transition
                                             {{ in_array($ally->id, $selectedStops, true)
-                                                ? 'border-amber-400 bg-amber-50'
+                                                ? 'border-blue-500 bg-blue-50'
                                                 : 'border-[#E2E8F0] hover:bg-slate-50' }}">
 
                                             <div>
@@ -803,7 +803,7 @@
 
                                         <div class="flex items-center gap-3">
 
-                                            <span class="w-8 h-8 rounded-full bg-amber-50 text-black flex items-center justify-center font-bold text-xs">
+                                            <span class="w-8 h-8 rounded-full bg-blue-50 text-blue-700 flex items-center justify-center font-bold text-xs">
                                                 {{ $index + 1 }}
                                             </span>
 

@@ -34,7 +34,7 @@
                                 <td class="px-6 py-4 font-medium text-[#0F172A]">
                                     {{ $rate->effective_at->format('d/m/Y h:i A') }}
                                     @if ($current && $current->id === $rate->id)
-                                        <span class="ml-2 rounded-full bg-amber-50 px-2.5 py-0.5 text-xs font-semibold text-amber-700">Vigente</span>
+                                        <span class="ml-2 rounded-full bg-blue-50 px-2.5 py-0.5 text-xs font-semibold text-blue-800">Vigente</span>
                                     @endif
                                 </td>
                                 <td class="px-6 py-4 text-right font-display font-bold text-[#0F172A]">
@@ -73,7 +73,7 @@
                     <label class="mb-1 block text-xs font-bold uppercase tracking-wider text-[#64748B]">Monto por paquete entregado (USD)</label>
                     <input type="number" step="0.01" wire:model="amount_usd"
                            placeholder="1.00"
-                           class="w-full rounded-xl border-[#E2E8F0] text-sm focus:border-black focus:ring-black">
+                           class="w-full rounded-xl border-[#E2E8F0] text-sm focus:border-blue-500 focus:ring-blue-500">
                     @error('amount_usd') <p class="mt-1 text-xs text-red-600">{{ $message }}</p> @enderror
                 </div>
 

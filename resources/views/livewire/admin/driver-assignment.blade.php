@@ -10,7 +10,7 @@
     <div class="rounded-2xl border border-slate-200 bg-white p-6 shadow-sm">
         <form wire:submit.prevent="search" class="flex flex-col gap-3 sm:flex-row">
             <input wire:model="trackingNumber" class="flex-1 rounded-xl border border-slate-300 px-4 py-3" placeholder="Número de guía">
-            <button class="rounded-xl bg-black px-5 py-3 font-semibold text-white">Buscar</button>
+            <button class="rounded-xl bg-blue-900 px-5 py-3 font-semibold text-white">Buscar</button>
         </form>
 
         @if($package)
@@ -20,7 +20,7 @@
                         <div class="font-tracking text-lg font-semibold">{{ $package->tracking_number }}</div>
                         <div class="text-sm text-slate-500">{{ $package->recipient_name }} · {{ $package->destination_city }}</div>
                     </div>
-                    <span class="rounded-full bg-gray-100 px-3 py-1 text-xs font-semibold text-black">{{ $package->statusLabel() }}</span>
+                    <span class="rounded-full bg-blue-100 px-3 py-1 text-xs font-semibold text-blue-800">{{ $package->statusLabel() }}</span>
                 </div>
 
                 <div class="mt-4 text-sm">

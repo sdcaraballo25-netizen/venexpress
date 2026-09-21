@@ -12,7 +12,7 @@
     <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
         <div class="rounded-2xl border border-[#E2E8F0] bg-white p-5 shadow-sm">
             <p class="text-sm text-slate-500">Comisión acumulada (histórico)</p>
-            <p class="mt-1 font-display text-2xl font-semibold text-black">
+            <p class="mt-1 font-display text-2xl font-semibold text-blue-900">
                 ${{ number_format($totalCommissionUsd, 2) }}
             </p>
             <p class="text-xs text-slate-400 mt-1">{{ $totalPackages }} guías registradas</p>

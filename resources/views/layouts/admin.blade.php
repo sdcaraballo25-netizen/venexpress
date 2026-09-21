@@ -99,7 +99,7 @@
                 {{-- Logo --}}
                 <div class="flex items-center gap-3 px-2 mb-10">
 
-                    <div class="bg-black text-white p-2 rounded-xl">
+                    <div class="bg-blue-900 text-white p-2 rounded-xl">
 
                         <svg
                             class="w-6 h-6"
@@ -199,12 +199,12 @@
                         href="{{ route('admin.dashboard') }}"
                         class="flex items-center gap-3 px-4 py-3 rounded-xl font-medium transition-colors
                         {{ request()->routeIs('admin.dashboard')
-                            ? 'bg-amber-50 text-black'
+                            ? 'bg-blue-50 text-blue-900'
                             : 'text-[#64748B] hover:bg-slate-50 hover:text-[#0F172A]' }}"
                     >
 
                         <svg
-                            class="w-5 h-5 {{ request()->routeIs('admin.dashboard') ? 'text-black' : '' }}"
+                            class="w-5 h-5 {{ request()->routeIs('admin.dashboard') ? 'text-blue-700' : '' }}"
                             fill="none"
                             stroke="currentColor"
                             viewBox="0 0 24 24"
@@ -267,7 +267,7 @@
                                 href="{{ route('admin.packages.reception') }}"
                                 class="flex items-center gap-3 px-4 py-3 rounded-xl font-medium transition-colors
                                 {{ request()->routeIs('admin.packages.reception')
-                                    ? 'bg-amber-50 text-black'
+                                    ? 'bg-blue-50 text-blue-900'
                                     : 'text-[#64748B] hover:bg-slate-50 hover:text-[#0F172A]' }}"
                             >
 
@@ -295,7 +295,7 @@
                                 href="{{ route('admin.packages.assignment') }}"
                                 class="flex items-center gap-3 px-4 py-3 rounded-xl font-medium transition-colors
                                 {{ request()->routeIs('admin.packages.assignment')
-                                    ? 'bg-amber-50 text-black'
+                                    ? 'bg-blue-50 text-blue-900'
                                     : 'text-[#64748B] hover:bg-slate-50 hover:text-[#0F172A]' }}"
                             >
 
@@ -323,7 +323,7 @@
                                 href="{{ route('admin.packages.dispatch') }}"
                                 class="flex items-center gap-3 px-4 py-3 rounded-xl font-medium transition-colors
                                 {{ request()->routeIs('admin.packages.dispatch')
-                                    ? 'bg-amber-50 text-black'
+                                    ? 'bg-blue-50 text-blue-900'
                                     : 'text-[#64748B] hover:bg-slate-50 hover:text-[#0F172A]' }}"
                             >
 
@@ -351,7 +351,7 @@
                                 href="{{ route('admin.routes') }}"
                                 class="flex items-center gap-3 px-4 py-3 rounded-xl font-medium transition-colors
                                 {{ request()->routeIs('admin.routes')
-                                    ? 'bg-amber-50 text-black'
+                                    ? 'bg-blue-50 text-blue-900'
                                     : 'text-[#64748B] hover:bg-slate-50 hover:text-[#0F172A]' }}"
                             >
 
@@ -379,7 +379,7 @@
                                 href="{{ route('admin.routes.dashboard') }}"
                                 class="flex items-center gap-3 px-4 py-3 rounded-xl font-medium transition-colors
                                 {{ request()->routeIs('admin.routes.dashboard')
-                                    ? 'bg-amber-50 text-black'
+                                    ? 'bg-blue-50 text-blue-900'
                                     : 'text-[#64748B] hover:bg-slate-50 hover:text-[#0F172A]' }}"
                             >
 
@@ -407,7 +407,7 @@
                                 href="{{ route('admin.warehouses') }}"
                                 class="flex items-center gap-3 px-4 py-3 rounded-xl font-medium transition-colors
                                 {{ request()->routeIs('admin.warehouses')
-                                    ? 'bg-amber-50 text-black'
+                                    ? 'bg-blue-50 text-blue-900'
                                     : 'text-[#64748B] hover:bg-slate-50 hover:text-[#0F172A]' }}"
                             >
 
@@ -435,7 +435,7 @@
                                 href="{{ route('admin.payments') }}"
                                 class="flex items-center gap-3 px-4 py-3 rounded-xl font-medium transition-colors
                                 {{ request()->routeIs('admin.payments')
-                                    ? 'bg-amber-50 text-black'
+                                    ? 'bg-blue-50 text-blue-900'
                                     : 'text-[#64748B] hover:bg-slate-50 hover:text-[#0F172A]' }}"
                             >
                                 <svg class="w-5 h-5 shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -494,7 +494,7 @@
                                 href="{{ route('admin.allies') }}"
                                 class="flex items-center gap-3 px-4 py-3 rounded-xl font-medium transition-colors
                                 {{ request()->routeIs('admin.allies')
-                                    ? 'bg-amber-50 text-black'
+                                    ? 'bg-blue-50 text-blue-900'
                                     : 'text-[#64748B] hover:bg-slate-50 hover:text-[#0F172A]' }}"
                             >
 
@@ -522,7 +522,7 @@
                                 href="{{ route('admin.rate-matrices') }}"
                                 class="flex items-center gap-3 px-4 py-3 rounded-xl font-medium transition-colors
                                 {{ request()->routeIs('admin.rate-matrices')
-                                    ? 'bg-amber-50 text-black'
+                                    ? 'bg-blue-50 text-blue-900'
                                     : 'text-[#64748B] hover:bg-slate-50 hover:text-[#0F172A]' }}"
                             >
 
@@ -550,7 +550,7 @@
                                 href="{{ route('admin.ally-finance') }}"
                                 class="flex items-center gap-3 px-4 py-3 rounded-xl font-medium transition-colors
                                 {{ request()->routeIs('admin.ally-finance')
-                                    ? 'bg-amber-50 text-black'
+                                    ? 'bg-blue-50 text-blue-900'
                                     : 'text-[#64748B] hover:bg-slate-50 hover:text-[#0F172A]' }}"
                             >
 
@@ -622,7 +622,7 @@
                                 href="{{ route('admin.users') }}"
                                 class="flex items-center gap-3 px-4 py-3 rounded-xl font-medium transition-colors
                                 {{ request()->routeIs('admin.users')
-                                    ? 'bg-amber-50 text-black'
+                                    ? 'bg-blue-50 text-blue-900'
                                     : 'text-[#64748B] hover:bg-slate-50 hover:text-[#0F172A]' }}"
                             >
 
@@ -650,7 +650,7 @@
                                 href="{{ route('admin.driver-payments') }}"
                                 class="flex items-center gap-3 px-4 py-3 rounded-xl font-medium transition-colors
                                 {{ request()->routeIs('admin.driver-payments')
-                                    ? 'bg-amber-50 text-black'
+                                    ? 'bg-blue-50 text-blue-900'
                                     : 'text-[#64748B] hover:bg-slate-50 hover:text-[#0F172A]' }}"
                             >
 
@@ -678,7 +678,7 @@
                                 href="{{ route('admin.drivers.approval') }}"
                                 class="flex items-center gap-3 px-4 py-3 rounded-xl font-medium transition-colors
                                 {{ request()->routeIs('admin.drivers.approval')
-                                    ? 'bg-amber-50 text-black'
+                                    ? 'bg-blue-50 text-blue-900'
                                     : 'text-[#64748B] hover:bg-slate-50 hover:text-[#0F172A]' }}"
                             >
 
@@ -750,7 +750,7 @@
                                 href="{{ route('admin.incidents') }}"
                                 class="flex items-center gap-3 px-4 py-3 rounded-xl font-medium transition-colors
                                 {{ request()->routeIs('admin.incidents')
-                                    ? 'bg-amber-50 text-black'
+                                    ? 'bg-blue-50 text-blue-900'
                                     : 'text-[#64748B] hover:bg-slate-50 hover:text-[#0F172A]' }}"
                             >
 
@@ -778,7 +778,7 @@
                                 href="{{ route('admin.recommendations') }}"
                                 class="flex items-center gap-3 px-4 py-3 rounded-xl font-medium transition-colors
                                 {{ request()->routeIs('admin.recommendations')
-                                    ? 'bg-amber-50 text-black'
+                                    ? 'bg-blue-50 text-blue-900'
                                     : 'text-[#64748B] hover:bg-slate-50 hover:text-[#0F172A]' }}"
                             >
 
@@ -808,7 +808,7 @@
                                     href="{{ route('admin.audit-log') }}"
                                     class="flex items-center gap-3 px-4 py-3 rounded-xl font-medium transition-colors
                                     {{ request()->routeIs('admin.audit-log')
-                                        ? 'bg-amber-50 text-black'
+                                        ? 'bg-blue-50 text-blue-900'
                                         : 'text-[#64748B] hover:bg-slate-50 hover:text-[#0F172A]' }}"
                                 >
 
@@ -849,12 +849,12 @@
                         href="{{ route('admin.help') }}"
                         class="flex items-center gap-3 px-4 py-2.5 rounded-xl text-sm font-medium transition-colors
                         {{ request()->routeIs('admin.help')
-                            ? 'bg-amber-50 text-black'
+                            ? 'bg-blue-50 text-blue-900'
                             : 'text-[#94A3B8] hover:bg-slate-50 hover:text-[#64748B]' }}"
                     >
 
                         <svg
-                            class="w-5 h-5 {{ request()->routeIs('admin.help') ? 'text-black' : '' }}"
+                            class="w-5 h-5 {{ request()->routeIs('admin.help') ? 'text-blue-700' : '' }}"
                             fill="none"
                             stroke="currentColor"
                             viewBox="0 0 24 24"
@@ -884,7 +884,7 @@
 
                 <div class="flex items-center gap-3 px-2">
 
-                    <div class="w-10 h-10 rounded-full bg-black flex items-center justify-center text-white font-bold uppercase">
+                    <div class="w-10 h-10 rounded-full bg-blue-900 flex items-center justify-center text-white font-bold uppercase">
 
                         {{ substr(Auth::user()->name ?? 'A', 0, 1) }}
 

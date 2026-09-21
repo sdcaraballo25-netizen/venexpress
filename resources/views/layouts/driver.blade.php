@@ -118,7 +118,7 @@
                     class="
                         h-11 w-11
                         rounded-xl
-                        bg-black
+                        bg-blue-900
                         flex items-center justify-center
                         text-white
                         shrink-0
@@ -245,7 +245,7 @@
                     font-medium
                     transition-colors
                     {{ request()->routeIs('repartidor.dashboard')
-                        ? 'bg-amber-50 text-black'
+                        ? 'bg-blue-50 text-blue-900'
                         : 'text-[#64748B] hover:bg-slate-50 hover:text-[#0F172A]' }}
                 "
             >
@@ -289,7 +289,7 @@
                         font-medium
                         transition-colors
                         {{ request()->routeIs('repartidor.route-detail')
-                            ? 'bg-amber-50 text-black'
+                            ? 'bg-blue-50 text-blue-900'
                             : 'text-[#64748B] hover:bg-slate-50 hover:text-[#0F172A]' }}
                     "
                 >
@@ -333,7 +333,7 @@
                     font-medium
                     transition-colors
                     {{ request()->routeIs('repartidor.route-history')
-                        ? 'bg-amber-50 text-black'
+                        ? 'bg-blue-50 text-blue-900'
                         : 'text-[#64748B] hover:bg-slate-50 hover:text-[#0F172A]' }}
                 "
             >
@@ -375,7 +375,7 @@
                     font-medium
                     transition-colors
                     {{ request()->routeIs('repartidor.scanner')
-                        ? 'bg-amber-50 text-black'
+                        ? 'bg-blue-50 text-blue-900'
                         : 'text-[#64748B] hover:bg-slate-50 hover:text-[#0F172A]' }}
                 "
             >
@@ -438,7 +438,7 @@
                     transition-colors
                     {{ request()->routeIs('repartidor.packages')
                         || request()->routeIs('repartidor.package-detail')
-                        ? 'bg-amber-50 text-black'
+                        ? 'bg-blue-50 text-blue-900'
                         : 'text-[#64748B] hover:bg-slate-50 hover:text-[#0F172A]' }}
                 "
             >
@@ -480,7 +480,7 @@
                     font-medium
                     transition-colors
                     {{ request()->routeIs('repartidor.app-download')
-                        ? 'bg-amber-50 text-black'
+                        ? 'bg-blue-50 text-blue-900'
                         : 'text-[#64748B] hover:bg-slate-50 hover:text-[#0F172A]' }}
                 "
             >
@@ -522,7 +522,7 @@
                     font-medium
                     transition-colors
                     {{ request()->routeIs('repartidor.help')
-                        ? 'bg-amber-50 text-black'
+                        ? 'bg-blue-50 text-blue-900'
                         : 'text-[#64748B] hover:bg-slate-50 hover:text-[#0F172A]' }}
                 "
             >
@@ -573,7 +573,7 @@
                     class="
                         h-10 w-10
                         rounded-full
-                        bg-black
+                        bg-blue-900
                         text-white
                         flex items-center justify-center
                         font-bold

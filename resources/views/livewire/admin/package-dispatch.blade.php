@@ -48,12 +48,12 @@
                         wire:model="trackingNumber"
                         placeholder="VEN-..."
                         autocomplete="off"
-                        class="min-w-0 flex-1 rounded-xl border border-slate-300 px-4 py-3 text-sm focus:border-black focus:ring-black"
+                        class="min-w-0 flex-1 rounded-xl border border-slate-300 px-4 py-3 text-sm focus:border-blue-900 focus:ring-blue-900"
                     >
 
                     <button
                         type="submit"
-                        class="rounded-xl bg-black px-5 py-3 text-sm font-semibold text-white hover:bg-gray-800"
+                        class="rounded-xl bg-blue-900 px-5 py-3 text-sm font-semibold text-white hover:bg-blue-800"
                     >
                         Buscar
                     </button>
@@ -102,7 +102,7 @@
                         type="text"
                         wire:model="originLocation"
                         placeholder="Ej. Hub Caracas"
-                        class="mt-2 w-full rounded-xl border border-slate-300 px-4 py-3 text-sm focus:border-black focus:ring-black"
+                        class="mt-2 w-full rounded-xl border border-slate-300 px-4 py-3 text-sm focus:border-blue-900 focus:ring-blue-900"
                     >
                     @error('originLocation')
                         <p class="mt-1 text-xs text-red-600">{{ $message }}</p>
@@ -117,7 +117,7 @@
                         type="text"
                         wire:model="destinationLocation"
                         placeholder="Ej. Agencia Aliada Valencia"
-                        class="mt-2 w-full rounded-xl border border-slate-300 px-4 py-3 text-sm focus:border-black focus:ring-black"
+                        class="mt-2 w-full rounded-xl border border-slate-300 px-4 py-3 text-sm focus:border-blue-900 focus:ring-blue-900"
                     >
                     @error('destinationLocation')
                         <p class="mt-1 text-xs text-red-600">{{ $message }}</p>
@@ -127,7 +127,7 @@
                 <button
                     type="submit"
                     wire:loading.attr="disabled"
-                    class="w-full rounded-xl bg-black px-5 py-3 text-sm font-semibold text-white hover:bg-gray-800 disabled:opacity-50"
+                    class="w-full rounded-xl bg-blue-900 px-5 py-3 text-sm font-semibold text-white hover:bg-blue-800 disabled:opacity-50"
                 >
                     Registrar despacho
                 </button>

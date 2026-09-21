@@ -38,7 +38,7 @@ new #[Layout('layouts.guest')] class extends Component
         <x-venexpress-logo size="md" />
     </div>
 
-    <h1 class="font-display text-2xl font-bold text-black">Confirma tu contraseña</h1>
+    <h1 class="font-display text-2xl font-bold text-blue-950">Confirma tu contraseña</h1>
     <p class="mt-1.5 text-sm text-gray-500">
         Esta es un área protegida. Confirma tu contraseña antes de continuar.
     </p>

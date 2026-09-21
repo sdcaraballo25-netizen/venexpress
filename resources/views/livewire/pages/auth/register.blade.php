@@ -418,7 +418,7 @@ new #[Layout('layouts.guest')] class extends Component
         <x-venexpress-logo size="md" />
     </div>
 
-    <h1 class="font-display text-2xl font-bold text-black">
+    <h1 class="font-display text-2xl font-bold text-blue-950">
         Crea tu cuenta
     </h1>
 
@@ -488,7 +488,7 @@ new #[Layout('layouts.guest')] class extends Component
                 wire:model.live="role"
                 id="role"
                 name="role"
-                class="block mt-1.5 w-full rounded-md border-gray-300 shadow-sm focus:border-black focus:ring-black"
+                class="block mt-1.5 w-full rounded-md border-gray-300 shadow-sm focus:border-blue-500 focus:ring-blue-500"
                 required
             >
                 <option value="cliente">
@@ -517,7 +517,7 @@ new #[Layout('layouts.guest')] class extends Component
         @if ($role === 'cliente')
 
             <div class="border-t border-gray-200 pt-5">
-                <h2 class="text-sm font-semibold text-black">
+                <h2 class="text-sm font-semibold text-blue-950">
                     Datos de contacto
                 </h2>
 
@@ -577,7 +577,7 @@ new #[Layout('layouts.guest')] class extends Component
         @if ($role === 'aliado')
 
             <div class="border-t border-gray-200 pt-5">
-                <h2 class="text-sm font-semibold text-black">
+                <h2 class="text-sm font-semibold text-blue-950">
                     Información del punto aliado
                 </h2>
 
@@ -639,7 +639,7 @@ new #[Layout('layouts.guest')] class extends Component
                     wire:model.live="state"
                     id="state"
                     name="state"
-                    class="block mt-1.5 w-full rounded-md border-gray-300 shadow-sm focus:border-black focus:ring-black"
+                    class="block mt-1.5 w-full rounded-md border-gray-300 shadow-sm focus:border-blue-500 focus:ring-blue-500"
                     required
                 >
                     <option value="">
@@ -670,7 +670,7 @@ new #[Layout('layouts.guest')] class extends Component
                     wire:model.live="city"
                     id="city"
                     name="city"
-                    class="block mt-1.5 w-full rounded-md border-gray-300 shadow-sm focus:border-black focus:ring-black"
+                    class="block mt-1.5 w-full rounded-md border-gray-300 shadow-sm focus:border-blue-500 focus:ring-blue-500"
                     @disabled($state === '')
                     required
                 >
@@ -729,7 +729,7 @@ new #[Layout('layouts.guest')] class extends Component
                     class="block mt-1.5 w-full text-sm text-gray-600
                            file:mr-4 file:py-2 file:px-4 file:rounded-md
                            file:border-0 file:text-sm file:font-semibold
-                           file:bg-amber-50 file:text-black hover:file:bg-amber-100"
+                           file:bg-blue-50 file:text-blue-700 hover:file:bg-blue-100"
                 />
 
                 <p class="mt-1 text-xs text-gray-500" wire:loading wire:target="storefront_photo">
@@ -781,7 +781,7 @@ new #[Layout('layouts.guest')] class extends Component
         @if ($role === 'repartidor')
 
             <div class="border-t border-gray-200 pt-5">
-                <h2 class="text-sm font-semibold text-black">
+                <h2 class="text-sm font-semibold text-blue-950">
                     Información del repartidor
                 </h2>
             </div>
@@ -850,7 +850,7 @@ new #[Layout('layouts.guest')] class extends Component
             </div>
 
             <div class="border-t border-gray-200 pt-5">
-                <h2 class="text-sm font-semibold text-black">
+                <h2 class="text-sm font-semibold text-blue-950">
                     Documentos
                 </h2>
 
@@ -874,7 +874,7 @@ new #[Layout('layouts.guest')] class extends Component
                     class="block mt-1.5 w-full text-sm text-gray-600
                            file:mr-4 file:py-2 file:px-4 file:rounded-md
                            file:border-0 file:text-sm file:font-semibold
-                           file:bg-amber-50 file:text-black hover:file:bg-amber-100"
+                           file:bg-blue-50 file:text-blue-700 hover:file:bg-blue-100"
                 />
 
                 <p class="mt-1 text-xs text-gray-500" wire:loading wire:target="license_photo">
@@ -906,7 +906,7 @@ new #[Layout('layouts.guest')] class extends Component
                     class="block mt-1.5 w-full text-sm text-gray-600
                            file:mr-4 file:py-2 file:px-4 file:rounded-md
                            file:border-0 file:text-sm file:font-semibold
-                           file:bg-amber-50 file:text-black hover:file:bg-amber-100"
+                           file:bg-blue-50 file:text-blue-700 hover:file:bg-blue-100"
                 />
 
                 <p class="mt-1 text-xs text-gray-500" wire:loading wire:target="id_photo">
@@ -942,7 +942,7 @@ new #[Layout('layouts.guest')] class extends Component
                     class="block mt-1.5 w-full text-sm text-gray-600
                            file:mr-4 file:py-2 file:px-4 file:rounded-md
                            file:border-0 file:text-sm file:font-semibold
-                           file:bg-amber-50 file:text-black hover:file:bg-amber-100"
+                           file:bg-blue-50 file:text-blue-700 hover:file:bg-blue-100"
                 />
 
                 <p class="mt-1 text-xs text-gray-500" wire:loading wire:target="vehicle_registration_photo">
@@ -1022,7 +1022,7 @@ new #[Layout('layouts.guest')] class extends Component
 
         <a
             href="{{ route('login') }}"
-            class="font-semibold text-black hover:text-black"
+            class="font-semibold text-blue-700 hover:text-blue-950"
             wire:navigate
         >
             Inicia sesión

@@ -6,7 +6,7 @@
         <div>
             <a
                 href="{{ route('repartidor.packages') }}"
-                class="text-sm font-medium text-black hover:text-gray-700"
+                class="text-sm font-medium text-blue-700 hover:text-blue-900"
             >
                 ← Volver a mis paquetes
             </a>
@@ -21,14 +21,14 @@
         </div>
 
         <div>
-            <span class="inline-flex rounded-full bg-gray-100 px-3 py-1 text-sm font-medium text-black">
+            <span class="inline-flex rounded-full bg-blue-50 px-3 py-1 text-sm font-medium text-blue-700">
                 {{ $package->statusLabel() }}
             </span>
 
             <a
                 href="{{ route('packages.label', $package->id) }}"
                 target="_blank"
-                class="ml-2 inline-flex rounded-full border border-black px-3 py-1 text-sm font-medium text-black"
+                class="ml-2 inline-flex rounded-full border border-blue-700 px-3 py-1 text-sm font-medium text-blue-700"
             >
                 Ver guía (PDF)
             </a>
@@ -196,17 +196,17 @@
     {{-- Dirección de entrega --}}
     @if ($package->requires_delivery)
 
-        <div class="rounded-2xl border border-amber-200 bg-amber-50 p-5">
+        <div class="rounded-2xl border border-blue-200 bg-blue-50 p-5">
 
-            <h2 class="font-display text-lg font-semibold text-black">
+            <h2 class="font-display text-lg font-semibold text-blue-900">
                 Entrega a domicilio
             </h2>
 
-            <div class="mt-4 space-y-3 text-sm text-black">
+            <div class="mt-4 space-y-3 text-sm text-blue-900">
 
                 @if ($package->delivery_address)
                     <div>
-                        <p class="text-xs font-medium text-amber-700">
+                        <p class="text-xs font-medium text-blue-700">
                             Dirección
                         </p>
 
@@ -218,7 +218,7 @@
 
                 @if ($package->delivery_sector)
                     <div>
-                        <p class="text-xs font-medium text-amber-700">
+                        <p class="text-xs font-medium text-blue-700">
                             Sector
                         </p>
 
@@ -230,7 +230,7 @@
 
                 @if ($package->delivery_reference)
                     <div>
-                        <p class="text-xs font-medium text-amber-700">
+                        <p class="text-xs font-medium text-blue-700">
                             Referencia
                         </p>
 
@@ -366,7 +366,7 @@
 
                     <div class="flex gap-3">
 
-                        <div class="mt-1 h-3 w-3 shrink-0 rounded-full bg-black"></div>
+                        <div class="mt-1 h-3 w-3 shrink-0 rounded-full bg-blue-900"></div>
 
                         <div class="min-w-0 flex-1">
 
@@ -454,14 +454,14 @@
 
                 <a
                     href="{{ $activeRouteId ? route('repartidor.route-detail', $activeRouteId) : route('repartidor.dashboard') }}"
-                    class="inline-flex items-center justify-center rounded-xl border border-[#E2E8F0] px-5 py-3 text-sm font-medium text-[#0F172A] transition hover:border-amber-300 hover:bg-amber-50"
+                    class="inline-flex items-center justify-center rounded-xl border border-[#E2E8F0] px-5 py-3 text-sm font-medium text-[#0F172A] transition hover:border-blue-300 hover:bg-blue-50"
                 >
                     Volver a mi ruta
                 </a>
 
                 <a
                     href="{{ route('repartidor.scanner') }}"
-                    class="inline-flex items-center justify-center rounded-xl bg-black px-5 py-3 text-sm font-medium text-white transition hover:bg-gray-800"
+                    class="inline-flex items-center justify-center rounded-xl bg-blue-900 px-5 py-3 text-sm font-medium text-white transition hover:bg-blue-800"
                 >
                     Escanear paquetes
                 </a>
@@ -490,7 +490,7 @@
                     wire:click="startDelivery"
                     wire:loading.attr="disabled"
                     wire:target="startDelivery"
-                    class="rounded-xl bg-black px-5 py-3 text-sm font-medium text-white transition hover:bg-gray-800 disabled:cursor-not-allowed disabled:opacity-60"
+                    class="rounded-xl bg-blue-900 px-5 py-3 text-sm font-medium text-white transition hover:bg-blue-800 disabled:cursor-not-allowed disabled:opacity-60"
                 >
                     <span wire:loading.remove wire:target="startDelivery">
                         Iniciar entrega
@@ -570,7 +570,7 @@
 
                 @else
 
-                    <div class="rounded-xl bg-amber-50 px-5 py-3 text-sm font-medium text-amber-700">
+                    <div class="rounded-xl bg-blue-50 px-5 py-3 text-sm font-medium text-blue-700">
                         Entrega en curso
                     </div>
 

@@ -11,7 +11,7 @@
     <div class="mt-10 bg-white border border-[#E2E8F0] rounded-2xl p-8 shadow-sm">
         @if ($apkAvailable)
             <a href="{{ $apkUrl }}"
-                class="inline-flex items-center gap-2 bg-black hover:bg-gray-800 text-white font-semibold text-sm px-8 py-3.5 rounded-lg transition">
+                class="inline-flex items-center gap-2 bg-blue-900 hover:bg-blue-800 text-white font-semibold text-sm px-8 py-3.5 rounded-lg transition">
                 <i class="fa-solid fa-download"></i>
                 Descargar APK para Android
             </a>

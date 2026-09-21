@@ -56,7 +56,7 @@
             {{-- LOGO --}}
             <div class="flex items-center gap-3 px-2 mb-10">
 
-                <div class="bg-black text-white p-2 rounded-xl shrink-0">
+                <div class="bg-blue-900 text-white p-2 rounded-xl shrink-0">
                     <svg
                         class="w-6 h-6"
                         fill="none"
@@ -109,12 +109,12 @@
                         name="guia"
                         required
                         placeholder="VEN-..."
-                        class="w-full min-w-0 rounded-xl border-[#E2E8F0] text-sm focus:border-black focus:ring-black"
+                        class="w-full min-w-0 rounded-xl border-[#E2E8F0] text-sm focus:border-blue-900 focus:ring-blue-900"
                     >
 
                     <button
                         type="submit"
-                        class="shrink-0 rounded-xl bg-black px-3 text-white hover:bg-gray-800"
+                        class="shrink-0 rounded-xl bg-blue-900 px-3 text-white hover:bg-blue-800"
                         aria-label="Buscar guía"
                     >
                         <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -140,7 +140,7 @@
                     @click="sidebarOpen = false"
                     class="flex items-center gap-3 px-4 py-3 rounded-xl font-medium transition-colors
                     {{ request()->routeIs('cliente.dashboard')
-                        ? 'bg-amber-50 text-black'
+                        ? 'bg-blue-50 text-blue-900'
                         : 'text-[#64748B] hover:bg-slate-50 hover:text-[#0F172A]' }}"
                 >
 
@@ -171,7 +171,7 @@
                     @click="sidebarOpen = false"
                     class="flex items-center gap-3 px-4 py-3 rounded-xl font-medium transition-colors
                     {{ request()->routeIs('cliente.incidents')
-                        ? 'bg-amber-50 text-black'
+                        ? 'bg-blue-50 text-blue-900'
                         : 'text-[#64748B] hover:bg-slate-50 hover:text-[#0F172A]' }}"
                 >
 
@@ -202,7 +202,7 @@
                     @click="sidebarOpen = false"
                     class="flex items-center gap-3 px-4 py-3 rounded-xl font-medium transition-colors
                     {{ request()->routeIs('cliente.pending-payments')
-                        ? 'bg-amber-50 text-black'
+                        ? 'bg-blue-50 text-blue-900'
                         : 'text-[#64748B] hover:bg-slate-50 hover:text-[#0F172A]' }}"
                 >
 
@@ -239,7 +239,7 @@
             <div class="flex items-center gap-3 px-2">
 
                 <div
-                    class="w-10 h-10 rounded-full bg-black flex items-center justify-center text-white font-bold uppercase shrink-0"
+                    class="w-10 h-10 rounded-full bg-blue-900 flex items-center justify-center text-white font-bold uppercase shrink-0"
                 >
                     {{ strtoupper(substr(Auth::user()->name ?? 'C', 0, 1)) }}
                 </div>

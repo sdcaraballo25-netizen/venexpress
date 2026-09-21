@@ -43,7 +43,7 @@ new #[Layout('layouts.guest')] class extends Component
         <x-venexpress-logo size="md" />
     </div>
 
-    <h1 class="font-display text-2xl font-bold text-black">Acceso administrador</h1>
+    <h1 class="font-display text-2xl font-bold text-blue-950">Acceso administrador</h1>
     <p class="mt-1.5 text-sm text-gray-500">
         Panel exclusivo para el equipo VenExpress.
     </p>
@@ -66,7 +66,7 @@ new #[Layout('layouts.guest')] class extends Component
         </div>
 
         <label for="remember" class="flex items-center gap-2 text-sm text-gray-600">
-            <input wire:model="form.remember" id="remember" type="checkbox" class="rounded border-gray-300 text-black shadow-sm focus:ring-black" name="remember">
+            <input wire:model="form.remember" id="remember" type="checkbox" class="rounded border-gray-300 text-blue-600 shadow-sm focus:ring-blue-600" name="remember">
             Recordarme en este dispositivo
         </label>
 

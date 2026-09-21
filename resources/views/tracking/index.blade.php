@@ -62,7 +62,7 @@
 
         .main-nav-link:hover,
         .main-nav-link.is-active {
-            color: #000000;
+            color: #172554;
         }
 
         .main-nav-link:hover {
@@ -77,7 +77,7 @@
             bottom: -0.1rem;
             height: 2px;
             border-radius: 999px;
-            background: #f0a80d;
+            background: #dc2626;
         }
 
         /* =====================================================
@@ -160,7 +160,7 @@
             border: 0;
             outline: none;
             background: transparent;
-            color: #000000;
+            color: #172554;
             font-size: 14px;
             font-weight: 500;
         }
@@ -174,7 +174,7 @@
             min-width: 128px;
             border: 0;
             border-radius: 11px;
-            background: #000000;
+            background: #172554;
             color: #ffffff;
             font-size: 14px;
             font-weight: 700;
@@ -187,9 +187,9 @@
         }
 
         .tracking-search-button:hover {
-            background: #262626;
+            background: #1e3a8a;
             transform: translateY(-1px);
-            box-shadow: 0 8px 18px rgba(0, 0, 0, 0.22);
+            box-shadow: 0 8px 18px rgba(23, 37, 84, 0.18);
         }
 
         .tracking-search-button:active {
@@ -231,14 +231,14 @@
         }
 
         .scan-button:hover {
-            border-color: #d1d5db;
-            background: #f3f4f6;
+            border-color: #bfdbfe;
+            background: #eff6ff;
             transform: translateY(-1px);
             box-shadow: 0 5px 15px rgba(15, 23, 42, 0.05);
         }
 
         .scan-button:focus-visible {
-            outline: 3px solid rgba(245, 158, 11, 0.35);
+            outline: 3px solid rgba(59, 130, 246, 0.25);
             outline-offset: 2px;
         }
 
@@ -255,7 +255,7 @@
             align-items: center;
             justify-content: center;
             border-radius: 10px;
-            background: #000000;
+            background: #172554;
             color: #ffffff;
         }
 
@@ -266,7 +266,7 @@
 
         .scan-title {
             display: block;
-            color: #000000;
+            color: #172554;
             font-size: 12px;
             font-weight: 700;
         }
@@ -529,7 +529,7 @@
             border: 0;
             border-radius: 999px;
             background: #ffffff;
-            color: #000000;
+            color: #172554;
             padding: 7px 22px 7px 8px;
             font-family: inherit;
             font-size: 13px;
@@ -550,7 +550,7 @@
             width: 44px;
             height: 44px;
             border-radius: 50%;
-            background: #000000;
+            background: #172554;
             color: #ffffff;
             display: flex;
             align-items: center;
@@ -590,7 +590,7 @@
             border: 1px solid #e2e8f0;
             border-radius: 7px;
             background: #ffffff;
-            color: #000000;
+            color: #1e3a8a;
             font-family: 'Courier New', monospace;
             font-size: 10px;
             font-weight: 700;
@@ -623,7 +623,7 @@
             top: 50%;
             transform: translateY(-50%);
             border-radius: 50%;
-            background: rgba(255, 251, 235, 0.9);
+            background: rgba(239, 246, 255, 0.9);
         }
 
         .tracking-circle::before {
@@ -631,7 +631,7 @@
             position: absolute;
             inset: 38px;
             border-radius: 50%;
-            border: 2px dashed rgba(0, 0, 0, 0.14);
+            border: 2px dashed rgba(30, 64, 175, 0.16);
         }
 
         .tracking-van {
@@ -678,8 +678,8 @@
             width: 34px;
             height: 34px;
             border-radius: 9px;
-            background: #fffbeb;
-            color: #000000;
+            background: #eff6ff;
+            color: #1e3a8a;
             display: flex;
             align-items: center;
             justify-content: center;
@@ -687,7 +687,7 @@
 
         .tracking-badge strong {
             display: block;
-            color: #000000;
+            color: #172554;
             font-size: 11px;
             line-height: 1.3;
         }
@@ -730,7 +730,7 @@
         ====================================================== */
 
         .benefits-section {
-            background: #000000;
+            background: #172554;
         }
 
         .benefit-item {
@@ -760,7 +760,7 @@
         .benefit-text small {
             display: block;
             margin-top: 2px;
-            color: rgba(255,255,255,0.55);
+            color: #bfdbfe;
             font-size: 9px;
         }
 
@@ -796,7 +796,7 @@
             width: 27px;
             height: 27px;
             border-radius: 50%;
-            background: #000000;
+            background: #172554;
             color: #ffffff;
             display: flex;
             align-items: center;
@@ -807,7 +807,7 @@
 
         .step-title {
             margin-top: 15px;
-            color: #000000;
+            color: #172554;
             font-size: 14px;
             font-weight: 600;
         }
@@ -1113,7 +1113,7 @@
 
             <a
                 href="{{ route('login') }}"
-                class="bg-amber-400 hover:bg-amber-500 text-black font-semibold text-sm px-6 py-2.5 rounded-lg transition inline-flex items-center justify-center shadow-sm hover:shadow-md"
+                class="bg-amber-400 hover:bg-amber-500 text-blue-950 font-semibold text-sm px-6 py-2.5 rounded-lg transition inline-flex items-center justify-center shadow-sm hover:shadow-md"
             >
                 Iniciar sesión
             </a>
@@ -1122,7 +1122,7 @@
             <button
                 id="mobile-menu-button"
                 type="button"
-                class="md:hidden w-10 h-10 rounded-lg border border-gray-200 text-black flex items-center justify-center"
+                class="md:hidden w-10 h-10 rounded-lg border border-gray-200 text-blue-950 flex items-center justify-center"
                 aria-label="Abrir menú"
                 aria-expanded="false"
                 aria-controls="mobile-menu"
@@ -1176,7 +1176,7 @@
 
             <a
                 href="{{ route('tracking.index') }}"
-                class="mobile-menu-link block py-3 text-sm font-semibold text-black"
+                class="mobile-menu-link block py-3 text-sm font-semibold text-blue-950"
             >
                 Rastreo
             </a>
@@ -1229,7 +1229,7 @@
         <div class="relative z-20 max-w-2xl">
 
             <div
-                class="inline-flex items-center gap-2 mb-5 px-3 py-1.5 rounded-full bg-amber-50 border border-amber-100 text-black text-[10px] font-bold uppercase tracking-[0.14em]"
+                class="inline-flex items-center gap-2 mb-5 px-3 py-1.5 rounded-full bg-blue-50 border border-blue-100 text-blue-900 text-[10px] font-bold uppercase tracking-[0.14em]"
             >
 
                 <span
@@ -1241,11 +1241,11 @@
             </div>
 
 
-            <h1 class="tracking-title font-extrabold text-black">
+            <h1 class="tracking-title font-extrabold text-blue-950">
 
                 Rastrea tu
 
-                <span class="block">
+                <span class="block text-red-600">
                     envío.
                 </span>
 
@@ -1571,13 +1571,13 @@
         <div class="text-center mb-16">
 
             <h2
-                class="text-3xl font-extrabold text-black inline-block relative pb-3"
+                class="text-3xl font-extrabold text-blue-950 inline-block relative pb-3"
             >
 
                 Sigue tu paquete en pocos pasos
 
                 <span
-                    class="absolute left-1/2 -translate-x-1/2 bottom-0 w-14 h-1 bg-amber-400 rounded-full"
+                    class="absolute left-1/2 -translate-x-1/2 bottom-0 w-14 h-1 bg-red-600 rounded-full"
                 ></span>
 
             </h2>
@@ -1600,7 +1600,7 @@
 
                 <div class="step-icon">
 
-                    <i class="fa-solid fa-receipt text-black text-2xl"></i>
+                    <i class="fa-solid fa-receipt text-blue-950 text-2xl"></i>
 
                     <span class="step-number">
                         1
@@ -1624,7 +1624,7 @@
 
                 <div class="step-icon">
 
-                    <i class="fa-solid fa-barcode text-black text-2xl"></i>
+                    <i class="fa-solid fa-barcode text-blue-950 text-2xl"></i>
 
                     <span class="step-number">
                         2
@@ -1648,7 +1648,7 @@
 
                 <div class="step-icon">
 
-                    <i class="fa-solid fa-location-crosshairs text-black text-2xl"></i>
+                    <i class="fa-solid fa-location-crosshairs text-blue-950 text-2xl"></i>
 
                     <span class="step-number">
                         3
@@ -1672,7 +1672,7 @@
 
                 <div class="step-icon bg-amber-400">
 
-                    <i class="fa-solid fa-box-open text-black text-2xl"></i>
+                    <i class="fa-solid fa-box-open text-blue-950 text-2xl"></i>
 
                     <span class="step-number">
                         4
@@ -1697,7 +1697,7 @@
 
             <a
                 href="{{ route('public.calculator') }}"
-                class="bg-black hover:bg-gray-800 text-white text-sm font-semibold px-5 py-2.5 rounded-lg transition inline-flex items-center justify-center"
+                class="bg-blue-950 hover:bg-blue-900 text-white text-sm font-semibold px-5 py-2.5 rounded-lg transition inline-flex items-center justify-center"
             >
 
                 Calcula un nuevo envío
@@ -1723,7 +1723,7 @@
     <div class="max-w-7xl mx-auto px-6 py-14">
 
         <div
-            class="rounded-2xl bg-black px-6 py-10 md:px-10 md:py-12 flex flex-col md:flex-row items-center justify-between gap-8"
+            class="rounded-2xl bg-blue-950 px-6 py-10 md:px-10 md:py-12 flex flex-col md:flex-row items-center justify-between gap-8"
         >
 
             <div>
@@ -1740,7 +1740,7 @@
                     Calcula tu envío con Venexpress.
                 </h2>
 
-                <p class="mt-2 text-sm text-gray-400 max-w-xl">
+                <p class="mt-2 text-sm text-blue-200 max-w-xl">
                     Consulta el precio estimado y encuentra una agencia
                     cercana para entregar tu paquete.
                 </p>
@@ -1752,7 +1752,7 @@
 
                 <a
                     href="{{ route('public.calculator') }}"
-                    class="bg-amber-400 hover:bg-amber-500 text-black font-semibold text-sm px-5 py-3 rounded-lg transition inline-flex items-center justify-center"
+                    class="bg-amber-400 hover:bg-amber-500 text-blue-950 font-semibold text-sm px-5 py-3 rounded-lg transition inline-flex items-center justify-center"
                 >
 
                     Calcular precio
@@ -1789,7 +1789,7 @@
 
 <footer
     id="ayuda"
-    class="bg-black"
+    class="bg-blue-950"
 >
 
     <div class="max-w-7xl mx-auto px-6 py-14 grid md:grid-cols-5 gap-10">
@@ -1803,7 +1803,7 @@
                 class="h-8 mb-4"
             >
 
-            <p class="text-sm text-gray-400">
+            <p class="text-sm text-blue-200">
                 Conectamos a Venezuela con soluciones de envío rápidas,
                 seguras y confiables.
             </p>
@@ -1855,7 +1855,7 @@
                 Enlaces rápidos
             </h4>
 
-            <ul class="space-y-2 text-sm text-gray-400">
+            <ul class="space-y-2 text-sm text-blue-200">
 
                 <li>
                     <a
@@ -1914,7 +1914,7 @@
                 Servicios
             </h4>
 
-            <ul class="space-y-2 text-sm text-gray-400">
+            <ul class="space-y-2 text-sm text-blue-200">
 
                 <li>
                     <a
@@ -1955,7 +1955,7 @@
                 Ayuda
             </h4>
 
-            <ul class="space-y-2 text-sm text-gray-400">
+            <ul class="space-y-2 text-sm text-blue-200">
 
                 <li>
                     <a
@@ -2005,7 +2005,7 @@
                 Contáctanos
             </h4>
 
-            <ul class="space-y-3 text-sm text-gray-400">
+            <ul class="space-y-3 text-sm text-blue-200">
 
                 <li class="flex items-start gap-2">
 
@@ -2050,7 +2050,7 @@
     <div class="border-t border-white/10">
 
         <div
-            class="max-w-7xl mx-auto px-6 py-6 text-center text-sm text-gray-500"
+            class="max-w-7xl mx-auto px-6 py-6 text-center text-sm text-blue-300"
         >
             &copy; {{ date('Y') }} Venexpress. Todos los derechos reservados.
         </div>

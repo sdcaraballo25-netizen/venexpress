@@ -46,7 +46,7 @@
             wire:click="showPending"
             @class([
                 'px-4 py-2.5 text-sm font-semibold border-b-2 -mb-px transition',
-                'border-black text-black' => $activeTab === 'pending',
+                'border-blue-900 text-blue-900' => $activeTab === 'pending',
                 'border-transparent text-slate-500 hover:text-slate-700' => $activeTab !== 'pending',
             ])
         >
@@ -58,7 +58,7 @@
             wire:click="showHistory"
             @class([
                 'px-4 py-2.5 text-sm font-semibold border-b-2 -mb-px transition',
-                'border-black text-black' => $activeTab === 'history',
+                'border-blue-900 text-blue-900' => $activeTab === 'history',
                 'border-transparent text-slate-500 hover:text-slate-700' => $activeTab !== 'history',
             ])
         >
@@ -142,13 +142,13 @@
 
                                 {{-- Entrega a domicilio --}}
                                 @if ($package->requires_delivery)
-                                    <div class="mt-3 rounded-xl border border-amber-100 bg-amber-50 p-4">
-                                        <p class="text-sm font-semibold text-black">
+                                    <div class="mt-3 rounded-xl border border-blue-100 bg-blue-50 p-4">
+                                        <p class="text-sm font-semibold text-blue-900">
                                             Entrega a domicilio
                                         </p>
 
                                         @if ($package->delivery_address)
-                                            <p class="mt-1 text-sm text-amber-800">
+                                            <p class="mt-1 text-sm text-blue-800">
                                                 {{ $package->delivery_address }}
                                             </p>
                                         @endif
@@ -167,7 +167,7 @@
                                                     </button>
                                                 </div>
                                             @else
-                                                <div class="mt-3 rounded-lg bg-amber-100 p-3 text-sm text-amber-800">
+                                                <div class="mt-3 rounded-lg bg-blue-100 p-3 text-sm text-blue-800">
                                                     Podrás confirmar la recepción cuando tu paquete esté Listo para Retiro.
                                                 </div>
                                             @endif
@@ -230,7 +230,7 @@
                     <input
                         type="date"
                         wire:model.live="historyFrom"
-                        class="mt-1 rounded-lg border-slate-300 text-sm focus:border-black focus:ring-black"
+                        class="mt-1 rounded-lg border-slate-300 text-sm focus:border-blue-500 focus:ring-blue-500"
                     >
                 </div>
 
@@ -241,7 +241,7 @@
                     <input
                         type="date"
                         wire:model.live="historyTo"
-                        class="mt-1 rounded-lg border-slate-300 text-sm focus:border-black focus:ring-black"
+                        class="mt-1 rounded-lg border-slate-300 text-sm focus:border-blue-500 focus:ring-blue-500"
                     >
                 </div>
 
@@ -249,7 +249,7 @@
                     <button
                         type="button"
                         wire:click="clearHistoryFilters"
-                        class="text-xs font-semibold text-black hover:text-gray-700"
+                        class="text-xs font-semibold text-blue-700 hover:text-blue-900"
                     >
                         Limpiar filtro
                     </button>

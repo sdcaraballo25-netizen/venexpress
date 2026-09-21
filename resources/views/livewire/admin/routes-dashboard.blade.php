@@ -28,11 +28,11 @@
 
             @php
                 $cards = [
-                    ['label' => 'Rutas activas', 'value' => $metrics['active_routes'], 'icon' => '🚚', 'bg' => 'bg-gray-100', 'text' => 'text-black'],
+                    ['label' => 'Rutas activas', 'value' => $metrics['active_routes'], 'icon' => '🚚', 'bg' => 'bg-blue-50', 'text' => 'text-blue-700'],
                     ['label' => 'Completadas hoy', 'value' => $metrics['completed_routes_today'], 'icon' => '✅', 'bg' => 'bg-emerald-50', 'text' => 'text-emerald-700'],
                     ['label' => 'Rutas pendientes', 'value' => $metrics['pending_routes'], 'icon' => '🕓', 'bg' => 'bg-amber-50', 'text' => 'text-amber-700'],
                     ['label' => 'Repartidores en ruta', 'value' => $metrics['drivers_on_route'], 'icon' => '🧑‍✈️', 'bg' => 'bg-slate-50', 'text' => 'text-slate-700'],
-                    ['label' => 'Recolecciones hoy', 'value' => $metrics['collections_completed_today'], 'icon' => '📦', 'bg' => 'bg-gray-100', 'text' => 'text-black'],
+                    ['label' => 'Recolecciones hoy', 'value' => $metrics['collections_completed_today'], 'icon' => '📦', 'bg' => 'bg-blue-50', 'text' => 'text-blue-700'],
                     ['label' => 'Recolecciones pendientes', 'value' => $metrics['collections_pending'], 'icon' => '📭', 'bg' => 'bg-amber-50', 'text' => 'text-amber-700'],
                     ['label' => 'Agencias visitadas (activas)', 'value' => $metrics['allies_visited'], 'icon' => '🏢', 'bg' => 'bg-emerald-50', 'text' => 'text-emerald-700'],
                     ['label' => 'Agencias pendientes (activas)', 'value' => $metrics['allies_pending'], 'icon' => '📍', 'bg' => 'bg-red-50', 'text' => 'text-red-700'],

@@ -51,14 +51,14 @@
         {{-- =========================================================
              BANNER
         ========================================================== --}}
-        <div class="bg-black rounded-3xl p-8 mb-8 text-white shadow-sm flex flex-col md:flex-row justify-between items-center gap-6">
+        <div class="bg-blue-900 rounded-3xl p-8 mb-8 text-white shadow-sm flex flex-col md:flex-row justify-between items-center gap-6">
 
             <div>
                 <h2 class="text-xl font-semibold mb-2">
                     Panel de Control General
                 </h2>
 
-                <p class="text-gray-400 text-sm max-w-xl">
+                <p class="text-blue-200 text-sm max-w-xl">
                     Administra aliados, repartidores, clientes y paquetes
                     desde un solo lugar.
                 </p>
@@ -67,7 +67,7 @@
             @if (auth()->user()?->isAdminPrincipal())
                 <a
                     href="{{ route('admin.audit-log') }}"
-                    class="bg-amber-400 hover:bg-amber-500 text-black px-6 py-3 rounded-xl font-medium transition-colors whitespace-nowrap shadow-sm"
+                    class="bg-blue-600 hover:bg-blue-500 px-6 py-3 rounded-xl font-medium transition-colors whitespace-nowrap shadow-sm"
                 >
                     Ver bitácora de auditoría
                 </a>
@@ -90,7 +90,7 @@
                         Comercios Asociados
                     </p>
 
-                    <div class="p-2 bg-amber-50 rounded-lg text-black">
+                    <div class="p-2 bg-blue-50 rounded-lg text-blue-700">
                         🏢
                     </div>
 
@@ -116,7 +116,7 @@
                         Repartidores
                     </p>
 
-                    <div class="p-2 bg-amber-50 rounded-lg text-black">
+                    <div class="p-2 bg-blue-50 rounded-lg text-blue-700">
                         🚚
                     </div>
 
@@ -178,7 +178,7 @@
                     {{ number_format($driversPendingCount) }}
                 </p>
 
-                <a href="{{ route('admin.drivers.approval') }}" class="text-xs text-black hover:text-gray-700 mt-2 inline-block">
+                <a href="{{ route('admin.drivers.approval') }}" class="text-xs text-blue-700 hover:text-blue-900 mt-2 inline-block">
                     Revisar solicitudes
                 </a>
 
@@ -194,7 +194,7 @@
                         Clientes
                     </p>
 
-                    <div class="p-2 bg-amber-50 rounded-lg text-black">
+                    <div class="p-2 bg-blue-50 rounded-lg text-blue-700">
                         👤
                     </div>
 
@@ -251,7 +251,7 @@
                 <div class="bg-white rounded-2xl border border-[#E2E8F0] p-6 shadow-sm">
                     <div class="flex justify-between items-start">
                         <p class="text-xs font-bold text-[#64748B] uppercase tracking-wider">Comisiones del mes</p>
-                        <div class="p-2 bg-amber-50 rounded-lg text-black">🏢</div>
+                        <div class="p-2 bg-blue-50 rounded-lg text-blue-700">🏢</div>
                     </div>
                     <p class="font-display text-3xl font-bold mt-4 text-[#0F172A]">
                         ${{ number_format((float) $commissionsThisMonth, 2) }}
@@ -272,7 +272,7 @@
                 </a>
 
                 {{-- REMUNERACIONES PENDIENTES --}}
-                <a href="{{ route('admin.driver-payments') }}" class="bg-white rounded-2xl border border-[#E2E8F0] p-6 shadow-sm hover:border-amber-300 transition-colors">
+                <a href="{{ route('admin.driver-payments') }}" class="bg-white rounded-2xl border border-[#E2E8F0] p-6 shadow-sm hover:border-blue-300 transition-colors">
                     <div class="flex justify-between items-start">
                         <p class="text-xs font-bold text-[#64748B] uppercase tracking-wider">Remuneraciones pendientes</p>
                         <div class="p-2 bg-orange-50 rounded-lg text-orange-600">🚚</div>
@@ -348,7 +348,7 @@
                     {{-- ENLACE A GESTIÓN DE ALIADOS --}}
                     <a
                         href="{{ route('admin.allies') }}"
-                        class="text-sm font-medium text-black hover:text-gray-700 transition-colors"
+                        class="text-sm font-medium text-blue-700 hover:text-blue-900 transition-colors"
                     >
                         Ver todos →
                     </a>
@@ -480,7 +480,7 @@
 
                         <div class="flex items-center gap-4">
 
-                            <div class="w-12 h-12 bg-amber-50 text-black rounded-xl flex items-center justify-center text-xl">
+                            <div class="w-12 h-12 bg-blue-50 text-blue-700 rounded-xl flex items-center justify-center text-xl">
                                 📦
                             </div>
 
@@ -575,7 +575,7 @@
 
                                 <div class="flex items-center gap-2">
 
-                                    <span class="w-2 h-2 rounded-full bg-black"></span>
+                                    <span class="w-2 h-2 rounded-full bg-blue-600"></span>
 
                                     <span class="text-sm text-[#475569]">
                                         {{ ucfirst(strtolower(str_replace('_', ' ', $status))) }}

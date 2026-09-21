@@ -6,7 +6,7 @@
     <div class="flex flex-col gap-4 md:flex-row md:items-center md:justify-between">
 
         <div>
-            <p class="text-sm font-medium text-black">
+            <p class="text-sm font-medium text-blue-700">
                 Panel del repartidor
             </p>
 
@@ -36,12 +36,12 @@
         {{-- =========================================================
              BIENVENIDA (primera vez, sin historial todavía)
         ========================================================== --}}
-        <div class="rounded-3xl bg-gradient-to-br from-black to-neutral-900 p-8 text-white shadow-sm">
+        <div class="rounded-3xl bg-gradient-to-br from-blue-900 to-blue-950 p-8 text-white shadow-sm">
 
             <div class="flex flex-col gap-6 md:flex-row md:items-center md:justify-between">
 
                 <div class="max-w-xl">
-                    <span class="inline-flex items-center gap-2 rounded-full bg-white/10 px-3 py-1.5 text-xs font-semibold text-gray-300">
+                    <span class="inline-flex items-center gap-2 rounded-full bg-white/10 px-3 py-1.5 text-xs font-semibold text-blue-100">
                         <i class="fa-solid fa-circle-check text-emerald-400"></i>
                         Cuenta aprobada
                     </span>
@@ -50,7 +50,7 @@
                         ¡Bienvenido a Venexpress, {{ $driver->user?->name ?? auth()->user()->name }}!
                     </h2>
 
-                    <p class="mt-2 text-sm text-gray-300">
+                    <p class="mt-2 text-sm text-blue-100">
                         Todavía no tienes paquetes ni rutas asignadas — es normal, es tu primera vez aquí.
                         En cuanto un administrador te asigne una ruta, aparecerá abajo y podrás empezar a escanear.
                     </p>
@@ -58,7 +58,7 @@
 
                 <div class="flex shrink-0 flex-col gap-2 sm:flex-row">
                     <a href="{{ route('repartidor.app-download') }}" wire:navigate
-                        class="inline-flex items-center justify-center gap-2 rounded-xl bg-white px-5 py-3 text-sm font-semibold text-black hover:bg-amber-50 transition">
+                        class="inline-flex items-center justify-center gap-2 rounded-xl bg-white px-5 py-3 text-sm font-semibold text-blue-950 hover:bg-blue-50 transition">
                         <i class="fa-solid fa-download"></i>
                         Descargar app
                     </a>
@@ -136,7 +136,7 @@
 
                             <div class="mt-2 flex items-center gap-3">
 
-                                <span class="flex h-11 w-11 shrink-0 items-center justify-center rounded-2xl bg-amber-50 font-display text-lg font-bold text-black">
+                                <span class="flex h-11 w-11 shrink-0 items-center justify-center rounded-2xl bg-blue-50 font-display text-lg font-bold text-blue-900">
                                     {{ $availableRoutesCount }}
                                 </span>
 
@@ -181,7 +181,7 @@
                                     type="button"
                                     wire:click="startRoute"
                                     wire:loading.attr="disabled"
-                                    class="inline-flex items-center justify-center rounded-xl bg-black px-5 py-3 text-sm font-semibold text-white transition hover:bg-gray-800 disabled:cursor-not-allowed disabled:opacity-50"
+                                    class="inline-flex items-center justify-center rounded-xl bg-blue-900 px-5 py-3 text-sm font-semibold text-white transition hover:bg-blue-800 disabled:cursor-not-allowed disabled:opacity-50"
                                 >
                                     <span wire:loading.remove wire:target="startRoute">
                                         Iniciar ruta
@@ -235,7 +235,7 @@
 
                             <a
                                 href="{{ route('repartidor.route-detail', $activeRoute->id) }}"
-                                class="inline-flex items-center justify-center rounded-xl border border-[#E2E8F0] px-5 py-3 text-sm font-semibold text-[#0F172A] transition hover:border-amber-300 hover:bg-amber-50"
+                                class="inline-flex items-center justify-center rounded-xl border border-[#E2E8F0] px-5 py-3 text-sm font-semibold text-[#0F172A] transition hover:border-blue-300 hover:bg-blue-50"
                             >
                                 Ver detalles
                             </a>
@@ -266,7 +266,7 @@
 
                         <div class="h-2.5 w-full rounded-full bg-slate-100">
                             <div
-                                class="h-2.5 rounded-full bg-black transition-all duration-500"
+                                class="h-2.5 rounded-full bg-blue-700 transition-all duration-500"
                                 @style(['width' => $routeProgress . '%'])
                             ></div>
                         </div>
@@ -322,8 +322,8 @@
                                     </p>
                                 </div>
 
-                                <span class="inline-flex w-fit items-center gap-1.5 rounded-full bg-amber-50 px-3 py-1 text-xs font-semibold text-amber-700">
-                                    <span class="h-1.5 w-1.5 rounded-full bg-amber-500"></span>
+                                <span class="inline-flex w-fit items-center gap-1.5 rounded-full bg-blue-50 px-3 py-1 text-xs font-semibold text-blue-700">
+                                    <span class="h-1.5 w-1.5 rounded-full bg-blue-600"></span>
                                     Pendiente
                                 </span>
 
@@ -378,7 +378,7 @@
                                     wire:click="claimRoute({{ $route->id }})"
                                     wire:loading.attr="disabled"
                                     wire:target="claimRoute({{ $route->id }})"
-                                    class="inline-flex items-center justify-center rounded-xl bg-black px-4 py-2.5 text-sm font-semibold text-white transition hover:bg-gray-800 disabled:cursor-not-allowed disabled:opacity-50"
+                                    class="inline-flex items-center justify-center rounded-xl bg-blue-900 px-4 py-2.5 text-sm font-semibold text-white transition hover:bg-blue-800 disabled:cursor-not-allowed disabled:opacity-50"
                                 >
                                     <span wire:loading.remove wire:target="claimRoute({{ $route->id }})">
                                         Tomar ruta
@@ -448,7 +448,7 @@
 
             <a
                 href="{{ route('repartidor.scanner') }}"
-                class="group flex flex-col gap-4 rounded-3xl border border-black bg-black p-6 shadow-sm transition hover:bg-gray-800 sm:flex-row sm:items-center sm:justify-between"
+                class="group flex flex-col gap-4 rounded-3xl border border-blue-900 bg-blue-900 p-6 shadow-sm transition hover:bg-blue-800 sm:flex-row sm:items-center sm:justify-between"
             >
 
                 <div class="flex items-center gap-4">
@@ -467,21 +467,21 @@
                         </h2>
 
                         @if ($hubScanOperation === 'collection')
-                            <p class="mt-1 text-sm text-gray-300">
+                            <p class="mt-1 text-sm text-blue-100">
                                 Siguiente parada:
                                 <span class="font-semibold text-white">
                                     {{ $nextPendingStop?->ally?->business_name ?? '—' }}
                                 </span>
                             </p>
                         @elseif ($hubScanOperation === \App\Livewire\Driver\Support\HubDistributionPhase::DEPARTURE)
-                            <p class="mt-1 text-sm text-gray-300">
+                            <p class="mt-1 text-sm text-blue-100">
                                 Paquetes pendientes:
                                 <span class="font-semibold text-white">
                                     {{ $hubScanPendingCount }}
                                 </span>
                             </p>
                         @else
-                            <p class="mt-1 text-sm text-gray-300">
+                            <p class="mt-1 text-sm text-blue-100">
                                 Almacén:
                                 <span class="font-semibold text-white">
                                     {{ $hubScanWarehouseName ?? '—' }}
@@ -496,7 +496,7 @@
 
                 </div>
 
-                <span class="inline-flex shrink-0 items-center justify-center rounded-xl bg-white px-5 py-3 text-sm font-semibold text-black transition group-hover:bg-amber-50">
+                <span class="inline-flex shrink-0 items-center justify-center rounded-xl bg-white px-5 py-3 text-sm font-semibold text-blue-900 transition group-hover:bg-blue-50">
                     {{ $hubScanCta }}
                 </span>
 
@@ -507,7 +507,7 @@
             {{-- Sin ruta HUB en curso: acceso genérico al escáner. --}}
             <a
                 href="{{ route('repartidor.scanner') }}"
-                class="group flex flex-col gap-4 rounded-3xl border border-black bg-black p-6 shadow-sm transition hover:bg-gray-800 sm:flex-row sm:items-center sm:justify-between"
+                class="group flex flex-col gap-4 rounded-3xl border border-blue-900 bg-blue-900 p-6 shadow-sm transition hover:bg-blue-800 sm:flex-row sm:items-center sm:justify-between"
             >
 
                 <div class="flex items-center gap-4">
@@ -521,14 +521,14 @@
                             Escanear paquetes
                         </h2>
 
-                        <p class="mt-1 text-sm text-gray-300">
+                        <p class="mt-1 text-sm text-blue-100">
                             Procesa los paquetes de esta ruta mediante QR/código.
                         </p>
                     </div>
 
                 </div>
 
-                <span class="inline-flex shrink-0 items-center justify-center rounded-xl bg-white px-5 py-3 text-sm font-semibold text-black transition group-hover:bg-amber-50">
+                <span class="inline-flex shrink-0 items-center justify-center rounded-xl bg-white px-5 py-3 text-sm font-semibold text-blue-900 transition group-hover:bg-blue-50">
                     Abrir escáner
                 </span>
 
@@ -540,7 +540,7 @@
         {{-- MIS PAQUETES (secundario para HUB) --}}
         <a
             href="{{ route('repartidor.packages') }}"
-            class="inline-flex items-center gap-1.5 text-sm font-medium text-slate-500 hover:text-black"
+            class="inline-flex items-center gap-1.5 text-sm font-medium text-slate-500 hover:text-blue-900"
         >
             📦 Ver mis paquetes asignados
         </a>
@@ -568,7 +568,7 @@
                     </p>
                 </div>
 
-                <div class="flex h-10 w-10 items-center justify-center rounded-xl bg-amber-50 text-lg">
+                <div class="flex h-10 w-10 items-center justify-center rounded-xl bg-blue-50 text-lg">
                     📦
                 </div>
 
@@ -711,7 +711,7 @@
 
                         <div class="mt-2 flex items-center gap-3">
 
-                            <span class="flex h-11 w-11 shrink-0 items-center justify-center rounded-2xl bg-amber-50 font-display text-lg font-bold text-black">
+                            <span class="flex h-11 w-11 shrink-0 items-center justify-center rounded-2xl bg-blue-50 font-display text-lg font-bold text-blue-900">
                                 {{ $availableRoutesCount }}
                             </span>
 
@@ -756,7 +756,7 @@
                                 type="button"
                                 wire:click="startRoute"
                                 wire:loading.attr="disabled"
-                                class="inline-flex items-center justify-center rounded-xl bg-black px-5 py-3 text-sm font-semibold text-white transition hover:bg-gray-800 disabled:cursor-not-allowed disabled:opacity-50"
+                                class="inline-flex items-center justify-center rounded-xl bg-blue-900 px-5 py-3 text-sm font-semibold text-white transition hover:bg-blue-800 disabled:cursor-not-allowed disabled:opacity-50"
                             >
                                 <span wire:loading.remove wire:target="startRoute">
                                     Iniciar ruta
@@ -794,7 +794,7 @@
 
                         <a
                             href="{{ route('repartidor.route-detail', $activeRoute->id) }}"
-                            class="inline-flex items-center justify-center rounded-xl border border-[#E2E8F0] px-5 py-3 text-sm font-semibold text-[#0F172A] transition hover:border-amber-300 hover:bg-amber-50"
+                            class="inline-flex items-center justify-center rounded-xl border border-[#E2E8F0] px-5 py-3 text-sm font-semibold text-[#0F172A] transition hover:border-blue-300 hover:bg-blue-50"
                         >
                             Ver detalles
                         </a>
@@ -823,9 +823,9 @@
 
                     </div>
 
-                    <div class="h-full rounded-full bg-black transition-all duration-500">
+                    <div class="h-full rounded-full bg-blue-700 transition-all duration-500">
     <div
-        class="h-full rounded-full bg-black transition-all duration-500"
+        class="h-full rounded-full bg-blue-700 transition-all duration-500"
         @style(['width' => $routeProgress . '%'])
     ></div>
 </div>
@@ -961,7 +961,7 @@
                                 wire:click="claimRoute({{ $route->id }})"
                                 wire:loading.attr="disabled"
                                 wire:target="claimRoute({{ $route->id }})"
-                                class="inline-flex items-center justify-center rounded-xl bg-black px-4 py-2.5 text-sm font-semibold text-white transition hover:bg-gray-800 disabled:cursor-not-allowed disabled:opacity-50"
+                                class="inline-flex items-center justify-center rounded-xl bg-blue-900 px-4 py-2.5 text-sm font-semibold text-white transition hover:bg-blue-800 disabled:cursor-not-allowed disabled:opacity-50"
                             >
                                 <span wire:loading.remove wire:target="claimRoute({{ $route->id }})">
                                     Tomar ruta
@@ -1027,12 +1027,12 @@
             {{-- ESCANEAR --}}
             <a
                 href="{{ route('repartidor.scanner') }}"
-                class="group rounded-2xl border border-[#E2E8F0] bg-white p-5 shadow-sm transition hover:-translate-y-0.5 hover:border-amber-300 hover:shadow-md"
+                class="group rounded-2xl border border-[#E2E8F0] bg-white p-5 shadow-sm transition hover:-translate-y-0.5 hover:border-blue-300 hover:shadow-md"
             >
 
                 <div class="flex items-center gap-4">
 
-                    <div class="flex h-12 w-12 items-center justify-center rounded-xl bg-amber-50 text-xl">
+                    <div class="flex h-12 w-12 items-center justify-center rounded-xl bg-blue-50 text-xl">
                         📷
                     </div>
 
@@ -1056,7 +1056,7 @@
             {{-- MIS PAQUETES --}}
             <a
                 href="{{ route('repartidor.packages') }}"
-                class="group rounded-2xl border border-[#E2E8F0] bg-white p-5 shadow-sm transition hover:-translate-y-0.5 hover:border-amber-300 hover:shadow-md"
+                class="group rounded-2xl border border-[#E2E8F0] bg-white p-5 shadow-sm transition hover:-translate-y-0.5 hover:border-blue-300 hover:shadow-md"
             >
 
                 <div class="flex items-center gap-4">

@@ -61,8 +61,8 @@
                        px-4 py-3 text-sm
                        text-[#0F172A]
                        placeholder:text-[#94A3B8]
-                       focus:border-black
-                       focus:ring-black"
+                       focus:border-blue-500
+                       focus:ring-blue-500"
             >
 
         </div>
@@ -477,7 +477,7 @@
                 <div class="grid grid-cols-2 gap-3 mb-4">
                     <div>
                         <label class="block text-xs font-medium text-[#64748B] mb-1">Estado</label>
-                        <select wire:model="location_state" class="w-full rounded-lg border-[#E2E8F0] text-sm focus:ring-black focus:border-black">
+                        <select wire:model="location_state" class="w-full rounded-lg border-[#E2E8F0] text-sm focus:ring-blue-500 focus:border-blue-500">
                             <option value="">Selecciona...</option>
                             @foreach ($venezuelaStates as $state)
                                 <option value="{{ $state }}">{{ $state }}</option>
@@ -506,7 +506,7 @@
                         Cancelar
                     </button>
                     <button wire:click="saveLocation"
-                        class="px-4 py-2 rounded-lg text-sm font-semibold bg-black text-white hover:bg-gray-800">
+                        class="px-4 py-2 rounded-lg text-sm font-semibold bg-blue-600 text-white hover:bg-blue-700">
                         Guardar ubicación
                     </button>
                 </div>

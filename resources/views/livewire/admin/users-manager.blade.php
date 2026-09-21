@@ -6,7 +6,7 @@
         </div>
 
         <button wire:click="openCreateModal"
-                class="inline-flex items-center justify-center gap-2 rounded-xl bg-black px-5 py-3 text-sm font-semibold text-white shadow-sm transition hover:bg-gray-800">
+                class="inline-flex items-center justify-center gap-2 rounded-xl bg-blue-900 px-5 py-3 text-sm font-semibold text-white shadow-sm transition hover:bg-blue-800">
             <span class="text-lg leading-none">+</span>
             Crear usuario
         </button>
@@ -32,12 +32,12 @@
                 <label class="mb-2 block text-xs font-semibold uppercase tracking-wide text-[#64748B]">Buscar</label>
                 <input wire:model.live.debounce.300ms="search" type="text"
                        placeholder="Nombre o correo electrónico..."
-                       class="w-full rounded-xl border border-[#E2E8F0] px-4 py-3 text-sm text-[#0F172A] placeholder:text-[#94A3B8] focus:border-black focus:ring-black">
+                       class="w-full rounded-xl border border-[#E2E8F0] px-4 py-3 text-sm text-[#0F172A] placeholder:text-[#94A3B8] focus:border-blue-500 focus:ring-blue-500">
             </div>
 
             <div>
                 <label class="mb-2 block text-xs font-semibold uppercase tracking-wide text-[#64748B]">Tipo de usuario</label>
-                <select wire:model.live="roleFilter" class="w-full rounded-xl border border-[#E2E8F0] px-4 py-3 text-sm focus:border-black focus:ring-black">
+                <select wire:model.live="roleFilter" class="w-full rounded-xl border border-[#E2E8F0] px-4 py-3 text-sm focus:border-blue-500 focus:ring-blue-500">
                     <option value="">Todos</option>
                     @foreach ($roleLabels as $value => $label)
                         <option value="{{ $value }}">{{ $label }}</option>
@@ -47,7 +47,7 @@
 
             <div>
                 <label class="mb-2 block text-xs font-semibold uppercase tracking-wide text-[#64748B]">Estado</label>
-                <select wire:model.live="statusFilter" class="w-full rounded-xl border border-[#E2E8F0] px-4 py-3 text-sm focus:border-black focus:ring-black">
+                <select wire:model.live="statusFilter" class="w-full rounded-xl border border-[#E2E8F0] px-4 py-3 text-sm focus:border-blue-500 focus:ring-blue-500">
                     <option value="">Todos</option>
                     <option value="activo">Activo</option>
                     <option value="inactivo">Inactivo</option>
@@ -73,7 +73,7 @@
                         <tr class="border-b border-[#F1F5F9] last:border-0 hover:bg-slate-50">
                             <td class="px-6 py-4">
                                 <div class="flex items-center gap-3">
-                                    <div class="flex h-10 w-10 shrink-0 items-center justify-center rounded-full bg-amber-50 font-bold uppercase text-black">
+                                    <div class="flex h-10 w-10 shrink-0 items-center justify-center rounded-full bg-blue-50 font-bold uppercase text-blue-800">
                                         {{ substr($user->name, 0, 1) }}
                                     </div>
                                     <div>
@@ -188,7 +188,7 @@
 
                     <div>
                         <x-input-label for="admin-user-role" value="Tipo de usuario" />
-                        <select wire:model.live="role" id="admin-user-role" class="mt-1.5 block w-full rounded-md border-gray-300 shadow-sm focus:border-black focus:ring-black">
+                        <select wire:model.live="role" id="admin-user-role" class="mt-1.5 block w-full rounded-md border-gray-300 shadow-sm focus:border-blue-500 focus:ring-blue-500">
                             <option value="aliado">Aliado</option>
                             <option value="repartidor">Repartidor</option>
                             <option value="almacen">Personal de Almacén</option>
@@ -202,8 +202,8 @@
                     </div>
 
                     @if ($role === 'aliado')
-                        <div class="rounded-xl border border-amber-100 bg-amber-50/50 p-5">
-                            <h3 class="font-semibold text-black">Información del aliado</h3>
+                        <div class="rounded-xl border border-blue-100 bg-blue-50/50 p-5">
+                            <h3 class="font-semibold text-blue-950">Información del aliado</h3>
                             <div class="mt-4 grid gap-5 md:grid-cols-2">
                                 <div>
                                     <x-input-label for="business-name" value="Nombre comercial" />
@@ -221,7 +221,7 @@
     <select
         wire:model.live="state"
         id="state"
-        class="mt-1.5 block w-full rounded-md border-gray-300 shadow-sm focus:border-black focus:ring-black"
+        class="mt-1.5 block w-full rounded-md border-gray-300 shadow-sm focus:border-blue-500 focus:ring-blue-500"
     >
         <option value="">Seleccionar estado</option>
 
@@ -244,7 +244,7 @@
     <select
         wire:model.live="city"
         id="city"
-        class="mt-1.5 block w-full rounded-md border-gray-300 shadow-sm focus:border-black focus:ring-black"
+        class="mt-1.5 block w-full rounded-md border-gray-300 shadow-sm focus:border-blue-500 focus:ring-blue-500"
         @disabled($state === '')
     >
         <option value="">
@@ -280,7 +280,7 @@
                             <div class="mt-4 grid gap-5 md:grid-cols-2">
                                 <div>
                                     <x-input-label for="driver-type" value="Tipo de repartidor" />
-                                    <select wire:model.live="driver_type" id="driver-type" class="mt-1.5 block w-full rounded-md border-gray-300 shadow-sm focus:border-black focus:ring-black">
+                                    <select wire:model.live="driver_type" id="driver-type" class="mt-1.5 block w-full rounded-md border-gray-300 shadow-sm focus:border-blue-500 focus:ring-blue-500">
                                         <option value="{{ \App\Models\Driver::TYPE_HUB }}">HUB</option>
                                         <option value="{{ \App\Models\Driver::TYPE_DELIVERY }}">Delivery</option>
                                     </select>
@@ -317,7 +317,7 @@
                             <h3 class="font-semibold text-purple-950">Información de almacén</h3>
                             <div class="mt-4">
                                 <x-input-label for="warehouse-id" value="Almacén asignado" />
-                                <select wire:model="warehouse_id" id="warehouse-id" class="mt-1.5 block w-full rounded-md border-gray-300 shadow-sm focus:border-black focus:ring-black">
+                                <select wire:model="warehouse_id" id="warehouse-id" class="mt-1.5 block w-full rounded-md border-gray-300 shadow-sm focus:border-blue-500 focus:ring-blue-500">
                                     <option value="">Selecciona un almacén...</option>
                                     @foreach ($warehouses as $warehouse)
                                         <option value="{{ $warehouse->id }}">{{ $warehouse->name }} ({{ $warehouse->city }})</option>
@@ -330,7 +330,7 @@
 
                     <div class="flex justify-end gap-3 border-t border-[#E2E8F0] pt-5">
                         <button type="button" wire:click="closeCreateModal" class="rounded-xl border border-[#E2E8F0] px-5 py-3 text-sm font-semibold text-[#475569]">Cancelar</button>
-                        <button type="submit" class="rounded-xl bg-black px-5 py-3 text-sm font-semibold text-white hover:bg-gray-800">Continuar</button>
+                        <button type="submit" class="rounded-xl bg-blue-900 px-5 py-3 text-sm font-semibold text-white hover:bg-blue-800">Continuar</button>
                     </div>
                 </form>
             </div>
@@ -353,7 +353,7 @@
 
                 <div class="mt-6 flex justify-end gap-3">
                     <button wire:click="$set('showConfirmModal', false)" class="rounded-xl border border-[#E2E8F0] px-5 py-3 text-sm font-semibold text-[#475569]">Volver</button>
-                    <button wire:click="createUser" class="rounded-xl bg-black px-5 py-3 text-sm font-semibold text-white hover:bg-gray-800">Confirmar creación</button>
+                    <button wire:click="createUser" class="rounded-xl bg-blue-900 px-5 py-3 text-sm font-semibold text-white hover:bg-blue-800">Confirmar creación</button>
                 </div>
             </div>
         </div>
@@ -390,7 +390,7 @@
                             <div class="mt-4 grid gap-5 md:grid-cols-2">
                                 <div>
                                     <x-input-label for="admin-user-edit-driver-type" value="Tipo de repartidor" />
-                                    <select wire:model.live="edit_driver_type" id="admin-user-edit-driver-type" class="mt-1.5 block w-full rounded-md border-gray-300 shadow-sm focus:border-black focus:ring-black">
+                                    <select wire:model.live="edit_driver_type" id="admin-user-edit-driver-type" class="mt-1.5 block w-full rounded-md border-gray-300 shadow-sm focus:border-blue-500 focus:ring-blue-500">
                                         <option value="{{ \App\Models\Driver::TYPE_HUB }}">HUB</option>
                                         <option value="{{ \App\Models\Driver::TYPE_DELIVERY }}">Delivery</option>
                                     </select>
@@ -436,7 +436,7 @@
 
                     <div class="flex justify-end gap-3 border-t border-[#E2E8F0] pt-5">
                         <button type="button" wire:click="closeEditModal" class="rounded-xl border border-[#E2E8F0] px-5 py-3 text-sm font-semibold text-[#475569]">Cancelar</button>
-                        <button type="submit" class="rounded-xl bg-black px-5 py-3 text-sm font-semibold text-white hover:bg-gray-800">Guardar cambios</button>
+                        <button type="submit" class="rounded-xl bg-blue-900 px-5 py-3 text-sm font-semibold text-white hover:bg-blue-800">Guardar cambios</button>
                     </div>
                 </form>
             </div>

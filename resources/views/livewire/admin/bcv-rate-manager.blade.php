@@ -9,7 +9,7 @@
             wire:click="syncNow"
             wire:loading.attr="disabled"
             wire:target="syncNow"
-            class="inline-flex items-center justify-center gap-2 rounded-xl bg-black px-5 py-3 text-sm font-semibold text-white shadow-sm transition hover:bg-gray-800 disabled:opacity-60">
+            class="inline-flex items-center justify-center gap-2 rounded-xl bg-blue-900 px-5 py-3 text-sm font-semibold text-white shadow-sm transition hover:bg-blue-800 disabled:opacity-60">
             <span wire:loading.remove wire:target="syncNow">Sincronizar ahora</span>
             <span wire:loading wire:target="syncNow">Consultando…</span>
         </button>
@@ -53,7 +53,7 @@
                                 <td class="px-6 py-4 font-medium text-[#0F172A]">
                                     {{ $bcvRate->effective_date->format('d/m/Y') }}
                                     @if ($current && $current->id === $bcvRate->id)
-                                        <span class="ml-2 rounded-full bg-amber-50 px-2.5 py-0.5 text-xs font-semibold text-amber-700">Vigente</span>
+                                        <span class="ml-2 rounded-full bg-blue-50 px-2.5 py-0.5 text-xs font-semibold text-blue-800">Vigente</span>
                                     @endif
                                 </td>
                                 <td class="px-6 py-4 text-right font-display font-bold text-[#0F172A]">
@@ -65,7 +65,7 @@
                                 <td class="px-6 py-4 text-right">
                                     <div class="flex justify-end gap-3">
                                         <button wire:click="edit({{ $bcvRate->id }})"
-                                                class="text-sm font-medium text-black hover:text-gray-700">
+                                                class="text-sm font-medium text-blue-800 hover:text-blue-900">
                                             Editar
                                         </button>
                                         <button wire:click="delete({{ $bcvRate->id }})"
@@ -105,14 +105,14 @@
                     <label class="mb-1 block text-xs font-bold uppercase tracking-wider text-[#64748B]">Tasa (Bs. por USD)</label>
                     <input type="number" step="0.000001" wire:model="rate"
                            placeholder="150.250000"
-                           class="w-full rounded-xl border-[#E2E8F0] text-sm focus:border-black focus:ring-black">
+                           class="w-full rounded-xl border-[#E2E8F0] text-sm focus:border-blue-500 focus:ring-blue-500">
                     @error('rate') <p class="mt-1 text-xs text-red-600">{{ $message }}</p> @enderror
                 </div>
 
                 <div>
                     <label class="mb-1 block text-xs font-bold uppercase tracking-wider text-[#64748B]">Fecha de vigencia</label>
                     <input type="date" wire:model="effective_date"
-                           class="w-full rounded-xl border-[#E2E8F0] text-sm focus:border-black focus:ring-black">
+                           class="w-full rounded-xl border-[#E2E8F0] text-sm focus:border-blue-500 focus:ring-blue-500">
                     @error('effective_date') <p class="mt-1 text-xs text-red-600">{{ $message }}</p> @enderror
                 </div>
 
