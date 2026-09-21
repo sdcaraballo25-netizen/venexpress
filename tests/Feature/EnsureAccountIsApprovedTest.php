@@ -4,6 +4,7 @@ namespace Tests\Feature;
 
 use App\Models\Ally;
 use App\Models\Driver;
+use App\Models\Emprendedor;
 use App\Models\User;
 use Illuminate\Foundation\Testing\RefreshDatabase;
 use Tests\TestCase;
@@ -111,5 +112,73 @@ class EnsureAccountIsApprovedTest extends TestCase
         $this->actingAs($user)
             ->get(route('repartidor.dashboard'))
             ->assertOk();
+    }
+
+    private function createActiveAlly(): Ally
+    {
+        $allyUser = User::factory()->create(['role' => User::ROLE_ALIADO]);
+
+        return Ally::create([
+            'user_id' => $allyUser->id,
+            'business_name' => 'Agencia de Retiro',
+            'rif' => 'J-33333333-3',
+            'city' => 'Caracas',
+            'state' => 'Distrito Capital',
+            'address' => 'Av. Principal',
+            'commission_percentage' => 10,
+            'status' => Ally::STATUS_ACTIVE,
+        ]);
+    }
+
+    public function test_active_emprendedor_can_access_their_dashboard(): void
+    {
+        $user = User::factory()->create([
+            'role' => User::ROLE_EMPRENDEDOR,
+            'status' => User::STATUS_ACTIVE,
+        ]);
+
+        Emprendedor::create([
+            'user_id' => $user->id,
+            'pickup_ally_id' => $this->createActiveAlly()->id,
+            'business_name' => 'Tienda Activa',
+            'document_id' => 'V-11111111',
+            'status' => Emprendedor::STATUS_ACTIVE,
+        ]);
+
+        $this->actingAs($user)
+            ->get(route('emprendedor.dashboard'))
+            ->assertOk();
+    }
+
+    public function test_pending_emprendedor_is_redirected_to_account_pending(): void
+    {
+        $user = User::factory()->create([
+            'role' => User::ROLE_EMPRENDEDOR,
+            'status' => User::STATUS_ACTIVE,
+        ]);
+
+        Emprendedor::create([
+            'user_id' => $user->id,
+            'pickup_ally_id' => $this->createActiveAlly()->id,
+            'business_name' => 'Tienda Pendiente',
+            'document_id' => 'V-22222222',
+            'status' => Emprendedor::STATUS_PENDING,
+        ]);
+
+        $this->actingAs($user)
+            ->get(route('emprendedor.dashboard'))
+            ->assertRedirect(route('account.pending'));
+    }
+
+    public function test_emprendedor_role_user_without_an_emprendedor_record_is_redirected_to_account_pending(): void
+    {
+        $user = User::factory()->create([
+            'role' => User::ROLE_EMPRENDEDOR,
+            'status' => User::STATUS_ACTIVE,
+        ]);
+
+        $this->actingAs($user)
+            ->get(route('emprendedor.dashboard'))
+            ->assertRedirect(route('account.pending'));
     }
 }

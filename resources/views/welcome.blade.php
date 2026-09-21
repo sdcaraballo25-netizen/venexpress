@@ -1052,9 +1052,9 @@
                 <a href="#servicios" class="main-nav-link">Servicios</a>
                 <a href="{{ route('public.calculator') }}" class="main-nav-link">Calcular precio</a>
                 <a href="{{ route('public.offices') }}" class="main-nav-link">Agencias aliadas</a>
+                <a href="{{ route('public.marketplace') }}" class="main-nav-link">Tienda</a>
                 <a href="#rastreo" class="main-nav-link">Rastreo</a>
-                <a href="#ayuda" class="main-nav-link">Ayuda</a>
-            </div>
+                <a href="#ayuda" class="main-nav-link">Ayuda</a>            </div>
 
             <div class="flex items-center gap-2 sm:gap-2.5 ml-auto">
                 <form action="{{ route('tracking.show') }}" method="GET" class="desktop-tracking-form items-center border-l border-gray-200 pl-4">
