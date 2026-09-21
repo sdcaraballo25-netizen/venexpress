@@ -111,6 +111,40 @@ class TariffServiceTest extends TestCase
         $this->assertSame(200.00, $result['total_price_ves']);
     }
 
+    public function test_calculate_applies_the_emprendedor_discount_to_the_total_and_its_ves_conversion(): void
+    {
+        $result = $this->service->calculate(
+            originCity: 'Caracas',
+            destinationCity: 'Valencia',
+            packageType: Package::TYPE_PAQUETE,
+            physicalWeightKg: 3.0,
+            originState: 'Distrito Capital',
+            destinationState: 'Carabobo',
+            discountPercentage: 20.0,
+        );
+
+        // Sin descuento el total es 5.00 (ver test end-to-end de arriba);
+        // con 20% de descuento: 5.00 * 0.8 = 4.00, y su conversión a
+        // bolívares parte de ese mismo total ya descontado.
+        $this->assertSame(4.00, $result['total_price_usd']);
+        $this->assertSame(160.00, $result['total_price_ves']);
+    }
+
+    public function test_calculate_rejects_a_discount_percentage_outside_of_zero_to_one_hundred(): void
+    {
+        $this->expectException(InvalidArgumentException::class);
+
+        $this->service->calculate(
+            originCity: 'Caracas',
+            destinationCity: 'Valencia',
+            packageType: Package::TYPE_PAQUETE,
+            physicalWeightKg: 3.0,
+            originState: 'Distrito Capital',
+            destinationState: 'Carabobo',
+            discountPercentage: 150.0,
+        );
+    }
+
     public function test_calculate_applies_fragile_and_insurance_and_delivery_surcharges(): void
     {
         $result = $this->service->calculate(

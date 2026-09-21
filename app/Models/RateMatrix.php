@@ -22,6 +22,7 @@ class RateMatrix extends Model
         'fragile_surcharge_usd',
         'insurance_percentage',
         'delivery_price_usd',
+        'emprendedor_discount_percentage',
     ];
 
     /**
@@ -39,6 +40,7 @@ class RateMatrix extends Model
             'fragile_surcharge_usd' => 'decimal:2',
             'insurance_percentage' => 'decimal:2',
             'delivery_price_usd' => 'decimal:2',
+            'emprendedor_discount_percentage' => 'decimal:2',
         ];
     }
 

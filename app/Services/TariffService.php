@@ -316,7 +316,14 @@ class TariffService
         ?string $originState = null,
         ?string $destinationState = null,
         bool $requiresDelivery = false,
+        float $discountPercentage = 0.0,
     ): array {
+        if ($discountPercentage < 0 || $discountPercentage > 100) {
+            throw new InvalidArgumentException(
+                'El porcentaje de descuento debe estar entre 0 y 100.'
+            );
+        }
+
         $originCity = trim($originCity);
         $destinationCity = trim($destinationCity);
 
@@ -486,6 +493,17 @@ class TariffService
             ]),
             2
         );
+
+        // El descuento del Emprendedor se aplica al final, sobre el
+        // total ya armado, para que se refleje también en lo que se
+        // convierte a bolívares más abajo (y, en PackageService, en la
+        // comisión calculada sobre este mismo total).
+        if ($discountPercentage > 0) {
+            $totalUsd = Money::round(
+                Money::mul($totalUsd, Money::sub(1, Money::div($discountPercentage, 100))),
+                2
+            );
+        }
 
         if ($totalUsd < 0) {
             throw new RuntimeException(

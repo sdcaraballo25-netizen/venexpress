@@ -173,6 +173,8 @@ class PackageService
                 destinationState:
                     $data['destination_state'] ?? null,
                 requiresDelivery: $requiresDelivery,
+                discountPercentage:
+                    $data['discount_percentage'] ?? 0.0,
             );
 
             // El monto COD siempre es el total calculado por

@@ -40,6 +40,7 @@ class RateMatrixManager extends Component
 
     public string $insurance_percentage = '';
     public string $delivery_price_usd = '0';
+    public string $emprendedor_discount_percentage = '0';
 
     public bool $editing = false;
 
@@ -84,6 +85,7 @@ class RateMatrixManager extends Component
             'fragile_surcharge_usd' => ['required', 'numeric', 'min:0'],
             'insurance_percentage' => ['required', 'numeric', 'min:0', 'max:100'],
             'delivery_price_usd' => ['required', 'numeric', 'min:0'],
+            'emprendedor_discount_percentage' => ['required', 'numeric', 'min:0', 'max:100'],
             // Regla nativa de Laravel: valida contra el hash del usuario autenticado.
             'confirm_password' => ['required', 'string', 'current_password'],
         ];
@@ -98,6 +100,8 @@ class RateMatrixManager extends Component
         'insurance_percentage.required' => 'Ingresa el porcentaje del seguro.',
         'delivery_price_usd.required' => 'Ingresa el precio del delivery.',
         'insurance_percentage.max' => 'El porcentaje del seguro no puede superar 100.',
+        'emprendedor_discount_percentage.required' => 'Ingresa el descuento para emprendedores.',
+        'emprendedor_discount_percentage.max' => 'El descuento no puede superar 100%.',
         'confirm_password.required' => 'Debes ingresar tu contraseña para guardar los cambios.',
         'confirm_password.current_password' => 'La contraseña ingresada es incorrecta.',
     ];
@@ -115,6 +119,7 @@ class RateMatrixManager extends Component
             $this->fragile_surcharge_usd = (string) $current->fragile_surcharge_usd;
             $this->insurance_percentage = (string) $current->insurance_percentage;
             $this->delivery_price_usd = (string) $current->delivery_price_usd;
+            $this->emprendedor_discount_percentage = (string) $current->emprendedor_discount_percentage;
         }
     }
 
@@ -145,6 +150,7 @@ class RateMatrixManager extends Component
             'fragile_surcharge_usd' => $this->fragile_surcharge_usd,
             'insurance_percentage' => $this->insurance_percentage,
             'delivery_price_usd' => $this->delivery_price_usd,
+            'emprendedor_discount_percentage' => $this->emprendedor_discount_percentage,
         ];
 
         $previous = $this->rateMatrixId
@@ -177,6 +183,7 @@ class RateMatrixManager extends Component
                     'fragile_surcharge_usd',
                     'insurance_percentage',
                     'delivery_price_usd',
+                    'emprendedor_discount_percentage',
                 ]),
                 'new' => $data,
             ],
