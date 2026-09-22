@@ -47,6 +47,7 @@ use App\Livewire\Almacen\HelpCenter as AlmacenHelpCenter;
 use App\Livewire\Emprendedor\Dashboard as EmprendedorDashboard;
 use App\Livewire\Emprendedor\Pedidos as EmprendedorPedidos;
 use App\Livewire\Emprendedor\PedidoShow as EmprendedorPedidoShow;
+use App\Livewire\Emprendedor\Perfil as EmprendedorPerfil;
 use App\Livewire\Emprendedor\Productos as EmprendedorProductos;
 use App\Livewire\Public\Marketplace;
 use App\Livewire\Public\PedidoChat;
@@ -350,6 +351,10 @@ Route::get('/emprendedor/pedidos', EmprendedorPedidos::class)
 Route::get('/emprendedor/pedidos/{pedidoId}', EmprendedorPedidoShow::class)
     ->middleware(['auth', 'verified', 'role:emprendedor', 'account.approved'])
     ->name('emprendedor.pedidos.show');
+
+Route::get('/emprendedor/perfil', EmprendedorPerfil::class)
+    ->middleware(['auth', 'verified', 'role:emprendedor', 'account.approved'])
+    ->name('emprendedor.perfil');
 
 /*
 |--------------------------------------------------------------------------

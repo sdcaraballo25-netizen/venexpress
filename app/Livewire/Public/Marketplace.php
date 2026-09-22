@@ -97,7 +97,7 @@ class Marketplace extends Component
             // tienda compartido. Se trata igual que un id inexistente.
             abort_unless($emprendedor->status === Emprendedor::STATUS_ACTIVE, 404);
 
-            $this->tiendaEmprendedor = $emprendedor;
+            $this->tiendaEmprendedor = $emprendedor->loadMissing('user');
         }
 
         $this->prefillDatosCliente();

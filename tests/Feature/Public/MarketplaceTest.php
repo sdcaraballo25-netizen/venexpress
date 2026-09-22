@@ -173,6 +173,23 @@ class MarketplaceTest extends TestCase
             ->assertSee($emprendedor->business_name);
     }
 
+    public function test_the_store_page_shows_trust_information_about_the_emprendedor(): void
+    {
+        $emprendedor = $this->createEmprendedor([
+            'descripcion' => 'Vendemos artesanías venezolanas hechas a mano.',
+            'address' => 'Av. Bolívar, C.C. Los Próceres, local 12, Valencia',
+        ]);
+        $emprendedor->user->update(['phone' => '0414-1234567']);
+        $this->createProducto($emprendedor);
+
+        $this->get(route('public.marketplace.store', $emprendedor->id))
+            ->assertOk()
+            ->assertSee('Vendemos artesanías venezolanas hechas a mano.')
+            ->assertSee('Av. Bolívar, C.C. Los Próceres, local 12, Valencia')
+            ->assertSee('0414-1234567')
+            ->assertSee($emprendedor->user->email);
+    }
+
     public function test_the_per_emprendedor_store_page_404s_for_a_suspended_emprendedor(): void
     {
         $emprendedor = $this->createEmprendedor(['status' => Emprendedor::STATUS_SUSPENDED]);

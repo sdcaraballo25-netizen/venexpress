@@ -2,19 +2,64 @@
     <section class="bg-white">
         <div class="max-w-6xl mx-auto px-6 py-14">
 
-            <div class="text-center mb-10">
-                @if ($tiendaEmprendedor)
+            @if ($tiendaEmprendedor)
+
+                {{-- =========================================================
+                     PERFIL DE LA TIENDA — información de confianza para
+                     que el comprador vea que es un negocio real antes de
+                     pagarle por fuera de la plataforma.
+                ========================================================== --}}
+                <div class="mb-10">
                     <a href="{{ route('public.marketplace') }}" wire:navigate class="text-xs font-semibold text-blue-700 hover:text-blue-950">
                         ← Ver toda la tienda
                     </a>
-                    <span class="block mt-3 inline-block bg-amber-100 text-amber-700 text-xs font-semibold tracking-wide uppercase px-3 py-1 rounded-full mb-4">
-                        Tienda del emprendedor
-                    </span>
-                    <h1 class="text-3xl md:text-4xl font-extrabold text-blue-950">{{ $tiendaEmprendedor->business_name }}</h1>
-                    <p class="text-gray-500 mt-3 max-w-xl mx-auto">
-                        Productos de este emprendedor, con envío por Venexpress. Tú acuerdas el pago directamente con él.
-                    </p>
-                @else
+
+                    <div class="mt-3 rounded-2xl border border-gray-200 overflow-hidden">
+                        <div class="relative h-40 sm:h-48 bg-gradient-to-br from-blue-950 to-blue-900">
+                            @if ($tiendaEmprendedor->cover_photo_path)
+                                <img src="{{ Illuminate\Support\Facades\Storage::disk('public')->url($tiendaEmprendedor->cover_photo_path) }}"
+                                     class="w-full h-full object-cover" alt="Portada de {{ $tiendaEmprendedor->business_name }}">
+                            @endif
+
+                            <div class="absolute -bottom-10 left-5 h-20 w-20 rounded-2xl bg-white border-4 border-white shadow-md overflow-hidden">
+                                @if ($tiendaEmprendedor->logo_path)
+                                    <img src="{{ Illuminate\Support\Facades\Storage::disk('public')->url($tiendaEmprendedor->logo_path) }}"
+                                         class="w-full h-full object-cover" alt="Logo de {{ $tiendaEmprendedor->business_name }}">
+                                @else
+                                    <div class="w-full h-full bg-amber-100 flex items-center justify-center text-amber-700 text-2xl font-bold">
+                                        {{ strtoupper(substr($tiendaEmprendedor->business_name, 0, 1)) }}
+                                    </div>
+                                @endif
+                            </div>
+                        </div>
+
+                        <div class="bg-white pt-12 px-5 pb-5 text-left">
+                            <span class="inline-block bg-amber-100 text-amber-700 text-xs font-semibold tracking-wide uppercase px-3 py-1 rounded-full mb-2">
+                                Tienda verificada por Venexpress
+                            </span>
+                            <h1 class="text-2xl md:text-3xl font-extrabold text-blue-950">{{ $tiendaEmprendedor->business_name }}</h1>
+
+                            @if ($tiendaEmprendedor->descripcion)
+                                <p class="text-gray-600 mt-2 max-w-2xl">{{ $tiendaEmprendedor->descripcion }}</p>
+                            @endif
+
+                            <div class="flex flex-wrap gap-x-5 gap-y-1.5 mt-4 text-sm text-gray-500">
+                                @if ($tiendaEmprendedor->address)
+                                    <span class="inline-flex items-center gap-1.5">📍 {{ $tiendaEmprendedor->address }}</span>
+                                @endif
+                                @if ($tiendaEmprendedor->user?->phone)
+                                    <span class="inline-flex items-center gap-1.5">📞 {{ $tiendaEmprendedor->user->phone }}</span>
+                                @endif
+                                @if ($tiendaEmprendedor->user?->email)
+                                    <span class="inline-flex items-center gap-1.5">✉️ {{ $tiendaEmprendedor->user->email }}</span>
+                                @endif
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+            @else
+                <div class="text-center mb-10">
                     <span class="inline-block bg-amber-100 text-amber-700 text-xs font-semibold tracking-wide uppercase px-3 py-1 rounded-full mb-4">
                         Marketplace
                     </span>
@@ -23,8 +68,8 @@
                         Productos de emprendedores venezolanos, con envío por Venexpress. Tú acuerdas el pago
                         directamente con el emprendedor.
                     </p>
-                @endif
-            </div>
+                </div>
+            @endif
 
             {{-- =========================================================
                  BÚSQUEDA

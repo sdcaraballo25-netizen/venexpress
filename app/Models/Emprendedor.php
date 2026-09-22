@@ -30,6 +30,10 @@ class Emprendedor extends Model
         'pickup_ally_id',
         'business_name',
         'document_id',
+        'logo_path',
+        'cover_photo_path',
+        'descripcion',
+        'address',
         'status',
     ];
 

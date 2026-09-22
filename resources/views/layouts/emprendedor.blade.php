@@ -119,6 +119,23 @@
                 <span>Pedidos</span>
             </a>
 
+            {{-- MI TIENDA (perfil público) --}}
+            <a
+                href="{{ route('emprendedor.perfil') }}"
+                wire:navigate
+                @click="sidebarOpen = false"
+                class="flex items-center gap-3 px-4 py-3 rounded-xl text-sm font-medium transition-colors
+                    {{ request()->routeIs('emprendedor.perfil')
+                        ? 'bg-amber-400 text-[#111111]'
+                        : 'text-[#6B6B66] hover:bg-slate-50 hover:text-[#111111]' }}"
+            >
+                <svg class="w-5 h-5 shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                        d="M3 21h18M5 21V7l8-4v18M13 21V7l6 4v10M9 9v.01M9 12v.01M9 15v.01" />
+                </svg>
+                <span>Mi Tienda</span>
+            </a>
+
             {{-- RECOMENDACIONES --}}
             <a
                 href="{{ route('recommendations.create') }}"
