@@ -2,6 +2,7 @@
 
 namespace Tests\Feature;
 
+use App\Models\Ally;
 use App\Models\BcvRate;
 use App\Models\CityDistance;
 use App\Models\Emprendedor;
@@ -17,10 +18,17 @@ use Tests\Feature\Concerns\CreatesTestPackages;
 use Tests\TestCase;
 
 /**
- * Etapa 1 del módulo Emprendedores: confirmar un pedido debe generar
- * una guía de envío real (Package), reutilizando PackageService en
- * vez de duplicar el cálculo de tarifa. Cubre también el descuento
- * global para emprendedores y las validaciones de stock/estado.
+ * Etapa 1 del módulo Emprendedores: confirmar un pedido queda en dos
+ * pasos, no uno.
+ *
+ *   1. marcarComoPagado(): el emprendedor confirma que ya le pagaron
+ *      (fuera de la plataforma) y reserva el stock, pero no genera
+ *      guía todavía.
+ *   2. registrarGuia(): taquilla, con el paquete físico en mano, mide
+ *      peso/tamaño reales e indica frágil/seguro; recién ahí se genera
+ *      la guía (Package), reutilizando PackageService en vez de
+ *      duplicar el cálculo de tarifa. Cubre también el descuento
+ *      global para emprendedores y las validaciones de stock/estado.
  */
 class PedidoServiceTest extends TestCase
 {
@@ -62,7 +70,7 @@ class PedidoServiceTest extends TestCase
         $this->service = app(PedidoService::class);
     }
 
-    private function createEmprendedorConProducto(int $stock = 10): Producto
+    private function createEmprendedorConProducto(int $stock = 10): array
     {
         $pickupAlly = $this->createAlly([
             'city' => 'Caracas',
@@ -83,7 +91,7 @@ class PedidoServiceTest extends TestCase
             'status' => Emprendedor::STATUS_ACTIVE,
         ]);
 
-        return Producto::create([
+        $producto = Producto::create([
             'emprendedor_id' => $emprendedor->id,
             'nombre' => 'Producto de prueba',
             'precio_usd' => 15.00,
@@ -91,6 +99,8 @@ class PedidoServiceTest extends TestCase
             'stock' => $stock,
             'activo' => true,
         ]);
+
+        return [$producto, $pickupAlly];
     }
 
     private function createPedido(Producto $producto, int $cantidad = 1): Pedido
@@ -106,81 +116,68 @@ class PedidoServiceTest extends TestCase
             'cliente_telefono' => '0424-7654321',
             'destino_ciudad' => 'Valencia',
             'destino_estado' => 'Carabobo',
+            'direccion_entrega' => 'Av. Bolívar, casa 1',
         ]);
     }
 
-    public function test_confirmar_pedido_genera_una_guia_real_con_el_descuento_aplicado(): void
+    public function test_marcar_como_pagado_reserva_stock_sin_generar_guia(): void
     {
-        $producto = $this->createEmprendedorConProducto(stock: 10);
+        [$producto] = $this->createEmprendedorConProducto(stock: 10);
         $pedido = $this->createPedido($producto, cantidad: 2);
 
-        $package = $this->service->confirmarPedido($pedido);
+        $resultado = $this->service->marcarComoPagado($pedido);
 
-        $this->assertInstanceOf(Package::class, $package);
-
-        // 2kg * 2 unidades = 4kg de peso facturable. El pedido siempre
-        // se entrega a domicilio del cliente (requires_delivery=true
-        // en PedidoService), así que suma el delivery_price_usd fijo:
-        // base(2.00) + peso(4 * 0.50) + distancia(150 * 0.01) + delivery(4.00) = 9.50
-        // con 20% de descuento: 9.50 * 0.8 = 7.60
-        $this->assertSame(7.60, (float) $package->total_price_usd);
-        $this->assertTrue((bool) $package->requires_delivery);
-        $this->assertSame('Tienda de Prueba', $package->sender_name);
-        $this->assertSame('Cliente de Prueba', $package->recipient_name);
-        $this->assertSame('Caracas', $package->origin_city);
-        $this->assertSame('Valencia', $package->destination_city);
-
-        $pedido->refresh();
-        $this->assertSame(Pedido::STATUS_CONFIRMADO, $pedido->status);
-        $this->assertSame($package->id, $pedido->package_id);
+        $this->assertSame(Pedido::STATUS_PAGADO, $resultado->status);
+        $this->assertNull($resultado->package_id);
+        $this->assertSame(0, Package::count());
 
         $producto->refresh();
         $this->assertSame(8, $producto->stock);
     }
 
-    public function test_confirmar_pedido_falla_si_no_hay_stock_suficiente(): void
+    public function test_marcar_como_pagado_falla_si_no_hay_stock_suficiente(): void
     {
-        $producto = $this->createEmprendedorConProducto(stock: 1);
+        [$producto] = $this->createEmprendedorConProducto(stock: 1);
         $pedido = $this->createPedido($producto, cantidad: 5);
 
         $this->expectException(RuntimeException::class);
         $this->expectExceptionMessage('No hay stock suficiente');
 
-        $this->service->confirmarPedido($pedido);
+        $this->service->marcarComoPagado($pedido);
     }
 
-    public function test_confirmar_pedido_falla_si_ya_fue_procesado(): void
+    public function test_marcar_como_pagado_falla_si_ya_fue_procesado(): void
     {
-        $producto = $this->createEmprendedorConProducto();
+        [$producto] = $this->createEmprendedorConProducto();
         $pedido = $this->createPedido($producto);
 
-        $this->service->confirmarPedido($pedido);
+        $this->service->marcarComoPagado($pedido);
 
         $this->expectException(RuntimeException::class);
         $this->expectExceptionMessage('ya fue procesado');
 
-        $this->service->confirmarPedido($pedido->fresh());
+        $this->service->marcarComoPagado($pedido->fresh());
     }
 
-    public function test_confirmar_pedido_falla_si_el_emprendedor_no_tiene_agencia_de_retiro(): void
+    public function test_marcar_como_pagado_falla_si_el_emprendedor_no_tiene_agencia_de_retiro(): void
     {
-        $producto = $this->createEmprendedorConProducto();
+        [$producto] = $this->createEmprendedorConProducto();
         $producto->emprendedor()->update(['pickup_ally_id' => null]);
         $pedido = $this->createPedido($producto);
 
         $this->expectException(RuntimeException::class);
         $this->expectExceptionMessage('agencia aliada de retiro');
 
-        $this->service->confirmarPedido($pedido);
+        $this->service->marcarComoPagado($pedido);
     }
 
-    public function test_no_deja_stock_negativo_ni_crea_guia_cuando_falla_la_validacion(): void
+    public function test_no_deja_stock_negativo_ni_marca_pagado_cuando_falla_la_validacion(): void
     {
-        $producto = $this->createEmprendedorConProducto(stock: 1);
+        [$producto] = $this->createEmprendedorConProducto(stock: 1);
         $pedido = $this->createPedido($producto, cantidad: 5);
 
         try {
-            $this->service->confirmarPedido($pedido);
+            $this->service->marcarComoPagado($pedido);
         } catch (RuntimeException) {
             // Esperado.
         }
@@ -191,5 +188,75 @@ class PedidoServiceTest extends TestCase
         $this->assertSame(1, $producto->stock);
         $this->assertSame(Pedido::STATUS_PENDIENTE, $pedido->status);
         $this->assertSame(0, Package::count());
+    }
+
+    public function test_registrar_guia_genera_una_guia_real_con_el_peso_verificado_y_el_descuento_aplicado(): void
+    {
+        [$producto, $pickupAlly] = $this->createEmprendedorConProducto(stock: 10);
+        $pedido = $this->createPedido($producto, cantidad: 2);
+        $this->service->marcarComoPagado($pedido);
+
+        $package = $this->service->registrarGuia($pedido->fresh(), [
+            // El peso real verificado en taquilla (5kg) es distinto al
+            // autodeclarado del catálogo (2kg * 2 = 4kg): debe usarse
+            // este, no el del producto.
+            'physical_weight_kg' => 5.0,
+            'is_fragile' => true,
+        ], null, $pickupAlly);
+
+        $this->assertInstanceOf(Package::class, $package);
+
+        // base(2.00) + peso(5 * 0.50=2.50) + distancia(150*0.01=1.50)
+        // + delivery(4.00) + frágil(3.00) = 13.00; con 20% descuento: 10.40
+        $this->assertSame(10.40, (float) $package->total_price_usd);
+        $this->assertTrue((bool) $package->requires_delivery);
+        $this->assertTrue((bool) $package->is_fragile);
+        $this->assertSame('Av. Bolívar, casa 1', $package->delivery_address);
+        $this->assertSame('Tienda de Prueba', $package->sender_name);
+        $this->assertSame('Cliente de Prueba', $package->recipient_name);
+        $this->assertSame('Caracas', $package->origin_city);
+        $this->assertSame('Valencia', $package->destination_city);
+
+        $pedido->refresh();
+        $this->assertSame(Pedido::STATUS_CONFIRMADO, $pedido->status);
+        $this->assertSame($package->id, $pedido->package_id);
+    }
+
+    public function test_registrar_guia_falla_si_el_pedido_no_esta_pagado_todavia(): void
+    {
+        [$producto, $pickupAlly] = $this->createEmprendedorConProducto();
+        $pedido = $this->createPedido($producto);
+
+        $this->expectException(RuntimeException::class);
+        $this->expectExceptionMessage('no está listo para generar guía');
+
+        $this->service->registrarGuia($pedido, ['physical_weight_kg' => 3.0], null, $pickupAlly);
+    }
+
+    public function test_registrar_guia_falla_si_el_pedido_ya_tiene_guia(): void
+    {
+        [$producto, $pickupAlly] = $this->createEmprendedorConProducto();
+        $pedido = $this->createPedido($producto);
+        $this->service->marcarComoPagado($pedido);
+        $this->service->registrarGuia($pedido->fresh(), ['physical_weight_kg' => 3.0], null, $pickupAlly);
+
+        $this->expectException(RuntimeException::class);
+        $this->expectExceptionMessage('no está listo para generar guía');
+
+        $this->service->registrarGuia($pedido->fresh(), ['physical_weight_kg' => 3.0], null, $pickupAlly);
+    }
+
+    public function test_registrar_guia_falla_si_la_agencia_no_es_la_del_emprendedor(): void
+    {
+        [$producto] = $this->createEmprendedorConProducto();
+        $pedido = $this->createPedido($producto);
+        $this->service->marcarComoPagado($pedido);
+
+        $otraAgencia = $this->createAlly(['city' => 'Valencia', 'state' => 'Carabobo']);
+
+        $this->expectException(RuntimeException::class);
+        $this->expectExceptionMessage('no pertenece a tu agencia');
+
+        $this->service->registrarGuia($pedido->fresh(), ['physical_weight_kg' => 3.0], null, $otraAgencia);
     }
 }

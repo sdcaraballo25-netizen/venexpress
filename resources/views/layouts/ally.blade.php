@@ -232,6 +232,37 @@
 
                 </a>
 
+                {{-- EMPRENDEDORES --}}
+                <a
+                    href="{{ route('ally.emprendedor-pedidos') }}"
+                    wire:navigate
+                    @click="sidebarOpen = false"
+                    class="flex items-center gap-3 px-4 py-3 rounded-xl font-medium transition-colors
+                    {{ request()->routeIs('ally.emprendedor-pedidos')
+                        ? 'bg-amber-400 text-[#111111]'
+                        : 'text-[#6B6B66] hover:bg-slate-50 hover:text-[#111111]' }}"
+                >
+
+                    <svg
+                        class="w-5 h-5"
+                        fill="none"
+                        stroke="currentColor"
+                        viewBox="0 0 24 24"
+                    >
+                        <path
+                            stroke-linecap="round"
+                            stroke-linejoin="round"
+                            stroke-width="2"
+                            d="M16 11V7a4 4 0 00-8 0v4M5 9h14l1 11H4L5 9z"
+                        />
+                    </svg>
+
+                    <span>
+                        Emprendedores
+                    </span>
+
+                </a>
+
                 {{-- MIS PEDIDOS --}}
 <a
     href="{{ route('ally.packages.index') }}"

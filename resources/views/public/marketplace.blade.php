@@ -111,6 +111,20 @@
                         </div>
 
                         <div>
+                            <label class="block text-xs font-medium text-gray-500 mb-1">Dirección exacta de entrega</label>
+                            <textarea wire:model="direccion_entrega" rows="2" placeholder="Calle, casa/edificio, urbanización..."
+                                      class="w-full rounded-lg border-gray-200 text-sm focus:ring-blue-950 focus:border-blue-950"></textarea>
+                            @error('direccion_entrega') <p class="mt-1 text-xs text-red-600">{{ $message }}</p> @enderror
+                        </div>
+
+                        <div>
+                            <label class="block text-xs font-medium text-gray-500 mb-1">Punto de referencia (opcional)</label>
+                            <input type="text" wire:model="referencia_entrega" placeholder="Cerca de..."
+                                   class="w-full rounded-lg border-gray-200 text-sm focus:ring-blue-950 focus:border-blue-950">
+                            @error('referencia_entrega') <p class="mt-1 text-xs text-red-600">{{ $message }}</p> @enderror
+                        </div>
+
+                        <div>
                             <label class="block text-xs font-medium text-gray-500 mb-1">Cantidad</label>
                             <input type="number" min="1" max="{{ $productoSeleccionado->stock }}" wire:model="cantidad"
                                    class="w-full rounded-lg border-gray-200 text-sm focus:ring-blue-950 focus:border-blue-950">

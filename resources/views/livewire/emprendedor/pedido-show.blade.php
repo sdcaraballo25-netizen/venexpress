@@ -58,10 +58,14 @@
             <p class="mt-4 text-sm text-[#6B6B66]">
                 Guía generada: <strong class="text-[#111111]">{{ $pedido->package->tracking_number }}</strong>
             </p>
+        @elseif ($pedido->status === Pedido::STATUS_PAGADO)
+            <p class="mt-4 text-sm text-[#6B6B66]">
+                Pago confirmado. Lleva el paquete a tu agencia aliada para que generen la guía.
+            </p>
         @elseif ($pedido->status === Pedido::STATUS_PENDIENTE)
             <button
                 @click.prevent="$store.confirm.open({
-                    message: '¿Ya recibiste el pago de este cliente? Al confirmar se genera la guía de envío.',
+                    message: '¿Ya recibiste el pago de este cliente? Después de confirmar, lleva el paquete a tu agencia aliada para generar la guía.',
                     confirmText: 'Confirmar pedido',
                     variant: 'primary',
                     onConfirm: () => $wire.confirmar(),

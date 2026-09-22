@@ -24,10 +24,12 @@ class Pedidos extends Component
     }
 
     /**
-     * Confirma un pedido propio: genera la guía real (ver
-     * PedidoService::confirmarPedido) y descuenta el stock. Solo
+     * Marca un pedido propio como pagado (ver
+     * PedidoService::marcarComoPagado) y descuenta el stock. Solo
      * después de que el emprendedor confirmó, por fuera de la
-     * plataforma, que el cliente ya le pagó.
+     * plataforma, que el cliente ya le pagó. La guía real se genera
+     * después, en taquilla, cuando lleve el paquete a su agencia
+     * aliada (Ally\EmprendedorPedidos).
      */
     public function confirmar(int $pedidoId, PedidoService $pedidoService): void
     {
@@ -38,9 +40,9 @@ class Pedidos extends Component
             ->findOrFail($pedidoId);
 
         try {
-            $package = $pedidoService->confirmarPedido($pedido, Auth::id());
+            $pedidoService->marcarComoPagado($pedido);
 
-            $this->successMessage = "Pedido confirmado. Guía generada: {$package->tracking_number}.";
+            $this->successMessage = 'Pedido marcado como pagado. Lleva el paquete a tu agencia aliada para generar la guía.';
         } catch (RuntimeException $e) {
             $this->errorMessage = $e->getMessage();
         }

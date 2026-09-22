@@ -66,7 +66,7 @@ class PedidosTest extends TestCase
         ]);
     }
 
-    public function test_confirming_a_pedido_generates_a_package_and_shows_the_tracking_number(): void
+    public function test_confirming_a_pedido_marks_it_as_paid_and_reserves_stock_without_a_package_yet(): void
     {
         $emprendedor = $this->createEmprendedor();
 
@@ -88,9 +88,12 @@ class PedidosTest extends TestCase
 
         $pedido->refresh();
 
-        $this->assertSame(Pedido::STATUS_CONFIRMADO, $pedido->status);
-        $this->assertNotNull($pedido->package_id);
-        $this->assertSame(1, Package::count());
+        $this->assertSame(Pedido::STATUS_PAGADO, $pedido->status);
+        $this->assertNull($pedido->package_id);
+        $this->assertSame(0, Package::count());
+
+        $producto->refresh();
+        $this->assertSame(4, $producto->stock);
     }
 
     public function test_confirming_a_pedido_with_insufficient_stock_shows_an_error_and_does_not_create_a_package(): void

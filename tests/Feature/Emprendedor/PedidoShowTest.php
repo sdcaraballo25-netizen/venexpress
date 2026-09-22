@@ -105,7 +105,7 @@ class PedidoShowTest extends TestCase
             ->test(PedidoShow::class, ['pedidoId' => $pedido->id]);
     }
 
-    public function test_confirming_from_the_show_page_generates_a_package(): void
+    public function test_confirming_from_the_show_page_marks_the_pedido_as_paid_without_a_package_yet(): void
     {
         $emprendedor = $this->createEmprendedor();
         $pedido = $this->createPedidoFor($emprendedor);
@@ -115,7 +115,7 @@ class PedidoShowTest extends TestCase
             ->call('confirmar')
             ->assertSet('errorMessage', null);
 
-        $this->assertSame(Pedido::STATUS_CONFIRMADO, $pedido->fresh()->status);
-        $this->assertNotNull($pedido->fresh()->package_id);
+        $this->assertSame(Pedido::STATUS_PAGADO, $pedido->fresh()->status);
+        $this->assertNull($pedido->fresh()->package_id);
     }
 }

@@ -13,6 +13,17 @@ class Pedido extends Model
 
     public const STATUS_PENDIENTE = 'PENDIENTE';
 
+    /**
+     * El emprendedor confirmó que el cliente ya le pagó (fuera de la
+     * plataforma), pero todavía no hay guía: falta que lleve el
+     * paquete a su agencia aliada y que taquilla verifique el peso
+     * real, tamaño, fragilidad y seguro (ver Ally\EmprendedorPedidos).
+     * Antes "confirmar" generaba la guía de una vez usando el peso
+     * autodeclarado del catálogo, sin frágil/seguro y sin verificación
+     * física alguna.
+     */
+    public const STATUS_PAGADO = 'PAGADO';
+
     public const STATUS_CONFIRMADO = 'CONFIRMADO';
 
     public const STATUS_CANCELADO = 'CANCELADO';
@@ -29,6 +40,8 @@ class Pedido extends Model
         'cliente_telefono',
         'destino_ciudad',
         'destino_estado',
+        'direccion_entrega',
+        'referencia_entrega',
         'status',
         'chat_token',
     ];

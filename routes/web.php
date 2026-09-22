@@ -32,6 +32,7 @@ use App\Livewire\Ally\Cod as AllyCod;
 use App\Livewire\Ally\Commissions as AllyCommissions;
 use App\Livewire\Ally\DailyCashCut;
 use App\Livewire\Ally\Dashboard as AllyDashboard;
+use App\Livewire\Ally\EmprendedorPedidos as AllyEmprendedorPedidos;
 use App\Livewire\Ally\HelpCenter as AllyHelpCenter;
 use App\Livewire\Ally\Incidents as AllyIncidents;
 use App\Livewire\Ally\PackageCreate as AllyPackageCreate;
@@ -102,6 +103,9 @@ Route::prefix('ally')
 
         Route::get('/pedidos/nuevo', AllyPackageCreate::class)
             ->name('packages.create');
+
+        Route::get('/pedidos-emprendedores', AllyEmprendedorPedidos::class)
+            ->name('emprendedor-pedidos');
 
         Route::get('/comisiones', AllyCommissions::class)
             ->middleware('role:aliado')

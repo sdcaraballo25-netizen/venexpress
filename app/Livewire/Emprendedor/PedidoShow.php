@@ -51,11 +51,11 @@ class PedidoShow extends Component
         $this->errorMessage = null;
 
         try {
-            $package = $pedidoService->confirmarPedido($this->pedido, Auth::id());
+            $pedidoService->marcarComoPagado($this->pedido);
 
             $this->pedido->refresh();
 
-            $this->successMessage = "Pedido confirmado. Guía generada: {$package->tracking_number}.";
+            $this->successMessage = 'Pedido marcado como pagado. Lleva el paquete a tu agencia aliada para generar la guía.';
         } catch (RuntimeException $e) {
             $this->errorMessage = $e->getMessage();
         }

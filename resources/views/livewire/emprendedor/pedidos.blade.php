@@ -60,6 +60,8 @@
                                 </span>
                                 @if ($pedido->package)
                                     <p class="mt-1 text-xs text-[#6B6B66]">Guía: {{ $pedido->package->tracking_number }}</p>
+                                @elseif ($pedido->status === Pedido::STATUS_PAGADO)
+                                    <p class="mt-1 text-xs text-[#6B6B66]">Llévalo a tu agencia para la guía</p>
                                 @endif
                             </td>
                             <td class="px-6 py-4 text-right">
@@ -72,7 +74,7 @@
                                     @if ($pedido->status === Pedido::STATUS_PENDIENTE)
                                         <button
                                             @click.prevent="$store.confirm.open({
-                                                message: '¿Ya recibiste el pago de este cliente? Al confirmar se genera la guía de envío.',
+                                                message: '¿Ya recibiste el pago de este cliente? Después de confirmar, lleva el paquete a tu agencia aliada para generar la guía.',
                                                 confirmText: 'Confirmar pedido',
                                                 variant: 'primary',
                                                 onConfirm: () => $wire.confirmar({{ $pedido->id }}),

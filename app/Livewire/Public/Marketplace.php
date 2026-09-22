@@ -36,6 +36,10 @@ class Marketplace extends Component
 
     public string $destino_ciudad = '';
 
+    public string $direccion_entrega = '';
+
+    public string $referencia_entrega = '';
+
     public string $cantidad = '1';
 
     public array $states = [];
@@ -74,6 +78,8 @@ class Marketplace extends Component
             'cliente_telefono',
             'destino_estado',
             'destino_ciudad',
+            'direccion_entrega',
+            'referencia_entrega',
             'cantidad',
             'cities',
         ]);
@@ -93,6 +99,8 @@ class Marketplace extends Component
             'cliente_telefono' => ['required', 'string', 'max:30'],
             'destino_estado' => ['required', 'string'],
             'destino_ciudad' => ['required', 'string'],
+            'direccion_entrega' => ['required', 'string', 'max:500'],
+            'referencia_entrega' => ['nullable', 'string', 'max:255'],
             'cantidad' => ['required', 'integer', 'min:1', 'max:' . $producto->stock],
         ]);
 
@@ -109,6 +117,8 @@ class Marketplace extends Component
             'cliente_telefono' => $this->cliente_telefono,
             'destino_ciudad' => $this->destino_ciudad,
             'destino_estado' => $this->destino_estado,
+            'direccion_entrega' => $this->direccion_entrega,
+            'referencia_entrega' => $this->referencia_entrega !== '' ? $this->referencia_entrega : null,
             'status' => Pedido::STATUS_PENDIENTE,
             'chat_token' => Str::random(40),
         ]);

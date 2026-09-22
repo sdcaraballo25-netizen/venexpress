@@ -77,6 +77,7 @@ class MarketplaceTest extends TestCase
             ->set('cliente_telefono', '0414-9999999')
             ->set('destino_estado', 'Carabobo')
             ->set('destino_ciudad', 'Valencia')
+            ->set('direccion_entrega', 'Av. Bolívar, casa 1')
             ->set('cantidad', '2')
             ->call('confirmarPedido')
             ->assertHasNoErrors();
@@ -87,6 +88,27 @@ class MarketplaceTest extends TestCase
         $this->assertSame(2, $pedido->cantidad);
         $this->assertSame('30.00', (string) $pedido->precio_total_usd);
         $this->assertSame(Pedido::STATUS_PENDIENTE, $pedido->status);
+    }
+
+    public function test_a_pedido_requires_a_delivery_address(): void
+    {
+        $emprendedor = $this->createEmprendedor();
+        $producto = $this->createProducto($emprendedor, ['stock' => 5]);
+
+        Livewire::test(Marketplace::class)
+            ->call('pedirProducto', $producto->id)
+            ->set('cliente_nombre', 'Comprador de Prueba')
+            ->set('cliente_id_doc', 'V-44455566')
+            ->set('cliente_telefono', '0414-4445556')
+            ->set('destino_estado', 'Carabobo')
+            ->set('destino_ciudad', 'Valencia')
+            ->set('cantidad', '1')
+            ->call('confirmarPedido')
+            ->assertHasErrors(['direccion_entrega']);
+
+        $this->assertDatabaseMissing('pedidos', [
+            'cliente_id_doc' => 'V-44455566',
+        ]);
     }
 
     public function test_a_pedido_cannot_request_more_units_than_available_stock(): void
