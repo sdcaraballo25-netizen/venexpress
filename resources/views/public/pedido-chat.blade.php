@@ -5,12 +5,17 @@
 
 <div>
     <section class="bg-white">
-        <div class="max-w-2xl mx-auto px-6 py-14">
+        <div class="max-w-4xl mx-auto px-6 py-14">
 
             <div class="mb-8">
-                <span class="inline-block bg-amber-100 text-amber-700 text-xs font-semibold tracking-wide uppercase px-3 py-1 rounded-full mb-4">
-                    Tu pedido
-                </span>
+                <div class="flex items-center gap-3 mb-4">
+                    <span class="inline-block bg-amber-100 text-amber-700 text-xs font-semibold tracking-wide uppercase px-3 py-1 rounded-full">
+                        Tu pedido
+                    </span>
+                    <span class="text-xs font-semibold text-gray-400">
+                        Pedido #{{ $pedido->id }}
+                    </span>
+                </div>
                 <h1 class="text-2xl md:text-3xl font-extrabold text-blue-950">
                     {{ $pedido->producto->nombre }}
                 </h1>
@@ -151,10 +156,9 @@
 
                                 @if ($mensaje->archivo_path)
                                     @if ($mensaje->esImagen())
-                                        <a href="{{ Illuminate\Support\Facades\Storage::disk('public')->url($mensaje->archivo_path) }}" target="_blank">
-                                            <img src="{{ Illuminate\Support\Facades\Storage::disk('public')->url($mensaje->archivo_path) }}"
-                                                 class="rounded-lg max-h-48 object-cover mb-1.5" alt="Adjunto">
-                                        </a>
+                                        <img src="{{ Illuminate\Support\Facades\Storage::disk('public')->url($mensaje->archivo_path) }}"
+                                             @click="$store.lightbox.open('{{ Illuminate\Support\Facades\Storage::disk('public')->url($mensaje->archivo_path) }}')"
+                                             class="rounded-lg max-h-48 object-cover mb-1.5 cursor-pointer" alt="Adjunto">
                                     @else
                                         <a href="{{ Illuminate\Support\Facades\Storage::disk('public')->url($mensaje->archivo_path) }}" target="_blank"
                                            class="flex items-center gap-2 rounded-lg px-3 py-2 mb-1.5

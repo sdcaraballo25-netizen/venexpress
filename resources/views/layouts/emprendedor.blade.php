@@ -234,6 +234,7 @@
 </div>
 
 <x-confirm-dialog />
+<x-image-lightbox />
 
 @livewireScripts
 

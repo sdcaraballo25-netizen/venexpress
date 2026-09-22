@@ -55,4 +55,24 @@ document.addEventListener('alpine:init', () => {
     Alpine.store('tracking', {
         src: '',
     });
+
+    /**
+     * Visor de imagen a pantalla completa para los adjuntos del chat
+     * de pedido (ver components/image-lightbox.blade.php) — antes las
+     * fotos abrían en una pestaña nueva. Mismo motivo que los stores
+     * de arriba para vivir aquí en vez de en un <script> del layout.
+     */
+    Alpine.store('lightbox', {
+        show: false,
+        src: null,
+
+        open(src) {
+            this.src = src;
+            this.show = true;
+        },
+
+        close() {
+            this.show = false;
+        },
+    });
 });

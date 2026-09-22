@@ -3,14 +3,15 @@
     use App\Models\Pedido;
 @endphp
 
-<div class="space-y-6 font-sans max-w-3xl">
+<div class="space-y-6 font-sans max-w-5xl">
 
     <div class="flex items-center justify-between">
         <div>
             <a href="{{ route('emprendedor.pedidos') }}" wire:navigate class="text-xs font-semibold text-blue-600 hover:text-blue-800">
                 ← Volver a Pedidos
             </a>
-            <h1 class="font-display text-2xl font-bold tracking-tight text-[#111111] mt-1">
+            <p class="text-xs font-semibold text-[#6B6B66] mt-1">Pedido #{{ $pedido->id }}</p>
+            <h1 class="font-display text-2xl font-bold tracking-tight text-[#111111]">
                 {{ $pedido->producto?->nombre }}
             </h1>
         </div>
@@ -113,10 +114,9 @@
 
                         @if ($mensaje->archivo_path)
                             @if ($mensaje->esImagen())
-                                <a href="{{ Illuminate\Support\Facades\Storage::disk('public')->url($mensaje->archivo_path) }}" target="_blank">
-                                    <img src="{{ Illuminate\Support\Facades\Storage::disk('public')->url($mensaje->archivo_path) }}"
-                                         class="rounded-lg max-h-48 object-cover mb-1.5" alt="Adjunto">
-                                </a>
+                                <img src="{{ Illuminate\Support\Facades\Storage::disk('public')->url($mensaje->archivo_path) }}"
+                                     @click="$store.lightbox.open('{{ Illuminate\Support\Facades\Storage::disk('public')->url($mensaje->archivo_path) }}')"
+                                     class="rounded-lg max-h-48 object-cover mb-1.5 cursor-pointer" alt="Adjunto">
                             @else
                                 <a href="{{ Illuminate\Support\Facades\Storage::disk('public')->url($mensaje->archivo_path) }}" target="_blank"
                                    class="flex items-center gap-2 rounded-lg px-3 py-2 mb-1.5

@@ -615,6 +615,8 @@
 
 </div>
 
+<x-image-lightbox />
+
 @livewireScripts
 
 @stack('scripts')

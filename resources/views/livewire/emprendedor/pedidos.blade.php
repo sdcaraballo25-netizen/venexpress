@@ -40,6 +40,7 @@
                     @forelse ($pedidos as $pedido)
                         <tr class="border-b border-[#F0F0EC] last:border-0 hover:bg-slate-50 transition">
                             <td class="px-6 py-4">
+                                <p class="text-xs font-semibold text-[#6B6B66]">Pedido #{{ $pedido->id }}</p>
                                 <p class="font-semibold text-[#111111]">{{ $pedido->producto?->nombre }}</p>
                                 <p class="text-xs text-[#6B6B66]">{{ $pedido->cantidad }} unidad(es)</p>
                             </td>
