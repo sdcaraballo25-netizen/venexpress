@@ -11,6 +11,7 @@ use App\Services\VenezuelaLocationService;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Str;
 use Livewire\Attributes\Title;
+use Livewire\Attributes\Url;
 use Livewire\Component;
 use Livewire\WithPagination;
 
@@ -61,6 +62,14 @@ class Marketplace extends Component
     public ?Pedido $pedidoCreado = null;
 
     /**
+     * #[Url]: permite compartir/guardar un enlace de búsqueda tipo
+     * /tienda?buscar=mango, igual que el criterio ya usado en
+     * Admin\UsersManager.
+     */
+    #[Url(as: 'buscar')]
+    public string $busqueda = '';
+
+    /**
      * True cuando quien pide está logueado como Cliente y ya tiene un
      * registro Customer con su cédula (viene de su registro en la
      * plataforma) — en ese caso no tiene sentido volver a pedirle
@@ -99,6 +108,11 @@ class Marketplace extends Component
         $this->cliente_id_doc = $customer->id_doc;
         $this->cliente_telefono = $customer->phone ?: ($user->phone ?? '');
         $this->clienteAutenticadoConDatos = true;
+    }
+
+    public function updatedBusqueda(): void
+    {
+        $this->resetPage();
     }
 
     public function verProducto(int $productoId): void
@@ -206,6 +220,14 @@ class Marketplace extends Component
             ->when(
                 $this->tiendaEmprendedor,
                 fn ($query) => $query->where('emprendedor_id', $this->tiendaEmprendedor->id)
+            )
+            ->when(
+                trim($this->busqueda) !== '',
+                fn ($query) => $query->where(
+                    fn ($sub) => $sub
+                        ->where('nombre', 'like', '%' . trim($this->busqueda) . '%')
+                        ->orWhere('descripcion', 'like', '%' . trim($this->busqueda) . '%')
+                )
             )
             ->with('emprendedor')
             ->withAvg('resenas', 'estrellas')

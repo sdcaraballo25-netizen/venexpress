@@ -27,6 +27,21 @@
             </div>
 
             {{-- =========================================================
+                 BÚSQUEDA
+            ========================================================== --}}
+            <div class="max-w-xl mx-auto mb-10">
+                <div class="relative">
+                    <svg class="absolute left-4 top-1/2 -translate-y-1/2 w-5 h-5 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                              d="M21 21l-4.35-4.35M17 11a6 6 0 11-12 0 6 6 0 0112 0z" />
+                    </svg>
+                    <input type="search" wire:model.live.debounce.400ms="busqueda"
+                           placeholder="Buscar productos por nombre o descripción..."
+                           class="w-full rounded-xl border-gray-200 pl-11 pr-4 py-3 text-sm focus:ring-blue-950 focus:border-blue-950">
+                </div>
+            </div>
+
+            {{-- =========================================================
                  CONFIRMACIÓN DE PEDIDO
             ========================================================== --}}
             @if ($pedidoCreado)
@@ -236,41 +251,50 @@
             {{-- =========================================================
                  CATÁLOGO
             ========================================================== --}}
-            <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6">
+            <div class="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-4 gap-4 sm:gap-5">
 
                 @forelse ($productos as $producto)
 
-                    <div class="border border-gray-100 rounded-2xl overflow-hidden bg-white shadow-sm">
+                    <div class="group flex flex-col border border-gray-200 rounded-lg bg-white hover:shadow-lg hover:border-gray-300 transition-all">
 
-                        <button wire:click="verProducto({{ $producto->id }})" class="block w-full text-left">
+                        <button wire:click="verProducto({{ $producto->id }})" class="block w-full aspect-square p-4 bg-white">
                             @if ($producto->foto_path)
                                 <img src="{{ Illuminate\Support\Facades\Storage::disk('public')->url($producto->foto_path) }}"
-                                     class="h-40 w-full object-cover" alt="{{ $producto->nombre }}">
+                                     class="w-full h-full object-contain group-hover:scale-105 transition-transform" alt="{{ $producto->nombre }}">
                             @else
-                                <div class="h-40 w-full bg-gray-50 flex items-center justify-center text-gray-200 text-5xl">📦</div>
+                                <div class="w-full h-full bg-gray-50 rounded flex items-center justify-center text-gray-200 text-5xl">📦</div>
                             @endif
                         </button>
 
-                        <div class="p-4">
+                        <div class="flex flex-col flex-1 px-4 pb-4">
                             @if (! $tiendaEmprendedor)
                                 <a href="{{ route('public.marketplace.store', $producto->emprendedor_id) }}" wire:navigate
-                                   class="text-xs text-gray-400 hover:text-blue-700">
+                                   class="text-xs text-gray-400 hover:text-blue-700 truncate">
                                     {{ $producto->emprendedor->business_name }}
                                 </a>
                             @endif
-                            <button wire:click="verProducto({{ $producto->id }})" class="block text-left w-full">
-                                <p class="font-semibold text-blue-950 mt-0.5">{{ $producto->nombre }}</p>
+
+                            <button wire:click="verProducto({{ $producto->id }})" class="block text-left w-full mt-0.5">
+                                <p class="text-sm text-gray-800 line-clamp-2 leading-snug">{{ $producto->nombre }}</p>
                             </button>
-                            <div class="mt-1">
+
+                            <div class="mt-1.5">
                                 <x-star-rating :rating="$producto->resenas_avg_estrellas" :count="$producto->resenas_count" size="text-xs" />
                             </div>
-                            <p class="text-lg font-extrabold text-blue-950 mt-1">${{ number_format((float) $producto->precio_usd, 2) }}</p>
-                            @if ($producto->precio_ves !== null)
-                                <p class="text-xs text-gray-400">Bs. {{ number_format($producto->precio_ves, 2) }}</p>
-                            @endif
+
+                            <div class="mt-2">
+                                <p class="text-xl font-bold text-gray-900">${{ number_format((float) $producto->precio_usd, 2) }}</p>
+                                @if ($producto->precio_ves !== null)
+                                    <p class="text-xs text-gray-400">Bs. {{ number_format($producto->precio_ves, 2) }}</p>
+                                @endif
+                            </div>
+
+                            <p class="text-xs text-emerald-700 font-medium mt-1.5">
+                                📦 Envío por Venexpress
+                            </p>
 
                             <button wire:click="pedirProducto({{ $producto->id }})"
-                                    class="mt-3 w-full bg-blue-950 hover:bg-blue-900 text-white text-sm font-semibold py-2.5 rounded-lg transition">
+                                    class="mt-auto pt-3 w-full bg-blue-950 hover:bg-blue-900 text-white text-sm font-semibold py-2.5 rounded-lg transition">
                                 Pedir
                             </button>
                         </div>
@@ -279,8 +303,12 @@
 
                 @empty
 
-                    <div class="sm:col-span-2 lg:col-span-4 text-center py-16 text-gray-400">
-                        Todavía no hay productos publicados. Vuelve pronto.
+                    <div class="col-span-full text-center py-16 text-gray-400">
+                        @if (trim($busqueda) !== '')
+                            No encontramos productos para "{{ $busqueda }}".
+                        @else
+                            Todavía no hay productos publicados. Vuelve pronto.
+                        @endif
                     </div>
 
                 @endforelse

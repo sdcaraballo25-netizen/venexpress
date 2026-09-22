@@ -93,6 +93,23 @@ class MarketplaceTest extends TestCase
         $this->assertSame(Pedido::STATUS_PENDIENTE, $pedido->status);
     }
 
+    public function test_products_can_be_searched_by_name_or_description(): void
+    {
+        $emprendedor = $this->createEmprendedor();
+        $this->createProducto($emprendedor, ['nombre' => 'Camisa azul', 'descripcion' => 'Talla M, algodón']);
+        $this->createProducto($emprendedor, ['nombre' => 'Zapatos deportivos', 'descripcion' => 'Ideales para correr']);
+
+        Livewire::test(Marketplace::class)
+            ->set('busqueda', 'camisa')
+            ->assertSee('Camisa azul')
+            ->assertDontSee('Zapatos deportivos');
+
+        Livewire::test(Marketplace::class)
+            ->set('busqueda', 'correr')
+            ->assertSee('Zapatos deportivos')
+            ->assertDontSee('Camisa azul');
+    }
+
     public function test_the_catalog_shows_a_products_average_rating(): void
     {
         $emprendedor = $this->createEmprendedor();
