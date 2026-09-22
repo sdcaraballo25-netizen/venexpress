@@ -83,7 +83,20 @@ class Marketplace extends Component
     {
         $this->states = $locationService->states();
 
-        if ($emprendedor && $emprendedor->status === Emprendedor::STATUS_ACTIVE) {
+        // $emprendedor->exists (no solo truthy): cuando no hay
+        // {emprendedor} en la ruta actual, la inyección de dependencias
+        // puede resolver este parámetro tipado como un Emprendedor
+        // "fantasma" (new Emprendedor() vacío, nunca guardado) en vez
+        // de null — ->exists distingue eso de un modelo real
+        // enlazado por la ruta.
+        if ($emprendedor?->exists) {
+            // Antes, una tienda suspendida/pendiente caía en silencio al
+            // catálogo genérico (el filtro de $emprendedor no
+            // coincidía con nada), mostrando "Tienda de Emprendedores"
+            // en vez de un error — confuso para quien abre un enlace de
+            // tienda compartido. Se trata igual que un id inexistente.
+            abort_unless($emprendedor->status === Emprendedor::STATUS_ACTIVE, 404);
+
             $this->tiendaEmprendedor = $emprendedor;
         }
 

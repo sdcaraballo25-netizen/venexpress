@@ -173,6 +173,15 @@ class MarketplaceTest extends TestCase
             ->assertSee($emprendedor->business_name);
     }
 
+    public function test_the_per_emprendedor_store_page_404s_for_a_suspended_emprendedor(): void
+    {
+        $emprendedor = $this->createEmprendedor(['status' => Emprendedor::STATUS_SUSPENDED]);
+        $this->createProducto($emprendedor, ['nombre' => 'Producto Suspendido']);
+
+        $this->get(route('public.marketplace.store', $emprendedor->id))
+            ->assertNotFound();
+    }
+
     public function test_checkout_prefills_and_hides_name_id_and_phone_for_a_client_with_a_customer_record(): void
     {
         $client = User::factory()->create([
