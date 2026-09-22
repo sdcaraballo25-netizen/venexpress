@@ -50,6 +50,7 @@ use App\Livewire\Emprendedor\PedidoShow as EmprendedorPedidoShow;
 use App\Livewire\Emprendedor\Productos as EmprendedorProductos;
 use App\Livewire\Public\Marketplace;
 use App\Livewire\Public\PedidoChat;
+use App\Livewire\Client\Compras as ClientCompras;
 use App\Livewire\Client\Dashboard as ClientDashboard;
 use App\Livewire\Client\HelpCenter as ClientHelpCenter;
 use App\Livewire\Client\Incidents as ClientIncidents;
@@ -236,6 +237,9 @@ Route::prefix('cliente')
 
         Route::get('/dashboard', ClientDashboard::class)
             ->name('dashboard');
+
+        Route::get('/mis-compras', ClientCompras::class)
+            ->name('compras');
 
         Route::get('/incidencias', ClientIncidents::class)
             ->name('incidents');

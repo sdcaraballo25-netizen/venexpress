@@ -132,6 +132,12 @@ class DatabaseSeeder extends Seeder
             'role' => User::ROLE_CLIENTE,
             'status' => User::STATUS_ACTIVE,
             'email_verified_at' => now(),
+            // Sin esto, EnsureAccountIsVerified manda a este usuario a
+            // /verify-account (verificación propia por código de
+            // VenExpress) en vez de dejarlo entrar al panel de Cliente
+            // — email_verified_at es el campo nativo de Laravel, que
+            // este proyecto no usa para el gate del panel.
+            'account_verified_at' => now(),
         ]);
 
         // Sin este registro en customers, el panel de Cliente

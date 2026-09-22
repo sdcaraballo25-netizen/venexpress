@@ -31,6 +31,7 @@ class Pedido extends Model
     protected $fillable = [
         'producto_id',
         'emprendedor_id',
+        'user_id',
         'package_id',
         'cantidad',
         'precio_unitario_usd',
@@ -62,6 +63,11 @@ class Pedido extends Model
     public function emprendedor(): BelongsTo
     {
         return $this->belongsTo(Emprendedor::class);
+    }
+
+    public function user(): BelongsTo
+    {
+        return $this->belongsTo(User::class);
     }
 
     public function package(): BelongsTo

@@ -7,6 +7,7 @@ use App\Models\Emprendedor;
 use App\Models\Pedido;
 use App\Models\Producto;
 use App\Services\VenezuelaLocationService;
+use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Str;
 use Livewire\Attributes\Title;
 use Livewire\Component;
@@ -109,6 +110,12 @@ class Marketplace extends Component
         $pedido = Pedido::create([
             'producto_id' => $producto->id,
             'emprendedor_id' => $producto->emprendedor_id,
+            // Nullable: el comprador nunca necesitó cuenta para pedir
+            // (accede al chat por chat_token). Si sí tiene sesión
+            // iniciada como Cliente, lo enlazamos para que aparezca en
+            // su panel ("Mis Compras") sin depender de guardar el
+            // enlace del chat.
+            'user_id' => Auth::check() && Auth::user()->isCliente() ? Auth::id() : null,
             'cantidad' => $cantidad,
             'precio_unitario_usd' => $producto->precio_usd,
             'precio_total_usd' => $producto->precio_usd * $cantidad,

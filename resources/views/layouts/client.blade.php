@@ -363,6 +363,37 @@
 
                 </a>
 
+                {{-- MIS COMPRAS --}}
+                <a
+                    href="{{ route('cliente.compras') }}"
+                    wire:navigate
+                    @click="sidebarOpen = false"
+                    class="flex items-center gap-3 px-4 py-3 rounded-xl font-medium transition-colors
+                    {{ request()->routeIs('cliente.compras')
+                        ? 'bg-amber-400 text-[#111111]'
+                        : 'text-[#6B6B66] hover:bg-slate-50 hover:text-[#111111]' }}"
+                >
+
+                    <svg
+                        class="w-5 h-5"
+                        fill="none"
+                        stroke="currentColor"
+                        viewBox="0 0 24 24"
+                    >
+                        <path
+                            stroke-linecap="round"
+                            stroke-linejoin="round"
+                            stroke-width="2"
+                            d="M8 10h.01M12 10h.01M16 10h.01M9 16H5a2 2 0 01-2-2V6a2 2 0 012-2h14a2 2 0 012 2v8a2 2 0 01-2 2h-6l-4 4v-4z"
+                        />
+                    </svg>
+
+                    <span>
+                        Mis Compras
+                    </span>
+
+                </a>
+
                 {{-- CENTRO DE AYUDA --}}
                 <a
                     href="{{ route('cliente.help') }}"
@@ -583,18 +614,6 @@
     </div>
 
 </div>
-
-{{-- Estado del modal de rastreo (ver más abajo). Se registra como
-     Alpine.store en vez de x-data en <html> — mismo patrón que
-     $store.confirm (confirm-dialog.blade.php) — para no depender de
-     que Alpine procese datos declarados en la raíz del documento. --}}
-<script>
-    document.addEventListener('alpine:init', () => {
-        Alpine.store('tracking', {
-            src: '',
-        });
-    });
-</script>
 
 @livewireScripts
 

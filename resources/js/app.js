@@ -44,4 +44,15 @@ document.addEventListener('alpine:init', () => {
             this.show = false;
         },
     });
+
+    /**
+     * Estado del modal de rastreo de guía en el sidebar del panel de
+     * Cliente (ver resources/views/layouts/client.blade.php). Mismo
+     * motivo que el store 'confirm' de arriba: antes vivía en un
+     * <script> dentro del propio layout y wire:navigate lo dejaba sin
+     * registrar tras el login.
+     */
+    Alpine.store('tracking', {
+        src: '',
+    });
 });

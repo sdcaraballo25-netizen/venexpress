@@ -6,6 +6,7 @@ use App\Livewire\Public\Marketplace;
 use App\Models\Emprendedor;
 use App\Models\Pedido;
 use App\Models\Producto;
+use App\Models\User;
 use Illuminate\Foundation\Testing\RefreshDatabase;
 use Livewire\Livewire;
 use Tests\Feature\Concerns\CreatesTestEmprendedores;
@@ -88,6 +89,59 @@ class MarketplaceTest extends TestCase
         $this->assertSame(2, $pedido->cantidad);
         $this->assertSame('30.00', (string) $pedido->precio_total_usd);
         $this->assertSame(Pedido::STATUS_PENDIENTE, $pedido->status);
+    }
+
+    public function test_a_pedido_is_linked_to_the_authenticated_client_so_they_can_find_it_later(): void
+    {
+        $client = User::factory()->create([
+            'role' => User::ROLE_CLIENTE,
+            'status' => User::STATUS_ACTIVE,
+            'account_verified_at' => now(),
+        ]);
+
+        $emprendedor = $this->createEmprendedor();
+        $producto = $this->createProducto($emprendedor, ['stock' => 5]);
+
+        Livewire::actingAs($client)
+            ->test(Marketplace::class)
+            ->call('pedirProducto', $producto->id)
+            ->set('cliente_nombre', 'Comprador de Prueba')
+            ->set('cliente_id_doc', 'V-55566677')
+            ->set('cliente_telefono', '0414-5556667')
+            ->set('destino_estado', 'Carabobo')
+            ->set('destino_ciudad', 'Valencia')
+            ->set('direccion_entrega', 'Av. Bolívar, casa 1')
+            ->set('cantidad', '1')
+            ->call('confirmarPedido')
+            ->assertHasNoErrors();
+
+        $pedido = Pedido::where('cliente_id_doc', 'V-55566677')->first();
+
+        $this->assertNotNull($pedido);
+        $this->assertSame($client->id, $pedido->user_id);
+    }
+
+    public function test_a_guest_pedido_has_no_user_linked(): void
+    {
+        $emprendedor = $this->createEmprendedor();
+        $producto = $this->createProducto($emprendedor, ['stock' => 5]);
+
+        Livewire::test(Marketplace::class)
+            ->call('pedirProducto', $producto->id)
+            ->set('cliente_nombre', 'Comprador de Prueba')
+            ->set('cliente_id_doc', 'V-77788899')
+            ->set('cliente_telefono', '0414-7778889')
+            ->set('destino_estado', 'Carabobo')
+            ->set('destino_ciudad', 'Valencia')
+            ->set('direccion_entrega', 'Av. Bolívar, casa 1')
+            ->set('cantidad', '1')
+            ->call('confirmarPedido')
+            ->assertHasNoErrors();
+
+        $pedido = Pedido::where('cliente_id_doc', 'V-77788899')->first();
+
+        $this->assertNotNull($pedido);
+        $this->assertNull($pedido->user_id);
     }
 
     public function test_a_pedido_requires_a_delivery_address(): void
