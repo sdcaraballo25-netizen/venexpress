@@ -27,6 +27,16 @@ class Marketplace extends Component
 
     public ?int $selectedProductoId = null;
 
+    public ?int $viewingProductoId = null;
+
+    /**
+     * Cuando se navega a la página de una tienda puntual
+     * (public.marketplace.store), el catálogo se filtra a solo los
+     * productos de este emprendedor y el encabezado muestra su
+     * negocio en vez del genérico "Tienda de Emprendedores".
+     */
+    public ?Emprendedor $tiendaEmprendedor = null;
+
     public string $cliente_nombre = '';
 
     public string $cliente_id_doc = '';
@@ -49,9 +59,23 @@ class Marketplace extends Component
 
     public ?Pedido $pedidoCreado = null;
 
-    public function mount(VenezuelaLocationService $locationService): void
+    public function mount(VenezuelaLocationService $locationService, ?Emprendedor $emprendedor = null): void
     {
         $this->states = $locationService->states();
+
+        if ($emprendedor && $emprendedor->status === Emprendedor::STATUS_ACTIVE) {
+            $this->tiendaEmprendedor = $emprendedor;
+        }
+    }
+
+    public function verProducto(int $productoId): void
+    {
+        $this->viewingProductoId = $productoId;
+    }
+
+    public function cerrarDetalle(): void
+    {
+        $this->viewingProductoId = null;
     }
 
     public function updatedDestinoEstado(VenezuelaLocationService $locationService): void
@@ -66,6 +90,7 @@ class Marketplace extends Component
     public function pedirProducto(int $productoId): void
     {
         $this->selectedProductoId = $productoId;
+        $this->viewingProductoId = null;
         $this->pedidoCreado = null;
         $this->resetValidation();
     }
@@ -140,6 +165,10 @@ class Marketplace extends Component
             ->where('activo', true)
             ->where('stock', '>', 0)
             ->whereHas('emprendedor', fn ($query) => $query->where('status', Emprendedor::STATUS_ACTIVE))
+            ->when(
+                $this->tiendaEmprendedor,
+                fn ($query) => $query->where('emprendedor_id', $this->tiendaEmprendedor->id)
+            )
             ->with('emprendedor')
             ->latest()
             ->paginate(12);
@@ -148,12 +177,21 @@ class Marketplace extends Component
             ? Producto::find($this->selectedProductoId)
             : null;
 
+        $productoViendo = $this->viewingProductoId
+            ? Producto::with('emprendedor')->find($this->viewingProductoId)
+            : null;
+
         return view('public.marketplace', [
             'productos' => $productos,
             'productoSeleccionado' => $productoSeleccionado,
+            'productoViendo' => $productoViendo,
         ])->layout(
             $this->resolveLayoutForViewer(),
-            ['title' => 'Tienda — Venexpress']
+            [
+                'title' => $this->tiendaEmprendedor
+                    ? "{$this->tiendaEmprendedor->business_name} — Venexpress"
+                    : 'Tienda — Venexpress',
+            ]
         );
     }
 }

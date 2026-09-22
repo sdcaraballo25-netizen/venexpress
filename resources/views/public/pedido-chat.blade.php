@@ -15,7 +15,11 @@
                     {{ $pedido->producto->nombre }}
                 </h1>
                 <p class="text-gray-500 mt-2">
-                    {{ $pedido->cantidad }} unidad(es) · ${{ number_format((float) $pedido->precio_total_usd, 2) }} ·
+                    {{ $pedido->cantidad }} unidad(es) · ${{ number_format((float) $pedido->precio_total_usd, 2) }}
+                    @if ($pedido->precio_total_ves !== null)
+                        (Bs. {{ number_format($pedido->precio_total_ves, 2) }})
+                    @endif
+                    ·
                     Vendedor: <strong>{{ $pedido->emprendedor->business_name }}</strong>
                     @if ($pedido->emprendedor->user?->phone)
                         ({{ $pedido->emprendedor->user->phone }})

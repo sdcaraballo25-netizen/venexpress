@@ -360,6 +360,9 @@ Route::get('/emprendedor/pedidos/{pedidoId}', EmprendedorPedidoShow::class)
 Route::get('/tienda', Marketplace::class)
     ->name('public.marketplace');
 
+Route::get('/tienda/emprendedor/{emprendedor}', Marketplace::class)
+    ->name('public.marketplace.store');
+
 Route::get('/tienda/pedido/{token}', PedidoChat::class)
     ->name('public.marketplace.pedido');
 

@@ -7,7 +7,26 @@
         </p>
     </div>
 
-    @if ($successMessage)
+    @if ($createdTrackingNumber)
+        <div class="rounded-2xl border border-emerald-200 bg-emerald-50 p-5">
+            <p class="text-sm font-semibold text-emerald-700">Pedido #{{ $createdPedidoId }} confirmado</p>
+            <p class="text-2xl font-bold text-emerald-900 mt-1">{{ $createdTrackingNumber }}</p>
+            <p class="text-sm text-emerald-700 mt-1">
+                Total: <strong>${{ number_format($createdTotalUsd, 2) }}</strong>
+                (Bs. {{ number_format($createdTotalVes, 2) }})
+            </p>
+            <div class="mt-3 flex flex-wrap gap-3">
+                <a href="{{ route('packages.label', $createdPackageId) }}" target="_blank"
+                   class="rounded-xl border border-emerald-700 px-4 py-2 text-sm font-semibold text-emerald-800 hover:bg-emerald-100 transition">
+                    Imprimir / Descargar guía (PDF)
+                </a>
+                <button wire:click="$set('createdTrackingNumber', null)"
+                        class="rounded-xl px-4 py-2 text-sm font-semibold text-emerald-800 hover:bg-emerald-100 transition">
+                    Buscar otro pedido
+                </button>
+            </div>
+        </div>
+    @elseif ($successMessage)
         <div class="rounded-xl border border-emerald-200 bg-emerald-50 px-4 py-3 text-sm font-medium text-emerald-700">
             {{ $successMessage }}
         </div>
@@ -73,7 +92,7 @@
         {{-- =========================================================
              VERIFICACIÓN FÍSICA DEL PAQUETE
         ========================================================== --}}
-        <form wire:submit.prevent="generarGuia" class="bg-white rounded-2xl border border-[#E5E5E0] shadow-sm p-5 space-y-4">
+        <div class="bg-white rounded-2xl border border-[#E5E5E0] shadow-sm p-5 space-y-4">
             <p class="text-xs font-bold text-[#6B6B66] uppercase tracking-wider">Verificación del paquete</p>
 
             <div class="grid grid-cols-2 gap-4">
@@ -131,10 +150,24 @@
                 </div>
             @endif
 
-            <button type="submit" class="w-full bg-blue-600 hover:bg-blue-700 text-white font-semibold py-2.5 rounded-xl transition">
+            <button
+                type="button"
+                @click.prevent="$store.confirm.open({
+                    title: 'Confirmar datos antes de generar la guía',
+                    message: 'Cliente: ' + @js($pedido->cliente_nombre) + '\n'
+                        + 'Producto: ' + @js($pedido->producto?->nombre . ' — ' . $pedido->cantidad . ' unidad(es)') + '\n'
+                        + 'Total a cobrar: '
+                        + @js($pricePreview ? '$' . number_format($pricePreview['total_price_usd'], 2) . ' (Bs. ' . number_format($pricePreview['total_price_ves'], 2) . ')' : 'ingresa el peso para calcularlo')
+                        + '\n\n¿Todo correcto? Esto genera la guía definitiva.',
+                    confirmText: 'Generar guía',
+                    variant: 'primary',
+                    onConfirm: () => $wire.generarGuia(),
+                })"
+                class="w-full bg-blue-600 hover:bg-blue-700 text-white font-semibold py-2.5 rounded-xl transition"
+            >
                 Generar guía
             </button>
-        </form>
+        </div>
     @endif
 
 </div>

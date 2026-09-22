@@ -37,7 +37,15 @@ class EmprendedorPedidos extends Component
 
     public ?string $errorMessage = null;
 
+    public ?int $createdPedidoId = null;
+
+    public ?int $createdPackageId = null;
+
     public ?string $createdTrackingNumber = null;
+
+    public ?float $createdTotalUsd = null;
+
+    public ?float $createdTotalVes = null;
 
     // Datos que solo se conocen con el paquete físico en mano.
     public ?float $physical_weight_kg = null;
@@ -69,7 +77,8 @@ class EmprendedorPedidos extends Component
     public function buscar(): void
     {
         $this->reset([
-            'pedido', 'searchError', 'successMessage', 'errorMessage', 'createdTrackingNumber',
+            'pedido', 'searchError', 'successMessage', 'errorMessage',
+            'createdPedidoId', 'createdPackageId', 'createdTrackingNumber', 'createdTotalUsd', 'createdTotalVes',
             'physical_weight_kg', 'length_cm', 'width_cm', 'height_cm',
             'is_fragile', 'has_insurance', 'declared_value_usd', 'pricePreview',
         ]);
@@ -150,7 +159,11 @@ class EmprendedorPedidos extends Component
                 'total_price_usd' => $pricing['total_price_usd'],
                 'total_price_ves' => $pricing['total_price_ves'],
             ];
-        } catch (RuntimeException) {
+        } catch (\Throwable) {
+            // No interrumpimos el llenado del formulario (ej. mientras
+            // se están escribiendo las dimensiones una por una, con
+            // solo largo y ancho todavía sin el alto): simplemente no
+            // se muestra preview hasta que los datos sean válidos.
             $this->pricePreview = null;
         }
     }
@@ -166,15 +179,24 @@ class EmprendedorPedidos extends Component
 
         $this->validate([
             'physical_weight_kg' => ['required', 'numeric', 'min:0.01'],
-            'length_cm' => ['nullable', 'numeric', 'min:0'],
-            'width_cm' => ['nullable', 'numeric', 'min:0'],
-            'height_cm' => ['nullable', 'numeric', 'min:0'],
+            // TariffService exige las 3 dimensiones juntas o ninguna
+            // para calcular peso volumétrico: required_with evita que
+            // llegue solo una o dos y reviente con un error de servidor.
+            'length_cm' => ['nullable', 'numeric', 'min:0', 'required_with:width_cm,height_cm'],
+            'width_cm' => ['nullable', 'numeric', 'min:0', 'required_with:length_cm,height_cm'],
+            'height_cm' => ['nullable', 'numeric', 'min:0', 'required_with:length_cm,width_cm'],
             'is_fragile' => ['boolean'],
             'has_insurance' => ['boolean'],
             'declared_value_usd' => ['nullable', 'required_if:has_insurance,true', 'numeric', 'min:0.01'],
+        ], [
+            'length_cm.required_with' => 'Si indicas una dimensión, indica las 3 (largo, ancho y alto).',
+            'width_cm.required_with' => 'Si indicas una dimensión, indica las 3 (largo, ancho y alto).',
+            'height_cm.required_with' => 'Si indicas una dimensión, indica las 3 (largo, ancho y alto).',
         ]);
 
         try {
+            $pedidoId = $this->pedido->id;
+
             $package = $pedidoService->registrarGuia($this->pedido, [
                 'physical_weight_kg' => (float) $this->physical_weight_kg,
                 'length_cm' => $this->length_cm,
@@ -185,14 +207,18 @@ class EmprendedorPedidos extends Component
                 'declared_value_usd' => $this->declared_value_usd,
             ], Auth::id(), $this->ally());
 
+            $this->createdPedidoId = $pedidoId;
+            $this->createdPackageId = $package->id;
             $this->createdTrackingNumber = $package->tracking_number;
-            $this->successMessage = "Guía generada: {$package->tracking_number}.";
+            $this->createdTotalUsd = (float) $package->total_price_usd;
+            $this->createdTotalVes = (float) $package->total_price_ves;
+            $this->successMessage = "Pedido #{$pedidoId} confirmado. Guía generada: {$package->tracking_number}.";
             $this->pedido = null;
             $this->reset([
                 'physical_weight_kg', 'length_cm', 'width_cm', 'height_cm',
                 'is_fragile', 'has_insurance', 'declared_value_usd', 'pricePreview', 'pedidoIdInput',
             ]);
-        } catch (RuntimeException $e) {
+        } catch (RuntimeException|\InvalidArgumentException $e) {
             $this->errorMessage = $e->getMessage();
         }
     }

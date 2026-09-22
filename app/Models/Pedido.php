@@ -79,4 +79,17 @@ class Pedido extends Model
     {
         return $this->hasMany(MensajePedido::class)->oldest();
     }
+
+    /**
+     * Mismo criterio que Producto::precio_ves: todo se cotiza en USD y
+     * se muestra convertido a Bs. con la tasa BCV vigente (no se
+     * guarda un snapshot — se recalcula con la tasa actual cada vez
+     * que se muestra, igual que en el resto de la plataforma).
+     */
+    public function getPrecioTotalVesAttribute(): ?float
+    {
+        $rate = BcvRate::current()?->rate;
+
+        return $rate ? (float) $this->precio_total_usd * (float) $rate : null;
+    }
 }

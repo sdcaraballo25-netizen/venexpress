@@ -36,6 +36,20 @@ class Producto extends Model
         return $this->belongsTo(Emprendedor::class);
     }
 
+    /**
+     * Precio en bolívares al tipo de cambio BCV vigente, para mostrar
+     * junto al precio en USD en la tienda pública (mismo criterio que
+     * el resto de la plataforma: todo se cotiza en USD y se convierte
+     * a Bs. con la tasa BCV actual). Null si todavía no hay ninguna
+     * tasa cargada.
+     */
+    public function getPrecioVesAttribute(): ?float
+    {
+        $rate = BcvRate::current()?->rate;
+
+        return $rate ? (float) $this->precio_usd * (float) $rate : null;
+    }
+
     public function pedidos(): HasMany
     {
         return $this->hasMany(Pedido::class);

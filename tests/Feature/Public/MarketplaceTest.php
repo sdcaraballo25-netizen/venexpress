@@ -91,6 +91,35 @@ class MarketplaceTest extends TestCase
         $this->assertSame(Pedido::STATUS_PENDIENTE, $pedido->status);
     }
 
+    public function test_clicking_a_product_shows_its_detail_without_opening_the_order_form(): void
+    {
+        $emprendedor = $this->createEmprendedor();
+        $producto = $this->createProducto($emprendedor, [
+            'nombre' => 'Producto Detallado',
+            'descripcion' => 'Una descripción de prueba.',
+        ]);
+
+        Livewire::test(Marketplace::class)
+            ->call('verProducto', $producto->id)
+            ->assertSee('Una descripción de prueba.')
+            ->assertSet('selectedProductoId', null);
+    }
+
+    public function test_the_per_emprendedor_store_page_only_lists_that_emprendedors_products(): void
+    {
+        $emprendedor = $this->createEmprendedor();
+        $this->createProducto($emprendedor, ['nombre' => 'Producto Propio']);
+
+        $otroEmprendedor = $this->createEmprendedor();
+        $this->createProducto($otroEmprendedor, ['nombre' => 'Producto Ajeno']);
+
+        $this->get(route('public.marketplace.store', $emprendedor->id))
+            ->assertOk()
+            ->assertSee('Producto Propio')
+            ->assertDontSee('Producto Ajeno')
+            ->assertSee($emprendedor->business_name);
+    }
+
     public function test_a_pedido_is_linked_to_the_authenticated_client_so_they_can_find_it_later(): void
     {
         $client = User::factory()->create([

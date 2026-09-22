@@ -115,6 +115,49 @@ class EmprendedorPedidosTest extends TestCase
         $this->assertSame('Av. Bolívar, casa 1', $package->delivery_address);
     }
 
+    public function test_generating_a_guide_populates_the_printable_receipt_fields(): void
+    {
+        $pedido = $this->createPedidoPagado();
+        $ally = $pedido->emprendedor->pickupAlly;
+
+        $component = Livewire::actingAs($ally->user)
+            ->test(EmprendedorPedidos::class)
+            ->set('pedidoIdInput', (string) $pedido->id)
+            ->call('buscar')
+            ->set('physical_weight_kg', 3.0)
+            ->call('generarGuia')
+            ->assertSet('errorMessage', null);
+
+        $package = Package::find($pedido->fresh()->package_id);
+
+        $component
+            ->assertSet('createdPedidoId', $pedido->id)
+            ->assertSet('createdPackageId', $package->id)
+            ->assertSet('createdTrackingNumber', $package->tracking_number)
+            ->assertSet('createdTotalUsd', (float) $package->total_price_usd)
+            ->assertSet('createdTotalVes', (float) $package->total_price_ves);
+    }
+
+    public function test_submitting_only_some_dimensions_is_rejected_without_a_server_error(): void
+    {
+        $pedido = $this->createPedidoPagado();
+        $ally = $pedido->emprendedor->pickupAlly;
+
+        Livewire::actingAs($ally->user)
+            ->test(EmprendedorPedidos::class)
+            ->set('pedidoIdInput', (string) $pedido->id)
+            ->call('buscar')
+            ->set('physical_weight_kg', 3.0)
+            ->set('length_cm', 10)
+            ->set('width_cm', 10)
+            // height_cm queda vacío a propósito.
+            ->call('generarGuia')
+            ->assertHasErrors(['height_cm']);
+
+        $this->assertSame(Pedido::STATUS_PAGADO, $pedido->fresh()->status);
+        $this->assertSame(0, Package::count());
+    }
+
     public function test_searching_a_pedido_from_another_agency_is_rejected(): void
     {
         $pedido = $this->createPedidoPagado();
