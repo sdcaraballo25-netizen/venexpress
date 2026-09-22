@@ -92,30 +92,52 @@
         {{-- =========================================================
              VERIFICACIÓN FÍSICA DEL PAQUETE
         ========================================================== --}}
-        <div class="bg-white rounded-2xl border border-[#E5E5E0] shadow-sm p-5 space-y-4">
+        <div class="bg-white rounded-2xl border border-[#E5E5E0] shadow-sm p-5 space-y-4"
+            x-on:keydown.enter="
+                const field = $event.target;
+
+                if (field.tagName === 'TEXTAREA' || field.type === 'submit' || field.type === 'button') {
+                    return;
+                }
+
+                $event.preventDefault();
+
+                const focusable = Array.from(
+                    $el.querySelectorAll('input:not([type=hidden]), select, textarea')
+                ).filter((el) => ! el.disabled && el.offsetParent !== null);
+
+                const index = focusable.indexOf(field);
+
+                if (index > -1 && index < focusable.length - 1) {
+                    const next = focusable[index + 1];
+                    next.focus();
+                    if (typeof next.select === 'function') next.select();
+                }
+            "
+        >
             <p class="text-xs font-bold text-[#6B6B66] uppercase tracking-wider">Verificación del paquete</p>
 
             <div class="grid grid-cols-2 gap-4">
                 <div>
                     <label class="block text-xs font-medium text-[#6B6B66] mb-1">Peso real (kg)</label>
-                    <input type="number" step="0.01" min="0.01" wire:model.live="physical_weight_kg"
+                    <input type="number" step="0.01" min="0.01" wire:model.live.debounce.500ms="physical_weight_kg"
                            class="w-full rounded-xl border-[#E5E5E0] text-sm focus:ring-blue-500 focus:border-blue-500">
                     @error('physical_weight_kg') <p class="mt-1 text-xs text-red-600">{{ $message }}</p> @enderror
                 </div>
                 <div class="grid grid-cols-3 gap-2">
                     <div>
                         <label class="block text-xs font-medium text-[#6B6B66] mb-1">Largo (cm)</label>
-                        <input type="number" step="0.1" min="0" wire:model.live="length_cm"
+                        <input type="number" step="0.1" min="0" wire:model.live.debounce.500ms="length_cm"
                                class="w-full rounded-xl border-[#E5E5E0] text-sm focus:ring-blue-500 focus:border-blue-500">
                     </div>
                     <div>
                         <label class="block text-xs font-medium text-[#6B6B66] mb-1">Ancho (cm)</label>
-                        <input type="number" step="0.1" min="0" wire:model.live="width_cm"
+                        <input type="number" step="0.1" min="0" wire:model.live.debounce.500ms="width_cm"
                                class="w-full rounded-xl border-[#E5E5E0] text-sm focus:ring-blue-500 focus:border-blue-500">
                     </div>
                     <div>
                         <label class="block text-xs font-medium text-[#6B6B66] mb-1">Alto (cm)</label>
-                        <input type="number" step="0.1" min="0" wire:model.live="height_cm"
+                        <input type="number" step="0.1" min="0" wire:model.live.debounce.500ms="height_cm"
                                class="w-full rounded-xl border-[#E5E5E0] text-sm focus:ring-blue-500 focus:border-blue-500">
                     </div>
                 </div>
@@ -135,7 +157,7 @@
             @if ($has_insurance)
                 <div>
                     <label class="block text-xs font-medium text-[#6B6B66] mb-1">Valor declarado (USD)</label>
-                    <input type="number" step="0.01" min="0.01" wire:model.live="declared_value_usd"
+                    <input type="number" step="0.01" min="0.01" wire:model.live.debounce.500ms="declared_value_usd"
                            class="w-full rounded-xl border-[#E5E5E0] text-sm focus:ring-blue-500 focus:border-blue-500">
                     @error('declared_value_usd') <p class="mt-1 text-xs text-red-600">{{ $message }}</p> @enderror
                 </div>
