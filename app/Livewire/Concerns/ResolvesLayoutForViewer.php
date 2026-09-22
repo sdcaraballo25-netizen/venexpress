@@ -29,6 +29,7 @@ trait ResolvesLayoutForViewer
             $user->isRepartidor() => 'layouts.driver',
             $user->isAlmacen() => 'layouts.almacen',
             $user->isCliente() => 'layouts.client',
+            $user->isEmprendedor() => 'layouts.emprendedor',
             default => $guestLayout,
         };
     }

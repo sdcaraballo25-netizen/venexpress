@@ -33,6 +33,7 @@ class Show extends Component
             $user->isAliadoModule() => 'layouts.ally',
             $user->isRepartidor() => 'layouts.driver',
             $user->isAlmacen() => 'layouts.almacen',
+            $user->isEmprendedor() => 'layouts.emprendedor',
             default => 'layouts.client',
         };
     }
