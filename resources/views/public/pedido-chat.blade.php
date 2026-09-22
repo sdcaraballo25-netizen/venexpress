@@ -79,6 +79,54 @@
                     </button>
                 @endif
 
+                {{-- =========================================================
+                     RESEÑA DEL PRODUCTO
+                ========================================================== --}}
+                @if ($resenaMensaje)
+                    <div class="mb-6 rounded-xl border border-emerald-200 bg-emerald-50 px-4 py-3 text-sm text-emerald-700">
+                        {{ $resenaMensaje }}
+                    </div>
+                @endif
+
+                @if ($pedido->resena)
+                    <div class="mb-6 rounded-2xl border border-gray-200 bg-gray-50 p-5">
+                        <p class="text-sm font-semibold text-blue-950 mb-2">Tu reseña</p>
+                        <div class="flex items-center gap-0.5">
+                            @for ($i = 1; $i <= 5; $i++)
+                                <span class="text-lg {{ $i <= $pedido->resena->estrellas ? 'text-amber-400' : 'text-gray-200' }}">★</span>
+                            @endfor
+                        </div>
+                        @if ($pedido->resena->comentario)
+                            <p class="text-sm text-gray-600 mt-2">{{ $pedido->resena->comentario }}</p>
+                        @endif
+                    </div>
+                @else
+                    <div class="mb-6 rounded-2xl border border-gray-200 bg-gray-50 p-5" x-data="{ hover: 0 }">
+                        <p class="text-sm font-semibold text-blue-950 mb-2">Califica tu compra</p>
+
+                        <div class="flex items-center gap-1 mb-3">
+                            @for ($i = 1; $i <= 5; $i++)
+                                <button type="button"
+                                        wire:click="$set('estrellas', {{ $i }})"
+                                        @mouseenter="hover = {{ $i }}" @mouseleave="hover = 0"
+                                        :class="(hover || {{ $estrellas }}) >= {{ $i }} ? 'text-amber-400' : 'text-gray-200'"
+                                        class="text-3xl leading-none transition-colors">
+                                    ★
+                                </button>
+                            @endfor
+                        </div>
+                        @error('estrellas') <p class="text-xs text-red-600 mb-2">{{ $message }}</p> @enderror
+
+                        <textarea wire:model="comentario" rows="3" placeholder="¿Qué te pareció el producto? (opcional)"
+                                  class="w-full rounded-lg border-gray-200 text-sm focus:ring-blue-950 focus:border-blue-950"></textarea>
+                        @error('comentario') <p class="mt-1 text-xs text-red-600">{{ $message }}</p> @enderror
+
+                        <button wire:click="enviarResena" class="mt-3 text-sm font-semibold text-white bg-blue-950 hover:bg-blue-900 px-4 py-2 rounded-lg transition">
+                            Enviar reseña
+                        </button>
+                    </div>
+                @endif
+
             @endif
 
             {{-- =========================================================

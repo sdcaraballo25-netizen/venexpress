@@ -6,6 +6,7 @@ use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
 use Illuminate\Database\Eloquent\Relations\HasMany;
+use Illuminate\Database\Eloquent\Relations\HasOne;
 
 class Pedido extends Model
 {
@@ -78,6 +79,11 @@ class Pedido extends Model
     public function mensajes(): HasMany
     {
         return $this->hasMany(MensajePedido::class)->oldest();
+    }
+
+    public function resena(): HasOne
+    {
+        return $this->hasOne(Resena::class);
     }
 
     /**

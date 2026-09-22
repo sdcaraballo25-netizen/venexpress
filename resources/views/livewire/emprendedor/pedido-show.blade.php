@@ -75,6 +75,20 @@
                 Confirmar pedido
             </button>
         @endif
+
+        @if ($pedido->resena)
+            <div class="mt-4 pt-4 border-t border-[#E5E5E0]">
+                <p class="text-xs text-[#6B6B66] mb-1">Reseña del cliente</p>
+                <div class="flex items-center gap-0.5">
+                    @for ($i = 1; $i <= 5; $i++)
+                        <span class="text-base {{ $i <= $pedido->resena->estrellas ? 'text-amber-400' : 'text-gray-200' }}">★</span>
+                    @endfor
+                </div>
+                @if ($pedido->resena->comentario)
+                    <p class="text-sm text-[#4A4A45] mt-1">{{ $pedido->resena->comentario }}</p>
+                @endif
+            </div>
+        @endif
     </div>
 
     {{-- =========================================================

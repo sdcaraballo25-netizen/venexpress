@@ -3,6 +3,7 @@
 namespace App\Livewire\Public;
 
 use App\Livewire\Concerns\ResolvesLayoutForViewer;
+use App\Models\Customer;
 use App\Models\Emprendedor;
 use App\Models\Pedido;
 use App\Models\Producto;
@@ -59,6 +60,16 @@ class Marketplace extends Component
 
     public ?Pedido $pedidoCreado = null;
 
+    /**
+     * True cuando quien pide está logueado como Cliente y ya tiene un
+     * registro Customer con su cédula (viene de su registro en la
+     * plataforma) — en ese caso no tiene sentido volver a pedirle
+     * nombre/cédula/teléfono: se prellenan y el campo queda oculto,
+     * solo pide la dirección de entrega. Un invitado, o un Cliente sin
+     * ese registro todavía, sigue viendo los campos editables.
+     */
+    public bool $clienteAutenticadoConDatos = false;
+
     public function mount(VenezuelaLocationService $locationService, ?Emprendedor $emprendedor = null): void
     {
         $this->states = $locationService->states();
@@ -66,6 +77,28 @@ class Marketplace extends Component
         if ($emprendedor && $emprendedor->status === Emprendedor::STATUS_ACTIVE) {
             $this->tiendaEmprendedor = $emprendedor;
         }
+
+        $this->prefillDatosCliente();
+    }
+
+    protected function prefillDatosCliente(): void
+    {
+        $user = Auth::user();
+
+        if (! $user || ! $user->isCliente()) {
+            return;
+        }
+
+        $customer = Customer::where('user_id', $user->id)->first();
+
+        if (! $customer) {
+            return;
+        }
+
+        $this->cliente_nombre = $user->name;
+        $this->cliente_id_doc = $customer->id_doc;
+        $this->cliente_telefono = $customer->phone ?: ($user->phone ?? '');
+        $this->clienteAutenticadoConDatos = true;
     }
 
     public function verProducto(int $productoId): void
@@ -109,6 +142,11 @@ class Marketplace extends Component
             'cantidad',
             'cities',
         ]);
+
+        // El reset() de arriba también vacía nombre/cédula/teléfono
+        // aunque vinieran prellenados de la cuenta; se vuelven a traer
+        // para que sigan ocultos al abrir otro producto.
+        $this->prefillDatosCliente();
     }
 
     public function confirmarPedido(): void
@@ -170,6 +208,8 @@ class Marketplace extends Component
                 fn ($query) => $query->where('emprendedor_id', $this->tiendaEmprendedor->id)
             )
             ->with('emprendedor')
+            ->withAvg('resenas', 'estrellas')
+            ->withCount('resenas')
             ->latest()
             ->paginate(12);
 
@@ -178,7 +218,7 @@ class Marketplace extends Component
             : null;
 
         $productoViendo = $this->viewingProductoId
-            ? Producto::with('emprendedor')->find($this->viewingProductoId)
+            ? Producto::with('emprendedor')->withAvg('resenas', 'estrellas')->withCount('resenas')->find($this->viewingProductoId)
             : null;
 
         return view('public.marketplace', [

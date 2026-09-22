@@ -3,9 +3,11 @@
 namespace Tests\Feature\Public;
 
 use App\Livewire\Public\Marketplace;
+use App\Models\Customer;
 use App\Models\Emprendedor;
 use App\Models\Pedido;
 use App\Models\Producto;
+use App\Models\Resena;
 use App\Models\User;
 use Illuminate\Foundation\Testing\RefreshDatabase;
 use Livewire\Livewire;
@@ -91,6 +93,40 @@ class MarketplaceTest extends TestCase
         $this->assertSame(Pedido::STATUS_PENDIENTE, $pedido->status);
     }
 
+    public function test_the_catalog_shows_a_products_average_rating(): void
+    {
+        $emprendedor = $this->createEmprendedor();
+        $producto = $this->createProducto($emprendedor, ['nombre' => 'Producto Calificado']);
+
+        foreach ([5, 3] as $i => $estrellas) {
+            $pedido = Pedido::create([
+                'producto_id' => $producto->id,
+                'emprendedor_id' => $emprendedor->id,
+                'cantidad' => 1,
+                'precio_unitario_usd' => 15.00,
+                'precio_total_usd' => 15.00,
+                'cliente_nombre' => 'Cliente ' . $i,
+                'cliente_id_doc' => 'V-' . (1000 + $i),
+                'cliente_telefono' => '0424-0000000',
+                'destino_ciudad' => 'Valencia',
+                'destino_estado' => 'Carabobo',
+                'status' => Pedido::STATUS_CONFIRMADO,
+                'chat_token' => 'token-rating-' . $i,
+            ]);
+
+            Resena::create([
+                'pedido_id' => $pedido->id,
+                'producto_id' => $producto->id,
+                'estrellas' => $estrellas,
+            ]);
+        }
+
+        $this->get(route('public.marketplace'))
+            ->assertOk()
+            ->assertSee('4.0')
+            ->assertSee('(2)');
+    }
+
     public function test_clicking_a_product_shows_its_detail_without_opening_the_order_form(): void
     {
         $emprendedor = $this->createEmprendedor();
@@ -118,6 +154,47 @@ class MarketplaceTest extends TestCase
             ->assertSee('Producto Propio')
             ->assertDontSee('Producto Ajeno')
             ->assertSee($emprendedor->business_name);
+    }
+
+    public function test_checkout_prefills_and_hides_name_id_and_phone_for_a_client_with_a_customer_record(): void
+    {
+        $client = User::factory()->create([
+            'name' => 'Cliente Con Cuenta',
+            'role' => User::ROLE_CLIENTE,
+            'status' => User::STATUS_ACTIVE,
+            'account_verified_at' => now(),
+        ]);
+
+        Customer::create([
+            'id_doc' => 'V-12345678',
+            'user_id' => $client->id,
+            'name' => $client->name,
+            'phone' => '0414-1234567',
+            'email' => $client->email,
+        ]);
+
+        $emprendedor = $this->createEmprendedor();
+        $producto = $this->createProducto($emprendedor, ['stock' => 5]);
+
+        Livewire::actingAs($client)
+            ->test(Marketplace::class)
+            ->assertSet('clienteAutenticadoConDatos', true)
+            ->assertSet('cliente_nombre', 'Cliente Con Cuenta')
+            ->assertSet('cliente_id_doc', 'V-12345678')
+            ->assertSet('cliente_telefono', '0414-1234567')
+            ->call('pedirProducto', $producto->id)
+            ->assertDontSee('Cédula')
+            ->assertSee('Cliente Con Cuenta')
+            ->set('destino_estado', 'Carabobo')
+            ->set('destino_ciudad', 'Valencia')
+            ->set('direccion_entrega', 'Av. Bolívar, casa 1')
+            ->call('confirmarPedido')
+            ->assertHasNoErrors();
+
+        $pedido = Pedido::where('user_id', $client->id)->first();
+
+        $this->assertNotNull($pedido);
+        $this->assertSame('V-12345678', $pedido->cliente_id_doc);
     }
 
     public function test_a_pedido_is_linked_to_the_authenticated_client_so_they_can_find_it_later(): void

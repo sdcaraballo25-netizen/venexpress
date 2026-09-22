@@ -6,6 +6,7 @@ use App\Livewire\Concerns\ResolvesLayoutForViewer;
 use App\Models\Incident;
 use App\Models\MensajePedido;
 use App\Models\Pedido;
+use App\Models\Resena;
 use Livewire\Attributes\Title;
 use Livewire\Component;
 
@@ -28,10 +29,16 @@ class PedidoChat extends Component
 
     public ?string $garantiaMensaje = null;
 
+    public int $estrellas = 0;
+
+    public string $comentario = '';
+
+    public ?string $resenaMensaje = null;
+
     public function mount(string $token): void
     {
         $this->pedido = Pedido::where('chat_token', $token)
-            ->with(['producto', 'emprendedor.user', 'package'])
+            ->with(['producto', 'emprendedor.user', 'package', 'resena'])
             ->firstOrFail();
     }
 
@@ -92,6 +99,39 @@ class PedidoChat extends Component
         $this->showReportarProblema = false;
         $this->garantiaMensaje = 'Reporte enviado. El equipo de Venexpress lo revisará — recuerda que un producto '
             . 'defectuoso solo da derecho a cambio, no a devolución de dinero (ese acuerdo es directamente con el emprendedor).';
+    }
+
+    /**
+     * Reseña del producto para esta compra puntual. Una por pedido
+     * (resenas.pedido_id es unique) y solo una vez que hay guía real
+     * generada — mismo criterio que reportarProblema().
+     */
+    public function enviarResena(): void
+    {
+        $this->resenaMensaje = null;
+
+        if ($this->pedido->status !== Pedido::STATUS_CONFIRMADO || ! $this->pedido->package_id) {
+            return;
+        }
+
+        if ($this->pedido->resena) {
+            return;
+        }
+
+        $this->validate([
+            'estrellas' => ['required', 'integer', 'min:1', 'max:5'],
+            'comentario' => ['nullable', 'string', 'max:1000'],
+        ]);
+
+        $resena = Resena::create([
+            'pedido_id' => $this->pedido->id,
+            'producto_id' => $this->pedido->producto_id,
+            'estrellas' => $this->estrellas,
+            'comentario' => $this->comentario !== '' ? $this->comentario : null,
+        ]);
+
+        $this->pedido->setRelation('resena', $resena);
+        $this->resenaMensaje = '¡Gracias por tu reseña!';
     }
 
     public function render()

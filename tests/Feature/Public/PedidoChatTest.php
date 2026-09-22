@@ -8,6 +8,7 @@ use App\Models\MensajePedido;
 use App\Models\Package;
 use App\Models\Pedido;
 use App\Models\Producto;
+use App\Models\Resena;
 use Illuminate\Foundation\Testing\RefreshDatabase;
 use Illuminate\Support\Str;
 use Livewire\Livewire;
@@ -190,5 +191,113 @@ class PedidoChatTest extends TestCase
             ->call('reportarProblema');
 
         $this->assertSame(0, Incident::count());
+    }
+
+    private function createConfirmedPedidoWithToken(string $token): Pedido
+    {
+        $emprendedor = $this->createEmprendedor();
+        $pickupAlly = $emprendedor->pickupAlly;
+
+        $producto = Producto::create([
+            'emprendedor_id' => $emprendedor->id,
+            'nombre' => 'Producto de prueba',
+            'precio_usd' => 15.00,
+            'peso_kg' => 1.0,
+            'stock' => 5,
+            'activo' => true,
+        ]);
+
+        $package = $this->createPackage($pickupAlly, [
+            'current_status' => Package::STATUS_ENTREGADO,
+        ]);
+
+        return Pedido::create([
+            'producto_id' => $producto->id,
+            'emprendedor_id' => $emprendedor->id,
+            'package_id' => $package->id,
+            'cantidad' => 1,
+            'precio_unitario_usd' => 15.00,
+            'precio_total_usd' => 15.00,
+            'cliente_nombre' => 'Cliente de Prueba',
+            'cliente_id_doc' => 'V-87654321',
+            'cliente_telefono' => '0424-7654321',
+            'destino_ciudad' => 'Valencia',
+            'destino_estado' => 'Carabobo',
+            'status' => Pedido::STATUS_CONFIRMADO,
+            'chat_token' => $token,
+        ]);
+    }
+
+    public function test_a_client_can_leave_a_star_rating_and_review_on_a_confirmed_pedido(): void
+    {
+        $pedido = $this->createConfirmedPedidoWithToken('token-resena-1');
+
+        Livewire::test(PedidoChat::class, ['token' => 'token-resena-1'])
+            ->set('estrellas', 4)
+            ->set('comentario', 'Muy buen producto, llegó a tiempo.')
+            ->call('enviarResena')
+            ->assertHasNoErrors();
+
+        $resena = Resena::where('pedido_id', $pedido->id)->first();
+
+        $this->assertNotNull($resena);
+        $this->assertSame(4, $resena->estrellas);
+        $this->assertSame('Muy buen producto, llegó a tiempo.', $resena->comentario);
+        $this->assertSame($pedido->producto_id, $resena->producto_id);
+    }
+
+    public function test_a_review_requires_at_least_one_star(): void
+    {
+        $this->createConfirmedPedidoWithToken('token-resena-2');
+
+        Livewire::test(PedidoChat::class, ['token' => 'token-resena-2'])
+            ->set('comentario', 'Sin estrellas seleccionadas.')
+            ->call('enviarResena')
+            ->assertHasErrors(['estrellas']);
+
+        $this->assertSame(0, Resena::count());
+    }
+
+    public function test_the_comment_is_optional_on_a_review(): void
+    {
+        $this->createConfirmedPedidoWithToken('token-resena-3');
+
+        Livewire::test(PedidoChat::class, ['token' => 'token-resena-3'])
+            ->set('estrellas', 5)
+            ->call('enviarResena')
+            ->assertHasNoErrors();
+
+        $this->assertSame(1, Resena::count());
+        $this->assertNull(Resena::first()->comentario);
+    }
+
+    public function test_cannot_leave_a_second_review_for_the_same_pedido(): void
+    {
+        $pedido = $this->createConfirmedPedidoWithToken('token-resena-4');
+
+        Resena::create([
+            'pedido_id' => $pedido->id,
+            'producto_id' => $pedido->producto_id,
+            'estrellas' => 3,
+            'comentario' => 'Primera reseña.',
+        ]);
+
+        Livewire::test(PedidoChat::class, ['token' => 'token-resena-4'])
+            ->set('estrellas', 1)
+            ->call('enviarResena');
+
+        $this->assertSame(1, Resena::count());
+        $this->assertSame(3, Resena::first()->estrellas);
+    }
+
+    public function test_cannot_review_a_pedido_that_is_not_confirmed_yet(): void
+    {
+        $this->createPedidoWithToken('token-resena-5');
+
+        Livewire::test(PedidoChat::class, ['token' => 'token-resena-5'])
+            ->set('estrellas', 5)
+            ->call('enviarResena');
+
+        $this->assertSame(0, Resena::count());
     }
 }

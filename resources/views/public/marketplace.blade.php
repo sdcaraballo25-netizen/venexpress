@@ -89,6 +89,10 @@
                                 Vendido por {{ $productoViendo->emprendedor->business_name }} — ver tienda
                             </a>
 
+                            <div class="mt-2">
+                                <x-star-rating :rating="$productoViendo->resenas_avg_estrellas" :count="$productoViendo->resenas_count" />
+                            </div>
+
                             @if ($productoViendo->descripcion)
                                 <p class="text-sm text-gray-600 mt-3">{{ $productoViendo->descripcion }}</p>
                             @endif
@@ -128,27 +132,34 @@
 
                     <form wire:submit.prevent="confirmarPedido" class="space-y-4">
 
-                        <div>
-                            <label class="block text-xs font-medium text-gray-500 mb-1">Tu nombre</label>
-                            <input type="text" wire:model="cliente_nombre"
-                                   class="w-full rounded-lg border-gray-200 text-sm focus:ring-blue-950 focus:border-blue-950">
-                            @error('cliente_nombre') <p class="mt-1 text-xs text-red-600">{{ $message }}</p> @enderror
-                        </div>
+                        @if ($clienteAutenticadoConDatos)
+                            <div class="rounded-lg bg-white border border-gray-200 px-4 py-3 text-sm text-gray-600">
+                                Pedido a nombre de <strong class="text-blue-950">{{ $cliente_nombre }}</strong>
+                                ({{ $cliente_id_doc }}) · {{ $cliente_telefono }}
+                            </div>
+                        @else
+                            <div>
+                                <label class="block text-xs font-medium text-gray-500 mb-1">Tu nombre</label>
+                                <input type="text" wire:model="cliente_nombre"
+                                       class="w-full rounded-lg border-gray-200 text-sm focus:ring-blue-950 focus:border-blue-950">
+                                @error('cliente_nombre') <p class="mt-1 text-xs text-red-600">{{ $message }}</p> @enderror
+                            </div>
 
-                        <div class="grid grid-cols-2 gap-3">
-                            <div>
-                                <label class="block text-xs font-medium text-gray-500 mb-1">Cédula</label>
-                                <input type="text" wire:model="cliente_id_doc"
-                                       class="w-full rounded-lg border-gray-200 text-sm focus:ring-blue-950 focus:border-blue-950">
-                                @error('cliente_id_doc') <p class="mt-1 text-xs text-red-600">{{ $message }}</p> @enderror
+                            <div class="grid grid-cols-2 gap-3">
+                                <div>
+                                    <label class="block text-xs font-medium text-gray-500 mb-1">Cédula</label>
+                                    <input type="text" wire:model="cliente_id_doc"
+                                           class="w-full rounded-lg border-gray-200 text-sm focus:ring-blue-950 focus:border-blue-950">
+                                    @error('cliente_id_doc') <p class="mt-1 text-xs text-red-600">{{ $message }}</p> @enderror
+                                </div>
+                                <div>
+                                    <label class="block text-xs font-medium text-gray-500 mb-1">Teléfono</label>
+                                    <input type="text" wire:model="cliente_telefono"
+                                           class="w-full rounded-lg border-gray-200 text-sm focus:ring-blue-950 focus:border-blue-950">
+                                    @error('cliente_telefono') <p class="mt-1 text-xs text-red-600">{{ $message }}</p> @enderror
+                                </div>
                             </div>
-                            <div>
-                                <label class="block text-xs font-medium text-gray-500 mb-1">Teléfono</label>
-                                <input type="text" wire:model="cliente_telefono"
-                                       class="w-full rounded-lg border-gray-200 text-sm focus:ring-blue-950 focus:border-blue-950">
-                                @error('cliente_telefono') <p class="mt-1 text-xs text-red-600">{{ $message }}</p> @enderror
-                            </div>
-                        </div>
+                        @endif
 
                         <div class="grid grid-cols-2 gap-3">
                             <div>
@@ -250,6 +261,9 @@
                             <button wire:click="verProducto({{ $producto->id }})" class="block text-left w-full">
                                 <p class="font-semibold text-blue-950 mt-0.5">{{ $producto->nombre }}</p>
                             </button>
+                            <div class="mt-1">
+                                <x-star-rating :rating="$producto->resenas_avg_estrellas" :count="$producto->resenas_count" size="text-xs" />
+                            </div>
                             <p class="text-lg font-extrabold text-blue-950 mt-1">${{ number_format((float) $producto->precio_usd, 2) }}</p>
                             @if ($producto->precio_ves !== null)
                                 <p class="text-xs text-gray-400">Bs. {{ number_format($producto->precio_ves, 2) }}</p>

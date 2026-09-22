@@ -54,4 +54,27 @@ class Producto extends Model
     {
         return $this->hasMany(Pedido::class);
     }
+
+    public function resenas(): HasMany
+    {
+        return $this->hasMany(Resena::class);
+    }
+
+    /**
+     * Promedio de estrellas (1-5) entre todas las reseñas del
+     * producto, redondeado a 1 decimal. Null si todavía no tiene
+     * ninguna, para poder distinguir "sin reseñas" de "0 estrellas" en
+     * la vista.
+     */
+    public function getPromedioEstrellasAttribute(): ?float
+    {
+        $promedio = $this->resenas()->avg('estrellas');
+
+        return $promedio !== null ? round((float) $promedio, 1) : null;
+    }
+
+    public function getTotalResenasAttribute(): int
+    {
+        return $this->resenas()->count();
+    }
 }

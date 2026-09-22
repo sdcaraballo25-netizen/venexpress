@@ -26,7 +26,7 @@ class PedidoShow extends Component
     public function mount(int $pedidoId): void
     {
         $this->pedido = Pedido::where('emprendedor_id', Auth::user()->emprendedor->id)
-            ->with(['producto', 'package'])
+            ->with(['producto', 'package', 'resena'])
             ->findOrFail($pedidoId);
     }
 
