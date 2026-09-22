@@ -132,34 +132,82 @@
             {{-- =========================================================
                  CONVERSACIÓN
             ========================================================== --}}
-            <div class="border border-gray-100 rounded-2xl bg-gray-50 p-5 space-y-3 mb-6 max-h-96 overflow-y-auto">
-                @forelse ($mensajes as $mensaje)
-                    <div class="flex {{ $mensaje->autor === MensajePedido::AUTOR_CLIENTE ? 'justify-end' : 'justify-start' }}">
-                        <div class="max-w-[80%] rounded-2xl px-4 py-2.5 text-sm
-                            {{ $mensaje->autor === MensajePedido::AUTOR_CLIENTE
-                                ? 'bg-blue-950 text-white'
-                                : 'bg-white border border-gray-200 text-gray-800' }}">
-                            <p>{{ $mensaje->texto }}</p>
-                            <p class="mt-1 text-[10px] opacity-60">{{ $mensaje->created_at->diffForHumans() }}</p>
-                        </div>
-                    </div>
-                @empty
-                    <p class="text-sm text-gray-400 text-center py-6">
-                        Todavía no hay mensajes. Escríbele al vendedor para coordinar el pago.
-                    </p>
-                @endforelse
-            </div>
-
-            <form wire:submit.prevent="enviarMensaje" class="flex items-start gap-3">
-                <div class="flex-1">
-                    <textarea wire:model="texto" rows="2" placeholder="Escribe un mensaje..."
-                              class="w-full rounded-xl border-gray-200 text-sm focus:ring-blue-950 focus:border-blue-950"></textarea>
-                    @error('texto') <p class="mt-1 text-xs text-red-600">{{ $message }}</p> @enderror
+            <div class="border border-gray-200 rounded-2xl bg-white overflow-hidden">
+                <div class="px-5 py-3 border-b border-gray-100 bg-gray-50">
+                    <p class="text-sm font-semibold text-blue-950">Chat con {{ $pedido->emprendedor->business_name }}</p>
                 </div>
-                <button type="submit" class="bg-blue-950 hover:bg-blue-900 text-white font-semibold px-5 py-2.5 rounded-xl transition">
-                    Enviar
-                </button>
-            </form>
+
+                <div class="p-5 space-y-4 max-h-96 overflow-y-auto" x-ref="hilo" x-init="$refs.hilo.scrollTop = $refs.hilo.scrollHeight">
+                    @forelse ($mensajes as $mensaje)
+                        @php $esCliente = $mensaje->autor === MensajePedido::AUTOR_CLIENTE; @endphp
+                        <div class="flex items-end gap-2 {{ $esCliente ? 'flex-row-reverse' : 'flex-row' }}">
+                            <div class="shrink-0 h-7 w-7 rounded-full flex items-center justify-center text-[11px] font-bold
+                                {{ $esCliente ? 'bg-amber-400 text-[#111111]' : 'bg-blue-950 text-white' }}">
+                                {{ $esCliente ? 'T' : strtoupper(substr($pedido->emprendedor->business_name, 0, 1)) }}
+                            </div>
+
+                            <div class="max-w-[75%] rounded-2xl px-4 py-2.5 text-sm
+                                {{ $esCliente ? 'bg-blue-950 text-white rounded-br-sm' : 'bg-gray-100 text-gray-800 rounded-bl-sm' }}">
+
+                                @if ($mensaje->archivo_path)
+                                    @if ($mensaje->esImagen())
+                                        <a href="{{ Illuminate\Support\Facades\Storage::disk('public')->url($mensaje->archivo_path) }}" target="_blank">
+                                            <img src="{{ Illuminate\Support\Facades\Storage::disk('public')->url($mensaje->archivo_path) }}"
+                                                 class="rounded-lg max-h-48 object-cover mb-1.5" alt="Adjunto">
+                                        </a>
+                                    @else
+                                        <a href="{{ Illuminate\Support\Facades\Storage::disk('public')->url($mensaje->archivo_path) }}" target="_blank"
+                                           class="flex items-center gap-2 rounded-lg px-3 py-2 mb-1.5
+                                               {{ $esCliente ? 'bg-blue-900' : 'bg-white border border-gray-200' }}">
+                                            <span>📎</span>
+                                            <span class="text-xs underline truncate">{{ $mensaje->archivo_nombre ?? 'Archivo adjunto' }}</span>
+                                        </a>
+                                    @endif
+                                @endif
+
+                                @if ($mensaje->texto !== '')
+                                    <p>{{ $mensaje->texto }}</p>
+                                @endif
+
+                                <p class="mt-1 text-[10px] opacity-60">{{ $mensaje->created_at->diffForHumans() }}</p>
+                            </div>
+                        </div>
+                    @empty
+                        <p class="text-sm text-gray-400 text-center py-6">
+                            Todavía no hay mensajes. Escríbele al vendedor para coordinar el pago.
+                        </p>
+                    @endforelse
+                </div>
+
+                <form wire:submit.prevent="enviarMensaje" class="border-t border-gray-100 p-3">
+                    @if ($archivo)
+                        <div class="flex items-center gap-2 bg-gray-50 border border-gray-200 rounded-lg px-3 py-2 mb-2 text-xs text-gray-600">
+                            <span>📎</span>
+                            <span class="truncate flex-1">{{ $archivo->getClientOriginalName() }}</span>
+                            <button type="button" wire:click="$set('archivo', null)" class="text-gray-400 hover:text-gray-700">✕</button>
+                        </div>
+                    @endif
+                    @error('archivo') <p class="mb-2 text-xs text-red-600">{{ $message }}</p> @enderror
+
+                    <div class="flex items-end gap-2">
+                        <label class="shrink-0 cursor-pointer text-gray-400 hover:text-blue-950 p-2" title="Adjuntar comprobante de pago u otro archivo">
+                            <input type="file" wire:model="archivo" class="hidden">
+                            <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                                      d="M15.172 7l-6.586 6.586a2 2 0 102.828 2.828l6.414-6.586a4 4 0 00-5.656-5.656l-6.415 6.585a6 6 0 108.486 8.486L20.5 13" />
+                            </svg>
+                        </label>
+
+                        <textarea wire:model="texto" rows="1" placeholder="Escribe un mensaje..."
+                                  class="flex-1 rounded-xl border-gray-200 text-sm focus:ring-blue-950 focus:border-blue-950 resize-none"></textarea>
+
+                        <button type="submit" class="shrink-0 bg-blue-950 hover:bg-blue-900 text-white font-semibold px-5 py-2.5 rounded-xl transition">
+                            Enviar
+                        </button>
+                    </div>
+                    @error('texto') <p class="mt-1 text-xs text-red-600">{{ $message }}</p> @enderror
+                </form>
+            </div>
 
         </div>
     </section>

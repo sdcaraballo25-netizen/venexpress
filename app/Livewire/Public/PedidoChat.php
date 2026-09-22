@@ -9,6 +9,7 @@ use App\Models\Pedido;
 use App\Models\Resena;
 use Livewire\Attributes\Title;
 use Livewire\Component;
+use Livewire\WithFileUploads;
 
 /**
  * Chat del cliente con el emprendedor sobre un pedido puntual. Acceso
@@ -18,10 +19,14 @@ use Livewire\Component;
 class PedidoChat extends Component
 {
     use ResolvesLayoutForViewer;
+    use WithFileUploads;
 
     public Pedido $pedido;
 
     public string $texto = '';
+
+    /** @var \Livewire\Features\SupportFileUploads\TemporaryUploadedFile|null */
+    public $archivo = null;
 
     public bool $showReportarProblema = false;
 
@@ -44,17 +49,34 @@ class PedidoChat extends Component
 
     public function enviarMensaje(): void
     {
+        if (trim($this->texto) === '' && ! $this->archivo) {
+            $this->addError('texto', 'Escribe un mensaje o adjunta un archivo.');
+
+            return;
+        }
+
         $this->validate([
-            'texto' => ['required', 'string', 'max:2000'],
+            'texto' => ['nullable', 'string', 'max:2000'],
+            // El comprobante de pago normalmente es una foto o captura
+            // de pantalla; se permite pdf también por si el banco
+            // manda el comprobante así.
+            'archivo' => ['nullable', 'file', 'mimes:jpg,jpeg,png,webp,pdf', 'max:4096'],
         ]);
 
-        MensajePedido::create([
+        $data = [
             'pedido_id' => $this->pedido->id,
             'autor' => MensajePedido::AUTOR_CLIENTE,
-            'texto' => $this->texto,
-        ]);
+            'texto' => trim($this->texto),
+        ];
 
-        $this->texto = '';
+        if ($this->archivo) {
+            $data['archivo_path'] = $this->archivo->store('mensajes-pedido', 'public');
+            $data['archivo_nombre'] = $this->archivo->getClientOriginalName();
+        }
+
+        MensajePedido::create($data);
+
+        $this->reset(['texto', 'archivo']);
     }
 
     /**

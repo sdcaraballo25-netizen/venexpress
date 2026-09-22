@@ -10,6 +10,8 @@ use App\Models\Pedido;
 use App\Models\Producto;
 use App\Models\Resena;
 use Illuminate\Foundation\Testing\RefreshDatabase;
+use Illuminate\Http\UploadedFile;
+use Illuminate\Support\Facades\Storage;
 use Illuminate\Support\Str;
 use Livewire\Livewire;
 use Tests\Feature\Concerns\CreatesTestEmprendedores;
@@ -89,6 +91,42 @@ class PedidoChatTest extends TestCase
             ->set('texto', '')
             ->call('enviarMensaje')
             ->assertHasErrors(['texto']);
+    }
+
+    public function test_a_guest_can_attach_a_payment_receipt_without_any_text(): void
+    {
+        Storage::fake('public');
+
+        $pedido = $this->createPedidoWithToken('token-chat-adjunto');
+
+        Livewire::test(PedidoChat::class, ['token' => 'token-chat-adjunto'])
+            ->set('texto', '')
+            ->set('archivo', UploadedFile::fake()->image('comprobante.jpg'))
+            ->call('enviarMensaje')
+            ->assertHasNoErrors();
+
+        $mensaje = MensajePedido::where('pedido_id', $pedido->id)->first();
+
+        $this->assertNotNull($mensaje);
+        $this->assertSame('', $mensaje->texto);
+        $this->assertNotNull($mensaje->archivo_path);
+        $this->assertSame('comprobante.jpg', $mensaje->archivo_nombre);
+        $this->assertTrue($mensaje->esImagen());
+
+        Storage::disk('public')->assertExists($mensaje->archivo_path);
+    }
+
+    public function test_sending_neither_text_nor_an_attachment_is_rejected(): void
+    {
+        $this->createPedidoWithToken('token-chat-vacio');
+
+        Livewire::test(PedidoChat::class, ['token' => 'token-chat-vacio'])
+            ->set('texto', '')
+            ->set('archivo', null)
+            ->call('enviarMensaje')
+            ->assertHasErrors(['texto']);
+
+        $this->assertSame(0, MensajePedido::count());
     }
 
     public function test_a_client_can_report_a_defective_product_on_a_confirmed_pedido(): void

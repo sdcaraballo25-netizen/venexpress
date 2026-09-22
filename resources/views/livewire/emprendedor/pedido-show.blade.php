@@ -94,17 +94,43 @@
     {{-- =========================================================
          CONVERSACIÓN
     ========================================================== --}}
-    <div class="bg-white rounded-2xl border border-[#E5E5E0] shadow-sm p-5">
-        <p class="text-xs font-bold text-[#6B6B66] uppercase tracking-wider mb-4">Chat con el cliente</p>
+    <div class="bg-white rounded-2xl border border-[#E5E5E0] shadow-sm overflow-hidden">
+        <div class="px-5 py-3 border-b border-[#E5E5E0] bg-slate-50">
+            <p class="text-xs font-bold text-[#6B6B66] uppercase tracking-wider">Chat con el cliente</p>
+        </div>
 
-        <div class="space-y-3 mb-4 max-h-96 overflow-y-auto">
+        <div class="p-5 space-y-4 max-h-96 overflow-y-auto" x-ref="hilo" x-init="$refs.hilo.scrollTop = $refs.hilo.scrollHeight">
             @forelse ($mensajes as $mensaje)
-                <div class="flex {{ $mensaje->autor === MensajePedido::AUTOR_EMPRENDEDOR ? 'justify-end' : 'justify-start' }}">
-                    <div class="max-w-[80%] rounded-2xl px-4 py-2.5 text-sm
-                        {{ $mensaje->autor === MensajePedido::AUTOR_EMPRENDEDOR
-                            ? 'bg-blue-600 text-white'
-                            : 'bg-slate-100 text-[#111111]' }}">
-                        <p>{{ $mensaje->texto }}</p>
+                @php $esEmprendedor = $mensaje->autor === MensajePedido::AUTOR_EMPRENDEDOR; @endphp
+                <div class="flex items-end gap-2 {{ $esEmprendedor ? 'flex-row-reverse' : 'flex-row' }}">
+                    <div class="shrink-0 h-7 w-7 rounded-full flex items-center justify-center text-[11px] font-bold
+                        {{ $esEmprendedor ? 'bg-blue-600 text-white' : 'bg-amber-400 text-[#111111]' }}">
+                        {{ $esEmprendedor ? strtoupper(substr(auth()->user()->emprendedor->business_name, 0, 1)) : 'C' }}
+                    </div>
+
+                    <div class="max-w-[75%] rounded-2xl px-4 py-2.5 text-sm
+                        {{ $esEmprendedor ? 'bg-blue-600 text-white rounded-br-sm' : 'bg-slate-100 text-[#111111] rounded-bl-sm' }}">
+
+                        @if ($mensaje->archivo_path)
+                            @if ($mensaje->esImagen())
+                                <a href="{{ Illuminate\Support\Facades\Storage::disk('public')->url($mensaje->archivo_path) }}" target="_blank">
+                                    <img src="{{ Illuminate\Support\Facades\Storage::disk('public')->url($mensaje->archivo_path) }}"
+                                         class="rounded-lg max-h-48 object-cover mb-1.5" alt="Adjunto">
+                                </a>
+                            @else
+                                <a href="{{ Illuminate\Support\Facades\Storage::disk('public')->url($mensaje->archivo_path) }}" target="_blank"
+                                   class="flex items-center gap-2 rounded-lg px-3 py-2 mb-1.5
+                                       {{ $esEmprendedor ? 'bg-blue-700' : 'bg-white border border-[#E5E5E0]' }}">
+                                    <span>📎</span>
+                                    <span class="text-xs underline truncate">{{ $mensaje->archivo_nombre ?? 'Archivo adjunto' }}</span>
+                                </a>
+                            @endif
+                        @endif
+
+                        @if ($mensaje->texto !== '')
+                            <p>{{ $mensaje->texto }}</p>
+                        @endif
+
                         <p class="mt-1 text-[10px] opacity-60">{{ $mensaje->created_at->diffForHumans() }}</p>
                     </div>
                 </div>
@@ -113,15 +139,33 @@
             @endforelse
         </div>
 
-        <form wire:submit.prevent="enviarMensaje" class="flex items-start gap-3">
-            <div class="flex-1">
-                <textarea wire:model="texto" rows="2" placeholder="Escribe un mensaje..."
-                          class="w-full rounded-xl border-[#E5E5E0] text-sm focus:ring-blue-500 focus:border-blue-500"></textarea>
-                @error('texto') <p class="mt-1 text-xs text-red-600">{{ $message }}</p> @enderror
+        <form wire:submit.prevent="enviarMensaje" class="border-t border-[#E5E5E0] p-3">
+            @if ($archivo)
+                <div class="flex items-center gap-2 bg-slate-50 border border-[#E5E5E0] rounded-lg px-3 py-2 mb-2 text-xs text-[#6B6B66]">
+                    <span>📎</span>
+                    <span class="truncate flex-1">{{ $archivo->getClientOriginalName() }}</span>
+                    <button type="button" wire:click="$set('archivo', null)" class="text-[#6B6B66] hover:text-[#111111]">✕</button>
+                </div>
+            @endif
+            @error('archivo') <p class="mb-2 text-xs text-red-600">{{ $message }}</p> @enderror
+
+            <div class="flex items-end gap-2">
+                <label class="shrink-0 cursor-pointer text-[#6B6B66] hover:text-blue-600 p-2" title="Adjuntar archivo">
+                    <input type="file" wire:model="archivo" class="hidden">
+                    <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                              d="M15.172 7l-6.586 6.586a2 2 0 102.828 2.828l6.414-6.586a4 4 0 00-5.656-5.656l-6.415 6.585a6 6 0 108.486 8.486L20.5 13" />
+                    </svg>
+                </label>
+
+                <textarea wire:model="texto" rows="1" placeholder="Escribe un mensaje..."
+                          class="flex-1 rounded-xl border-[#E5E5E0] text-sm focus:ring-blue-500 focus:border-blue-500 resize-none"></textarea>
+
+                <button type="submit" class="shrink-0 bg-blue-600 hover:bg-blue-700 text-white font-semibold px-5 py-2.5 rounded-xl transition">
+                    Enviar
+                </button>
             </div>
-            <button type="submit" class="bg-blue-600 hover:bg-blue-700 text-white font-semibold px-5 py-2.5 rounded-xl transition">
-                Enviar
-            </button>
+            @error('texto') <p class="mt-1 text-xs text-red-600">{{ $message }}</p> @enderror
         </form>
     </div>
 

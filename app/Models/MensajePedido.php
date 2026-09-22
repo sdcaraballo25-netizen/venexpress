@@ -20,10 +20,25 @@ class MensajePedido extends Model
         'pedido_id',
         'autor',
         'texto',
+        'archivo_path',
+        'archivo_nombre',
     ];
+
+    protected const IMAGE_EXTENSIONS = ['jpg', 'jpeg', 'png', 'webp'];
 
     public function pedido(): BelongsTo
     {
         return $this->belongsTo(Pedido::class);
+    }
+
+    public function esImagen(): bool
+    {
+        if (! $this->archivo_path) {
+            return false;
+        }
+
+        $extension = strtolower(pathinfo($this->archivo_path, PATHINFO_EXTENSION));
+
+        return in_array($extension, self::IMAGE_EXTENSIONS, true);
     }
 }

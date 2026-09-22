@@ -9,15 +9,21 @@ use Illuminate\Support\Facades\Auth;
 use Livewire\Attributes\Layout;
 use Livewire\Attributes\Title;
 use Livewire\Component;
+use Livewire\WithFileUploads;
 use RuntimeException;
 
 #[Layout('layouts.emprendedor')]
 #[Title('Pedido')]
 class PedidoShow extends Component
 {
+    use WithFileUploads;
+
     public Pedido $pedido;
 
     public string $texto = '';
+
+    /** @var \Livewire\Features\SupportFileUploads\TemporaryUploadedFile|null */
+    public $archivo = null;
 
     public ?string $errorMessage = null;
 
@@ -32,17 +38,31 @@ class PedidoShow extends Component
 
     public function enviarMensaje(): void
     {
+        if (trim($this->texto) === '' && ! $this->archivo) {
+            $this->addError('texto', 'Escribe un mensaje o adjunta un archivo.');
+
+            return;
+        }
+
         $this->validate([
-            'texto' => ['required', 'string', 'max:2000'],
+            'texto' => ['nullable', 'string', 'max:2000'],
+            'archivo' => ['nullable', 'file', 'mimes:jpg,jpeg,png,webp,pdf', 'max:4096'],
         ]);
 
-        MensajePedido::create([
+        $data = [
             'pedido_id' => $this->pedido->id,
             'autor' => MensajePedido::AUTOR_EMPRENDEDOR,
-            'texto' => $this->texto,
-        ]);
+            'texto' => trim($this->texto),
+        ];
 
-        $this->texto = '';
+        if ($this->archivo) {
+            $data['archivo_path'] = $this->archivo->store('mensajes-pedido', 'public');
+            $data['archivo_nombre'] = $this->archivo->getClientOriginalName();
+        }
+
+        MensajePedido::create($data);
+
+        $this->reset(['texto', 'archivo']);
     }
 
     public function confirmar(PedidoService $pedidoService): void

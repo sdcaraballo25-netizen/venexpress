@@ -11,6 +11,8 @@ use App\Models\Producto;
 use App\Models\RateMatrix;
 use Illuminate\Database\Eloquent\ModelNotFoundException;
 use Illuminate\Foundation\Testing\RefreshDatabase;
+use Illuminate\Http\UploadedFile;
+use Illuminate\Support\Facades\Storage;
 use Livewire\Livewire;
 use Tests\Feature\Concerns\CreatesTestEmprendedores;
 use Tests\TestCase;
@@ -91,6 +93,30 @@ class PedidoShowTest extends TestCase
 
         $this->assertNotNull($mensaje);
         $this->assertSame(MensajePedido::AUTOR_EMPRENDEDOR, $mensaje->autor);
+    }
+
+    public function test_an_emprendedor_can_attach_a_file_to_a_message(): void
+    {
+        Storage::fake('public');
+
+        $emprendedor = $this->createEmprendedor();
+        $pedido = $this->createPedidoFor($emprendedor);
+
+        Livewire::actingAs($emprendedor->user)
+            ->test(PedidoShow::class, ['pedidoId' => $pedido->id])
+            ->set('texto', 'Aquí está tu guía')
+            ->set('archivo', UploadedFile::fake()->create('guia.pdf', 100, 'application/pdf'))
+            ->call('enviarMensaje')
+            ->assertHasNoErrors();
+
+        $mensaje = MensajePedido::where('pedido_id', $pedido->id)->first();
+
+        $this->assertNotNull($mensaje);
+        $this->assertNotNull($mensaje->archivo_path);
+        $this->assertSame('guia.pdf', $mensaje->archivo_nombre);
+        $this->assertFalse($mensaje->esImagen());
+
+        Storage::disk('public')->assertExists($mensaje->archivo_path);
     }
 
     public function test_an_emprendedor_cannot_view_another_emprendedors_pedido(): void
