@@ -1,6 +1,34 @@
 @php
     use App\Models\Ally;
     use Illuminate\Support\Facades\Storage;
+
+    $statusStyles = [
+
+        'PENDIENTE' => [
+            'bg' => 'bg-amber-50',
+            'text' => 'text-amber-700',
+            'dot' => 'bg-amber-500',
+        ],
+
+        'ACTIVO' => [
+            'bg' => 'bg-blue-50',
+            'text' => 'text-blue-700',
+            'dot' => 'bg-blue-600',
+        ],
+
+        'RECHAZADO' => [
+            'bg' => 'bg-red-50',
+            'text' => 'text-red-700',
+            'dot' => 'bg-red-500',
+        ],
+
+        'SUSPENDIDO' => [
+            'bg' => 'bg-slate-100',
+            'text' => 'text-slate-700',
+            'dot' => 'bg-slate-500',
+        ],
+
+    ];
 @endphp
 
 <div class="min-h-screen">
@@ -11,11 +39,11 @@
     <div class="flex flex-col md:flex-row md:items-center md:justify-between gap-4 mb-8">
 
         <div>
-            <h1 class="font-display text-3xl font-bold text-[#0F172A]">
+            <h1 class="font-display text-3xl font-bold text-[#111111]">
                 Gestión de Aliados
             </h1>
 
-            <p class="text-sm text-[#64748B] mt-1">
+            <p class="text-sm text-[#6B6B66] mt-1">
                 Administra las taquillas aliadas de Venexpress.
             </p>
         </div>
@@ -49,7 +77,7 @@
     {{-- =========================================================
          BUSCADOR
     ========================================================== --}}
-    <div class="bg-white border border-[#E2E8F0] rounded-2xl p-5 shadow-sm mb-6">
+    <div class="bg-white border border-[#E5E5E0] rounded-2xl p-5 shadow-sm mb-6">
 
         <div class="relative max-w-md">
 
@@ -57,10 +85,10 @@
                 type="text"
                 wire:model.live="search"
                 placeholder="Buscar por empresa, RIF o ciudad..."
-                class="w-full rounded-xl border border-[#E2E8F0]
+                class="w-full rounded-xl border border-[#E5E5E0]
                        px-4 py-3 text-sm
-                       text-[#0F172A]
-                       placeholder:text-[#94A3B8]
+                       text-[#111111]
+                       placeholder:text-[#B8B8B2]
                        focus:border-blue-500
                        focus:ring-blue-500"
             >
@@ -73,7 +101,7 @@
     {{-- =========================================================
          TABLA
     ========================================================== --}}
-    <div class="bg-white border border-[#E2E8F0] rounded-2xl shadow-sm overflow-hidden">
+    <div class="bg-white border border-[#E5E5E0] rounded-2xl shadow-sm overflow-hidden">
 
         <div class="overflow-x-auto">
 
@@ -82,25 +110,25 @@
                 {{-- CABECERA --}}
                 <thead>
 
-                    <tr class="bg-slate-50 border-b border-[#E2E8F0]">
+                    <tr class="bg-slate-50 border-b border-[#E5E5E0]">
 
-                        <th class="px-6 py-4 text-left text-xs font-semibold text-[#64748B] uppercase">
+                        <th class="px-6 py-4 text-left text-xs font-semibold text-[#6B6B66] uppercase">
                             Aliado / Empresa
                         </th>
 
-                        <th class="px-6 py-4 text-left text-xs font-semibold text-[#64748B] uppercase">
+                        <th class="px-6 py-4 text-left text-xs font-semibold text-[#6B6B66] uppercase">
                             RIF
                         </th>
 
-                        <th class="px-6 py-4 text-left text-xs font-semibold text-[#64748B] uppercase">
+                        <th class="px-6 py-4 text-left text-xs font-semibold text-[#6B6B66] uppercase">
                             Ciudad
                         </th>
 
-                        <th class="px-6 py-4 text-center text-xs font-semibold text-[#64748B] uppercase">
+                        <th class="px-6 py-4 text-center text-xs font-semibold text-[#6B6B66] uppercase">
                             Estado
                         </th>
 
-                        <th class="px-6 py-4 text-right text-xs font-semibold text-[#64748B] uppercase">
+                        <th class="px-6 py-4 text-right text-xs font-semibold text-[#6B6B66] uppercase">
                             Acción
                         </th>
 
@@ -116,34 +144,6 @@
 
                         @php
 
-                            $statusStyles = [
-
-                                'PENDIENTE' => [
-                                    'bg' => 'bg-amber-50',
-                                    'text' => 'text-amber-700',
-                                    'dot' => 'bg-amber-500',
-                                ],
-
-                                'ACTIVO' => [
-                                    'bg' => 'bg-blue-50',
-                                    'text' => 'text-blue-700',
-                                    'dot' => 'bg-blue-600',
-                                ],
-
-                                'RECHAZADO' => [
-                                    'bg' => 'bg-red-50',
-                                    'text' => 'text-red-700',
-                                    'dot' => 'bg-red-500',
-                                ],
-
-                                'SUSPENDIDO' => [
-                                    'bg' => 'bg-slate-100',
-                                    'text' => 'text-slate-700',
-                                    'dot' => 'bg-slate-500',
-                                ],
-
-                            ];
-
                             $style = $statusStyles[$ally->status] ?? [
                                 'bg' => 'bg-slate-50',
                                 'text' => 'text-slate-600',
@@ -153,7 +153,7 @@
                         @endphp
 
 
-                        <tr class="border-b border-[#F1F5F9] last:border-0 hover:bg-slate-50 transition">
+                        <tr class="border-b border-[#F0F0EC] last:border-0 hover:bg-slate-50 transition">
 
 
                             {{-- =================================================
@@ -164,20 +164,27 @@
                                 <div class="flex items-center gap-3">
 
                                     @if($ally->storefront_photo_path)
-                                        <img
-                                            src="{{ route('allies.documents.storefront', $ally) }}"
-                                            alt="Fachada de {{ $ally->business_name }}"
-                                            class="w-10 h-10 rounded-lg object-cover border border-[#E2E8F0] shrink-0"
+                                        <button
+                                            type="button"
+                                            wire:click="viewDetails({{ $ally->id }})"
+                                            title="Ver detalles del aliado"
+                                            class="shrink-0"
                                         >
+                                            <img
+                                                src="{{ route('allies.documents.storefront', $ally) }}"
+                                                alt="Fachada de {{ $ally->business_name }}"
+                                                class="w-10 h-10 rounded-lg object-cover border border-[#E5E5E0] hover:opacity-80 transition"
+                                            >
+                                        </button>
                                     @endif
 
                                     <div>
 
-                                        <p class="font-semibold text-[#0F172A]">
+                                        <p class="font-semibold text-[#111111]">
                                             {{ $ally->business_name }}
                                         </p>
 
-                                        <p class="text-xs text-[#64748B] mt-1">
+                                        <p class="text-xs text-[#6B6B66] mt-1">
                                             {{ $ally->user?->email }}
                                         </p>
 
@@ -191,7 +198,7 @@
                             {{-- =================================================
                                  RIF
                             ================================================== --}}
-                            <td class="px-6 py-4 text-[#475569]">
+                            <td class="px-6 py-4 text-[#4A4A45]">
 
                                 {{ $ally->rif }}
 
@@ -201,7 +208,7 @@
                             {{-- =================================================
                                  CIUDAD
                             ================================================== --}}
-                            <td class="px-6 py-4 text-[#475569]">
+                            <td class="px-6 py-4 text-[#4A4A45]">
 
                                 {{ $ally->city }}
 
@@ -251,6 +258,21 @@
                                 <div class="flex justify-end items-center gap-2">
 
                                     {{-- =========================================
+                                         VER DETALLES
+                                    ========================================== --}}
+                                    <button
+                                        wire:click="viewDetails({{ $ally->id }})"
+                                        class="px-3 py-2 rounded-lg
+                                               bg-slate-50 text-slate-600
+                                               hover:bg-slate-100
+                                               text-xs font-semibold
+                                               transition inline-flex items-center gap-1.5"
+                                    >
+                                        <i class="fa-solid fa-eye"></i>
+                                        Ver detalles
+                                    </button>
+
+                                    {{-- =========================================
                                          UBICACIÓN (para el localizador público)
                                     ========================================== --}}
                                     @if($ally->status !== Ally::STATUS_REJECTED)
@@ -274,10 +296,14 @@
                                     ========================================== --}}
                                     @if($ally->status !== Ally::STATUS_REJECTED)
                                         <button
-                                            wire:click="toggleVerifiedDestination({{ $ally->id }})"
-                                            wire:confirm="{{ $ally->is_verified_destination
-                                                ? '¿Quitar la verificación de punto de entrega/retiro de este aliado?'
-                                                : 'Esto es una configuración administrativa temporal (todavía no existe el flujo de verificación documental). ¿Marcar este aliado como punto verificado de entrega/retiro?' }}"
+                                            @click.prevent="$store.confirm.open({
+                                                message: {{ Js::from($ally->is_verified_destination
+                                                    ? '¿Quitar la verificación de punto de entrega/retiro de este aliado?'
+                                                    : 'Esto es una configuración administrativa temporal (todavía no existe el flujo de verificación documental). ¿Marcar este aliado como punto verificado de entrega/retiro?') }},
+                                                confirmText: {{ Js::from($ally->is_verified_destination ? 'Quitar verificación' : 'Marcar verificado') }},
+                                                variant: {{ Js::from($ally->is_verified_destination ? 'warning' : 'primary') }},
+                                                onConfirm: () => $wire.toggleVerifiedDestination({{ $ally->id }}),
+                                            })"
                                             title="Configuración administrativa temporal"
                                             class="px-3 py-2 rounded-lg
                                                    {{ $ally->is_verified_destination
@@ -299,8 +325,12 @@
 
                                         {{-- Aprobar --}}
                                         <button
-                                            wire:click="approve({{ $ally->id }})"
-                                            wire:confirm="¿Estás seguro de que deseas aprobar este aliado?"
+                                            @click.prevent="$store.confirm.open({
+                                                message: '¿Estás seguro de que deseas aprobar este aliado?',
+                                                confirmText: 'Aprobar',
+                                                variant: 'primary',
+                                                onConfirm: () => $wire.approve({{ $ally->id }}),
+                                            })"
                                             class="px-3 py-2 rounded-lg
                                                    bg-blue-600 text-white
                                                    hover:bg-blue-700
@@ -313,8 +343,12 @@
 
                                         {{-- Rechazar --}}
                                         <button
-                                            wire:click="reject({{ $ally->id }})"
-                                            wire:confirm="¿Estás seguro de que deseas rechazar este aliado?"
+                                            @click.prevent="$store.confirm.open({
+                                                message: '¿Estás seguro de que deseas rechazar este aliado?',
+                                                confirmText: 'Rechazar',
+                                                variant: 'danger',
+                                                onConfirm: () => $wire.reject({{ $ally->id }}),
+                                            })"
                                             class="px-3 py-2 rounded-lg
                                                    bg-red-50 text-red-700
                                                    hover:bg-red-100
@@ -331,8 +365,12 @@
                                     @elseif($ally->status === Ally::STATUS_ACTIVE)
 
                                         <button
-                                            wire:click="suspend({{ $ally->id }})"
-                                            wire:confirm="¿Estás seguro de que deseas suspender este aliado?"
+                                            @click.prevent="$store.confirm.open({
+                                                message: '¿Estás seguro de que deseas suspender este aliado?',
+                                                confirmText: 'Suspender',
+                                                variant: 'warning',
+                                                onConfirm: () => $wire.suspend({{ $ally->id }}),
+                                            })"
                                             class="px-3 py-2 rounded-lg
                                                    bg-amber-50 text-amber-700
                                                    hover:bg-amber-100
@@ -349,8 +387,12 @@
                                     @elseif($ally->status === Ally::STATUS_SUSPENDED)
 
                                         <button
-                                            wire:click="activate({{ $ally->id }})"
-                                            wire:confirm="¿Deseas activar nuevamente este aliado?"
+                                            @click.prevent="$store.confirm.open({
+                                                message: '¿Deseas activar nuevamente este aliado?',
+                                                confirmText: 'Activar',
+                                                variant: 'primary',
+                                                onConfirm: () => $wire.activate({{ $ally->id }}),
+                                            })"
                                             class="px-3 py-2 rounded-lg
                                                    bg-blue-50 text-blue-700
                                                    hover:bg-blue-100
@@ -366,7 +408,7 @@
                                     ========================================== --}}
                                     @elseif($ally->status === Ally::STATUS_REJECTED)
 
-                                        <span class="text-xs text-[#94A3B8]">
+                                        <span class="text-xs text-[#B8B8B2]">
                                             Sin acciones
                                         </span>
 
@@ -397,11 +439,11 @@
                                         👥
                                     </div>
 
-                                    <p class="font-semibold text-[#0F172A]">
+                                    <p class="font-semibold text-[#111111]">
                                         No hay aliados registrados
                                     </p>
 
-                                    <p class="text-sm text-[#64748B] mt-1">
+                                    <p class="text-sm text-[#6B6B66] mt-1">
                                         Los aliados aparecerán aquí cuando sean registrados.
                                     </p>
 
@@ -425,7 +467,7 @@
         ========================================================== --}}
         @if($allies->hasPages())
 
-            <div class="px-6 py-4 border-t border-[#E2E8F0]">
+            <div class="px-6 py-4 border-t border-[#E5E5E0]">
 
                 {{ $allies->links() }}
 
@@ -449,7 +491,7 @@
             <div class="bg-white rounded-2xl shadow-xl w-full max-w-lg p-6">
 
                 <div class="flex items-center justify-between mb-4">
-                    <h3 class="font-display text-lg font-bold text-[#0F172A]">
+                    <h3 class="font-display text-lg font-bold text-[#111111]">
                         Ubicación de la agencia
                     </h3>
                     <button wire:click="$set('showLocationModal', false)" class="text-slate-400 hover:text-slate-600">
@@ -457,7 +499,7 @@
                     </button>
                 </div>
 
-                <p class="text-xs text-[#64748B] mb-3">
+                <p class="text-xs text-[#6B6B66] mb-3">
                     Haz clic en el mapa sobre la ubicación exacta de la agencia. Estas coordenadas
                     son las que se muestran a los clientes en el localizador público de oficinas.
                 </p>
@@ -470,14 +512,14 @@
                     })"
                     x-init="init($el)"
                     wire:ignore
-                    class="rounded-xl overflow-hidden border border-[#E2E8F0] mb-4"
+                    class="rounded-xl overflow-hidden border border-[#E5E5E0] mb-4"
                     style="height: 280px;"
                 ></div>
 
                 <div class="grid grid-cols-2 gap-3 mb-4">
                     <div>
-                        <label class="block text-xs font-medium text-[#64748B] mb-1">Estado</label>
-                        <select wire:model="location_state" class="w-full rounded-lg border-[#E2E8F0] text-sm focus:ring-blue-500 focus:border-blue-500">
+                        <label class="block text-xs font-medium text-[#6B6B66] mb-1">Estado</label>
+                        <select wire:model="location_state" class="w-full rounded-lg border-[#E5E5E0] text-sm focus:ring-blue-500 focus:border-blue-500">
                             <option value="">Selecciona...</option>
                             @foreach ($venezuelaStates as $state)
                                 <option value="{{ $state }}">{{ $state }}</option>
@@ -487,14 +529,14 @@
                     </div>
                     <div class="grid grid-cols-2 gap-2">
                         <div>
-                            <label class="block text-xs font-medium text-[#64748B] mb-1">Latitud</label>
+                            <label class="block text-xs font-medium text-[#6B6B66] mb-1">Latitud</label>
                             <input type="text" wire:model="location_latitude" readonly
-                                class="w-full rounded-lg border-[#E2E8F0] text-sm bg-slate-50 text-slate-500">
+                                class="w-full rounded-lg border-[#E5E5E0] text-sm bg-slate-50 text-slate-500">
                         </div>
                         <div>
-                            <label class="block text-xs font-medium text-[#64748B] mb-1">Longitud</label>
+                            <label class="block text-xs font-medium text-[#6B6B66] mb-1">Longitud</label>
                             <input type="text" wire:model="location_longitude" readonly
-                                class="w-full rounded-lg border-[#E2E8F0] text-sm bg-slate-50 text-slate-500">
+                                class="w-full rounded-lg border-[#E5E5E0] text-sm bg-slate-50 text-slate-500">
                         </div>
                     </div>
                 </div>
@@ -512,6 +554,189 @@
                 </div>
 
             </div>
+
+        </div>
+
+    @endif
+
+
+    {{-- =========================================================
+         MODAL: DETALLE DEL ALIADO (solo lectura)
+    ========================================================== --}}
+    @if($showDetailsModal && $viewingAlly)
+
+        @php
+            $detailStyle = $statusStyles[$viewingAlly->status] ?? [
+                'bg' => 'bg-slate-50',
+                'text' => 'text-slate-600',
+                'dot' => 'bg-slate-400',
+            ];
+        @endphp
+
+        <div
+            x-data="{ photoOpen: false }"
+            class="fixed inset-0 z-50 flex items-center justify-center bg-black/40 px-4"
+            wire:key="details-modal-{{ $viewingAlly->id }}"
+        >
+
+            <div class="bg-white rounded-2xl shadow-xl w-full max-w-lg p-6 max-h-[90vh] overflow-y-auto">
+
+                <div class="flex items-center justify-between mb-4">
+                    <h3 class="font-display text-lg font-bold text-[#111111]">
+                        Detalle del aliado
+                    </h3>
+                    <button wire:click="closeDetails" class="text-slate-400 hover:text-slate-600">
+                        ✕
+                    </button>
+                </div>
+
+                @if($viewingAlly->storefront_photo_path)
+                    <button
+                        type="button"
+                        @click="photoOpen = true"
+                        title="Ver foto en grande"
+                        class="block w-full mb-4"
+                    >
+                        <img
+                            src="{{ route('allies.documents.storefront', $viewingAlly) }}"
+                            alt="Fachada de {{ $viewingAlly->business_name }}"
+                            class="w-full h-48 object-cover rounded-xl border border-[#E5E5E0] hover:opacity-90 transition"
+                        >
+                    </button>
+                @else
+                    <div class="w-full h-32 rounded-xl border border-dashed border-[#E5E5E0] bg-slate-50 flex items-center justify-center text-xs text-[#B8B8B2] mb-4">
+                        Sin foto de fachada
+                    </div>
+                @endif
+
+                <div class="flex items-center justify-between mb-4">
+                    <p class="font-display text-xl font-bold text-[#111111]">
+                        {{ $viewingAlly->business_name }}
+                    </p>
+
+                    <span
+                        class="inline-flex items-center gap-2 px-3 py-1.5 rounded-lg text-xs font-semibold
+                               {{ $detailStyle['bg'] }} {{ $detailStyle['text'] }}"
+                    >
+                        <span class="w-1.5 h-1.5 rounded-full {{ $detailStyle['dot'] }}"></span>
+                        {{ str_replace('_', ' ', $viewingAlly->status) }}
+                    </span>
+                </div>
+
+                @if($viewingAlly->is_verified_destination)
+                    <div class="mb-4">
+                        <span class="inline-flex items-center gap-1 rounded-md bg-emerald-50 px-2 py-0.5 text-[10px] font-semibold text-emerald-700">
+                            Punto de retiro verificado
+                        </span>
+                    </div>
+                @endif
+
+                <dl class="grid grid-cols-2 gap-x-4 gap-y-3 text-sm mb-2">
+
+                    <div class="col-span-2">
+                        <dt class="text-xs font-medium text-[#6B6B66]">RIF</dt>
+                        <dd class="text-[#111111]">{{ $viewingAlly->rif }}</dd>
+                    </div>
+
+                    <div>
+                        <dt class="text-xs font-medium text-[#6B6B66]">Contacto</dt>
+                        <dd class="text-[#111111]">{{ $viewingAlly->user?->name ?? '—' }}</dd>
+                    </div>
+
+                    <div>
+                        <dt class="text-xs font-medium text-[#6B6B66]">Teléfono</dt>
+                        <dd class="text-[#111111]">{{ $viewingAlly->user?->phone ?? '—' }}</dd>
+                    </div>
+
+                    <div class="col-span-2">
+                        <dt class="text-xs font-medium text-[#6B6B66]">Correo</dt>
+                        <dd class="text-[#111111]">{{ $viewingAlly->user?->email ?? '—' }}</dd>
+                    </div>
+
+                    <div>
+                        <dt class="text-xs font-medium text-[#6B6B66]">Ciudad</dt>
+                        <dd class="text-[#111111]">{{ $viewingAlly->city }}</dd>
+                    </div>
+
+                    <div>
+                        <dt class="text-xs font-medium text-[#6B6B66]">Estado (región)</dt>
+                        <dd class="text-[#111111]">{{ $viewingAlly->state ?? '—' }}</dd>
+                    </div>
+
+                    <div class="col-span-2">
+                        <dt class="text-xs font-medium text-[#6B6B66]">Dirección</dt>
+                        <dd class="text-[#111111]">{{ $viewingAlly->address }}</dd>
+                    </div>
+
+                    <div>
+                        <dt class="text-xs font-medium text-[#6B6B66]">Comisión</dt>
+                        <dd class="text-[#111111]">{{ $viewingAlly->commission_percentage }}%</dd>
+                    </div>
+
+                    <div>
+                        <dt class="text-xs font-medium text-[#6B6B66]">Postulado el</dt>
+                        <dd class="text-[#111111]">{{ $viewingAlly->created_at?->format('d/m/Y h:i A') }}</dd>
+                    </div>
+
+                </dl>
+
+                @if($viewingAlly->rif_document_path || $viewingAlly->mercantile_registry_document_path || $viewingAlly->owner_id_document_path)
+                    <div class="border-t border-[#E5E5E0] mt-4 pt-4">
+                        <p class="text-xs font-medium text-[#6B6B66] mb-2">Documentos de verificación</p>
+
+                        <div class="flex flex-col gap-1.5 text-sm">
+                            @if($viewingAlly->rif_document_path)
+                                <a href="{{ route('allies.documents.rif', $viewingAlly) }}" target="_blank"
+                                   class="inline-flex items-center gap-1.5 text-blue-700 hover:underline">
+                                    <i class="fa-solid fa-file"></i> RIF
+                                </a>
+                            @endif
+
+                            @if($viewingAlly->mercantile_registry_document_path)
+                                <a href="{{ route('allies.documents.mercantile-registry', $viewingAlly) }}" target="_blank"
+                                   class="inline-flex items-center gap-1.5 text-blue-700 hover:underline">
+                                    <i class="fa-solid fa-file"></i> Registro mercantil
+                                </a>
+                            @endif
+
+                            @if($viewingAlly->owner_id_document_path)
+                                <a href="{{ route('allies.documents.owner-id', $viewingAlly) }}" target="_blank"
+                                   class="inline-flex items-center gap-1.5 text-blue-700 hover:underline">
+                                    <i class="fa-solid fa-file"></i> Cédula del titular
+                                </a>
+                            @endif
+                        </div>
+                    </div>
+                @else
+                    <p class="text-xs text-[#B8B8B2] mt-4 pt-4 border-t border-[#E5E5E0]">
+                        Este aliado no tiene documentos de verificación cargados (se registró antes de que este requisito existiera).
+                    </p>
+                @endif
+
+                <div class="flex justify-end mt-4">
+                    <button wire:click="closeDetails"
+                        class="px-4 py-2 rounded-lg text-sm font-semibold text-slate-600 hover:bg-slate-50">
+                        Cerrar
+                    </button>
+                </div>
+
+            </div>
+
+            {{-- Lightbox: foto de fachada a tamaño completo --}}
+            @if($viewingAlly->storefront_photo_path)
+                <div
+                    x-show="photoOpen"
+                    x-cloak
+                    @click="photoOpen = false"
+                    class="fixed inset-0 z-[60] flex items-center justify-center bg-black/80 p-6 cursor-zoom-out"
+                >
+                    <img
+                        src="{{ route('allies.documents.storefront', $viewingAlly) }}"
+                        alt="Fachada de {{ $viewingAlly->business_name }} (tamaño completo)"
+                        class="max-w-full max-h-full rounded-xl object-contain"
+                    >
+                </div>
+            @endif
 
         </div>
 

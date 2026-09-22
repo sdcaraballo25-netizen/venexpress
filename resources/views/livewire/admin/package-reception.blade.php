@@ -2,7 +2,7 @@
 
     <div class="flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
         <div>
-            <h2 class="font-display text-2xl font-semibold text-[#0F172A]">
+            <h2 class="font-display text-2xl font-semibold text-[#111111]">
                 Recepción de paquetes
             </h2>
             <p class="text-sm text-slate-500">
@@ -185,9 +185,13 @@
 
             <button
                 type="button"
-                wire:click="releaseFromHub"
+                @click.prevent="$store.confirm.open({
+                    message: '¿Confirmas esta acción? Esta guía cambiará de estado.',
+                    confirmText: {{ Js::from($this->releaseActionLabel()) }},
+                    variant: 'warning',
+                    onConfirm: () => $wire.releaseFromHub(),
+                })"
                 wire:loading.attr="disabled"
-                wire:confirm="¿Confirmas esta acción? Esta guía cambiará de estado."
                 class="mt-4 w-full rounded-xl bg-amber-500 px-5 py-3 text-sm font-semibold text-white hover:bg-amber-600 disabled:opacity-50 sm:w-auto"
             >
                 {{ $this->releaseActionLabel() }}

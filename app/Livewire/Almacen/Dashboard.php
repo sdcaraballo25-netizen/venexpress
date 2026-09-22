@@ -197,6 +197,14 @@ class Dashboard extends Component
             return;
         }
 
+        $warehouse = $this->warehouse();
+
+        if (! $warehouse) {
+            $this->dispatchError = 'Tu usuario no tiene un almacén asignado.';
+
+            return;
+        }
+
         $package = Package::where('tracking_number', $trackingNumber)->first();
 
         if (! $package) {
@@ -207,6 +215,12 @@ class Dashboard extends Component
 
         if ($package->current_status !== Package::STATUS_LISTO_RETIRO) {
             $this->dispatchError = 'Esta guía todavía no está lista para despacho. Estado actual: '.$package->statusLabel().'.';
+
+            return;
+        }
+
+        if (! $this->belongsToWarehouse($package, $warehouse)) {
+            $this->dispatchError = 'Este paquete no tiene como destino este almacén.';
 
             return;
         }
@@ -227,9 +241,18 @@ class Dashboard extends Component
 
         try {
             $warehouse = $this->warehouse();
+
+            if (! $warehouse) {
+                throw new RuntimeException('Tu usuario no tiene un almacén asignado.');
+            }
+
             $package = Package::where('tracking_number', trim($this->dispatchTrackingNumber))
                 ->where('current_status', Package::STATUS_LISTO_RETIRO)
                 ->firstOrFail();
+
+            if (! $this->belongsToWarehouse($package, $warehouse)) {
+                throw new RuntimeException('Este paquete no tiene como destino este almacén.');
+            }
 
             if ($package->requires_delivery) {
                 throw new RuntimeException('Este envío requiere entrega a domicilio; no puede retirarse en el almacén.');
@@ -284,9 +307,19 @@ class Dashboard extends Component
         $this->dispatchError = null;
 
         try {
+            $warehouse = $this->warehouse();
+
+            if (! $warehouse) {
+                throw new RuntimeException('Tu usuario no tiene un almacén asignado.');
+            }
+
             $package = Package::where('tracking_number', trim($this->dispatchTrackingNumber))
                 ->where('current_status', Package::STATUS_LISTO_RETIRO)
                 ->firstOrFail();
+
+            if (! $this->belongsToWarehouse($package, $warehouse)) {
+                throw new RuntimeException('Este paquete no tiene como destino este almacén.');
+            }
 
             $route = Route::findOrFail($routeId);
 

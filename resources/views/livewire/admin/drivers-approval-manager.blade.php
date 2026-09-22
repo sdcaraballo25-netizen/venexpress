@@ -10,11 +10,11 @@
     <div class="flex flex-col md:flex-row md:items-center md:justify-between gap-4 mb-8">
 
         <div>
-            <h1 class="font-display text-3xl font-bold text-[#0F172A]">
+            <h1 class="font-display text-3xl font-bold text-[#111111]">
                 Aprobación de Repartidores
             </h1>
 
-            <p class="text-sm text-[#64748B] mt-1">
+            <p class="text-sm text-[#6B6B66] mt-1">
                 Revisa y aprueba a los repartidores que se registran en Venexpress.
             </p>
         </div>
@@ -48,7 +48,7 @@
     {{-- =========================================================
          BUSCADOR
     ========================================================== --}}
-    <div class="bg-white border border-[#E2E8F0] rounded-2xl p-5 shadow-sm mb-6">
+    <div class="bg-white border border-[#E5E5E0] rounded-2xl p-5 shadow-sm mb-6">
 
         <div class="relative max-w-md">
 
@@ -56,10 +56,10 @@
                 type="text"
                 wire:model.live="search"
                 placeholder="Buscar por nombre, correo o placa..."
-                class="w-full rounded-xl border border-[#E2E8F0]
+                class="w-full rounded-xl border border-[#E5E5E0]
                        px-4 py-3 text-sm
-                       text-[#0F172A]
-                       placeholder:text-[#94A3B8]
+                       text-[#111111]
+                       placeholder:text-[#B8B8B2]
                        focus:border-blue-500
                        focus:ring-blue-500"
             >
@@ -72,7 +72,7 @@
     {{-- =========================================================
          TABLA
     ========================================================== --}}
-    <div class="bg-white border border-[#E2E8F0] rounded-2xl shadow-sm overflow-hidden">
+    <div class="bg-white border border-[#E5E5E0] rounded-2xl shadow-sm overflow-hidden">
 
         <div class="overflow-x-auto">
 
@@ -81,29 +81,29 @@
                 {{-- CABECERA --}}
                 <thead>
 
-                    <tr class="bg-slate-50 border-b border-[#E2E8F0]">
+                    <tr class="bg-slate-50 border-b border-[#E5E5E0]">
 
-                        <th class="px-6 py-4 text-left text-xs font-semibold text-[#64748B] uppercase">
+                        <th class="px-6 py-4 text-left text-xs font-semibold text-[#6B6B66] uppercase">
                             Repartidor
                         </th>
 
-                        <th class="px-6 py-4 text-left text-xs font-semibold text-[#64748B] uppercase">
+                        <th class="px-6 py-4 text-left text-xs font-semibold text-[#6B6B66] uppercase">
                             Vehículo
                         </th>
 
-                        <th class="px-6 py-4 text-left text-xs font-semibold text-[#64748B] uppercase">
+                        <th class="px-6 py-4 text-left text-xs font-semibold text-[#6B6B66] uppercase">
                             Tipo
                         </th>
 
-                        <th class="px-6 py-4 text-left text-xs font-semibold text-[#64748B] uppercase">
+                        <th class="px-6 py-4 text-left text-xs font-semibold text-[#6B6B66] uppercase">
                             Documentos
                         </th>
 
-                        <th class="px-6 py-4 text-center text-xs font-semibold text-[#64748B] uppercase">
+                        <th class="px-6 py-4 text-center text-xs font-semibold text-[#6B6B66] uppercase">
                             Estado
                         </th>
 
-                        <th class="px-6 py-4 text-right text-xs font-semibold text-[#64748B] uppercase">
+                        <th class="px-6 py-4 text-right text-xs font-semibold text-[#6B6B66] uppercase">
                             Acción
                         </th>
 
@@ -156,7 +156,7 @@
                         @endphp
 
 
-                        <tr class="border-b border-[#F1F5F9] last:border-0 hover:bg-slate-50 transition">
+                        <tr class="border-b border-[#F0F0EC] last:border-0 hover:bg-slate-50 transition">
 
 
                             {{-- =================================================
@@ -166,11 +166,11 @@
 
                                 <div>
 
-                                    <p class="font-semibold text-[#0F172A]">
+                                    <p class="font-semibold text-[#111111]">
                                         {{ $driver->user?->name }}
                                     </p>
 
-                                    <p class="text-xs text-[#64748B] mt-1">
+                                    <p class="text-xs text-[#6B6B66] mt-1">
                                         {{ $driver->user?->email }}
                                     </p>
 
@@ -182,7 +182,7 @@
                             {{-- =================================================
                                  VEHÍCULO
                             ================================================== --}}
-                            <td class="px-6 py-4 text-[#475569]">
+                            <td class="px-6 py-4 text-[#4A4A45]">
 
                                 {{ $driver->vehicle_plate }} · {{ $driver->vehicle_type }}
 
@@ -192,7 +192,7 @@
                             {{-- =================================================
                                  TIPO (delivery / hub)
                             ================================================== --}}
-                            <td class="px-6 py-4 text-[#475569]">
+                            <td class="px-6 py-4 text-[#4A4A45]">
 
                                 <span class="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-lg text-xs font-semibold
                                     {{ $driver->driver_type === Driver::TYPE_HUB ? 'bg-purple-50 text-purple-700' : 'bg-slate-100 text-slate-700' }}">
@@ -234,7 +234,7 @@
                                     @endif
 
                                     @if (! $driver->license_photo_path && ! $driver->id_photo_path && ! $driver->vehicle_registration_photo_path)
-                                        <span class="text-xs text-[#94A3B8]">Sin documentos</span>
+                                        <span class="text-xs text-[#B8B8B2]">Sin documentos</span>
                                     @endif
 
                                 </div>
@@ -280,8 +280,12 @@
 
                                         {{-- Aprobar --}}
                                         <button
-                                            wire:click="approve({{ $driver->id }})"
-                                            wire:confirm="¿Estás seguro de que deseas aprobar a este repartidor?"
+                                            @click.prevent="$store.confirm.open({
+                                                message: '¿Estás seguro de que deseas aprobar a este repartidor?',
+                                                confirmText: 'Aprobar',
+                                                variant: 'primary',
+                                                onConfirm: () => $wire.approve({{ $driver->id }}),
+                                            })"
                                             class="px-3 py-2 rounded-lg
                                                    bg-blue-600 text-white
                                                    hover:bg-blue-700
@@ -294,8 +298,12 @@
 
                                         {{-- Rechazar --}}
                                         <button
-                                            wire:click="reject({{ $driver->id }})"
-                                            wire:confirm="¿Estás seguro de que deseas rechazar a este repartidor?"
+                                            @click.prevent="$store.confirm.open({
+                                                message: '¿Estás seguro de que deseas rechazar a este repartidor?',
+                                                confirmText: 'Rechazar',
+                                                variant: 'danger',
+                                                onConfirm: () => $wire.reject({{ $driver->id }}),
+                                            })"
                                             class="px-3 py-2 rounded-lg
                                                    bg-red-50 text-red-700
                                                    hover:bg-red-100
@@ -312,8 +320,12 @@
                                     @elseif($driver->status === Driver::STATUS_ACTIVE)
 
                                         <button
-                                            wire:click="suspend({{ $driver->id }})"
-                                            wire:confirm="¿Estás seguro de que deseas suspender a este repartidor?"
+                                            @click.prevent="$store.confirm.open({
+                                                message: '¿Estás seguro de que deseas suspender a este repartidor?',
+                                                confirmText: 'Suspender',
+                                                variant: 'warning',
+                                                onConfirm: () => $wire.suspend({{ $driver->id }}),
+                                            })"
                                             class="px-3 py-2 rounded-lg
                                                    bg-amber-50 text-amber-700
                                                    hover:bg-amber-100
@@ -330,8 +342,12 @@
                                     @elseif($driver->status === Driver::STATUS_SUSPENDED)
 
                                         <button
-                                            wire:click="activate({{ $driver->id }})"
-                                            wire:confirm="¿Deseas activar nuevamente a este repartidor?"
+                                            @click.prevent="$store.confirm.open({
+                                                message: '¿Deseas activar nuevamente a este repartidor?',
+                                                confirmText: 'Activar',
+                                                variant: 'primary',
+                                                onConfirm: () => $wire.activate({{ $driver->id }}),
+                                            })"
                                             class="px-3 py-2 rounded-lg
                                                    bg-blue-50 text-blue-700
                                                    hover:bg-blue-100
@@ -347,7 +363,7 @@
                                     ========================================== --}}
                                     @elseif($driver->status === Driver::STATUS_REJECTED)
 
-                                        <span class="text-xs text-[#94A3B8]">
+                                        <span class="text-xs text-[#B8B8B2]">
                                             Sin acciones
                                         </span>
 
@@ -378,11 +394,11 @@
                                         🚚
                                     </div>
 
-                                    <p class="font-semibold text-[#0F172A]">
+                                    <p class="font-semibold text-[#111111]">
                                         No hay repartidores registrados
                                     </p>
 
-                                    <p class="text-sm text-[#64748B] mt-1">
+                                    <p class="text-sm text-[#6B6B66] mt-1">
                                         Los repartidores aparecerán aquí cuando se registren.
                                     </p>
 
@@ -406,7 +422,7 @@
         ========================================================== --}}
         @if($drivers->hasPages())
 
-            <div class="px-6 py-4 border-t border-[#E2E8F0]">
+            <div class="px-6 py-4 border-t border-[#E5E5E0]">
 
                 {{ $drivers->links() }}
 

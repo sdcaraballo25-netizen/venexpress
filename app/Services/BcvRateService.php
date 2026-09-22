@@ -11,7 +11,35 @@ use RuntimeException;
 class BcvRateService
 {
     /**
-     * Obtiene la tasa BCV vigente más reciente.
+     * Antigüedad de una tasa contando solo horas de días hábiles
+     * (lunes a viernes) — el BCV no publica nada nuevo sábados,
+     * domingos ni feriados bancarios, así que un fin de semana entero
+     * NO debe contar como "atraso": la tasa del viernes en la tarde
+     * sigue siendo, correctamente, la vigente durante todo el fin de
+     * semana. Contar horas de reloj crudas bloquearía cotizaciones
+     * todos los lunes por la mañana sin que nada estuviera realmente
+     * roto.
+     */
+    public function businessHoursAge(BcvRate $rate): int
+    {
+        return $rate->effective_at->diffInHoursFiltered(
+            fn (Carbon $date) => ! $date->isWeekend(),
+            now()
+        );
+    }
+
+    /**
+     * Obtiene la tasa BCV vigente más reciente, para usarla en
+     * cotizaciones/cobros reales. Bloquea con una excepción si esa
+     * tasa ya es demasiado vieja (bcv_api.max_age_hours, contado en
+     * horas hábiles) — señal de que bcv:sync lleva tiempo fallando en
+     * silencio — en vez de seguir cotizando indefinidamente con un
+     * valor desactualizado.
+     *
+     * Los usos puramente informativos (mostrar la tasa actual en el
+     * dashboard de Admin o en BcvRateManager) NO pasan por aquí: usan
+     * BcvRate::current() directamente, porque el admin necesita poder
+     * ver y corregir una tasa vieja aunque esté vieja.
      */
     public function getCurrentRate(): BcvRate
     {
@@ -19,6 +47,18 @@ class BcvRateService
 
         if (! $rate) {
             throw new RuntimeException('No hay ninguna tasa BCV registrada todavía.');
+        }
+
+        $maxAgeHours = (int) config('services.bcv_api.max_age_hours', 72);
+        $ageInHours = $this->businessHoursAge($rate);
+
+        if ($ageInHours > $maxAgeHours) {
+            throw new RuntimeException(
+                "La tasa BCV vigente tiene {$ageInHours} horas hábiles de antigüedad (máximo "
+                ."permitido: {$maxAgeHours}h). No se pueden generar cotizaciones ni registrar "
+                .'paquetes hasta que un administrador actualice la tasa (sincronización automática '
+                .'o manual en el panel de Tasa BCV).'
+            );
         }
 
         return $rate;

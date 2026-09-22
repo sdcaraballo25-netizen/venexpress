@@ -27,7 +27,7 @@
     </style>
 </head>
 
-<body class="bg-[#F3F5F7] text-[#0B1220] antialiased">
+<body class="bg-[#F7F7F4] text-[#111111] antialiased">
 
     <div class="min-h-screen flex">
 
@@ -49,17 +49,17 @@
         <div class="flex-1 min-w-0">
 
             {{-- HEADER --}}
-            <header class="h-16 bg-white border-b border-[#E2E8F0] flex items-center justify-between px-6 lg:px-8">
+            <header class="h-16 bg-white border-b border-[#E5E5E0] flex items-center justify-between px-6 lg:px-8">
 
                 <div>
-                    <span class="text-sm text-[#64748B]">
+                    <span class="text-sm text-[#6B6B66]">
                         {{ \App\Models\User::roleLabels()[auth()->user()->role] ?? '' }}
                     </span>
                 </div>
 
                 <div class="flex items-center gap-4">
 
-                    <span class="text-sm font-medium text-[#0F172A]">
+                    <span class="text-sm font-medium text-[#111111]">
                         {{ auth()->user()->name }}
                     </span>
 
@@ -68,7 +68,7 @@
 
                         <button
                             type="submit"
-                            class="text-sm font-medium text-[#64748B] hover:text-red-600 transition"
+                            class="text-sm font-medium text-[#6B6B66] hover:text-red-600 transition"
                         >
                             Salir
                         </button>

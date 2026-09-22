@@ -4,6 +4,18 @@ return [
 
     'bcv_api' => [
         'url' => env('BCV_API_URL', 'https://ve.dolarapi.com/v1/dolares/oficial'),
+
+        // Antigüedad máxima aceptada para la tasa BCV vigente antes de
+        // bloquear cotizaciones (BcvRateService::getCurrentRate()), en
+        // HORAS HÁBILES (BcvRateService::businessHoursAge() no cuenta
+        // sábados/domingos, porque el BCV no publica esos días — un
+        // fin de semana entero nunca cuenta como "atraso"). 48 horas
+        // hábiles son 2 días hábiles completos sin ninguna
+        // sincronización exitosa (bcv:sync corre cada 15 min entre
+        // 1:30pm-6:30pm VET en días de semana, ver routes/console.php)
+        // — bastante margen sobre una falla puntual, pero sin dejar
+        // que el sistema siga cotizando con una tasa vieja por días.
+        'max_age_hours' => env('BCV_MAX_RATE_AGE_HOURS', 48),
     ],
 
     'google_maps' => [
@@ -11,6 +23,17 @@ return [
         // (dirección exacta de entrega). Null/vacío = el campo sigue
         // siendo texto libre, sin autocompletado ni coordenadas exactas.
         'api_key' => env('GOOGLE_MAPS_API_KEY'),
+    ],
+
+    // "Continuar con Google" (login/registro). Client ID/Secret se
+    // obtienen en https://console.cloud.google.com/apis/credentials
+    // (tipo "OAuth client ID" > "Web application"); el redirect debe
+    // registrarse ahí tal cual, incluyendo el dominio real en
+    // producción.
+    'google' => [
+        'client_id' => env('GOOGLE_CLIENT_ID'),
+        'client_secret' => env('GOOGLE_CLIENT_SECRET'),
+        'redirect' => env('GOOGLE_REDIRECT_URI'),
     ],
 
     /*

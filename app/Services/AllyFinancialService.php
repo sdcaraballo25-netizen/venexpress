@@ -632,16 +632,33 @@ class AllyFinancialService
                     $direction
                     === AllyFinancialTransaction::DIRECTION_DEBIT
                 ) {
+                    // Igual que createSettlement(): el saldo bruto no
+                    // basta, hay que descontar lo ya reservado por
+                    // liquidaciones pendientes. Si no, un ajuste de
+                    // débito podría dejar sin fondos una liquidación
+                    // pendiente que ya había sido aprobada como válida,
+                    // y esta última quedaría varada sin forma de
+                    // pagarse (solo cancelarse).
                     $balance =
                         $this->getBalance(
                             $ally->id
                         );
 
-                    if ($amountUsd > $balance) {
+                    $pendingSettlements = AllySettlement::query()
+                        ->where('ally_id', $ally->id)
+                        ->where('status', AllySettlement::STATUS_PENDING)
+                        ->sum('amount_usd');
+
+                    $availableBalance = round(
+                        $balance - (float) $pendingSettlements,
+                        2
+                    );
+
+                    if ($amountUsd > $availableBalance) {
                         throw new RuntimeException(
                             sprintf(
                                 'El ajuste supera el saldo disponible de $%.2f.',
-                                $balance
+                                $availableBalance
                             )
                         );
                     }

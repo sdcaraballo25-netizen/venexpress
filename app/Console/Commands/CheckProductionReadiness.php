@@ -70,18 +70,29 @@ class CheckProductionReadiness extends Command
             );
         }
 
-        $lastBcvRate = \App\Models\BcvRate::query()->latest('created_at')->first();
+        $lastBcvRate = \App\Models\BcvRate::current();
 
         if ($lastBcvRate === null) {
             $warnings[] = 'Nunca se ha registrado una tasa BCV: revisa si `bcv:sync` corrió alguna vez.';
-        } elseif ($lastBcvRate->created_at->lt(now()->subHours(6))) {
-            $warnings[] = sprintf(
-                'La última tasa BCV registrada es de %s (hace más de 6 horas). '
-                . 'bcv:sync está programado cada hora (routes/console.php) pero eso solo '
-                . 'funciona si el cron del scheduler está configurado en el servidor '
-                . '(`* * * * * php artisan schedule:run`). Verifica el crontab.',
-                $lastBcvRate->created_at->diffForHumans()
-            );
+        } else {
+            // En horas HÁBILES: el BCV no publica sábados ni
+            // domingos, así que un fin de semana entero no debe
+            // contarse como "atraso" (ver BcvRateService::
+            // businessHoursAge()).
+            $businessHoursAge = app(\App\Services\BcvRateService::class)
+                ->businessHoursAge($lastBcvRate);
+
+            if ($businessHoursAge >= 24) {
+                $warnings[] = sprintf(
+                    'La última tasa BCV vigente es de %s (%d horas hábiles de antigüedad). '
+                    . 'bcv:sync está programado cada 15 minutos entre 1:30pm y 6:30pm VET en días '
+                    . 'hábiles (routes/console.php) pero eso solo funciona si el cron del '
+                    . 'scheduler está configurado en el servidor '
+                    . '(`* * * * * php artisan schedule:run`). Verifica el crontab.',
+                    $lastBcvRate->effective_at->diffForHumans(),
+                    $businessHoursAge
+                );
+            }
         }
 
         foreach ($warnings as $warning) {

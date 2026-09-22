@@ -31,11 +31,11 @@
         <div class="flex flex-col md:flex-row justify-between items-start md:items-center mb-8 gap-4">
 
             <div>
-                <h1 class="font-display text-3xl font-bold tracking-tight text-[#0F172A]">
+                <h1 class="font-display text-3xl font-bold tracking-tight text-[#111111]">
                     ¡Hola, Admin! 👋
                 </h1>
 
-                <p class="text-sm text-[#64748B] mt-1">
+                <p class="text-sm text-[#6B6B66] mt-1">
                     {{ now()->translatedFormat('l, d \d\e F \d\e Y') }}
                 </p>
             </div>
@@ -82,11 +82,11 @@
         <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-5 mb-8">
 
             {{-- COMERCIOS --}}
-            <div class="bg-white rounded-2xl border border-[#E2E8F0] p-6 shadow-sm">
+            <div class="bg-white rounded-2xl border border-[#E5E5E0] p-6 shadow-sm">
 
                 <div class="flex justify-between items-start">
 
-                    <p class="text-xs font-bold text-[#64748B] uppercase tracking-wider">
+                    <p class="text-xs font-bold text-[#6B6B66] uppercase tracking-wider">
                         Comercios Asociados
                     </p>
 
@@ -96,11 +96,11 @@
 
                 </div>
 
-                <p class="font-display text-3xl font-bold mt-4 text-[#0F172A]">
+                <p class="font-display text-3xl font-bold mt-4 text-[#111111]">
                     {{ number_format($alliesCount) }}
                 </p>
 
-                <p class="text-xs text-[#64748B] mt-2">
+                <p class="text-xs text-[#6B6B66] mt-2">
                     Aliados aprobados
                 </p>
 
@@ -108,11 +108,11 @@
 
 
             {{-- REPARTIDORES --}}
-            <div class="bg-white rounded-2xl border border-[#E2E8F0] p-6 shadow-sm">
+            <div class="bg-white rounded-2xl border border-[#E5E5E0] p-6 shadow-sm">
 
                 <div class="flex justify-between items-start">
 
-                    <p class="text-xs font-bold text-[#64748B] uppercase tracking-wider">
+                    <p class="text-xs font-bold text-[#6B6B66] uppercase tracking-wider">
                         Repartidores
                     </p>
 
@@ -122,11 +122,11 @@
 
                 </div>
 
-                <p class="font-display text-3xl font-bold mt-4 text-[#0F172A]">
+                <p class="font-display text-3xl font-bold mt-4 text-[#111111]">
                     {{ number_format($driversCount) }}
                 </p>
 
-                <p class="text-xs text-[#64748B] mt-2">
+                <p class="text-xs text-[#6B6B66] mt-2">
                     Registrados en el sistema
                 </p>
 
@@ -134,11 +134,11 @@
 
 
             {{-- POSTULACIONES --}}
-            <div class="bg-white rounded-2xl border border-[#E2E8F0] p-6 shadow-sm">
+            <div class="bg-white rounded-2xl border border-[#E5E5E0] p-6 shadow-sm">
 
                 <div class="flex justify-between items-start">
 
-                    <p class="text-xs font-bold text-[#64748B] uppercase tracking-wider">
+                    <p class="text-xs font-bold text-[#6B6B66] uppercase tracking-wider">
                         Nuevas Postulaciones
                     </p>
 
@@ -148,11 +148,11 @@
 
                 </div>
 
-                <p class="font-display text-3xl font-bold mt-4 text-[#0F172A]">
+                <p class="font-display text-3xl font-bold mt-4 text-[#111111]">
                     {{ number_format($postulacionesCount) }}
                 </p>
 
-                <p class="text-xs text-[#64748B] mt-2">
+                <p class="text-xs text-[#6B6B66] mt-2">
                     Pendientes de revisión
                 </p>
 
@@ -160,11 +160,11 @@
 
 
             {{-- REPARTIDORES PENDIENTES --}}
-            <div class="bg-white rounded-2xl border border-[#E2E8F0] p-6 shadow-sm">
+            <div class="bg-white rounded-2xl border border-[#E5E5E0] p-6 shadow-sm">
 
                 <div class="flex justify-between items-start">
 
-                    <p class="text-xs font-bold text-[#64748B] uppercase tracking-wider">
+                    <p class="text-xs font-bold text-[#6B6B66] uppercase tracking-wider">
                         Repartidores Pendientes
                     </p>
 
@@ -174,7 +174,7 @@
 
                 </div>
 
-                <p class="font-display text-3xl font-bold mt-4 text-[#0F172A]">
+                <p class="font-display text-3xl font-bold mt-4 text-[#111111]">
                     {{ number_format($driversPendingCount) }}
                 </p>
 
@@ -186,11 +186,11 @@
 
 
             {{-- CLIENTES --}}
-            <div class="bg-white rounded-2xl border border-[#E2E8F0] p-6 shadow-sm">
+            <div class="bg-white rounded-2xl border border-[#E5E5E0] p-6 shadow-sm">
 
                 <div class="flex justify-between items-start">
 
-                    <p class="text-xs font-bold text-[#64748B] uppercase tracking-wider">
+                    <p class="text-xs font-bold text-[#6B6B66] uppercase tracking-wider">
                         Clientes
                     </p>
 
@@ -200,11 +200,11 @@
 
                 </div>
 
-                <p class="font-display text-3xl font-bold mt-4 text-[#0F172A]">
+                <p class="font-display text-3xl font-bold mt-4 text-[#111111]">
                     {{ number_format($clientsCount) }}
                 </p>
 
-                <p class="text-xs text-[#64748B] mt-2">
+                <p class="text-xs text-[#6B6B66] mt-2">
                     Usuarios registrados
                 </p>
 
@@ -217,104 +217,104 @@
              REPORTES
         ========================================================== --}}
         <div>
-            <h2 class="font-display text-lg font-bold text-[#0F172A] mb-4">
+            <h2 class="font-display text-lg font-bold text-[#111111] mb-4">
                 Reportes
             </h2>
 
             <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-5">
 
                 {{-- INGRESOS HOY --}}
-                <div class="bg-white rounded-2xl border border-[#E2E8F0] p-6 shadow-sm">
+                <div class="bg-white rounded-2xl border border-[#E5E5E0] p-6 shadow-sm">
                     <div class="flex justify-between items-start">
-                        <p class="text-xs font-bold text-[#64748B] uppercase tracking-wider">Ingresos hoy</p>
+                        <p class="text-xs font-bold text-[#6B6B66] uppercase tracking-wider">Ingresos hoy</p>
                         <div class="p-2 bg-emerald-50 rounded-lg text-emerald-700">💵</div>
                     </div>
-                    <p class="font-display text-3xl font-bold mt-4 text-[#0F172A]">
+                    <p class="font-display text-3xl font-bold mt-4 text-[#111111]">
                         ${{ number_format((float) $revenueToday, 2) }}
                     </p>
-                    <p class="text-xs text-[#64748B] mt-2">Envíos entregados hoy</p>
+                    <p class="text-xs text-[#6B6B66] mt-2">Envíos entregados hoy</p>
                 </div>
 
                 {{-- INGRESOS DEL MES --}}
-                <div class="bg-white rounded-2xl border border-[#E2E8F0] p-6 shadow-sm">
+                <div class="bg-white rounded-2xl border border-[#E5E5E0] p-6 shadow-sm">
                     <div class="flex justify-between items-start">
-                        <p class="text-xs font-bold text-[#64748B] uppercase tracking-wider">Ingresos del mes</p>
+                        <p class="text-xs font-bold text-[#6B6B66] uppercase tracking-wider">Ingresos del mes</p>
                         <div class="p-2 bg-emerald-50 rounded-lg text-emerald-700">📈</div>
                     </div>
-                    <p class="font-display text-3xl font-bold mt-4 text-[#0F172A]">
+                    <p class="font-display text-3xl font-bold mt-4 text-[#111111]">
                         ${{ number_format((float) $revenueThisMonth, 2) }}
                     </p>
-                    <p class="text-xs text-[#64748B] mt-2">Envíos entregados en {{ now()->translatedFormat('F') }}</p>
+                    <p class="text-xs text-[#6B6B66] mt-2">Envíos entregados en {{ now()->translatedFormat('F') }}</p>
                 </div>
 
                 {{-- COMISIONES A ALIADOS --}}
-                <div class="bg-white rounded-2xl border border-[#E2E8F0] p-6 shadow-sm">
+                <div class="bg-white rounded-2xl border border-[#E5E5E0] p-6 shadow-sm">
                     <div class="flex justify-between items-start">
-                        <p class="text-xs font-bold text-[#64748B] uppercase tracking-wider">Comisiones del mes</p>
+                        <p class="text-xs font-bold text-[#6B6B66] uppercase tracking-wider">Comisiones del mes</p>
                         <div class="p-2 bg-blue-50 rounded-lg text-blue-700">🏢</div>
                     </div>
-                    <p class="font-display text-3xl font-bold mt-4 text-[#0F172A]">
+                    <p class="font-display text-3xl font-bold mt-4 text-[#111111]">
                         ${{ number_format((float) $commissionsThisMonth, 2) }}
                     </p>
-                    <p class="text-xs text-[#64748B] mt-2">Generadas a favor de agencias aliadas</p>
+                    <p class="text-xs text-[#6B6B66] mt-2">Generadas a favor de agencias aliadas</p>
                 </div>
 
                 {{-- COD PENDIENTE --}}
-                <a href="{{ route('admin.allies') }}" class="bg-white rounded-2xl border border-[#E2E8F0] p-6 shadow-sm hover:border-amber-300 transition-colors">
+                <a href="{{ route('admin.allies') }}" class="bg-white rounded-2xl border border-[#E5E5E0] p-6 shadow-sm hover:border-amber-300 transition-colors">
                     <div class="flex justify-between items-start">
-                        <p class="text-xs font-bold text-[#64748B] uppercase tracking-wider">COD por liquidar</p>
+                        <p class="text-xs font-bold text-[#6B6B66] uppercase tracking-wider">COD por liquidar</p>
                         <div class="p-2 bg-amber-50 rounded-lg text-amber-600">📭</div>
                     </div>
-                    <p class="font-display text-3xl font-bold mt-4 text-[#0F172A]">
+                    <p class="font-display text-3xl font-bold mt-4 text-[#111111]">
                         ${{ number_format((float) $codPendingTotal, 2) }}
                     </p>
-                    <p class="text-xs text-[#64748B] mt-2">{{ number_format($codPendingCount) }} guías contra-entrega sin remitir</p>
+                    <p class="text-xs text-[#6B6B66] mt-2">{{ number_format($codPendingCount) }} guías contra-entrega sin remitir</p>
                 </a>
 
                 {{-- REMUNERACIONES PENDIENTES --}}
-                <a href="{{ route('admin.driver-payments') }}" class="bg-white rounded-2xl border border-[#E2E8F0] p-6 shadow-sm hover:border-blue-300 transition-colors">
+                <a href="{{ route('admin.driver-payments') }}" class="bg-white rounded-2xl border border-[#E5E5E0] p-6 shadow-sm hover:border-blue-300 transition-colors">
                     <div class="flex justify-between items-start">
-                        <p class="text-xs font-bold text-[#64748B] uppercase tracking-wider">Remuneraciones pendientes</p>
+                        <p class="text-xs font-bold text-[#6B6B66] uppercase tracking-wider">Remuneraciones pendientes</p>
                         <div class="p-2 bg-orange-50 rounded-lg text-orange-600">🚚</div>
                     </div>
-                    <p class="font-display text-3xl font-bold mt-4 text-[#0F172A]">
+                    <p class="font-display text-3xl font-bold mt-4 text-[#111111]">
                         ${{ number_format((float) $pendingPaymentsTotal, 2) }}
                     </p>
-                    <p class="text-xs text-[#64748B] mt-2">{{ number_format($pendingPaymentsCount) }} pagos por generar a repartidores</p>
+                    <p class="text-xs text-[#6B6B66] mt-2">{{ number_format($pendingPaymentsCount) }} pagos por generar a repartidores</p>
                 </a>
 
                 {{-- INCIDENCIAS ABIERTAS --}}
-                <a href="{{ route('admin.incidents') }}" class="bg-white rounded-2xl border border-[#E2E8F0] p-6 shadow-sm hover:border-red-300 transition-colors">
+                <a href="{{ route('admin.incidents') }}" class="bg-white rounded-2xl border border-[#E5E5E0] p-6 shadow-sm hover:border-red-300 transition-colors">
                     <div class="flex justify-between items-start">
-                        <p class="text-xs font-bold text-[#64748B] uppercase tracking-wider">Incidencias abiertas</p>
+                        <p class="text-xs font-bold text-[#6B6B66] uppercase tracking-wider">Incidencias abiertas</p>
                         <div class="p-2 bg-red-50 rounded-lg text-red-600">⚠️</div>
                     </div>
-                    <p class="font-display text-3xl font-bold mt-4 text-[#0F172A]">
+                    <p class="font-display text-3xl font-bold mt-4 text-[#111111]">
                         {{ number_format($openIncidentsCount) }}
                     </p>
-                    <p class="text-xs text-[#64748B] mt-2">Abiertas o en proceso</p>
+                    <p class="text-xs text-[#6B6B66] mt-2">Abiertas o en proceso</p>
                 </a>
 
                 {{-- TOP ALIADOS --}}
-                <div class="bg-white rounded-2xl border border-[#E2E8F0] p-6 shadow-sm sm:col-span-2 lg:col-span-2">
-                    <p class="text-xs font-bold text-[#64748B] uppercase tracking-wider mb-4">Aliados con más volumen</p>
+                <div class="bg-white rounded-2xl border border-[#E5E5E0] p-6 shadow-sm sm:col-span-2 lg:col-span-2">
+                    <p class="text-xs font-bold text-[#6B6B66] uppercase tracking-wider mb-4">Aliados con más volumen</p>
 
                     @if($topAllies->count())
                         <div class="space-y-3">
                             @foreach($topAllies as $ally)
                                 <div class="flex items-center justify-between">
                                     <div>
-                                        <p class="text-sm font-medium text-[#0F172A]">{{ $ally->business_name }}</p>
-                                        <p class="text-xs text-[#64748B]">{{ $ally->city }}</p>
+                                        <p class="text-sm font-medium text-[#111111]">{{ $ally->business_name }}</p>
+                                        <p class="text-xs text-[#6B6B66]">{{ $ally->city }}</p>
                                     </div>
-                                    <span class="text-sm font-semibold text-[#0F172A]">
+                                    <span class="text-sm font-semibold text-[#111111]">
                                         {{ number_format($ally->packages_count) }} guías
                                     </span>
                                 </div>
                             @endforeach
                         </div>
                     @else
-                        <p class="text-sm text-[#64748B]">Todavía no hay suficiente actividad para mostrar un ranking.</p>
+                        <p class="text-sm text-[#6B6B66]">Todavía no hay suficiente actividad para mostrar un ranking.</p>
                     @endif
                 </div>
 
@@ -331,16 +331,16 @@
             {{-- =====================================================
                  ÚLTIMOS ALIADOS
             ====================================================== --}}
-            <div class="bg-white rounded-2xl border border-[#E2E8F0] p-6 shadow-sm">
+            <div class="bg-white rounded-2xl border border-[#E5E5E0] p-6 shadow-sm">
 
                 <div class="flex justify-between items-center mb-5">
 
                     <div>
-                        <h2 class="font-display text-lg font-bold text-[#0F172A]">
+                        <h2 class="font-display text-lg font-bold text-[#111111]">
                             Últimos Aliados
                         </h2>
 
-                        <p class="text-xs text-[#64748B] mt-1">
+                        <p class="text-xs text-[#6B6B66] mt-1">
                             Comercios registrados recientemente
                         </p>
                     </div>
@@ -364,7 +364,7 @@
                         <table class="w-full text-sm">
 
                             <thead>
-                                <tr class="text-left text-[#94A3B8] text-xs uppercase tracking-wider border-b border-[#E2E8F0]">
+                                <tr class="text-left text-[#B8B8B2] text-xs uppercase tracking-wider border-b border-[#E5E5E0]">
 
                                     <th class="pb-3 font-semibold">
                                         Aliado / Empresa
@@ -394,16 +394,16 @@
                                         ];
                                     @endphp
 
-                                    <tr class="border-b border-[#F1F5F9] last:border-0">
+                                    <tr class="border-b border-[#F0F0EC] last:border-0">
 
                                         {{-- EMPRESA --}}
                                         <td class="py-4">
 
-                                            <p class="font-medium text-[#0F172A]">
+                                            <p class="font-medium text-[#111111]">
                                                 {{ $ally->business_name }}
                                             </p>
 
-                                            <p class="text-xs text-[#64748B]">
+                                            <p class="text-xs text-[#6B6B66]">
                                                 {{ $ally->city }}
                                             </p>
 
@@ -427,7 +427,7 @@
                                         {{-- FECHA --}}
                                         <td class="py-4 text-right">
 
-                                            <span class="text-xs text-[#64748B]">
+                                            <span class="text-xs text-[#6B6B66]">
                                                 {{ $ally->created_at?->diffForHumans() }}
                                             </span>
 
@@ -452,11 +452,11 @@
                             🏢
                         </div>
 
-                        <p class="font-medium text-[#0F172A]">
+                        <p class="font-medium text-[#111111]">
                             No hay aliados registrados
                         </p>
 
-                        <p class="text-sm text-[#64748B] mt-1">
+                        <p class="text-sm text-[#6B6B66] mt-1">
                             Los nuevos aliados aparecerán aquí.
                         </p>
 
@@ -474,7 +474,7 @@
 
 
                 {{-- PAQUETES --}}
-                <div class="bg-white rounded-2xl border border-[#E2E8F0] p-6 shadow-sm">
+                <div class="bg-white rounded-2xl border border-[#E5E5E0] p-6 shadow-sm">
 
                     <div class="flex items-center justify-between">
 
@@ -486,11 +486,11 @@
 
                             <div>
 
-                                <h3 class="font-display font-bold text-[#0F172A]">
+                                <h3 class="font-display font-bold text-[#111111]">
                                     Paquetes
                                 </h3>
 
-                                <p class="text-sm text-[#64748B]">
+                                <p class="text-sm text-[#6B6B66]">
                                     Total registrados
                                 </p>
 
@@ -498,7 +498,7 @@
 
                         </div>
 
-                        <span class="text-2xl font-bold text-[#0F172A]">
+                        <span class="text-2xl font-bold text-[#111111]">
                             {{ number_format($totalPackages) }}
                         </span>
 
@@ -508,7 +508,7 @@
 
 
                 {{-- TASA BCV --}}
-                <div class="bg-white rounded-2xl border border-[#E2E8F0] p-6 shadow-sm">
+                <div class="bg-white rounded-2xl border border-[#E5E5E0] p-6 shadow-sm">
 
                     <div class="flex items-center justify-between">
 
@@ -520,11 +520,11 @@
 
                             <div>
 
-                                <h3 class="font-display font-bold text-[#0F172A]">
+                                <h3 class="font-display font-bold text-[#111111]">
                                     Tasa BCV
                                 </h3>
 
-                                <p class="text-sm text-[#64748B]">
+                                <p class="text-sm text-[#6B6B66]">
                                     Tasa actual del sistema
                                 </p>
 
@@ -532,7 +532,7 @@
 
                         </div>
 
-                        <span class="text-xl font-bold text-[#0F172A]">
+                        <span class="text-xl font-bold text-[#111111]">
 
                             @if($currentRate)
                                 {{ number_format($currentRate->rate, 2, ',', '.') }}
@@ -544,19 +544,34 @@
 
                     </div>
 
+                    @if($bcvRateIsStale || ! $currentRate)
+                        <a
+                            href="{{ route('admin.bcv-rates') }}"
+                            wire:navigate
+                            class="mt-4 flex items-center gap-2 rounded-xl border border-red-200 bg-red-50 px-3 py-2 text-xs font-semibold text-red-700 hover:bg-red-100"
+                        >
+                            <span>⚠</span>
+                            @if($currentRate)
+                                Sin actualizar desde {{ $currentRate->effective_at->diffForHumans() }} — revisa la sincronización
+                            @else
+                                No hay ninguna tasa BCV registrada — carga una para poder cotizar
+                            @endif
+                        </a>
+                    @endif
+
                 </div>
 
 
                 {{-- ESTADOS DE PAQUETES --}}
-                <div class="bg-white rounded-2xl border border-[#E2E8F0] p-6 shadow-sm">
+                <div class="bg-white rounded-2xl border border-[#E5E5E0] p-6 shadow-sm">
 
                     <div class="flex items-center justify-between mb-4">
 
-                        <h3 class="font-display font-bold text-[#0F172A]">
+                        <h3 class="font-display font-bold text-[#111111]">
                             Estado de paquetes
                         </h3>
 
-                        <span class="text-xs text-[#64748B]">
+                        <span class="text-xs text-[#6B6B66]">
                             {{ number_format($totalPackages) }} total
                         </span>
 
@@ -577,13 +592,13 @@
 
                                     <span class="w-2 h-2 rounded-full bg-blue-600"></span>
 
-                                    <span class="text-sm text-[#475569]">
+                                    <span class="text-sm text-[#4A4A45]">
                                         {{ ucfirst(strtolower(str_replace('_', ' ', $status))) }}
                                     </span>
 
                                 </div>
 
-                                <span class="text-sm font-semibold text-[#0F172A]">
+                                <span class="text-sm font-semibold text-[#111111]">
                                     {{ number_format($count) }}
                                 </span>
 

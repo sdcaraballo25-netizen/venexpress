@@ -7,16 +7,16 @@
         ========================================================== --}}
         <div class="flex flex-col md:flex-row justify-between items-start md:items-center mb-8 gap-4">
             <div>
-                <h1 class="font-display text-3xl font-bold tracking-tight text-[#0F172A]">
+                <h1 class="font-display text-3xl font-bold tracking-tight text-[#111111]">
                     Dashboard de Rutas
                 </h1>
-                <p class="text-sm text-[#64748B] mt-1">
+                <p class="text-sm text-[#6B6B66] mt-1">
                     Estado en vivo de las recolecciones de hoy.
                 </p>
             </div>
 
             <a href="{{ route('admin.routes') }}"
-               class="bg-[#0F172A] hover:bg-slate-800 text-white px-4 py-2 rounded-xl text-sm font-medium transition-colors">
+               class="bg-[#111111] hover:bg-slate-800 text-white px-4 py-2 rounded-xl text-sm font-medium transition-colors">
                 Ir a Gestión de Rutas
             </a>
         </div>
@@ -40,9 +40,9 @@
             @endphp
 
             @foreach ($cards as $card)
-                <div class="bg-white rounded-2xl border border-[#E2E8F0] p-6 shadow-sm">
+                <div class="bg-white rounded-2xl border border-[#E5E5E0] p-6 shadow-sm">
                     <div class="flex justify-between items-start">
-                        <p class="text-xs font-bold text-[#64748B] uppercase tracking-wider">
+                        <p class="text-xs font-bold text-[#6B6B66] uppercase tracking-wider">
                             {{ $card['label'] }}
                         </p>
                         <div class="p-2 {{ $card['bg'] }} rounded-lg {{ $card['text'] }}">
@@ -50,7 +50,7 @@
                         </div>
                     </div>
 
-                    <p class="font-display text-3xl font-bold mt-4 text-[#0F172A]">
+                    <p class="font-display text-3xl font-bold mt-4 text-[#111111]">
                         {{ number_format($card['value']) }}
                     </p>
                 </div>
@@ -62,25 +62,25 @@
         ========================================================== --}}
         <div class="grid grid-cols-1 lg:grid-cols-2 gap-5 mb-8">
 
-            <div class="bg-white rounded-2xl border border-[#E2E8F0] p-6 shadow-sm">
-                <p class="text-xs font-bold text-[#64748B] uppercase tracking-wider">
+            <div class="bg-white rounded-2xl border border-[#E5E5E0] p-6 shadow-sm">
+                <p class="text-xs font-bold text-[#6B6B66] uppercase tracking-wider">
                     % de cumplimiento (últimas 10 rutas completadas)
                 </p>
-                <p class="font-display text-3xl font-bold mt-4 text-[#0F172A]">
+                <p class="font-display text-3xl font-bold mt-4 text-[#111111]">
                     {{ $completionRate !== null ? $completionRate . '%' : '—' }}
                 </p>
                 @if ($completionRate === null)
-                    <p class="text-xs text-[#64748B] mt-2">Todavía no hay rutas completadas.</p>
+                    <p class="text-xs text-[#6B6B66] mt-2">Todavía no hay rutas completadas.</p>
                 @endif
             </div>
 
-            <div class="bg-white rounded-2xl border border-[#E2E8F0] p-6 shadow-sm">
-                <p class="text-xs font-bold text-[#64748B] uppercase tracking-wider mb-3">
+            <div class="bg-white rounded-2xl border border-[#E5E5E0] p-6 shadow-sm">
+                <p class="text-xs font-bold text-[#6B6B66] uppercase tracking-wider mb-3">
                     Rutas posiblemente estancadas
                 </p>
 
                 @if ($stalledRoutes->isEmpty())
-                    <p class="text-sm text-[#64748B]">Ninguna ruta activa lleva más de 30 min sin actividad.</p>
+                    <p class="text-sm text-[#6B6B66]">Ninguna ruta activa lleva más de 30 min sin actividad.</p>
                 @else
                     <ul class="space-y-2">
                         @foreach ($stalledRoutes as $route)
@@ -97,22 +97,22 @@
         {{-- =========================================================
              RUTAS EN CURSO
         ========================================================== --}}
-        <div class="bg-white rounded-2xl border border-[#E2E8F0] p-6 shadow-sm">
-            <p class="text-xs font-bold text-[#64748B] uppercase tracking-wider mb-4">
+        <div class="bg-white rounded-2xl border border-[#E5E5E0] p-6 shadow-sm">
+            <p class="text-xs font-bold text-[#6B6B66] uppercase tracking-wider mb-4">
                 Rutas en curso
             </p>
 
             @if ($activeRoutes->isEmpty())
-                <p class="text-sm text-[#64748B]">No hay rutas en curso en este momento.</p>
+                <p class="text-sm text-[#6B6B66]">No hay rutas en curso en este momento.</p>
             @else
                 <div class="space-y-2">
                     @foreach ($activeRoutes as $route)
-                        <div class="flex items-center justify-between rounded-xl border border-[#E2E8F0] px-4 py-3">
+                        <div class="flex items-center justify-between rounded-xl border border-[#E5E5E0] px-4 py-3">
                             <div>
-                                <p class="text-sm font-medium text-[#0F172A]">{{ $route->name }}</p>
-                                <p class="text-xs text-[#64748B]">{{ $route->city }}</p>
+                                <p class="text-sm font-medium text-[#111111]">{{ $route->name }}</p>
+                                <p class="text-xs text-[#6B6B66]">{{ $route->city }}</p>
                             </div>
-                            <span class="text-xs font-medium text-[#64748B]">
+                            <span class="text-xs font-medium text-[#6B6B66]">
                                 {{ $route->visitedStopsCount() }}/{{ $route->stops->count() }} agencias
                             </span>
                         </div>

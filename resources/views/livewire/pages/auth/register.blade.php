@@ -3,14 +3,20 @@
 use App\Models\Ally;
 use App\Models\Customer;
 use App\Models\Driver;
+use App\Models\Emprendedor;
 use App\Models\User;
+use App\Notifications\AccountPendingApproval;
 use App\Notifications\WelcomeVerificationToken;
 use App\Services\VenezuelaLocationService;
 use Illuminate\Auth\Events\Registered;
 use Illuminate\Support\Facades\Auth;
+use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Hash;
+use Illuminate\Support\Str;
+use Illuminate\Validation\Rule;
 use Illuminate\Validation\Rules;
 use Livewire\Attributes\Layout;
+use Livewire\Attributes\Locked;
 use Livewire\Volt\Component;
 use Livewire\WithFileUploads;
 
@@ -25,6 +31,25 @@ new #[Layout('layouts.guest')] class extends Component
     public string $role = 'cliente';
 
     /**
+     * Cuando viene de "Continuar con Google" (ver mount()): nombre y
+     * correo ya están confirmados por Google, así que se ocultan los
+     * campos de nombre/correo/contraseña y se completa el resto del
+     * formulario (rol + datos que Google no entrega) normalmente.
+     *
+     * #[Locked] impide que el cliente pueda enviar un valor propio
+     * para estas dos props en la petición de Livewire que dispara
+     * register() (sin esto, alguien podría forzar viaGoogle=true con
+     * un googleId inventado). $name y $email no se bloquean aquí
+     * porque siguen siendo editables en el registro manual; su
+     * verificación va dentro de register() releyendo la sesión.
+     */
+    #[Locked]
+    public bool $viaGoogle = false;
+
+    #[Locked]
+    public ?string $googleId = null;
+
+    /**
      * Datos adicionales para aliados.
      */
     public string $business_name = '';
@@ -33,6 +58,9 @@ new #[Layout('layouts.guest')] class extends Component
     public string $city = '';
     public string $address = '';
     public $storefront_photo = null;
+    public $rif_document = null;
+    public $mercantile_registry_document = null;
+    public $owner_id_document = null;
     public ?float $latitude = null;
     public ?float $longitude = null;
 
@@ -59,12 +87,48 @@ new #[Layout('layouts.guest')] class extends Component
     public string $id_doc = '';
 
     /**
+     * Datos adicionales para emprendedores (módulo de marketplace).
+     * business_name se reutiliza tal cual de la sección de Aliado
+     * (mismo concepto: nombre del negocio).
+     */
+    public string $document_id = '';
+
+    public ?int $pickup_ally_id = null;
+
+    /**
+     * Agencias aliadas activas, para que el emprendedor elija dónde
+     * entregará su mercancía (no hay recolección a domicilio).
+     */
+    public array $allies = [];
+
+    /**
      * Carga los estados disponibles.
      */
     public function mount(
         VenezuelaLocationService $locationService
     ): void {
         $this->states = $locationService->states();
+
+        $this->allies = Ally::query()
+            ->where('status', Ally::STATUS_ACTIVE)
+            ->orderBy('business_name')
+            ->get(['id', 'business_name', 'city', 'state'])
+            ->toArray();
+
+        $requestedRole = request()->query('role');
+
+        if (in_array($requestedRole, ['cliente', 'repartidor', 'aliado', 'emprendedor'], true)) {
+            $this->role = $requestedRole;
+        }
+
+        $googlePending = session('google_pending');
+
+        if (is_array($googlePending)) {
+            $this->viaGoogle = true;
+            $this->googleId = $googlePending['google_id'];
+            $this->name = $googlePending['name'];
+            $this->email = $googlePending['email'];
+        }
     }
 
     /**
@@ -94,6 +158,24 @@ new #[Layout('layouts.guest')] class extends Component
      */
     public function register(): void
     {
+        // El cliente puede tener modificado $email/$name antes de
+        // enviar el formulario (son props públicas editables en el
+        // registro manual). Cuando viene de Google, la identidad
+        // confirmada es la que quedó en sesión al volver del OAuth
+        // callback (ver GoogleAuthController), así que se restaura
+        // aquí para que no se pueda crear la cuenta con un correo
+        // distinto al que Google realmente verificó.
+        if ($this->viaGoogle) {
+            $googlePending = session('google_pending');
+
+            if (! is_array($googlePending) || ($googlePending['google_id'] ?? null) !== $this->googleId) {
+                abort(403);
+            }
+
+            $this->email = $googlePending['email'];
+            $this->name = $googlePending['name'];
+        }
+
         $rules = [
             'name' => [
                 'required',
@@ -112,16 +194,21 @@ new #[Layout('layouts.guest')] class extends Component
 
             'role' => [
                 'required',
-                'in:cliente,repartidor,aliado',
+                'in:cliente,repartidor,aliado,emprendedor',
             ],
+        ];
 
-            'password' => [
+        // Una cuenta que llega por "Continuar con Google" no crea
+        // contraseña propia (ver GoogleAuthController y mount()): la
+        // que se guarda es una aleatoria que nadie usa para entrar.
+        if (! $this->viaGoogle) {
+            $rules['password'] = [
                 'required',
                 'string',
                 'confirmed',
                 Rules\Password::defaults(),
-            ],
-        ];
+            ];
+        }
 
         /*
         |--------------------------------------------------------------------------
@@ -165,6 +252,37 @@ new #[Layout('layouts.guest')] class extends Component
                     'image',
                     'mimes:jpg,jpeg,png,webp',
                     'max:4096',
+                ],
+
+                /*
+                 * Documentos de verificación (RIF, registro
+                 * mercantil, cédula del titular). No forzamos
+                 * 'image' aquí: el aliado puede subir una foto o un
+                 * PDF/documento escaneado, según lo que tenga a
+                 * mano. 'mimes' es una lista blanca, así que
+                 * cualquier otro tipo de archivo (.exe, .zip, .rar,
+                 * etc.) queda rechazado automáticamente sin
+                 * necesidad de una lista negra.
+                 */
+                'rif_document' => [
+                    'required',
+                    'file',
+                    'mimes:jpg,jpeg,png,webp,pdf,doc,docx',
+                    'max:8192',
+                ],
+
+                'mercantile_registry_document' => [
+                    'required',
+                    'file',
+                    'mimes:jpg,jpeg,png,webp,pdf,doc,docx',
+                    'max:8192',
+                ],
+
+                'owner_id_document' => [
+                    'required',
+                    'file',
+                    'mimes:jpg,jpeg,png,webp,pdf,doc,docx',
+                    'max:8192',
                 ],
 
                 'latitude' => [
@@ -233,6 +351,34 @@ new #[Layout('layouts.guest')] class extends Component
 
         /*
         |--------------------------------------------------------------------------
+        | VALIDACIÓN DE EMPRENDEDOR
+        |--------------------------------------------------------------------------
+        */
+
+        if ($this->role === User::ROLE_EMPRENDEDOR) {
+            $rules = array_merge($rules, [
+                'business_name' => [
+                    'required',
+                    'string',
+                    'max:255',
+                ],
+
+                'document_id' => [
+                    'required',
+                    'string',
+                    'max:20',
+                ],
+
+                'pickup_ally_id' => [
+                    'required',
+                    'integer',
+                    Rule::exists('allies', 'id')->where('status', Ally::STATUS_ACTIVE),
+                ],
+            ]);
+        }
+
+        /*
+        |--------------------------------------------------------------------------
         | VALIDACIÓN DE CLIENTE
         |--------------------------------------------------------------------------
         */
@@ -256,18 +402,20 @@ new #[Layout('layouts.guest')] class extends Component
                      * persona con solo conocer o adivinar su cédula,
                      * además de sobrescribir su nombre/teléfono/email.
                      *
-                     * Por eso: solo permitimos crear la cuenta si la
-                     * cédula es nueva, o si el customer existente aún
-                     * NO tiene email (fue creado por un aliado al
-                     * despachar una guía y todavía nadie lo reclamó).
-                     * Si el customer ya tiene email, la cédula ya fue
-                     * reclamada por otra cuenta y bloqueamos el
-                     * registro.
+                     * Antes esto se decidía mirando si el Customer ya
+                     * tenía un email — pero un aliado puede haber
+                     * tecleado el email real de esa persona al
+                     * despachar una guía sin que nadie haya
+                     * "reclamado" la cédula todavía, lo que bloqueaba
+                     * el registro de su verdadero dueño. Ahora se
+                     * decide por user_id: solo bloqueamos si otra
+                     * cuenta ya demostró ser dueña de esta cédula
+                     * registrándose con ella.
                      */
                     function (string $attribute, mixed $value, \Closure $fail) {
                         $existing = Customer::where('id_doc', $value)->first();
 
-                        if ($existing && $existing->email) {
+                        if ($existing && $existing->user_id !== null) {
                             $fail(
                                 'Ya existe una cuenta de cliente registrada '
                                 . 'con esta cédula. Si es tuya, inicia sesión '
@@ -297,7 +445,9 @@ new #[Layout('layouts.guest')] class extends Component
             'name' => $validated['name'],
             'email' => $validated['email'],
             'phone' => $validated['phone'] ?? null,
-            'password' => Hash::make($validated['password']),
+            'password' => Hash::make($this->viaGoogle ? Str::random(40) : $validated['password']),
+            'google_id' => $this->viaGoogle ? $this->googleId : null,
+            'email_verified_at' => $this->viaGoogle ? now() : null,
             'role' => $validated['role'],
         ]);
 
@@ -310,25 +460,49 @@ new #[Layout('layouts.guest')] class extends Component
         */
 
         if ($user->isAliado()) {
-            $storefrontPhotoPath = $this->storefront_photo->store('allies', 'local');
+            /*
+             * Si Ally::create() falla a mitad de camino (ej. un error
+             * al guardar alguno de los documentos), sin esta
+             * transacción quedaría un User con rol "aliado" ya creado
+             * pero sin su Ally correspondiente: una cuenta huérfana
+             * que podría iniciar sesión normalmente después. Si eso
+             * pasa, deshacemos también la creación del User en vez de
+             * dejarlo a medio registrar.
+             */
+            try {
+                DB::transaction(function () use ($user, $validated) {
+                    $storefrontPhotoPath = $this->storefront_photo->store('allies', 'documents');
 
-            Ally::create([
-                'user_id' => $user->id,
-                'business_name' => $validated['business_name'],
-                'rif' => $validated['rif'],
-                'state' => $validated['state'],
-                'city' => $validated['city'],
-                'address' => $validated['address'],
-                'storefront_photo_path' => $storefrontPhotoPath,
-                'latitude' => $validated['latitude'],
-                'longitude' => $validated['longitude'],
-                'commission_percentage' => 10.00,
+                    Ally::create([
+                        'user_id' => $user->id,
+                        'business_name' => $validated['business_name'],
+                        'rif' => $validated['rif'],
+                        'state' => $validated['state'],
+                        'city' => $validated['city'],
+                        'address' => $validated['address'],
+                        'storefront_photo_path' => $storefrontPhotoPath,
+                        'rif_document_path' => $this->rif_document->store('allies', 'documents'),
+                        'mercantile_registry_document_path' => $this->mercantile_registry_document->store('allies', 'documents'),
+                        'owner_id_document_path' => $this->owner_id_document->store('allies', 'documents'),
+                        'latitude' => $validated['latitude'],
+                        'longitude' => $validated['longitude'],
+                        'commission_percentage' => 10.00,
 
-                // Un aliado nuevo comienza como PENDIENTE.
-                'status' => Ally::STATUS_PENDING,
-            ]);
+                        // Un aliado nuevo comienza como PENDIENTE.
+                        'status' => Ally::STATUS_PENDING,
+                    ]);
+                });
+            } catch (\Throwable $e) {
+                $user->delete();
+
+                throw $e;
+            }
+
+            $user->notify(new AccountPendingApproval('Aliado'));
 
             Auth::login($user);
+
+            session()->forget('google_pending');
 
             $this->redirect(
                 route('ally.dashboard', absolute: false),
@@ -345,25 +519,84 @@ new #[Layout('layouts.guest')] class extends Component
         */
 
         if ($user->isChofer()) {
-            Driver::create([
-                'user_id' => $user->id,
-                'vehicle_plate' => $validated['vehicle_plate'],
-                'vehicle_type' => $validated['vehicle_type'],
-                'phone' => $validated['phone'],
-                'driver_type' => Driver::TYPE_DELIVERY,
-                'license_photo_path' => $this->license_photo->store('drivers', 'local'),
-                'id_photo_path' => $this->id_photo->store('drivers', 'local'),
-                'vehicle_registration_photo_path' => $this->vehicle_registration_photo->store('drivers', 'local'),
+            // Ver comentario equivalente en la rama de Aliado: sin
+            // esta transacción, un fallo a mitad de camino dejaría un
+            // User con rol "repartidor" sin su Driver correspondiente.
+            try {
+                DB::transaction(function () use ($user, $validated) {
+                    Driver::create([
+                        'user_id' => $user->id,
+                        'vehicle_plate' => $validated['vehicle_plate'],
+                        'vehicle_type' => $validated['vehicle_type'],
+                        'phone' => $validated['phone'],
+                        'driver_type' => Driver::TYPE_DELIVERY,
+                        'license_photo_path' => $this->license_photo->store('drivers', 'documents'),
+                        'id_photo_path' => $this->id_photo->store('drivers', 'documents'),
+                        'vehicle_registration_photo_path' => $this->vehicle_registration_photo->store('drivers', 'documents'),
 
-                // Un repartidor nuevo comienza como PENDIENTE, igual
-                // que un aliado, hasta que un admin lo apruebe.
-                'status' => Driver::STATUS_PENDING,
-            ]);
+                        // Un repartidor nuevo comienza como PENDIENTE, igual
+                        // que un aliado, hasta que un admin lo apruebe.
+                        'status' => Driver::STATUS_PENDING,
+                    ]);
+                });
+            } catch (\Throwable $e) {
+                $user->delete();
+
+                throw $e;
+            }
+
+            $user->notify(new AccountPendingApproval('Repartidor'));
 
             Auth::login($user);
 
+            session()->forget('google_pending');
+
             $this->redirect(
                 route('repartidor.dashboard', absolute: false),
+                navigate: true
+            );
+
+            return;
+        }
+
+        /*
+        |--------------------------------------------------------------------------
+        | CREAR EMPRENDEDOR
+        |--------------------------------------------------------------------------
+        */
+
+        if ($user->isEmprendedor()) {
+            // Ver comentario equivalente en la rama de Aliado: sin
+            // esta transacción, un fallo a mitad de camino dejaría un
+            // User con rol "emprendedor" sin su Emprendedor correspondiente.
+            try {
+                DB::transaction(function () use ($user, $validated) {
+                    Emprendedor::create([
+                        'user_id' => $user->id,
+                        'pickup_ally_id' => $validated['pickup_ally_id'],
+                        'business_name' => $validated['business_name'],
+                        'document_id' => $validated['document_id'],
+
+                        // Un emprendedor nuevo comienza como PENDIENTE,
+                        // igual que un aliado o repartidor, hasta que
+                        // un admin lo apruebe.
+                        'status' => Emprendedor::STATUS_PENDING,
+                    ]);
+                });
+            } catch (\Throwable $e) {
+                $user->delete();
+
+                throw $e;
+            }
+
+            $user->notify(new AccountPendingApproval('Emprendedor'));
+
+            Auth::login($user);
+
+            session()->forget('google_pending');
+
+            $this->redirect(
+                route('emprendedor.dashboard', absolute: false),
                 navigate: true
             );
 
@@ -383,15 +616,35 @@ new #[Layout('layouts.guest')] class extends Component
          * anterior, el customer ya existe con este id_doc: lo
          * actualizamos en vez de duplicarlo, para que el historial de
          * paquetes previos también quede visible.
+         *
+         * user_id queda fijado a ESTE usuario: la validación de arriba
+         * ya garantizó que nadie más lo había reclamado todavía.
          */
         Customer::updateOrCreate(
             ['id_doc' => $validated['id_doc']],
             [
+                'user_id' => $user->id,
                 'name' => $validated['name'],
                 'phone' => $validated['phone'],
                 'email' => $validated['email'],
             ]
         );
+
+        // Un correo de Google ya viene verificado por Google (y
+        // email_verified_at ya quedó marcado al crear el User arriba),
+        // así que el código de 6 dígitos por correo sería redundante.
+        if ($this->viaGoogle) {
+            session()->forget('google_pending');
+
+            Auth::login($user);
+
+            $this->redirect(
+                route('cliente.dashboard', absolute: false),
+                navigate: true
+            );
+
+            return;
+        }
 
         // Generar y guardar el código de verificación.
         $plainToken = $user->generateVerificationToken();
@@ -426,56 +679,90 @@ new #[Layout('layouts.guest')] class extends Component
         Regístrate para gestionar tus guías, tarifas o entregas en VenExpress.
     </p>
 
-    <form wire:submit="register" class="mt-8 space-y-5">
+    @if ($viaGoogle)
 
-        {{-- NOMBRE --}}
-        <div>
-            <x-input-label
-                for="name"
-                value="Nombre completo"
-            />
-
-            <x-text-input
-                wire:model="name"
-                id="name"
-                class="block mt-1.5 w-full"
-                type="text"
-                name="name"
-                required
-                autofocus
-                autocomplete="name"
-                placeholder="Tu nombre"
-            />
-
-            <x-input-error
-                :messages="$errors->get('name')"
-                class="mt-2"
-            />
+        {{-- Nombre/correo ya confirmados por Google: solo falta el
+             resto de datos que Google no entrega. --}}
+        <div class="mt-6 flex items-center gap-3 rounded-xl border border-[#E5E5E0] bg-[#F7F7F4] px-4 py-3">
+            <svg class="h-4 w-4 shrink-0" viewBox="0 0 18 18" xmlns="http://www.w3.org/2000/svg"><path fill="#4285F4" d="M17.64 9.2c0-.637-.057-1.251-.164-1.84H9v3.481h4.844a4.14 4.14 0 01-1.796 2.716v2.259h2.908c1.702-1.567 2.684-3.874 2.684-6.615z"/><path fill="#34A853" d="M9 18c2.43 0 4.467-.806 5.956-2.184l-2.908-2.259c-.806.54-1.837.86-3.048.86-2.344 0-4.328-1.584-5.036-3.711H.957v2.332A8.997 8.997 0 009 18z"/><path fill="#FBBC05" d="M3.964 10.706A5.41 5.41 0 013.682 9c0-.593.102-1.17.282-1.706V4.962H.957A8.996 8.996 0 000 9c0 1.452.348 2.827.957 4.038l3.007-2.332z"/><path fill="#EA4335" d="M9 3.58c1.321 0 2.508.454 3.44 1.345l2.582-2.581C13.463.891 11.426 0 9 0A8.997 8.997 0 00.957 4.962L3.964 7.294C4.672 5.167 6.656 3.58 9 3.58z"/></svg>
+            <div class="text-sm">
+                <p class="font-semibold text-[#111111]">{{ $name }}</p>
+                <p class="text-gray-500">{{ $email }}</p>
+            </div>
         </div>
 
-        {{-- EMAIL --}}
-        <div>
-            <x-input-label
-                for="email"
-                value="Correo electrónico"
-            />
+    @elseif (config('services.google.client_id'))
 
-            <x-text-input
-                wire:model="email"
-                id="email"
-                class="block mt-1.5 w-full"
-                type="email"
-                name="email"
-                required
-                autocomplete="username"
-                placeholder="tu@correo.com"
-            />
+        <a
+            href="{{ route('auth.google.redirect') }}"
+            class="mt-6 flex items-center justify-center gap-2 rounded-lg border border-[#E5E5E0] bg-white px-4 py-2.5 text-sm font-semibold text-[#111111] transition hover:bg-[#F7F7F4]"
+        >
+            <svg class="h-4 w-4 shrink-0" viewBox="0 0 18 18" xmlns="http://www.w3.org/2000/svg"><path fill="#4285F4" d="M17.64 9.2c0-.637-.057-1.251-.164-1.84H9v3.481h4.844a4.14 4.14 0 01-1.796 2.716v2.259h2.908c1.702-1.567 2.684-3.874 2.684-6.615z"/><path fill="#34A853" d="M9 18c2.43 0 4.467-.806 5.956-2.184l-2.908-2.259c-.806.54-1.837.86-3.048.86-2.344 0-4.328-1.584-5.036-3.711H.957v2.332A8.997 8.997 0 009 18z"/><path fill="#FBBC05" d="M3.964 10.706A5.41 5.41 0 013.682 9c0-.593.102-1.17.282-1.706V4.962H.957A8.996 8.996 0 000 9c0 1.452.348 2.827.957 4.038l3.007-2.332z"/><path fill="#EA4335" d="M9 3.58c1.321 0 2.508.454 3.44 1.345l2.582-2.581C13.463.891 11.426 0 9 0A8.997 8.997 0 00.957 4.962L3.964 7.294C4.672 5.167 6.656 3.58 9 3.58z"/></svg>
+            Continuar con Google
+        </a>
 
-            <x-input-error
-                :messages="$errors->get('email')"
-                class="mt-2"
-            />
+        <div class="mt-6 flex items-center gap-3 text-xs text-gray-400">
+            <span class="h-px flex-1 bg-[#E5E5E0]"></span>
+            o regístrate con tu correo
+            <span class="h-px flex-1 bg-[#E5E5E0]"></span>
         </div>
+
+    @endif
+
+    <form wire:submit="register" class="mt-6 space-y-5">
+
+        @unless ($viaGoogle)
+
+            {{-- NOMBRE --}}
+            <div>
+                <x-input-label
+                    for="name"
+                    value="Nombre completo"
+                />
+
+                <x-text-input
+                    wire:model="name"
+                    id="name"
+                    class="block mt-1.5 w-full"
+                    type="text"
+                    name="name"
+                    required
+                    autofocus
+                    autocomplete="name"
+                    placeholder="Tu nombre"
+                />
+
+                <x-input-error
+                    :messages="$errors->get('name')"
+                    class="mt-2"
+                />
+            </div>
+
+            {{-- EMAIL --}}
+            <div>
+                <x-input-label
+                    for="email"
+                    value="Correo electrónico"
+                />
+
+                <x-text-input
+                    wire:model="email"
+                    id="email"
+                    class="block mt-1.5 w-full"
+                    type="email"
+                    name="email"
+                    required
+                    autocomplete="username"
+                    placeholder="tu@correo.com"
+                />
+
+                <x-input-error
+                    :messages="$errors->get('email')"
+                    class="mt-2"
+                />
+            </div>
+
+        @endunless
 
         {{-- ROL --}}
         <div>
@@ -501,6 +788,10 @@ new #[Layout('layouts.guest')] class extends Component
 
                 <option value="aliado">
                     Punto aliado
+                </option>
+
+                <option value="emprendedor">
+                    Emprendedor
                 </option>
             </select>
 
@@ -710,6 +1001,132 @@ new #[Layout('layouts.guest')] class extends Component
 
                 <x-input-error
                     :messages="$errors->get('address')"
+                    class="mt-2"
+                />
+            </div>
+
+            {{--
+                DOCUMENTOS DE VERIFICACIÓN (RIF, registro mercantil,
+                cédula del titular). A diferencia de la foto de
+                fachada, aquí el aliado puede subir una foto o un
+                PDF/documento escaneado según lo que tenga a mano, así
+                que no forzamos accept="image/*" ni mostramos una
+                vista previa de imagen para cualquier archivo (un PDF
+                no se puede previsualizar como <img>).
+            --}}
+            <div>
+                <p class="text-sm font-medium text-gray-700">
+                    Documentos de verificación
+                </p>
+                <p class="mt-1 text-xs text-gray-500">
+                    Foto o documento escaneado (imagen, PDF o Word). Máx. 8MB por archivo.
+                </p>
+            </div>
+
+            {{-- RIF --}}
+            <div>
+                <x-input-label
+                    for="rif_document"
+                    value="RIF"
+                />
+
+                <input
+                    type="file"
+                    wire:model="rif_document"
+                    id="rif_document"
+                    accept="image/*,.pdf,.doc,.docx"
+                    class="block mt-1.5 w-full text-sm text-gray-600
+                           file:mr-4 file:py-2 file:px-4 file:rounded-md
+                           file:border-0 file:text-sm file:font-semibold
+                           file:bg-blue-50 file:text-blue-700 hover:file:bg-blue-100"
+                />
+
+                <p class="mt-1 text-xs text-gray-500" wire:loading wire:target="rif_document">
+                    Subiendo archivo...
+                </p>
+
+                @if ($rif_document)
+                    @if (str_starts_with($rif_document->getMimeType(), 'image/'))
+                        <img src="{{ $rif_document->temporaryUrl() }}" class="mt-2 h-24 rounded-lg object-cover" alt="Vista previa">
+                    @else
+                        <p class="mt-2 text-xs text-gray-600">📄 {{ $rif_document->getClientOriginalName() }}</p>
+                    @endif
+                @endif
+
+                <x-input-error
+                    :messages="$errors->get('rif_document')"
+                    class="mt-2"
+                />
+            </div>
+
+            {{-- REGISTRO MERCANTIL --}}
+            <div>
+                <x-input-label
+                    for="mercantile_registry_document"
+                    value="Registro mercantil"
+                />
+
+                <input
+                    type="file"
+                    wire:model="mercantile_registry_document"
+                    id="mercantile_registry_document"
+                    accept="image/*,.pdf,.doc,.docx"
+                    class="block mt-1.5 w-full text-sm text-gray-600
+                           file:mr-4 file:py-2 file:px-4 file:rounded-md
+                           file:border-0 file:text-sm file:font-semibold
+                           file:bg-blue-50 file:text-blue-700 hover:file:bg-blue-100"
+                />
+
+                <p class="mt-1 text-xs text-gray-500" wire:loading wire:target="mercantile_registry_document">
+                    Subiendo archivo...
+                </p>
+
+                @if ($mercantile_registry_document)
+                    @if (str_starts_with($mercantile_registry_document->getMimeType(), 'image/'))
+                        <img src="{{ $mercantile_registry_document->temporaryUrl() }}" class="mt-2 h-24 rounded-lg object-cover" alt="Vista previa">
+                    @else
+                        <p class="mt-2 text-xs text-gray-600">📄 {{ $mercantile_registry_document->getClientOriginalName() }}</p>
+                    @endif
+                @endif
+
+                <x-input-error
+                    :messages="$errors->get('mercantile_registry_document')"
+                    class="mt-2"
+                />
+            </div>
+
+            {{-- CÉDULA DEL TITULAR --}}
+            <div>
+                <x-input-label
+                    for="owner_id_document"
+                    value="Cédula del titular"
+                />
+
+                <input
+                    type="file"
+                    wire:model="owner_id_document"
+                    id="owner_id_document"
+                    accept="image/*,.pdf,.doc,.docx"
+                    class="block mt-1.5 w-full text-sm text-gray-600
+                           file:mr-4 file:py-2 file:px-4 file:rounded-md
+                           file:border-0 file:text-sm file:font-semibold
+                           file:bg-blue-50 file:text-blue-700 hover:file:bg-blue-100"
+                />
+
+                <p class="mt-1 text-xs text-gray-500" wire:loading wire:target="owner_id_document">
+                    Subiendo archivo...
+                </p>
+
+                @if ($owner_id_document)
+                    @if (str_starts_with($owner_id_document->getMimeType(), 'image/'))
+                        <img src="{{ $owner_id_document->temporaryUrl() }}" class="mt-2 h-24 rounded-lg object-cover" alt="Vista previa">
+                    @else
+                        <p class="mt-2 text-xs text-gray-600">📄 {{ $owner_id_document->getClientOriginalName() }}</p>
+                    @endif
+                @endif
+
+                <x-input-error
+                    :messages="$errors->get('owner_id_document')"
                     class="mt-2"
                 />
             </div>
@@ -961,54 +1378,147 @@ new #[Layout('layouts.guest')] class extends Component
 
         @endif
 
-        {{-- ====================================================== --}}
-        {{-- CONTRASEÑA --}}
-        {{-- ====================================================== --}}
+        @if ($role === 'emprendedor')
 
-        <div>
-            <x-input-label
-                for="password"
-                value="Contraseña"
-            />
+            <div class="border-t border-gray-200 pt-5">
+                <h2 class="text-sm font-semibold text-blue-950">
+                    Información del negocio
+                </h2>
 
-            <x-password-input
-                wire:model="password"
-                id="password"
-                class="block mt-1.5"
-                name="password"
-                required
-                autocomplete="new-password"
-                placeholder="••••••••"
-            />
+                <p class="mt-1 text-xs text-gray-500">
+                    Tú entregas la mercancía en la agencia aliada que elijas — Venexpress no recolecta a domicilio.
+                </p>
+            </div>
 
-            <x-input-error
-                :messages="$errors->get('password')"
-                class="mt-2"
-            />
-        </div>
+            {{-- NOMBRE DEL NEGOCIO --}}
+            <div>
+                <x-input-label
+                    for="business_name"
+                    value="Nombre del negocio"
+                />
 
-        {{-- CONFIRMAR CONTRASEÑA --}}
-        <div>
-            <x-input-label
-                for="password_confirmation"
-                value="Confirmar contraseña"
-            />
+                <x-text-input
+                    wire:model="business_name"
+                    id="business_name"
+                    class="block mt-1.5 w-full"
+                    type="text"
+                    placeholder="Mi Tienda"
+                />
 
-            <x-password-input
-                wire:model="password_confirmation"
-                id="password_confirmation"
-                class="block mt-1.5"
-                name="password_confirmation"
-                required
-                autocomplete="new-password"
-                placeholder="••••••••"
-            />
+                <x-input-error
+                    :messages="$errors->get('business_name')"
+                    class="mt-2"
+                />
+            </div>
 
-            <x-input-error
-                :messages="$errors->get('password_confirmation')"
-                class="mt-2"
-            />
-        </div>
+            {{-- CÉDULA O RIF --}}
+            <div>
+                <x-input-label
+                    for="document_id"
+                    value="Cédula o RIF"
+                />
+
+                <x-text-input
+                    wire:model="document_id"
+                    id="document_id"
+                    class="block mt-1.5 w-full"
+                    type="text"
+                    placeholder="V-12345678 o J-12345678-9"
+                />
+
+                <x-input-error
+                    :messages="$errors->get('document_id')"
+                    class="mt-2"
+                />
+            </div>
+
+            {{-- AGENCIA DE RETIRO --}}
+            <div>
+                <x-input-label
+                    for="pickup_ally_id"
+                    value="Agencia aliada donde entregarás tu mercancía"
+                />
+
+                <select
+                    wire:model="pickup_ally_id"
+                    id="pickup_ally_id"
+                    class="block mt-1.5 w-full rounded-md border-gray-300 shadow-sm focus:border-blue-500 focus:ring-blue-500"
+                >
+                    <option value="">Selecciona una agencia</option>
+
+                    @foreach ($allies as $ally)
+                        <option value="{{ $ally['id'] }}">
+                            {{ $ally['business_name'] }} — {{ $ally['city'] }}, {{ $ally['state'] }}
+                        </option>
+                    @endforeach
+                </select>
+
+                @if (count($allies) === 0)
+                    <p class="mt-1 text-xs text-amber-600">
+                        Todavía no hay agencias aliadas activas disponibles.
+                    </p>
+                @endif
+
+                <x-input-error
+                    :messages="$errors->get('pickup_ally_id')"
+                    class="mt-2"
+                />
+            </div>
+
+        @endif
+
+        @unless ($viaGoogle)
+
+            {{-- ====================================================== --}}
+            {{-- CONTRASEÑA --}}
+            {{-- ====================================================== --}}
+
+            <div>
+                <x-input-label
+                    for="password"
+                    value="Contraseña"
+                />
+
+                <x-password-input
+                    wire:model="password"
+                    id="password"
+                    class="block mt-1.5"
+                    name="password"
+                    required
+                    autocomplete="new-password"
+                    placeholder="••••••••"
+                />
+
+                <x-input-error
+                    :messages="$errors->get('password')"
+                    class="mt-2"
+                />
+            </div>
+
+            {{-- CONFIRMAR CONTRASEÑA --}}
+            <div>
+                <x-input-label
+                    for="password_confirmation"
+                    value="Confirmar contraseña"
+                />
+
+                <x-password-input
+                    wire:model="password_confirmation"
+                    id="password_confirmation"
+                    class="block mt-1.5"
+                    name="password_confirmation"
+                    required
+                    autocomplete="new-password"
+                    placeholder="••••••••"
+                />
+
+                <x-input-error
+                    :messages="$errors->get('password_confirmation')"
+                    class="mt-2"
+                />
+            </div>
+
+        @endunless
 
         {{-- BOTÓN --}}
         <x-primary-button class="w-full py-3">

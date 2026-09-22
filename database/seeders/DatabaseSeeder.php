@@ -6,6 +6,7 @@ use App\Models\Ally;
 use App\Models\BcvRate;
 use App\Models\Customer;
 use App\Models\Driver;
+use App\Models\Emprendedor;
 use App\Models\RateMatrix;
 use App\Models\User;
 use Illuminate\Database\Console\Seeds\WithoutModelEvents;
@@ -34,9 +35,10 @@ class DatabaseSeeder extends Seeder
     public function run(): void
     {
         $this->seedAdmins();
-        $this->seedAllyWithStaff();
+        $ally = $this->seedAllyWithStaff();
         $this->seedDriver();
         $this->seedClient();
+        $this->seedEmprendedor($ally);
         $this->seedRateMatrix();
         $this->seedBcvRate();
     }
@@ -62,7 +64,7 @@ class DatabaseSeeder extends Seeder
         ]);
     }
 
-    protected function seedAllyWithStaff(): void
+    protected function seedAllyWithStaff(): Ally
     {
         $owner = User::factory()->create([
             'name' => 'Aliado Demo Caracas',
@@ -97,6 +99,8 @@ class DatabaseSeeder extends Seeder
             'status' => User::STATUS_ACTIVE,
             'email_verified_at' => now(),
         ]);
+
+        return $ally;
     }
 
     protected function seedDriver(): void
@@ -128,6 +132,12 @@ class DatabaseSeeder extends Seeder
             'role' => User::ROLE_CLIENTE,
             'status' => User::STATUS_ACTIVE,
             'email_verified_at' => now(),
+            // Sin esto, EnsureAccountIsVerified manda a este usuario a
+            // /verify-account (verificación propia por código de
+            // VenExpress) en vez de dejarlo entrar al panel de Cliente
+            // — email_verified_at es el campo nativo de Laravel, que
+            // este proyecto no usa para el gate del panel.
+            'account_verified_at' => now(),
         ]);
 
         // Sin este registro en customers, el panel de Cliente
@@ -141,6 +151,28 @@ class DatabaseSeeder extends Seeder
                 'email' => $clientUser->email,
             ]
         );
+    }
+
+    protected function seedEmprendedor(Ally $pickupAlly): void
+    {
+        $emprendedorUser = User::factory()->create([
+            'name' => 'Emprendedor',
+            'email' => 'emprendedor@venexpress.test',
+            'password' => Hash::make(self::DEMO_PASSWORD),
+            'role' => User::ROLE_EMPRENDEDOR,
+            'status' => User::STATUS_ACTIVE,
+            'email_verified_at' => now(),
+        ]);
+
+        Emprendedor::create([
+            'user_id' => $emprendedorUser->id,
+            'pickup_ally_id' => $pickupAlly->id,
+            'business_name' => 'Tienda Demo',
+            'document_id' => 'V-00000001',
+            // Activo directamente: en producción, un emprendedor nuevo
+            // nace PENDIENTE y un admin lo aprueba desde /admin/emprendedores/aprobacion.
+            'status' => Emprendedor::STATUS_ACTIVE,
+        ]);
     }
 
     protected function seedRateMatrix(): void

@@ -67,7 +67,7 @@
 
     @vite(['resources/css/app.css', 'resources/js/app.js'])
 </head>
-<body class="font-sans text-blue-950 antialiased bg-[#F3F5F7]">
+<body class="font-sans text-blue-950 antialiased bg-[#F7F7F4]">
 
     <div class="min-h-screen flex flex-col items-center justify-center px-6 py-12">
 
@@ -75,7 +75,7 @@
             <x-venexpress-logo size="md" />
         </div>
 
-        <div class="w-full max-w-md bg-white rounded-3xl shadow-sm border border-[#E2E8F0] p-8 text-center">
+        <div class="w-full max-w-md bg-white rounded-3xl shadow-sm border border-[#E5E5E0] p-8 text-center">
 
             <div class="mx-auto flex h-16 w-16 items-center justify-center rounded-full {{ $colorClasses['bg'] }} {{ $colorClasses['text'] }}">
                 @if ($copy['icon'] === 'clock')
@@ -105,7 +105,7 @@
                 {{ $copy['body'] }}
             </p>
 
-            <div class="mt-6 pt-6 border-t border-[#E2E8F0] flex items-center justify-between text-left">
+            <div class="mt-6 pt-6 border-t border-[#E5E5E0] flex items-center justify-between text-left">
                 <div class="min-w-0">
                     <p class="text-sm font-semibold text-blue-950 truncate">{{ $user->name }}</p>
                     <p class="text-xs text-gray-400 truncate">{{ $user->email }}</p>

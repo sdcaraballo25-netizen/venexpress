@@ -28,7 +28,7 @@
 
 </head>
 
-<body class="bg-[#F3F5F7] text-[#0B1220] antialiased">
+<body class="bg-[#F7F7F4] text-[#111111] antialiased">
 
 <div class="min-h-screen flex">
 
@@ -37,7 +37,7 @@
     ========================================================== --}}
 
     <aside
-        class="fixed inset-y-0 left-0 z-40 w-72 bg-white border-r border-[#E2E8F0] flex flex-col
+        class="fixed inset-y-0 left-0 z-40 w-72 bg-white border-r border-[#E5E5E0] flex flex-col
                transform transition-transform duration-200 md:relative md:translate-x-0"
         :class="sidebarOpen ? 'translate-x-0' : '-translate-x-full md:translate-x-0'"
     >
@@ -46,7 +46,7 @@
         <div class="px-6 pt-7 pb-8">
             <div class="flex items-center gap-3">
 
-                <div class="h-11 w-11 rounded-xl bg-purple-900 flex items-center justify-center text-white shrink-0">
+                <div class="h-11 w-11 rounded-xl bg-amber-400 flex items-center justify-center text-[#111111] shrink-0">
                     <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                         <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
                             d="M3 7l9-4 9 4M3 7l9 4m-9-4v10l9 4m0-10l9-4m-9 4v10m9-14v10l-9 4" />
@@ -54,8 +54,8 @@
                 </div>
 
                 <div class="min-w-0">
-                    <span class="font-display font-bold text-xl text-[#0F172A] block leading-none">Venexpress</span>
-                    <span class="text-xs text-[#94A3B8] block mt-1">Panel Almacén</span>
+                    <span class="font-display font-bold text-xl text-[#111111] block leading-none">Venexpress</span>
+                    <span class="text-xs text-[#B8B8B2] block mt-1">Panel Almacén</span>
                 </div>
 
             </div>
@@ -64,7 +64,7 @@
         {{-- NAVEGACIÓN --}}
         <nav class="flex-1 px-4 pb-6 overflow-y-auto">
 
-            <p class="px-3 mb-3 text-xs font-semibold uppercase tracking-wider text-[#94A3B8]">
+            <p class="px-3 mb-3 text-xs font-semibold uppercase tracking-wider text-[#B8B8B2]">
                 Principal
             </p>
 
@@ -75,8 +75,8 @@
                 @click="sidebarOpen = false"
                 class="flex items-center gap-3 px-4 py-3 rounded-xl text-sm font-medium transition-colors
                     {{ request()->routeIs('almacen.dashboard')
-                        ? 'bg-purple-50 text-purple-900'
-                        : 'text-[#64748B] hover:bg-slate-50 hover:text-[#0F172A]' }}"
+                        ? 'bg-amber-400 text-[#111111]'
+                        : 'text-[#6B6B66] hover:bg-slate-50 hover:text-[#111111]' }}"
             >
                 <svg class="w-5 h-5 shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                     <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
@@ -90,7 +90,7 @@
                 href="{{ route('almacen.dashboard') }}#escanear"
                 wire:navigate
                 @click="sidebarOpen = false"
-                class="flex items-center gap-3 px-4 py-3 rounded-xl text-sm font-medium transition-colors text-[#64748B] hover:bg-slate-50 hover:text-[#0F172A]"
+                class="flex items-center gap-3 px-4 py-3 rounded-xl text-sm font-medium transition-colors text-[#6B6B66] hover:bg-slate-50 hover:text-[#111111]"
             >
                 <svg class="w-5 h-5 shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                     <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.8"
@@ -106,8 +106,8 @@
                 @click="sidebarOpen = false"
                 class="flex items-center gap-3 px-4 py-3 rounded-xl text-sm font-medium transition-colors
                     {{ request()->routeIs('almacen.help')
-                        ? 'bg-purple-50 text-purple-900'
-                        : 'text-[#64748B] hover:bg-slate-50 hover:text-[#0F172A]' }}"
+                        ? 'bg-amber-400 text-[#111111]'
+                        : 'text-[#6B6B66] hover:bg-slate-50 hover:text-[#111111]' }}"
             >
                 <svg class="w-5 h-5 shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                     <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
@@ -116,23 +116,47 @@
                 <span>Ayuda</span>
             </a>
 
+            {{-- RECOMENDACIONES --}}
+            <a
+                href="{{ route('recommendations.create') }}"
+                wire:navigate
+                @click="sidebarOpen = false"
+                class="flex items-center gap-3 px-4 py-3 rounded-xl text-sm font-medium transition-colors
+                    {{ request()->routeIs('recommendations.create')
+                        ? 'bg-amber-400 text-[#111111]'
+                        : 'text-[#6B6B66] hover:bg-slate-50 hover:text-[#111111]' }}"
+            >
+                <svg class="w-5 h-5 shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                        d="M8 10h.01M12 10h.01M16 10h.01M9 16H5a2 2 0 01-2-2V6a2 2 0 012-2h14a2 2 0 012 2v8a2 2 0 01-2 2h-6l-4 4v-4z" />
+                </svg>
+                <span>Recomendaciones</span>
+            </a>
+
         </nav>
 
         {{-- USUARIO --}}
-        <div class="border-t border-[#E2E8F0] px-5 py-5 bg-white">
+        <div class="border-t border-[#E5E5E0] px-5 py-5 bg-white">
 
             <div class="flex items-center gap-3">
-                <div class="h-10 w-10 rounded-full bg-purple-900 text-white flex items-center justify-center font-bold uppercase shrink-0">
+                <div class="h-10 w-10 rounded-full bg-amber-400 text-[#111111] flex items-center justify-center font-bold uppercase shrink-0">
                     {{ strtoupper(substr(auth()->user()->name ?? 'A', 0, 1)) }}
                 </div>
 
                 <div class="min-w-0 flex-1">
-                    <p class="text-sm font-semibold text-[#0F172A] truncate">{{ auth()->user()->name ?? 'Almacén' }}</p>
-                    <p class="text-xs text-[#64748B] truncate">{{ auth()->user()?->warehouse?->name ?? 'Personal de almacén' }}</p>
+                    <p class="text-sm font-semibold text-[#111111] truncate">{{ auth()->user()->name ?? 'Almacén' }}</p>
+                    <p class="text-xs text-[#6B6B66] truncate">{{ auth()->user()?->warehouse?->name ?? 'Personal de almacén' }}</p>
                 </div>
             </div>
 
-            <form method="POST" action="{{ route('logout') }}" class="mt-4">
+            <a
+                href="{{ route('profile') }}"
+                class="block w-full mt-4 rounded-xl px-3 py-2 text-sm font-medium text-[#6B6B66] hover:bg-slate-50 hover:text-[#111111] transition-colors"
+            >
+                Mi Perfil
+            </a>
+
+            <form method="POST" action="{{ route('logout') }}" class="mt-2">
                 @csrf
                 <button type="submit"
                     class="w-full rounded-xl px-3 py-2 text-left text-sm font-medium text-red-500 hover:bg-red-50 hover:text-red-700 transition-colors">
@@ -151,12 +175,12 @@
     <div class="flex-1 min-w-0">
 
         {{-- HEADER --}}
-        <header class="h-16 bg-white border-b border-[#E2E8F0] flex items-center justify-between px-4 lg:px-8 sticky top-0 z-20">
+        <header class="h-16 bg-white border-b border-[#E5E5E0] flex items-center justify-between px-4 lg:px-8 sticky top-0 z-20">
 
             <button
                 type="button"
                 @click="sidebarOpen = true"
-                class="md:hidden h-10 w-10 rounded-xl flex items-center justify-center text-[#0F172A] hover:bg-slate-100"
+                class="md:hidden h-10 w-10 rounded-xl flex items-center justify-center text-[#111111] hover:bg-slate-100"
                 aria-label="Abrir menú"
             >
                 <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -174,9 +198,16 @@
                 </div>
 
                 <div class="hidden sm:block text-right">
-                    <p class="text-sm font-semibold text-[#0F172A]">{{ auth()->user()->name ?? 'Almacén' }}</p>
-                    <p class="text-xs text-[#64748B]">Panel de almacén</p>
+                    <p class="text-sm font-semibold text-[#111111]">{{ auth()->user()->name ?? 'Almacén' }}</p>
+                    <p class="text-xs text-[#6B6B66]">Panel de almacén</p>
                 </div>
+
+                <a
+                    href="{{ route('profile') }}"
+                    class="h-10 px-4 inline-flex items-center rounded-xl text-sm font-medium text-[#6B6B66] border border-[#E5E5E0] hover:bg-slate-50 hover:text-[#111111] transition-colors"
+                >
+                    Mi Perfil
+                </a>
 
                 <form method="POST" action="{{ route('logout') }}">
                     @csrf
@@ -198,6 +229,8 @@
     </div>
 
 </div>
+
+<x-confirm-dialog />
 
 @livewireScripts
 

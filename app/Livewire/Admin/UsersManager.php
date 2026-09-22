@@ -522,6 +522,14 @@ class UsersManager extends Component
                             : Driver::STATUS_SUSPENDED,
                 ]);
             }
+
+            if ($target->isAliado()) {
+                $target->ally?->update([
+                    'status' => $newStatus === User::STATUS_ACTIVE
+                            ? Ally::STATUS_ACTIVE
+                            : Ally::STATUS_SUSPENDED,
+                ]);
+            }
         });
 
         AuditLog::create([

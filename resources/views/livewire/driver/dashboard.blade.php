@@ -10,7 +10,7 @@
                 Panel del repartidor
             </p>
 
-            <h1 class="mt-1 font-display text-3xl font-bold tracking-tight text-[#0F172A]">
+            <h1 class="mt-1 font-display text-3xl font-bold tracking-tight text-[#111111]">
                 Hola, {{ $driver->user?->name ?? auth()->user()->name }} 👋
             </h1>
 
@@ -82,7 +82,7 @@
              MI RUTA ACTUAL (HUB)
         ========================================================== --}}
         <div
-            class="rounded-3xl border border-[#E2E8F0] bg-white p-6 shadow-sm"
+            class="rounded-3xl border border-[#E5E5E0] bg-white p-6 shadow-sm"
             @if (! $activeRoute) wire:poll.15s @endif
         >
 
@@ -102,7 +102,7 @@
 
                         @if ($activeRoute)
 
-                            <h2 class="mt-1 font-display text-2xl font-bold text-[#0F172A]">
+                            <h2 class="mt-1 font-display text-2xl font-bold text-[#111111]">
                                 {{ $activeRoute->name }}
                             </h2>
 
@@ -142,7 +142,7 @@
 
                                 <div>
 
-                                    <h2 class="font-display text-lg font-bold leading-tight text-[#0F172A]">
+                                    <h2 class="font-display text-lg font-bold leading-tight text-[#111111]">
                                         {{ $availableRoutesCount === 1 ? 'Ruta compatible esperando' : 'Rutas compatibles esperando' }}
                                     </h2>
 
@@ -157,7 +157,7 @@
 
                         @else
 
-                            <h2 class="mt-1 font-display text-2xl font-bold text-[#0F172A]">
+                            <h2 class="mt-1 font-display text-2xl font-bold text-[#111111]">
                                 Sin rutas disponibles
                             </h2>
 
@@ -194,10 +194,14 @@
 
                                 <button
                                     type="button"
-                                    wire:click="releaseRoute"
                                     wire:loading.attr="disabled"
-                                    wire:confirm="¿Confirmas que quieres liberar esta ruta? Volverá a estar disponible para otros repartidores."
-                                    class="inline-flex items-center justify-center rounded-xl border border-[#E2E8F0] px-5 py-3 text-sm font-semibold text-[#0F172A] transition hover:border-amber-300 hover:bg-amber-50 disabled:cursor-not-allowed disabled:opacity-50"
+                                    @click.prevent="$store.confirm.open({
+                                        message: '¿Confirmas que quieres liberar esta ruta? Volverá a estar disponible para otros repartidores.',
+                                        confirmText: 'Liberar ruta',
+                                        variant: 'warning',
+                                        onConfirm: () => $wire.releaseRoute(),
+                                    })"
+                                    class="inline-flex items-center justify-center rounded-xl border border-[#E5E5E0] px-5 py-3 text-sm font-semibold text-[#111111] transition hover:border-amber-300 hover:bg-amber-50 disabled:cursor-not-allowed disabled:opacity-50"
                                 >
                                     <span wire:loading.remove wire:target="releaseRoute">
                                         Liberar ruta
@@ -217,10 +221,14 @@
 
                                 <button
                                     type="button"
-                                    wire:click="completeRoute"
                                     wire:loading.attr="disabled"
-                                    wire:confirm="¿Confirmas que quieres finalizar esta ruta? Las paradas pendientes quedarán marcadas como omitidas."
-                                    class="inline-flex items-center justify-center rounded-xl border border-[#E2E8F0] px-5 py-3 text-sm font-semibold text-[#0F172A] transition hover:border-red-300 hover:bg-red-50 disabled:cursor-not-allowed disabled:opacity-50"
+                                    @click.prevent="$store.confirm.open({
+                                        message: '¿Confirmas que quieres finalizar esta ruta? Las paradas pendientes quedarán marcadas como omitidas.',
+                                        confirmText: 'Finalizar ruta',
+                                        variant: 'danger',
+                                        onConfirm: () => $wire.completeRoute(),
+                                    })"
+                                    class="inline-flex items-center justify-center rounded-xl border border-[#E5E5E0] px-5 py-3 text-sm font-semibold text-[#111111] transition hover:border-red-300 hover:bg-red-50 disabled:cursor-not-allowed disabled:opacity-50"
                                 >
                                     <span wire:loading.remove wire:target="completeRoute">
                                         Finalizar ruta
@@ -235,7 +243,7 @@
 
                             <a
                                 href="{{ route('repartidor.route-detail', $activeRoute->id) }}"
-                                class="inline-flex items-center justify-center rounded-xl border border-[#E2E8F0] px-5 py-3 text-sm font-semibold text-[#0F172A] transition hover:border-blue-300 hover:bg-blue-50"
+                                class="inline-flex items-center justify-center rounded-xl border border-[#E5E5E0] px-5 py-3 text-sm font-semibold text-[#111111] transition hover:border-blue-300 hover:bg-blue-50"
                             >
                                 Ver detalles
                             </a>
@@ -258,7 +266,7 @@
                                 Paradas completadas
                             </span>
 
-                            <span class="text-sm font-bold text-[#0F172A]">
+                            <span class="text-sm font-bold text-[#111111]">
                                 {{ $visitedStopsCount }} de {{ $routeStopsCount }} · {{ $routeProgress }}%
                             </span>
 
@@ -278,7 +286,7 @@
                                 · {{ $routePackagesProcessed }} paquetes procesados
                             </span>
 
-                            <span class="font-semibold text-[#0F172A]">
+                            <span class="font-semibold text-[#111111]">
 
                                 Estado:
 
@@ -309,7 +317,7 @@
                             <div class="mt-2 flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
 
                                 <div>
-                                    <p class="font-semibold text-sm text-[#0F172A]">
+                                    <p class="font-semibold text-sm text-[#111111]">
                                         {{ $nextPendingStop->ally?->business_name ?? $nextPendingStop->warehouse?->name ?? 'Parada' }}
                                     </p>
 
@@ -341,11 +349,11 @@
 
                         @foreach ($availableRoutes as $route)
 
-                            <div class="flex flex-col gap-3 rounded-xl border border-[#E2E8F0] p-4 sm:flex-row sm:items-center sm:justify-between">
+                            <div class="flex flex-col gap-3 rounded-xl border border-[#E5E5E0] p-4 sm:flex-row sm:items-center sm:justify-between">
 
                                 <div>
 
-                                    <p class="font-semibold text-sm text-[#0F172A]">
+                                    <p class="font-semibold text-sm text-[#111111]">
                                         {{ $route->name }}
                                     </p>
 
@@ -554,7 +562,7 @@
     <div class="grid grid-cols-2 gap-4 xl:grid-cols-4">
 
         {{-- ASIGNADOS --}}
-        <div class="rounded-2xl border border-[#E2E8F0] bg-white p-5 shadow-sm">
+        <div class="rounded-2xl border border-[#E5E5E0] bg-white p-5 shadow-sm">
 
             <div class="flex items-start justify-between">
 
@@ -563,7 +571,7 @@
                         Asignados
                     </p>
 
-                    <p class="mt-3 font-display text-3xl font-bold text-[#0F172A]">
+                    <p class="mt-3 font-display text-3xl font-bold text-[#111111]">
                         {{ number_format($assignedCount) }}
                     </p>
                 </div>
@@ -582,7 +590,7 @@
 
 
         {{-- PENDIENTES --}}
-        <div class="rounded-2xl border border-[#E2E8F0] bg-white p-5 shadow-sm">
+        <div class="rounded-2xl border border-[#E5E5E0] bg-white p-5 shadow-sm">
 
             <div class="flex items-start justify-between">
 
@@ -591,7 +599,7 @@
                         Pendientes
                     </p>
 
-                    <p class="mt-3 font-display text-3xl font-bold text-[#0F172A]">
+                    <p class="mt-3 font-display text-3xl font-bold text-[#111111]">
                         {{ number_format($pendingCount) }}
                     </p>
                 </div>
@@ -610,7 +618,7 @@
 
 
         {{-- EN GESTIÓN --}}
-        <div class="rounded-2xl border border-[#E2E8F0] bg-white p-5 shadow-sm">
+        <div class="rounded-2xl border border-[#E5E5E0] bg-white p-5 shadow-sm">
 
             <div class="flex items-start justify-between">
 
@@ -619,7 +627,7 @@
                         En gestión
                     </p>
 
-                    <p class="mt-3 font-display text-3xl font-bold text-[#0F172A]">
+                    <p class="mt-3 font-display text-3xl font-bold text-[#111111]">
                         {{ number_format($collectedCount) }}
                     </p>
                 </div>
@@ -638,7 +646,7 @@
 
 
         {{-- ENTREGADOS --}}
-        <div class="rounded-2xl border border-[#E2E8F0] bg-white p-5 shadow-sm">
+        <div class="rounded-2xl border border-[#E5E5E0] bg-white p-5 shadow-sm">
 
             <div class="flex items-start justify-between">
 
@@ -647,7 +655,7 @@
                         Entregados
                     </p>
 
-                    <p class="mt-3 font-display text-3xl font-bold text-[#0F172A]">
+                    <p class="mt-3 font-display text-3xl font-bold text-[#111111]">
                         {{ number_format($deliveredCount) }}
                     </p>
                 </div>
@@ -673,7 +681,7 @@
          RUTA ACTIVA
     ========================================================== --}}
     <div
-        class="rounded-3xl border border-[#E2E8F0] bg-white p-6 shadow-sm"
+        class="rounded-3xl border border-[#E5E5E0] bg-white p-6 shadow-sm"
         @if (! $activeRoute) wire:poll.15s @endif
     >
 
@@ -693,7 +701,7 @@
 
                     @if ($activeRoute)
 
-                        <h2 class="mt-1 font-display text-2xl font-bold text-[#0F172A]">
+                        <h2 class="mt-1 font-display text-2xl font-bold text-[#111111]">
                             {{ $activeRoute->name }}
                         </h2>
 
@@ -717,7 +725,7 @@
 
                             <div>
 
-                                <h2 class="font-display text-lg font-bold leading-tight text-[#0F172A]">
+                                <h2 class="font-display text-lg font-bold leading-tight text-[#111111]">
                                     {{ $availableRoutesCount === 1 ? 'Ruta compatible esperando' : 'Rutas compatibles esperando' }}
                                 </h2>
 
@@ -732,7 +740,7 @@
 
                     @else
 
-                        <h2 class="mt-1 font-display text-2xl font-bold text-[#0F172A]">
+                        <h2 class="mt-1 font-display text-2xl font-bold text-[#111111]">
                             Sin rutas disponibles
                         </h2>
 
@@ -769,10 +777,14 @@
 
                             <button
                                 type="button"
-                                wire:click="releaseRoute"
                                 wire:loading.attr="disabled"
-                                wire:confirm="¿Confirmas que quieres liberar esta ruta? Volverá a estar disponible para otros repartidores."
-                                class="inline-flex items-center justify-center rounded-xl border border-[#E2E8F0] px-5 py-3 text-sm font-semibold text-[#0F172A] transition hover:border-amber-300 hover:bg-amber-50 disabled:cursor-not-allowed disabled:opacity-50"
+                                @click.prevent="$store.confirm.open({
+                                    message: '¿Confirmas que quieres liberar esta ruta? Volverá a estar disponible para otros repartidores.',
+                                    confirmText: 'Liberar ruta',
+                                    variant: 'warning',
+                                    onConfirm: () => $wire.releaseRoute(),
+                                })"
+                                class="inline-flex items-center justify-center rounded-xl border border-[#E5E5E0] px-5 py-3 text-sm font-semibold text-[#111111] transition hover:border-amber-300 hover:bg-amber-50 disabled:cursor-not-allowed disabled:opacity-50"
                             >
                                 <span wire:loading.remove wire:target="releaseRoute">
                                     Liberar ruta
@@ -794,7 +806,7 @@
 
                         <a
                             href="{{ route('repartidor.route-detail', $activeRoute->id) }}"
-                            class="inline-flex items-center justify-center rounded-xl border border-[#E2E8F0] px-5 py-3 text-sm font-semibold text-[#0F172A] transition hover:border-blue-300 hover:bg-blue-50"
+                            class="inline-flex items-center justify-center rounded-xl border border-[#E5E5E0] px-5 py-3 text-sm font-semibold text-[#111111] transition hover:border-blue-300 hover:bg-blue-50"
                         >
                             Ver detalles
                         </a>
@@ -817,7 +829,7 @@
                             Progreso de la ruta
                         </span>
 
-                        <span class="text-sm font-bold text-[#0F172A]">
+                        <span class="text-sm font-bold text-[#111111]">
                             {{ $routeProgress }}%
                         </span>
 
@@ -854,7 +866,7 @@
                             Estado
                         </p>
 
-                        <p class="mt-1 text-sm font-semibold text-[#0F172A]">
+                        <p class="mt-1 text-sm font-semibold text-[#111111]">
 
                             @if ($activeRoute->status === \App\Models\Route::STATUS_ASSIGNED)
                                 Asignada
@@ -875,7 +887,7 @@
                             Paradas
                         </p>
 
-                        <p class="mt-1 text-sm font-semibold text-[#0F172A]">
+                        <p class="mt-1 text-sm font-semibold text-[#111111]">
                             {{ $routeStopsCount }}
                         </p>
 
@@ -888,7 +900,7 @@
                             Paradas visitadas
                         </p>
 
-                        <p class="mt-1 text-sm font-semibold text-[#0F172A]">
+                        <p class="mt-1 text-sm font-semibold text-[#111111]">
                             {{ $visitedStopsCount }}
                         </p>
 
@@ -901,7 +913,7 @@
                             Tipo
                         </p>
 
-                        <p class="mt-1 text-sm font-semibold text-[#0F172A]">
+                        <p class="mt-1 text-sm font-semibold text-[#111111]">
 
                             @if ($activeRoute->route_type === \App\Models\Route::TYPE_HUB_TRANSFER)
                                 Traslado a hub
@@ -924,11 +936,11 @@
 
                     @foreach ($availableRoutes as $route)
 
-                        <div class="flex flex-col gap-3 rounded-xl border border-[#E2E8F0] p-4 sm:flex-row sm:items-center sm:justify-between">
+                        <div class="flex flex-col gap-3 rounded-xl border border-[#E5E5E0] p-4 sm:flex-row sm:items-center sm:justify-between">
 
                             <div>
 
-                                <p class="font-semibold text-sm text-[#0F172A]">
+                                <p class="font-semibold text-sm text-[#111111]">
                                     {{ $route->name }}
                                 </p>
 
@@ -1011,7 +1023,7 @@
 
         <div class="mb-4">
 
-            <h2 class="font-display text-lg font-bold text-[#0F172A]">
+            <h2 class="font-display text-lg font-bold text-[#111111]">
                 Acciones rápidas
             </h2>
 
@@ -1027,7 +1039,7 @@
             {{-- ESCANEAR --}}
             <a
                 href="{{ route('repartidor.scanner') }}"
-                class="group rounded-2xl border border-[#E2E8F0] bg-white p-5 shadow-sm transition hover:-translate-y-0.5 hover:border-blue-300 hover:shadow-md"
+                class="group rounded-2xl border border-[#E5E5E0] bg-white p-5 shadow-sm transition hover:-translate-y-0.5 hover:border-blue-300 hover:shadow-md"
             >
 
                 <div class="flex items-center gap-4">
@@ -1038,7 +1050,7 @@
 
                     <div>
 
-                        <h3 class="font-semibold text-[#0F172A]">
+                        <h3 class="font-semibold text-[#111111]">
                             Escanear paquete
                         </h3>
 
@@ -1056,7 +1068,7 @@
             {{-- MIS PAQUETES --}}
             <a
                 href="{{ route('repartidor.packages') }}"
-                class="group rounded-2xl border border-[#E2E8F0] bg-white p-5 shadow-sm transition hover:-translate-y-0.5 hover:border-blue-300 hover:shadow-md"
+                class="group rounded-2xl border border-[#E5E5E0] bg-white p-5 shadow-sm transition hover:-translate-y-0.5 hover:border-blue-300 hover:shadow-md"
             >
 
                 <div class="flex items-center gap-4">
@@ -1067,7 +1079,7 @@
 
                     <div>
 
-                        <h3 class="font-semibold text-[#0F172A]">
+                        <h3 class="font-semibold text-[#111111]">
                             Mis paquetes
                         </h3>
 
@@ -1095,13 +1107,13 @@
 
 
         {{-- PENDIENTES --}}
-        <div class="rounded-2xl border border-[#E2E8F0] bg-white p-6 shadow-sm">
+        <div class="rounded-2xl border border-[#E5E5E0] bg-white p-6 shadow-sm">
 
             <div class="flex items-start justify-between gap-4">
 
                 <div>
 
-                    <h2 class="font-display text-lg font-bold text-[#0F172A]">
+                    <h2 class="font-display text-lg font-bold text-[#111111]">
                         Paquetes pendientes
                     </h2>
 
@@ -1130,7 +1142,7 @@
 
                                 <div class="min-w-0">
 
-                                    <p class="font-mono text-sm font-semibold text-[#0F172A]">
+                                    <p class="font-mono text-sm font-semibold text-[#111111]">
                                         {{ $package->tracking_number }}
                                     </p>
 
@@ -1167,7 +1179,7 @@
                         ✅
                     </div>
 
-                    <p class="mt-3 font-semibold text-[#0F172A]">
+                    <p class="mt-3 font-semibold text-[#111111]">
                         No tienes paquetes pendientes
                     </p>
 
@@ -1183,11 +1195,11 @@
 
 
         {{-- ENTREGAS RECIENTES --}}
-        <div class="rounded-2xl border border-[#E2E8F0] bg-white p-6 shadow-sm">
+        <div class="rounded-2xl border border-[#E5E5E0] bg-white p-6 shadow-sm">
 
             <div>
 
-                <h2 class="font-display text-lg font-bold text-[#0F172A]">
+                <h2 class="font-display text-lg font-bold text-[#111111]">
                     Entregas recientes
                 </h2>
 
@@ -1208,7 +1220,7 @@
 
                             <div class="min-w-0">
 
-                                <p class="font-mono text-sm font-semibold text-[#0F172A]">
+                                <p class="font-mono text-sm font-semibold text-[#111111]">
                                     {{ $package->tracking_number }}
                                 </p>
 
@@ -1250,7 +1262,7 @@
                         📭
                     </div>
 
-                    <p class="mt-3 font-semibold text-[#0F172A]">
+                    <p class="mt-3 font-semibold text-[#111111]">
                         Aún no hay entregas
                     </p>
 

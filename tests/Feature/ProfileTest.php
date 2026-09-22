@@ -20,13 +20,15 @@ class ProfileTest extends TestCase
         $response
             ->assertOk()
             ->assertSeeVolt('profile.update-profile-information-form')
-            ->assertSeeVolt('profile.update-password-form')
-            ->assertSeeVolt('profile.delete-user-form');
+            ->assertSeeVolt('profile.update-password-form');
     }
 
     public function test_profile_information_can_be_updated(): void
     {
-        $user = User::factory()->create();
+        // Rol distinto de Cliente a propósito: el Cliente no puede
+        // cambiar su correo desde el perfil (ver
+        // test_client_cannot_change_their_email_from_the_profile).
+        $user = User::factory()->create(['role' => User::ROLE_ADMIN_PRINCIPAL]);
 
         $this->actingAs($user);
 
@@ -44,6 +46,26 @@ class ProfileTest extends TestCase
         $this->assertSame('Test User', $user->name);
         $this->assertSame('test@example.com', $user->email);
         $this->assertNull($user->email_verified_at);
+    }
+
+    public function test_client_cannot_change_their_email_from_the_profile(): void
+    {
+        $user = User::factory()->create(['role' => User::ROLE_CLIENTE, 'email' => 'original@example.com']);
+
+        $this->actingAs($user);
+
+        $component = Volt::test('profile.update-profile-information-form')
+            ->assertSet('canChangeEmail', false)
+            ->set('name', 'Test User')
+            ->set('email', 'attacker-controlled@example.com')
+            ->call('updateProfileInformation');
+
+        $component->assertHasNoErrors();
+
+        $user->refresh();
+
+        $this->assertSame('Test User', $user->name);
+        $this->assertSame('original@example.com', $user->email);
     }
 
     public function test_email_verification_status_is_unchanged_when_the_email_address_is_unchanged(): void

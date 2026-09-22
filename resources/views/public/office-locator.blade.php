@@ -178,8 +178,8 @@
 
                 this.userMarker = L.circleMarker([lat, lng], {
                     radius: 8,
-                    color: '#1d4ed8',
-                    fillColor: '#3b82f6',
+                    color: '#2A2A26',
+                    fillColor: '#6B6B66',
                     fillOpacity: 0.9,
                     weight: 2,
                 }).addTo(this.map).bindPopup('Tu ubicación');

@@ -1,7 +1,7 @@
 <div class="space-y-6" x-data>
 
     <div>
-        <h2 class="font-display text-2xl font-semibold text-[#0F172A]">
+        <h2 class="font-display text-2xl font-semibold text-[#111111]">
             Registrar pedido
         </h2>
         <p class="text-sm text-slate-500">
@@ -12,7 +12,7 @@
     @if ($createdTrackingNumber)
         {{-- PANEL DE ÉXITO --}}
         <div
-            class="print:hidden rounded-2xl border border-[#E2E8F0] bg-white p-6"
+            class="print:hidden rounded-2xl border border-[#E5E5E0] bg-white p-6"
             wire:key="success-{{ $createdTrackingNumber }}"
             x-init="
                 $nextTick(() => {
@@ -44,33 +44,33 @@
                     <p class="text-sm text-emerald-600 font-medium">
                         Guía registrada con éxito
                     </p>
-                    <p class="mt-1 font-display text-2xl font-semibold text-[#0F172A]">
+                    <p class="mt-1 font-display text-2xl font-semibold text-[#111111]">
                         {{ $createdTrackingNumber }}
                     </p>
                     <div class="mt-3 flex gap-6 justify-center sm:justify-start text-sm">
                         <div>
                             <p class="text-slate-500">Distancia</p>
-                            <p class="font-medium text-[#0F172A]">
+                            <p class="font-medium text-[#111111]">
                                 {{ data_get($pricePreview, 'distance_km', 0) }} km
                             </p>
                         </div>
                         @if (($pricePreview['delivery_fee_usd'] ?? 0) > 0)
                             <div>
                                 <p class="text-slate-500">Delivery</p>
-                                <p class="font-medium text-[#0F172A]">
+                                <p class="font-medium text-[#111111]">
                                     ${{ number_format($pricePreview['delivery_fee_usd'], 2) }}
                                 </p>
                             </div>
                         @endif
                         <div>
                             <p class="text-slate-500">Total USD</p>
-                            <p class="font-semibold text-[#0F172A]">
+                            <p class="font-semibold text-[#111111]">
                                 ${{ number_format($createdTotalUsd, 2) }}
                             </p>
                         </div>
                         <div>
                             <p class="text-slate-500">Total VES</p>
-                            <p class="font-semibold text-[#0F172A]">
+                            <p class="font-semibold text-[#111111]">
                                 Bs. {{ number_format($createdTotalVes, 2) }}
                             </p>
                         </div>
@@ -313,11 +313,52 @@
         @endonce
     @else
         {{-- FORMULARIO --}}
-        <form wire:submit="save" class="space-y-6">
+        <form wire:submit="save" class="space-y-6"
+            x-on:keydown.enter="
+                const field = $event.target;
+
+                // Deja pasar Enter tal cual en botones, el submit final
+                // y el textarea de dirección (ahí Enter selecciona la
+                // sugerencia del autocompletado de Google Maps).
+                if (field.tagName === 'TEXTAREA' || field.type === 'submit' || field.type === 'button') {
+                    return;
+                }
+
+                $event.preventDefault();
+
+                // Si hay un modal de cliente nuevo abierto (remitente o
+                // destinatario), el recorrido queda acotado a sus campos:
+                // si no, Enter saltaría el modal recién abierto porque en
+                // el HTML está más abajo que la sección de destinatario.
+                const scope = $el.querySelector('[data-enter-scope]') ?? $el;
+
+                const focusable = Array.from(
+                    scope.querySelectorAll('input:not([type=hidden]), select, textarea')
+                ).filter((el) => ! el.disabled && el.offsetParent !== null);
+
+                const index = focusable.indexOf(field);
+                let next = null;
+
+                if (index > -1 && index < focusable.length - 1) {
+                    // Campo dentro del recorrido actual: sigue al que viene.
+                    next = focusable[index + 1];
+                } else if (index === -1 && scope !== $el && focusable.length > 0) {
+                    // El campo que tenía el foco (ej. número de documento)
+                    // quedó fuera del modal que se acaba de abrir: entra
+                    // directo a su primer campo en vez de no hacer nada.
+                    next = focusable[0];
+                }
+
+                if (next) {
+                    next.focus();
+                    if (typeof next.select === 'function') next.select();
+                }
+            "
+        >
 
             {{-- REMITENTE --}}
-            <div class="rounded-2xl border border-[#E2E8F0] bg-white p-5 shadow-sm">
-                <h3 class="font-display text-lg font-semibold text-[#0F172A] mb-4">
+            <div class="rounded-2xl border border-[#E5E5E0] bg-white p-5 shadow-sm">
+                <h3 class="font-display text-lg font-semibold text-[#111111] mb-4">
                     Remitente
                 </h3>
                 <div class="grid grid-cols-1 sm:grid-cols-3 gap-4">
@@ -359,7 +400,7 @@
                 @elseif ($sender_name)
                     <div class="mt-4 flex items-start justify-between gap-3 rounded-xl bg-slate-50 px-4 py-3">
                         <div class="text-sm">
-                            <p class="font-medium text-[#0F172A]">{{ $sender_name }}</p>
+                            <p class="font-medium text-[#111111]">{{ $sender_name }}</p>
                             <p class="text-slate-500">{{ $sender_phone }}{{ $sender_email ? ' · '.$sender_email : '' }}</p>
                         </div>
                         <button type="button" wire:click="openSenderCustomerModal"
@@ -374,8 +415,8 @@
             </div>
 
             {{-- DESTINATARIO --}}
-            <div class="rounded-2xl border border-[#E2E8F0] bg-white p-5 shadow-sm">
-                <h3 class="font-display text-lg font-semibold text-[#0F172A] mb-4">
+            <div class="rounded-2xl border border-[#E5E5E0] bg-white p-5 shadow-sm">
+                <h3 class="font-display text-lg font-semibold text-[#111111] mb-4">
                     Destinatario
                 </h3>
                 <div class="grid grid-cols-1 sm:grid-cols-3 gap-4">
@@ -417,7 +458,7 @@
                 @elseif ($recipient_name)
                     <div class="mt-4 flex items-start justify-between gap-3 rounded-xl bg-slate-50 px-4 py-3">
                         <div class="text-sm">
-                            <p class="font-medium text-[#0F172A]">{{ $recipient_name }}</p>
+                            <p class="font-medium text-[#111111]">{{ $recipient_name }}</p>
                             <p class="text-slate-500">{{ $recipient_phone }}{{ $recipient_email ? ' · '.$recipient_email : '' }}</p>
                         </div>
                         <button type="button" wire:click="openRecipientCustomerModal"
@@ -433,9 +474,9 @@
 
             {{-- MODAL: DATOS DE CLIENTE NUEVO — REMITENTE --}}
             @if ($showSenderCustomerModal)
-                <div class="fixed inset-0 z-50 flex items-center justify-center bg-black/40 px-4">
+                <div class="fixed inset-0 z-50 flex items-center justify-center bg-black/40 px-4" data-enter-scope>
                     <div class="w-full max-w-md rounded-2xl bg-white p-6 shadow-xl">
-                        <h3 class="font-display text-lg font-semibold text-[#0F172A]">
+                        <h3 class="font-display text-lg font-semibold text-[#111111]">
                             Registrar datos del remitente
                         </h3>
                         <p class="mt-1 text-sm text-slate-500">
@@ -461,9 +502,10 @@
                                 @error('sender_phone') <p class="text-xs text-red-600 mt-1">{{ $message }}</p> @enderror
                             </div>
                             <div>
-                                <label class="text-sm text-slate-600">Correo (opcional)</label>
-                                <input type="email" wire:model="sender_email"
+                                <label class="text-sm text-slate-600">Correo *</label>
+                                <input type="email" wire:model="sender_email" required
                                     class="mt-1 w-full rounded-xl border border-slate-300 px-3 py-2 text-sm shadow-sm focus:border-blue-900 focus:ring-blue-900">
+                                <p class="text-xs text-slate-400 mt-1">Le enviaremos ahí los datos de la guía.</p>
                                 @error('sender_email') <p class="text-xs text-red-600 mt-1">{{ $message }}</p> @enderror
                             </div>
                         </div>
@@ -484,9 +526,9 @@
 
             {{-- MODAL: DATOS DE CLIENTE NUEVO — DESTINATARIO --}}
             @if ($showRecipientCustomerModal)
-                <div class="fixed inset-0 z-50 flex items-center justify-center bg-black/40 px-4">
+                <div class="fixed inset-0 z-50 flex items-center justify-center bg-black/40 px-4" data-enter-scope>
                     <div class="w-full max-w-md rounded-2xl bg-white p-6 shadow-xl">
-                        <h3 class="font-display text-lg font-semibold text-[#0F172A]">
+                        <h3 class="font-display text-lg font-semibold text-[#111111]">
                             Registrar datos del destinatario
                         </h3>
                         <p class="mt-1 text-sm text-slate-500">
@@ -512,9 +554,10 @@
                                 @error('recipient_phone') <p class="text-xs text-red-600 mt-1">{{ $message }}</p> @enderror
                             </div>
                             <div>
-                                <label class="text-sm text-slate-600">Correo (opcional)</label>
-                                <input type="email" wire:model="recipient_email"
+                                <label class="text-sm text-slate-600">Correo *</label>
+                                <input type="email" wire:model="recipient_email" required
                                     class="mt-1 w-full rounded-xl border border-slate-300 px-3 py-2 text-sm shadow-sm focus:border-blue-900 focus:ring-blue-900">
+                                <p class="text-xs text-slate-400 mt-1">Le enviaremos ahí los datos de la guía.</p>
                                 @error('recipient_email') <p class="text-xs text-red-600 mt-1">{{ $message }}</p> @enderror
                             </div>
                         </div>
@@ -534,8 +577,8 @@
             @endif
 
             {{-- PAQUETE --}}
-            <div class="rounded-2xl border border-[#E2E8F0] bg-white p-5 shadow-sm">
-                <h3 class="font-display text-lg font-semibold text-[#0F172A] mb-4">
+            <div class="rounded-2xl border border-[#E5E5E0] bg-white p-5 shadow-sm">
+                <h3 class="font-display text-lg font-semibold text-[#111111] mb-4">
                     Paquete y destino
                 </h3>
                 <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
@@ -639,8 +682,8 @@
             </div>
 
             {{-- MODALIDAD DE DESTINO FINAL --}}
-            <div class="rounded-2xl border border-[#E2E8F0] bg-white p-5 shadow-sm">
-                <h3 class="font-display text-lg font-semibold text-[#0F172A] mb-4">
+            <div class="rounded-2xl border border-[#E5E5E0] bg-white p-5 shadow-sm">
+                <h3 class="font-display text-lg font-semibold text-[#111111] mb-4">
                     ¿Cómo recibirá el cliente?
                 </h3>
 
@@ -692,7 +735,7 @@
                         <label class="text-sm text-slate-600">Punto de retiro</label>
 
                         @if ($destination_state === '')
-                            <p class="mt-2 text-xs text-[#94A3B8]">
+                            <p class="mt-2 text-xs text-[#B8B8B2]">
                                 Selecciona primero el estado destino.
                             </p>
                         @elseif (empty($pickupAllies))
@@ -798,8 +841,8 @@
             </div>
 
             {{-- COBRO --}}
-            <div class="rounded-2xl border border-[#E2E8F0] bg-white p-5 shadow-sm">
-                <h3 class="font-display text-lg font-semibold text-[#0F172A] mb-4">
+            <div class="rounded-2xl border border-[#E5E5E0] bg-white p-5 shadow-sm">
+                <h3 class="font-display text-lg font-semibold text-[#111111] mb-4">
                     Cobro
                 </h3>
 
@@ -824,7 +867,7 @@
                 @else
                     <div class="max-w-sm">
                         <label class="text-sm text-slate-600">Monto a cobrar en destino (USD)</label>
-                        <div class="mt-1 w-full rounded-xl border border-slate-300 bg-slate-50 px-3 py-2 text-sm font-semibold text-[#0F172A]">
+                        <div class="mt-1 w-full rounded-xl border border-slate-300 bg-slate-50 px-3 py-2 text-sm font-semibold text-[#111111]">
                             {{ $cod_amount_usd ? '$' . number_format($cod_amount_usd, 2) : 'Se calcula al completar destino y peso' }}
                         </div>
                         <p class="text-xs text-slate-400 mt-1">
@@ -836,8 +879,8 @@
             </div>
 
             {{-- TARIFA ESTIMADA (en vivo) --}}
-            <div class="rounded-2xl border border-[#E2E8F0] bg-white p-5 shadow-sm">
-                <h3 class="font-display text-lg font-semibold text-[#0F172A] mb-4">
+            <div class="rounded-2xl border border-[#E5E5E0] bg-white p-5 shadow-sm">
+                <h3 class="font-display text-lg font-semibold text-[#111111] mb-4">
                     Tarifa estimada
                 </h3>
 
@@ -845,14 +888,14 @@
                     <div class="grid grid-cols-2 sm:grid-cols-4 gap-4 text-sm">
                         <div>
                             <p class="text-slate-500">Peso facturable</p>
-                            <p class="font-medium text-[#0F172A]">
+                            <p class="font-medium text-[#111111]">
                                 {{ number_format($pricePreview['billable_weight_kg'], 3) }} kg
                             </p>
                         </div>
                         @if (($pricePreview['fragile_surcharge_usd'] ?? 0) > 0)
                             <div>
                                 <p class="text-slate-500">Recargo frágil</p>
-                                <p class="font-medium text-[#0F172A]">
+                                <p class="font-medium text-[#111111]">
                                     ${{ number_format($pricePreview['fragile_surcharge_usd'], 2) }}
                                 </p>
                             </div>
@@ -860,21 +903,21 @@
                         @if (($pricePreview['insurance_price_usd'] ?? 0) > 0)
                             <div>
                                 <p class="text-slate-500">Seguro</p>
-                                <p class="font-medium text-[#0F172A]">
+                                <p class="font-medium text-[#111111]">
                                     ${{ number_format($pricePreview['insurance_price_usd'], 2) }}
                                 </p>
                             </div>
                         @endif
                         <div>
                             <p class="text-slate-500">Distancia</p>
-                            <p class="font-medium text-[#0F172A]">
+                            <p class="font-medium text-[#111111]">
                                 {{ data_get($pricePreview, 'distance_km', 0) }} km
                             </p>
                         </div>
                         @if (($pricePreview['delivery_fee_usd'] ?? 0) > 0)
                             <div>
                                 <p class="text-slate-500">Delivery</p>
-                                <p class="font-medium text-[#0F172A]">
+                                <p class="font-medium text-[#111111]">
                                     ${{ number_format($pricePreview['delivery_fee_usd'], 2) }}
                                 </p>
                             </div>
@@ -887,7 +930,7 @@
                         </div>
                         <div>
                             <p class="text-slate-500">Total VES</p>
-                            <p class="font-display text-lg font-semibold text-[#0F172A]">
+                            <p class="font-display text-lg font-semibold text-[#111111]">
                                 Bs. {{ number_format($pricePreview['total_price_ves'], 2) }}
                             </p>
                         </div>

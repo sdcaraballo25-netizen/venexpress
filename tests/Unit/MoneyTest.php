@@ -8,9 +8,10 @@ use PHPUnit\Framework\TestCase;
 /**
  * Hallazgo de auditoría #3: TariffService calculaba todo con float
  * nativo de PHP. Estas pruebas verifican que el helper de aritmética
- * decimal exacta (bcmath) que lo reemplaza redondea de forma
- * consistente y sin el error de representación binaria clásico de
- * los floats (el caso de libro es 0.1 + 0.2 !== 0.3 en float puro).
+ * decimal exacta que lo reemplaza (App\Support\Money, sobre
+ * brick/math) redondea de forma consistente y sin el error de
+ * representación binaria clásico de los floats (el caso de libro es
+ * 0.1 + 0.2 !== 0.3 en float puro).
  */
 class MoneyTest extends TestCase
 {

@@ -70,10 +70,12 @@ class PackageCreatePickupTest extends TestCase
             ->set('sender_doc_number', '12345678')
             ->set('sender_name', 'Juan Pérez')
             ->set('sender_phone', '0414-1234567')
+            ->set('sender_email', 'juan.perez@example.com')
             ->set('recipient_doc_type', 'V')
             ->set('recipient_doc_number', '87654321')
             ->set('recipient_name', 'María Gómez')
             ->set('recipient_phone', '0424-7654321')
+            ->set('recipient_email', 'maria.gomez@example.com')
             ->set('package_type', Package::TYPE_PAQUETE)
             ->set('physical_weight_kg', 2.0)
             ->set('payment_method', 'efectivo_usd');

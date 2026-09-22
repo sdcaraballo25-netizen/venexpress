@@ -1,7 +1,7 @@
 <div class="space-y-6">
 
     <div>
-        <h2 class="font-display text-2xl font-semibold text-[#0F172A]">
+        <h2 class="font-display text-2xl font-semibold text-[#111111]">
             Gestión de Taquillas
         </h2>
         <p class="text-sm text-slate-500 mt-1">
@@ -15,9 +15,9 @@
         </div>
     @endif
 
-    <div class="rounded-2xl border border-[#E2E8F0] bg-white p-5 shadow-sm">
+    <div class="rounded-2xl border border-[#E5E5E0] bg-white p-5 shadow-sm">
         <div class="flex items-center justify-between mb-4">
-            <h3 class="font-display text-lg font-semibold text-[#0F172A]">
+            <h3 class="font-display text-lg font-semibold text-[#111111]">
                 Taquillas ({{ $staff->total() }})
             </h3>
 
@@ -35,7 +35,7 @@
         @if ($showForm)
             <form wire:submit="save" class="grid grid-cols-1 md:grid-cols-2 gap-4 rounded-xl border border-slate-200 bg-slate-50 p-4 mb-5">
                 <div class="md:col-span-2">
-                    <h4 class="text-sm font-semibold text-[#0F172A]">
+                    <h4 class="text-sm font-semibold text-[#111111]">
                         {{ $editingId ? 'Editar taquilla' : 'Nueva taquilla' }}
                     </h4>
                 </div>
@@ -104,7 +104,7 @@
                         @foreach ($staff as $member)
                             @php $sales = $todaySalesByUser->get($member->id); @endphp
                             <tr class="border-b border-slate-100 last:border-0">
-                                <td class="py-3 pr-4 font-medium text-[#0F172A]">{{ $member->name }}</td>
+                                <td class="py-3 pr-4 font-medium text-[#111111]">{{ $member->name }}</td>
                                 <td class="py-3 pr-4 text-slate-500 font-tracking">{{ $member->username }}</td>
                                 <td class="py-3 pr-4">
                                     <span class="inline-flex items-center rounded-full px-2.5 py-1 text-xs font-medium
@@ -125,8 +125,12 @@
                                     </button>
                                     <button
                                         type="button"
-                                        wire:click="toggleActive({{ $member->id }})"
-                                        wire:confirm="¿{{ $member->isActive() ? 'Desactivar' : 'Reactivar' }} a {{ $member->name }}?"
+                                        @click.prevent="$store.confirm.open({
+                                            message: {{ Js::from('¿' . ($member->isActive() ? 'Desactivar' : 'Reactivar') . ' a ' . $member->name . '?') }},
+                                            confirmText: {{ Js::from($member->isActive() ? 'Desactivar' : 'Reactivar') }},
+                                            variant: {{ Js::from($member->isActive() ? 'danger' : 'primary') }},
+                                            onConfirm: () => $wire.toggleActive({{ $member->id }}),
+                                        })"
                                         class="text-xs font-medium {{ $member->isActive() ? 'text-red-600' : 'text-emerald-700' }} hover:underline"
                                     >
                                         {{ $member->isActive() ? 'Desactivar' : 'Reactivar' }}

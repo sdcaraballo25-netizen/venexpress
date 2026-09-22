@@ -5,6 +5,7 @@ namespace Tests\Feature;
 use App\Models\AuditLog;
 use App\Models\Driver;
 use App\Models\Package;
+use App\Models\PackageHistory;
 use App\Models\User;
 use App\Services\PackageService;
 use Illuminate\Foundation\Testing\RefreshDatabase;
@@ -87,6 +88,18 @@ class PackageServiceCodTest extends TestCase
         $this->assertNotNull($package->cod_collected_at);
         $this->assertSame($user->id, $package->cod_collected_by_user_id);
         $this->assertSame(Package::COD_PENDIENTE, $package->cod_status);
+
+        // Cobrar el COD debe dejar un renglón en el historial, igual
+        // que cualquier otro movimiento relevante del paquete —
+        // necesario para reconstruir el cierre de caja/conciliación.
+        $this->assertSame(
+            1,
+            $package->histories()
+                ->where('event_type', PackageHistory::EVENT_MOVIMIENTO)
+                ->where('location_description', 'Cobro COD registrado')
+                ->where('scanned_by_user_id', $user->id)
+                ->count()
+        );
 
         $package = $this->service->liquidateCod($package, $user->id);
         $this->assertSame(Package::COD_LIQUIDADO, $package->cod_status);
@@ -232,6 +245,33 @@ class PackageServiceCodTest extends TestCase
      * que el repartidor confirme con qué forma de pago le cancelaron
      * — antes lo asumía automáticamente, sin ningún registro real.
      */
+    /**
+     * Igual que completeDelivery(), collectCod() ahora rechaza a un
+     * repartidor que ya no está activo, aunque su token todavía no
+     * haya sido revocado (defensa en profundidad además de la
+     * revocación de tokens en DriversApprovalManager).
+     */
+    public function test_collect_cod_rejects_a_suspended_driver(): void
+    {
+        $ally = $this->createAlly();
+        $driver = $this->createActiveDriver();
+
+        $package = $this->createPackage($ally, [
+            'requires_delivery' => true,
+            'driver_id' => $driver->id,
+            'current_status' => Package::STATUS_ENTREGADO,
+            'is_cod' => true,
+            'cod_amount_usd' => 15.00,
+        ]);
+
+        $driver->update(['status' => Driver::STATUS_SUSPENDED]);
+
+        $this->expectException(RuntimeException::class);
+        $this->expectExceptionMessage('El repartidor no está activo.');
+
+        $this->service->collectCod($package, $driver->user_id, $driver);
+    }
+
     public function test_complete_delivery_requires_a_payment_method_for_cod_packages(): void
     {
         $ally = $this->createAlly();

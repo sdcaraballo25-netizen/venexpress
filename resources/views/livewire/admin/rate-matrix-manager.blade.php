@@ -4,8 +4,8 @@
         {{-- Cabecera --}}
         <div class="flex flex-col md:flex-row justify-between items-start md:items-center mb-8 gap-4">
             <div>
-                <h1 class="font-display text-3xl font-bold tracking-tight text-[#0F172A]">Tarifas</h1>
-                <p class="text-sm text-[#64748B] mt-1">Configura los precios de envío y simula una venta antes de aplicar cambios.</p>
+                <h1 class="font-display text-3xl font-bold tracking-tight text-[#111111]">Tarifas</h1>
+                <p class="text-sm text-[#6B6B66] mt-1">Configura los precios de envío y simula una venta antes de aplicar cambios.</p>
             </div>
         </div>
 
@@ -18,12 +18,12 @@
         <div class="grid grid-cols-1 lg:grid-cols-2 gap-8">
 
             {{-- ================= TARIFAS VIGENTES / EDICIÓN ================= --}}
-            <div class="bg-white rounded-2xl border border-[#E2E8F0] p-6 shadow-sm">
+            <div class="bg-white rounded-2xl border border-[#E5E5E0] p-6 shadow-sm">
                 <div class="flex justify-between items-center mb-5">
-                    <h2 class="font-display text-lg font-bold text-[#0F172A]">Precios actuales</h2>
+                    <h2 class="font-display text-lg font-bold text-[#111111]">Precios actuales</h2>
                     @unless ($editing)
                         <button wire:click="startEditing"
-                                class="bg-[#0F172A] hover:bg-slate-800 text-white px-4 py-2 rounded-xl text-sm font-medium transition-colors">
+                                class="bg-[#111111] hover:bg-slate-800 text-white px-4 py-2 rounded-xl text-sm font-medium transition-colors">
                             Modificar
                         </button>
                     @endunless
@@ -32,33 +32,37 @@
                 @unless ($editing)
                     {{-- Solo lectura --}}
                     <div class="grid grid-cols-2 gap-4">
-                        <div class="bg-[#F8FAFC] rounded-xl p-4">
-                            <p class="text-xs font-bold text-[#64748B] uppercase tracking-wider">Precio por volumen</p>
-                            <p class="font-display text-xl font-bold text-[#0F172A] mt-1">${{ number_format((float) $base_price_usd, 2) }}</p>
+                        <div class="bg-[#F7F7F4] rounded-xl p-4">
+                            <p class="text-xs font-bold text-[#6B6B66] uppercase tracking-wider">Precio por volumen</p>
+                            <p class="font-display text-xl font-bold text-[#111111] mt-1">${{ number_format((float) $base_price_usd, 2) }}</p>
                         </div>
-                        <div class="bg-[#F8FAFC] rounded-xl p-4">
-                            <p class="text-xs font-bold text-[#64748B] uppercase tracking-wider">Por kg facturable</p>
-                            <p class="font-display text-xl font-bold text-[#0F172A] mt-1">${{ number_format((float) $price_per_kg_usd, 2) }}</p>
+                        <div class="bg-[#F7F7F4] rounded-xl p-4">
+                            <p class="text-xs font-bold text-[#6B6B66] uppercase tracking-wider">Por kg facturable</p>
+                            <p class="font-display text-xl font-bold text-[#111111] mt-1">${{ number_format((float) $price_per_kg_usd, 2) }}</p>
                         </div>
-                        <div class="bg-[#F8FAFC] rounded-xl p-4">
-                            <p class="text-xs font-bold text-[#64748B] uppercase tracking-wider">Por km</p>
-                            <p class="font-display text-xl font-bold text-[#0F172A] mt-1">${{ number_format((float) $price_per_km_usd, 2) }}</p>
+                        <div class="bg-[#F7F7F4] rounded-xl p-4">
+                            <p class="text-xs font-bold text-[#6B6B66] uppercase tracking-wider">Por km</p>
+                            <p class="font-display text-xl font-bold text-[#111111] mt-1">${{ number_format((float) $price_per_km_usd, 2) }}</p>
                         </div>
-                        <div class="bg-[#F8FAFC] rounded-xl p-4">
-                            <p class="text-xs font-bold text-[#64748B] uppercase tracking-wider">Sobre (fijo)</p>
-                            <p class="font-display text-xl font-bold text-[#0F172A] mt-1">${{ number_format((float) $envelope_price_usd, 2) }}</p>
+                        <div class="bg-[#F7F7F4] rounded-xl p-4">
+                            <p class="text-xs font-bold text-[#6B6B66] uppercase tracking-wider">Sobre (fijo)</p>
+                            <p class="font-display text-xl font-bold text-[#111111] mt-1">${{ number_format((float) $envelope_price_usd, 2) }}</p>
                         </div>
-                        <div class="bg-[#F8FAFC] rounded-xl p-4">
-                            <p class="text-xs font-bold text-[#64748B] uppercase tracking-wider">Recargo frágil</p>
-                            <p class="font-display text-xl font-bold text-[#0F172A] mt-1">${{ number_format((float) $fragile_surcharge_usd, 2) }}</p>
+                        <div class="bg-[#F7F7F4] rounded-xl p-4">
+                            <p class="text-xs font-bold text-[#6B6B66] uppercase tracking-wider">Recargo frágil</p>
+                            <p class="font-display text-xl font-bold text-[#111111] mt-1">${{ number_format((float) $fragile_surcharge_usd, 2) }}</p>
                         </div>
-                        <div class="bg-[#F8FAFC] rounded-xl p-4">
-                            <p class="text-xs font-bold text-[#64748B] uppercase tracking-wider">Seguro</p>
-                            <p class="font-display text-xl font-bold text-[#0F172A] mt-1">{{ number_format((float) $insurance_percentage, 2) }}%</p>
+                        <div class="bg-[#F7F7F4] rounded-xl p-4">
+                            <p class="text-xs font-bold text-[#6B6B66] uppercase tracking-wider">Seguro</p>
+                            <p class="font-display text-xl font-bold text-[#111111] mt-1">{{ number_format((float) $insurance_percentage, 2) }}%</p>
                         </div>
-                        <div class="bg-[#F8FAFC] rounded-xl p-4">
-                            <p class="text-xs font-bold text-[#64748B] uppercase tracking-wider">Delivery</p>
-                            <p class="font-display text-xl font-bold text-[#0F172A] mt-1">${{ number_format((float) $delivery_price_usd, 2) }}</p>
+                        <div class="bg-[#F7F7F4] rounded-xl p-4">
+                            <p class="text-xs font-bold text-[#6B6B66] uppercase tracking-wider">Delivery</p>
+                            <p class="font-display text-xl font-bold text-[#111111] mt-1">${{ number_format((float) $delivery_price_usd, 2) }}</p>
+                        </div>
+                        <div class="bg-[#F7F7F4] rounded-xl p-4">
+                            <p class="text-xs font-bold text-[#6B6B66] uppercase tracking-wider">Descuento Emprendedores</p>
+                            <p class="font-display text-xl font-bold text-[#111111] mt-1">{{ number_format((float) $emprendedor_discount_percentage, 2) }}%</p>
                         </div>
                     </div>
                 @else
@@ -66,56 +70,62 @@
                     <form wire:submit="save" class="space-y-4">
                         <div class="grid grid-cols-2 gap-4">
                             <div>
-                                <label class="block text-xs font-bold text-[#64748B] uppercase tracking-wider mb-1">Precio por volumen (USD)</label>
+                                <label class="block text-xs font-bold text-[#6B6B66] uppercase tracking-wider mb-1">Precio por volumen (USD)</label>
                                 <input type="number" step="0.01" wire:model="base_price_usd"
-                                       class="w-full rounded-xl border-[#E2E8F0] focus:border-blue-500 focus:ring-blue-500 text-sm">
+                                       class="w-full rounded-xl border-[#E5E5E0] focus:border-blue-500 focus:ring-blue-500 text-sm">
                                 @error('base_price_usd') <p class="text-red-600 text-xs mt-1">{{ $message }}</p> @enderror
                             </div>
                             <div>
-                                <label class="block text-xs font-bold text-[#64748B] uppercase tracking-wider mb-1">Por kg (USD)</label>
+                                <label class="block text-xs font-bold text-[#6B6B66] uppercase tracking-wider mb-1">Por kg (USD)</label>
                                 <input type="number" step="0.01" wire:model="price_per_kg_usd"
-                                       class="w-full rounded-xl border-[#E2E8F0] focus:border-blue-500 focus:ring-blue-500 text-sm">
+                                       class="w-full rounded-xl border-[#E5E5E0] focus:border-blue-500 focus:ring-blue-500 text-sm">
                                 @error('price_per_kg_usd') <p class="text-red-600 text-xs mt-1">{{ $message }}</p> @enderror
                             </div>
                             <div>
-                                <label class="block text-xs font-bold text-[#64748B] uppercase tracking-wider mb-1">Por km (USD)</label>
+                                <label class="block text-xs font-bold text-[#6B6B66] uppercase tracking-wider mb-1">Por km (USD)</label>
                                 <input type="number" step="0.01" wire:model="price_per_km_usd"
-                                       class="w-full rounded-xl border-[#E2E8F0] focus:border-blue-500 focus:ring-blue-500 text-sm">
+                                       class="w-full rounded-xl border-[#E5E5E0] focus:border-blue-500 focus:ring-blue-500 text-sm">
                                 @error('price_per_km_usd') <p class="text-red-600 text-xs mt-1">{{ $message }}</p> @enderror
                             </div>
                             <div>
-                                <label class="block text-xs font-bold text-[#64748B] uppercase tracking-wider mb-1">Sobre, fijo (USD)</label>
+                                <label class="block text-xs font-bold text-[#6B6B66] uppercase tracking-wider mb-1">Sobre, fijo (USD)</label>
                                 <input type="number" step="0.01" wire:model="envelope_price_usd"
-                                       class="w-full rounded-xl border-[#E2E8F0] focus:border-blue-500 focus:ring-blue-500 text-sm">
+                                       class="w-full rounded-xl border-[#E5E5E0] focus:border-blue-500 focus:ring-blue-500 text-sm">
                                 @error('envelope_price_usd') <p class="text-red-600 text-xs mt-1">{{ $message }}</p> @enderror
                             </div>
                             <div>
-                                <label class="block text-xs font-bold text-[#64748B] uppercase tracking-wider mb-1">Recargo frágil (USD)</label>
+                                <label class="block text-xs font-bold text-[#6B6B66] uppercase tracking-wider mb-1">Recargo frágil (USD)</label>
                                 <input type="number" step="0.01" wire:model="fragile_surcharge_usd"
-                                       class="w-full rounded-xl border-[#E2E8F0] focus:border-blue-500 focus:ring-blue-500 text-sm">
+                                       class="w-full rounded-xl border-[#E5E5E0] focus:border-blue-500 focus:ring-blue-500 text-sm">
                                 @error('fragile_surcharge_usd') <p class="text-red-600 text-xs mt-1">{{ $message }}</p> @enderror
                             </div>
                             <div>
-                                <label class="block text-xs font-bold text-[#64748B] uppercase tracking-wider mb-1">Seguro (%)</label>
+                                <label class="block text-xs font-bold text-[#6B6B66] uppercase tracking-wider mb-1">Seguro (%)</label>
                                 <input type="number" step="0.01" wire:model="insurance_percentage"
-                                       class="w-full rounded-xl border-[#E2E8F0] focus:border-blue-500 focus:ring-blue-500 text-sm">
+                                       class="w-full rounded-xl border-[#E5E5E0] focus:border-blue-500 focus:ring-blue-500 text-sm">
                                 @error('insurance_percentage') <p class="text-red-600 text-xs mt-1">{{ $message }}</p> @enderror
                             </div>
                             <div>
-                                <label class="block text-xs font-bold text-[#64748B] uppercase tracking-wider mb-1">Delivery fijo (USD)</label>
+                                <label class="block text-xs font-bold text-[#6B6B66] uppercase tracking-wider mb-1">Delivery fijo (USD)</label>
                                 <input type="number" step="0.01" wire:model="delivery_price_usd"
-                                       class="w-full rounded-xl border-[#E2E8F0] focus:border-blue-500 focus:ring-blue-500 text-sm">
+                                       class="w-full rounded-xl border-[#E5E5E0] focus:border-blue-500 focus:ring-blue-500 text-sm">
                                 @error('delivery_price_usd') <p class="text-red-600 text-xs mt-1">{{ $message }}</p> @enderror
+                            </div>
+                            <div>
+                                <label class="block text-xs font-bold text-[#6B6B66] uppercase tracking-wider mb-1">Descuento Emprendedores (%)</label>
+                                <input type="number" step="0.01" wire:model="emprendedor_discount_percentage"
+                                       class="w-full rounded-xl border-[#E5E5E0] focus:border-blue-500 focus:ring-blue-500 text-sm">
+                                @error('emprendedor_discount_percentage') <p class="text-red-600 text-xs mt-1">{{ $message }}</p> @enderror
                             </div>
                         </div>
 
-                        <div class="pt-4 border-t border-[#E2E8F0]">
-                            <label class="block text-xs font-bold text-[#64748B] uppercase tracking-wider mb-1">
+                        <div class="pt-4 border-t border-[#E5E5E0]">
+                            <label class="block text-xs font-bold text-[#6B6B66] uppercase tracking-wider mb-1">
                                 Confirma tu contraseña para guardar
                             </label>
                             <input type="password" wire:model="confirm_password"
                                    placeholder="Tu contraseña de administrador"
-                                   class="w-full rounded-xl border-[#E2E8F0] focus:border-blue-500 focus:ring-blue-500 text-sm">
+                                   class="w-full rounded-xl border-[#E5E5E0] focus:border-blue-500 focus:ring-blue-500 text-sm">
                             @error('confirm_password') <p class="text-red-600 text-xs mt-1">{{ $message }}</p> @enderror
                         </div>
 
@@ -125,7 +135,7 @@
                                 Guardar cambios
                             </button>
                             <button type="button" wire:click="cancelEditing"
-                                    class="text-[#64748B] hover:text-[#0F172A] px-5 py-2.5 rounded-xl text-sm font-medium transition-colors">
+                                    class="text-[#6B6B66] hover:text-[#111111] px-5 py-2.5 rounded-xl text-sm font-medium transition-colors">
                                 Cancelar
                             </button>
                         </div>
@@ -134,13 +144,13 @@
             </div>
 
             {{-- ================= SIMULADOR DE VENTA ================= --}}
-            <div class="bg-white rounded-2xl border border-[#E2E8F0] p-6 shadow-sm">
-                <h2 class="font-display text-lg font-bold text-[#0F172A] mb-5">Simular venta</h2>
+            <div class="bg-white rounded-2xl border border-[#E5E5E0] p-6 shadow-sm">
+                <h2 class="font-display text-lg font-bold text-[#111111] mb-5">Simular venta</h2>
 
                 <form wire:submit="simulate" class="space-y-4">
                     <div>
-                        <label class="block text-xs font-bold text-[#64748B] uppercase tracking-wider mb-1">Tipo de envío</label>
-                        <select wire:model="sim_package_type" class="w-full rounded-xl border-[#E2E8F0] text-sm">
+                        <label class="block text-xs font-bold text-[#6B6B66] uppercase tracking-wider mb-1">Tipo de envío</label>
+                        <select wire:model="sim_package_type" class="w-full rounded-xl border-[#E5E5E0] text-sm">
                             <option value="paquete">Paquete</option>
                             <option value="sobre">Sobre</option>
                         </select>
@@ -148,15 +158,15 @@
 
                     <div class="grid grid-cols-2 gap-4">
                         <div>
-                            <label class="block text-xs font-bold text-[#64748B] uppercase tracking-wider mb-1">Ciudad origen</label>
+                            <label class="block text-xs font-bold text-[#6B6B66] uppercase tracking-wider mb-1">Ciudad origen</label>
                             <input type="text" wire:model="sim_origin_city" placeholder="Caracas"
-                                   class="w-full rounded-xl border-[#E2E8F0] text-sm">
+                                   class="w-full rounded-xl border-[#E5E5E0] text-sm">
                             @error('sim_origin_city') <p class="text-red-600 text-xs mt-1">{{ $message }}</p> @enderror
                         </div>
                         <div>
-                            <label class="block text-xs font-bold text-[#64748B] uppercase tracking-wider mb-1">Ciudad destino</label>
+                            <label class="block text-xs font-bold text-[#6B6B66] uppercase tracking-wider mb-1">Ciudad destino</label>
                             <input type="text" wire:model="sim_destination_city" placeholder="Valencia"
-                                   class="w-full rounded-xl border-[#E2E8F0] text-sm">
+                                   class="w-full rounded-xl border-[#E5E5E0] text-sm">
                             @error('sim_destination_city') <p class="text-red-600 text-xs mt-1">{{ $message }}</p> @enderror
                         </div>
                     </div>
@@ -164,39 +174,39 @@
                     @if ($sim_package_type === 'paquete')
                         <div class="grid grid-cols-2 gap-3 sm:grid-cols-4">
                             <div>
-                                <label class="block text-xs font-bold text-[#64748B] uppercase tracking-wider mb-1">Peso (kg)</label>
-                                <input type="number" step="0.01" wire:model="sim_physical_weight_kg" class="w-full rounded-xl border-[#E2E8F0] text-sm">
+                                <label class="block text-xs font-bold text-[#6B6B66] uppercase tracking-wider mb-1">Peso (kg)</label>
+                                <input type="number" step="0.01" wire:model="sim_physical_weight_kg" class="w-full rounded-xl border-[#E5E5E0] text-sm">
                             </div>
                             <div>
-                                <label class="block text-xs font-bold text-[#64748B] uppercase tracking-wider mb-1">Largo (cm)</label>
-                                <input type="number" step="0.01" wire:model="sim_length_cm" class="w-full rounded-xl border-[#E2E8F0] text-sm">
+                                <label class="block text-xs font-bold text-[#6B6B66] uppercase tracking-wider mb-1">Largo (cm)</label>
+                                <input type="number" step="0.01" wire:model="sim_length_cm" class="w-full rounded-xl border-[#E5E5E0] text-sm">
                             </div>
                             <div>
-                                <label class="block text-xs font-bold text-[#64748B] uppercase tracking-wider mb-1">Ancho (cm)</label>
-                                <input type="number" step="0.01" wire:model="sim_width_cm" class="w-full rounded-xl border-[#E2E8F0] text-sm">
+                                <label class="block text-xs font-bold text-[#6B6B66] uppercase tracking-wider mb-1">Ancho (cm)</label>
+                                <input type="number" step="0.01" wire:model="sim_width_cm" class="w-full rounded-xl border-[#E5E5E0] text-sm">
                             </div>
                             <div>
-                                <label class="block text-xs font-bold text-[#64748B] uppercase tracking-wider mb-1">Alto (cm)</label>
-                                <input type="number" step="0.01" wire:model="sim_height_cm" class="w-full rounded-xl border-[#E2E8F0] text-sm">
+                                <label class="block text-xs font-bold text-[#6B6B66] uppercase tracking-wider mb-1">Alto (cm)</label>
+                                <input type="number" step="0.01" wire:model="sim_height_cm" class="w-full rounded-xl border-[#E5E5E0] text-sm">
                             </div>
                         </div>
                     @endif
 
                     <div class="flex items-center gap-6">
-                        <label class="flex items-center gap-2 text-sm text-[#0F172A]">
-                            <input type="checkbox" wire:model="sim_is_fragile" class="rounded border-[#E2E8F0]">
+                        <label class="flex items-center gap-2 text-sm text-[#111111]">
+                            <input type="checkbox" wire:model="sim_is_fragile" class="rounded border-[#E5E5E0]">
                             Frágil
                         </label>
-                        <label class="flex items-center gap-2 text-sm text-[#0F172A]">
-                            <input type="checkbox" wire:model.live="sim_has_insurance" class="rounded border-[#E2E8F0]">
+                        <label class="flex items-center gap-2 text-sm text-[#111111]">
+                            <input type="checkbox" wire:model.live="sim_has_insurance" class="rounded border-[#E5E5E0]">
                             Con seguro
                         </label>
                     </div>
 
                     @if ($sim_has_insurance)
                         <div>
-                            <label class="block text-xs font-bold text-[#64748B] uppercase tracking-wider mb-1">Valor declarado (USD)</label>
-                            <input type="number" step="0.01" wire:model="sim_declared_value_usd" class="w-full rounded-xl border-[#E2E8F0] text-sm">
+                            <label class="block text-xs font-bold text-[#6B6B66] uppercase tracking-wider mb-1">Valor declarado (USD)</label>
+                            <input type="number" step="0.01" wire:model="sim_declared_value_usd" class="w-full rounded-xl border-[#E5E5E0] text-sm">
                             @error('sim_declared_value_usd') <p class="text-red-600 text-xs mt-1">{{ $message }}</p> @enderror
                         </div>
                     @endif
@@ -207,7 +217,7 @@
                             Simular
                         </button>
                         <button type="button" wire:click="resetSimulation"
-                                class="text-[#64748B] hover:text-[#0F172A] px-5 py-2.5 rounded-xl text-sm font-medium transition-colors">
+                                class="text-[#6B6B66] hover:text-[#111111] px-5 py-2.5 rounded-xl text-sm font-medium transition-colors">
                             Limpiar
                         </button>
                     </div>

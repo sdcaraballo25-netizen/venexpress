@@ -2,6 +2,7 @@
 
 namespace App\Models;
 
+use App\Models\Concerns\HasPublicId;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
@@ -9,7 +10,7 @@ use Illuminate\Database\Eloquent\Relations\HasMany;
 
 class Ally extends Model
 {
-    use HasFactory;
+    use HasFactory, HasPublicId;
 
     public const STATUS_PENDING = 'PENDIENTE';
     public const STATUS_ACTIVE = 'ACTIVO';
@@ -42,9 +43,15 @@ class Ally extends Model
         'state',
         'address',
         'storefront_photo_path',
+        'rif_document_path',
+        'mercantile_registry_document_path',
+        'owner_id_document_path',
         'latitude',
         'longitude',
         'commission_percentage',
+        'bank_account_number',
+        'bank_account_holder_name',
+        'bank_account_holder_id',
         'status',
         'is_verified_destination',
         'destination_verification_status',

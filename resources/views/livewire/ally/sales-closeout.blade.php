@@ -1,7 +1,7 @@
 <div class="space-y-6">
 
     <div>
-        <h2 class="font-display text-2xl font-semibold text-[#0F172A]">
+        <h2 class="font-display text-2xl font-semibold text-[#111111]">
             Cierre del día
         </h2>
         <p class="text-sm text-slate-500 mt-1">
@@ -13,7 +13,7 @@
         </p>
     </div>
 
-    <div class="rounded-2xl border border-[#E2E8F0] bg-white p-5 shadow-sm">
+    <div class="rounded-2xl border border-[#E5E5E0] bg-white p-5 shadow-sm">
         <div class="flex flex-wrap items-end gap-4 mb-6">
             <div>
                 <label class="text-sm text-slate-600">Fecha</label>
@@ -43,12 +43,58 @@
             </div>
             <div class="rounded-xl bg-slate-50 border border-slate-200 px-5 py-4">
                 <p class="text-xs text-slate-500 uppercase tracking-wide">Guías registradas</p>
-                <p class="font-display text-3xl font-bold text-[#0F172A] mt-1">{{ $totalGuides }}</p>
+                <p class="font-display text-3xl font-bold text-[#111111] mt-1">{{ $totalGuides }}</p>
             </div>
         </div>
 
+        @if ($isPrincipal && $staffSummary->isNotEmpty())
+            <div class="mb-6">
+                <h3 class="text-sm font-semibold text-[#111111] mb-3">Resumen por taquilla</h3>
+
+                <div class="overflow-x-auto rounded-xl border border-slate-200">
+                    <table class="w-full text-sm">
+                        <thead>
+                            <tr class="text-left text-xs uppercase tracking-wide text-slate-400 border-b border-slate-200 bg-slate-50">
+                                <th class="py-2 px-4">Taquilla</th>
+                                <th class="py-2 px-4">Guías</th>
+                                <th class="py-2 px-4">Total vendido</th>
+                                <th class="py-2 px-4"></th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            @foreach ($staffSummary as $row)
+                                <tr
+                                    wire:key="staff-summary-{{ $row['user_id'] }}"
+                                    class="border-b border-slate-100 last:border-0
+                                        {{ (string) $row['user_id'] === $registeredBy ? 'bg-blue-50' : '' }}"
+                                >
+                                    <td class="py-3 px-4 font-medium text-[#111111]">
+                                        {{ $row['name'] }}
+                                        @if ($row['is_self'])
+                                            <span class="text-xs text-slate-400">(Tú)</span>
+                                        @endif
+                                    </td>
+                                    <td class="py-3 px-4 text-slate-500">{{ $row['guides'] }}</td>
+                                    <td class="py-3 px-4 font-medium text-[#111111]">${{ number_format($row['total'], 2) }}</td>
+                                    <td class="py-3 px-4 text-right">
+                                        <button
+                                            type="button"
+                                            wire:click="$set('registeredBy', '{{ $row['user_id'] }}')"
+                                            class="rounded-lg border border-slate-200 px-3 py-1 text-xs font-semibold text-blue-900 hover:bg-blue-50"
+                                        >
+                                            Ver detalle
+                                        </button>
+                                    </td>
+                                </tr>
+                            @endforeach
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        @endif
+
         <div class="flex flex-wrap items-center justify-between gap-3 mb-3">
-            <h3 class="text-sm font-semibold text-[#0F172A]">Por forma de pago</h3>
+            <h3 class="text-sm font-semibold text-[#111111]">Por forma de pago</h3>
 
             @if ($byPaymentMethod->isNotEmpty())
                 <button
@@ -76,11 +122,11 @@
                     <tbody>
                         @foreach ($byPaymentMethod as $row)
                             <tr class="border-b border-slate-100 last:border-0">
-                                <td class="py-3 pr-4 font-medium text-[#0F172A]">
+                                <td class="py-3 pr-4 font-medium text-[#111111]">
                                     {{ \App\Models\Package::PAYMENT_METHOD_LABELS[$row->payment_method] ?? $row->payment_method }}
                                 </td>
                                 <td class="py-3 pr-4 text-slate-500">{{ $row->guides }}</td>
-                                <td class="py-3 pr-4 font-medium text-[#0F172A]">${{ number_format((float) $row->total, 2) }}</td>
+                                <td class="py-3 pr-4 font-medium text-[#111111]">${{ number_format((float) $row->total, 2) }}</td>
                             </tr>
                         @endforeach
                     </tbody>

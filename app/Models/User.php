@@ -3,6 +3,7 @@
 namespace App\Models;
 
 use Laravel\Sanctum\HasApiTokens;
+use App\Models\Concerns\HasPublicId;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
 use Illuminate\Database\Eloquent\Relations\HasMany;
@@ -13,7 +14,7 @@ use Illuminate\Support\Facades\Hash;
 
 class User extends Authenticatable
 {
-    use HasApiTokens, HasFactory, Notifiable;
+    use HasApiTokens, HasFactory, HasPublicId, Notifiable;
 
     public const ROLE_ADMIN_PRINCIPAL = 'admin_principal';
     public const ROLE_ADMIN_OPERATIVO = 'admin_operativo';
@@ -22,6 +23,7 @@ class User extends Authenticatable
     public const ROLE_REPARTIDOR = 'repartidor';
     public const ROLE_CLIENTE = 'cliente';
     public const ROLE_ALMACEN = 'almacen';
+    public const ROLE_EMPRENDEDOR = 'emprendedor';
 
     // Alias de compatibilidad para código existente.
     public const ROLE_ADMIN = self::ROLE_ADMIN_PRINCIPAL;
@@ -36,6 +38,7 @@ class User extends Authenticatable
         'username',
         'phone',
         'password',
+        'google_id',
         'role',
         'ally_id',
         'warehouse_id',
@@ -47,6 +50,7 @@ class User extends Authenticatable
         'password',
         'remember_token',
         'verification_token',
+        'password_change_code',
     ];
 
     protected function casts(): array
@@ -56,6 +60,8 @@ class User extends Authenticatable
             'account_verified_at' => 'datetime',
             'verification_token_expires_at' => 'datetime',
             'verification_token_last_sent_at' => 'datetime',
+            'password_change_code_expires_at' => 'datetime',
+            'password_change_code_last_sent_at' => 'datetime',
             'password' => 'hashed',
         ];
     }
@@ -170,6 +176,93 @@ class User extends Authenticatable
         );
     }
 
+    /*
+    |--------------------------------------------------------------------------
+    | CÓDIGO PARA CAMBIAR CONTRASEÑA
+    |--------------------------------------------------------------------------
+    |
+    | Cambiar la contraseña desde el perfil ya no basta con escribir la
+    | contraseña actual: si alguien más la conoce (o la cuenta ya está
+    | comprometida), podría bloquear al dueño real cambiándola. Este
+    | código de 6 dígitos enviado al correo registrado exige acceso a
+    | ese correo, igual que el token de verificación de cuenta, pero
+    | en columnas separadas porque son propósitos distintos.
+    |
+    */
+
+    public const PASSWORD_CHANGE_CODE_TTL_MINUTES = 15;
+
+    public const PASSWORD_CHANGE_CODE_RESEND_COOLDOWN_SECONDS = 60;
+
+    public function generatePasswordChangeCode(): string
+    {
+        $plainCode = (string) random_int(100000, 999999);
+
+        $this->forceFill([
+            'password_change_code' => Hash::make($plainCode),
+            'password_change_code_expires_at' => now()->addMinutes(
+                self::PASSWORD_CHANGE_CODE_TTL_MINUTES
+            ),
+            'password_change_code_last_sent_at' => now(),
+        ])->save();
+
+        return $plainCode;
+    }
+
+    public function passwordChangeCodeIsValid(string $plainCode): bool
+    {
+        if (! $this->password_change_code) {
+            return false;
+        }
+
+        if (
+            $this->password_change_code_expires_at
+            && $this->password_change_code_expires_at->isPast()
+        ) {
+            return false;
+        }
+
+        return Hash::check($plainCode, $this->password_change_code);
+    }
+
+    /**
+     * Invalida el código para que no pueda reutilizarse, ya sea
+     * porque se usó para cambiar la contraseña o porque el usuario
+     * canceló el proceso.
+     */
+    public function clearPasswordChangeCode(): void
+    {
+        $this->forceFill([
+            'password_change_code' => null,
+            'password_change_code_expires_at' => null,
+        ])->save();
+    }
+
+    public function canResendPasswordChangeCode(): bool
+    {
+        if (! $this->password_change_code_last_sent_at) {
+            return true;
+        }
+
+        return $this->password_change_code_last_sent_at
+            ->addSeconds(self::PASSWORD_CHANGE_CODE_RESEND_COOLDOWN_SECONDS)
+            ->isPast();
+    }
+
+    public function secondsUntilCanResendPasswordChangeCode(): int
+    {
+        if ($this->canResendPasswordChangeCode()) {
+            return 0;
+        }
+
+        return (int) now()->diffInSeconds(
+            $this->password_change_code_last_sent_at->addSeconds(
+                self::PASSWORD_CHANGE_CODE_RESEND_COOLDOWN_SECONDS
+            ),
+            false
+        );
+    }
+
     /**
      * Agencia aliada de la que este usuario es dueño (role 'aliado').
      * Relación inversa de Ally::user() — sin cambios respecto a antes.
@@ -192,6 +285,48 @@ class User extends Authenticatable
     public function driver(): HasOne
     {
         return $this->hasOne(Driver::class);
+    }
+
+    /**
+     * Perfil de negocio del marketplace (role 'emprendedor'). Mismo
+     * patrón 1-a-1 que ally()/driver().
+     */
+    public function emprendedor(): HasOne
+    {
+        return $this->hasOne(Emprendedor::class);
+    }
+
+    /**
+     * Registro de Customer que este usuario reclamó al registrarse
+     * como cliente con su cédula (ver register.blade.php).
+     */
+    public function customer(): HasOne
+    {
+        return $this->hasOne(Customer::class);
+    }
+
+    /**
+     * Mismo criterio que Client\Dashboard/Client\PendingPayments
+     * (customerIdDocsForCurrentUser): un cliente puede tener varios
+     * id_doc asociados a su cuenta. Se usa para el puntito de aviso en
+     * "Pagos" del panel de Cliente.
+     */
+    public function hasPendingCodPayments(): bool
+    {
+        $idDocs = Customer::query()
+            ->where('email', $this->email)
+            ->orWhere('user_id', $this->id)
+            ->pluck('id_doc');
+
+        if ($idDocs->isEmpty()) {
+            return false;
+        }
+
+        return Package::query()
+            ->whereIn('recipient_id_doc', $idDocs)
+            ->where('is_cod', true)
+            ->where('cod_status', Package::COD_PENDIENTE)
+            ->exists();
     }
 
     /**
@@ -265,6 +400,11 @@ class User extends Authenticatable
     public function isCliente(): bool
     {
         return $this->role === self::ROLE_CLIENTE;
+    }
+
+    public function isEmprendedor(): bool
+    {
+        return $this->role === self::ROLE_EMPRENDEDOR;
     }
 
     public function isActive(): bool
@@ -408,6 +548,7 @@ class User extends Authenticatable
             $this->isAliadoTaquilla() => 'ally.packages.create',
             $this->isAlmacen() => 'almacen.dashboard',
             $this->isAdmin() => 'admin.dashboard',
+            $this->isEmprendedor() => 'emprendedor.dashboard',
             default => 'dashboard',
         };
     }
@@ -422,6 +563,7 @@ class User extends Authenticatable
             self::ROLE_REPARTIDOR => 'Repartidor',
             self::ROLE_CLIENTE => 'Cliente',
             self::ROLE_ALMACEN => 'Personal de Almacén',
+            self::ROLE_EMPRENDEDOR => 'Emprendedor',
         ];
     }
 }

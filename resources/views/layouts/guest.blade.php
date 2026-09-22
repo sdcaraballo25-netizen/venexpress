@@ -65,12 +65,9 @@
         <div class="min-h-screen grid lg:grid-cols-[minmax(0,0.85fr)_minmax(0,1fr)] bg-white">
 
             <aside class="relative overflow-hidden bg-blue-950 px-6 py-10 sm:px-10 lg:px-14 lg:py-14 flex flex-col justify-between">
-                <div class="pointer-events-none absolute -bottom-24 -left-24 h-72 w-[130%] rotate-[-8deg]">
-                    <div class="h-6 w-full bg-blue-800/60"></div>
-                    <div class="h-6 w-full bg-amber-400/80 mt-3"></div>
-                    <div class="h-6 w-full bg-red-600/70 mt-3"></div>
-                </div>
-                <div class="pointer-events-none absolute inset-0 bg-[radial-gradient(circle_at_top_right,rgba(251,191,36,0.12),transparent_55%)]"></div>
+                <div class="pointer-events-none absolute -top-20 -right-20 h-64 w-64 rounded-full bg-amber-400/10"></div>
+                <div class="pointer-events-none absolute -bottom-24 -left-16 h-48 w-48 rounded-full bg-amber-400/10"></div>
+                <div class="pointer-events-none absolute inset-0 bg-[radial-gradient(circle_at_top_right,rgba(247,255,0,0.12),transparent_55%)]"></div>
 
                 <div class="relative">
                     <a href="{{ url('/') }}" wire:navigate>

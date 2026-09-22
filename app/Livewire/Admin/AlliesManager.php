@@ -4,6 +4,8 @@ namespace App\Livewire\Admin;
 
 use App\Models\Ally;
 use App\Models\AuditLog;
+use App\Notifications\AccountApproved;
+use App\Notifications\AccountRejected;
 use App\Services\VenezuelaLocationService;
 use Illuminate\Validation\Rule;
 use Livewire\Attributes\Layout;
@@ -31,6 +33,30 @@ class AlliesManager extends Component
     public ?float $location_latitude = null;
 
     public ?float $location_longitude = null;
+
+    /**
+     * Estado del modal de detalle (solo lectura) de un aliado.
+     */
+    public bool $showDetailsModal = false;
+
+    public ?int $viewingAllyId = null;
+
+    /**
+     * Abre el modal de detalle con los datos completos del aliado,
+     * incluyendo la foto de fachada en tamaño grande, para que el
+     * Admin pueda revisarlos antes de aprobar/rechazar la postulación.
+     */
+    public function viewDetails(int $allyId): void
+    {
+        $this->viewingAllyId = $allyId;
+        $this->showDetailsModal = true;
+    }
+
+    public function closeDetails(): void
+    {
+        $this->showDetailsModal = false;
+        $this->viewingAllyId = null;
+    }
 
     /**
      * Abre el modal de ubicación con los datos actuales del aliado.
@@ -122,6 +148,8 @@ class AlliesManager extends Component
             ['previous_status' => $previousStatus, 'new_status' => Ally::STATUS_ACTIVE]
         );
 
+        $ally->user?->notify(new AccountApproved('Aliado'));
+
         session()->flash('success', 'El aliado fue aprobado correctamente.');
     }
 
@@ -143,6 +171,8 @@ class AlliesManager extends Component
             "Rechazó al aliado {$ally->business_name}.",
             ['previous_status' => $previousStatus, 'new_status' => Ally::STATUS_REJECTED]
         );
+
+        $ally->user?->notify(new AccountRejected('Aliado'));
 
         session()->flash('success', 'El aliado fue rechazado.');
     }
@@ -274,6 +304,9 @@ class AlliesManager extends Component
         return view('livewire.admin.allies-manager', [
             'allies' => $allies,
             'venezuelaStates' => app(VenezuelaLocationService::class)->states(),
+            'viewingAlly' => $this->viewingAllyId
+                ? Ally::with('user')->find($this->viewingAllyId)
+                : null,
         ]);
     }
 }

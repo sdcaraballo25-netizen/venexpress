@@ -73,7 +73,7 @@
 </head>
 
 
-<body class="bg-[#F3F5F7] text-[#0B1220] antialiased">
+<body class="bg-[#F7F7F4] text-[#111111] antialiased">
 
 
 <div class="min-h-screen flex">
@@ -88,7 +88,7 @@
             fixed inset-y-0 left-0 z-40
             w-72
             bg-white
-            border-r border-[#E2E8F0]
+            border-r border-[#E5E5E0]
             flex flex-col
             transform transition-transform duration-200
             md:relative
@@ -118,9 +118,9 @@
                     class="
                         h-11 w-11
                         rounded-xl
-                        bg-blue-900
+                        bg-amber-400
                         flex items-center justify-center
-                        text-white
+                        text-[#111111]
                         shrink-0
                     "
                 >
@@ -166,7 +166,7 @@
                             font-display
                             font-bold
                             text-xl
-                            text-[#0F172A]
+                            text-[#111111]
                             block
                             leading-none
                         "
@@ -177,7 +177,7 @@
                     <span
                         class="
                             text-xs
-                            text-[#94A3B8]
+                            text-[#B8B8B2]
                             block
                             mt-1
                         "
@@ -224,7 +224,7 @@
                     font-semibold
                     uppercase
                     tracking-wider
-                    text-[#94A3B8]
+                    text-[#B8B8B2]
                 "
             >
                 Principal
@@ -245,8 +245,8 @@
                     font-medium
                     transition-colors
                     {{ request()->routeIs('repartidor.dashboard')
-                        ? 'bg-blue-50 text-blue-900'
-                        : 'text-[#64748B] hover:bg-slate-50 hover:text-[#0F172A]' }}
+                        ? 'bg-amber-400 text-[#111111]'
+                        : 'text-[#6B6B66] hover:bg-slate-50 hover:text-[#111111]' }}
                 "
             >
 
@@ -289,8 +289,8 @@
                         font-medium
                         transition-colors
                         {{ request()->routeIs('repartidor.route-detail')
-                            ? 'bg-blue-50 text-blue-900'
-                            : 'text-[#64748B] hover:bg-slate-50 hover:text-[#0F172A]' }}
+                            ? 'bg-amber-400 text-[#111111]'
+                            : 'text-[#6B6B66] hover:bg-slate-50 hover:text-[#111111]' }}
                     "
                 >
 
@@ -333,8 +333,8 @@
                     font-medium
                     transition-colors
                     {{ request()->routeIs('repartidor.route-history')
-                        ? 'bg-blue-50 text-blue-900'
-                        : 'text-[#64748B] hover:bg-slate-50 hover:text-[#0F172A]' }}
+                        ? 'bg-amber-400 text-[#111111]'
+                        : 'text-[#6B6B66] hover:bg-slate-50 hover:text-[#111111]' }}
                 "
             >
 
@@ -375,8 +375,8 @@
                     font-medium
                     transition-colors
                     {{ request()->routeIs('repartidor.scanner')
-                        ? 'bg-blue-50 text-blue-900'
-                        : 'text-[#64748B] hover:bg-slate-50 hover:text-[#0F172A]' }}
+                        ? 'bg-amber-400 text-[#111111]'
+                        : 'text-[#6B6B66] hover:bg-slate-50 hover:text-[#111111]' }}
                 "
             >
 
@@ -416,7 +416,7 @@
                     font-semibold
                     uppercase
                     tracking-wider
-                    text-[#94A3B8]
+                    text-[#B8B8B2]
                 "
             >
                 Operaciones
@@ -438,8 +438,8 @@
                     transition-colors
                     {{ request()->routeIs('repartidor.packages')
                         || request()->routeIs('repartidor.package-detail')
-                        ? 'bg-blue-50 text-blue-900'
-                        : 'text-[#64748B] hover:bg-slate-50 hover:text-[#0F172A]' }}
+                        ? 'bg-amber-400 text-[#111111]'
+                        : 'text-[#6B6B66] hover:bg-slate-50 hover:text-[#111111]' }}
                 "
             >
 
@@ -480,8 +480,8 @@
                     font-medium
                     transition-colors
                     {{ request()->routeIs('repartidor.app-download')
-                        ? 'bg-blue-50 text-blue-900'
-                        : 'text-[#64748B] hover:bg-slate-50 hover:text-[#0F172A]' }}
+                        ? 'bg-amber-400 text-[#111111]'
+                        : 'text-[#6B6B66] hover:bg-slate-50 hover:text-[#111111]' }}
                 "
             >
 
@@ -522,8 +522,8 @@
                     font-medium
                     transition-colors
                     {{ request()->routeIs('repartidor.help')
-                        ? 'bg-blue-50 text-blue-900'
-                        : 'text-[#64748B] hover:bg-slate-50 hover:text-[#0F172A]' }}
+                        ? 'bg-amber-400 text-[#111111]'
+                        : 'text-[#6B6B66] hover:bg-slate-50 hover:text-[#111111]' }}
                 "
             >
 
@@ -550,6 +550,48 @@
             </a>
 
 
+            {{-- RECOMENDACIONES --}}
+
+            <a
+                href="{{ route('recommendations.create') }}"
+                wire:navigate
+                @click="sidebarOpen = false"
+                class="
+                    flex items-center gap-3
+                    px-4 py-3
+                    rounded-xl
+                    text-sm
+                    font-medium
+                    transition-colors
+                    {{ request()->routeIs('recommendations.create')
+                        ? 'bg-amber-400 text-[#111111]'
+                        : 'text-[#6B6B66] hover:bg-slate-50 hover:text-[#111111]' }}
+                "
+            >
+
+                <svg
+                    class="w-5 h-5 shrink-0"
+                    fill="none"
+                    stroke="currentColor"
+                    viewBox="0 0 24 24"
+                >
+
+                    <path
+                        stroke-linecap="round"
+                        stroke-linejoin="round"
+                        stroke-width="2"
+                        d="M8 10h.01M12 10h.01M16 10h.01M9 16H5a2 2 0 01-2-2V6a2 2 0 012-2h14a2 2 0 012 2v8a2 2 0 01-2 2h-6l-4 4v-4z"
+                    />
+
+                </svg>
+
+                <span>
+                    Recomendaciones
+                </span>
+
+            </a>
+
+
         </nav>
 
 
@@ -560,7 +602,7 @@
         <div
             class="
                 border-t
-                border-[#E2E8F0]
+                border-[#E5E5E0]
                 px-5
                 py-5
                 bg-white
@@ -573,8 +615,8 @@
                     class="
                         h-10 w-10
                         rounded-full
-                        bg-blue-900
-                        text-white
+                        bg-amber-400
+                        text-[#111111]
                         flex items-center justify-center
                         font-bold
                         uppercase
@@ -591,7 +633,7 @@
                         class="
                             text-sm
                             font-semibold
-                            text-[#0F172A]
+                            text-[#111111]
                             truncate
                         "
                     >
@@ -601,7 +643,7 @@
                     <p
                         class="
                             text-xs
-                            text-[#64748B]
+                            text-[#6B6B66]
                             truncate
                         "
                     >
@@ -613,10 +655,30 @@
             </div>
 
 
+            <a
+                href="{{ route('profile') }}"
+                class="
+                    block
+                    w-full
+                    mt-4
+                    rounded-xl
+                    px-3
+                    py-2
+                    text-sm
+                    font-medium
+                    text-[#6B6B66]
+                    hover:bg-slate-50
+                    hover:text-[#111111]
+                    transition-colors
+                "
+            >
+                Mi Perfil
+            </a>
+
             <form
                 method="POST"
                 action="{{ route('logout') }}"
-                class="mt-4"
+                class="mt-2"
             >
 
                 @csrf
@@ -678,7 +740,7 @@
             class="
                 h-16
                 bg-white
-                border-b border-[#E2E8F0]
+                border-b border-[#E5E5E0]
                 flex items-center
                 justify-between
                 px-4 lg:px-8
@@ -697,7 +759,7 @@
                         h-10 w-10
                         rounded-xl
                         flex items-center justify-center
-                        text-[#0F172A]
+                        text-[#111111]
                         hover:bg-slate-100
                     "
                     aria-label="Abrir menú"
@@ -768,7 +830,7 @@
                         class="
                             text-sm
                             font-semibold
-                            text-[#0F172A]
+                            text-[#111111]
                         "
                     >
                         {{ auth()->user()->name ?? 'Repartidor' }}
@@ -777,13 +839,34 @@
                     <p
                         class="
                             text-xs
-                            text-[#64748B]
+                            text-[#6B6B66]
                         "
                     >
                         Panel de repartidor
                     </p>
 
                 </div>
+
+
+                <a
+                    href="{{ route('profile') }}"
+                    class="
+                        h-10
+                        px-4
+                        inline-flex
+                        items-center
+                        rounded-xl
+                        text-sm
+                        font-medium
+                        text-[#6B6B66]
+                        border border-[#E5E5E0]
+                        hover:bg-slate-50
+                        hover:text-[#111111]
+                        transition-colors
+                    "
+                >
+                    Mi Perfil
+                </a>
 
 
                 <form
@@ -840,6 +923,7 @@
 
 </div>
 
+<x-confirm-dialog />
 
 @livewireScripts
 

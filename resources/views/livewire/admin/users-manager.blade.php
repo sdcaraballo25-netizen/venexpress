@@ -1,8 +1,8 @@
 <div class="min-h-screen">
     <div class="flex flex-col gap-5 mb-8 md:flex-row md:items-center md:justify-between">
         <div>
-            <h1 class="font-display text-3xl font-bold text-[#0F172A]">Gestión de usuarios</h1>
-            <p class="mt-1 text-sm text-[#64748B]">Consulta, filtra y administra las cuentas de Venexpress.</p>
+            <h1 class="font-display text-3xl font-bold text-[#111111]">Gestión de usuarios</h1>
+            <p class="mt-1 text-sm text-[#6B6B66]">Consulta, filtra y administra las cuentas de Venexpress.</p>
         </div>
 
         <button wire:click="openCreateModal"
@@ -26,18 +26,18 @@
         </div>
     @endif
 
-    <div class="mb-6 rounded-2xl border border-[#E2E8F0] bg-white p-5 shadow-sm">
+    <div class="mb-6 rounded-2xl border border-[#E5E5E0] bg-white p-5 shadow-sm">
         <div class="grid gap-4 md:grid-cols-[1fr_220px_180px]">
             <div>
-                <label class="mb-2 block text-xs font-semibold uppercase tracking-wide text-[#64748B]">Buscar</label>
+                <label class="mb-2 block text-xs font-semibold uppercase tracking-wide text-[#6B6B66]">Buscar</label>
                 <input wire:model.live.debounce.300ms="search" type="text"
                        placeholder="Nombre o correo electrónico..."
-                       class="w-full rounded-xl border border-[#E2E8F0] px-4 py-3 text-sm text-[#0F172A] placeholder:text-[#94A3B8] focus:border-blue-500 focus:ring-blue-500">
+                       class="w-full rounded-xl border border-[#E5E5E0] px-4 py-3 text-sm text-[#111111] placeholder:text-[#B8B8B2] focus:border-blue-500 focus:ring-blue-500">
             </div>
 
             <div>
-                <label class="mb-2 block text-xs font-semibold uppercase tracking-wide text-[#64748B]">Tipo de usuario</label>
-                <select wire:model.live="roleFilter" class="w-full rounded-xl border border-[#E2E8F0] px-4 py-3 text-sm focus:border-blue-500 focus:ring-blue-500">
+                <label class="mb-2 block text-xs font-semibold uppercase tracking-wide text-[#6B6B66]">Tipo de usuario</label>
+                <select wire:model.live="roleFilter" class="w-full rounded-xl border border-[#E5E5E0] px-4 py-3 text-sm focus:border-blue-500 focus:ring-blue-500">
                     <option value="">Todos</option>
                     @foreach ($roleLabels as $value => $label)
                         <option value="{{ $value }}">{{ $label }}</option>
@@ -46,8 +46,8 @@
             </div>
 
             <div>
-                <label class="mb-2 block text-xs font-semibold uppercase tracking-wide text-[#64748B]">Estado</label>
-                <select wire:model.live="statusFilter" class="w-full rounded-xl border border-[#E2E8F0] px-4 py-3 text-sm focus:border-blue-500 focus:ring-blue-500">
+                <label class="mb-2 block text-xs font-semibold uppercase tracking-wide text-[#6B6B66]">Estado</label>
+                <select wire:model.live="statusFilter" class="w-full rounded-xl border border-[#E5E5E0] px-4 py-3 text-sm focus:border-blue-500 focus:ring-blue-500">
                     <option value="">Todos</option>
                     <option value="activo">Activo</option>
                     <option value="inactivo">Inactivo</option>
@@ -56,29 +56,29 @@
         </div>
     </div>
 
-    <div class="overflow-hidden rounded-2xl border border-[#E2E8F0] bg-white shadow-sm">
+    <div class="overflow-hidden rounded-2xl border border-[#E5E5E0] bg-white shadow-sm">
         <div class="overflow-x-auto">
             <table class="w-full text-sm">
-                <thead class="border-b border-[#E2E8F0] bg-slate-50">
+                <thead class="border-b border-[#E5E5E0] bg-slate-50">
                     <tr>
-                        <th class="px-6 py-4 text-left text-xs font-semibold uppercase text-[#64748B]">Usuario</th>
-                        <th class="px-6 py-4 text-left text-xs font-semibold uppercase text-[#64748B]">Tipo</th>
-                        <th class="px-6 py-4 text-center text-xs font-semibold uppercase text-[#64748B]">Estado</th>
-                        <th class="px-6 py-4 text-left text-xs font-semibold uppercase text-[#64748B]">Registro</th>
-                        <th class="px-6 py-4 text-right text-xs font-semibold uppercase text-[#64748B]">Acciones</th>
+                        <th class="px-6 py-4 text-left text-xs font-semibold uppercase text-[#6B6B66]">Usuario</th>
+                        <th class="px-6 py-4 text-left text-xs font-semibold uppercase text-[#6B6B66]">Tipo</th>
+                        <th class="px-6 py-4 text-center text-xs font-semibold uppercase text-[#6B6B66]">Estado</th>
+                        <th class="px-6 py-4 text-left text-xs font-semibold uppercase text-[#6B6B66]">Registro</th>
+                        <th class="px-6 py-4 text-right text-xs font-semibold uppercase text-[#6B6B66]">Acciones</th>
                     </tr>
                 </thead>
                 <tbody>
                     @forelse ($users as $user)
-                        <tr class="border-b border-[#F1F5F9] last:border-0 hover:bg-slate-50">
+                        <tr class="border-b border-[#F0F0EC] last:border-0 hover:bg-slate-50">
                             <td class="px-6 py-4">
                                 <div class="flex items-center gap-3">
                                     <div class="flex h-10 w-10 shrink-0 items-center justify-center rounded-full bg-blue-50 font-bold uppercase text-blue-800">
                                         {{ substr($user->name, 0, 1) }}
                                     </div>
                                     <div>
-                                        <p class="font-semibold text-[#0F172A]">{{ $user->name }}</p>
-                                        <p class="mt-1 text-xs text-[#64748B]">{{ $user->email }}</p>
+                                        <p class="font-semibold text-[#111111]">{{ $user->name }}</p>
+                                        <p class="mt-1 text-xs text-[#6B6B66]">{{ $user->email }}</p>
                                     </div>
                                 </div>
                             </td>
@@ -102,21 +102,21 @@
                                     {{ $user->isActive() ? 'Activo' : 'Inactivo' }}
                                 </span>
                             </td>
-                            <td class="px-6 py-4 text-[#475569]">
+                            <td class="px-6 py-4 text-[#4A4A45]">
                                 {{ optional($user->created_at)->format('d/m/Y') }}
                             </td>
                             <td class="px-6 py-4">
                                 <div class="flex items-center justify-end gap-2">
                                     @if (auth()->user()->canEditUser($user))
                                         <button wire:click="openEditModal({{ $user->id }})"
-                                                class="rounded-lg border border-[#E2E8F0] px-3 py-2 text-xs font-semibold text-[#475569] hover:bg-slate-50">
+                                                class="rounded-lg border border-[#E5E5E0] px-3 py-2 text-xs font-semibold text-[#4A4A45] hover:bg-slate-50">
                                             Editar
                                         </button>
                                     @endif
 
                                     @if (auth()->user()->canDeactivateUser($user))
                                         <button wire:click="toggleStatus({{ $user->id }})"
-                                                class="rounded-lg border border-[#E2E8F0] px-3 py-2 text-xs font-semibold text-[#475569] hover:bg-slate-50">
+                                                class="rounded-lg border border-[#E5E5E0] px-3 py-2 text-xs font-semibold text-[#4A4A45] hover:bg-slate-50">
                                             {{ $user->isActive() ? 'Desactivar' : 'Activar' }}
                                         </button>
                                     @endif
@@ -133,8 +133,8 @@
                     @empty
                         <tr>
                             <td colspan="5" class="px-6 py-14 text-center">
-                                <p class="font-semibold text-[#0F172A]">No encontramos usuarios</p>
-                                <p class="mt-1 text-sm text-[#64748B]">Prueba con otro nombre, correo o filtro.</p>
+                                <p class="font-semibold text-[#111111]">No encontramos usuarios</p>
+                                <p class="mt-1 text-sm text-[#6B6B66]">Prueba con otro nombre, correo o filtro.</p>
                             </td>
                         </tr>
                     @endforelse
@@ -143,7 +143,7 @@
         </div>
 
         @if ($users->hasPages())
-            <div class="border-t border-[#E2E8F0] px-6 py-4">{{ $users->links() }}</div>
+            <div class="border-t border-[#E5E5E0] px-6 py-4">{{ $users->links() }}</div>
         @endif
     </div>
 
@@ -151,12 +151,12 @@
     @if ($showCreateModal)
         <div class="fixed inset-0 z-50 flex items-center justify-center bg-slate-950/50 p-4" wire:click.self="closeCreateModal">
             <div class="max-h-[92vh] w-full max-w-3xl overflow-y-auto rounded-2xl bg-white shadow-2xl">
-                <div class="flex items-center justify-between border-b border-[#E2E8F0] px-6 py-5">
+                <div class="flex items-center justify-between border-b border-[#E5E5E0] px-6 py-5">
                     <div>
-                        <h2 class="font-display text-xl font-bold text-[#0F172A]">Crear usuario</h2>
-                        <p class="mt-1 text-xs text-[#64748B]">La cuenta quedará activa al completar la creación.</p>
+                        <h2 class="font-display text-xl font-bold text-[#111111]">Crear usuario</h2>
+                        <p class="mt-1 text-xs text-[#6B6B66]">La cuenta quedará activa al completar la creación.</p>
                     </div>
-                    <button wire:click="closeCreateModal" class="text-2xl text-[#64748B]">×</button>
+                    <button wire:click="closeCreateModal" class="text-2xl text-[#6B6B66]">×</button>
                 </div>
 
                 <form wire:submit="requestCreate" class="space-y-6 p-6">
@@ -328,8 +328,8 @@
                         </div>
                     @endif
 
-                    <div class="flex justify-end gap-3 border-t border-[#E2E8F0] pt-5">
-                        <button type="button" wire:click="closeCreateModal" class="rounded-xl border border-[#E2E8F0] px-5 py-3 text-sm font-semibold text-[#475569]">Cancelar</button>
+                    <div class="flex justify-end gap-3 border-t border-[#E5E5E0] pt-5">
+                        <button type="button" wire:click="closeCreateModal" class="rounded-xl border border-[#E5E5E0] px-5 py-3 text-sm font-semibold text-[#4A4A45]">Cancelar</button>
                         <button type="submit" class="rounded-xl bg-blue-900 px-5 py-3 text-sm font-semibold text-white hover:bg-blue-800">Continuar</button>
                     </div>
                 </form>
@@ -342,8 +342,8 @@
         <div class="fixed inset-0 z-[60] flex items-center justify-center bg-slate-950/60 p-4">
             <div class="w-full max-w-md rounded-2xl bg-white p-6 shadow-2xl">
                 <div class="flex h-12 w-12 items-center justify-center rounded-full bg-amber-50 text-amber-700">🔐</div>
-                <h2 class="mt-4 font-display text-xl font-bold text-[#0F172A]">Confirmar creación</h2>
-                <p class="mt-2 text-sm leading-6 text-[#64748B]">Esta acción creará una cuenta con acceso al sistema. Introduce tu contraseña de administrador para confirmar que eres tú.</p>
+                <h2 class="mt-4 font-display text-xl font-bold text-[#111111]">Confirmar creación</h2>
+                <p class="mt-2 text-sm leading-6 text-[#6B6B66]">Esta acción creará una cuenta con acceso al sistema. Introduce tu contraseña de administrador para confirmar que eres tú.</p>
 
                 <div class="mt-5">
                     <x-input-label for="admin-password-create" value="Contraseña de administrador" />
@@ -352,7 +352,7 @@
                 </div>
 
                 <div class="mt-6 flex justify-end gap-3">
-                    <button wire:click="$set('showConfirmModal', false)" class="rounded-xl border border-[#E2E8F0] px-5 py-3 text-sm font-semibold text-[#475569]">Volver</button>
+                    <button wire:click="$set('showConfirmModal', false)" class="rounded-xl border border-[#E5E5E0] px-5 py-3 text-sm font-semibold text-[#4A4A45]">Volver</button>
                     <button wire:click="createUser" class="rounded-xl bg-blue-900 px-5 py-3 text-sm font-semibold text-white hover:bg-blue-800">Confirmar creación</button>
                 </div>
             </div>
@@ -363,12 +363,12 @@
     @if ($showEditModal)
         <div class="fixed inset-0 z-50 flex items-center justify-center bg-slate-950/50 p-4" wire:click.self="closeEditModal">
             <div class="max-h-[92vh] w-full max-w-lg overflow-y-auto rounded-2xl bg-white shadow-2xl">
-                <div class="flex items-center justify-between border-b border-[#E2E8F0] px-6 py-5">
+                <div class="flex items-center justify-between border-b border-[#E5E5E0] px-6 py-5">
                     <div>
-                        <h2 class="font-display text-xl font-bold text-[#0F172A]">Editar usuario</h2>
-                        <p class="mt-1 text-xs text-[#64748B]">Actualiza los datos de la cuenta. Deja la contraseña en blanco para conservar la actual.</p>
+                        <h2 class="font-display text-xl font-bold text-[#111111]">Editar usuario</h2>
+                        <p class="mt-1 text-xs text-[#6B6B66]">Actualiza los datos de la cuenta. Deja la contraseña en blanco para conservar la actual.</p>
                     </div>
-                    <button wire:click="closeEditModal" class="text-2xl text-[#64748B]">×</button>
+                    <button wire:click="closeEditModal" class="text-2xl text-[#6B6B66]">×</button>
                 </div>
 
                 <form wire:submit="updateUser" class="space-y-6 p-6">
@@ -434,8 +434,8 @@
                         </div>
                     </div>
 
-                    <div class="flex justify-end gap-3 border-t border-[#E2E8F0] pt-5">
-                        <button type="button" wire:click="closeEditModal" class="rounded-xl border border-[#E2E8F0] px-5 py-3 text-sm font-semibold text-[#475569]">Cancelar</button>
+                    <div class="flex justify-end gap-3 border-t border-[#E5E5E0] pt-5">
+                        <button type="button" wire:click="closeEditModal" class="rounded-xl border border-[#E5E5E0] px-5 py-3 text-sm font-semibold text-[#4A4A45]">Cancelar</button>
                         <button type="submit" class="rounded-xl bg-blue-900 px-5 py-3 text-sm font-semibold text-white hover:bg-blue-800">Guardar cambios</button>
                     </div>
                 </form>
@@ -448,8 +448,8 @@
         <div class="fixed inset-0 z-[60] flex items-center justify-center bg-slate-950/60 p-4">
             <div class="w-full max-w-md rounded-2xl bg-white p-6 shadow-2xl">
                 <div class="flex h-12 w-12 items-center justify-center rounded-full bg-red-50 text-red-600">!</div>
-                <h2 class="mt-4 font-display text-xl font-bold text-[#0F172A]">Eliminar usuario</h2>
-                <p class="mt-2 text-sm leading-6 text-[#64748B]">Esta acción es permanente. Confirma con tu contraseña de administrador para continuar.</p>
+                <h2 class="mt-4 font-display text-xl font-bold text-[#111111]">Eliminar usuario</h2>
+                <p class="mt-2 text-sm leading-6 text-[#6B6B66]">Esta acción es permanente. Confirma con tu contraseña de administrador para continuar.</p>
 
                 <div class="mt-5">
                     <x-input-label for="admin-password-delete" value="Contraseña de administrador" />
@@ -458,7 +458,7 @@
                 </div>
 
                 <div class="mt-6 flex justify-end gap-3">
-                    <button wire:click="$set('showDeleteModal', false)" class="rounded-xl border border-[#E2E8F0] px-5 py-3 text-sm font-semibold text-[#475569]">Cancelar</button>
+                    <button wire:click="$set('showDeleteModal', false)" class="rounded-xl border border-[#E5E5E0] px-5 py-3 text-sm font-semibold text-[#4A4A45]">Cancelar</button>
                     <button wire:click="deleteUser" class="rounded-xl bg-red-600 px-5 py-3 text-sm font-semibold text-white hover:bg-red-700">Eliminar definitivamente</button>
                 </div>
             </div>

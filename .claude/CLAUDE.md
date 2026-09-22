@@ -190,6 +190,8 @@ Current application roles include:
 - aliado
 - chofer
 - cliente
+- emprendedor (marketplace module, added 2026-09-21; confirmed with
+  the user before creating it, per the rule above)
 
 Do not add or remove roles without confirming that the change is required.
 

@@ -10,6 +10,17 @@ new class extends Component
 {
     public string $name = '';
     public string $email = '';
+    public string $phone = '';
+
+    /**
+     * El Cliente no puede cambiar su correo desde el perfil: varias
+     * pantallas de Cliente (Dashboard, Incidents, PendingPayments)
+     * siguen usando el correo para encontrar guías de familiares que
+     * comparten cuenta, y un cambio accidental o malintencionado
+     * podría desconectarlo de ese historial compartido. Los demás
+     * roles no tienen esa dependencia y sí pueden editarlo.
+     */
+    public bool $canChangeEmail = true;
 
     /**
      * Mount the component.
@@ -18,6 +29,8 @@ new class extends Component
     {
         $this->name = Auth::user()->name;
         $this->email = Auth::user()->email;
+        $this->phone = (string) Auth::user()->phone;
+        $this->canChangeEmail = ! Auth::user()->isCliente();
     }
 
     /**
@@ -26,11 +39,25 @@ new class extends Component
     public function updateProfileInformation(): void
     {
         $user = Auth::user();
+        $canChangeEmail = ! $user->isCliente();
 
-        $validated = $this->validate([
+        $rules = [
             'name' => ['required', 'string', 'max:255'],
-            'email' => ['required', 'string', 'lowercase', 'email', 'max:255', Rule::unique(User::class)->ignore($user->id)],
-        ]);
+            'phone' => ['nullable', 'string', 'max:30'],
+        ];
+
+        if ($canChangeEmail) {
+            $rules['email'] = ['required', 'string', 'lowercase', 'email', 'max:255', Rule::unique(User::class)->ignore($user->id)];
+        }
+
+        $validated = $this->validate($rules);
+
+        if (! $canChangeEmail) {
+            // Se ignora cualquier valor que haya llegado en $this->email
+            // (el campo está deshabilitado en la vista, pero un request
+            // manipulado podría intentar enviarlo de todos modos).
+            $this->email = $user->email;
+        }
 
         $user->fill($validated);
 
@@ -82,8 +109,14 @@ new class extends Component
 
         <div>
             <x-input-label for="email" :value="__('Email')" />
-            <x-text-input wire:model="email" id="email" name="email" type="email" class="mt-1 block w-full" required autocomplete="username" />
+            <x-text-input wire:model="email" id="email" name="email" type="email" class="mt-1 block w-full" required autocomplete="username" :disabled="! $canChangeEmail" />
             <x-input-error class="mt-2" :messages="$errors->get('email')" />
+
+            @unless ($canChangeEmail)
+                <p class="text-xs text-gray-500 mt-1">
+                    No puedes cambiar tu correo desde aquí. Si necesitas actualizarlo, contacta a soporte.
+                </p>
+            @endunless
 
             @if (auth()->user() instanceof \Illuminate\Contracts\Auth\MustVerifyEmail && ! auth()->user()->hasVerifiedEmail())
                 <div>
@@ -102,6 +135,12 @@ new class extends Component
                     @endif
                 </div>
             @endif
+        </div>
+
+        <div>
+            <x-input-label for="phone" value="Teléfono" />
+            <x-text-input wire:model="phone" id="phone" name="phone" type="text" class="mt-1 block w-full" autocomplete="tel" placeholder="04XX-XXXXXXX" />
+            <x-input-error class="mt-2" :messages="$errors->get('phone')" />
         </div>
 
         <div class="flex items-center gap-4">

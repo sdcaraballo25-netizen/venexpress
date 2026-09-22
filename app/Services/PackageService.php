@@ -8,6 +8,7 @@ use App\Models\Customer;
 use App\Models\Driver;
 use App\Models\Package;
 use App\Models\PackageHistory;
+use App\Notifications\PackageCreated;
 use App\Notifications\PackageStatusUpdated;
 use App\Support\Money;
 use Illuminate\Database\QueryException;
@@ -49,13 +50,51 @@ class PackageService
             }
 
             Notification::route('mail', $customer->email)
-                ->notify(new PackageStatusUpdated($package, $status));
+                ->notify(new PackageStatusUpdated($package->id, $status));
         } catch (Throwable $e) {
             Log::warning(
                 'No se pudo enviar la notificación de cambio de estado.',
                 [
                     'package_id' => $package->id,
                     'status' => $status,
+                    'error' => $e->getMessage(),
+                ]
+            );
+        }
+    }
+
+    /**
+     * Avisa por correo al remitente y al destinatario que la guía
+     * quedó registrada, cada uno con un mensaje distinto (ver
+     * PackageCreated). El correo de cada uno se busca en customers
+     * por su id_doc, igual que notifyStatusChange(): si no tiene uno
+     * registrado, simplemente no se le envía nada.
+     */
+    protected function notifyPackageCreated(Package $package): void
+    {
+        try {
+            $senderEmail = Customer::query()
+                ->where('id_doc', $package->sender_id_doc)
+                ->value('email');
+
+            if ($senderEmail) {
+                Notification::route('mail', $senderEmail)
+                    ->notify(new PackageCreated($package->id, PackageCreated::ROLE_SENDER));
+            }
+
+            $recipientEmail = Customer::query()
+                ->where('id_doc', $package->recipient_id_doc)
+                ->value('email');
+
+            if ($recipientEmail) {
+                Notification::route('mail', $recipientEmail)
+                    ->notify(new PackageCreated($package->id, PackageCreated::ROLE_RECIPIENT));
+            }
+        } catch (Throwable $e) {
+            Log::warning(
+                'No se pudo enviar la notificación de guía registrada.',
+                [
+                    'package_id' => $package->id,
                     'error' => $e->getMessage(),
                 ]
             );
@@ -111,10 +150,6 @@ class PackageService
             $declaredValueUsd = $data['declared_value_usd'] ?? null;
             $isCod = $data['is_cod'] ?? false;
 
-            $codAmountUsd = $isCod
-                ? ($data['cod_amount_usd'] ?? null)
-                : null;
-
             $requiresDelivery =
                 $data['requires_delivery'] ?? false;
 
@@ -138,7 +173,18 @@ class PackageService
                 destinationState:
                     $data['destination_state'] ?? null,
                 requiresDelivery: $requiresDelivery,
+                discountPercentage:
+                    $data['discount_percentage'] ?? 0.0,
             );
+
+            // El monto COD siempre es el total calculado por
+            // TariffService, nunca lo que venga en $data: ese valor
+            // viene de un campo del formulario (Ally\PackageCreate)
+            // que un request manipulado podría alterar para cobrar de
+            // más o de menos en destino.
+            $codAmountUsd = $isCod
+                ? $pricing['total_price_usd']
+                : null;
 
             $commission = $this->calculateCommission(
                 $data['ally_id'],
@@ -284,7 +330,7 @@ class PackageService
             return $package;
         });
 
-        $this->notifyStatusChange($package, Package::STATUS_RECIBIDO_AGENCIA);
+        $this->notifyPackageCreated($package);
 
         return $package;
     }
@@ -487,6 +533,10 @@ class PackageService
 
             Package::STATUS_RECOLECTADO_VENEXPRESS => [
                 Package::STATUS_EN_HUB,
+                // Un repartidor de tipo Delivery recolecta directo en
+                // la agencia y arranca el reparto a domicilio sin pasar
+                // por el HUB (PackageDetail::startDelivery()).
+                Package::STATUS_EN_TRANSITO_NACIONAL,
             ],
 
             Package::STATUS_EN_HUB => [
@@ -678,7 +728,16 @@ class PackageService
                 );
             }
 
-            if ($locked->isClaimedForDelivery()) {
+            // isClaimedForDelivery() no basta aquí: solo es cierto
+            // cuando delivery_status === DELIVERY_ACCEPTED, pero un
+            // paquete también puede tener driver_id asignado por la
+            // ruta de un chofer de HUB/reparto (registerCollection(),
+            // DeliveryAssignmentService::assign()) sin tocar
+            // delivery_status. Si solo miráramos isClaimedForDelivery()
+            // aquí, ese paquete se vería como "libre" y otro repartidor
+            // distinto podría reclamarlo mientras el primero todavía lo
+            // tiene físicamente.
+            if ($locked->driver_id !== null) {
                 if ((int) $locked->driver_id === (int) $driver->id) {
                     // Ya lo tenía él mismo: no es un error, solo lo devolvemos.
                     return $locked->fresh();
@@ -924,6 +983,13 @@ class PackageService
                 );
             }
 
+            // Igual que completeDelivery(): un repartidor suspendido o
+            // rechazado no puede seguir registrando cobros aunque su
+            // token todavía no se haya revocado.
+            if ($driver !== null && $driver->status !== Driver::STATUS_ACTIVE) {
+                throw new RuntimeException('El repartidor no está activo.');
+            }
+
             if (! $locked->is_cod) {
                 throw new RuntimeException('Este paquete no tiene COD.');
             }
@@ -946,6 +1012,19 @@ class PackageService
                 'cod_collected_at' => now(),
                 'cod_collected_by_user_id' => $userId,
             ]);
+
+            // Igual que completeDelivery()/scanCollection(): toda
+            // acción que cambia algo relevante del paquete deja un
+            // renglón en el historial, para que el cierre de caja y
+            // la conciliación tengan de dónde reconstruir cuándo se
+            // cobró el COD.
+            $this->recordHistory(
+                package: $locked,
+                status: $locked->current_status,
+                userId: $userId,
+                locationDescription: 'Cobro COD registrado',
+                eventType: PackageHistory::EVENT_MOVIMIENTO,
+            );
 
             return $locked->fresh();
         });

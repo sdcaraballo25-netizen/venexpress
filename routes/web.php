@@ -15,12 +15,15 @@ use App\Livewire\Admin\DriverAssignment;
 use App\Livewire\Admin\DriverPayments;
 use App\Livewire\Admin\DriverRemunerationManager;
 use App\Livewire\Admin\DriversApprovalManager;
+use App\Livewire\Admin\EmprendedoresApprovalManager;
 use App\Livewire\Admin\HelpCenter as AdminHelpCenter;
 use App\Livewire\Admin\IncidentsManager;
 use App\Livewire\Admin\PackageDispatch;
 use App\Livewire\Admin\PaymentOrders;
 use App\Livewire\Admin\RateMatrixManager;
 use App\Livewire\Admin\RecommendationsManager;
+use App\Livewire\Admin\RemunerationsSummary;
+use App\Livewire\Admin\Reports as AdminReports;
 use App\Livewire\Admin\RoutesDashboard;
 use App\Livewire\Admin\RoutesManager;
 use App\Livewire\Admin\UsersManager;
@@ -29,6 +32,7 @@ use App\Livewire\Ally\Cod as AllyCod;
 use App\Livewire\Ally\Commissions as AllyCommissions;
 use App\Livewire\Ally\DailyCashCut;
 use App\Livewire\Ally\Dashboard as AllyDashboard;
+use App\Livewire\Ally\EmprendedorPedidos as AllyEmprendedorPedidos;
 use App\Livewire\Ally\HelpCenter as AllyHelpCenter;
 use App\Livewire\Ally\Incidents as AllyIncidents;
 use App\Livewire\Ally\PackageCreate as AllyPackageCreate;
@@ -40,7 +44,16 @@ use App\Livewire\Ally\SalesCloseout as AllySalesCloseout;
 use App\Livewire\Ally\StaffManager as AllyStaffManager;
 use App\Livewire\Almacen\Dashboard as AlmacenDashboard;
 use App\Livewire\Almacen\HelpCenter as AlmacenHelpCenter;
+use App\Livewire\Emprendedor\Dashboard as EmprendedorDashboard;
+use App\Livewire\Emprendedor\Pedidos as EmprendedorPedidos;
+use App\Livewire\Emprendedor\PedidoShow as EmprendedorPedidoShow;
+use App\Livewire\Emprendedor\Perfil as EmprendedorPerfil;
+use App\Livewire\Emprendedor\Productos as EmprendedorProductos;
+use App\Livewire\Public\Marketplace;
+use App\Livewire\Public\PedidoChat;
+use App\Livewire\Client\Compras as ClientCompras;
 use App\Livewire\Client\Dashboard as ClientDashboard;
+use App\Livewire\Client\HelpCenter as ClientHelpCenter;
 use App\Livewire\Client\Incidents as ClientIncidents;
 use App\Livewire\Client\PendingPayments as ClientPendingPayments;
 use App\Livewire\Driver\AppDownload;
@@ -51,10 +64,14 @@ use App\Livewire\Driver\Packages;
 use App\Livewire\Driver\RouteDetail;
 use App\Livewire\Driver\RouteHistory;
 use App\Livewire\Driver\Scanner;
+use App\Livewire\Profile\Show as ProfileShow;
+use App\Livewire\Recommendations\Create as RecommendationCreate;
 use App\Livewire\Public\HelpCenter;
 use App\Livewire\Public\OfficeLocator;
 use App\Livewire\Public\PriceCalculator;
+use App\Livewire\Public\PrivacyPolicy;
 use App\Livewire\Public\RecommendationForm;
+use App\Livewire\Public\TermsAndConditions;
 use Illuminate\Support\Facades\Route;
 
 /*
@@ -88,6 +105,9 @@ Route::prefix('ally')
 
         Route::get('/pedidos/nuevo', AllyPackageCreate::class)
             ->name('packages.create');
+
+        Route::get('/pedidos-emprendedores', AllyEmprendedorPedidos::class)
+            ->name('emprendedor-pedidos');
 
         Route::get('/comisiones', AllyCommissions::class)
             ->middleware('role:aliado')
@@ -183,9 +203,19 @@ Route::view('dashboard', 'dashboard')
 |--------------------------------------------------------------------------
 */
 
-Route::view('profile', 'profile')
+Route::get('profile', ProfileShow::class)
     ->middleware(['auth'])
     ->name('profile');
+
+/*
+|--------------------------------------------------------------------------
+| Recomendaciones (usuario autenticado)
+|--------------------------------------------------------------------------
+*/
+
+Route::get('mis-recomendaciones', RecommendationCreate::class)
+    ->middleware(['auth'])
+    ->name('recommendations.create');
 
 /*
 |--------------------------------------------------------------------------
@@ -209,11 +239,17 @@ Route::prefix('cliente')
         Route::get('/dashboard', ClientDashboard::class)
             ->name('dashboard');
 
+        Route::get('/mis-compras', ClientCompras::class)
+            ->name('compras');
+
         Route::get('/incidencias', ClientIncidents::class)
             ->name('incidents');
 
         Route::get('/pagos-pendientes', ClientPendingPayments::class)
             ->name('pending-payments');
+
+        Route::get('/ayuda', ClientHelpCenter::class)
+            ->name('help');
     });
 
 /*
@@ -296,6 +332,47 @@ Route::get('/almacen/ayuda', AlmacenHelpCenter::class)
 
 /*
 |--------------------------------------------------------------------------
+| Emprendedor (marketplace)
+|--------------------------------------------------------------------------
+*/
+
+Route::get('/emprendedor/dashboard', EmprendedorDashboard::class)
+    ->middleware(['auth', 'verified', 'role:emprendedor', 'account.approved'])
+    ->name('emprendedor.dashboard');
+
+Route::get('/emprendedor/productos', EmprendedorProductos::class)
+    ->middleware(['auth', 'verified', 'role:emprendedor', 'account.approved'])
+    ->name('emprendedor.productos');
+
+Route::get('/emprendedor/pedidos', EmprendedorPedidos::class)
+    ->middleware(['auth', 'verified', 'role:emprendedor', 'account.approved'])
+    ->name('emprendedor.pedidos');
+
+Route::get('/emprendedor/pedidos/{pedidoId}', EmprendedorPedidoShow::class)
+    ->middleware(['auth', 'verified', 'role:emprendedor', 'account.approved'])
+    ->name('emprendedor.pedidos.show');
+
+Route::get('/emprendedor/perfil', EmprendedorPerfil::class)
+    ->middleware(['auth', 'verified', 'role:emprendedor', 'account.approved'])
+    ->name('emprendedor.perfil');
+
+/*
+|--------------------------------------------------------------------------
+| Tienda pública (marketplace)
+|--------------------------------------------------------------------------
+*/
+
+Route::get('/tienda', Marketplace::class)
+    ->name('public.marketplace');
+
+Route::get('/tienda/emprendedor/{emprendedor}', Marketplace::class)
+    ->name('public.marketplace.store');
+
+Route::get('/tienda/pedido/{token}', PedidoChat::class)
+    ->name('public.marketplace.pedido');
+
+/*
+|--------------------------------------------------------------------------
 | Rastreo público
 |--------------------------------------------------------------------------
 */
@@ -324,6 +401,18 @@ Route::get('/calcular-precio', PriceCalculator::class)
 
 Route::get('/agencias', OfficeLocator::class)
     ->name('public.offices');
+
+/*
+|--------------------------------------------------------------------------
+| Legal (público)
+|--------------------------------------------------------------------------
+*/
+
+Route::get('/terminos-y-condiciones', TermsAndConditions::class)
+    ->name('public.terms');
+
+Route::get('/politica-de-privacidad', PrivacyPolicy::class)
+    ->name('public.privacy');
 
 /*
 |--------------------------------------------------------------------------
@@ -359,6 +448,15 @@ Route::prefix('admin')
 
         Route::get('/', AdminDashboard::class)
             ->name('dashboard');
+
+        /*
+        |--------------------------------------------------------------------------
+        | Reportes
+        |--------------------------------------------------------------------------
+        */
+
+        Route::get('/reportes', AdminReports::class)
+            ->name('reports');
 
         /*
         |--------------------------------------------------------------------------
@@ -450,8 +548,20 @@ Route::prefix('admin')
         Route::get('/remuneraciones', DriverPayments::class)
             ->name('driver-payments');
 
+        /*
+        |--------------------------------------------------------------------------
+        | Resumen de pagos pendientes (Aliados + Repartidores juntos)
+        |--------------------------------------------------------------------------
+        */
+
+        Route::get('/remuneraciones/resumen', RemunerationsSummary::class)
+            ->name('remunerations-summary');
+
         Route::get('/repartidores/aprobacion', DriversApprovalManager::class)
             ->name('drivers.approval');
+
+        Route::get('/emprendedores/aprobacion', EmprendedoresApprovalManager::class)
+            ->name('emprendedores.approval');
 
         Route::get('/remuneraciones/tarifa', DriverRemunerationManager::class)
             ->name('driver-remuneration-rate');
@@ -554,6 +664,27 @@ Route::get(
 )
     ->middleware(['auth'])
     ->name('allies.documents.storefront');
+
+Route::get(
+    '/aliados/{ally}/documentos/rif',
+    [DocumentPhotoController::class, 'allyRifDocument']
+)
+    ->middleware(['auth'])
+    ->name('allies.documents.rif');
+
+Route::get(
+    '/aliados/{ally}/documentos/registro-mercantil',
+    [DocumentPhotoController::class, 'allyMercantileRegistry']
+)
+    ->middleware(['auth'])
+    ->name('allies.documents.mercantile-registry');
+
+Route::get(
+    '/aliados/{ally}/documentos/cedula-titular',
+    [DocumentPhotoController::class, 'allyOwnerIdDocument']
+)
+    ->middleware(['auth'])
+    ->name('allies.documents.owner-id');
 
 Route::get(
     '/repartidores/{driver}/documentos/licencia',

@@ -2,7 +2,7 @@
 
     {{-- ENCABEZADO --}}
     <div>
-        <h2 class="font-display text-2xl font-semibold text-[#0F172A]">
+        <h2 class="font-display text-2xl font-semibold text-[#111111]">
             Mis pedidos
         </h2>
 
@@ -12,7 +12,7 @@
     </div>
 
     {{-- FILTROS --}}
-    <div class="rounded-2xl border border-[#E2E8F0] bg-white p-5 shadow-sm">
+    <div class="rounded-2xl border border-[#E5E5E0] bg-white p-5 shadow-sm">
 
         <div class="grid grid-cols-1 md:grid-cols-3 gap-4">
 
@@ -79,7 +79,7 @@
     </div>
 
     {{-- LISTADO --}}
-    <div class="rounded-2xl border border-[#E2E8F0] bg-white shadow-sm overflow-hidden">
+    <div class="rounded-2xl border border-[#E5E5E0] bg-white shadow-sm overflow-hidden">
 
         <div class="overflow-x-auto">
 
@@ -147,7 +147,7 @@
                             {{-- REMITENTE --}}
                             <td class="px-5 py-4">
 
-                                <div class="font-medium text-[#0F172A]">
+                                <div class="font-medium text-[#111111]">
                                     {{ $package->sender_name }}
                                 </div>
 
@@ -160,7 +160,7 @@
                             {{-- DESTINATARIO --}}
                             <td class="px-5 py-4">
 
-                                <div class="font-medium text-[#0F172A]">
+                                <div class="font-medium text-[#111111]">
                                     {{ $package->recipient_name }}
                                 </div>
 
@@ -173,7 +173,7 @@
                             {{-- DESTINO --}}
                             <td class="px-5 py-4">
 
-                                <div class="font-medium text-[#0F172A]">
+                                <div class="font-medium text-[#111111]">
                                     {{ $package->destination_city }}
                                 </div>
 
@@ -275,7 +275,7 @@
                                 colspan="8"
                                 class="px-5 py-12 text-center"
                             >
-                                <p class="font-medium text-[#0F172A]">
+                                <p class="font-medium text-[#111111]">
                                     No hay pedidos para mostrar.
                                 </p>
 

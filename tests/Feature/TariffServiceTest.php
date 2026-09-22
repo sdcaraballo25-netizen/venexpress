@@ -7,8 +7,10 @@ use App\Models\CityDistance;
 use App\Models\Package;
 use App\Models\RateMatrix;
 use App\Services\TariffService;
+use Carbon\Carbon;
 use Illuminate\Foundation\Testing\RefreshDatabase;
 use InvalidArgumentException;
+use RuntimeException;
 use Tests\TestCase;
 
 class TariffServiceTest extends TestCase
@@ -109,6 +111,40 @@ class TariffServiceTest extends TestCase
         $this->assertSame(200.00, $result['total_price_ves']);
     }
 
+    public function test_calculate_applies_the_emprendedor_discount_to_the_total_and_its_ves_conversion(): void
+    {
+        $result = $this->service->calculate(
+            originCity: 'Caracas',
+            destinationCity: 'Valencia',
+            packageType: Package::TYPE_PAQUETE,
+            physicalWeightKg: 3.0,
+            originState: 'Distrito Capital',
+            destinationState: 'Carabobo',
+            discountPercentage: 20.0,
+        );
+
+        // Sin descuento el total es 5.00 (ver test end-to-end de arriba);
+        // con 20% de descuento: 5.00 * 0.8 = 4.00, y su conversión a
+        // bolívares parte de ese mismo total ya descontado.
+        $this->assertSame(4.00, $result['total_price_usd']);
+        $this->assertSame(160.00, $result['total_price_ves']);
+    }
+
+    public function test_calculate_rejects_a_discount_percentage_outside_of_zero_to_one_hundred(): void
+    {
+        $this->expectException(InvalidArgumentException::class);
+
+        $this->service->calculate(
+            originCity: 'Caracas',
+            destinationCity: 'Valencia',
+            packageType: Package::TYPE_PAQUETE,
+            physicalWeightKg: 3.0,
+            originState: 'Distrito Capital',
+            destinationState: 'Carabobo',
+            discountPercentage: 150.0,
+        );
+    }
+
     public function test_calculate_applies_fragile_and_insurance_and_delivery_surcharges(): void
     {
         $result = $this->service->calculate(
@@ -186,5 +222,45 @@ class TariffServiceTest extends TestCase
         );
 
         $this->assertSame(0, $result['distance_km']);
+    }
+
+    /**
+     * calculate() obtiene la tasa BCV a través de
+     * BcvRateService::getCurrentRate(), que ahora bloquea con una
+     * excepción si esa tasa es demasiado vieja (ver
+     * BcvRateServiceTest). Este test confirma que el bloqueo
+     * realmente se propaga hasta calculate(), no solo hasta el
+     * servicio de la tasa.
+     */
+    public function test_calculate_rejects_a_stale_bcv_rate(): void
+    {
+        config(['services.bcv_api.max_age_hours' => 48]);
+
+        // Miércoles 3pm, tasa del lunes 1pm de la misma semana: 50
+        // horas, todas hábiles (sin fin de semana de por medio), para
+        // que el resultado no dependa de qué día real corra la suite.
+        Carbon::setTestNow(Carbon::parse('next Wednesday 15:00:00'));
+        $effectiveAt = Carbon::now()->subHours(50);
+
+        BcvRate::query()->update([
+            'effective_at' => $effectiveAt,
+            'effective_date' => $effectiveAt->toDateString(),
+        ]);
+
+        $this->expectException(RuntimeException::class);
+        $this->expectExceptionMessage('La tasa BCV vigente tiene');
+
+        try {
+            $this->service->calculate(
+                originCity: 'Caracas',
+                destinationCity: 'Valencia',
+                packageType: Package::TYPE_PAQUETE,
+                physicalWeightKg: 3.0,
+                originState: 'Distrito Capital',
+                destinationState: 'Carabobo',
+            );
+        } finally {
+            Carbon::setTestNow();
+        }
     }
 }

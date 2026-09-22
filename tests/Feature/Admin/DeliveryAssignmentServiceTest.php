@@ -8,6 +8,7 @@ use App\Models\Route;
 use App\Models\User;
 use App\Services\DeliveryAssignmentService;
 use App\Services\PackageService;
+use App\Services\RouteService;
 use Illuminate\Foundation\Testing\RefreshDatabase;
 use RuntimeException;
 use Tests\Feature\Concerns\CreatesTestPackages;
@@ -79,6 +80,60 @@ class DeliveryAssignmentServiceTest extends TestCase
         );
 
         $this->assertSame(Package::STATUS_ENTREGADO, $delivered->current_status);
+    }
+
+    /**
+     * assign() no pasa por ninguna RouteStop, así que
+     * packageIdsCollectedOnRoute() nunca lo veía. Antes de este fix,
+     * cancelar la ruta después de asignar el paquete no liberaba su
+     * driver_id (releasePendingCustodyFor() no lo encontraba), y
+     * completar la ruta tampoco se bloqueaba aunque el paquete jamás
+     * llegara a ENTREGADO (pendingPackagesCountFor() tampoco lo veía).
+     */
+    public function test_cancelling_a_route_releases_a_package_assigned_via_delivery_assignment_service(): void
+    {
+        $admin = User::factory()->create([
+            'role' => User::ROLE_ADMIN_PRINCIPAL,
+            'status' => User::STATUS_ACTIVE,
+        ]);
+
+        $driverUser = User::factory()->create([
+            'role' => User::ROLE_REPARTIDOR,
+            'status' => User::STATUS_ACTIVE,
+        ]);
+
+        $driver = Driver::factory()->create([
+            'user_id' => $driverUser->id,
+            'status' => Driver::STATUS_ACTIVE,
+            'driver_type' => Driver::TYPE_DELIVERY,
+        ]);
+
+        $route = Route::create([
+            'city' => 'Valencia',
+            'state' => 'Carabobo',
+            'name' => 'Ruta de reparto de prueba',
+            'driver_id' => $driver->id,
+            'created_by' => $admin->id,
+            'status' => Route::STATUS_IN_PROGRESS,
+            'route_type' => Route::TYPE_DELIVERY,
+        ]);
+
+        $ally = $this->createAlly();
+
+        $package = $this->createPackage($ally, [
+            'requires_delivery' => true,
+            'destination_city' => 'Valencia',
+            'current_status' => Package::STATUS_LISTO_RETIRO,
+            'delivery_status' => Package::DELIVERY_ACCEPTED,
+        ]);
+
+        $assigned = app(DeliveryAssignmentService::class)->assign($package, $route, $admin->id);
+        $this->assertSame($driver->id, $assigned->driver_id);
+        $this->assertSame(Package::STATUS_EN_TRANSITO_NACIONAL, $assigned->current_status);
+
+        app(RouteService::class)->cancel($route, $admin->id);
+
+        $this->assertNull($assigned->fresh()->driver_id);
     }
 
     public function test_assign_rejects_a_package_that_is_not_listo_retiro(): void

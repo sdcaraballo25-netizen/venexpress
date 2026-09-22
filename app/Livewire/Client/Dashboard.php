@@ -4,6 +4,7 @@ namespace App\Livewire\Client;
 
 use App\Models\AuditLog;
 use App\Models\Customer;
+use App\Models\Incident;
 use App\Models\Package;
 use Illuminate\Support\Facades\Auth;
 use Livewire\Attributes\Layout;
@@ -138,6 +139,12 @@ class Dashboard extends Component
      * paquetes de otros id_doc asociados al mismo correo. Ahora se
      * consideran TODOS los id_doc registrados con ese correo.
      *
+     * También se incluye, aparte, el id_doc vinculado por user_id
+     * (la cédula con la que este usuario se registró — ver
+     * register.blade.php): así nunca pierde acceso a su propio
+     * historial si más tarde cambia el email de su cuenta desde su
+     * perfil, aunque el Customer todavía tenga el email viejo.
+     *
      * @return list<string>
      */
     protected function customerIdDocsForCurrentUser(): array
@@ -146,7 +153,10 @@ class Dashboard extends Component
 
         return Customer::query()
             ->where('email', $user->email)
+            ->orWhere('user_id', $user->id)
             ->pluck('id_doc')
+            ->unique()
+            ->values()
             ->all();
     }
 
@@ -199,46 +209,73 @@ class Dashboard extends Component
     {
         $idDocs = $this->customerIdDocsForCurrentUser();
 
+        // whereIn()/orWhereIn() con un array vacío ya compilan a "sin
+        // resultados" de forma segura en Laravel, así que no hace
+        // falta (ni conviene) ramificar por separado el caso "$idDocs
+        // vacío": antes, ese caso especial dejaba $historyPackages en
+        // null en vez de un paginador vacío, y la vista de Historial
+        // (que llama ->isEmpty() y ->links() incondicionalmente)
+        // reventaba para cualquier cliente sin ningún id_doc asociado
+        // todavía.
+        $baseQuery = fn () => Package::query()
+            ->where(function ($query) use ($idDocs) {
+                $query->whereIn('recipient_id_doc', $idDocs)
+                    ->orWhereIn('sender_id_doc', $idDocs);
+            });
+
         $packages = collect();
         $historyPackages = null;
 
-        if (! empty($idDocs)) {
-            $baseQuery = fn () => Package::query()
-                ->where(function ($query) use ($idDocs) {
-                    $query->whereIn('recipient_id_doc', $idDocs)
-                        ->orWhereIn('sender_id_doc', $idDocs);
-                });
-
-            if ($this->activeTab === self::TAB_HISTORY) {
-                $historyPackages = $baseQuery()
-                    ->where('current_status', Package::STATUS_ENTREGADO)
-                    ->when(
-                        $this->historyFrom !== '',
-                        fn ($q) => $q->whereDate('delivery_completed_at', '>=', $this->historyFrom)
-                    )
-                    ->when(
-                        $this->historyTo !== '',
-                        fn ($q) => $q->whereDate('delivery_completed_at', '<=', $this->historyTo)
-                    )
-                    ->with(['histories', 'incidents'])
-                    ->orderByDesc('delivery_completed_at')
-                    ->paginate(10)
-                    ->through(fn (Package $package) => $this->withClientRole($package, $idDocs));
-            } else {
-                $packages = $baseQuery()
-                    ->where('current_status', '!=', Package::STATUS_ENTREGADO)
-                    ->with(['histories', 'incidents'])
-                    ->latest()
-                    ->get()
-                    ->map(fn (Package $package) => $this->withClientRole($package, $idDocs));
-            }
+        if ($this->activeTab === self::TAB_HISTORY) {
+            $historyPackages = $baseQuery()
+                ->where('current_status', Package::STATUS_ENTREGADO)
+                ->when(
+                    $this->historyFrom !== '',
+                    fn ($q) => $q->whereDate('delivery_completed_at', '>=', $this->historyFrom)
+                )
+                ->when(
+                    $this->historyTo !== '',
+                    fn ($q) => $q->whereDate('delivery_completed_at', '<=', $this->historyTo)
+                )
+                ->with(['histories', 'incidents'])
+                ->orderByDesc('delivery_completed_at')
+                ->paginate(10)
+                ->through(fn (Package $package) => $this->withClientRole($package, $idDocs));
+        } else {
+            $packages = $baseQuery()
+                ->where('current_status', '!=', Package::STATUS_ENTREGADO)
+                ->with(['histories', 'incidents'])
+                ->latest()
+                ->get()
+                ->map(fn (Package $package) => $this->withClientRole($package, $idDocs));
         }
+
+        // Datos para la franja de accesos rápidos del encabezado
+        // (mismo criterio que PendingPayments.php/Incidents.php, no se
+        // duplica la lógica de negocio, solo el conteo).
+        $pendingPaymentsPackages = empty($idDocs)
+            ? collect()
+            : Package::query()
+                ->whereIn('recipient_id_doc', $idDocs)
+                ->where('is_cod', true)
+                ->where('cod_status', Package::COD_PENDIENTE)
+                ->get();
+
+        $openIncidentsCount = Incident::query()
+            ->where('reported_by_user_id', Auth::id())
+            ->where('status', Incident::STATUS_OPEN)
+            ->count();
 
         return view(
             'livewire.client.dashboard',
             [
                 'packages' => $packages,
                 'historyPackages' => $historyPackages,
+                'pendingPaymentsCount' => $pendingPaymentsPackages->count(),
+                'pendingPaymentsTotalUsd' => $pendingPaymentsPackages->sum(
+                    fn (Package $package) => (float) $package->cod_amount_usd
+                ),
+                'openIncidentsCount' => $openIncidentsCount,
             ]
         );
     }

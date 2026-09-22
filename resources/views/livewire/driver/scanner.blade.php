@@ -20,7 +20,7 @@
                 </span>
             @endif
 
-            <h2 class="mt-2 font-display text-2xl font-semibold text-[#0F172A]">
+            <h2 class="mt-2 font-display text-2xl font-semibold text-[#111111]">
                 Escanear guía
             </h2>
             <p class="text-sm text-slate-500">
@@ -43,13 +43,13 @@
     </div>
 
     @if ($activeRoute && $operationTitle)
-        <div class="rounded-2xl border border-[#E2E8F0] bg-white p-5 shadow-sm">
+        <div class="rounded-2xl border border-[#E5E5E0] bg-white p-5 shadow-sm">
             <div class="grid grid-cols-2 gap-4 sm:grid-cols-5">
                 <div>
                     <p class="text-xs font-bold uppercase tracking-wider text-slate-400">
                         Ruta
                     </p>
-                    <p class="mt-1 text-sm font-semibold text-[#0F172A]">
+                    <p class="mt-1 text-sm font-semibold text-[#111111]">
                         {{ $activeRoute->name }}
                     </p>
                 </div>
@@ -62,7 +62,7 @@
                             Almacén destino
                         @endif
                     </p>
-                    <p class="mt-1 text-sm font-semibold text-[#0F172A]">
+                    <p class="mt-1 text-sm font-semibold text-[#111111]">
                         {{ $contextStop?->ally?->business_name ?? $contextStop?->warehouse?->name ?? '—' }}
                     </p>
                 </div>
@@ -71,7 +71,7 @@
                     <p class="text-xs font-bold uppercase tracking-wider text-slate-400">
                         Ciudad
                     </p>
-                    <p class="mt-1 text-sm font-semibold text-[#0F172A]">
+                    <p class="mt-1 text-sm font-semibold text-[#111111]">
                         {{ $contextStop?->ally?->city ?? $contextStop?->warehouse?->city ?? $activeRoute->city }}
                     </p>
                 </div>
@@ -80,7 +80,7 @@
                     <p class="text-xs font-bold uppercase tracking-wider text-slate-400">
                         Pendientes
                     </p>
-                    <p class="mt-1 text-sm font-semibold text-[#0F172A]">
+                    <p class="mt-1 text-sm font-semibold text-[#111111]">
                         {{ $pendingCount ?? '—' }}
                     </p>
                 </div>
@@ -89,7 +89,7 @@
                     <p class="text-xs font-bold uppercase tracking-wider text-slate-400">
                         Procesados
                     </p>
-                    <p class="mt-1 text-sm font-semibold text-[#0F172A]">
+                    <p class="mt-1 text-sm font-semibold text-[#111111]">
                         {{ $processedCount }}
                     </p>
                 </div>
@@ -99,8 +99,8 @@
 
     <div class="grid grid-cols-1 gap-6 lg:grid-cols-2">
 
-        <div class="rounded-2xl border border-[#E2E8F0] bg-white p-6 shadow-sm">
-            <h3 class="font-display text-lg font-semibold text-[#0F172A]">
+        <div class="rounded-2xl border border-[#E5E5E0] bg-white p-6 shadow-sm">
+            <h3 class="font-display text-lg font-semibold text-[#111111]">
                 Lector QR
             </h3>
 
@@ -156,7 +156,7 @@
             </form>
         </div>
 
-        <div class="rounded-2xl border border-[#E2E8F0] bg-white p-6 shadow-sm">
+        <div class="rounded-2xl border border-[#E5E5E0] bg-white p-6 shadow-sm">
 
             @if ($package)
 
@@ -165,7 +165,7 @@
                         <p class="text-xs font-medium uppercase tracking-wide text-slate-400">
                             Guía
                         </p>
-                        <h3 class="mt-1 font-display text-xl font-semibold text-[#0F172A]">
+                        <h3 class="mt-1 font-display text-xl font-semibold text-[#111111]">
                             {{ $package->tracking_number }}
                         </h3>
                     </div>
@@ -403,7 +403,7 @@
                         </svg>
                     </div>
 
-                    <h3 class="mt-5 font-display text-lg font-semibold text-[#0F172A]">
+                    <h3 class="mt-5 font-display text-lg font-semibold text-[#111111]">
                         Ninguna guía seleccionada
                     </h3>
 

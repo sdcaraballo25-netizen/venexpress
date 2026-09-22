@@ -68,8 +68,11 @@ class DriverHubDistributionController extends Controller
             ], 404);
         }
 
+        $scanService = app(LogisticsScanService::class);
+        $canAccess = $scanService->canDriverAccessPackage($package, $driver);
+
         try {
-            $package = app(LogisticsScanService::class)->scanHubDeparture(
+            $package = $scanService->scanHubDeparture(
                 package: $package,
                 driver: $driver,
                 userId: (int) Auth::id(),
@@ -80,10 +83,14 @@ class DriverHubDistributionController extends Controller
                 'package' => new DriverPackageResource($package),
             ]);
         } catch (RuntimeException $e) {
-            return response()->json([
+            // No se filtra la PII del paquete (remitente/destinatario)
+            // en una respuesta de error a menos que el paquete
+            // realmente le toque a este repartidor — el mensaje de
+            // error sigue siendo el mismo que antes.
+            return response()->json(array_filter([
                 'message' => $e->getMessage(),
-                'package' => new DriverPackageResource($package),
-            ], 422);
+                'package' => $canAccess ? new DriverPackageResource($package) : null,
+            ], fn ($v) => $v !== null), 422);
         }
     }
 
@@ -108,8 +115,11 @@ class DriverHubDistributionController extends Controller
             ], 404);
         }
 
+        $scanService = app(LogisticsScanService::class);
+        $canAccess = $scanService->canDriverAccessPackage($package, $driver);
+
         try {
-            $package = app(LogisticsScanService::class)->scanHubArrival(
+            $package = $scanService->scanHubArrival(
                 package: $package,
                 driver: $driver,
                 userId: (int) Auth::id(),
@@ -120,10 +130,10 @@ class DriverHubDistributionController extends Controller
                 'package' => new DriverPackageResource($package),
             ]);
         } catch (RuntimeException $e) {
-            return response()->json([
+            return response()->json(array_filter([
                 'message' => $e->getMessage(),
-                'package' => new DriverPackageResource($package),
-            ], 422);
+                'package' => $canAccess ? new DriverPackageResource($package) : null,
+            ], fn ($v) => $v !== null), 422);
         }
     }
 }

@@ -2,21 +2,23 @@
 
 namespace App\Livewire\Public;
 
+use App\Livewire\Concerns\ResolvesLayoutForViewer;
 use App\Models\Ally;
 use Livewire\Attributes\Computed;
-use Livewire\Attributes\Layout;
 use Livewire\Component;
 
 /**
- * Localizador público de agencias aliadas.
- *
- * Muestra únicamente las agencias con status ACTIVO y coordenadas
- * cargadas (ver Ally::scopePubliclyVisible). Las coordenadas se
- * cargan desde el panel admin (AlliesManager::editLocation).
+ * Localizador de agencias aliadas. Muestra únicamente las agencias
+ * con status ACTIVO y coordenadas cargadas (ver
+ * Ally::scopePubliclyVisible); las coordenadas se cargan desde el
+ * panel admin (AlliesManager::editLocation). También se enlaza desde
+ * el menú de un usuario logueado, que ve esta misma página dentro del
+ * layout de su propio panel — ver ResolvesLayoutForViewer.
  */
-#[Layout('layouts.public', ['title' => 'Agencias aliadas — Venexpress'])]
 class OfficeLocator extends Component
 {
+    use ResolvesLayoutForViewer;
+
     public string $state = '';
 
     public string $search = '';
@@ -149,6 +151,9 @@ class OfficeLocator extends Component
             'mapPoints' => $this->mapPoints(),
             'userLat' => $this->userLat,
             'userLng' => $this->userLng,
-        ]);
+        ])->layout(
+            $this->resolveLayoutForViewer(),
+            ['title' => 'Agencias aliadas — Venexpress']
+        );
     }
 }

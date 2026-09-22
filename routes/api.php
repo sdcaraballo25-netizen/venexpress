@@ -28,6 +28,10 @@ Route::prefix('driver')
             'auth:sanctum',
             'ability:driver',
             'role:repartidor',
+            // Sin esto, un token válido podía usarse para automatizar
+            // cientos de peticiones por segundo (p. ej. enumerar
+            // números de guía en /packages/lookup) sin ningún límite.
+            'throttle:120,1',
         ])->group(function () {
 
             Route::post('/logout', [DriverAuthController::class, 'logout'])

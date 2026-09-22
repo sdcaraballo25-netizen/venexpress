@@ -6,6 +6,7 @@ use App\Models\Customer;
 use App\Models\Package;
 use Illuminate\Support\Facades\Auth;
 use Livewire\Attributes\Layout;
+use Livewire\Attributes\Title;
 use Livewire\Component;
 
 /**
@@ -30,6 +31,7 @@ use Livewire\Component;
  * de extensión documentado.
  */
 #[Layout('layouts.client')]
+#[Title('Pagos')]
 class PendingPayments extends Component
 {
     /**
@@ -39,9 +41,15 @@ class PendingPayments extends Component
     {
         $user = Auth::user();
 
+        // También se incluye el id_doc vinculado por user_id (la
+        // cédula con la que este usuario se registró), para que no
+        // pierda acceso si cambia el email de su cuenta más tarde.
         return Customer::query()
             ->where('email', $user->email)
+            ->orWhere('user_id', $user->id)
             ->pluck('id_doc')
+            ->unique()
+            ->values()
             ->all();
     }
 

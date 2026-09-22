@@ -5,6 +5,7 @@ namespace App\Http\Controllers\Api;
 use App\Http\Controllers\Controller;
 use App\Http\Resources\IncidentResource;
 use App\Models\AuditLog;
+use App\Models\Driver;
 use App\Models\Incident;
 use App\Models\Package;
 use Illuminate\Http\JsonResponse;
@@ -49,6 +50,10 @@ class DriverIncidentController extends Controller
     public function store(Request $request, int $packageId): JsonResponse
     {
         $driver = $this->driver();
+
+        if ($driver->status !== Driver::STATUS_ACTIVE) {
+            abort(403, 'Solo un repartidor activo puede reportar incidencias.');
+        }
 
         $validated = $request->validate([
             'type' => ['required', 'string', 'in:' . implode(',', self::TYPES)],

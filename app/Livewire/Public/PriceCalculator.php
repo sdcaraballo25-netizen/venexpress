@@ -2,24 +2,25 @@
 
 namespace App\Livewire\Public;
 
+use App\Livewire\Concerns\ResolvesLayoutForViewer;
 use App\Models\Package;
 use App\Services\TariffService;
 use App\Services\VenezuelaLocationService;
 use Livewire\Attributes\Computed;
-use Livewire\Attributes\Layout;
 use Livewire\Component;
 
 /**
- * Calculadora pública de precio de envío.
- *
- * Vive fuera de cualquier middleware de auth: cualquier visitante
- * de la web puede simular cuánto costaría su envío antes de
- * acercarse a una agencia aliada. Usa el mismo TariffService que
+ * Calculadora de precio de envío. Vive fuera de cualquier middleware
+ * de auth (cualquier visitante puede usarla), pero también se enlaza
+ * desde el menú de un usuario ya logueado — en ese caso se renderiza
+ * dentro del layout de su propio panel en vez del layout público, ver
+ * ResolvesLayoutForViewer. Usa el mismo TariffService que
  * PackageCreate para que el precio mostrado sea siempre real.
  */
-#[Layout('layouts.public', ['title' => 'Calcula tu envío — Venexpress'])]
 class PriceCalculator extends Component
 {
+    use ResolvesLayoutForViewer;
+
     // Ruta
     public string $origin_state = '';
     public string $origin_city = '';
@@ -158,6 +159,10 @@ class PriceCalculator extends Component
 
     public function render()
     {
-        return view('public.price-calculator');
+        return view('public.price-calculator')
+            ->layout(
+                $this->resolveLayoutForViewer(),
+                ['title' => 'Calcula tu envío — Venexpress']
+            );
     }
 }

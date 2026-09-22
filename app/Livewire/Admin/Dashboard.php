@@ -9,6 +9,7 @@ use App\Models\DriverPayment;
 use App\Models\Incident;
 use App\Models\Package;
 use App\Models\User;
+use App\Services\BcvRateService;
 use Illuminate\Support\Facades\DB;
 use Livewire\Attributes\Layout;
 use Livewire\Attributes\Title;
@@ -173,13 +174,27 @@ class Dashboard extends Component
         |--------------------------------------------------------------------------
         */
 
+        $currentRate = BcvRate::current();
+
+        // 24 horas HÁBILES (BcvRateService::businessHoursAge() no
+        // cuenta fin de semana, porque el BCV no publica esos días):
+        // un día hábil entero completo sin ninguna sincronización
+        // exitosa ya es señal real de que algo está fallando — más
+        // allá del correo de aviso que manda SyncBcvRate al fallar,
+        // esto se ve incluso si el cron del scheduler nunca llegó a
+        // correr en el servidor, algo que ese correo no puede
+        // detectar por sí solo.
+        $bcvRateIsStale = $currentRate
+            && app(BcvRateService::class)->businessHoursAge($currentRate) >= 24;
+
         return view('livewire.admin.dashboard', [
 
             // Paquetes
             'totalPackages' => $totalPackages,
             'statusCounts' => $statusCounts,
             'statuses' => Package::STATUSES,
-            'currentRate' => BcvRate::current(),
+            'currentRate' => $currentRate,
+            'bcvRateIsStale' => $bcvRateIsStale,
             'recentPackages' => $recentPackages,
 
             // Aliados

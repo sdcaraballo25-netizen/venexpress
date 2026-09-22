@@ -5,6 +5,7 @@ namespace App\Livewire\Admin;
 use App\Models\AuditLog;
 use App\Models\BcvRate;
 use App\Services\BcvRateService;
+use Carbon\Carbon;
 use Illuminate\Support\Facades\DB;
 use Livewire\Attributes\Layout;
 use Livewire\Attributes\Title;
@@ -49,6 +50,38 @@ class BcvRateManager extends Component
         $this->effective_date = now()->format('Y-m-d');
     }
 
+    /**
+     * BcvRate::current() decide la tasa vigente ordenando por
+     * effective_at (no por effective_date), justamente para poder
+     * distinguir dos tasas publicadas el mismo día. Si aquí siempre
+     * usáramos now(), un admin corrigiendo una tasa de una fecha
+     * pasada la volvería "vigente" al instante sin importar qué fecha
+     * eligió. Para la fecha de hoy usamos now() (para que una
+     * corrección manual de hoy sí desplace a la sincronización
+     * automática de hoy); para cualquier otra fecha usamos el final de
+     * ese día, así ordena correctamente contra tasas de otros días.
+     */
+    protected function resolveEffectiveAt(?BcvRate $existing = null): Carbon
+    {
+        $date = Carbon::parse($this->effective_date);
+
+        if ($date->isToday()) {
+            return now();
+        }
+
+        // Si estamos editando y la fecha de vigencia no cambió, no
+        // tocamos el effective_at existente: pudo venir de una
+        // sincronización automática con hora precisa (ej. la
+        // publicación de la tarde de BCV), y recalcularlo a fin de día
+        // lo desordenaría frente a otra tasa del mismo día que sí
+        // conserva su hora real.
+        if ($existing && $existing->effective_date->isSameDay($date)) {
+            return $existing->effective_at;
+        }
+
+        return $date->endOfDay();
+    }
+
     public function save(): void
     {
         $this->validate();
@@ -60,7 +93,7 @@ class BcvRateManager extends Component
             $bcvRate->update([
                 'rate' => $this->rate,
                 'effective_date' => $this->effective_date,
-                'effective_at' => now(),
+                'effective_at' => $this->resolveEffectiveAt($bcvRate),
                 'source' => 'manual',
             ]);
 
@@ -83,7 +116,7 @@ class BcvRateManager extends Component
             $bcvRate = BcvRate::create([
                 'rate' => $this->rate,
                 'effective_date' => $this->effective_date,
-                'effective_at' => now(),
+                'effective_at' => $this->resolveEffectiveAt(),
                 'source' => 'manual',
             ]);
 
@@ -157,9 +190,17 @@ class BcvRateManager extends Component
 
     public function delete(int $id): void
     {
-        // No permitir borrar la única tasa existente o la vigente si es la última.
+        // No permitir borrar la única tasa existente.
         if (BcvRate::count() <= 1) {
             session()->flash('error', 'No puedes eliminar la única tasa registrada.');
+
+            return;
+        }
+
+        // Tampoco la tasa vigente: borrarla revertiría todo el sistema
+        // a la tasa anterior sin ningún aviso.
+        if (BcvRate::current()?->id === $id) {
+            session()->flash('error', 'No puedes eliminar la tasa vigente. Registra o sincroniza una tasa más reciente primero.');
 
             return;
         }
