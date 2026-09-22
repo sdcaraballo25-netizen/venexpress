@@ -548,6 +548,7 @@ class User extends Authenticatable
             $this->isAliadoTaquilla() => 'ally.packages.create',
             $this->isAlmacen() => 'almacen.dashboard',
             $this->isAdmin() => 'admin.dashboard',
+            $this->isEmprendedor() => 'emprendedor.dashboard',
             default => 'dashboard',
         };
     }
@@ -562,6 +563,7 @@ class User extends Authenticatable
             self::ROLE_REPARTIDOR => 'Repartidor',
             self::ROLE_CLIENTE => 'Cliente',
             self::ROLE_ALMACEN => 'Personal de Almacén',
+            self::ROLE_EMPRENDEDOR => 'Emprendedor',
         ];
     }
 }

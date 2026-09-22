@@ -62,6 +62,11 @@ if ($user->isAlmacen()) {
     return;
 }
 
+if ($user->isEmprendedor()) {
+    $this->redirect(route('emprendedor.dashboard', absolute: false), navigate: true);
+    return;
+}
+
 $this->redirect(route('dashboard', absolute: false), navigate: true);
     }
 }; ?>
