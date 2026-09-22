@@ -21,40 +21,11 @@
     onConfirm captura el $wire del componente Livewire donde vive el
     botón, así que sigue apuntando a la instancia correcta aunque el
     modal en sí viva fuera de ese componente (es global, en el layout).
+
+    El store en sí (Alpine.store('confirm', ...)) se registra en
+    resources/js/app.js, no aquí — ver el comentario ahí para el motivo
+    (wire:navigate no re-ejecuta <script> insertados en el body).
 --}}
-<script>
-    document.addEventListener('alpine:init', () => {
-        Alpine.store('confirm', {
-            show: false,
-            title: null,
-            message: '',
-            confirmText: 'Confirmar',
-            cancelText: 'Cancelar',
-            variant: 'primary',
-            onConfirm: null,
-
-            open(options) {
-                this.title = options.title ?? null;
-                this.message = options.message ?? '¿Estás seguro?';
-                this.confirmText = options.confirmText ?? 'Confirmar';
-                this.cancelText = options.cancelText ?? 'Cancelar';
-                this.variant = options.variant ?? 'primary';
-                this.onConfirm = options.onConfirm ?? null;
-                this.show = true;
-            },
-
-            confirmAction() {
-                const action = this.onConfirm;
-                this.show = false;
-                if (typeof action === 'function') action();
-            },
-
-            cancel() {
-                this.show = false;
-            },
-        });
-    });
-</script>
 
 <div
     x-show="$store.confirm.show"
