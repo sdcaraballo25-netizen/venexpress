@@ -1,5 +1,5 @@
 <!DOCTYPE html>
-<html lang="es" x-data="{ sidebarOpen: false }">
+<html lang="es">
 
 <head>
 
@@ -95,7 +95,7 @@
             md:translate-x-0
         "
         :class="
-            sidebarOpen
+            $store.sidebar.open
                 ? 'translate-x-0'
                 : '-translate-x-full md:translate-x-0'
         "
@@ -236,7 +236,7 @@
             <a
                 href="{{ route('repartidor.dashboard') }}"
                 wire:navigate
-                @click="sidebarOpen = false"
+                @click="$store.sidebar.open = false"
                 class="
                     flex items-center gap-3
                     px-4 py-3
@@ -280,7 +280,7 @@
                 <a
                     href="{{ route('repartidor.route-detail', $sidebarActiveRouteId) }}"
                     wire:navigate
-                    @click="sidebarOpen = false"
+                    @click="$store.sidebar.open = false"
                     class="
                         flex items-center gap-3
                         px-4 py-3
@@ -324,7 +324,7 @@
             <a
                 href="{{ route('repartidor.route-history') }}"
                 wire:navigate
-                @click="sidebarOpen = false"
+                @click="$store.sidebar.open = false"
                 class="
                     flex items-center gap-3
                     px-4 py-3
@@ -366,7 +366,7 @@
             <a
                 href="{{ route('repartidor.scanner') }}"
                 wire:navigate
-                @click="sidebarOpen = false"
+                @click="$store.sidebar.open = false"
                 class="
                     flex items-center gap-3
                     px-4 py-3
@@ -428,7 +428,7 @@
             <a
                 href="{{ route('repartidor.packages') }}"
                 wire:navigate
-                @click="sidebarOpen = false"
+                @click="$store.sidebar.open = false"
                 class="
                     flex items-center gap-3
                     px-4 py-3
@@ -471,7 +471,7 @@
             <a
                 href="{{ route('repartidor.app-download') }}"
                 wire:navigate
-                @click="sidebarOpen = false"
+                @click="$store.sidebar.open = false"
                 class="
                     flex items-center gap-3
                     px-4 py-3
@@ -513,7 +513,7 @@
             <a
                 href="{{ route('repartidor.help') }}"
                 wire:navigate
-                @click="sidebarOpen = false"
+                @click="$store.sidebar.open = false"
                 class="
                     flex items-center gap-3
                     px-4 py-3
@@ -555,7 +555,7 @@
             <a
                 href="{{ route('recommendations.create') }}"
                 wire:navigate
-                @click="sidebarOpen = false"
+                @click="$store.sidebar.open = false"
                 class="
                     flex items-center gap-3
                     px-4 py-3
@@ -714,9 +714,9 @@
     ========================================================== --}}
 
     <div
-        x-show="sidebarOpen"
+        x-show="$store.sidebar.open"
         x-cloak
-        @click="sidebarOpen = false"
+        @click="$store.sidebar.open = false"
         class="
             fixed
             inset-0
@@ -753,7 +753,7 @@
 
                 <button
                     type="button"
-                    @click="sidebarOpen = true"
+                    @click="$store.sidebar.open = true"
                     class="
                         md:hidden
                         h-10 w-10

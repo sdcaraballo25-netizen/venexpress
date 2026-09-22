@@ -1,5 +1,5 @@
 <!DOCTYPE html>
-<html lang="es" x-data="{ sidebarOpen: false }">
+<html lang="es">
 
 <head>
     <meta charset="UTF-8">
@@ -1031,8 +1031,8 @@
         ============================================================= --}}
 
         <div
-            x-show="sidebarOpen"
-            @click="sidebarOpen = false"
+            x-show="$store.sidebar.open"
+            @click="$store.sidebar.open = false"
             class="fixed inset-0 bg-black/40 z-20 lg:hidden"
             x-cloak
         ></div>
@@ -1051,7 +1051,7 @@
 
                 {{-- Botón menú móvil --}}
                 <button
-                    @click="sidebarOpen = !sidebarOpen"
+                    @click="$store.sidebar.open = !$store.sidebar.open"
                     class="lg:hidden text-[#111111] text-xl"
                     type="button"
                     aria-label="Abrir menú"

@@ -1,5 +1,5 @@
 <!DOCTYPE html>
-<html lang="es" x-data="{ sidebarOpen: false }">
+<html lang="es">
 
 <head>
 
@@ -39,7 +39,7 @@
     <aside
         class="fixed inset-y-0 left-0 z-40 w-72 bg-white border-r border-[#E5E5E0] flex flex-col
                transform transition-transform duration-200 md:relative md:translate-x-0"
-        :class="sidebarOpen ? 'translate-x-0' : '-translate-x-full md:translate-x-0'"
+        :class="$store.sidebar.open ? 'translate-x-0' : '-translate-x-full md:translate-x-0'"
     >
 
         {{-- LOGO --}}
@@ -72,7 +72,7 @@
             <a
                 href="{{ route('emprendedor.dashboard') }}"
                 wire:navigate
-                @click="sidebarOpen = false"
+                @click="$store.sidebar.open = false"
                 class="flex items-center gap-3 px-4 py-3 rounded-xl text-sm font-medium transition-colors
                     {{ request()->routeIs('emprendedor.dashboard')
                         ? 'bg-amber-400 text-[#111111]'
@@ -89,7 +89,7 @@
             <a
                 href="{{ route('emprendedor.productos') }}"
                 wire:navigate
-                @click="sidebarOpen = false"
+                @click="$store.sidebar.open = false"
                 class="flex items-center gap-3 px-4 py-3 rounded-xl text-sm font-medium transition-colors
                     {{ request()->routeIs('emprendedor.productos')
                         ? 'bg-amber-400 text-[#111111]'
@@ -106,7 +106,7 @@
             <a
                 href="{{ route('emprendedor.pedidos') }}"
                 wire:navigate
-                @click="sidebarOpen = false"
+                @click="$store.sidebar.open = false"
                 class="flex items-center gap-3 px-4 py-3 rounded-xl text-sm font-medium transition-colors
                     {{ request()->routeIs('emprendedor.pedidos')
                         ? 'bg-amber-400 text-[#111111]'
@@ -123,7 +123,7 @@
             <a
                 href="{{ route('emprendedor.perfil') }}"
                 wire:navigate
-                @click="sidebarOpen = false"
+                @click="$store.sidebar.open = false"
                 class="flex items-center gap-3 px-4 py-3 rounded-xl text-sm font-medium transition-colors
                     {{ request()->routeIs('emprendedor.perfil')
                         ? 'bg-amber-400 text-[#111111]'
@@ -140,7 +140,7 @@
             <a
                 href="{{ route('recommendations.create') }}"
                 wire:navigate
-                @click="sidebarOpen = false"
+                @click="$store.sidebar.open = false"
                 class="flex items-center gap-3 px-4 py-3 rounded-xl text-sm font-medium transition-colors
                     {{ request()->routeIs('recommendations.create')
                         ? 'bg-amber-400 text-[#111111]'
@@ -189,7 +189,7 @@
     </aside>
 
     {{-- OVERLAY MÓVIL --}}
-    <div x-show="sidebarOpen" x-cloak @click="sidebarOpen = false" class="fixed inset-0 bg-black/40 z-30 md:hidden"></div>
+    <div x-show="$store.sidebar.open" x-cloak @click="$store.sidebar.open = false" class="fixed inset-0 bg-black/40 z-30 md:hidden"></div>
 
     {{-- ÁREA PRINCIPAL --}}
     <div class="flex-1 min-w-0">
@@ -199,7 +199,7 @@
 
             <button
                 type="button"
-                @click="sidebarOpen = true"
+                @click="$store.sidebar.open = true"
                 class="md:hidden h-10 w-10 rounded-xl flex items-center justify-center text-[#111111] hover:bg-slate-100"
                 aria-label="Abrir menú"
             >
