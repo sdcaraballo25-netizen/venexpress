@@ -605,7 +605,14 @@
              Los componentes de App\Livewire\Client usan:
              #[Layout('layouts.client')]
         ======================================================= --}}
-        <main class="p-4 lg:p-8 w-full max-w-7xl mx-auto">
+        {{--
+            El marketplace (public.marketplace*) gestiona su propio ancho
+            (max-w-screen-2xl) y necesita usar toda la pantalla disponible
+            como catálogo de e-commerce — max-w-7xl aquí lo dejaba atrapado
+            en una columna angosta, con la mitad derecha de la pantalla
+            vacía. El resto de las páginas del panel de Cliente no cambia.
+        --}}
+        <main class="p-4 lg:p-8 w-full mx-auto {{ request()->routeIs('public.marketplace*') ? 'max-w-none' : 'max-w-7xl' }}">
 
             {{ $slot }}
 

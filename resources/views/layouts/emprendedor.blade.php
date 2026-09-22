@@ -242,7 +242,8 @@
         </header>
 
         {{-- CONTENIDO LIVEWIRE --}}
-        <main class="p-4 lg:p-8 w-full max-w-7xl mx-auto">
+        {{-- El marketplace (public.marketplace*) gestiona su propio ancho — ver el mismo comentario en layouts/client.blade.php. --}}
+        <main class="p-4 lg:p-8 w-full mx-auto {{ request()->routeIs('public.marketplace*') ? 'max-w-none' : 'max-w-7xl' }}">
             {{ $slot }}
         </main>
 
