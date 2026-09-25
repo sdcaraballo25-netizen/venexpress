@@ -78,18 +78,25 @@
 
                 <div class="sm:col-span-2">
                     <label class="text-sm font-medium text-[#6B6B66]">Fotos (hasta 6, opcional)</label>
-                    <input type="file" wire:model="fotos" accept="image/*" multiple
+                    <input type="file" wire:model="nuevasFotos" accept="image/*" multiple
                            class="mt-2 block w-full text-sm text-[#6B6B66]
                                   file:mr-4 file:py-2 file:px-4 file:rounded-xl
                                   file:border-0 file:text-sm file:font-semibold
                                   file:bg-blue-50 file:text-blue-700 hover:file:bg-blue-100">
-                    <p class="mt-1 text-xs text-[#6B6B66]" wire:loading wire:target="fotos">Subiendo fotos...</p>
+                    <p class="mt-1 text-xs text-[#6B6B66]" wire:loading wire:target="nuevasFotos">Subiendo fotos...</p>
+                    <p class="mt-1 text-xs text-[#B8B8B2]">Puedes abrir el selector varias veces: cada foto que elijas se suma a las anteriores.</p>
                     @error('fotos') <p class="mt-1 text-xs text-red-600">{{ $message }}</p> @enderror
                     @error('fotos.*') <p class="mt-1 text-xs text-red-600">{{ $message }}</p> @enderror
 
                     <div class="mt-2 flex flex-wrap gap-2">
-                        @foreach ($fotos as $foto)
-                            <img src="{{ $foto->temporaryUrl() }}" class="h-20 w-20 rounded-xl object-cover" alt="Vista previa">
+                        @foreach ($fotos as $index => $foto)
+                            <div class="relative">
+                                <img src="{{ $foto->temporaryUrl() }}" class="h-20 w-20 rounded-xl object-cover" alt="Vista previa">
+                                <button type="button" wire:click="quitarFotoPendiente({{ $index }})"
+                                        class="absolute -top-1.5 -right-1.5 h-5 w-5 rounded-full bg-red-600 text-white text-xs leading-5">
+                                    ✕
+                                </button>
+                            </div>
                         @endforeach
 
                         @foreach ($existingFotos as $existingFoto)

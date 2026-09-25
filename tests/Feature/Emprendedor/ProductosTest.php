@@ -48,6 +48,36 @@ class ProductosTest extends TestCase
         Storage::disk('public')->assertExists($foto->path);
     }
 
+    /**
+     * Un <input type="file multiple"> reemplaza su selección cada vez
+     * que se abre el diálogo (no la acumula) — sin updatedNuevasFotos()
+     * sumando a $fotos, elegir una segunda foto por separado borraba
+     * la primera en vez de agregarse.
+     */
+    public function test_selecting_photos_in_separate_dialog_actions_accumulates_them(): void
+    {
+        Storage::fake('public');
+
+        $emprendedor = $this->createEmprendedor();
+
+        Livewire::actingAs($emprendedor->user)
+            ->test(Productos::class)
+            ->set('nombre', 'Producto con varias fotos')
+            ->set('precio_usd', '10')
+            ->set('peso_kg', '1')
+            ->set('stock', '5')
+            ->set('nuevasFotos', [UploadedFile::fake()->image('a.jpg')])
+            ->assertCount('fotos', 1)
+            ->set('nuevasFotos', [UploadedFile::fake()->image('b.jpg')])
+            ->assertCount('fotos', 2)
+            ->call('save')
+            ->assertHasNoErrors();
+
+        $producto = Producto::where('emprendedor_id', $emprendedor->id)->first();
+
+        $this->assertSame(2, ProductoFoto::where('producto_id', $producto->id)->count());
+    }
+
     public function test_creating_a_product_requires_a_positive_price_and_weight(): void
     {
         $emprendedor = $this->createEmprendedor();

@@ -41,6 +41,18 @@ class Productos extends Component
     /** @var array<int, \Livewire\Features\SupportFileUploads\TemporaryUploadedFile> */
     public array $fotos = [];
 
+    /**
+     * Intake del <input type="file multiple">: un input nativo
+     * REEMPLAZA su selección cada vez que se abre el diálogo, no la
+     * acumula. updatedNuevasFotos() suma lo que llega aquí a $fotos
+     * (que es lo que realmente se sube al guardar) y vacía esta
+     * propiedad, para que el emprendedor pueda ir agregando fotos una
+     * selección a la vez sin perder las anteriores.
+     *
+     * @var array<int, \Livewire\Features\SupportFileUploads\TemporaryUploadedFile>
+     */
+    public array $nuevasFotos = [];
+
     /** @var \Illuminate\Support\Collection<int, ProductoFoto> */
     public $existingFotos = [];
 
@@ -51,6 +63,18 @@ class Productos extends Component
     protected function emprendedor()
     {
         return Auth::user()->emprendedor;
+    }
+
+    public function updatedNuevasFotos(): void
+    {
+        $this->fotos = array_slice([...$this->fotos, ...$this->nuevasFotos], 0, 6);
+        $this->reset('nuevasFotos');
+    }
+
+    public function quitarFotoPendiente(int $index): void
+    {
+        unset($this->fotos[$index]);
+        $this->fotos = array_values($this->fotos);
     }
 
     public function startCreating(): void
@@ -98,6 +122,7 @@ class Productos extends Component
             'peso_kg',
             'stock',
             'fotos',
+            'nuevasFotos',
             'existingFotoPath',
             'existingFotos',
         ]);
