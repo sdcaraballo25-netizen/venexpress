@@ -4,6 +4,7 @@ namespace Tests\Feature\Emprendedor;
 
 use App\Livewire\Emprendedor\Productos;
 use App\Models\Producto;
+use App\Models\ProductoFoto;
 use Illuminate\Database\Eloquent\ModelNotFoundException;
 use Illuminate\Foundation\Testing\RefreshDatabase;
 use Illuminate\Http\UploadedFile;
@@ -29,7 +30,7 @@ class ProductosTest extends TestCase
             ->set('precio_usd', '15.50')
             ->set('peso_kg', '0.5')
             ->set('stock', '10')
-            ->set('foto', UploadedFile::fake()->create('foto.jpg', 100, 'image/jpeg'))
+            ->set('fotos.0', UploadedFile::fake()->create('foto.jpg', 100, 'image/jpeg'))
             ->call('save')
             ->assertHasNoErrors();
 
@@ -39,9 +40,12 @@ class ProductosTest extends TestCase
         $this->assertSame('Camisa azul', $producto->nombre);
         $this->assertSame(10, $producto->stock);
         $this->assertTrue($producto->activo);
-        $this->assertNotNull($producto->foto_path);
 
-        Storage::disk('public')->assertExists($producto->foto_path);
+        $foto = ProductoFoto::where('producto_id', $producto->id)->first();
+        $this->assertNotNull($foto);
+        $this->assertSame($foto->path, $producto->foto_principal_path);
+
+        Storage::disk('public')->assertExists($foto->path);
     }
 
     public function test_creating_a_product_requires_a_positive_price_and_weight(): void
