@@ -7,6 +7,7 @@ use App\Models\BcvRate;
 use App\Models\CityDistance;
 use App\Models\MensajePedido;
 use App\Models\Pedido;
+use App\Models\PedidoItem;
 use App\Models\Producto;
 use App\Models\RateMatrix;
 use Illuminate\Database\Eloquent\ModelNotFoundException;
@@ -19,8 +20,8 @@ use Tests\TestCase;
 
 class PedidoShowTest extends TestCase
 {
-    use RefreshDatabase;
     use CreatesTestEmprendedores;
+    use RefreshDatabase;
 
     protected function setUp(): void
     {
@@ -63,19 +64,26 @@ class PedidoShowTest extends TestCase
             'activo' => true,
         ]);
 
-        return Pedido::create([
-            'producto_id' => $producto->id,
+        $pedido = Pedido::create([
             'emprendedor_id' => $emprendedor->id,
-            'cantidad' => 1,
-            'precio_unitario_usd' => 15.00,
             'precio_total_usd' => 15.00,
             'cliente_nombre' => 'Cliente de Prueba',
             'cliente_id_doc' => 'V-87654321',
             'cliente_telefono' => '0424-7654321',
             'destino_ciudad' => 'Valencia',
             'destino_estado' => 'Carabobo',
-            'chat_token' => 'token-' . uniqid(),
+            'chat_token' => 'token-'.uniqid(),
         ]);
+
+        PedidoItem::create([
+            'pedido_id' => $pedido->id,
+            'producto_id' => $producto->id,
+            'cantidad' => 1,
+            'precio_unitario_usd' => 15.00,
+            'subtotal_usd' => 15.00,
+        ]);
+
+        return $pedido;
     }
 
     public function test_an_emprendedor_can_send_a_message_on_their_own_pedido(): void

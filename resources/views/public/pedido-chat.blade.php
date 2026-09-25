@@ -17,10 +17,15 @@
                     </span>
                 </div>
                 <h1 class="text-2xl md:text-3xl font-extrabold text-blue-950">
-                    {{ $pedido->producto->nombre }}
+                    @foreach ($pedido->items as $item)
+                        {{ $item->producto?->nombre }}@if (! $loop->last), @endif
+                    @endforeach
                 </h1>
                 <p class="text-gray-500 mt-2">
-                    {{ $pedido->cantidad }} unidad(es) · ${{ number_format((float) $pedido->precio_total_usd, 2) }}
+                    @foreach ($pedido->items as $item)
+                        {{ $item->cantidad }} × {{ $item->producto?->nombre }}@if (! $loop->last), @endif
+                    @endforeach
+                    · ${{ number_format((float) $pedido->precio_total_usd, 2) }}
                     @if ($pedido->precio_total_ves !== null)
                         (Bs. {{ number_format($pedido->precio_total_ves, 2) }})
                     @endif

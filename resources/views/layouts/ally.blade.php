@@ -1,5 +1,5 @@
 <!DOCTYPE html>
-<html lang="es" x-data="{ sidebarOpen: false }">
+<html lang="es">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
@@ -48,7 +48,7 @@
     =========================================================== --}}
     <aside
         class="fixed inset-y-0 left-0 z-40 w-64 border-r border-[#E5E5E0] bg-white px-5 py-8 flex flex-col justify-between transform transition-transform duration-200 md:relative md:translate-x-0"
-        :class="sidebarOpen ? 'translate-x-0' : '-translate-x-full md:translate-x-0'"
+        :class="$store.sidebar.open ? 'translate-x-0' : '-translate-x-full md:translate-x-0'"
     >
 
         <div class="min-h-0 flex flex-col">
@@ -101,7 +101,7 @@
                     <a
                         href="{{ route('ally.dashboard') }}"
                         wire:navigate
-                        @click="sidebarOpen = false"
+                        @click="$store.sidebar.open = false"
                         class="flex items-center gap-3 px-4 py-3 rounded-xl font-medium transition-colors
                         {{ request()->routeIs('ally.dashboard')
                             ? 'bg-amber-400 text-[#111111]'
@@ -134,7 +134,7 @@
                 <a
                     href="{{ route('ally.help') }}"
                     wire:navigate
-                    @click="sidebarOpen = false"
+                    @click="$store.sidebar.open = false"
                     class="flex items-center gap-3 px-4 py-3 rounded-xl font-medium transition-colors
                     {{ request()->routeIs('ally.help')
                         ? 'bg-amber-400 text-[#111111]'
@@ -165,7 +165,7 @@
                 <a
                     href="{{ route('recommendations.create') }}"
                     wire:navigate
-                    @click="sidebarOpen = false"
+                    @click="$store.sidebar.open = false"
                     class="flex items-center gap-3 px-4 py-3 rounded-xl font-medium transition-colors
                     {{ request()->routeIs('recommendations.create')
                         ? 'bg-amber-400 text-[#111111]'
@@ -205,7 +205,7 @@
                 <a
                     href="{{ route('ally.packages.create') }}"
                     wire:navigate
-                    @click="sidebarOpen = false"
+                    @click="$store.sidebar.open = false"
                     class="flex items-center gap-3 px-4 py-3 rounded-xl font-medium transition-colors
                     {{ request()->routeIs('ally.packages.create')
                         ? 'bg-amber-400 text-[#111111]'
@@ -236,7 +236,7 @@
                 <a
                     href="{{ route('ally.emprendedor-pedidos') }}"
                     wire:navigate
-                    @click="sidebarOpen = false"
+                    @click="$store.sidebar.open = false"
                     class="flex items-center gap-3 px-4 py-3 rounded-xl font-medium transition-colors
                     {{ request()->routeIs('ally.emprendedor-pedidos')
                         ? 'bg-amber-400 text-[#111111]'
@@ -267,7 +267,7 @@
 <a
     href="{{ route('ally.packages.index') }}"
     wire:navigate
-    @click="sidebarOpen = false"
+    @click="$store.sidebar.open = false"
     class="flex items-center gap-3 px-4 py-3 rounded-xl font-medium transition-colors
     {{ request()->routeIs('ally.packages.index')
         ? 'bg-amber-400 text-[#111111]'
@@ -297,7 +297,7 @@
                 <a
                     href="{{ route('ally.packages.reception') }}"
                     wire:navigate
-                    @click="sidebarOpen = false"
+                    @click="$store.sidebar.open = false"
                     class="flex items-center gap-3 px-4 py-3 rounded-xl font-medium transition-colors
                     {{ request()->routeIs('ally.packages.reception')
                         ? 'bg-amber-400 text-[#111111]'
@@ -329,7 +329,7 @@
                 <a
                     href="{{ route('ally.packages.pickup') }}"
                     wire:navigate
-                    @click="sidebarOpen = false"
+                    @click="$store.sidebar.open = false"
                     class="flex items-center gap-3 px-4 py-3 rounded-xl font-medium transition-colors
                     {{ request()->routeIs('ally.packages.pickup')
                         ? 'bg-amber-400 text-[#111111]'
@@ -366,7 +366,7 @@
                 <a
                     href="{{ route('ally.sales-closeout') }}"
                     wire:navigate
-                    @click="sidebarOpen = false"
+                    @click="$store.sidebar.open = false"
                     class="flex items-center gap-3 px-4 py-3 rounded-xl font-medium transition-colors
                     {{ request()->routeIs('ally.sales-closeout')
                         ? 'bg-amber-400 text-[#111111]'
@@ -403,7 +403,7 @@
                 <a
                     href="{{ route('ally.cod') }}"
                     wire:navigate
-                    @click="sidebarOpen = false"
+                    @click="$store.sidebar.open = false"
                     class="flex items-center gap-3 px-4 py-3 rounded-xl font-medium transition-colors
                     {{ request()->routeIs('ally.cod')
                         ? 'bg-amber-400 text-[#111111]'
@@ -439,7 +439,7 @@
                 <a
                     href="{{ route('ally.incidents') }}"
                     wire:navigate
-                    @click="sidebarOpen = false"
+                    @click="$store.sidebar.open = false"
                     class="flex items-center gap-3 px-4 py-3 rounded-xl font-medium transition-colors
                     {{ request()->routeIs('ally.incidents')
                         ? 'bg-amber-400 text-[#111111]'
@@ -481,7 +481,7 @@
                     <a
                         href="{{ route('ally.staff') }}"
                         wire:navigate
-                        @click="sidebarOpen = false"
+                        @click="$store.sidebar.open = false"
                         class="flex items-center gap-3 px-4 py-3 rounded-xl font-medium transition-colors
                         {{ request()->routeIs('ally.staff')
                             ? 'bg-amber-400 text-[#111111]'
@@ -644,8 +644,8 @@
          OVERLAY MÓVIL
     =========================================================== --}}
     <div
-        x-show="sidebarOpen"
-        @click="sidebarOpen = false"
+        x-show="$store.sidebar.open"
+        @click="$store.sidebar.open = false"
         class="fixed inset-0 bg-black/40 z-30 md:hidden"
         x-cloak
     ></div>
@@ -663,7 +663,7 @@
 
             <button
                 type="button"
-                @click="sidebarOpen = !sidebarOpen"
+                @click="$store.sidebar.open = !$store.sidebar.open"
                 class="md:hidden inline-flex items-center justify-center w-10 h-10 rounded-xl text-[#111111] hover:bg-slate-100"
                 aria-label="Abrir menú"
             >

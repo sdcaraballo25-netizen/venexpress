@@ -1,5 +1,5 @@
 <!DOCTYPE html>
-<html lang="es" x-data="{ sidebarOpen: false }">
+<html lang="es">
 
 <head>
     <meta charset="UTF-8">
@@ -456,6 +456,34 @@
                                 </svg>
 
                                 Almacenes
+
+                            </a>
+
+
+                            {{-- Categorías (marketplace) --}}
+                            <a
+                                href="{{ route('admin.categorias') }}"
+                                class="flex items-center gap-3 px-4 py-3 rounded-xl font-medium transition-colors
+                                {{ request()->routeIs('admin.categorias')
+                                    ? 'bg-amber-400 text-[#111111]'
+                                    : 'text-[#6B6B66] hover:bg-slate-50 hover:text-[#111111]' }}"
+                            >
+
+                                <svg
+                                    class="w-5 h-5"
+                                    fill="none"
+                                    stroke="currentColor"
+                                    viewBox="0 0 24 24"
+                                >
+                                    <path
+                                        stroke-linecap="round"
+                                        stroke-linejoin="round"
+                                        stroke-width="2"
+                                        d="M7 7h.01M3 4h18v16H3V4zm4 8h10M7 16h6"
+                                    />
+                                </svg>
+
+                                Categorías
 
                             </a>
 
@@ -1031,8 +1059,8 @@
         ============================================================= --}}
 
         <div
-            x-show="sidebarOpen"
-            @click="sidebarOpen = false"
+            x-show="$store.sidebar.open"
+            @click="$store.sidebar.open = false"
             class="fixed inset-0 bg-black/40 z-20 lg:hidden"
             x-cloak
         ></div>
@@ -1051,7 +1079,7 @@
 
                 {{-- Botón menú móvil --}}
                 <button
-                    @click="sidebarOpen = !sidebarOpen"
+                    @click="$store.sidebar.open = !$store.sidebar.open"
                     class="lg:hidden text-[#111111] text-xl"
                     type="button"
                     aria-label="Abrir menú"

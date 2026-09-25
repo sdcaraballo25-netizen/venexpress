@@ -7,6 +7,7 @@ use App\Models\BcvRate;
 use App\Models\Customer;
 use App\Models\Driver;
 use App\Models\Emprendedor;
+use App\Models\Producto;
 use App\Models\RateMatrix;
 use App\Models\User;
 use Illuminate\Database\Console\Seeds\WithoutModelEvents;
@@ -164,7 +165,7 @@ class DatabaseSeeder extends Seeder
             'email_verified_at' => now(),
         ]);
 
-        Emprendedor::create([
+        $emprendedor = Emprendedor::create([
             'user_id' => $emprendedorUser->id,
             'pickup_ally_id' => $pickupAlly->id,
             'business_name' => 'Tienda Demo',
@@ -173,6 +174,30 @@ class DatabaseSeeder extends Seeder
             // nace PENDIENTE y un admin lo aprueba desde /admin/emprendedores/aprobacion.
             'status' => Emprendedor::STATUS_ACTIVE,
         ]);
+
+        $this->seedProductosDemo($emprendedor);
+    }
+
+    /**
+     * Sin esto, la tienda pública (Public\Marketplace) y el panel del
+     * emprendedor (Emprendedor\Productos) se ven vacíos en un entorno
+     * recién sembrado.
+     */
+    protected function seedProductosDemo(Emprendedor $emprendedor): void
+    {
+        $productos = [
+            ['nombre' => 'Camisa de algodón', 'precio_usd' => 15.00, 'peso_kg' => 0.300, 'stock' => 20],
+            ['nombre' => 'Bolso artesanal', 'precio_usd' => 25.00, 'peso_kg' => 0.500, 'stock' => 10],
+            ['nombre' => 'Taza de cerámica', 'precio_usd' => 8.50, 'peso_kg' => 0.400, 'stock' => 30],
+        ];
+
+        foreach ($productos as $producto) {
+            Producto::create([
+                ...$producto,
+                'emprendedor_id' => $emprendedor->id,
+                'activo' => true,
+            ]);
+        }
     }
 
     protected function seedRateMatrix(): void

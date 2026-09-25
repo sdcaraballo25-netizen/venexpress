@@ -4,6 +4,7 @@ namespace Tests\Feature;
 
 use App\Livewire\Client\Compras;
 use App\Models\Pedido;
+use App\Models\PedidoItem;
 use App\Models\Producto;
 use App\Models\User;
 use Illuminate\Foundation\Testing\RefreshDatabase;
@@ -13,8 +14,8 @@ use Tests\TestCase;
 
 class ClientComprasTest extends TestCase
 {
-    use RefreshDatabase;
     use CreatesTestEmprendedores;
+    use RefreshDatabase;
 
     private function createClient(): User
     {
@@ -38,12 +39,9 @@ class ClientComprasTest extends TestCase
             'activo' => true,
         ]);
 
-        return Pedido::create([
-            'producto_id' => $producto->id,
+        $pedido = Pedido::create([
             'emprendedor_id' => $emprendedor->id,
             'user_id' => $userId,
-            'cantidad' => 1,
-            'precio_unitario_usd' => 15.00,
             'precio_total_usd' => 15.00,
             'cliente_nombre' => 'Cliente de Prueba',
             'cliente_id_doc' => 'V-87654321',
@@ -51,8 +49,18 @@ class ClientComprasTest extends TestCase
             'destino_ciudad' => 'Valencia',
             'destino_estado' => 'Carabobo',
             'direccion_entrega' => 'Av. Bolívar, casa 1',
-            'chat_token' => 'token-' . uniqid(),
+            'chat_token' => 'token-'.uniqid(),
         ]);
+
+        PedidoItem::create([
+            'pedido_id' => $pedido->id,
+            'producto_id' => $producto->id,
+            'cantidad' => 1,
+            'precio_unitario_usd' => 15.00,
+            'subtotal_usd' => 15.00,
+        ]);
+
+        return $pedido;
     }
 
     public function test_a_client_sees_only_their_own_pedidos(): void
@@ -64,7 +72,7 @@ class ClientComprasTest extends TestCase
 
         Livewire::actingAs($client)
             ->test(Compras::class)
-            ->assertSee($ownPedido->producto->nombre)
+            ->assertSee($ownPedido->items->first()->producto->nombre)
             ->assertViewHas('pedidos', fn ($pedidos) => $pedidos->count() === 1);
     }
 

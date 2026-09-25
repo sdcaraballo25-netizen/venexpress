@@ -53,7 +53,7 @@ class Pedidos extends Component
         return view('livewire.emprendedor.pedidos', [
             'pedidos' => Pedido::query()
                 ->where('emprendedor_id', $this->emprendedor()->id)
-                ->with(['producto', 'package'])
+                ->with(['items.producto', 'package'])
                 ->latest()
                 ->paginate(15),
         ]);

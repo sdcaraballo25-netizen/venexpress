@@ -42,18 +42,6 @@
                     @error('descripcion') <p class="mt-1 text-xs text-red-600">{{ $message }}</p> @enderror
                 </div>
 
-                <div class="sm:col-span-2">
-                    <label class="text-sm font-medium text-[#6B6B66]">Categoría (opcional)</label>
-                    <select wire:model="categoria"
-                            class="mt-2 w-full rounded-xl border border-[#E5E5E0] px-4 py-3 text-sm focus:border-blue-500 focus:ring-blue-500">
-                        <option value="">Sin categoría</option>
-                        @foreach (\App\Models\Producto::CATEGORIAS as $valor => $etiqueta)
-                            <option value="{{ $valor }}">{{ $etiqueta }}</option>
-                        @endforeach
-                    </select>
-                    @error('categoria') <p class="mt-1 text-xs text-red-600">{{ $message }}</p> @enderror
-                </div>
-
                 <div>
                     <label class="text-sm font-medium text-[#6B6B66]">Precio (USD)</label>
                     <input type="number" step="0.01" wire:model="precio_usd"
@@ -77,56 +65,57 @@
                 </div>
 
                 <div>
-                    <label class="text-sm font-medium text-[#6B6B66]">Foto (opcional)</label>
-                    <input type="file" wire:model="foto" accept="image/*"
-                           class="mt-2 block w-full text-sm text-[#6B6B66]
-                                  file:mr-4 file:py-2 file:px-4 file:rounded-xl
-                                  file:border-0 file:text-sm file:font-semibold
-                                  file:bg-blue-50 file:text-blue-700 hover:file:bg-blue-100">
-                    <p class="mt-1 text-xs text-[#6B6B66]" wire:loading wire:target="foto">Subiendo foto...</p>
-
-                    @if ($foto)
-                        <img src="{{ $foto->temporaryUrl() }}" class="mt-2 h-20 rounded-xl object-cover" alt="Vista previa">
-                    @elseif ($existingFotoPath)
-                        <img src="{{ Illuminate\Support\Facades\Storage::disk('public')->url($existingFotoPath) }}" class="mt-2 h-20 rounded-xl object-cover" alt="Foto actual">
-                    @endif
-
-                    @error('foto') <p class="mt-1 text-xs text-red-600">{{ $message }}</p> @enderror
+                    <label class="text-sm font-medium text-[#6B6B66]">Categoría (opcional)</label>
+                    <select wire:model="categoria_id"
+                            class="mt-2 w-full rounded-xl border border-[#E5E5E0] px-4 py-3 text-sm focus:border-blue-500 focus:ring-blue-500">
+                        <option value="">Sin categoría</option>
+                        @foreach ($categorias as $categoria)
+                            <option value="{{ $categoria->id }}">{{ $categoria->nombre }}</option>
+                        @endforeach
+                    </select>
+                    @error('categoria_id') <p class="mt-1 text-xs text-red-600">{{ $message }}</p> @enderror
                 </div>
 
                 <div class="sm:col-span-2">
-                    <label class="text-sm font-medium text-[#6B6B66]">Galería adicional (opcional, hasta 5 fotos)</label>
-                    <input type="file" wire:model="fotosNuevas" accept="image/*" multiple
+                    <label class="text-sm font-medium text-[#6B6B66]">Fotos (hasta 6, opcional)</label>
+                    <input type="file" wire:model="nuevasFotos" accept="image/*" multiple
                            class="mt-2 block w-full text-sm text-[#6B6B66]
                                   file:mr-4 file:py-2 file:px-4 file:rounded-xl
                                   file:border-0 file:text-sm file:font-semibold
                                   file:bg-blue-50 file:text-blue-700 hover:file:bg-blue-100">
-                    <p class="mt-1 text-xs text-[#6B6B66]" wire:loading wire:target="fotosNuevas">Subiendo fotos...</p>
-                    @error('fotosNuevas') <p class="mt-1 text-xs text-red-600">{{ $message }}</p> @enderror
+                    <p class="mt-1 text-xs text-[#6B6B66]" wire:loading wire:target="nuevasFotos">Subiendo fotos...</p>
+                    <p class="mt-1 text-xs text-[#B8B8B2]">Puedes abrir el selector varias veces: cada foto que elijas se suma a las anteriores.</p>
+                    @error('fotos') <p class="mt-1 text-xs text-red-600">{{ $message }}</p> @enderror
+                    @error('fotos.*') <p class="mt-1 text-xs text-red-600">{{ $message }}</p> @enderror
 
-                    @if (count($existingFotos) > 0 || count($fotosNuevas) > 0)
-                        <div class="mt-3 flex flex-wrap gap-3">
-                            @foreach ($existingFotos as $index => $rutaFoto)
-                                <div class="relative">
-                                    <img src="{{ Illuminate\Support\Facades\Storage::disk('public')->url($rutaFoto) }}" class="h-20 w-20 rounded-xl object-cover" alt="Foto de galería">
-                                    <button type="button" wire:click="eliminarFotoExistente({{ $index }})"
-                                            class="absolute -top-2 -right-2 h-6 w-6 rounded-full bg-red-600 text-white text-xs font-bold leading-none flex items-center justify-center hover:bg-red-700">
-                                        ✕
-                                    </button>
-                                </div>
-                            @endforeach
+                    <div class="mt-2 flex flex-wrap gap-2">
+                        @foreach ($fotos as $index => $foto)
+                            <div class="relative">
+                                <img src="{{ $foto->temporaryUrl() }}" class="h-20 w-20 rounded-xl object-cover" alt="Vista previa">
+                                <button type="button" wire:click="quitarFotoPendiente({{ $index }})"
+                                        class="absolute -top-1.5 -right-1.5 h-5 w-5 rounded-full bg-red-600 text-white text-xs leading-5">
+                                    ✕
+                                </button>
+                            </div>
+                        @endforeach
 
-                            @foreach ($fotosNuevas as $index => $fotoNueva)
-                                <div class="relative">
-                                    <img src="{{ $fotoNueva->temporaryUrl() }}" class="h-20 w-20 rounded-xl object-cover" alt="Vista previa">
-                                    <button type="button" wire:click="eliminarFotoNueva({{ $index }})"
-                                            class="absolute -top-2 -right-2 h-6 w-6 rounded-full bg-red-600 text-white text-xs font-bold leading-none flex items-center justify-center hover:bg-red-700">
-                                        ✕
-                                    </button>
-                                </div>
-                            @endforeach
-                        </div>
-                    @endif
+                        @foreach ($existingFotos as $existingFoto)
+                            <div class="relative">
+                                <img src="{{ Illuminate\Support\Facades\Storage::disk('public')->url($existingFoto->path) }}"
+                                     class="h-20 w-20 rounded-xl object-cover" alt="Foto del producto">
+                                <button type="button" wire:click="eliminarFoto({{ $existingFoto->id }})"
+                                        wire:confirm="¿Quitar esta foto del producto?"
+                                        class="absolute -top-1.5 -right-1.5 h-5 w-5 rounded-full bg-red-600 text-white text-xs leading-5">
+                                    ✕
+                                </button>
+                            </div>
+                        @endforeach
+
+                        @if ($existingFotos->isEmpty() && ! $fotos && $existingFotoPath)
+                            <img src="{{ Illuminate\Support\Facades\Storage::disk('public')->url($existingFotoPath) }}"
+                                 class="h-20 w-20 rounded-xl object-cover" alt="Foto actual">
+                        @endif
+                    </div>
                 </div>
 
                 <div class="sm:col-span-2 flex justify-end gap-3">
@@ -148,8 +137,8 @@
         @forelse ($productos as $producto)
             <div class="bg-white rounded-2xl border border-[#E5E5E0] shadow-sm overflow-hidden">
 
-                @if ($producto->foto_path)
-                    <img src="{{ Illuminate\Support\Facades\Storage::disk('public')->url($producto->foto_path) }}" class="h-36 w-full object-cover" alt="{{ $producto->nombre }}">
+                @if ($producto->foto_principal_path)
+                    <img src="{{ Illuminate\Support\Facades\Storage::disk('public')->url($producto->foto_principal_path) }}" class="h-36 w-full object-cover" alt="{{ $producto->nombre }}">
                 @else
                     <div class="h-36 w-full bg-slate-100 flex items-center justify-center text-slate-300 text-4xl">📦</div>
                 @endif
@@ -163,9 +152,7 @@
                     </div>
 
                     @if ($producto->categoria)
-                        <span class="mt-1 inline-block text-xs font-medium text-blue-700 bg-blue-50 px-2 py-0.5 rounded-lg">
-                            {{ \App\Models\Producto::CATEGORIAS[$producto->categoria] ?? $producto->categoria }}
-                        </span>
+                        <p class="mt-0.5 text-xs text-[#6B6B66]">{{ $producto->categoria->nombre }}</p>
                     @endif
 
                     <p class="mt-1 text-lg font-bold text-[#111111]">${{ number_format((float) $producto->precio_usd, 2) }}</p>

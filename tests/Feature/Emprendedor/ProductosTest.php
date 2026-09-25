@@ -4,6 +4,7 @@ namespace Tests\Feature\Emprendedor;
 
 use App\Livewire\Emprendedor\Productos;
 use App\Models\Producto;
+use App\Models\ProductoFoto;
 use Illuminate\Database\Eloquent\ModelNotFoundException;
 use Illuminate\Foundation\Testing\RefreshDatabase;
 use Illuminate\Http\UploadedFile;
@@ -29,7 +30,7 @@ class ProductosTest extends TestCase
             ->set('precio_usd', '15.50')
             ->set('peso_kg', '0.5')
             ->set('stock', '10')
-            ->set('foto', UploadedFile::fake()->create('foto.jpg', 100, 'image/jpeg'))
+            ->set('fotos.0', UploadedFile::fake()->create('foto.jpg', 100, 'image/jpeg'))
             ->call('save')
             ->assertHasNoErrors();
 
@@ -39,12 +40,21 @@ class ProductosTest extends TestCase
         $this->assertSame('Camisa azul', $producto->nombre);
         $this->assertSame(10, $producto->stock);
         $this->assertTrue($producto->activo);
-        $this->assertNotNull($producto->foto_path);
 
-        Storage::disk('public')->assertExists($producto->foto_path);
+        $foto = ProductoFoto::where('producto_id', $producto->id)->first();
+        $this->assertNotNull($foto);
+        $this->assertSame($foto->path, $producto->foto_principal_path);
+
+        Storage::disk('public')->assertExists($foto->path);
     }
 
-    public function test_an_emprendedor_can_create_a_product_with_a_category_and_gallery_photos(): void
+    /**
+     * Un <input type="file multiple"> reemplaza su selección cada vez
+     * que se abre el diálogo (no la acumula) — sin updatedNuevasFotos()
+     * sumando a $fotos, elegir una segunda foto por separado borraba
+     * la primera en vez de agregarse.
+     */
+    public function test_selecting_photos_in_separate_dialog_actions_accumulates_them(): void
     {
         Storage::fake('public');
 
@@ -52,87 +62,20 @@ class ProductosTest extends TestCase
 
         Livewire::actingAs($emprendedor->user)
             ->test(Productos::class)
-            ->set('nombre', 'Camisa azul')
-            ->set('precio_usd', '15.50')
-            ->set('peso_kg', '0.5')
-            ->set('stock', '10')
-            ->set('categoria', 'ropa')
-            ->set('fotosNuevas', [
-                UploadedFile::fake()->create('galeria-1.jpg', 100, 'image/jpeg'),
-                UploadedFile::fake()->create('galeria-2.jpg', 100, 'image/jpeg'),
-            ])
+            ->set('nombre', 'Producto con varias fotos')
+            ->set('precio_usd', '10')
+            ->set('peso_kg', '1')
+            ->set('stock', '5')
+            ->set('nuevasFotos', [UploadedFile::fake()->image('a.jpg')])
+            ->assertCount('fotos', 1)
+            ->set('nuevasFotos', [UploadedFile::fake()->image('b.jpg')])
+            ->assertCount('fotos', 2)
             ->call('save')
             ->assertHasNoErrors();
 
         $producto = Producto::where('emprendedor_id', $emprendedor->id)->first();
 
-        $this->assertSame('ropa', $producto->categoria);
-        $this->assertCount(2, $producto->fotos);
-
-        foreach ($producto->fotos as $ruta) {
-            Storage::disk('public')->assertExists($ruta);
-        }
-    }
-
-    public function test_creating_a_product_rejects_an_invalid_category(): void
-    {
-        $emprendedor = $this->createEmprendedor();
-
-        Livewire::actingAs($emprendedor->user)
-            ->test(Productos::class)
-            ->set('nombre', 'Producto con categoría inválida')
-            ->set('precio_usd', '10')
-            ->set('peso_kg', '1')
-            ->set('stock', '5')
-            ->set('categoria', 'no-existe')
-            ->call('save')
-            ->assertHasErrors(['categoria']);
-    }
-
-    public function test_a_gallery_cannot_exceed_the_maximum_number_of_photos(): void
-    {
-        $emprendedor = $this->createEmprendedor();
-
-        Livewire::actingAs($emprendedor->user)
-            ->test(Productos::class)
-            ->set('nombre', 'Producto con muchas fotos')
-            ->set('precio_usd', '10')
-            ->set('peso_kg', '1')
-            ->set('stock', '5')
-            ->set('fotosNuevas', array_map(
-                fn ($i) => UploadedFile::fake()->create("galeria-{$i}.jpg", 100, 'image/jpeg'),
-                range(1, 6)
-            ))
-            ->call('save')
-            ->assertHasErrors(['fotosNuevas']);
-    }
-
-    public function test_an_emprendedor_can_remove_a_gallery_photo_while_editing(): void
-    {
-        Storage::fake('public');
-
-        $emprendedor = $this->createEmprendedor();
-
-        $producto = Producto::create([
-            'emprendedor_id' => $emprendedor->id,
-            'nombre' => 'Producto con galería',
-            'precio_usd' => 10.00,
-            'peso_kg' => 1.0,
-            'stock' => 5,
-            'activo' => true,
-            'fotos' => ['productos/foto-1.jpg', 'productos/foto-2.jpg'],
-        ]);
-
-        Livewire::actingAs($emprendedor->user)
-            ->test(Productos::class)
-            ->call('editProducto', $producto->id)
-            ->assertSet('existingFotos', ['productos/foto-1.jpg', 'productos/foto-2.jpg'])
-            ->call('eliminarFotoExistente', 0)
-            ->assertSet('existingFotos', ['productos/foto-2.jpg'])
-            ->call('save')
-            ->assertHasNoErrors();
-
-        $this->assertSame(['productos/foto-2.jpg'], $producto->fresh()->fotos);
+        $this->assertSame(2, ProductoFoto::where('producto_id', $producto->id)->count());
     }
 
     public function test_creating_a_product_requires_a_positive_price_and_weight(): void

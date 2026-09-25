@@ -12,9 +12,9 @@ class Producto extends Model
     use HasFactory;
 
     /**
-     * Categorías fijas del catálogo (mismo criterio simple que los
-     * STATUS_* de otros modelos: no amerita una tabla aparte en esta
-     * etapa del MVP). null/"" se trata como "sin categoría".
+     * Categorías de una implementación previa (lista fija, sin tabla),
+     * superada por el sistema relacional categoria_id -> Categoria ya
+     * en uso. Se deja sin exponer en la UI — ver categoria_legacy.
      */
     public const CATEGORIAS = [
         'ropa' => 'Ropa y accesorios',
@@ -27,11 +27,12 @@ class Producto extends Model
 
     protected $fillable = [
         'emprendedor_id',
+        'categoria_id',
         'nombre',
         'descripcion',
-        'categoria',
+        'categoria_legacy',
         'foto_path',
-        'fotos',
+        'fotos_legacy',
         'precio_usd',
         'peso_kg',
         'stock',
@@ -44,13 +45,23 @@ class Producto extends Model
             'precio_usd' => 'decimal:2',
             'peso_kg' => 'decimal:3',
             'activo' => 'boolean',
-            'fotos' => 'array',
+            'fotos_legacy' => 'array',
         ];
     }
 
     public function emprendedor(): BelongsTo
     {
         return $this->belongsTo(Emprendedor::class);
+    }
+
+    public function categoria(): BelongsTo
+    {
+        return $this->belongsTo(Categoria::class);
+    }
+
+    public function fotos(): HasMany
+    {
+        return $this->hasMany(ProductoFoto::class)->orderBy('orden');
     }
 
     /**
@@ -70,6 +81,16 @@ class Producto extends Model
     public function pedidos(): HasMany
     {
         return $this->hasMany(Pedido::class);
+    }
+
+    /**
+     * Primera foto de la galería (producto_fotos), o foto_path si el
+     * producto es de antes de que existiera la galería. Null si no
+     * tiene ninguna foto todavía.
+     */
+    public function getFotoPrincipalPathAttribute(): ?string
+    {
+        return $this->fotos->first()?->path ?? $this->foto_path;
     }
 
     public function resenas(): HasMany
@@ -96,14 +117,15 @@ class Producto extends Model
     }
 
     /**
-     * Galería completa para mostrar en la tienda: la portada (foto_path)
-     * primero, seguida de las fotos adicionales. Se calcula aquí para no
-     * repetir el orden en cada vista que necesite mostrar imágenes.
+     * Galería de la implementación previa (ver categoria_legacy):
+     * combina foto_path con fotos_legacy. No se usa en la UI actual,
+     * que ya tiene su propia galería vía Producto::fotos()
+     * (producto_fotos) y getFotoPrincipalPathAttribute().
      */
-    public function getGaleriaAttribute(): array
+    public function getGaleriaLegacyAttribute(): array
     {
         return collect([$this->foto_path])
-            ->merge($this->fotos ?? [])
+            ->merge($this->fotos_legacy ?? [])
             ->filter()
             ->values()
             ->all();

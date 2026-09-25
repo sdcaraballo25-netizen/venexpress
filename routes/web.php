@@ -9,6 +9,7 @@ use App\Livewire\Admin\AlliesManager;
 use App\Livewire\Admin\AllyFinance;
 use App\Livewire\Admin\AuditLogViewer;
 use App\Livewire\Admin\BcvRateManager;
+use App\Livewire\Admin\CategoriasManager;
 use App\Livewire\Admin\CityDistanceManager;
 use App\Livewire\Admin\Dashboard as AdminDashboard;
 use App\Livewire\Admin\DriverAssignment;
@@ -572,6 +573,9 @@ Route::prefix('admin')
 
         Route::get('/emprendedores/aprobacion', EmprendedoresApprovalManager::class)
             ->name('emprendedores.approval');
+
+        Route::get('/categorias', CategoriasManager::class)
+            ->name('categorias');
 
         Route::get('/remuneraciones/tarifa', DriverRemunerationManager::class)
             ->name('driver-remuneration-rate');

@@ -7,8 +7,8 @@ use App\Models\Incident;
 use App\Models\MensajePedido;
 use App\Models\Pedido;
 use App\Models\Resena;
-use Livewire\Attributes\Title;
 use Livewire\Component;
+use Livewire\Features\SupportFileUploads\TemporaryUploadedFile;
 use Livewire\WithFileUploads;
 
 /**
@@ -25,7 +25,7 @@ class PedidoChat extends Component
 
     public string $texto = '';
 
-    /** @var \Livewire\Features\SupportFileUploads\TemporaryUploadedFile|null */
+    /** @var TemporaryUploadedFile|null */
     public $archivo = null;
 
     public bool $showReportarProblema = false;
@@ -43,7 +43,7 @@ class PedidoChat extends Component
     public function mount(string $token): void
     {
         $this->pedido = Pedido::where('chat_token', $token)
-            ->with(['producto', 'emprendedor.user', 'package', 'resena'])
+            ->with(['items.producto', 'emprendedor.user', 'package', 'resena'])
             ->firstOrFail();
     }
 
@@ -120,13 +120,15 @@ class PedidoChat extends Component
         $this->problemaDescripcion = '';
         $this->showReportarProblema = false;
         $this->garantiaMensaje = 'Reporte enviado. El equipo de Venexpress lo revisará — recuerda que un producto '
-            . 'defectuoso solo da derecho a cambio, no a devolución de dinero (ese acuerdo es directamente con el emprendedor).';
+            .'defectuoso solo da derecho a cambio, no a devolución de dinero (ese acuerdo es directamente con el emprendedor).';
     }
 
     /**
-     * Reseña del producto para esta compra puntual. Una por pedido
-     * (resenas.pedido_id es unique) y solo una vez que hay guía real
-     * generada — mismo criterio que reportarProblema().
+     * Reseña de esta compra. Una por pedido (resenas.pedido_id es
+     * unique), aunque el carrito haya tenido varios productos — se
+     * guarda contra el primer producto del carrito, igual que antes
+     * cuando solo se podía pedir uno a la vez. Solo una vez que hay
+     * guía real generada, mismo criterio que reportarProblema().
      */
     public function enviarResena(): void
     {
@@ -147,7 +149,7 @@ class PedidoChat extends Component
 
         $resena = Resena::create([
             'pedido_id' => $this->pedido->id,
-            'producto_id' => $this->pedido->producto_id,
+            'producto_id' => $this->pedido->items->first()?->producto_id,
             'estrellas' => $this->estrellas,
             'comentario' => $this->comentario !== '' ? $this->comentario : null,
         ]);

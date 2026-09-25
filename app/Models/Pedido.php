@@ -30,16 +30,14 @@ class Pedido extends Model
     public const STATUS_CANCELADO = 'CANCELADO';
 
     protected $fillable = [
-        'producto_id',
         'emprendedor_id',
         'user_id',
         'package_id',
-        'cantidad',
-        'precio_unitario_usd',
         'precio_total_usd',
         'cliente_nombre',
         'cliente_id_doc',
         'cliente_telefono',
+        'cliente_email',
         'destino_ciudad',
         'destino_estado',
         'direccion_entrega',
@@ -51,14 +49,30 @@ class Pedido extends Model
     protected function casts(): array
     {
         return [
-            'precio_unitario_usd' => 'decimal:2',
             'precio_total_usd' => 'decimal:2',
         ];
     }
 
-    public function producto(): BelongsTo
+    /**
+     * Líneas del carrito de este pedido (ver PedidoItem: antes un
+     * Pedido era un solo producto/cantidad, ahora puede ser varios,
+     * siempre del mismo Emprendedor).
+     */
+    public function items(): HasMany
     {
-        return $this->belongsTo(Producto::class);
+        return $this->hasMany(PedidoItem::class);
+    }
+
+    /**
+     * Resumen de una línea por producto, para listados compactos
+     * (tablas de Admin/Emprendedor/Cliente) donde no cabe el detalle
+     * completo de cada línea del carrito.
+     */
+    public function getResumenItemsAttribute(): string
+    {
+        return $this->items
+            ->map(fn (PedidoItem $item) => "{$item->producto?->nombre} ×{$item->cantidad}")
+            ->implode(', ');
     }
 
     public function emprendedor(): BelongsTo

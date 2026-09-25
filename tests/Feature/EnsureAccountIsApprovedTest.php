@@ -181,4 +181,56 @@ class EnsureAccountIsApprovedTest extends TestCase
             ->get(route('emprendedor.dashboard'))
             ->assertRedirect(route('account.pending'));
     }
+
+    /**
+     * account-pending.blade.php solo miraba isAliado()/isAliadoTaquilla()/
+     * isRepartidor() para decidir el mensaje ("en revisión", "rechazada",
+     * "suspendida"): un Emprendedor pendiente caía siempre en el genérico
+     * "Tu cuenta no está activa" / "Inactiva", el mismo texto que ve una
+     * cuenta rechazada — encontrado al recorrer el registro de un
+     * emprendedor nuevo de punta a punta.
+     */
+    public function test_a_pending_emprendedor_sees_the_in_review_message_not_the_generic_inactive_one(): void
+    {
+        $user = User::factory()->create([
+            'role' => User::ROLE_EMPRENDEDOR,
+            'status' => User::STATUS_ACTIVE,
+        ]);
+
+        Emprendedor::create([
+            'user_id' => $user->id,
+            'pickup_ally_id' => $this->createActiveAlly()->id,
+            'business_name' => 'Tienda Pendiente',
+            'document_id' => 'V-22222222',
+            'status' => Emprendedor::STATUS_PENDING,
+        ]);
+
+        $this->actingAs($user)
+            ->get(route('account.pending'))
+            ->assertOk()
+            ->assertSee('Tu cuenta está en revisión')
+            ->assertSee('En revisión')
+            ->assertDontSee('Tu cuenta no está activa');
+    }
+
+    public function test_a_rejected_emprendedor_sees_the_rejected_message(): void
+    {
+        $user = User::factory()->create([
+            'role' => User::ROLE_EMPRENDEDOR,
+            'status' => User::STATUS_ACTIVE,
+        ]);
+
+        Emprendedor::create([
+            'user_id' => $user->id,
+            'pickup_ally_id' => $this->createActiveAlly()->id,
+            'business_name' => 'Tienda Rechazada',
+            'document_id' => 'V-33333333',
+            'status' => Emprendedor::STATUS_REJECTED,
+        ]);
+
+        $this->actingAs($user)
+            ->get(route('account.pending'))
+            ->assertOk()
+            ->assertSee('Tu solicitud fue rechazada');
+    }
 }

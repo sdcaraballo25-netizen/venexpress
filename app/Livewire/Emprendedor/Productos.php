@@ -2,9 +2,11 @@
 
 namespace App\Livewire\Emprendedor;
 
+use App\Models\Categoria;
 use App\Models\Producto;
+use App\Models\ProductoFoto;
+use Illuminate\Support\Collection;
 use Illuminate\Support\Facades\Auth;
-use Illuminate\Validation\Rule;
 use Livewire\Attributes\Layout;
 use Livewire\Attributes\Title;
 use Livewire\Component;
@@ -22,13 +24,6 @@ class Productos extends Component
 {
     use WithFileUploads;
 
-    /**
-     * Límite de fotos de galería (además de la portada) por producto —
-     * suficiente para mostrar el producto desde varios ángulos sin
-     * convertir el formulario en un uploader ilimitado.
-     */
-    protected const MAX_FOTOS_GALERIA = 5;
-
     public bool $showForm = false;
 
     public ?int $editingProductoId = null;
@@ -37,7 +32,7 @@ class Productos extends Component
 
     public string $descripcion = '';
 
-    public string $categoria = '';
+    public string $categoria_id = '';
 
     public string $precio_usd = '';
 
@@ -45,21 +40,43 @@ class Productos extends Component
 
     public string $stock = '';
 
-    public $foto = null;
+    /** @var array<int, TemporaryUploadedFile> */
+    public array $fotos = [];
+
+    /**
+     * Intake del <input type="file multiple">: un input nativo
+     * REEMPLAZA su selección cada vez que se abre el diálogo, no la
+     * acumula. updatedNuevasFotos() suma lo que llega aquí a $fotos
+     * (que es lo que realmente se sube al guardar) y vacía esta
+     * propiedad, para que el emprendedor pueda ir agregando fotos una
+     * selección a la vez sin perder las anteriores.
+     *
+     * @var array<int, TemporaryUploadedFile>
+     */
+    public array $nuevasFotos = [];
+
+    /** @var Collection<int, ProductoFoto> */
+    public $existingFotos = [];
 
     public ?string $existingFotoPath = null;
-
-    /** @var TemporaryUploadedFile[] */
-    public array $fotosNuevas = [];
-
-    /** Rutas (storage/public) de la galería ya guardada, al editar. */
-    public array $existingFotos = [];
 
     public ?string $successMessage = null;
 
     protected function emprendedor()
     {
         return Auth::user()->emprendedor;
+    }
+
+    public function updatedNuevasFotos(): void
+    {
+        $this->fotos = array_slice([...$this->fotos, ...$this->nuevasFotos], 0, 6);
+        $this->reset('nuevasFotos');
+    }
+
+    public function quitarFotoPendiente(int $index): void
+    {
+        unset($this->fotos[$index]);
+        $this->fotos = array_values($this->fotos);
     }
 
     public function startCreating(): void
@@ -72,19 +89,19 @@ class Productos extends Component
     public function editProducto(int $productoId): void
     {
         $producto = Producto::where('emprendedor_id', $this->emprendedor()->id)
+            ->with('fotos')
             ->findOrFail($productoId);
 
         $this->editingProductoId = $producto->id;
         $this->nombre = $producto->nombre;
         $this->descripcion = $producto->descripcion ?? '';
-        $this->categoria = $producto->categoria ?? '';
+        $this->categoria_id = $producto->categoria_id ? (string) $producto->categoria_id : '';
         $this->precio_usd = (string) $producto->precio_usd;
         $this->peso_kg = (string) $producto->peso_kg;
         $this->stock = (string) $producto->stock;
         $this->existingFotoPath = $producto->foto_path;
-        $this->foto = null;
-        $this->existingFotos = $producto->fotos ?? [];
-        $this->fotosNuevas = [];
+        $this->existingFotos = $producto->fotos;
+        $this->fotos = [];
 
         $this->showForm = true;
     }
@@ -102,35 +119,17 @@ class Productos extends Component
             'editingProductoId',
             'nombre',
             'descripcion',
-            'categoria',
+            'categoria_id',
             'precio_usd',
             'peso_kg',
             'stock',
-            'foto',
+            'fotos',
+            'nuevasFotos',
             'existingFotoPath',
-            'fotosNuevas',
             'existingFotos',
         ]);
-    }
 
-    /**
-     * Quita una foto ya guardada de la galería (solo del formulario en
-     * edición; se persiste al guardar, igual que el resto de los
-     * campos). No borra el archivo del disco — mismo criterio que ya
-     * usa este componente al reemplazar la portada.
-     */
-    public function eliminarFotoExistente(int $index): void
-    {
-        unset($this->existingFotos[$index]);
-
-        $this->existingFotos = array_values($this->existingFotos);
-    }
-
-    public function eliminarFotoNueva(int $index): void
-    {
-        unset($this->fotosNuevas[$index]);
-
-        $this->fotosNuevas = array_values($this->fotosNuevas);
+        $this->existingFotos = collect();
     }
 
     public function save(): void
@@ -138,47 +137,32 @@ class Productos extends Component
         $this->validate([
             'nombre' => ['required', 'string', 'max:255'],
             'descripcion' => ['nullable', 'string', 'max:2000'],
-            'categoria' => ['nullable', 'string', Rule::in(array_keys(Producto::CATEGORIAS))],
+            'categoria_id' => ['nullable', 'integer', 'exists:categorias,id'],
             'precio_usd' => ['required', 'numeric', 'min:0.01'],
             'peso_kg' => ['required', 'numeric', 'min:0.01'],
             'stock' => ['required', 'integer', 'min:0'],
-            'foto' => ['nullable', 'image', 'mimes:jpg,jpeg,png,webp', 'max:4096'],
-            'fotosNuevas' => [
-                'array',
-                function ($attribute, $value, $fail) {
-                    if (count($this->existingFotos) + count($value) > self::MAX_FOTOS_GALERIA) {
-                        $fail('Puedes tener hasta '.self::MAX_FOTOS_GALERIA.' fotos de galería por producto.');
-                    }
-                },
-            ],
-            'fotosNuevas.*' => ['image', 'mimes:jpg,jpeg,png,webp', 'max:4096'],
+            'fotos' => ['nullable', 'array', 'max:6'],
+            'fotos.*' => ['image', 'mimes:jpg,jpeg,png,webp', 'max:4096'],
         ]);
 
         $data = [
             'nombre' => $this->nombre,
             'descripcion' => $this->descripcion !== '' ? $this->descripcion : null,
-            'categoria' => $this->categoria !== '' ? $this->categoria : null,
+            'categoria_id' => $this->categoria_id !== '' ? (int) $this->categoria_id : null,
             'precio_usd' => $this->precio_usd,
             'peso_kg' => $this->peso_kg,
             'stock' => $this->stock,
-            'fotos' => [
-                ...$this->existingFotos,
-                ...array_map(fn ($foto) => $foto->store('productos', 'public'), $this->fotosNuevas),
-            ],
         ];
 
-        if ($this->foto) {
-            $data['foto_path'] = $this->foto->store('productos', 'public');
-        }
-
         if ($this->editingProductoId) {
-            Producto::where('emprendedor_id', $this->emprendedor()->id)
-                ->findOrFail($this->editingProductoId)
-                ->update($data);
+            $producto = Producto::where('emprendedor_id', $this->emprendedor()->id)
+                ->findOrFail($this->editingProductoId);
+
+            $producto->update($data);
 
             $this->successMessage = 'Producto actualizado correctamente.';
         } else {
-            Producto::create([
+            $producto = Producto::create([
                 ...$data,
                 'emprendedor_id' => $this->emprendedor()->id,
                 'activo' => true,
@@ -187,7 +171,36 @@ class Productos extends Component
             $this->successMessage = 'Producto creado correctamente.';
         }
 
+        if ($this->fotos) {
+            $siguienteOrden = 1 + (int) $producto->fotos()->max('orden');
+
+            foreach ($this->fotos as $foto) {
+                ProductoFoto::create([
+                    'producto_id' => $producto->id,
+                    'path' => $foto->store('productos', 'public'),
+                    'orden' => $siguienteOrden++,
+                ]);
+            }
+        }
+
         $this->cancelForm();
+    }
+
+    /**
+     * Quita una foto de la galería mientras se edita el formulario
+     * (sin necesitar guardar aparte: es una acción directa, igual que
+     * toggleActivo()).
+     */
+    public function eliminarFoto(int $fotoId): void
+    {
+        $foto = ProductoFoto::whereHas(
+            'producto',
+            fn ($query) => $query->where('emprendedor_id', $this->emprendedor()->id)
+        )->findOrFail($fotoId);
+
+        $foto->delete();
+
+        $this->existingFotos = $this->existingFotos->reject(fn (ProductoFoto $f) => $f->id === $fotoId);
     }
 
     public function toggleActivo(int $productoId): void
@@ -209,8 +222,10 @@ class Productos extends Component
         return view('livewire.emprendedor.productos', [
             'productos' => Producto::query()
                 ->where('emprendedor_id', $this->emprendedor()->id)
+                ->with('fotos')
                 ->latest()
                 ->get(),
+            'categorias' => Categoria::orderBy('nombre')->get(),
         ]);
     }
 }

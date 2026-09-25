@@ -5,6 +5,7 @@ namespace Tests\Feature\Emprendedor;
 use App\Exports\SimpleArrayExport;
 use App\Livewire\Emprendedor\Reports;
 use App\Models\Pedido;
+use App\Models\PedidoItem;
 use App\Models\Producto;
 use Illuminate\Foundation\Testing\RefreshDatabase;
 use Livewire\Livewire;
@@ -16,7 +17,9 @@ use Tests\TestCase;
  * Emprendedor\Reports es la versión de ventas de Admin\Reports /
  * Ally\Reports para el propio emprendedor: acotado a sus pedidos.
  * Cubre el aislamiento entre emprendedores y que solo los pedidos
- * CONFIRMADO cuentan como venta (ver Pedido::STATUS_CONFIRMADO).
+ * CONFIRMADO cuentan como venta (ver Pedido::STATUS_CONFIRMADO). Un
+ * Pedido es un carrito (ver PedidoItem): cada línea tiene su propio
+ * producto/cantidad/subtotal.
  */
 class ReportsTest extends TestCase
 {
@@ -35,22 +38,30 @@ class ReportsTest extends TestCase
         ], $overrides));
     }
 
-    private function createPedido(Producto $producto, array $overrides = []): Pedido
+    private function createPedido(Producto $producto, array $overrides = [], int $cantidad = 1): Pedido
     {
-        return Pedido::create(array_merge([
-            'producto_id' => $producto->id,
+        $precioTotal = $producto->precio_usd * $cantidad;
+
+        $pedido = Pedido::create(array_merge([
             'emprendedor_id' => $producto->emprendedor_id,
-            'cantidad' => 1,
-            'precio_unitario_usd' => $producto->precio_usd,
-            'precio_total_usd' => $producto->precio_usd,
+            'precio_total_usd' => $precioTotal,
             'cliente_nombre' => 'Cliente de prueba',
             'cliente_id_doc' => 'V-'.random_int(10000000, 99999999),
             'cliente_telefono' => '0414-0000000',
             'destino_ciudad' => 'Valencia',
             'destino_estado' => 'Carabobo',
             'status' => Pedido::STATUS_PENDIENTE,
-            'chat_token' => str()->random(40),
         ], $overrides));
+
+        PedidoItem::create([
+            'pedido_id' => $pedido->id,
+            'producto_id' => $producto->id,
+            'cantidad' => $cantidad,
+            'precio_unitario_usd' => $producto->precio_usd,
+            'subtotal_usd' => $precioTotal,
+        ]);
+
+        return $pedido;
     }
 
     public function test_the_screen_renders_with_default_period(): void
@@ -81,24 +92,19 @@ class ReportsTest extends TestCase
     public function test_sales_total_only_counts_confirmed_pedidos_in_the_period(): void
     {
         $emprendedor = $this->createEmprendedor();
-        $producto = $this->createProducto($emprendedor->id);
+        $producto = $this->createProducto($emprendedor->id, ['precio_usd' => 25.00]);
 
-        $confirmed = $this->createPedido($producto, [
-            'status' => Pedido::STATUS_CONFIRMADO,
-            'precio_total_usd' => 25.00,
-        ]);
+        $confirmed = $this->createPedido($producto, ['status' => Pedido::STATUS_CONFIRMADO]);
         $confirmed->forceFill(['created_at' => now()->subDays(2)])->save();
 
         // Pendiente: no debe sumar a las ventas aunque esté en el período.
-        $this->createPedido($producto, [
+        $this->createPedido($this->createProducto($emprendedor->id, ['precio_usd' => 999.00]), [
             'status' => Pedido::STATUS_PENDIENTE,
-            'precio_total_usd' => 999.00,
         ]);
 
         // Confirmado pero fuera del período elegido.
-        $outOfRange = $this->createPedido($producto, [
+        $outOfRange = $this->createPedido($this->createProducto($emprendedor->id, ['precio_usd' => 999.00]), [
             'status' => Pedido::STATUS_CONFIRMADO,
-            'precio_total_usd' => 999.00,
         ]);
         $outOfRange->forceFill(['created_at' => now()->subDays(60)])->save();
 
@@ -118,17 +124,8 @@ class ReportsTest extends TestCase
         $topProducto = $this->createProducto($emprendedor->id, ['nombre' => 'Producto Estrella']);
         $lowProducto = $this->createProducto($emprendedor->id, ['nombre' => 'Producto Secundario']);
 
-        $this->createPedido($topProducto, [
-            'status' => Pedido::STATUS_CONFIRMADO,
-            'cantidad' => 5,
-            'precio_total_usd' => 50.00,
-        ]);
-
-        $this->createPedido($lowProducto, [
-            'status' => Pedido::STATUS_CONFIRMADO,
-            'cantidad' => 1,
-            'precio_total_usd' => 10.00,
-        ]);
+        $this->createPedido($topProducto, ['status' => Pedido::STATUS_CONFIRMADO], cantidad: 5);
+        $this->createPedido($lowProducto, ['status' => Pedido::STATUS_CONFIRMADO], cantidad: 1);
 
         Livewire::actingAs($emprendedor->user)
             ->test(Reports::class)
@@ -156,8 +153,8 @@ class ReportsTest extends TestCase
         Excel::assertDownloaded($filename, function (SimpleArrayExport $export) {
             $productos = array_column(iterator_to_array($export->generator()), 3);
 
-            self::assertContains('Producto Propio', $productos);
-            self::assertNotContains('Producto Ajeno', $productos);
+            self::assertTrue(collect($productos)->contains(fn ($resumen) => str_contains($resumen, 'Producto Propio')));
+            self::assertFalse(collect($productos)->contains(fn ($resumen) => str_contains($resumen, 'Producto Ajeno')));
 
             return true;
         });

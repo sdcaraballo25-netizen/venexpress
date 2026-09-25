@@ -5,6 +5,7 @@ namespace App\Livewire\Emprendedor;
 use App\Livewire\Concerns\ExportsSpreadsheet;
 use App\Models\Emprendedor;
 use App\Models\Pedido;
+use App\Models\PedidoItem;
 use Illuminate\Support\Carbon;
 use Illuminate\Support\Facades\Auth;
 use Livewire\Attributes\Layout;
@@ -98,15 +99,14 @@ class Reports extends Component
                 Pedido::query()
                     ->where('emprendedor_id', $emprendedor->id)
                     ->whereBetween('created_at', [$from, $to])
-                    ->with('producto')
+                    ->with('items.producto')
                     ->cursor() as $pedido
             ) {
                 yield [
                     $pedido->id,
                     $pedido->created_at?->format('d/m/Y H:i'),
                     $pedido->cliente_nombre,
-                    $pedido->producto?->nombre,
-                    $pedido->cantidad,
+                    $pedido->resumen_items,
                     number_format((float) $pedido->precio_total_usd, 2, '.', ''),
                     $pedido->status,
                 ];
@@ -115,7 +115,7 @@ class Reports extends Component
 
         return $this->excelDownload(
             'reporte-ventas-'.$from->format('Y-m-d').'-a-'.$to->format('Y-m-d').'.xlsx',
-            ['Pedido', 'Fecha', 'Cliente', 'Producto', 'Cantidad', 'Total USD', 'Estado'],
+            ['Pedido', 'Fecha', 'Cliente', 'Productos', 'Total USD', 'Estado'],
             $rows,
         );
     }
@@ -166,10 +166,17 @@ class Reports extends Component
         $chartConfirmed = $days->map(fn ($day) => (int) ($confirmedByDay[$day] ?? 0))->values();
         $chartSales = $days->map(fn ($day) => round((float) ($salesByDay[$day] ?? 0), 2))->values();
 
-        // Top 5 productos más vendidos (por unidades) entre los
-        // pedidos confirmados del período.
-        $topProductos = $this->confirmedQuery($emprendedor->id, $from, $to)
-            ->selectRaw('producto_id, SUM(cantidad) as unidades, SUM(precio_total_usd) as total_usd')
+        // Top 5 productos más vendidos (por unidades) entre las líneas
+        // de los pedidos confirmados del período. Un Pedido es un
+        // carrito (ver PedidoItem): el producto/cantidad vendidos
+        // viven en cada línea, no en el pedido.
+        $topProductos = PedidoItem::query()
+            ->whereHas('pedido', function ($query) use ($emprendedor, $from, $to) {
+                $query->where('emprendedor_id', $emprendedor->id)
+                    ->where('status', Pedido::STATUS_CONFIRMADO)
+                    ->whereBetween('created_at', [$from, $to]);
+            })
+            ->selectRaw('producto_id, SUM(cantidad) as unidades, SUM(subtotal_usd) as total_usd')
             ->groupBy('producto_id')
             ->orderByDesc('unidades')
             ->with('producto')
