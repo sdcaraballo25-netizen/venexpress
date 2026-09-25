@@ -74,7 +74,7 @@
             {{-- =========================================================
                  BÚSQUEDA
             ========================================================== --}}
-            <div class="mb-10">
+            <div class="mb-6">
                 <div class="relative max-w-2xl">
                     <input type="search" wire:model.live.debounce.400ms="busqueda"
                            placeholder="Buscar productos, marcas y más..."
@@ -86,6 +86,24 @@
                         </svg>
                     </div>
                 </div>
+            </div>
+
+            {{-- =========================================================
+                 FILTRO DE CATEGORÍAS
+            ========================================================== --}}
+            <div class="mb-10 flex flex-wrap gap-2">
+                <button wire:click="$set('categoriaFiltro', '')"
+                        class="text-xs font-semibold px-3.5 py-2 rounded-full border transition
+                            {{ $categoriaFiltro === '' ? 'bg-blue-950 border-blue-950 text-white' : 'border-gray-300 text-gray-600 hover:border-gray-400' }}">
+                    Todas
+                </button>
+                @foreach (\App\Models\Producto::CATEGORIAS as $valor => $etiqueta)
+                    <button wire:click="$set('categoriaFiltro', '{{ $valor }}')"
+                            class="text-xs font-semibold px-3.5 py-2 rounded-full border transition
+                                {{ $categoriaFiltro === $valor ? 'bg-blue-950 border-blue-950 text-white' : 'border-gray-300 text-gray-600 hover:border-gray-400' }}">
+                        {{ $etiqueta }}
+                    </button>
+                @endforeach
             </div>
 
             {{-- =========================================================
@@ -138,12 +156,30 @@
                     </div>
 
                     <div class="grid sm:grid-cols-2 gap-5">
-                        @if ($productoViendo->foto_path)
-                            <img src="{{ Illuminate\Support\Facades\Storage::disk('public')->url($productoViendo->foto_path) }}"
-                                 class="w-full h-56 object-cover rounded-xl" alt="{{ $productoViendo->nombre }}">
-                        @else
-                            <div class="w-full h-56 bg-white border border-gray-200 rounded-xl flex items-center justify-center text-gray-200 text-6xl">📦</div>
-                        @endif
+                        @php
+                            $imagenesGaleria = collect($productoViendo->galeria)
+                                ->map(fn ($ruta) => Illuminate\Support\Facades\Storage::disk('public')->url($ruta))
+                                ->values();
+                        @endphp
+
+                        <div x-data="{ activa: 0, imagenes: {{ Illuminate\Support\Js::from($imagenesGaleria) }} }">
+                            <template x-if="imagenes.length > 0">
+                                <img :src="imagenes[activa]" class="w-full h-56 object-cover rounded-xl" alt="{{ $productoViendo->nombre }}">
+                            </template>
+                            <template x-if="imagenes.length === 0">
+                                <div class="w-full h-56 bg-white border border-gray-200 rounded-xl flex items-center justify-center text-gray-200 text-6xl">📦</div>
+                            </template>
+
+                            <div class="mt-2 flex gap-2" x-show="imagenes.length > 1">
+                                <template x-for="(imagen, index) in imagenes" :key="index">
+                                    <button type="button" @click="activa = index"
+                                            class="h-14 w-14 rounded-lg overflow-hidden border-2"
+                                            :class="activa === index ? 'border-blue-950' : 'border-transparent'">
+                                        <img :src="imagen" class="h-full w-full object-cover">
+                                    </button>
+                                </template>
+                            </div>
+                        </div>
 
                         <div>
                             <a href="{{ route('public.marketplace.store', $productoViendo->emprendedor_id) }}" wire:navigate
@@ -319,6 +355,12 @@
                                    class="text-xs text-gray-400 hover:text-blue-700 truncate">
                                     {{ $producto->emprendedor->business_name }}
                                 </a>
+                            @endif
+
+                            @if ($producto->categoria)
+                                <span class="mt-1 text-[10px] font-semibold uppercase tracking-wide text-blue-700">
+                                    {{ \App\Models\Producto::CATEGORIAS[$producto->categoria] ?? $producto->categoria }}
+                                </span>
                             @endif
 
                             <button wire:click="verProducto({{ $producto->id }})" class="block text-left w-full mt-0.5">

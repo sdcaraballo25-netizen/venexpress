@@ -10,7 +10,6 @@ use App\Models\Producto;
 use App\Services\VenezuelaLocationService;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Str;
-use Livewire\Attributes\Title;
 use Livewire\Attributes\Url;
 use Livewire\Component;
 use Livewire\WithPagination;
@@ -69,6 +68,9 @@ class Marketplace extends Component
     #[Url(as: 'buscar')]
     public string $busqueda = '';
 
+    #[Url(as: 'categoria')]
+    public string $categoriaFiltro = '';
+
     /**
      * True cuando quien pide está logueado como Cliente y ya tiene un
      * registro Customer con su cédula (viene de su registro en la
@@ -124,6 +126,11 @@ class Marketplace extends Component
     }
 
     public function updatedBusqueda(): void
+    {
+        $this->resetPage();
+    }
+
+    public function updatedCategoriaFiltro(): void
     {
         $this->resetPage();
     }
@@ -192,7 +199,7 @@ class Marketplace extends Component
             'destino_ciudad' => ['required', 'string'],
             'direccion_entrega' => ['required', 'string', 'max:500'],
             'referencia_entrega' => ['nullable', 'string', 'max:255'],
-            'cantidad' => ['required', 'integer', 'min:1', 'max:' . $producto->stock],
+            'cantidad' => ['required', 'integer', 'min:1', 'max:'.$producto->stock],
         ]);
 
         $cantidad = (int) $this->cantidad;
@@ -235,11 +242,15 @@ class Marketplace extends Component
                 fn ($query) => $query->where('emprendedor_id', $this->tiendaEmprendedor->id)
             )
             ->when(
+                $this->categoriaFiltro !== '',
+                fn ($query) => $query->where('categoria', $this->categoriaFiltro)
+            )
+            ->when(
                 trim($this->busqueda) !== '',
                 fn ($query) => $query->where(
                     fn ($sub) => $sub
-                        ->where('nombre', 'like', '%' . trim($this->busqueda) . '%')
-                        ->orWhere('descripcion', 'like', '%' . trim($this->busqueda) . '%')
+                        ->where('nombre', 'like', '%'.trim($this->busqueda).'%')
+                        ->orWhere('descripcion', 'like', '%'.trim($this->busqueda).'%')
                 )
             )
             ->with('emprendedor')

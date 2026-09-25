@@ -16,8 +16,8 @@ use Tests\TestCase;
 
 class MarketplaceTest extends TestCase
 {
-    use RefreshDatabase;
     use CreatesTestEmprendedores;
+    use RefreshDatabase;
 
     private function createProducto(Emprendedor $emprendedor, array $overrides = []): Producto
     {
@@ -110,6 +110,18 @@ class MarketplaceTest extends TestCase
             ->assertDontSee('Camisa azul');
     }
 
+    public function test_products_can_be_filtered_by_category(): void
+    {
+        $emprendedor = $this->createEmprendedor();
+        $this->createProducto($emprendedor, ['nombre' => 'Camisa azul', 'categoria' => 'ropa']);
+        $this->createProducto($emprendedor, ['nombre' => 'Torta de chocolate', 'categoria' => 'comida']);
+
+        Livewire::test(Marketplace::class)
+            ->set('categoriaFiltro', 'ropa')
+            ->assertSee('Camisa azul')
+            ->assertDontSee('Torta de chocolate');
+    }
+
     public function test_the_catalog_shows_a_products_average_rating(): void
     {
         $emprendedor = $this->createEmprendedor();
@@ -122,13 +134,13 @@ class MarketplaceTest extends TestCase
                 'cantidad' => 1,
                 'precio_unitario_usd' => 15.00,
                 'precio_total_usd' => 15.00,
-                'cliente_nombre' => 'Cliente ' . $i,
-                'cliente_id_doc' => 'V-' . (1000 + $i),
+                'cliente_nombre' => 'Cliente '.$i,
+                'cliente_id_doc' => 'V-'.(1000 + $i),
                 'cliente_telefono' => '0424-0000000',
                 'destino_ciudad' => 'Valencia',
                 'destino_estado' => 'Carabobo',
                 'status' => Pedido::STATUS_CONFIRMADO,
-                'chat_token' => 'token-rating-' . $i,
+                'chat_token' => 'token-rating-'.$i,
             ]);
 
             Resena::create([

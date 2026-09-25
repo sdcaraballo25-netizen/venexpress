@@ -42,6 +42,18 @@
                     @error('descripcion') <p class="mt-1 text-xs text-red-600">{{ $message }}</p> @enderror
                 </div>
 
+                <div class="sm:col-span-2">
+                    <label class="text-sm font-medium text-[#6B6B66]">Categoría (opcional)</label>
+                    <select wire:model="categoria"
+                            class="mt-2 w-full rounded-xl border border-[#E5E5E0] px-4 py-3 text-sm focus:border-blue-500 focus:ring-blue-500">
+                        <option value="">Sin categoría</option>
+                        @foreach (\App\Models\Producto::CATEGORIAS as $valor => $etiqueta)
+                            <option value="{{ $valor }}">{{ $etiqueta }}</option>
+                        @endforeach
+                    </select>
+                    @error('categoria') <p class="mt-1 text-xs text-red-600">{{ $message }}</p> @enderror
+                </div>
+
                 <div>
                     <label class="text-sm font-medium text-[#6B6B66]">Precio (USD)</label>
                     <input type="number" step="0.01" wire:model="precio_usd"
@@ -82,6 +94,41 @@
                     @error('foto') <p class="mt-1 text-xs text-red-600">{{ $message }}</p> @enderror
                 </div>
 
+                <div class="sm:col-span-2">
+                    <label class="text-sm font-medium text-[#6B6B66]">Galería adicional (opcional, hasta 5 fotos)</label>
+                    <input type="file" wire:model="fotosNuevas" accept="image/*" multiple
+                           class="mt-2 block w-full text-sm text-[#6B6B66]
+                                  file:mr-4 file:py-2 file:px-4 file:rounded-xl
+                                  file:border-0 file:text-sm file:font-semibold
+                                  file:bg-blue-50 file:text-blue-700 hover:file:bg-blue-100">
+                    <p class="mt-1 text-xs text-[#6B6B66]" wire:loading wire:target="fotosNuevas">Subiendo fotos...</p>
+                    @error('fotosNuevas') <p class="mt-1 text-xs text-red-600">{{ $message }}</p> @enderror
+
+                    @if (count($existingFotos) > 0 || count($fotosNuevas) > 0)
+                        <div class="mt-3 flex flex-wrap gap-3">
+                            @foreach ($existingFotos as $index => $rutaFoto)
+                                <div class="relative">
+                                    <img src="{{ Illuminate\Support\Facades\Storage::disk('public')->url($rutaFoto) }}" class="h-20 w-20 rounded-xl object-cover" alt="Foto de galería">
+                                    <button type="button" wire:click="eliminarFotoExistente({{ $index }})"
+                                            class="absolute -top-2 -right-2 h-6 w-6 rounded-full bg-red-600 text-white text-xs font-bold leading-none flex items-center justify-center hover:bg-red-700">
+                                        ✕
+                                    </button>
+                                </div>
+                            @endforeach
+
+                            @foreach ($fotosNuevas as $index => $fotoNueva)
+                                <div class="relative">
+                                    <img src="{{ $fotoNueva->temporaryUrl() }}" class="h-20 w-20 rounded-xl object-cover" alt="Vista previa">
+                                    <button type="button" wire:click="eliminarFotoNueva({{ $index }})"
+                                            class="absolute -top-2 -right-2 h-6 w-6 rounded-full bg-red-600 text-white text-xs font-bold leading-none flex items-center justify-center hover:bg-red-700">
+                                        ✕
+                                    </button>
+                                </div>
+                            @endforeach
+                        </div>
+                    @endif
+                </div>
+
                 <div class="sm:col-span-2 flex justify-end gap-3">
                     <button type="button" wire:click="cancelForm"
                             class="rounded-xl border border-[#E5E5E0] bg-white px-5 py-3 text-sm font-medium text-[#6B6B66] hover:bg-slate-50">
@@ -114,6 +161,12 @@
                             {{ $producto->activo ? 'Activo' : 'Inactivo' }}
                         </span>
                     </div>
+
+                    @if ($producto->categoria)
+                        <span class="mt-1 inline-block text-xs font-medium text-blue-700 bg-blue-50 px-2 py-0.5 rounded-lg">
+                            {{ \App\Models\Producto::CATEGORIAS[$producto->categoria] ?? $producto->categoria }}
+                        </span>
+                    @endif
 
                     <p class="mt-1 text-lg font-bold text-[#111111]">${{ number_format((float) $producto->precio_usd, 2) }}</p>
                     <p class="text-xs text-[#6B6B66]">Stock: {{ $producto->stock }} · {{ $producto->peso_kg }} kg</p>

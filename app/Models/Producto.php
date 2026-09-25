@@ -11,11 +11,27 @@ class Producto extends Model
 {
     use HasFactory;
 
+    /**
+     * Categorías fijas del catálogo (mismo criterio simple que los
+     * STATUS_* de otros modelos: no amerita una tabla aparte en esta
+     * etapa del MVP). null/"" se trata como "sin categoría".
+     */
+    public const CATEGORIAS = [
+        'ropa' => 'Ropa y accesorios',
+        'hogar' => 'Hogar y decoración',
+        'comida' => 'Alimentos y bebidas',
+        'belleza' => 'Belleza y cuidado personal',
+        'tecnologia' => 'Tecnología',
+        'otros' => 'Otros',
+    ];
+
     protected $fillable = [
         'emprendedor_id',
         'nombre',
         'descripcion',
+        'categoria',
         'foto_path',
+        'fotos',
         'precio_usd',
         'peso_kg',
         'stock',
@@ -28,6 +44,7 @@ class Producto extends Model
             'precio_usd' => 'decimal:2',
             'peso_kg' => 'decimal:3',
             'activo' => 'boolean',
+            'fotos' => 'array',
         ];
     }
 
@@ -76,5 +93,19 @@ class Producto extends Model
     public function getTotalResenasAttribute(): int
     {
         return $this->resenas()->count();
+    }
+
+    /**
+     * Galería completa para mostrar en la tienda: la portada (foto_path)
+     * primero, seguida de las fotos adicionales. Se calcula aquí para no
+     * repetir el orden en cada vista que necesite mostrar imágenes.
+     */
+    public function getGaleriaAttribute(): array
+    {
+        return collect([$this->foto_path])
+            ->merge($this->fotos ?? [])
+            ->filter()
+            ->values()
+            ->all();
     }
 }
