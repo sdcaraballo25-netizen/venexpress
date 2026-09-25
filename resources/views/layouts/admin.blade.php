@@ -460,6 +460,34 @@
                             </a>
 
 
+                            {{-- Categorías (marketplace) --}}
+                            <a
+                                href="{{ route('admin.categorias') }}"
+                                class="flex items-center gap-3 px-4 py-3 rounded-xl font-medium transition-colors
+                                {{ request()->routeIs('admin.categorias')
+                                    ? 'bg-amber-400 text-[#111111]'
+                                    : 'text-[#6B6B66] hover:bg-slate-50 hover:text-[#111111]' }}"
+                            >
+
+                                <svg
+                                    class="w-5 h-5"
+                                    fill="none"
+                                    stroke="currentColor"
+                                    viewBox="0 0 24 24"
+                                >
+                                    <path
+                                        stroke-linecap="round"
+                                        stroke-linejoin="round"
+                                        stroke-width="2"
+                                        d="M7 7h.01M3 4h18v16H3V4zm4 8h10M7 16h6"
+                                    />
+                                </svg>
+
+                                Categorías
+
+                            </a>
+
+
                             {{-- Órdenes de pago --}}
                             <a
                                 href="{{ route('admin.payments') }}"

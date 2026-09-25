@@ -27,7 +27,7 @@ class Compras extends Component
         return view('livewire.client.compras', [
             'pedidos' => Pedido::query()
                 ->where('user_id', Auth::id())
-                ->with(['producto', 'emprendedor'])
+                ->with(['items.producto', 'emprendedor'])
                 ->latest()
                 ->paginate(10),
         ]);

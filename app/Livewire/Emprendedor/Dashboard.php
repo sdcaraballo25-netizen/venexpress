@@ -34,7 +34,7 @@ class Dashboard extends Component
 
         $pedidosRecientes = Pedido::query()
             ->where('emprendedor_id', $emprendedor->id)
-            ->with('producto')
+            ->with('items.producto')
             ->latest()
             ->limit(5)
             ->get();

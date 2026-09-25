@@ -7,6 +7,7 @@ use App\Models\Incident;
 use App\Models\MensajePedido;
 use App\Models\Package;
 use App\Models\Pedido;
+use App\Models\PedidoItem;
 use App\Models\Producto;
 use App\Models\Resena;
 use Illuminate\Foundation\Testing\RefreshDatabase;
@@ -24,11 +25,9 @@ class PedidoChatTest extends TestCase
     use CreatesTestEmprendedores;
     use CreatesTestPackages;
 
-    private function createPedidoWithToken(string $token): Pedido
+    private function createProductoDePrueba($emprendedor): Producto
     {
-        $emprendedor = $this->createEmprendedor();
-
-        $producto = Producto::create([
+        return Producto::create([
             'emprendedor_id' => $emprendedor->id,
             'nombre' => 'Producto de prueba',
             'precio_usd' => 15.00,
@@ -36,12 +35,26 @@ class PedidoChatTest extends TestCase
             'stock' => 5,
             'activo' => true,
         ]);
+    }
 
-        return Pedido::create([
+    private function attachItem(Pedido $pedido, Producto $producto): PedidoItem
+    {
+        return PedidoItem::create([
+            'pedido_id' => $pedido->id,
             'producto_id' => $producto->id,
-            'emprendedor_id' => $emprendedor->id,
             'cantidad' => 1,
             'precio_unitario_usd' => 15.00,
+            'subtotal_usd' => 15.00,
+        ]);
+    }
+
+    private function createPedidoWithToken(string $token): Pedido
+    {
+        $emprendedor = $this->createEmprendedor();
+        $producto = $this->createProductoDePrueba($emprendedor);
+
+        $pedido = Pedido::create([
+            'emprendedor_id' => $emprendedor->id,
             'precio_total_usd' => 15.00,
             'cliente_nombre' => 'Cliente de Prueba',
             'cliente_id_doc' => 'V-87654321',
@@ -50,6 +63,10 @@ class PedidoChatTest extends TestCase
             'destino_estado' => 'Carabobo',
             'chat_token' => $token,
         ]);
+
+        $this->attachItem($pedido, $producto);
+
+        return $pedido;
     }
 
     public function test_a_guest_can_open_the_chat_with_a_valid_token(): void
@@ -58,7 +75,7 @@ class PedidoChatTest extends TestCase
 
         $this->get(route('public.marketplace.pedido', 'token-valido-123'))
             ->assertOk()
-            ->assertSee($pedido->producto->nombre);
+            ->assertSee($pedido->items->first()->producto->nombre);
     }
 
     public function test_an_invalid_token_returns_a_404(): void
@@ -133,26 +150,15 @@ class PedidoChatTest extends TestCase
     {
         $emprendedor = $this->createEmprendedor();
         $pickupAlly = $emprendedor->pickupAlly;
-
-        $producto = Producto::create([
-            'emprendedor_id' => $emprendedor->id,
-            'nombre' => 'Producto de prueba',
-            'precio_usd' => 15.00,
-            'peso_kg' => 1.0,
-            'stock' => 5,
-            'activo' => true,
-        ]);
+        $producto = $this->createProductoDePrueba($emprendedor);
 
         $package = $this->createPackage($pickupAlly, [
             'current_status' => Package::STATUS_ENTREGADO,
         ]);
 
         $pedido = Pedido::create([
-            'producto_id' => $producto->id,
             'emprendedor_id' => $emprendedor->id,
             'package_id' => $package->id,
-            'cantidad' => 1,
-            'precio_unitario_usd' => 15.00,
             'precio_total_usd' => 15.00,
             'cliente_nombre' => 'Cliente de Prueba',
             'cliente_id_doc' => 'V-87654321',
@@ -162,6 +168,7 @@ class PedidoChatTest extends TestCase
             'status' => Pedido::STATUS_CONFIRMADO,
             'chat_token' => 'token-garantia-1',
         ]);
+        $this->attachItem($pedido, $producto);
 
         Livewire::test(PedidoChat::class, ['token' => 'token-garantia-1'])
             ->set('problemaDescripcion', 'El producto llegó roto por dentro de la caja.')
@@ -184,24 +191,12 @@ class PedidoChatTest extends TestCase
     public function test_reporting_a_problem_requires_a_minimum_description(): void
     {
         $emprendedor = $this->createEmprendedor();
-
-        $producto = Producto::create([
-            'emprendedor_id' => $emprendedor->id,
-            'nombre' => 'Producto de prueba',
-            'precio_usd' => 15.00,
-            'peso_kg' => 1.0,
-            'stock' => 5,
-            'activo' => true,
-        ]);
-
+        $producto = $this->createProductoDePrueba($emprendedor);
         $package = $this->createPackage($emprendedor->pickupAlly);
 
         $pedido = Pedido::create([
-            'producto_id' => $producto->id,
             'emprendedor_id' => $emprendedor->id,
             'package_id' => $package->id,
-            'cantidad' => 1,
-            'precio_unitario_usd' => 15.00,
             'precio_total_usd' => 15.00,
             'cliente_nombre' => 'Cliente de Prueba',
             'cliente_id_doc' => 'V-87654321',
@@ -211,6 +206,7 @@ class PedidoChatTest extends TestCase
             'status' => Pedido::STATUS_CONFIRMADO,
             'chat_token' => 'token-garantia-2',
         ]);
+        $this->attachItem($pedido, $producto);
 
         Livewire::test(PedidoChat::class, ['token' => 'token-garantia-2'])
             ->set('problemaDescripcion', 'roto')
@@ -235,26 +231,15 @@ class PedidoChatTest extends TestCase
     {
         $emprendedor = $this->createEmprendedor();
         $pickupAlly = $emprendedor->pickupAlly;
-
-        $producto = Producto::create([
-            'emprendedor_id' => $emprendedor->id,
-            'nombre' => 'Producto de prueba',
-            'precio_usd' => 15.00,
-            'peso_kg' => 1.0,
-            'stock' => 5,
-            'activo' => true,
-        ]);
+        $producto = $this->createProductoDePrueba($emprendedor);
 
         $package = $this->createPackage($pickupAlly, [
             'current_status' => Package::STATUS_ENTREGADO,
         ]);
 
-        return Pedido::create([
-            'producto_id' => $producto->id,
+        $pedido = Pedido::create([
             'emprendedor_id' => $emprendedor->id,
             'package_id' => $package->id,
-            'cantidad' => 1,
-            'precio_unitario_usd' => 15.00,
             'precio_total_usd' => 15.00,
             'cliente_nombre' => 'Cliente de Prueba',
             'cliente_id_doc' => 'V-87654321',
@@ -264,6 +249,9 @@ class PedidoChatTest extends TestCase
             'status' => Pedido::STATUS_CONFIRMADO,
             'chat_token' => $token,
         ]);
+        $this->attachItem($pedido, $producto);
+
+        return $pedido;
     }
 
     public function test_a_client_can_leave_a_star_rating_and_review_on_a_confirmed_pedido(): void
@@ -281,7 +269,7 @@ class PedidoChatTest extends TestCase
         $this->assertNotNull($resena);
         $this->assertSame(4, $resena->estrellas);
         $this->assertSame('Muy buen producto, llegó a tiempo.', $resena->comentario);
-        $this->assertSame($pedido->producto_id, $resena->producto_id);
+        $this->assertSame($pedido->items->first()->producto_id, $resena->producto_id);
     }
 
     public function test_a_review_requires_at_least_one_star(): void
@@ -315,7 +303,7 @@ class PedidoChatTest extends TestCase
 
         Resena::create([
             'pedido_id' => $pedido->id,
-            'producto_id' => $pedido->producto_id,
+            'producto_id' => $pedido->items->first()->producto_id,
             'estrellas' => 3,
             'comentario' => 'Primera reseña.',
         ]);

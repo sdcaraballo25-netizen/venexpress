@@ -52,8 +52,8 @@
             @forelse ($pedidosRecientes as $pedido)
                 <div class="flex items-center justify-between px-5 py-3">
                     <div>
-                        <p class="text-sm font-medium text-[#111111]">{{ $pedido->producto?->nombre }}</p>
-                        <p class="text-xs text-[#6B6B66]">{{ $pedido->cliente_nombre }} · {{ $pedido->cantidad }} unidad(es)</p>
+                        <p class="text-sm font-medium text-[#111111]">{{ $pedido->resumen_items }}</p>
+                        <p class="text-xs text-[#6B6B66]">{{ $pedido->cliente_nombre }}</p>
                     </div>
                     <span class="text-xs font-semibold px-2.5 py-1 rounded-lg
                         {{ $pedido->status === \App\Models\Pedido::STATUS_CONFIRMADO ? 'bg-emerald-50 text-emerald-700' : 'bg-amber-50 text-amber-700' }}">

@@ -6,6 +6,7 @@ use App\Livewire\Public\Marketplace;
 use App\Models\Customer;
 use App\Models\Emprendedor;
 use App\Models\Pedido;
+use App\Models\PedidoItem;
 use App\Models\Producto;
 use App\Models\Resena;
 use App\Models\User;
@@ -74,23 +75,65 @@ class MarketplaceTest extends TestCase
         $producto = $this->createProducto($emprendedor, ['stock' => 5]);
 
         Livewire::test(Marketplace::class)
-            ->call('pedirProducto', $producto->id)
+            ->call('agregarAlCarrito', $producto->id, 2)
+            ->call('abrirCheckout')
             ->set('cliente_nombre', 'Comprador de Prueba')
             ->set('cliente_id_doc', 'V-99999999')
             ->set('cliente_telefono', '0414-9999999')
             ->set('destino_estado', 'Carabobo')
             ->set('destino_ciudad', 'Valencia')
             ->set('direccion_entrega', 'Av. Bolívar, casa 1')
-            ->set('cantidad', '2')
             ->call('confirmarPedido')
             ->assertHasNoErrors();
 
         $pedido = Pedido::where('cliente_id_doc', 'V-99999999')->first();
 
         $this->assertNotNull($pedido);
-        $this->assertSame(2, $pedido->cantidad);
+        $this->assertSame(2, $pedido->items->first()->cantidad);
         $this->assertSame('30.00', (string) $pedido->precio_total_usd);
         $this->assertSame(Pedido::STATUS_PENDIENTE, $pedido->status);
+    }
+
+    public function test_a_cart_can_hold_several_products_from_the_same_emprendedor(): void
+    {
+        $emprendedor = $this->createEmprendedor();
+        $camisa = $this->createProducto($emprendedor, ['nombre' => 'Camisa', 'precio_usd' => 10.00, 'stock' => 5]);
+        $gorra = $this->createProducto($emprendedor, ['nombre' => 'Gorra', 'precio_usd' => 5.00, 'stock' => 5]);
+
+        Livewire::test(Marketplace::class)
+            ->call('agregarAlCarrito', $camisa->id, 2)
+            ->call('agregarAlCarrito', $gorra->id, 1)
+            ->call('abrirCheckout')
+            ->set('cliente_nombre', 'Comprador de Prueba')
+            ->set('cliente_id_doc', 'V-33344455')
+            ->set('cliente_telefono', '0414-3334445')
+            ->set('destino_estado', 'Carabobo')
+            ->set('destino_ciudad', 'Valencia')
+            ->set('direccion_entrega', 'Av. Bolívar, casa 1')
+            ->call('confirmarPedido')
+            ->assertHasNoErrors();
+
+        $pedido = Pedido::where('cliente_id_doc', 'V-33344455')->first();
+
+        $this->assertNotNull($pedido);
+        $this->assertSame(2, $pedido->items()->count());
+        $this->assertSame('25.00', (string) $pedido->precio_total_usd);
+    }
+
+    public function test_adding_a_product_from_a_different_emprendedor_flags_a_conflict_instead_of_mixing_carts(): void
+    {
+        $emprendedorUno = $this->createEmprendedor();
+        $emprendedorDos = $this->createEmprendedor();
+        $productoUno = $this->createProducto($emprendedorUno, ['nombre' => 'Producto Uno']);
+        $productoDos = $this->createProducto($emprendedorDos, ['nombre' => 'Producto Dos']);
+
+        Livewire::test(Marketplace::class)
+            ->call('agregarAlCarrito', $productoUno->id)
+            ->call('agregarAlCarrito', $productoDos->id)
+            ->assertSet('conflictoProductoId', $productoDos->id)
+            ->call('vaciarYAgregar', $productoDos->id)
+            ->assertSet('conflictoProductoId', null)
+            ->assertSet('carrito', [$productoDos->id => 1]);
     }
 
     public function test_products_can_be_searched_by_name_or_description(): void
@@ -110,6 +153,21 @@ class MarketplaceTest extends TestCase
             ->assertDontSee('Camisa azul');
     }
 
+    public function test_products_can_be_filtered_by_category(): void
+    {
+        $emprendedor = $this->createEmprendedor();
+        $ropa = \App\Models\Categoria::first();
+        $otraCategoria = \App\Models\Categoria::skip(1)->first();
+
+        $this->createProducto($emprendedor, ['nombre' => 'Producto En Ropa', 'categoria_id' => $ropa->id]);
+        $this->createProducto($emprendedor, ['nombre' => 'Producto En Otra', 'categoria_id' => $otraCategoria->id]);
+
+        Livewire::test(Marketplace::class)
+            ->set('categoriaId', (string) $ropa->id)
+            ->assertSee('Producto En Ropa')
+            ->assertDontSee('Producto En Otra');
+    }
+
     public function test_the_catalog_shows_a_products_average_rating(): void
     {
         $emprendedor = $this->createEmprendedor();
@@ -117,10 +175,7 @@ class MarketplaceTest extends TestCase
 
         foreach ([5, 3] as $i => $estrellas) {
             $pedido = Pedido::create([
-                'producto_id' => $producto->id,
                 'emprendedor_id' => $emprendedor->id,
-                'cantidad' => 1,
-                'precio_unitario_usd' => 15.00,
                 'precio_total_usd' => 15.00,
                 'cliente_nombre' => 'Cliente ' . $i,
                 'cliente_id_doc' => 'V-' . (1000 + $i),
@@ -129,6 +184,14 @@ class MarketplaceTest extends TestCase
                 'destino_estado' => 'Carabobo',
                 'status' => Pedido::STATUS_CONFIRMADO,
                 'chat_token' => 'token-rating-' . $i,
+            ]);
+
+            PedidoItem::create([
+                'pedido_id' => $pedido->id,
+                'producto_id' => $producto->id,
+                'cantidad' => 1,
+                'precio_unitario_usd' => 15.00,
+                'subtotal_usd' => 15.00,
             ]);
 
             Resena::create([
@@ -144,7 +207,7 @@ class MarketplaceTest extends TestCase
             ->assertSee('(2)');
     }
 
-    public function test_clicking_a_product_shows_its_detail_without_opening_the_order_form(): void
+    public function test_clicking_a_product_shows_its_detail_without_opening_the_checkout_form(): void
     {
         $emprendedor = $this->createEmprendedor();
         $producto = $this->createProducto($emprendedor, [
@@ -155,7 +218,7 @@ class MarketplaceTest extends TestCase
         Livewire::test(Marketplace::class)
             ->call('verProducto', $producto->id)
             ->assertSee('Una descripción de prueba.')
-            ->assertSet('selectedProductoId', null);
+            ->assertSet('showCheckout', false);
     }
 
     public function test_the_per_emprendedor_store_page_only_lists_that_emprendedors_products(): void
@@ -225,7 +288,8 @@ class MarketplaceTest extends TestCase
             ->assertSet('cliente_nombre', 'Cliente Con Cuenta')
             ->assertSet('cliente_id_doc', 'V-12345678')
             ->assertSet('cliente_telefono', '0414-1234567')
-            ->call('pedirProducto', $producto->id)
+            ->call('agregarAlCarrito', $producto->id)
+            ->call('abrirCheckout')
             ->assertDontSee('Cédula')
             ->assertSee('Cliente Con Cuenta')
             ->set('destino_estado', 'Carabobo')
@@ -253,14 +317,14 @@ class MarketplaceTest extends TestCase
 
         Livewire::actingAs($client)
             ->test(Marketplace::class)
-            ->call('pedirProducto', $producto->id)
+            ->call('agregarAlCarrito', $producto->id)
+            ->call('abrirCheckout')
             ->set('cliente_nombre', 'Comprador de Prueba')
             ->set('cliente_id_doc', 'V-55566677')
             ->set('cliente_telefono', '0414-5556667')
             ->set('destino_estado', 'Carabobo')
             ->set('destino_ciudad', 'Valencia')
             ->set('direccion_entrega', 'Av. Bolívar, casa 1')
-            ->set('cantidad', '1')
             ->call('confirmarPedido')
             ->assertHasNoErrors();
 
@@ -276,14 +340,14 @@ class MarketplaceTest extends TestCase
         $producto = $this->createProducto($emprendedor, ['stock' => 5]);
 
         Livewire::test(Marketplace::class)
-            ->call('pedirProducto', $producto->id)
+            ->call('agregarAlCarrito', $producto->id)
+            ->call('abrirCheckout')
             ->set('cliente_nombre', 'Comprador de Prueba')
             ->set('cliente_id_doc', 'V-77788899')
             ->set('cliente_telefono', '0414-7778889')
             ->set('destino_estado', 'Carabobo')
             ->set('destino_ciudad', 'Valencia')
             ->set('direccion_entrega', 'Av. Bolívar, casa 1')
-            ->set('cantidad', '1')
             ->call('confirmarPedido')
             ->assertHasNoErrors();
 
@@ -299,13 +363,13 @@ class MarketplaceTest extends TestCase
         $producto = $this->createProducto($emprendedor, ['stock' => 5]);
 
         Livewire::test(Marketplace::class)
-            ->call('pedirProducto', $producto->id)
+            ->call('agregarAlCarrito', $producto->id)
+            ->call('abrirCheckout')
             ->set('cliente_nombre', 'Comprador de Prueba')
             ->set('cliente_id_doc', 'V-44455566')
             ->set('cliente_telefono', '0414-4445556')
             ->set('destino_estado', 'Carabobo')
             ->set('destino_ciudad', 'Valencia')
-            ->set('cantidad', '1')
             ->call('confirmarPedido')
             ->assertHasErrors(['direccion_entrega']);
 
@@ -319,16 +383,11 @@ class MarketplaceTest extends TestCase
         $emprendedor = $this->createEmprendedor();
         $producto = $this->createProducto($emprendedor, ['stock' => 2]);
 
-        Livewire::test(Marketplace::class)
-            ->call('pedirProducto', $producto->id)
-            ->set('cliente_nombre', 'Comprador de Prueba')
-            ->set('cliente_id_doc', 'V-11122233')
-            ->set('cliente_telefono', '0414-1112223')
-            ->set('destino_estado', 'Carabobo')
-            ->set('destino_ciudad', 'Valencia')
-            ->set('cantidad', '5')
-            ->call('confirmarPedido')
-            ->assertHasErrors(['cantidad']);
+        $component = Livewire::test(Marketplace::class)
+            ->call('agregarAlCarrito', $producto->id, 5)
+            ->assertSet('carritoError', "Solo quedan 2 unidad(es) de \"{$producto->nombre}\".");
+
+        $this->assertSame([], $component->get('carrito'));
 
         $this->assertDatabaseMissing('pedidos', [
             'cliente_id_doc' => 'V-11122233',

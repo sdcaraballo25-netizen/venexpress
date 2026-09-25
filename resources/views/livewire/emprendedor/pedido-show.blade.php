@@ -12,7 +12,7 @@
             </a>
             <p class="text-xs font-semibold text-[#6B6B66] mt-1">Pedido #{{ $pedido->id }}</p>
             <h1 class="font-display text-2xl font-bold tracking-tight text-[#111111]">
-                {{ $pedido->producto?->nombre }}
+                {{ $pedido->resumen_items }}
             </h1>
         </div>
 
@@ -45,9 +45,16 @@
                 <p class="text-xs text-[#6B6B66]">Destino</p>
                 <p class="font-medium text-[#111111]">{{ $pedido->destino_ciudad }}, {{ $pedido->destino_estado }}</p>
             </div>
-            <div>
-                <p class="text-xs text-[#6B6B66]">Cantidad</p>
-                <p class="font-medium text-[#111111]">{{ $pedido->cantidad }} unidad(es)</p>
+            <div class="col-span-2">
+                <p class="text-xs text-[#6B6B66]">Productos</p>
+                <ul class="mt-1 space-y-0.5">
+                    @foreach ($pedido->items as $item)
+                        <li class="font-medium text-[#111111]">
+                            {{ $item->cantidad }} × {{ $item->producto?->nombre }}
+                            <span class="text-[#6B6B66] font-normal">(${{ number_format((float) $item->subtotal_usd, 2) }})</span>
+                        </li>
+                    @endforeach
+                </ul>
             </div>
             <div>
                 <p class="text-xs text-[#6B6B66]">Total</p>

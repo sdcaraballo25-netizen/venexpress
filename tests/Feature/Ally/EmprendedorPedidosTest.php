@@ -8,6 +8,7 @@ use App\Models\BcvRate;
 use App\Models\CityDistance;
 use App\Models\Package;
 use App\Models\Pedido;
+use App\Models\PedidoItem;
 use App\Models\Producto;
 use App\Models\RateMatrix;
 use App\Services\PedidoService;
@@ -71,10 +72,7 @@ class EmprendedorPedidosTest extends TestCase
         ]);
 
         $pedido = Pedido::create([
-            'producto_id' => $producto->id,
             'emprendedor_id' => $emprendedor->id,
-            'cantidad' => 1,
-            'precio_unitario_usd' => 15.00,
             'precio_total_usd' => 15.00,
             'cliente_nombre' => 'Cliente de Prueba',
             'cliente_id_doc' => 'V-87654321',
@@ -82,6 +80,14 @@ class EmprendedorPedidosTest extends TestCase
             'destino_ciudad' => 'Valencia',
             'destino_estado' => 'Carabobo',
             'direccion_entrega' => 'Av. Bolívar, casa 1',
+        ]);
+
+        PedidoItem::create([
+            'pedido_id' => $pedido->id,
+            'producto_id' => $producto->id,
+            'cantidad' => 1,
+            'precio_unitario_usd' => 15.00,
+            'subtotal_usd' => 15.00,
         ]);
 
         app(PedidoService::class)->marcarComoPagado($pedido);
@@ -185,10 +191,7 @@ class EmprendedorPedidosTest extends TestCase
         ]);
 
         $pedido = Pedido::create([
-            'producto_id' => $producto->id,
             'emprendedor_id' => $emprendedor->id,
-            'cantidad' => 1,
-            'precio_unitario_usd' => 15.00,
             'precio_total_usd' => 15.00,
             'cliente_nombre' => 'Cliente de Prueba',
             'cliente_id_doc' => 'V-87654321',
@@ -196,6 +199,14 @@ class EmprendedorPedidosTest extends TestCase
             'destino_ciudad' => 'Valencia',
             'destino_estado' => 'Carabobo',
             'direccion_entrega' => 'Av. Bolívar, casa 1',
+        ]);
+
+        PedidoItem::create([
+            'pedido_id' => $pedido->id,
+            'producto_id' => $producto->id,
+            'cantidad' => 1,
+            'precio_unitario_usd' => 15.00,
+            'subtotal_usd' => 15.00,
         ]);
 
         $ally = $emprendedor->pickupAlly;
