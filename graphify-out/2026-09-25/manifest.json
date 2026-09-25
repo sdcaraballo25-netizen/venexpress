@@ -360,9 +360,9 @@
     "semantic_hash": "89a8dd996123468bd60ca62c58d38ff5"
   },
   "database/seeders/DatabaseSeeder.php": {
-    "mtime": 1790049658.92437,
-    "seen": 1790355069.4807162,
-    "ast_hash": "1883800ec8ba578b8e423e5d01ffe418",
+    "mtime": 1790361641.929994,
+    "seen": 1790362069.3057644,
+    "ast_hash": "ecfaad3fbc83ab0214e4a9cc54f1ef49",
     "semantic_hash": ""
   },
   "lang/es/auth.php": {
@@ -402,9 +402,9 @@
     "semantic_hash": "d8eda274115af5fd2aaa8230af329ef7"
   },
   "resources/js/app.js": {
-    "mtime": 1790108432.4228976,
-    "seen": 1790355069.480723,
-    "ast_hash": "dbb5134f030d553b8b6e4bdc08df8af8",
+    "mtime": 1790361641.929994,
+    "seen": 1790362069.3057714,
+    "ast_hash": "d2221486ad1c487d504f84a5bbbcacbd",
     "semantic_hash": ""
   },
   "resources/js/bootstrap.js": {
@@ -606,9 +606,9 @@
     "semantic_hash": "e1790b7d0d6e0f4a34bb7497b14eeace"
   },
   "resources/views/layouts/admin.blade.php": {
-    "mtime": 1790032350.0079954,
-    "seen": 1790034276.7314637,
-    "ast_hash": "7e391bb23d1a9836600f8cfa879bb2fe",
+    "mtime": 1790361641.930994,
+    "seen": 1790362069.3058712,
+    "ast_hash": "e8790353521827521be49d08d418a94f",
     "semantic_hash": ""
   },
   "resources/views/layouts/app.blade.php": {
@@ -648,9 +648,9 @@
     "semantic_hash": ""
   },
   "routes/web.php": {
-    "mtime": 1790359411.7432778,
-    "seen": 1790359485.4782305,
-    "ast_hash": "4472a991cab930fe53833acea780d71f",
+    "mtime": 1790361991.9060683,
+    "seen": 1790362069.305895,
+    "ast_hash": "81dd226a4f737d240a058bbcedea8585",
     "semantic_hash": ""
   },
   "tailwind.config.js": {
@@ -1104,9 +1104,9 @@
     "semantic_hash": ""
   },
   "resources/views/layouts/ally.blade.php": {
-    "mtime": 1790359249.8020673,
-    "seen": 1790359485.4782073,
-    "ast_hash": "8ca959562ad4d5f2288fb3cf52c6a024",
+    "mtime": 1790361641.930994,
+    "seen": 1790362069.305872,
+    "ast_hash": "b5c346f5e940729c816b8acf34e050fc",
     "semantic_hash": ""
   },
   "app/Console/Commands/SyncBcvRate.php": {
@@ -1434,9 +1434,9 @@
     "semantic_hash": ""
   },
   "resources/views/layouts/driver.blade.php": {
-    "mtime": 1789963415.0317583,
-    "seen": 1790031061.4014986,
-    "ast_hash": "d3e28f87c871fd2738f6297be6edfcb9",
+    "mtime": 1790361641.9329941,
+    "seen": 1790362069.3058755,
+    "ast_hash": "09a1239757ddb0bf0e58389bd6a4733b",
     "semantic_hash": ""
   },
   "app/Livewire/Public/OfficeLocator.php": {
@@ -1776,9 +1776,9 @@
     "semantic_hash": ""
   },
   "resources/views/layouts/client.blade.php": {
-    "mtime": 1790110821.0690877,
-    "seen": 1790355069.4808273,
-    "ast_hash": "995aaf5d28842afa91caf94fd165dbb6",
+    "mtime": 1790361641.9319942,
+    "seen": 1790362069.3058746,
+    "ast_hash": "3c06fd8f1807806046e8a7ff17589baa",
     "semantic_hash": ""
   },
   "resources/views/pages/auth/verify-account.blade.php": {
@@ -2712,9 +2712,9 @@
     "semantic_hash": ""
   },
   "resources/views/account-pending.blade.php": {
-    "mtime": 1789963415.0266895,
-    "seen": 1790031061.4014778,
-    "ast_hash": "cdbc9ff6384f1635478537bec1386723",
+    "mtime": 1790361641.930994,
+    "seen": 1790362069.3058512,
+    "ast_hash": "6f895eb1fb6364f612f181b40a162065",
     "semantic_hash": ""
   },
   "resources/views/components/faq-accordion.blade.php": {
@@ -2724,9 +2724,9 @@
     "semantic_hash": ""
   },
   "resources/views/layouts/almacen.blade.php": {
-    "mtime": 1789963415.0307562,
-    "seen": 1790031061.4014962,
-    "ast_hash": "47c80c94399efa301635391332a29333",
+    "mtime": 1790361641.9319942,
+    "seen": 1790362069.305873,
+    "ast_hash": "87c0754a2dd08f93cb860ee7dc1f0c6a",
     "semantic_hash": ""
   },
   "resources/views/public/help-center.blade.php": {
@@ -3420,9 +3420,9 @@
     "semantic_hash": ""
   },
   "tests/Feature/EnsureAccountIsApprovedTest.php": {
-    "mtime": 1790032350.0139573,
-    "seen": 1790034276.731571,
-    "ast_hash": "b4b74a0d9126cd4b16a0e79aa480c8aa",
+    "mtime": 1790361641.939715,
+    "seen": 1790362069.3059955,
+    "ast_hash": "a7d85fc66b89d851779ea35f16a0d760",
     "semantic_hash": ""
   },
   "tests/Feature/Profile/PayoutAccountFormTest.php": {
@@ -3612,21 +3612,21 @@
     "semantic_hash": ""
   },
   "app/Models/Pedido.php": {
-    "mtime": 1790051818.55235,
-    "seen": 1790355069.4805586,
-    "ast_hash": "fef516dd624e9a65a1749552a28dfad0",
+    "mtime": 1790361641.9259942,
+    "seen": 1790362069.3055854,
+    "ast_hash": "1aee822174ef1bb2a4bad58f23942854",
     "semantic_hash": ""
   },
   "app/Models/Producto.php": {
-    "mtime": 1790354852.4938312,
-    "seen": 1790355069.4805596,
-    "ast_hash": "925c81d3f4e3deb7f2fc60db389538b2",
+    "mtime": 1790361697.6057165,
+    "seen": 1790362069.305587,
+    "ast_hash": "8bb1c189be20df55c4c177f22df8de6b",
     "semantic_hash": ""
   },
   "app/Services/PedidoService.php": {
-    "mtime": 1790048939.5336044,
-    "seen": 1790355069.4805965,
-    "ast_hash": "18d15a2f611b2aa84310c90a5ed4123c",
+    "mtime": 1790361991.6220646,
+    "seen": 1790362069.3056269,
+    "ast_hash": "7fed6cdce36c0b95658e0d65db20676b",
     "semantic_hash": ""
   },
   "database/migrations/2026_09_21_000001_add_emprendedor_discount_to_rate_matrices_table.php": {
@@ -3660,9 +3660,9 @@
     "semantic_hash": ""
   },
   "tests/Feature/PedidoServiceTest.php": {
-    "mtime": 1790048939.5376472,
-    "seen": 1790355069.480948,
-    "ast_hash": "c81b050641752e6361d433ade8f1a1c8",
+    "mtime": 1790361992.2593632,
+    "seen": 1790362069.3060002,
+    "ast_hash": "42d910f66787ac5c349a7d3f9127f207",
     "semantic_hash": ""
   },
   "app/Livewire/Admin/EmprendedoresApprovalManager.php": {
@@ -3672,27 +3672,27 @@
     "semantic_hash": ""
   },
   "app/Livewire/Emprendedor/Dashboard.php": {
-    "mtime": 1790032350.0069933,
-    "seen": 1790034276.7311969,
-    "ast_hash": "5acf5995b31154eeb85e9c77e4ea62f5",
+    "mtime": 1790361641.923994,
+    "seen": 1790362069.3055482,
+    "ast_hash": "643732d46491cbedd4599c6d9bf44854",
     "semantic_hash": ""
   },
   "app/Livewire/Emprendedor/Pedidos.php": {
-    "mtime": 1790048939.53249,
-    "seen": 1790355069.4805255,
-    "ast_hash": "16d6d98631537abfae42e19ef3057836",
+    "mtime": 1790361641.923994,
+    "seen": 1790362069.30555,
+    "ast_hash": "35bda20a21d44cf95e6f122532b51992",
     "semantic_hash": ""
   },
   "app/Livewire/Emprendedor/Productos.php": {
-    "mtime": 1790354981.1527686,
-    "seen": 1790355069.4805276,
-    "ast_hash": "47c4456e1615807cd0c3a9d344914f0b",
+    "mtime": 1790361991.205528,
+    "seen": 1790362069.3055518,
+    "ast_hash": "a74b2076540f5638e4f5c5cae149843b",
     "semantic_hash": ""
   },
   "app/Livewire/Public/Marketplace.php": {
-    "mtime": 1790354981.2205117,
-    "seen": 1790355069.4805326,
-    "ast_hash": "9eb41ac8555e853e330de99c06161254",
+    "mtime": 1790361991.415819,
+    "seen": 1790362069.3055577,
+    "ast_hash": "aae512d73cc381a120ef50c7203a50e4",
     "semantic_hash": ""
   },
   "database/migrations/2026_09_21_000005_add_foto_path_to_productos_table.php": {
@@ -3708,33 +3708,33 @@
     "semantic_hash": ""
   },
   "resources/views/Livewire/emprendedor/dashboard.blade.php": {
-    "mtime": 1790032350.009498,
-    "seen": 1790034276.731429,
-    "ast_hash": "09e54801188600fefb5db500ff3ad0a9",
+    "mtime": 1790361641.9339943,
+    "seen": 1790362069.3058305,
+    "ast_hash": "10a0928cefa4cd8f30fc529229442378",
     "semantic_hash": ""
   },
   "resources/views/Livewire/emprendedor/pedidos.blade.php": {
-    "mtime": 1790108432.4228976,
-    "seen": 1790355069.480784,
-    "ast_hash": "1498d3a7af024cac5ca93b0ff5be32ee",
+    "mtime": 1790361641.9349942,
+    "seen": 1790362069.305832,
+    "ast_hash": "ed1843e5d9563a8b07c4083e3a3f79f2",
     "semantic_hash": ""
   },
   "resources/views/Livewire/emprendedor/productos.blade.php": {
-    "mtime": 1790354902.8218045,
-    "seen": 1790355069.4807856,
-    "ast_hash": "ff9d79d0402ccca20eb7057d1de39e01",
+    "mtime": 1790361706.1518707,
+    "seen": 1790362069.3058338,
+    "ast_hash": "16fb78292e447a2d8a5631539e686b45",
     "semantic_hash": ""
   },
   "resources/views/layouts/emprendedor.blade.php": {
-    "mtime": 1790359332.4178782,
-    "seen": 1790359485.4782128,
-    "ast_hash": "f101190991e040fc97385f9f349a510d",
+    "mtime": 1790361641.9329941,
+    "seen": 1790362069.3058765,
+    "ast_hash": "2cfb3d247b8ea3a020279e3349869fc9",
     "semantic_hash": ""
   },
   "resources/views/public/marketplace.blade.php": {
-    "mtime": 1790354932.6809344,
-    "seen": 1790355069.4808357,
-    "ast_hash": "20eb5fe7846fcd334f809c9541fad924",
+    "mtime": 1790361706.2577136,
+    "seen": 1790362069.3058832,
+    "ast_hash": "bfb331e7d36510802a81d3019a21b48b",
     "semantic_hash": ""
   },
   "tests/Feature/Admin/EmprendedoresApprovalManagerTest.php": {
@@ -3750,39 +3750,39 @@
     "semantic_hash": ""
   },
   "tests/Feature/Emprendedor/PedidosTest.php": {
-    "mtime": 1790048939.5376472,
-    "seen": 1790355069.4809399,
-    "ast_hash": "3df4797f44354e1c09815516b59382fe",
+    "mtime": 1790361992.0656896,
+    "seen": 1790362069.305991,
+    "ast_hash": "ebc2dea1c503e0702df4db924e04ba69",
     "semantic_hash": ""
   },
   "tests/Feature/Emprendedor/ProductosTest.php": {
-    "mtime": 1790354981.3142118,
-    "seen": 1790355069.4809413,
-    "ast_hash": "95e7096a4c4b1303b81912d05530a1c1",
+    "mtime": 1790361723.3023138,
+    "seen": 1790362069.3059926,
+    "ast_hash": "8de5386419e8008851692303a0a4379f",
     "semantic_hash": ""
   },
   "tests/Feature/Public/MarketplaceTest.php": {
-    "mtime": 1790354981.407302,
-    "seen": 1790355069.4809542,
-    "ast_hash": "abaa27b06d817a0d9697cb57a2f2ad9e",
+    "mtime": 1790361992.3717577,
+    "seen": 1790362069.3060064,
+    "ast_hash": "4ed70625051602eac2ce8612fb62f2cf",
     "semantic_hash": ""
   },
   "app/Livewire/Ally/EmprendedorPedidos.php": {
-    "mtime": 1790050927.9011774,
-    "seen": 1790355069.4804928,
-    "ast_hash": "57ffe369a5d8f6a0ff6c81e025cae712",
+    "mtime": 1790361991.0846572,
+    "seen": 1790362069.3055177,
+    "ast_hash": "56efa680ecb35e6ff01eb070d858f755",
     "semantic_hash": ""
   },
   "app/Livewire/Client/Compras.php": {
-    "mtime": 1790049658.9233685,
-    "seen": 1790355069.4805062,
-    "ast_hash": "db4c87ea66b48d6c3c678341ce2bdbf5",
+    "mtime": 1790361641.9229937,
+    "seen": 1790362069.305531,
+    "ast_hash": "af9a5e1f8b990212544fc1903d802af6",
     "semantic_hash": ""
   },
   "app/Livewire/Emprendedor/PedidoShow.php": {
-    "mtime": 1790103620.7365496,
-    "seen": 1790355069.4805243,
-    "ast_hash": "597bf7daa311a1dd5a1296250949a2a1",
+    "mtime": 1790361991.1406188,
+    "seen": 1790362069.3055494,
+    "ast_hash": "1caa78f2ae87686a511a7fadee62f6f8",
     "semantic_hash": ""
   },
   "app/Livewire/Emprendedor/Perfil.php": {
@@ -3792,9 +3792,9 @@
     "semantic_hash": ""
   },
   "app/Livewire/Public/PedidoChat.php": {
-    "mtime": 1790103620.7375534,
-    "seen": 1790355069.4805348,
-    "ast_hash": "3f7ae583da8b06e5a04125339ca90564",
+    "mtime": 1790361991.4576206,
+    "seen": 1790362069.30556,
+    "ast_hash": "00d01a7c06e6cd61e40051650af2c1bf",
     "semantic_hash": ""
   },
   "app/Models/MensajePedido.php": {
@@ -3852,27 +3852,27 @@
     "semantic_hash": ""
   },
   "database/migrations/2026_09_25_124713_add_categoria_and_fotos_to_productos_table.php": {
-    "mtime": 1790354840.310534,
-    "seen": 1790355069.4807153,
-    "ast_hash": "ab094c15308748f71f5aba4d90897409",
+    "mtime": 1790361684.2230282,
+    "seen": 1790362069.3057632,
+    "ast_hash": "5763138b5d2a261517013a0da8ebd08e",
     "semantic_hash": ""
   },
   "resources/views/Livewire/Ally/emprendedor-pedidos.blade.php": {
-    "mtime": 1790108994.4342778,
-    "seen": 1790355069.4807546,
-    "ast_hash": "b58d864840f3ea220944e79756b841d2",
+    "mtime": 1790361641.9339943,
+    "seen": 1790362069.3058012,
+    "ast_hash": "24d0409d073f77ba0beb307482fdd174",
     "semantic_hash": ""
   },
   "resources/views/Livewire/client/compras.blade.php": {
-    "mtime": 1790108432.4228976,
-    "seen": 1790355069.4807768,
-    "ast_hash": "a17248b775a4a9ee15684e1f4d752482",
+    "mtime": 1790361641.9339943,
+    "seen": 1790362069.3058255,
+    "ast_hash": "15250f0d7516dd0f7036224a65bb728a",
     "semantic_hash": ""
   },
   "resources/views/Livewire/emprendedor/pedido-show.blade.php": {
-    "mtime": 1790108432.4228976,
-    "seen": 1790355069.480783,
-    "ast_hash": "c4e5ac4a7e833262ecf4f0ad93ac19a6",
+    "mtime": 1790361641.9349942,
+    "seen": 1790362069.3058312,
+    "ast_hash": "3c5ca4ca413ac8b1700a584363e80e39",
     "semantic_hash": ""
   },
   "resources/views/Livewire/emprendedor/perfil.blade.php": {
@@ -3894,15 +3894,15 @@
     "semantic_hash": ""
   },
   "resources/views/public/pedido-chat.blade.php": {
-    "mtime": 1790108432.431469,
-    "seen": 1790355069.4808373,
-    "ast_hash": "a529f7d8abd417488a96017ef0e2fb9d",
+    "mtime": 1790361641.9359946,
+    "seen": 1790362069.3058848,
+    "ast_hash": "f3371186f22020a8dbdd6db36f84754c",
     "semantic_hash": ""
   },
   "tests/Feature/Ally/EmprendedorPedidosTest.php": {
-    "mtime": 1790050927.9061773,
-    "seen": 1790355069.4808857,
-    "ast_hash": "660c14365b44d4b268e9322ae4f54979",
+    "mtime": 1790361991.9659648,
+    "seen": 1790362069.3059323,
+    "ast_hash": "3736e0e92d73ddeff90b26bfbeaee8ae",
     "semantic_hash": ""
   },
   "tests/Feature/Auth/EmprendedorLoginRedirectTest.php": {
@@ -3912,15 +3912,15 @@
     "semantic_hash": ""
   },
   "tests/Feature/ClientComprasTest.php": {
-    "mtime": 1790049658.9266427,
-    "seen": 1790355069.4809103,
-    "ast_hash": "478cecc6c0a4c8e28bd2632a5baa33f8",
+    "mtime": 1790361991.9890373,
+    "seen": 1790362069.3059576,
+    "ast_hash": "b1deaae80377b0698c0957d1de524a49",
     "semantic_hash": ""
   },
   "tests/Feature/Emprendedor/PedidoShowTest.php": {
-    "mtime": 1790103620.7395468,
-    "seen": 1790355069.4809387,
-    "ast_hash": "610991d9d08edcc3926a82ab9e2db409",
+    "mtime": 1790361992.0297883,
+    "seen": 1790362069.30599,
+    "ast_hash": "8c0defbfb127e182254ee6ded3fb6d73",
     "semantic_hash": ""
   },
   "tests/Feature/Emprendedor/PerfilTest.php": {
@@ -3936,9 +3936,9 @@
     "semantic_hash": ""
   },
   "tests/Feature/Public/PedidoChatTest.php": {
-    "mtime": 1790103620.7395468,
-    "seen": 1790355069.4809558,
-    "ast_hash": "7b111c8a761dbb11e319a4113c8a3e28",
+    "mtime": 1790361992.453624,
+    "seen": 1790362069.3060083,
+    "ast_hash": "b831d0a425b7f493c080a47eb58bbcd6",
     "semantic_hash": ""
   },
   "public/images/ChatGPT Image 23 sept 2026, 21_54_58.png": {
@@ -4014,9 +4014,9 @@
     "semantic_hash": ""
   },
   "app/Livewire/Emprendedor/Reports.php": {
-    "mtime": 1790359290.1947775,
-    "seen": 1790359485.477903,
-    "ast_hash": "0c975b5db6e445ffb372ce76bc8aa5d6",
+    "mtime": 1790361903.8688185,
+    "seen": 1790362069.305553,
+    "ast_hash": "e24aac23a09638bfd2cbdf6bc02cd3c7",
     "semantic_hash": ""
   },
   "resources/views/Livewire/Ally/reports.blade.php": {
@@ -4038,9 +4038,81 @@
     "semantic_hash": ""
   },
   "tests/Feature/Emprendedor/ReportsTest.php": {
-    "mtime": 1790359401.1392481,
-    "seen": 1790359485.4783235,
-    "ast_hash": "102c481b326dcad769c6568026b3ea00",
+    "mtime": 1790361927.1166544,
+    "seen": 1790362069.3059938,
+    "ast_hash": "b2f1ad1abad8fe5b79aad2c4bbcc54ca",
+    "semantic_hash": ""
+  },
+  "app/Livewire/Admin/CategoriasManager.php": {
+    "mtime": 1790361641.9229937,
+    "seen": 1790362069.305488,
+    "ast_hash": "3add9b3167ca99486a054aa0d1a97425",
+    "semantic_hash": ""
+  },
+  "app/Models/Categoria.php": {
+    "mtime": 1790361641.9259942,
+    "seen": 1790362069.3055725,
+    "ast_hash": "5bbf5b05d547cff3f625a181ed878f83",
+    "semantic_hash": ""
+  },
+  "app/Models/PedidoItem.php": {
+    "mtime": 1790361641.9269936,
+    "seen": 1790362069.305586,
+    "ast_hash": "c646b87e193ba98fee077d468058359d",
+    "semantic_hash": ""
+  },
+  "app/Models/ProductoFoto.php": {
+    "mtime": 1790361641.9269936,
+    "seen": 1790362069.305588,
+    "ast_hash": "47f7f54a81f99221a95221b7746e2895",
+    "semantic_hash": ""
+  },
+  "app/Notifications/NuevoPedidoRecibido.php": {
+    "mtime": 1790361991.5344033,
+    "seen": 1790362069.305601,
+    "ast_hash": "362c8a6cef944c5811f00459b836e053",
+    "semantic_hash": ""
+  },
+  "app/Notifications/PedidoEstadoActualizado.php": {
+    "mtime": 1790361991.553649,
+    "seen": 1790362069.3056047,
+    "ast_hash": "74ab1f7b23a4eecc7052f4f0e773e619",
+    "semantic_hash": ""
+  },
+  "database/migrations/2026_09_25_000001_create_categorias_table.php": {
+    "mtime": 1790361641.9279943,
+    "seen": 1790362069.3057482,
+    "ast_hash": "5de5963266063606f873b572091cd46b",
+    "semantic_hash": ""
+  },
+  "database/migrations/2026_09_25_000002_add_categoria_id_to_productos_table.php": {
+    "mtime": 1790361641.9289942,
+    "seen": 1790362069.305749,
+    "ast_hash": "bcba14b3766c85cc0dcfa38604aff4e3",
+    "semantic_hash": ""
+  },
+  "database/migrations/2026_09_25_000003_create_producto_fotos_table.php": {
+    "mtime": 1790361641.9289942,
+    "seen": 1790362069.3057501,
+    "ast_hash": "2196d0db06c7989ea7b3a609459774ce",
+    "semantic_hash": ""
+  },
+  "database/migrations/2026_09_25_000004_create_pedido_items_table.php": {
+    "mtime": 1790361641.9289942,
+    "seen": 1790362069.3057616,
+    "ast_hash": "27825e75a1676498414644ae5ec7b2a5",
+    "semantic_hash": ""
+  },
+  "database/migrations/2026_09_25_000005_add_cliente_email_to_pedidos_table.php": {
+    "mtime": 1790361641.929994,
+    "seen": 1790362069.3057625,
+    "ast_hash": "197384123f9bff942c3e2515f98ad7e0",
+    "semantic_hash": ""
+  },
+  "resources/views/Livewire/Admin/categorias-manager.blade.php": {
+    "mtime": 1790361641.9329941,
+    "seen": 1790362069.3057768,
+    "ast_hash": "cf8a667df7792f48187fd65a06918c71",
     "semantic_hash": ""
   }
 }
