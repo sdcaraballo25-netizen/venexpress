@@ -13,6 +13,7 @@ class Producto extends Model
 
     protected $fillable = [
         'emprendedor_id',
+        'categoria_id',
         'nombre',
         'descripcion',
         'foto_path',
@@ -36,6 +37,16 @@ class Producto extends Model
         return $this->belongsTo(Emprendedor::class);
     }
 
+    public function categoria(): BelongsTo
+    {
+        return $this->belongsTo(Categoria::class);
+    }
+
+    public function fotos(): HasMany
+    {
+        return $this->hasMany(ProductoFoto::class)->orderBy('orden');
+    }
+
     /**
      * Precio en bolívares al tipo de cambio BCV vigente, para mostrar
      * junto al precio en USD en la tienda pública (mismo criterio que
@@ -53,6 +64,16 @@ class Producto extends Model
     public function pedidos(): HasMany
     {
         return $this->hasMany(Pedido::class);
+    }
+
+    /**
+     * Primera foto de la galería (producto_fotos), o foto_path si el
+     * producto es de antes de que existiera la galería. Null si no
+     * tiene ninguna foto todavía.
+     */
+    public function getFotoPrincipalPathAttribute(): ?string
+    {
+        return $this->fotos->first()?->path ?? $this->foto_path;
     }
 
     public function resenas(): HasMany

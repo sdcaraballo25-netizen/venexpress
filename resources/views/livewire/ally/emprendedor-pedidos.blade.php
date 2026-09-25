@@ -70,8 +70,10 @@
                     <p class="font-medium text-[#111111]">{{ $pedido->emprendedor->business_name }}</p>
                 </div>
                 <div>
-                    <p class="text-xs text-[#6B6B66]">Producto</p>
-                    <p class="font-medium text-[#111111]">{{ $pedido->producto?->nombre }} ({{ $pedido->cantidad }} unidad(es))</p>
+                    <p class="text-xs text-[#6B6B66]">Producto(s)</p>
+                    @foreach ($pedido->items as $item)
+                        <p class="font-medium text-[#111111]">{{ $item->producto?->nombre }} ({{ $item->cantidad }} unidad(es))</p>
+                    @endforeach
                 </div>
                 <div>
                     <p class="text-xs text-[#6B6B66]">Destinatario</p>
@@ -177,7 +179,7 @@
                 @click.prevent="$store.confirm.open({
                     title: 'Confirmar datos antes de generar la guía',
                     message: 'Cliente: ' + @js($pedido->cliente_nombre) + '\n'
-                        + 'Producto: ' + @js($pedido->producto?->nombre . ' — ' . $pedido->cantidad . ' unidad(es)') + '\n'
+                        + 'Producto(s): ' + @js($pedido->resumen_items) + '\n'
                         + 'Total a cobrar: '
                         + @js($pricePreview ? '$' . number_format($pricePreview['total_price_usd'], 2) . ' (Bs. ' . number_format($pricePreview['total_price_ves'], 2) . ')' : 'ingresa el peso para calcularlo')
                         + '\n\n¿Todo correcto? Esto genera la guía definitiva.',

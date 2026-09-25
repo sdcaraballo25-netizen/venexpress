@@ -8,6 +8,7 @@ use App\Models\CityDistance;
 use App\Models\Emprendedor;
 use App\Models\Package;
 use App\Models\Pedido;
+use App\Models\PedidoItem;
 use App\Models\Producto;
 use App\Models\RateMatrix;
 use App\Models\User;
@@ -105,11 +106,8 @@ class PedidoServiceTest extends TestCase
 
     private function createPedido(Producto $producto, int $cantidad = 1): Pedido
     {
-        return Pedido::create([
-            'producto_id' => $producto->id,
+        $pedido = Pedido::create([
             'emprendedor_id' => $producto->emprendedor_id,
-            'cantidad' => $cantidad,
-            'precio_unitario_usd' => $producto->precio_usd,
             'precio_total_usd' => $producto->precio_usd * $cantidad,
             'cliente_nombre' => 'Cliente de Prueba',
             'cliente_id_doc' => 'V-87654321',
@@ -118,6 +116,16 @@ class PedidoServiceTest extends TestCase
             'destino_estado' => 'Carabobo',
             'direccion_entrega' => 'Av. Bolívar, casa 1',
         ]);
+
+        PedidoItem::create([
+            'pedido_id' => $pedido->id,
+            'producto_id' => $producto->id,
+            'cantidad' => $cantidad,
+            'precio_unitario_usd' => $producto->precio_usd,
+            'subtotal_usd' => $producto->precio_usd * $cantidad,
+        ]);
+
+        return $pedido;
     }
 
     public function test_marcar_como_pagado_reserva_stock_sin_generar_guia(): void

@@ -7,6 +7,7 @@ use App\Models\BcvRate;
 use App\Models\CityDistance;
 use App\Models\Package;
 use App\Models\Pedido;
+use App\Models\PedidoItem;
 use App\Models\Producto;
 use App\Models\RateMatrix;
 use Illuminate\Database\Eloquent\ModelNotFoundException;
@@ -52,11 +53,8 @@ class PedidosTest extends TestCase
 
     private function createPedido(int $emprendedorId, int $productoId, int $cantidad = 1): Pedido
     {
-        return Pedido::create([
-            'producto_id' => $productoId,
+        $pedido = Pedido::create([
             'emprendedor_id' => $emprendedorId,
-            'cantidad' => $cantidad,
-            'precio_unitario_usd' => 15.00,
             'precio_total_usd' => 15.00 * $cantidad,
             'cliente_nombre' => 'Cliente de Prueba',
             'cliente_id_doc' => 'V-87654321',
@@ -64,6 +62,16 @@ class PedidosTest extends TestCase
             'destino_ciudad' => 'Valencia',
             'destino_estado' => 'Carabobo',
         ]);
+
+        PedidoItem::create([
+            'pedido_id' => $pedido->id,
+            'producto_id' => $productoId,
+            'cantidad' => $cantidad,
+            'precio_unitario_usd' => 15.00,
+            'subtotal_usd' => 15.00 * $cantidad,
+        ]);
+
+        return $pedido;
     }
 
     public function test_confirming_a_pedido_marks_it_as_paid_and_reserves_stock_without_a_package_yet(): void

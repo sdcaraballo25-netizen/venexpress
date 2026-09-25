@@ -4,6 +4,7 @@ namespace Tests\Feature\Emprendedor;
 
 use App\Livewire\Emprendedor\Productos;
 use App\Models\Producto;
+use App\Models\ProductoFoto;
 use Illuminate\Database\Eloquent\ModelNotFoundException;
 use Illuminate\Foundation\Testing\RefreshDatabase;
 use Illuminate\Http\UploadedFile;
@@ -29,7 +30,7 @@ class ProductosTest extends TestCase
             ->set('precio_usd', '15.50')
             ->set('peso_kg', '0.5')
             ->set('stock', '10')
-            ->set('foto', UploadedFile::fake()->create('foto.jpg', 100, 'image/jpeg'))
+            ->set('fotos.0', UploadedFile::fake()->create('foto.jpg', 100, 'image/jpeg'))
             ->call('save')
             ->assertHasNoErrors();
 
@@ -39,9 +40,42 @@ class ProductosTest extends TestCase
         $this->assertSame('Camisa azul', $producto->nombre);
         $this->assertSame(10, $producto->stock);
         $this->assertTrue($producto->activo);
-        $this->assertNotNull($producto->foto_path);
 
-        Storage::disk('public')->assertExists($producto->foto_path);
+        $foto = ProductoFoto::where('producto_id', $producto->id)->first();
+        $this->assertNotNull($foto);
+        $this->assertSame($foto->path, $producto->foto_principal_path);
+
+        Storage::disk('public')->assertExists($foto->path);
+    }
+
+    /**
+     * Un <input type="file multiple"> reemplaza su selección cada vez
+     * que se abre el diálogo (no la acumula) — sin updatedNuevasFotos()
+     * sumando a $fotos, elegir una segunda foto por separado borraba
+     * la primera en vez de agregarse.
+     */
+    public function test_selecting_photos_in_separate_dialog_actions_accumulates_them(): void
+    {
+        Storage::fake('public');
+
+        $emprendedor = $this->createEmprendedor();
+
+        Livewire::actingAs($emprendedor->user)
+            ->test(Productos::class)
+            ->set('nombre', 'Producto con varias fotos')
+            ->set('precio_usd', '10')
+            ->set('peso_kg', '1')
+            ->set('stock', '5')
+            ->set('nuevasFotos', [UploadedFile::fake()->image('a.jpg')])
+            ->assertCount('fotos', 1)
+            ->set('nuevasFotos', [UploadedFile::fake()->image('b.jpg')])
+            ->assertCount('fotos', 2)
+            ->call('save')
+            ->assertHasNoErrors();
+
+        $producto = Producto::where('emprendedor_id', $emprendedor->id)->first();
+
+        $this->assertSame(2, ProductoFoto::where('producto_id', $producto->id)->count());
     }
 
     public function test_creating_a_product_requires_a_positive_price_and_weight(): void

@@ -27,6 +27,7 @@ use App\Livewire\Admin\Reports as AdminReports;
 use App\Livewire\Admin\RoutesDashboard;
 use App\Livewire\Admin\RoutesManager;
 use App\Livewire\Admin\UsersManager;
+use App\Livewire\Admin\CategoriasManager;
 use App\Livewire\Admin\WarehousesManager;
 use App\Livewire\Ally\Cod as AllyCod;
 use App\Livewire\Ally\Commissions as AllyCommissions;
@@ -562,6 +563,9 @@ Route::prefix('admin')
 
         Route::get('/emprendedores/aprobacion', EmprendedoresApprovalManager::class)
             ->name('emprendedores.approval');
+
+        Route::get('/categorias', CategoriasManager::class)
+            ->name('categorias');
 
         Route::get('/remuneraciones/tarifa', DriverRemunerationManager::class)
             ->name('driver-remuneration-rate');

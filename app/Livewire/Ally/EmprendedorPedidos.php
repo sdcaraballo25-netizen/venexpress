@@ -91,7 +91,7 @@ class EmprendedorPedidos extends Component
             return;
         }
 
-        $pedido = Pedido::with(['producto', 'emprendedor.pickupAlly'])->find((int) $id);
+        $pedido = Pedido::with(['items.producto', 'emprendedor.pickupAlly'])->find((int) $id);
 
         if (! $pedido) {
             $this->searchError = 'No existe ningún pedido con ese número.';
