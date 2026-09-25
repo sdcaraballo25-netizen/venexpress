@@ -532,6 +532,29 @@
                     </a>
 
 
+                    {{-- Reportes --}}
+                    <a
+                        href="{{ route('ally.reports') }}"
+                        wire:navigate
+                        class="mb-1 flex items-center gap-3 rounded-xl px-3 py-2.5 text-sm font-medium transition
+                        {{ request()->routeIs('ally.reports')
+                            ? 'bg-amber-400 text-[#111111]'
+                            : 'text-slate-600 hover:bg-slate-50' }}"
+                    >
+                        <svg class="h-5 w-5"
+                            fill="none"
+                            stroke="currentColor"
+                            viewBox="0 0 24 24">
+                            <path stroke-linecap="round"
+                                stroke-linejoin="round"
+                                stroke-width="2"
+                                d="M9 19v-6a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2a2 2 0 002-2zm0 0V9a2 2 0 012-2h2a2 2 0 012 2v10m0 0V5a2 2 0 012-2h2a2 2 0 012 2v14a2 2 0 01-2 2h-2a2 2 0 01-2-2"/>
+                        </svg>
+
+                        <span>Reportes</span>
+                    </a>
+
+
                     {{-- Corte de caja --}}
                     <a
                         href="{{ route('ally.cash-cut') }}"

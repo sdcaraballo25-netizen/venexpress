@@ -40,17 +40,11 @@ use App\Livewire\Ally\PackageDetail as AllyPackageDetail;
 use App\Livewire\Ally\PackagePickup as AllyPackagePickup;
 use App\Livewire\Ally\PackageReception;
 use App\Livewire\Ally\Packages as AllyPackages;
+use App\Livewire\Ally\Reports as AllyReports;
 use App\Livewire\Ally\SalesCloseout as AllySalesCloseout;
 use App\Livewire\Ally\StaffManager as AllyStaffManager;
 use App\Livewire\Almacen\Dashboard as AlmacenDashboard;
 use App\Livewire\Almacen\HelpCenter as AlmacenHelpCenter;
-use App\Livewire\Emprendedor\Dashboard as EmprendedorDashboard;
-use App\Livewire\Emprendedor\Pedidos as EmprendedorPedidos;
-use App\Livewire\Emprendedor\PedidoShow as EmprendedorPedidoShow;
-use App\Livewire\Emprendedor\Perfil as EmprendedorPerfil;
-use App\Livewire\Emprendedor\Productos as EmprendedorProductos;
-use App\Livewire\Public\Marketplace;
-use App\Livewire\Public\PedidoChat;
 use App\Livewire\Client\Compras as ClientCompras;
 use App\Livewire\Client\Dashboard as ClientDashboard;
 use App\Livewire\Client\HelpCenter as ClientHelpCenter;
@@ -64,14 +58,22 @@ use App\Livewire\Driver\Packages;
 use App\Livewire\Driver\RouteDetail;
 use App\Livewire\Driver\RouteHistory;
 use App\Livewire\Driver\Scanner;
+use App\Livewire\Emprendedor\Dashboard as EmprendedorDashboard;
+use App\Livewire\Emprendedor\Pedidos as EmprendedorPedidos;
+use App\Livewire\Emprendedor\PedidoShow as EmprendedorPedidoShow;
+use App\Livewire\Emprendedor\Perfil as EmprendedorPerfil;
+use App\Livewire\Emprendedor\Productos as EmprendedorProductos;
+use App\Livewire\Emprendedor\Reports as EmprendedorReports;
 use App\Livewire\Profile\Show as ProfileShow;
-use App\Livewire\Recommendations\Create as RecommendationCreate;
 use App\Livewire\Public\HelpCenter;
+use App\Livewire\Public\Marketplace;
 use App\Livewire\Public\OfficeLocator;
+use App\Livewire\Public\PedidoChat;
 use App\Livewire\Public\PriceCalculator;
 use App\Livewire\Public\PrivacyPolicy;
 use App\Livewire\Public\RecommendationForm;
 use App\Livewire\Public\TermsAndConditions;
+use App\Livewire\Recommendations\Create as RecommendationCreate;
 use Illuminate\Support\Facades\Route;
 
 /*
@@ -112,6 +114,10 @@ Route::prefix('ally')
         Route::get('/comisiones', AllyCommissions::class)
             ->middleware('role:aliado')
             ->name('commissions');
+
+        Route::get('/reportes', AllyReports::class)
+            ->middleware('role:aliado')
+            ->name('reports');
 
         Route::get('/pedidos', AllyPackages::class)
             ->name('packages.index');
@@ -351,6 +357,10 @@ Route::get('/emprendedor/pedidos', EmprendedorPedidos::class)
 Route::get('/emprendedor/pedidos/{pedidoId}', EmprendedorPedidoShow::class)
     ->middleware(['auth', 'verified', 'role:emprendedor', 'account.approved'])
     ->name('emprendedor.pedidos.show');
+
+Route::get('/emprendedor/reportes', EmprendedorReports::class)
+    ->middleware(['auth', 'verified', 'role:emprendedor', 'account.approved'])
+    ->name('emprendedor.reportes');
 
 Route::get('/emprendedor/perfil', EmprendedorPerfil::class)
     ->middleware(['auth', 'verified', 'role:emprendedor', 'account.approved'])
