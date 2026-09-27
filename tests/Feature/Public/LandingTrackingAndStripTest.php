@@ -53,7 +53,7 @@ class LandingTrackingAndStripTest extends TestCase
         }
     }
 
-    public function test_shared_navbar_shows_tienda_for_guests_and_marks_it_active_on_the_store(): void
+    public function test_shared_navbar_shows_tienda_for_guests(): void
     {
         $tiendaLink = preg_quote(route('public.marketplace'), '/');
 
@@ -69,11 +69,22 @@ class LandingTrackingAndStripTest extends TestCase
             $this->assertMatchesRegularExpression('/href="' . $tiendaLink . '"\s+class="pnav-link "/', $html, $url);
             $this->assertDoesNotMatchRegularExpression('/href="' . $tiendaLink . '"\s+class="pnav-link is-active"/', $html, $url);
         }
+    }
 
+    /**
+     * /tienda dejó de usar el navbar público compartido (layouts.public +
+     * x-public-navbar): ahora tiene su propio layout (layouts.marketplace)
+     * con un header/nav propio, independiente del navbar general — ver
+     * Marketplace::render() y ResolvesLayoutForViewer.
+     */
+    public function test_marketplace_page_uses_its_own_dedicated_header_not_the_shared_navbar(): void
+    {
         $html = $this->get(route('public.marketplace'))->assertOk()->getContent();
 
-        $this->assertMatchesRegularExpression('/href="' . $tiendaLink . '"\s+class="pnav-link is-active"/', $html);
-        $this->assertMatchesRegularExpression('/href="' . $tiendaLink . '"\s+class="pnav-menu-link is-active"/', $html);
+        $this->assertStringNotContainsString('pnav-link', $html);
+        $this->assertStringNotContainsString('pnav-menu-link', $html);
+        $this->assertStringContainsString('aria-label="Ver carrito"', $html);
+        $this->assertStringContainsString('Buscar productos, marcas y más...', $html);
     }
 
     public function test_shared_navbar_login_button_uses_the_landing_yellow_and_scroll_hide(): void

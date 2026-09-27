@@ -367,6 +367,11 @@
                 Inicio
             </a>
 
+            <a href="{{ route('public.marketplace') }}"
+               class="pnav-link {{ request()->routeIs('public.marketplace*') ? 'is-active' : '' }}">
+                Tienda
+            </a>
+
             <a href="{{ route('home') }}#servicios"
                class="pnav-link">
                 Servicios
@@ -380,11 +385,6 @@
             <a href="{{ route('public.offices') }}"
                class="pnav-link {{ request()->routeIs('public.offices') ? 'is-active' : '' }}">
                 Agencias aliadas
-            </a>
-
-            <a href="{{ route('public.marketplace') }}"
-               class="pnav-link {{ request()->routeIs('public.marketplace*') ? 'is-active' : '' }}">
-                Tienda
             </a>
 
             <a href="{{ route('tracking.index') }}"
@@ -444,6 +444,11 @@
             Inicio
         </a>
 
+        <a href="{{ route('public.marketplace') }}"
+           class="pnav-menu-link {{ request()->routeIs('public.marketplace*') ? 'is-active' : '' }}">
+            Tienda
+        </a>
+
         <a href="{{ route('home') }}#servicios" class="pnav-menu-link">
             Servicios
         </a>
@@ -456,11 +461,6 @@
         <a href="{{ route('public.offices') }}"
            class="pnav-menu-link {{ request()->routeIs('public.offices') ? 'is-active' : '' }}">
             Agencias aliadas
-        </a>
-
-        <a href="{{ route('public.marketplace') }}"
-           class="pnav-menu-link {{ request()->routeIs('public.marketplace*') ? 'is-active' : '' }}">
-            Tienda
         </a>
 
         <a href="{{ route('tracking.index') }}"

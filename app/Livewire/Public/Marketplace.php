@@ -497,13 +497,17 @@ class Marketplace extends Component
         return view('public.marketplace', [
             'productos' => $productos,
             'productoViendo' => $productoViendo,
-            'categorias' => Categoria::orderBy('nombre')->get(),
+            'categorias' => Categoria::withCount(['productos' => fn ($query) => $query
+                ->where('activo', true)
+                ->where('stock', '>', 0)
+                ->whereHas('emprendedor', fn ($sub) => $sub->where('status', Emprendedor::STATUS_ACTIVE)),
+            ])->orderBy('nombre')->get(),
             'carritoDetalle' => $carritoDetalle,
             'carritoTotal' => $carritoDetalle->sum('subtotal'),
             'carritoCount' => $carritoDetalle->sum('cantidad'),
             'conflictoProducto' => $this->conflictoProductoId ? Producto::find($this->conflictoProductoId) : null,
         ])->layout(
-            $this->resolveLayoutForViewer(),
+            $this->resolveLayoutForViewer('layouts.marketplace'),
             [
                 'title' => $this->tiendaEmprendedor
                     ? "{$this->tiendaEmprendedor->business_name} — Venexpress"

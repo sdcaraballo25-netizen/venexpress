@@ -169,6 +169,29 @@ class MarketplaceTest extends TestCase
             ->assertDontSee('Producto En Otra');
     }
 
+    /**
+     * El badge de cantidad del menú/sidebar de categorías (ver
+     * Marketplace::render()) debe contar solo lo que el catálogo
+     * realmente lista: activo, con stock y de un emprendedor activo.
+     */
+    public function test_category_product_count_only_includes_really_available_products(): void
+    {
+        $categoria = Categoria::first();
+
+        $emprendedor = $this->createEmprendedor();
+        $this->createProducto($emprendedor, ['nombre' => 'Disponible 1', 'categoria_id' => $categoria->id]);
+        $this->createProducto($emprendedor, ['nombre' => 'Disponible 2', 'categoria_id' => $categoria->id]);
+        $this->createProducto($emprendedor, ['nombre' => 'Sin Stock', 'categoria_id' => $categoria->id, 'stock' => 0]);
+        $this->createProducto($emprendedor, ['nombre' => 'Inactivo', 'categoria_id' => $categoria->id, 'activo' => false]);
+
+        $emprendedorSuspendido = $this->createEmprendedor(['status' => Emprendedor::STATUS_SUSPENDED]);
+        $this->createProducto($emprendedorSuspendido, ['nombre' => 'De Suspendido', 'categoria_id' => $categoria->id]);
+
+        $categorias = Livewire::test(Marketplace::class)->viewData('categorias');
+
+        $this->assertSame(2, $categorias->firstWhere('id', $categoria->id)->productos_count);
+    }
+
     public function test_the_catalog_shows_a_products_average_rating(): void
     {
         $emprendedor = $this->createEmprendedor();

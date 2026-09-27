@@ -88,7 +88,54 @@
             {{-- ==================================================
                  NAVEGACIÓN
             =================================================== --}}
-            <nav class="space-y-1 overflow-y-auto">
+            <nav
+                class="space-y-1 overflow-y-auto"
+                x-data="{
+                    openGroup: null,
+
+                    init() {
+
+                        if (
+                            {{ request()->routeIs(
+                                'ally.packages.create',
+                                'ally.emprendedor-pedidos',
+                                'ally.packages.index',
+                                'ally.packages.reception',
+                                'ally.packages.pickup',
+                                'ally.cod'
+                            ) ? 'true' : 'false' }}
+                        ) {
+                            this.openGroup = 'operacion';
+
+                        } else if (
+                            {{ request()->routeIs(
+                                'ally.sales-closeout',
+                                'ally.cash-cut',
+                                'ally.commissions',
+                                'ally.reports'
+                            ) ? 'true' : 'false' }}
+                        ) {
+                            this.openGroup = 'finanzas';
+
+                        } else if (
+                            {{ request()->routeIs(
+                                'ally.staff',
+                                'ally.incidents',
+                                'recommendations.create'
+                            ) ? 'true' : 'false' }}
+                        ) {
+                            this.openGroup = 'administracion';
+                        }
+                    },
+
+                    toggleGroup(group) {
+                        this.openGroup =
+                            this.openGroup === group
+                                ? null
+                                : group;
+                    }
+                }"
+            >
 
                 {{-- PRINCIPAL --}}
                 <p class="px-2 text-xs font-semibold text-[#B8B8B2] uppercase tracking-wider mb-3">
@@ -130,15 +177,551 @@
                 @endif
 
 
-                {{-- AYUDA --}}
+                {{-- ==================================================
+                     OPERACIÓN
+                =================================================== --}}
+                <div class="mt-6">
+
+                    <button
+                        type="button"
+                        @click="toggleGroup('operacion')"
+                        class="w-full flex items-center justify-between px-2 py-2 text-xs font-semibold text-[#B8B8B2] uppercase tracking-wider hover:text-[#4A4A45] transition-colors"
+                    >
+
+                        <span>
+                            Operación
+                        </span>
+
+                        <svg
+                            class="w-4 h-4 transition-transform duration-200"
+                            :class="{ 'rotate-180': openGroup === 'operacion' }"
+                            fill="none"
+                            stroke="currentColor"
+                            viewBox="0 0 24 24"
+                        >
+                            <path
+                                stroke-linecap="round"
+                                stroke-linejoin="round"
+                                stroke-width="2"
+                                d="M19 9l-7 7-7-7"
+                            />
+                        </svg>
+
+                    </button>
+
+
+                    <div
+                        x-show="openGroup === 'operacion'"
+                        x-cloak
+                        class="mt-1 space-y-1"
+                    >
+
+                        {{-- REGISTRAR PEDIDO --}}
+                        <a
+                            href="{{ route('ally.packages.create') }}"
+                            wire:navigate
+                            @click="$store.sidebar.open = false"
+                            class="flex items-center gap-3 px-4 py-3 rounded-xl font-medium transition-colors
+                            {{ request()->routeIs('ally.packages.create')
+                                ? 'bg-amber-400 text-[#111111]'
+                                : 'text-[#6B6B66] hover:bg-slate-50 hover:text-[#111111]' }}"
+                        >
+
+                            <svg
+                                class="w-5 h-5"
+                                fill="none"
+                                stroke="currentColor"
+                                viewBox="0 0 24 24"
+                            >
+                                <path
+                                    stroke-linecap="round"
+                                    stroke-linejoin="round"
+                                    stroke-width="2"
+                                    d="M12 4v16m8-8H4"
+                                />
+                            </svg>
+
+                            <span>
+                                Registrar pedido
+                            </span>
+
+                        </a>
+
+                        {{-- EMPRENDEDORES --}}
+                        <a
+                            href="{{ route('ally.emprendedor-pedidos') }}"
+                            wire:navigate
+                            @click="$store.sidebar.open = false"
+                            class="flex items-center gap-3 px-4 py-3 rounded-xl font-medium transition-colors
+                            {{ request()->routeIs('ally.emprendedor-pedidos')
+                                ? 'bg-amber-400 text-[#111111]'
+                                : 'text-[#6B6B66] hover:bg-slate-50 hover:text-[#111111]' }}"
+                        >
+
+                            <svg
+                                class="w-5 h-5"
+                                fill="none"
+                                stroke="currentColor"
+                                viewBox="0 0 24 24"
+                            >
+                                <path
+                                    stroke-linecap="round"
+                                    stroke-linejoin="round"
+                                    stroke-width="2"
+                                    d="M16 11V7a4 4 0 00-8 0v4M5 9h14l1 11H4L5 9z"
+                                />
+                            </svg>
+
+                            <span>
+                                Emprendedores
+                            </span>
+
+                        </a>
+
+                        {{-- MIS PEDIDOS --}}
+                        <a
+                            href="{{ route('ally.packages.index') }}"
+                            wire:navigate
+                            @click="$store.sidebar.open = false"
+                            class="flex items-center gap-3 px-4 py-3 rounded-xl font-medium transition-colors
+                            {{ request()->routeIs('ally.packages.index')
+                                ? 'bg-amber-400 text-[#111111]'
+                                : 'text-[#6B6B66] hover:bg-slate-50 hover:text-[#111111]' }}"
+                        >
+                            <svg
+                                class="w-5 h-5"
+                                fill="none"
+                                stroke="currentColor"
+                                viewBox="0 0 24 24"
+                            >
+                                <path
+                                    stroke-linecap="round"
+                                    stroke-linejoin="round"
+                                    stroke-width="2"
+                                    d="M9 5h6m-7 4h8m-9 4h10m-9 4h8M5 3h14a2 2 0 012 2v14a2 2 0 01-2 2H5a2 2 0 01-2-2V5a2 2 0 012-2z"
+                                />
+                            </svg>
+
+                            <span>
+                                Mis pedidos
+                            </span>
+                        </a>
+
+
+                        {{-- RECEPCIÓN --}}
+                        <a
+                            href="{{ route('ally.packages.reception') }}"
+                            wire:navigate
+                            @click="$store.sidebar.open = false"
+                            class="flex items-center gap-3 px-4 py-3 rounded-xl font-medium transition-colors
+                            {{ request()->routeIs('ally.packages.reception')
+                                ? 'bg-amber-400 text-[#111111]'
+                                : 'text-[#6B6B66] hover:bg-slate-50 hover:text-[#111111]' }}"
+                        >
+
+                            <svg
+                                class="w-5 h-5"
+                                fill="none"
+                                stroke="currentColor"
+                                viewBox="0 0 24 24"
+                            >
+                                <path
+                                    stroke-linecap="round"
+                                    stroke-linejoin="round"
+                                    stroke-width="2"
+                                    d="M20 7l-8-4-8 4m16 0v10l-8 4-8-4V7m16 0l-8 4-8-4m8 4v10"
+                                />
+                            </svg>
+
+                            <span>
+                                Recepción de paquetes
+                            </span>
+
+                        </a>
+
+
+                        {{-- RETIRO EN AGENCIA --}}
+                        <a
+                            href="{{ route('ally.packages.pickup') }}"
+                            wire:navigate
+                            @click="$store.sidebar.open = false"
+                            class="flex items-center gap-3 px-4 py-3 rounded-xl font-medium transition-colors
+                            {{ request()->routeIs('ally.packages.pickup')
+                                ? 'bg-amber-400 text-[#111111]'
+                                : 'text-[#6B6B66] hover:bg-slate-50 hover:text-[#111111]' }}"
+                        >
+
+                            <svg
+                                class="w-5 h-5"
+                                fill="none"
+                                stroke="currentColor"
+                                viewBox="0 0 24 24"
+                            >
+                                <path
+                                    stroke-linecap="round"
+                                    stroke-linejoin="round"
+                                    stroke-width="2"
+                                    d="M3 10h18M5 10v10h14V10M7 10V7a5 5 0 0110 0v3"
+                                />
+                            </svg>
+
+                            <span>
+                                Retiro en agencia
+                            </span>
+
+                        </a>
+
+
+                        {{-- COBRO EN DESTINO --}}
+                        {{--
+                            La ruta ally.cod permite role:aliado,aliado_taquilla,
+                            así que el personal de Taquilla también debe ver este enlace.
+                        --}}
+                        <a
+                            href="{{ route('ally.cod') }}"
+                            wire:navigate
+                            @click="$store.sidebar.open = false"
+                            class="flex items-center gap-3 px-4 py-3 rounded-xl font-medium transition-colors
+                            {{ request()->routeIs('ally.cod')
+                                ? 'bg-amber-400 text-[#111111]'
+                                : 'text-[#6B6B66] hover:bg-slate-50 hover:text-[#111111]' }}"
+                        >
+
+                            <svg
+                                class="w-5 h-5"
+                                fill="none"
+                                stroke="currentColor"
+                                viewBox="0 0 24 24"
+                            >
+                                <path
+                                    stroke-linecap="round"
+                                    stroke-linejoin="round"
+                                    stroke-width="2"
+                                    d="M12 8c-1.657 0-3 .895-3 2s1.343 2 3 2 3 .895 3 2-1.343 2-3 2m0-8c1.11 0 2.08.402 2.599 1M12 8V7m0 1v8m0 0v1m0-1c-1.11 0-2.08-.402-2.599-1M21 12a9 9 0 11-18 0 9 9 0 0118 0z"
+                                />
+                            </svg>
+
+                            <span>
+                                Cobro en destino
+                            </span>
+
+                        </a>
+
+                    </div>
+
+                </div>
+
+
+                {{-- ==================================================
+                     FINANZAS
+                =================================================== --}}
+                <div class="mt-3">
+
+                    <button
+                        type="button"
+                        @click="toggleGroup('finanzas')"
+                        class="w-full flex items-center justify-between px-2 py-2 text-xs font-semibold text-[#B8B8B2] uppercase tracking-wider hover:text-[#4A4A45] transition-colors"
+                    >
+
+                        <span>
+                            Finanzas
+                        </span>
+
+                        <svg
+                            class="w-4 h-4 transition-transform duration-200"
+                            :class="{ 'rotate-180': openGroup === 'finanzas' }"
+                            fill="none"
+                            stroke="currentColor"
+                            viewBox="0 0 24 24"
+                        >
+                            <path
+                                stroke-linecap="round"
+                                stroke-linejoin="round"
+                                stroke-width="2"
+                                d="M19 9l-7 7-7-7"
+                            />
+                        </svg>
+
+                    </button>
+
+
+                    <div
+                        x-show="openGroup === 'finanzas'"
+                        x-cloak
+                        class="mt-1 space-y-1"
+                    >
+
+                        {{-- CIERRE DEL DÍA --}}
+                        {{--
+                            Visible para ambos roles: el Aliado Administrador ve
+                            todo el negocio (con filtro por taquilla), Taquilla
+                            solo ve lo que ella misma registró.
+                        --}}
+                        <a
+                            href="{{ route('ally.sales-closeout') }}"
+                            wire:navigate
+                            @click="$store.sidebar.open = false"
+                            class="flex items-center gap-3 px-4 py-3 rounded-xl font-medium transition-colors
+                            {{ request()->routeIs('ally.sales-closeout')
+                                ? 'bg-amber-400 text-[#111111]'
+                                : 'text-[#6B6B66] hover:bg-slate-50 hover:text-[#111111]' }}"
+                        >
+
+                            <svg
+                                class="w-5 h-5"
+                                fill="none"
+                                stroke="currentColor"
+                                viewBox="0 0 24 24"
+                            >
+                                <path
+                                    stroke-linecap="round"
+                                    stroke-linejoin="round"
+                                    stroke-width="2"
+                                    d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z"
+                                />
+                            </svg>
+
+                            <span>
+                                Cierre del día
+                            </span>
+
+                        </a>
+
+                        @if (auth()->user()->isAliado())
+
+                            {{-- Corte de caja --}}
+                            <a
+                                href="{{ route('ally.cash-cut') }}"
+                                wire:navigate
+                                class="mb-1 flex items-center gap-3 rounded-xl px-3 py-2.5 text-sm font-medium transition
+                                {{ request()->routeIs('ally.cash-cut')
+                                    ? 'bg-amber-400 text-[#111111]'
+                                    : 'text-slate-600 hover:bg-slate-50' }}"
+                            >
+                                <svg class="h-5 w-5"
+                                    fill="none"
+                                    stroke="currentColor"
+                                    viewBox="0 0 24 24">
+                                    <path stroke-linecap="round"
+                                        stroke-linejoin="round"
+                                        stroke-width="2"
+                                        d="M3 10h18M5 10v8m4-8v8m6-8v8m4-8v8M3 18h18M5 6h14l2 4H3l2-4z"/>
+                                </svg>
+
+                                <span>Corte de caja</span>
+                            </a>
+
+                            {{-- Comisiones --}}
+                            <a
+                                href="{{ route('ally.commissions') }}"
+                                wire:navigate
+                                class="mb-1 flex items-center gap-3 rounded-xl px-3 py-2.5 text-sm font-medium transition
+                                {{ request()->routeIs('ally.commissions')
+                                    ? 'bg-amber-400 text-[#111111]'
+                                    : 'text-slate-600 hover:bg-slate-50' }}"
+                            >
+                                <svg class="h-5 w-5"
+                                    fill="none"
+                                    stroke="currentColor"
+                                    viewBox="0 0 24 24">
+                                    <path stroke-linecap="round"
+                                        stroke-linejoin="round"
+                                        stroke-width="2"
+                                        d="M12 8c-1.657 0-3 .895-3 2s1.343 2 3 2 3 .895 3 2-1.343 2-3 2m0-8V4m0 16v-4m8-4a8 8 0 11-16 0 8 8 0 0116 0z"/>
+                                </svg>
+
+                                <span>Comisiones y saldo</span>
+                            </a>
+
+                            {{-- Reportes --}}
+                            <a
+                                href="{{ route('ally.reports') }}"
+                                wire:navigate
+                                class="mb-1 flex items-center gap-3 rounded-xl px-3 py-2.5 text-sm font-medium transition
+                                {{ request()->routeIs('ally.reports')
+                                    ? 'bg-amber-400 text-[#111111]'
+                                    : 'text-slate-600 hover:bg-slate-50' }}"
+                            >
+                                <svg class="h-5 w-5"
+                                    fill="none"
+                                    stroke="currentColor"
+                                    viewBox="0 0 24 24">
+                                    <path stroke-linecap="round"
+                                        stroke-linejoin="round"
+                                        stroke-width="2"
+                                        d="M9 19v-6a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2a2 2 0 002-2zm0 0V9a2 2 0 012-2h2a2 2 0 012 2v10m0 0V5a2 2 0 012-2h2a2 2 0 012 2v14a2 2 0 01-2 2h-2a2 2 0 01-2-2"/>
+                                </svg>
+
+                                <span>Reportes</span>
+                            </a>
+
+                        @endif
+
+                    </div>
+
+                </div>
+
+
+                {{-- ==================================================
+                     ADMINISTRACIÓN
+                =================================================== --}}
+                <div class="mt-3">
+
+                    <button
+                        type="button"
+                        @click="toggleGroup('administracion')"
+                        class="w-full flex items-center justify-between px-2 py-2 text-xs font-semibold text-[#B8B8B2] uppercase tracking-wider hover:text-[#4A4A45] transition-colors"
+                    >
+
+                        <span>
+                            Administración
+                        </span>
+
+                        <svg
+                            class="w-4 h-4 transition-transform duration-200"
+                            :class="{ 'rotate-180': openGroup === 'administracion' }"
+                            fill="none"
+                            stroke="currentColor"
+                            viewBox="0 0 24 24"
+                        >
+                            <path
+                                stroke-linecap="round"
+                                stroke-linejoin="round"
+                                stroke-width="2"
+                                d="M19 9l-7 7-7-7"
+                            />
+                        </svg>
+
+                    </button>
+
+
+                    <div
+                        x-show="openGroup === 'administracion'"
+                        x-cloak
+                        class="mt-1 space-y-1"
+                    >
+
+                        @if (auth()->user()->isAliado())
+
+                            {{-- TAQUILLAS --}}
+                            <a
+                                href="{{ route('ally.staff') }}"
+                                wire:navigate
+                                @click="$store.sidebar.open = false"
+                                class="flex items-center gap-3 px-4 py-3 rounded-xl font-medium transition-colors
+                                {{ request()->routeIs('ally.staff')
+                                    ? 'bg-amber-400 text-[#111111]'
+                                    : 'text-[#6B6B66] hover:bg-slate-50 hover:text-[#111111]' }}"
+                            >
+
+                                <svg
+                                    class="w-5 h-5"
+                                    fill="none"
+                                    stroke="currentColor"
+                                    viewBox="0 0 24 24"
+                                >
+                                    <path
+                                        stroke-linecap="round"
+                                        stroke-linejoin="round"
+                                        stroke-width="2"
+                                        d="M17 20h5v-2a3 3 0 00-5.356-1.857M17 20H7m10 0v-2c0-.656-.126-1.283-.356-1.857M7 20H2v-2a3 3 0 015.356-1.857M7 20v-2c0-.656.126-1.283.356-1.857m0 0a5.002 5.002 0 019.288 0M15 7a3 3 0 11-6 0 3 3 0 016 0zm6 3a2 2 0 11-4 0 2 2 0 014 0zM7 10a2 2 0 11-4 0 2 2 0 014 0z"
+                                    />
+                                </svg>
+
+                                <span>
+                                    Gestión de Taquillas
+                                </span>
+
+                            </a>
+
+                        @endif
+
+                        {{-- INCIDENCIAS --}}
+                        {{--
+                            Igual que Cobro en destino: ally.incidents también
+                            permite role:aliado,aliado_taquilla.
+                        --}}
+                        <a
+                            href="{{ route('ally.incidents') }}"
+                            wire:navigate
+                            @click="$store.sidebar.open = false"
+                            class="flex items-center gap-3 px-4 py-3 rounded-xl font-medium transition-colors
+                            {{ request()->routeIs('ally.incidents')
+                                ? 'bg-amber-400 text-[#111111]'
+                                : 'text-[#6B6B66] hover:bg-slate-50 hover:text-[#111111]' }}"
+                        >
+
+                            <svg
+                                class="w-5 h-5"
+                                fill="none"
+                                stroke="currentColor"
+                                viewBox="0 0 24 24"
+                            >
+                                <path
+                                    stroke-linecap="round"
+                                    stroke-linejoin="round"
+                                    stroke-width="2"
+                                    d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z"
+                                />
+                            </svg>
+
+                            <span>
+                                Incidencias
+                            </span>
+
+                        </a>
+
+                        {{-- RECOMENDACIONES --}}
+                        <a
+                            href="{{ route('recommendations.create') }}"
+                            wire:navigate
+                            @click="$store.sidebar.open = false"
+                            class="flex items-center gap-3 px-4 py-3 rounded-xl font-medium transition-colors
+                            {{ request()->routeIs('recommendations.create')
+                                ? 'bg-amber-400 text-[#111111]'
+                                : 'text-[#6B6B66] hover:bg-slate-50 hover:text-[#111111]' }}"
+                        >
+
+                            <svg
+                                class="w-5 h-5"
+                                fill="none"
+                                stroke="currentColor"
+                                viewBox="0 0 24 24"
+                            >
+                                <path
+                                    stroke-linecap="round"
+                                    stroke-linejoin="round"
+                                    stroke-width="2"
+                                    d="M8 10h.01M12 10h.01M16 10h.01M9 16H5a2 2 0 01-2-2V6a2 2 0 012-2h14a2 2 0 012 2v8a2 2 0 01-2 2h-6l-4 4v-4z"
+                                />
+                            </svg>
+
+                            <span>
+                                Recomendaciones
+                            </span>
+
+                        </a>
+
+                    </div>
+
+                </div>
+
+            </nav>
+
+
+            {{-- ==================================================
+                 AYUDA (opción secundaria / soporte)
+            =================================================== --}}
+            <div class="mt-6 pt-4 border-t border-[#E5E5E0]">
+
                 <a
                     href="{{ route('ally.help') }}"
                     wire:navigate
                     @click="$store.sidebar.open = false"
-                    class="flex items-center gap-3 px-4 py-3 rounded-xl font-medium transition-colors
+                    class="flex items-center gap-3 px-4 py-2.5 rounded-xl text-sm font-medium transition-colors
                     {{ request()->routeIs('ally.help')
                         ? 'bg-amber-400 text-[#111111]'
-                        : 'text-[#6B6B66] hover:bg-slate-50 hover:text-[#111111]' }}"
+                        : 'text-[#B8B8B2] hover:bg-slate-50 hover:text-[#6B6B66]' }}"
                 >
 
                     <svg
@@ -161,425 +744,7 @@
 
                 </a>
 
-                {{-- RECOMENDACIONES --}}
-                <a
-                    href="{{ route('recommendations.create') }}"
-                    wire:navigate
-                    @click="$store.sidebar.open = false"
-                    class="flex items-center gap-3 px-4 py-3 rounded-xl font-medium transition-colors
-                    {{ request()->routeIs('recommendations.create')
-                        ? 'bg-amber-400 text-[#111111]'
-                        : 'text-[#6B6B66] hover:bg-slate-50 hover:text-[#111111]' }}"
-                >
-
-                    <svg
-                        class="w-5 h-5"
-                        fill="none"
-                        stroke="currentColor"
-                        viewBox="0 0 24 24"
-                    >
-                        <path
-                            stroke-linecap="round"
-                            stroke-linejoin="round"
-                            stroke-width="2"
-                            d="M8 10h.01M12 10h.01M16 10h.01M9 16H5a2 2 0 01-2-2V6a2 2 0 012-2h14a2 2 0 012 2v8a2 2 0 01-2 2h-6l-4 4v-4z"
-                        />
-                    </svg>
-
-                    <span>
-                        Recomendaciones
-                    </span>
-
-                </a>
-
-
-                {{-- ==================================================
-                     OPERACIONES
-                =================================================== --}}
-                <p class="px-2 text-xs font-semibold text-[#B8B8B2] uppercase tracking-wider mb-3 mt-6">
-                    Operaciones
-                </p>
-
-
-                {{-- REGISTRAR PEDIDO --}}
-                <a
-                    href="{{ route('ally.packages.create') }}"
-                    wire:navigate
-                    @click="$store.sidebar.open = false"
-                    class="flex items-center gap-3 px-4 py-3 rounded-xl font-medium transition-colors
-                    {{ request()->routeIs('ally.packages.create')
-                        ? 'bg-amber-400 text-[#111111]'
-                        : 'text-[#6B6B66] hover:bg-slate-50 hover:text-[#111111]' }}"
-                >
-
-                    <svg
-                        class="w-5 h-5"
-                        fill="none"
-                        stroke="currentColor"
-                        viewBox="0 0 24 24"
-                    >
-                        <path
-                            stroke-linecap="round"
-                            stroke-linejoin="round"
-                            stroke-width="2"
-                            d="M12 4v16m8-8H4"
-                        />
-                    </svg>
-
-                    <span>
-                        Registrar pedido
-                    </span>
-
-                </a>
-
-                {{-- EMPRENDEDORES --}}
-                <a
-                    href="{{ route('ally.emprendedor-pedidos') }}"
-                    wire:navigate
-                    @click="$store.sidebar.open = false"
-                    class="flex items-center gap-3 px-4 py-3 rounded-xl font-medium transition-colors
-                    {{ request()->routeIs('ally.emprendedor-pedidos')
-                        ? 'bg-amber-400 text-[#111111]'
-                        : 'text-[#6B6B66] hover:bg-slate-50 hover:text-[#111111]' }}"
-                >
-
-                    <svg
-                        class="w-5 h-5"
-                        fill="none"
-                        stroke="currentColor"
-                        viewBox="0 0 24 24"
-                    >
-                        <path
-                            stroke-linecap="round"
-                            stroke-linejoin="round"
-                            stroke-width="2"
-                            d="M16 11V7a4 4 0 00-8 0v4M5 9h14l1 11H4L5 9z"
-                        />
-                    </svg>
-
-                    <span>
-                        Emprendedores
-                    </span>
-
-                </a>
-
-                {{-- MIS PEDIDOS --}}
-<a
-    href="{{ route('ally.packages.index') }}"
-    wire:navigate
-    @click="$store.sidebar.open = false"
-    class="flex items-center gap-3 px-4 py-3 rounded-xl font-medium transition-colors
-    {{ request()->routeIs('ally.packages.index')
-        ? 'bg-amber-400 text-[#111111]'
-        : 'text-[#6B6B66] hover:bg-slate-50 hover:text-[#111111]' }}"
->
-    <svg
-        class="w-5 h-5"
-        fill="none"
-        stroke="currentColor"
-        viewBox="0 0 24 24"
-    >
-        <path
-            stroke-linecap="round"
-            stroke-linejoin="round"
-            stroke-width="2"
-            d="M9 5h6m-7 4h8m-9 4h10m-9 4h8M5 3h14a2 2 0 012 2v14a2 2 0 01-2 2H5a2 2 0 01-2-2V5a2 2 0 012-2z"
-        />
-    </svg>
-
-    <span>
-        Mis pedidos
-    </span>
-</a>
-
-
-                {{-- RECEPCIÓN --}}
-                <a
-                    href="{{ route('ally.packages.reception') }}"
-                    wire:navigate
-                    @click="$store.sidebar.open = false"
-                    class="flex items-center gap-3 px-4 py-3 rounded-xl font-medium transition-colors
-                    {{ request()->routeIs('ally.packages.reception')
-                        ? 'bg-amber-400 text-[#111111]'
-                        : 'text-[#6B6B66] hover:bg-slate-50 hover:text-[#111111]' }}"
-                >
-
-                    <svg
-                        class="w-5 h-5"
-                        fill="none"
-                        stroke="currentColor"
-                        viewBox="0 0 24 24"
-                    >
-                        <path
-                            stroke-linecap="round"
-                            stroke-linejoin="round"
-                            stroke-width="2"
-                            d="M20 7l-8-4-8 4m16 0v10l-8 4-8-4V7m16 0l-8 4-8-4m8 4v10"
-                        />
-                    </svg>
-
-                    <span>
-                        Recepción de paquetes
-                    </span>
-
-                </a>
-
-
-                {{-- RETIRO EN AGENCIA --}}
-                <a
-                    href="{{ route('ally.packages.pickup') }}"
-                    wire:navigate
-                    @click="$store.sidebar.open = false"
-                    class="flex items-center gap-3 px-4 py-3 rounded-xl font-medium transition-colors
-                    {{ request()->routeIs('ally.packages.pickup')
-                        ? 'bg-amber-400 text-[#111111]'
-                        : 'text-[#6B6B66] hover:bg-slate-50 hover:text-[#111111]' }}"
-                >
-
-                    <svg
-                        class="w-5 h-5"
-                        fill="none"
-                        stroke="currentColor"
-                        viewBox="0 0 24 24"
-                    >
-                        <path
-                            stroke-linecap="round"
-                            stroke-linejoin="round"
-                            stroke-width="2"
-                            d="M3 10h18M5 10v10h14V10M7 10V7a5 5 0 0110 0v3"
-                        />
-                    </svg>
-
-                    <span>
-                        Retiro en agencia
-                    </span>
-
-                </a>
-
-
-                {{-- CIERRE DEL DÍA --}}
-                {{--
-                    Visible para ambos roles: el Aliado Administrador ve
-                    todo el negocio (con filtro por taquilla), Taquilla
-                    solo ve lo que ella misma registró.
-                --}}
-                <a
-                    href="{{ route('ally.sales-closeout') }}"
-                    wire:navigate
-                    @click="$store.sidebar.open = false"
-                    class="flex items-center gap-3 px-4 py-3 rounded-xl font-medium transition-colors
-                    {{ request()->routeIs('ally.sales-closeout')
-                        ? 'bg-amber-400 text-[#111111]'
-                        : 'text-[#6B6B66] hover:bg-slate-50 hover:text-[#111111]' }}"
-                >
-
-                    <svg
-                        class="w-5 h-5"
-                        fill="none"
-                        stroke="currentColor"
-                        viewBox="0 0 24 24"
-                    >
-                        <path
-                            stroke-linecap="round"
-                            stroke-linejoin="round"
-                            stroke-width="2"
-                            d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z"
-                        />
-                    </svg>
-
-                    <span>
-                        Cierre del día
-                    </span>
-
-                </a>
-
-
-                {{-- COBRO EN DESTINO --}}
-                {{--
-                    Fuera del bloque "Administración": la ruta ally.cod
-                    permite role:aliado,aliado_taquilla, así que el
-                    personal de Taquilla también debe ver este enlace.
-                --}}
-                <a
-                    href="{{ route('ally.cod') }}"
-                    wire:navigate
-                    @click="$store.sidebar.open = false"
-                    class="flex items-center gap-3 px-4 py-3 rounded-xl font-medium transition-colors
-                    {{ request()->routeIs('ally.cod')
-                        ? 'bg-amber-400 text-[#111111]'
-                        : 'text-[#6B6B66] hover:bg-slate-50 hover:text-[#111111]' }}"
-                >
-
-                    <svg
-                        class="w-5 h-5"
-                        fill="none"
-                        stroke="currentColor"
-                        viewBox="0 0 24 24"
-                    >
-                        <path
-                            stroke-linecap="round"
-                            stroke-linejoin="round"
-                            stroke-width="2"
-                            d="M12 8c-1.657 0-3 .895-3 2s1.343 2 3 2 3 .895 3 2-1.343 2-3 2m0-8c1.11 0 2.08.402 2.599 1M12 8V7m0 1v8m0 0v1m0-1c-1.11 0-2.08-.402-2.599-1M21 12a9 9 0 11-18 0 9 9 0 0118 0z"
-                        />
-                    </svg>
-
-                    <span>
-                        Cobro en destino
-                    </span>
-
-                </a>
-
-
-                {{-- INCIDENCIAS --}}
-                {{--
-                    Igual que Cobro en destino: ally.incidents también
-                    permite role:aliado,aliado_taquilla.
-                --}}
-                <a
-                    href="{{ route('ally.incidents') }}"
-                    wire:navigate
-                    @click="$store.sidebar.open = false"
-                    class="flex items-center gap-3 px-4 py-3 rounded-xl font-medium transition-colors
-                    {{ request()->routeIs('ally.incidents')
-                        ? 'bg-amber-400 text-[#111111]'
-                        : 'text-[#6B6B66] hover:bg-slate-50 hover:text-[#111111]' }}"
-                >
-
-                    <svg
-                        class="w-5 h-5"
-                        fill="none"
-                        stroke="currentColor"
-                        viewBox="0 0 24 24"
-                    >
-                        <path
-                            stroke-linecap="round"
-                            stroke-linejoin="round"
-                            stroke-width="2"
-                            d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z"
-                        />
-                    </svg>
-
-                    <span>
-                        Incidencias
-                    </span>
-
-                </a>
-
-
-                @if (auth()->user()->isAliado())
-
-                    {{-- ==================================================
-                         ADMINISTRACIÓN
-                    =================================================== --}}
-                    <p class="px-2 text-xs font-semibold text-[#B8B8B2] uppercase tracking-wider mb-3 mt-6">
-                        Administración
-                    </p>
-
-
-                    {{-- TAQUILLAS --}}
-                    <a
-                        href="{{ route('ally.staff') }}"
-                        wire:navigate
-                        @click="$store.sidebar.open = false"
-                        class="flex items-center gap-3 px-4 py-3 rounded-xl font-medium transition-colors
-                        {{ request()->routeIs('ally.staff')
-                            ? 'bg-amber-400 text-[#111111]'
-                            : 'text-[#6B6B66] hover:bg-slate-50 hover:text-[#111111]' }}"
-                    >
-
-                        <svg
-                            class="w-5 h-5"
-                            fill="none"
-                            stroke="currentColor"
-                            viewBox="0 0 24 24"
-                        >
-                            <path
-                                stroke-linecap="round"
-                                stroke-linejoin="round"
-                                stroke-width="2"
-                                d="M17 20h5v-2a3 3 0 00-5.356-1.857M17 20H7m10 0v-2c0-.656-.126-1.283-.356-1.857M7 20H2v-2a3 3 0 015.356-1.857M7 20v-2c0-.656.126-1.283.356-1.857m0 0a5.002 5.002 0 019.288 0M15 7a3 3 0 11-6 0 3 3 0 016 0zm6 3a2 2 0 11-4 0 2 2 0 014 0zM7 10a2 2 0 11-4 0 2 2 0 014 0z"
-                            />
-                        </svg>
-
-                        <span>
-                            Gestión de Taquillas
-                        </span>
-
-                    </a>
-
-
-                    {{-- Comisiones --}}
-                    <a
-                        href="{{ route('ally.commissions') }}"
-                        wire:navigate
-                        class="mb-1 flex items-center gap-3 rounded-xl px-3 py-2.5 text-sm font-medium transition
-                        {{ request()->routeIs('ally.commissions')
-                            ? 'bg-amber-400 text-[#111111]'
-                            : 'text-slate-600 hover:bg-slate-50' }}"
-                    >
-                        <svg class="h-5 w-5"
-                            fill="none"
-                            stroke="currentColor"
-                            viewBox="0 0 24 24">
-                            <path stroke-linecap="round"
-                                stroke-linejoin="round"
-                                stroke-width="2"
-                                d="M12 8c-1.657 0-3 .895-3 2s1.343 2 3 2 3 .895 3 2-1.343 2-3 2m0-8V4m0 16v-4m8-4a8 8 0 11-16 0 8 8 0 0116 0z"/>
-                        </svg>
-
-                        <span>Comisiones y saldo</span>
-                    </a>
-
-
-                    {{-- Reportes --}}
-                    <a
-                        href="{{ route('ally.reports') }}"
-                        wire:navigate
-                        class="mb-1 flex items-center gap-3 rounded-xl px-3 py-2.5 text-sm font-medium transition
-                        {{ request()->routeIs('ally.reports')
-                            ? 'bg-amber-400 text-[#111111]'
-                            : 'text-slate-600 hover:bg-slate-50' }}"
-                    >
-                        <svg class="h-5 w-5"
-                            fill="none"
-                            stroke="currentColor"
-                            viewBox="0 0 24 24">
-                            <path stroke-linecap="round"
-                                stroke-linejoin="round"
-                                stroke-width="2"
-                                d="M9 19v-6a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2a2 2 0 002-2zm0 0V9a2 2 0 012-2h2a2 2 0 012 2v10m0 0V5a2 2 0 012-2h2a2 2 0 012 2v14a2 2 0 01-2 2h-2a2 2 0 01-2-2"/>
-                        </svg>
-
-                        <span>Reportes</span>
-                    </a>
-
-
-                    {{-- Corte de caja --}}
-                    <a
-                        href="{{ route('ally.cash-cut') }}"
-                        wire:navigate
-                        class="mb-1 flex items-center gap-3 rounded-xl px-3 py-2.5 text-sm font-medium transition
-                        {{ request()->routeIs('ally.cash-cut')
-                            ? 'bg-amber-400 text-[#111111]'
-                            : 'text-slate-600 hover:bg-slate-50' }}"
-                    >
-                        <svg class="h-5 w-5"
-                            fill="none"
-                            stroke="currentColor"
-                            viewBox="0 0 24 24">
-                            <path stroke-linecap="round"
-                                stroke-linejoin="round"
-                                stroke-width="2"
-                                d="M3 10h18M5 10v8m4-8v8m6-8v8m4-8v8M3 18h18M5 6h14l2 4H3l2-4z"/>
-                        </svg>
-
-                        <span>Corte de caja</span>
-                    </a>
-
-                @endif
-
-            </nav>
+            </div>
 
         </div>
 

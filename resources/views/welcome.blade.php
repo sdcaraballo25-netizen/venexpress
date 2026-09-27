@@ -622,6 +622,82 @@
         }
 
         /* =========================================================
+           MARKETPLACE (vista previa)
+        ========================================================== */
+
+        .market-grid {
+            margin-top: 2rem;
+            display: grid;
+            grid-template-columns: repeat(4, minmax(0, 1fr));
+            gap: 0.9rem;
+        }
+
+        .market-card {
+            display: flex;
+            flex-direction: column;
+            border: 1px solid var(--line);
+            border-radius: 0.85rem;
+            background: #fff;
+            overflow: hidden;
+            transition: transform 0.22s ease, box-shadow 0.22s ease, border-color 0.22s ease;
+        }
+
+        .market-card:hover {
+            transform: translateY(-3px);
+            box-shadow: 0 16px 35px rgba(0,0,0,.07);
+            border-color: #d7d7d2;
+        }
+
+        .market-card-image {
+            aspect-ratio: 1 / 1;
+            background: #fafaf8;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            overflow: hidden;
+        }
+
+        .market-card-placeholder {
+            font-size: 2.4rem;
+            color: #e2e2dc;
+        }
+
+        .market-card-body {
+            padding: 1rem 1.1rem 1.2rem;
+            display: flex;
+            flex-direction: column;
+            gap: 0.2rem;
+        }
+
+        .market-card-seller {
+            font-size: 0.62rem;
+            font-weight: 800;
+            text-transform: uppercase;
+            letter-spacing: 0.06em;
+            color: #9a9a95;
+        }
+
+        .market-card-name {
+            margin-top: 0.1rem;
+            font-size: 0.82rem;
+            font-weight: 700;
+            line-height: 1.3;
+            color: var(--ink);
+            display: -webkit-box;
+            -webkit-line-clamp: 2;
+            line-clamp: 2;
+            -webkit-box-orient: vertical;
+            overflow: hidden;
+        }
+
+        .market-card-price {
+            margin-top: 0.35rem;
+            font-size: 1rem;
+            font-weight: 800;
+            color: var(--ink);
+        }
+
+        /* =========================================================
            COMO FUNCIONA
         ========================================================== */
 
@@ -940,7 +1016,8 @@
             }
 
             .quick-grid,
-            .agency-grid {
+            .agency-grid,
+            .market-grid {
                 grid-template-columns: repeat(2, minmax(0, 1fr));
             }
 
@@ -1074,6 +1151,7 @@
 
             .quick-grid,
             .agency-grid,
+            .market-grid,
             .steps,
             .partner-grid {
                 grid-template-columns: 1fr;
@@ -1157,6 +1235,11 @@
                     Inicio
                 </a>
 
+                <a href="{{ route('public.marketplace') }}"
+                   class="main-nav-link">
+                    Tienda
+                </a>
+
                 <a href="#servicios"
                    class="main-nav-link">
                     Servicios
@@ -1170,11 +1253,6 @@
                 <a href="{{ route('public.offices') }}"
                    class="main-nav-link">
                     Agencias aliadas
-                </a>
-
-                <a href="{{ route('public.marketplace') }}"
-                   class="main-nav-link">
-                    Tienda
                 </a>
 
                 <a href="{{ route('tracking.index') }}"
@@ -1266,6 +1344,11 @@
                 <a href="{{ route('home') }}"
                    class="mobile-menu-link block py-3 text-sm font-semibold text-[#111111]">
                     Inicio
+                </a>
+
+                <a href="{{ route('public.marketplace') }}"
+                   class="mobile-menu-link block py-3 text-sm text-gray-600">
+                    Tienda
                 </a>
 
                 <a href="#servicios"
@@ -1865,6 +1948,57 @@
                 </a>
 
             </div>
+
+        </div>
+
+    </section>
+
+    {{-- =========================================================
+         MARKETPLACE (vista previa)
+    ========================================================== --}}
+
+    <section id="marketplace"
+             class="section section-soft">
+
+        <div class="section-wrap">
+
+            <div class="section-heading">
+
+                <span class="eyebrow">
+                    Tienda Venexpress
+                </span>
+
+                <h2 class="section-title">
+                    Descubre la Tienda Venexpress.
+                </h2>
+
+                <p class="section-subtitle">
+                    Productos de emprendedores venezolanos, con envío
+                    por nuestra red de Venexpress.
+                </p>
+
+                <a href="{{ route('public.marketplace') }}"
+                   class="hero-primary mt-6">
+
+                    Explorar la tienda
+
+                    <i class="fa-solid fa-arrow-right text-xs"></i>
+
+                </a>
+
+            </div>
+
+            @if ($productosDestacados->isNotEmpty())
+
+                <div class="market-grid">
+
+                    @foreach ($productosDestacados as $producto)
+                        <x-marketplace-preview-card :producto="$producto" />
+                    @endforeach
+
+                </div>
+
+            @endif
 
         </div>
 
@@ -2663,6 +2797,13 @@
                     <a href="{{ route('public.offices') }}"
                        class="footer-link">
                         Agencias
+                    </a>
+                </li>
+
+                <li>
+                    <a href="{{ route('public.marketplace') }}"
+                       class="footer-link">
+                        Tienda
                     </a>
                 </li>
 
