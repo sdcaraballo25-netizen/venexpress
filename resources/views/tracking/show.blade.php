@@ -15,6 +15,13 @@
         href="{{ asset('images/venexpress-logo.png') }}"
     >
 
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link
+        href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;500;600;700;800&display=swap"
+        rel="stylesheet"
+    >
+
     @vite([
         'resources/css/app.css',
         'resources/js/app.js'
@@ -27,83 +34,8 @@
 
 <body class="antialiased bg-gray-50">
 
-    {{-- NAVBAR --}}
-    <nav class="bg-white border-b border-gray-100 sticky top-0 z-50">
-
-        <div
-            class="max-w-7xl mx-auto px-6 py-4 flex items-center justify-between"
-        >
-
-            <a href="{{ route('home') }}">
-
-                <img
-                    src="{{ asset('images/venexpress-logo.png') }}"
-                    alt="Venexpress"
-                    class="h-9"
-                >
-
-            </a>
-
-
-            <div
-                class="hidden md:flex items-center gap-9 text-sm font-medium text-gray-500"
-            >
-
-                <a
-                    href="{{ route('home') }}"
-                    class="hover:text-blue-950 transition"
-                >
-                    Inicio
-                </a>
-
-                <a
-                    href="{{ route('home') }}#servicios"
-                    class="hover:text-blue-950 transition"
-                >
-                    Servicios
-                </a>
-
-                <a
-                    href="{{ route('public.calculator') }}"
-                    class="hover:text-blue-950 transition"
-                >
-                    Calcular precio
-                </a>
-
-                <a
-                    href="{{ route('public.offices') }}"
-                    class="hover:text-blue-950 transition"
-                >
-                    Agencias aliadas
-                </a>
-
-                <a
-                    href="{{ route('tracking.index') }}"
-                    class="text-blue-950 font-semibold"
-                >
-                    Rastreo
-                </a>
-
-                <a
-                    href="{{ route('home') }}#ayuda"
-                    class="hover:text-blue-950 transition"
-                >
-                    Ayuda
-                </a>
-
-            </div>
-
-
-            <a
-                href="{{ route('login') }}"
-                class="bg-amber-400 hover:bg-amber-500 text-blue-950 font-semibold text-sm px-6 py-2.5 rounded-lg transition"
-            >
-                Iniciar sesión
-            </a>
-
-        </div>
-
-    </nav>
+    {{-- NAVBAR (compartido) --}}
+    <x-public-navbar />
 
 
     <div class="max-w-4xl mx-auto px-6 py-10">

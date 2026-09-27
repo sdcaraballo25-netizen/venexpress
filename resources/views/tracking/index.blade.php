@@ -37,50 +37,6 @@
         }
 
         /* =====================================================
-           NAVBAR
-        ====================================================== */
-
-        .main-nav-links {
-            display: flex;
-            align-items: center;
-            gap: 2.25rem;
-        }
-
-        .main-nav-link {
-            position: relative;
-            display: inline-flex;
-            align-items: center;
-            white-space: nowrap;
-            padding: 0.45rem 0;
-            color: #6B6B66;
-            font-size: 0.875rem;
-            font-weight: 500;
-            transition:
-                color 0.2s ease,
-                transform 0.2s ease;
-        }
-
-        .main-nav-link:hover,
-        .main-nav-link.is-active {
-            color: #0A0A09;
-        }
-
-        .main-nav-link:hover {
-            transform: translateY(-1px);
-        }
-
-        .main-nav-link.is-active::after {
-            content: '';
-            position: absolute;
-            left: 0;
-            right: 0;
-            bottom: -0.1rem;
-            height: 2px;
-            border-radius: 999px;
-            background: #F7FF00;
-        }
-
-        /* =====================================================
            HERO
         ====================================================== */
 
@@ -601,68 +557,62 @@
            HERO VISUAL
         ====================================================== */
 
+        /* Imagen de fondo de la mitad derecha del hero (sin caja, borde ni
+           radio). El lado izquierdo se funde con el blanco mediante una
+           máscara CSS: el archivo no trae el degradado horneado. */
         .tracking-visual {
             position: relative;
-            display: flex;
-            justify-content: center;
-            align-items: flex-end;
-        }
-
-        .tracking-visual-card {
-            position: relative;
-            width: 100%;
-            max-width: 560px;
-            min-height: 390px;
-        }
-
-        .tracking-circle {
-            position: absolute;
-            width: 430px;
-            height: 430px;
-            right: 3%;
-            top: 50%;
-            transform: translateY(-50%);
-            border-radius: 50%;
-            background: rgba(239, 246, 255, 0.9);
-        }
-
-        .tracking-circle::before {
-            content: '';
-            position: absolute;
-            inset: 38px;
-            border-radius: 50%;
-            border: 2px dashed rgba(30, 64, 175, 0.16);
+            z-index: 5;
         }
 
         .tracking-van {
-            position: absolute;
+            display: block;
             width: 100%;
-            max-width: 550px;
-            right: -3%;
-            bottom: 25px;
-            z-index: 5;
-            transform: translateY(25px) scale(1.04);
-            filter: drop-shadow(
-                0 30px 25px rgba(15, 23, 55, 0.22)
-            );
+            height: auto;
+            aspect-ratio: 1672 / 940;
+            object-fit: cover;
+            object-position: 80% center;
+            /* < 1024px: la imagen va bajo el contenido y se funde por arriba */
+            -webkit-mask-image: linear-gradient(to bottom, transparent 0%, #000 24%);
+            mask-image: linear-gradient(to bottom, transparent 0%, #000 24%);
         }
 
-        .tracking-shadow {
-            position: absolute;
-            right: 7%;
-            bottom: 18px;
-            width: 70%;
-            height: 22px;
-            border-radius: 999px;
-            background: rgba(15, 23, 55, 0.18);
-            filter: blur(9px);
-            z-index: 2;
+        @media (min-width: 1024px) {
+
+            .tracking-visual {
+                position: absolute;
+                top: 0;
+                right: 0;
+                bottom: 0;
+                width: 55%;
+            }
+
+            .tracking-van {
+                height: 100%;
+                aspect-ratio: auto;
+                -webkit-mask-image: linear-gradient(
+                    to right,
+                    transparent 0%,
+                    rgba(0,0,0,0.2) 8%,
+                    rgba(0,0,0,0.5) 18%,
+                    rgba(0,0,0,0.85) 30%,
+                    #000 40%
+                );
+                mask-image: linear-gradient(
+                    to right,
+                    transparent 0%,
+                    rgba(0,0,0,0.2) 8%,
+                    rgba(0,0,0,0.5) 18%,
+                    rgba(0,0,0,0.85) 30%,
+                    #000 40%
+                );
+            }
         }
 
         .tracking-badge {
             position: absolute;
-            left: 5%;
-            top: 16%;
+            left: 8%;
+            top: 9%;
             z-index: 10;
             display: flex;
             align-items: center;
@@ -701,8 +651,8 @@
 
         .tracking-status {
             position: absolute;
-            right: 2%;
-            bottom: 17%;
+            left: 34%;
+            bottom: 5%;
             z-index: 10;
             display: flex;
             align-items: center;
@@ -847,41 +797,16 @@
             .tracking-title {
                 font-size: 4rem;
             }
-
-            .tracking-van {
-                transform: translateY(30px) scale(1.08);
-            }
         }
 
         @media (max-width: 1023px) {
 
-            .main-nav-links {
-                gap: 1.35rem;
-            }
-
             .tracking-title {
                 font-size: 3.45rem;
-            }
-
-            .tracking-visual-card {
-                min-height: 330px;
-            }
-
-            .tracking-circle {
-                width: 350px;
-                height: 350px;
-            }
-
-            .tracking-van {
-                transform: translateY(15px) scale(1.02);
             }
         }
 
         @media (max-width: 767px) {
-
-            .main-nav-links {
-                display: none;
-            }
 
             .tracking-hero-content {
                 min-height: auto;
@@ -922,38 +847,12 @@
                 grid-template-columns: 1fr;
             }
 
-            .tracking-visual {
-                margin-top: 25px;
-            }
-
-            .tracking-visual-card {
-                min-height: 290px;
-            }
-
-            .tracking-circle {
-                width: 290px;
-                height: 290px;
-                right: 50%;
-                transform: translate(50%, -50%);
-            }
-
-            .tracking-van {
-                width: 100%;
-                right: 0;
-                bottom: 12px;
-                transform: none;
-            }
-
             .tracking-badge {
-                left: 0;
-                top: 8%;
                 transform: scale(.88);
                 transform-origin: left top;
             }
 
             .tracking-status {
-                right: 0;
-                bottom: 8%;
                 transform: scale(.88);
                 transform-origin: right bottom;
             }
@@ -999,15 +898,6 @@
                 padding-bottom: 45px;
             }
 
-            .tracking-visual-card {
-                min-height: 245px;
-            }
-
-            .tracking-circle {
-                width: 235px;
-                height: 235px;
-            }
-
             .benefit-text {
                 font-size: 10px;
             }
@@ -1039,160 +929,7 @@
      NAVBAR
 ========================================================= --}}
 
-<nav
-    id="main-navbar"
-    class="bg-white border-b border-gray-100 sticky top-0 z-50"
->
-
-    <div class="max-w-7xl mx-auto px-6 py-4 flex items-center justify-between">
-
-        {{-- LOGO --}}
-        <a
-            href="{{ route('home') }}"
-            class="shrink-0"
-            aria-label="Venexpress - Inicio"
-        >
-            <img
-                src="{{ asset('images/venexpress-logo.png') }}"
-                alt="Venexpress"
-                class="h-9 w-auto"
-            >
-        </a>
-
-
-        {{-- NAV DESKTOP --}}
-        <div class="main-nav-links">
-
-            <a
-                href="{{ route('home') }}"
-                class="main-nav-link"
-            >
-                Inicio
-            </a>
-
-            <a
-                href="{{ route('home') }}#servicios"
-                class="main-nav-link"
-            >
-                Servicios
-            </a>
-
-            <a
-                href="{{ route('public.calculator') }}"
-                class="main-nav-link"
-            >
-                Calcular precio
-            </a>
-
-            <a
-                href="{{ route('public.offices') }}"
-                class="main-nav-link"
-            >
-                Agencias aliadas
-            </a>
-
-            <a
-                href="{{ route('tracking.index') }}"
-                class="main-nav-link is-active"
-            >
-                Rastreo
-            </a>
-
-            <a
-                href="{{ route('home') }}#ayuda"
-                class="main-nav-link"
-            >
-                Ayuda
-            </a>
-
-        </div>
-
-
-        {{-- LOGIN + MOBILE --}}
-        <div class="flex items-center gap-3">
-
-            <a
-                href="{{ route('login') }}"
-                class="bg-amber-400 hover:bg-amber-500 text-blue-950 font-semibold text-sm px-6 py-2.5 rounded-lg transition inline-flex items-center justify-center shadow-sm hover:shadow-md"
-            >
-                Iniciar sesión
-            </a>
-
-
-            <button
-                id="mobile-menu-button"
-                type="button"
-                class="md:hidden w-10 h-10 rounded-lg border border-gray-200 text-blue-950 flex items-center justify-center"
-                aria-label="Abrir menú"
-                aria-expanded="false"
-                aria-controls="mobile-menu"
-            >
-                <i
-                    id="mobile-menu-icon"
-                    class="fa-solid fa-bars"
-                ></i>
-            </button>
-
-        </div>
-
-    </div>
-
-
-    {{-- MENÚ MÓVIL --}}
-    <div
-        id="mobile-menu"
-        class="hidden border-t border-gray-100 bg-white md:hidden"
-    >
-
-        <div class="max-w-7xl mx-auto px-6 py-3">
-
-            <a
-                href="{{ route('home') }}"
-                class="mobile-menu-link block py-3 text-sm text-gray-600"
-            >
-                Inicio
-            </a>
-
-            <a
-                href="{{ route('home') }}#servicios"
-                class="mobile-menu-link block py-3 text-sm text-gray-600"
-            >
-                Servicios
-            </a>
-
-            <a
-                href="{{ route('public.calculator') }}"
-                class="mobile-menu-link block py-3 text-sm text-gray-600"
-            >
-                Calcular precio
-            </a>
-
-            <a
-                href="{{ route('public.offices') }}"
-                class="mobile-menu-link block py-3 text-sm text-gray-600"
-            >
-                Agencias aliadas
-            </a>
-
-            <a
-                href="{{ route('tracking.index') }}"
-                class="mobile-menu-link block py-3 text-sm font-semibold text-blue-950"
-            >
-                Rastreo
-            </a>
-
-            <a
-                href="{{ route('home') }}#ayuda"
-                class="mobile-menu-link block py-3 text-sm text-gray-600"
-            >
-                Ayuda
-            </a>
-
-        </div>
-
-    </div>
-
-</nav>
+<x-public-navbar />
 
 
 
@@ -1402,64 +1139,55 @@
         </div>
 
 
-
-        {{-- =================================================
-             VEHÍCULO
-        ================================================== --}}
-
-        <div class="tracking-visual">
-
-            <div class="tracking-visual-card">
-
-                <div class="tracking-circle"></div>
+    </div>
 
 
-                {{-- BADGE --}}
-                <div class="tracking-badge">
+    {{-- =====================================================
+         IMAGEN HERO (mitad derecha en escritorio, bajo el
+         contenido en tablet/móvil)
+    ====================================================== --}}
 
-                    <div class="tracking-badge-icon">
+    <div class="tracking-visual">
 
-                        <i class="fa-solid fa-route text-xs"></i>
+        {{-- BADGE --}}
+        <div class="tracking-badge">
 
-                    </div>
+            <div class="tracking-badge-icon">
 
-                    <div>
-
-                        <strong>
-                            Seguimiento activo
-                        </strong>
-
-                        <span>
-                            Consulta tu envío en tiempo real
-                        </span>
-
-                    </div>
-
-                </div>
-
-
-                {{-- CAMIONETA --}}
-                <img
-                    src="{{ asset('images/van-hero.png') }}"
-                    alt="Furgoneta Venexpress"
-                    class="tracking-van"
-                >
-
-
-                {{-- SOMBRA --}}
-                <div class="tracking-shadow"></div>
-
-
-                {{-- STATUS --}}
-                <div class="tracking-status">
-
-                    <span class="tracking-status-dot"></span>
-
-                    Rastreo disponible
-
-                </div>
+                <i class="fa-solid fa-route text-xs"></i>
 
             </div>
+
+            <div>
+
+                <strong>
+                    Seguimiento activo
+                </strong>
+
+                <span>
+                    Consulta tu envío en tiempo real
+                </span>
+
+            </div>
+
+        </div>
+
+
+        <img
+            src="{{ asset('images/van-hero1.png') }}"
+            alt=""
+            width="1672"
+            height="940"
+            class="tracking-van"
+        >
+
+
+        {{-- STATUS --}}
+        <div class="tracking-status">
+
+            <span class="tracking-status-dot"></span>
+
+            Rastreo disponible
 
         </div>
 
@@ -2192,61 +1920,6 @@
 <script>
 
 document.addEventListener('DOMContentLoaded', function () {
-
-    /* =====================================================
-       MENÚ MÓVIL
-    ====================================================== */
-
-    const button = document.getElementById('mobile-menu-button');
-    const menu = document.getElementById('mobile-menu');
-    const icon = document.getElementById('mobile-menu-icon');
-
-    if (button && menu && icon) {
-
-        const closeMenu = () => {
-
-            menu.classList.add('hidden');
-
-            icon.classList.remove('fa-xmark');
-            icon.classList.add('fa-bars');
-
-            button.setAttribute('aria-expanded', 'false');
-
-        };
-
-
-        button.addEventListener('click', function () {
-
-            const isOpen = !menu.classList.contains('hidden');
-
-            if (isOpen) {
-
-                closeMenu();
-
-            } else {
-
-                menu.classList.remove('hidden');
-
-                icon.classList.remove('fa-bars');
-                icon.classList.add('fa-xmark');
-
-                button.setAttribute('aria-expanded', 'true');
-
-            }
-
-        });
-
-
-        document
-            .querySelectorAll('.mobile-menu-link')
-            .forEach(link => {
-
-                link.addEventListener('click', closeMenu);
-
-            });
-
-    }
-
 
     /* =====================================================
        TRACKING + OCR

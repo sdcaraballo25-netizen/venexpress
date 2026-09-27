@@ -33,7 +33,6 @@
         }
 
         #servicios,
-        #rastreo,
         #cobertura,
         #aliados,
         #como-funciona,
@@ -110,7 +109,31 @@
             max-height: 510px;
         }
 
+        /* Pista horizontal: los 4 slides conviven lado a lado y solo
+           cambia el translateX, así el arrastre puede seguir al dedo
+           y la altura nunca salta entre slides. */
+        .hero-track {
+            display: flex;
+            height: 100%;
+            transition: transform 0.5s cubic-bezier(.22,.61,.36,1);
+            cursor: grab;
+            touch-action: pan-y;
+            user-select: none;
+            -webkit-user-select: none;
+        }
+
+        .hero-shell.is-dragging .hero-track {
+            transition: none;
+            cursor: grabbing;
+        }
+
+        .hero-track img {
+            -webkit-user-drag: none;
+        }
+
         .hero-slide {
+            flex: 0 0 100%;
+            min-width: 0;
             height: 510px;
             min-height: 510px;
             max-height: 510px;
@@ -228,6 +251,59 @@
         .hero-role-button {
             padding: 0.95rem 1.4rem;
             font-size: 0.86rem;
+        }
+
+        /* Flechas: solo un chevron sobre los laterales. Sin círculo,
+           fondo ni borde; el área clicable es generosa pero invisible.
+           El halo blanco lo mantiene legible sobre la foto. */
+        .hero-arrow {
+            position: absolute;
+            top: 50%;
+            z-index: 10;
+            width: 2.75rem;
+            height: 4rem;
+            transform: translateY(-50%);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            padding: 0;
+            border: 0;
+            border-radius: 0;
+            background: transparent;
+            box-shadow: none;
+            color: var(--ink);
+            font-size: 1.35rem;
+            opacity: 0.7;
+            filter: drop-shadow(0 0 3px rgba(255,255,255,.95));
+            transition: opacity 0.2s ease;
+        }
+
+        .hero-arrow:hover,
+        .hero-arrow:focus-visible {
+            opacity: 1;
+        }
+
+        .hero-arrow:focus-visible {
+            outline: 2px solid var(--ink);
+            outline-offset: -4px;
+            border-radius: 0.5rem;
+        }
+
+        .hero-arrow-prev { left: 0.25rem; }
+        .hero-arrow-next { right: 0.25rem; }
+
+        @media (min-width: 768px) {
+            /* deja libre el hueco de las flechas junto al texto */
+            .hero-content.section-wrap {
+                padding-left: max(clamp(1rem, 4vw, 4.5rem), 3rem);
+                padding-right: 3rem;
+            }
+        }
+
+        @media (prefers-reduced-motion: reduce) {
+            .hero-track {
+                transition: none;
+            }
         }
 
         .hero-dots {
@@ -421,127 +497,6 @@
             display: inline-flex;
             align-items: center;
             gap: 0.45rem;
-        }
-
-        /* =========================================================
-           RASTREO
-        ========================================================== */
-
-        .tracking-layout {
-            display: grid;
-            grid-template-columns: minmax(0, 1.05fr) minmax(320px, 0.95fr);
-            gap: 2rem;
-            align-items: center;
-        }
-
-        .tracking-box {
-            margin-top: 1.5rem;
-            display: flex;
-            max-width: 620px;
-            gap: 0.55rem;
-        }
-
-        .tracking-box input {
-            width: 100%;
-            border: 1px solid #ddddda;
-            border-radius: 999px;
-            background: #fff;
-            padding: 0.92rem 1.15rem;
-            outline: none;
-            font-size: 0.8rem;
-        }
-
-        .tracking-box input:focus {
-            border-color: #bdbdb8;
-            box-shadow: 0 0 0 4px rgba(247,217,0,.18);
-        }
-
-        .tracking-box button {
-            flex: 0 0 auto;
-            border-radius: 999px;
-            background: var(--brand-yellow-strong);
-            padding: 0.92rem 1.3rem;
-            font-size: 0.78rem;
-            font-weight: 800;
-        }
-
-        .tracking-note {
-            margin-top: 0.65rem;
-            font-size: 0.67rem;
-            color: #777772;
-        }
-
-        .tracking-visual {
-            position: relative;
-            min-height: 280px;
-            overflow: hidden;
-            border-radius: 1rem;
-            background: linear-gradient(135deg, #f0f0ed 0%, #fafaf7 50%, #eeeeea 100%);
-        }
-
-        .tracking-visual::before,
-        .tracking-visual::after {
-            content: '';
-            position: absolute;
-            background: var(--brand-yellow);
-            z-index: 0;
-        }
-
-        .tracking-visual::before {
-            width: 55%;
-            height: 30%;
-            left: -5%;
-            bottom: 6%;
-            transform: skewX(-28deg);
-        }
-
-        .tracking-visual::after {
-            width: 30%;
-            height: 16%;
-            right: -3%;
-            top: 6%;
-            transform: skewX(-28deg);
-        }
-
-        .tracking-placeholder {
-            position: absolute;
-            left: 50%;
-            top: 52%;
-            transform: translate(-50%, -50%);
-            z-index: 1;
-            width: min(62%, 340px);
-            aspect-ratio: 1.35 / 1;
-            border-radius: 0.7rem;
-            border: 1px dashed rgba(17,17,17,.26);
-            background: rgba(255,255,255,.88);
-            display: flex;
-            flex-direction: column;
-            align-items: center;
-            justify-content: center;
-            text-align: center;
-            padding: 1rem;
-        }
-
-        .tracking-placeholder strong {
-            font-size: 0.78rem;
-        }
-
-        .tracking-placeholder span {
-            margin-top: 0.35rem;
-            font-size: 0.64rem;
-            color: #74746f;
-        }
-
-        .tracking-image {
-            position: absolute;
-            inset: 0;
-            width: 100%;
-            height: 100%;
-            object-fit: contain;
-            object-position: center;
-            transform: scale(1.20);
-            display: block;
-            z-index: 1;
         }
 
         /* =========================================================
@@ -1019,14 +974,9 @@
                 object-position: center;
             }
 
-            .tracking-layout,
             .coverage-layout,
             .faq-layout {
                 grid-template-columns: 1fr;
-            }
-
-            .tracking-visual {
-                min-height: 250px;
             }
 
             .partner-main-image {
@@ -1069,16 +1019,53 @@
                 padding-bottom: 3.5rem;
             }
 
-            .hero-shell,
-            .hero-slide,
+            /* Móvil: la imagen (con el degradado blanco horneado a la
+               izquierda) se recorta desde la derecha, sin deformarse, y
+               el texto vive debajo sobre blanco. La altura la marca el
+               slide más alto; todos se estiran a esa altura. */
+            .hero-shell {
+                height: auto;
+                min-height: 0;
+                max-height: none;
+            }
+
+            .hero-slide {
+                height: auto;
+                min-height: 0;
+                max-height: none;
+                display: flex;
+                flex-direction: column;
+            }
+
+            .hero-image-panel {
+                position: relative;
+                inset: auto;
+                left: 0;
+                flex: 0 0 auto;
+                height: 220px;
+            }
+
+            .hero-image {
+                object-position: right center;
+            }
+
             .hero-content {
-                height: 540px;
-                min-height: 540px;
-                max-height: 540px;
+                height: auto;
+                min-height: 0;
+                max-height: none;
+                flex: 1 1 auto;
+                align-items: flex-start;
+            }
+
+            .hero-arrow {
+                top: 110px;
+                width: 2.5rem;
+                height: 3.5rem;
+                font-size: 1.15rem;
             }
 
             .hero-copy {
-                padding: 3.4rem 0 4.2rem;
+                padding: 1.4rem 0 4rem;
             }
 
             .hero-title {
@@ -1109,14 +1096,6 @@
             .utility-item + .utility-item {
                 border-left: 0;
                 border-top: 1px solid rgba(255,255,255,.18);
-            }
-
-            .tracking-box {
-                flex-direction: column;
-            }
-
-            .tracking-box button {
-                width: 100%;
             }
 
             .steps::before {
@@ -1198,7 +1177,7 @@
                     Tienda
                 </a>
 
-                <a href="#rastreo"
+                <a href="{{ route('tracking.index') }}"
                    class="main-nav-link">
                     Rastreo
                 </a>
@@ -1304,7 +1283,7 @@
                     Agencias aliadas
                 </a>
 
-                <a href="#rastreo"
+                <a href="{{ route('tracking.index') }}"
                    class="mobile-menu-link block py-3 text-sm text-gray-600">
                     Rastreo
                 </a>
@@ -1359,6 +1338,9 @@
     <section id="hero-carousel"
              class="hero-shell relative overflow-hidden bg-white">
 
+        <div id="hero-track"
+             class="hero-track">
+
         {{-- Slide 1: Cliente --}}
 
         <div id="hero-slide-0"
@@ -1407,7 +1389,7 @@
 
                         </a>
 
-                        <a href="#rastreo"
+                        <a href="{{ route('tracking.index') }}"
                            class="hero-secondary">
 
                             <i class="fa-solid fa-magnifying-glass text-xs"></i>
@@ -1427,7 +1409,7 @@
         {{-- Slide 2: Agencias --}}
 
         <div id="hero-slide-1"
-             class="hero-slide hero-slide-item relative hidden">
+             class="hero-slide hero-slide-item relative">
 
             <div class="hero-image-panel">
 
@@ -1483,7 +1465,7 @@
         {{-- Slide 3: Repartidores --}}
 
         <div id="hero-slide-2"
-             class="hero-slide hero-slide-item relative hidden">
+             class="hero-slide hero-slide-item relative">
 
             <div class="hero-image-panel">
 
@@ -1539,7 +1521,7 @@
         {{-- Slide 4: Emprendedores --}}
 
         <div id="hero-slide-3"
-             class="hero-slide hero-slide-item relative hidden">
+             class="hero-slide hero-slide-item relative">
 
             <div class="hero-image-panel">
 
@@ -1591,6 +1573,24 @@
             </div>
 
         </div>
+
+        </div>
+
+        {{-- FLECHAS --}}
+
+        <button type="button"
+                class="hero-arrow hero-arrow-prev"
+                data-hero-arrow="-1"
+                aria-label="Slide anterior">
+            <i class="fa-solid fa-chevron-left"></i>
+        </button>
+
+        <button type="button"
+                class="hero-arrow hero-arrow-next"
+                data-hero-arrow="1"
+                aria-label="Slide siguiente">
+            <i class="fa-solid fa-chevron-right"></i>
+        </button>
 
         {{-- DOTS --}}
 
@@ -1804,7 +1804,7 @@
 
                 </a>
 
-                <a href="#rastreo"
+                <a href="{{ route('tracking.index') }}"
                    class="quick-card group">
 
                     <div class="icon-chip">
@@ -1863,77 +1863,6 @@
                     </span>
 
                 </a>
-
-            </div>
-
-        </div>
-
-    </section>
-
-    {{-- =========================================================
-         RASTREO
-    ========================================================== --}}
-
-    <section id="rastreo"
-             class="section section-soft">
-
-        <div class="section-wrap tracking-layout">
-
-            <div>
-
-                <span class="eyebrow">
-                    ¿Dónde está tu envío?
-                </span>
-
-                <h2 class="section-title">
-                    Introduce tu número de guía y consulta
-                    el estado de tu paquete.
-                </h2>
-
-                <p class="section-subtitle">
-                    Consulta rápidamente la información disponible
-                    de tu envío desde cualquier dispositivo.
-                </p>
-
-                <form action="{{ route('tracking.show') }}"
-                      method="GET"
-                      class="tracking-box">
-
-                    <input
-                        type="text"
-                        name="guia"
-                        placeholder="Ej. VEN-2026-000123"
-                        autocomplete="off"
-                        spellcheck="false"
-                        aria-label="Número de guía"
-                    >
-
-                    <button type="submit">
-                        Rastrear envío
-                    </button>
-
-                </form>
-
-                <p class="tracking-note">
-
-                    <i class="fa-regular fa-circle-question mr-1"></i>
-
-                    ¿No encuentras tu número de guía?
-                    Consulta con la agencia donde realizaste
-                    tu envío.
-
-                </p>
-
-            </div>
-
-            <div class="tracking-visual"
-                 aria-hidden="true">
-
-                <img
-                    src="{{ asset('images/hero5.png') }}"
-                    alt="Paquete Venexpress"
-                    class="tracking-image"
-                >
 
             </div>
 
@@ -2523,7 +2452,7 @@
 
                         Introduce tu número de guía en el
                         buscador del menú superior o en la
-                        sección de rastreo de esta página.
+                        página de rastreo.
 
                     </div>
 
@@ -2724,7 +2653,7 @@
                 </li>
 
                 <li>
-                    <a href="#rastreo"
+                    <a href="{{ route('tracking.index') }}"
                        class="footer-link">
                         Rastreo
                     </a>
@@ -3003,7 +2932,15 @@
 
             /* =====================================================
                CARRUSEL
+               Una sola lógica (showHeroSlide) alimenta puntos,
+               flechas, autoplay y arrastre/swipe.
             ====================================================== */
+
+            const heroShell =
+                document.getElementById('hero-carousel');
+
+            const heroTrack =
+                document.getElementById('hero-track');
 
             const heroSlides =
                 Array.from(
@@ -3015,19 +2952,35 @@
                     document.querySelectorAll('.hero-dot')
                 );
 
+            const heroArrows =
+                Array.from(
+                    document.querySelectorAll('[data-hero-arrow]')
+                );
+
             let heroCurrent = 0;
             let heroTimer = null;
 
             function showHeroSlide(index) {
 
-                if (!heroSlides.length) return;
+                if (!heroSlides.length || !heroTrack) return;
+
+                index =
+                    (index + heroSlides.length) %
+                    heroSlides.length;
+
+                heroTrack.style.transform =
+                    'translateX(-' + (index * 100) + '%)';
 
                 heroSlides.forEach(
                     (slide, i) => {
 
-                        slide.classList.toggle(
-                            'hidden',
-                            i !== index
+                        // Los slides fuera de vista no reciben foco
+                        // ni los leen los lectores de pantalla.
+                        slide.inert = i !== index;
+
+                        slide.setAttribute(
+                            'aria-hidden',
+                            i !== index ? 'true' : 'false'
                         );
 
                     }
@@ -3048,19 +3001,22 @@
 
             }
 
+            function stopHeroAutoplay() {
+
+                clearInterval(heroTimer);
+
+            }
+
             function startHeroAutoplay() {
 
                 if (heroSlides.length < 2) return;
 
-                clearInterval(heroTimer);
+                stopHeroAutoplay();
 
                 heroTimer = setInterval(
                     () => {
 
-                        showHeroSlide(
-                            (heroCurrent + 1) %
-                            heroSlides.length
-                        );
+                        showHeroSlide(heroCurrent + 1);
 
                     },
                     6000
@@ -3069,8 +3025,9 @@
             }
 
             if (
-                heroSlides.length &&
-                heroDots.length
+                heroShell &&
+                heroTrack &&
+                heroSlides.length
             ) {
 
                 heroDots.forEach(
@@ -3092,6 +3049,205 @@
                         );
 
                     }
+                );
+
+                heroArrows.forEach(
+                    arrow => {
+
+                        arrow.addEventListener(
+                            'click',
+                            function () {
+
+                                showHeroSlide(
+                                    heroCurrent +
+                                    Number(
+                                        arrow.dataset.heroArrow
+                                    )
+                                );
+
+                                startHeroAutoplay();
+
+                            }
+                        );
+
+                    }
+                );
+
+                /* ---- Arrastre (mouse) y swipe (touch) ---- */
+
+                const DRAG_INTENT_PX = 6;
+
+                let dragPointerId = null;
+                let dragStartX = 0;
+                let dragStartY = 0;
+                let dragDeltaX = 0;
+                let dragActive = false;
+                let dragMoved = false;
+
+                function finishHeroDrag(commit) {
+
+                    if (dragPointerId === null) return;
+
+                    const width =
+                        heroShell.getBoundingClientRect().width;
+
+                    const threshold =
+                        Math.min(80, width * 0.15);
+
+                    if (dragActive) {
+
+                        try {
+                            heroShell.releasePointerCapture(
+                                dragPointerId
+                            );
+                        } catch (e) {}
+
+                    }
+
+                    heroShell.classList.remove('is-dragging');
+
+                    if (commit && dragActive) {
+
+                        if (dragDeltaX <= -threshold) {
+
+                            showHeroSlide(heroCurrent + 1);
+
+                        } else if (dragDeltaX >= threshold) {
+
+                            showHeroSlide(heroCurrent - 1);
+
+                        } else {
+
+                            showHeroSlide(heroCurrent);
+
+                        }
+
+                    } else if (dragActive) {
+
+                        showHeroSlide(heroCurrent);
+
+                    }
+
+                    dragPointerId = null;
+                    dragActive = false;
+                    dragDeltaX = 0;
+
+                    // El click posterior al arrastre se traga; la marca se
+                    // limpia sola para no afectar a flechas o puntos.
+                    setTimeout(() => { dragMoved = false; }, 50);
+
+                    startHeroAutoplay();
+
+                }
+
+                heroTrack.addEventListener(
+                    'pointerdown',
+                    function (e) {
+
+                        if (
+                            dragPointerId !== null ||
+                            (e.pointerType === 'mouse' && e.button !== 0)
+                        ) return;
+
+                        dragPointerId = e.pointerId;
+                        dragStartX = e.clientX;
+                        dragStartY = e.clientY;
+                        dragDeltaX = 0;
+                        dragActive = false;
+                        dragMoved = false;
+
+                        stopHeroAutoplay();
+
+                    }
+                );
+
+                heroShell.addEventListener(
+                    'pointermove',
+                    function (e) {
+
+                        if (e.pointerId !== dragPointerId) return;
+
+                        const dx = e.clientX - dragStartX;
+                        const dy = e.clientY - dragStartY;
+
+                        if (!dragActive) {
+
+                            // Solo es arrastre si la intención es
+                            // claramente horizontal.
+                            if (
+                                Math.abs(dx) < DRAG_INTENT_PX ||
+                                Math.abs(dx) < Math.abs(dy)
+                            ) return;
+
+                            dragActive = true;
+                            dragMoved = true;
+
+                            // Se captura el puntero recién aquí, para
+                            // que un simple tap siga llegando intacto
+                            // a botones y enlaces del slide.
+                            heroShell.setPointerCapture(e.pointerId);
+                            heroShell.classList.add('is-dragging');
+
+                        }
+
+                        dragDeltaX = dx;
+
+                        heroTrack.style.transform =
+                            'translateX(calc(-' +
+                            (heroCurrent * 100) +
+                            '% + ' + dx + 'px))';
+
+                    }
+                );
+
+                heroShell.addEventListener(
+                    'pointerup',
+                    function (e) {
+
+                        if (e.pointerId === dragPointerId) {
+
+                            finishHeroDrag(true);
+
+                        }
+
+                    }
+                );
+
+                heroShell.addEventListener(
+                    'pointercancel',
+                    function (e) {
+
+                        if (e.pointerId === dragPointerId) {
+
+                            finishHeroDrag(false);
+
+                        }
+
+                    }
+                );
+
+                // Si hubo arrastre, el click que dispara el navegador al
+                // soltar no debe activar un enlace o botón del slide.
+                heroShell.addEventListener(
+                    'click',
+                    function (e) {
+
+                        if (dragMoved) {
+
+                            e.preventDefault();
+                            e.stopPropagation();
+                            dragMoved = false;
+
+                        }
+
+                    },
+                    true
+                );
+
+                // Evita el drag nativo de enlaces/imágenes.
+                heroTrack.addEventListener(
+                    'dragstart',
+                    e => e.preventDefault()
                 );
 
                 showHeroSlide(0);
