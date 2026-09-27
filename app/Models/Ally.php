@@ -17,6 +17,22 @@ class Ally extends Model
     public const STATUS_REJECTED = 'RECHAZADO';
     public const STATUS_SUSPENDED = 'SUSPENDIDO';
 
+    /**
+     * Estados de VERIFICACIÓN DE IDENTIDAD del aliado, separados del
+     * estado operativo (`status`, sin cambios). No confundir con
+     * DESTINATION_VERIFICATION_* (esa es sobre si la agencia es punto
+     * final de entrega/retiro, un concepto distinto). Un aliado solo
+     * puede operar como Punto Aliado si verification_status ===
+     * VERIFICADO Y status === ACTIVO (ver canOperate()).
+     */
+    public const VERIFICATION_PENDING = 'PENDIENTE';
+
+    public const VERIFICATION_IN_REVIEW = 'EN_REVISION';
+
+    public const VERIFICATION_VERIFIED = 'VERIFICADO';
+
+    public const VERIFICATION_REJECTED = 'RECHAZADO';
+
     /*
     |--------------------------------------------------------------------------
     | VERIFICACIÓN DE DESTINO (punto final de entrega/retiro)
@@ -46,6 +62,7 @@ class Ally extends Model
         'rif_document_path',
         'mercantile_registry_document_path',
         'owner_id_document_path',
+        'owner_id_back_document_path',
         'latitude',
         'longitude',
         'commission_percentage',
@@ -56,6 +73,9 @@ class Ally extends Model
         'is_verified_destination',
         'destination_verification_status',
         'destination_verified_at',
+        'verification_status',
+        'verification_rejection_reason',
+        'verification_reviewed_at',
     ];
 
     protected function casts(): array
@@ -66,7 +86,19 @@ class Ally extends Model
             'longitude' => 'decimal:7',
             'is_verified_destination' => 'boolean',
             'destination_verified_at' => 'datetime',
+            'verification_reviewed_at' => 'datetime',
         ];
+    }
+
+    /**
+     * True si el aliado puede operar como Punto Aliado: verificado
+     * documentalmente Y con la cuenta operativa activa. Única fuente
+     * de verdad que debe consultar el backend.
+     */
+    public function canOperate(): bool
+    {
+        return $this->verification_status === self::VERIFICATION_VERIFIED
+            && $this->status === self::STATUS_ACTIVE;
     }
 
     /**

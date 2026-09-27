@@ -4,6 +4,7 @@ namespace App\Http\Controllers;
 
 use App\Models\Ally;
 use App\Models\Driver;
+use App\Models\Emprendedor;
 use App\Models\Package;
 use App\Models\User;
 use Illuminate\Http\Request;
@@ -47,6 +48,13 @@ class DocumentPhotoController extends Controller
         return $this->serve($ally->owner_id_document_path);
     }
 
+    public function allyOwnerIdBackDocument(Request $request, Ally $ally): StreamedResponse
+    {
+        $this->authorizeAllyDocument($request->user(), $ally);
+
+        return $this->serve($ally->owner_id_back_document_path);
+    }
+
     public function driverLicense(Request $request, Driver $driver): StreamedResponse
     {
         $this->authorizeDriverDocument($request->user(), $driver);
@@ -61,11 +69,67 @@ class DocumentPhotoController extends Controller
         return $this->serve($driver->id_photo_path);
     }
 
+    public function driverCedulaBack(Request $request, Driver $driver): StreamedResponse
+    {
+        $this->authorizeDriverDocument($request->user(), $driver);
+
+        return $this->serve($driver->cedula_back_photo_path);
+    }
+
+    public function driverSelfie(Request $request, Driver $driver): StreamedResponse
+    {
+        $this->authorizeDriverDocument($request->user(), $driver);
+
+        return $this->serve($driver->selfie_photo_path);
+    }
+
+    public function driverVehiclePhoto(Request $request, Driver $driver): StreamedResponse
+    {
+        $this->authorizeDriverDocument($request->user(), $driver);
+
+        return $this->serve($driver->vehicle_photo_path);
+    }
+
+    public function driverPlatePhoto(Request $request, Driver $driver): StreamedResponse
+    {
+        $this->authorizeDriverDocument($request->user(), $driver);
+
+        return $this->serve($driver->plate_photo_path);
+    }
+
     public function driverVehicleRegistration(Request $request, Driver $driver): StreamedResponse
     {
         $this->authorizeDriverDocument($request->user(), $driver);
 
         return $this->serve($driver->vehicle_registration_photo_path);
+    }
+
+    public function emprendedorCedulaFront(Request $request, Emprendedor $emprendedor): StreamedResponse
+    {
+        $this->authorizeEmprendedorDocument($request->user(), $emprendedor);
+
+        return $this->serve($emprendedor->cedula_front_photo_path);
+    }
+
+    public function emprendedorCedulaBack(Request $request, Emprendedor $emprendedor): StreamedResponse
+    {
+        $this->authorizeEmprendedorDocument($request->user(), $emprendedor);
+
+        return $this->serve($emprendedor->cedula_back_photo_path);
+    }
+
+    public function emprendedorRifDocument(Request $request, Emprendedor $emprendedor): StreamedResponse
+    {
+        $this->authorizeEmprendedorDocument($request->user(), $emprendedor);
+
+        return $this->serve($emprendedor->rif_document_path);
+    }
+
+    public function emprendedorProductOrWorkspacePhoto(Request $request, Emprendedor $emprendedor): StreamedResponse
+    {
+        $this->authorizeEmprendedorDocument($request->user(), $emprendedor);
+
+        return $this->serve($emprendedor->product_or_workspace_photo_path);
     }
 
     public function packageDeliveryEvidence(Request $request, Package $package): StreamedResponse
@@ -109,6 +173,26 @@ class DocumentPhotoController extends Controller
         }
 
         if ($user->isRepartidor() && $user->driver?->id === $driver->id) {
+            return;
+        }
+
+        abort(403, 'No tienes permiso para ver este documento.');
+    }
+
+    /**
+     * Administradores o el propio Emprendedor dueño del documento.
+     */
+    protected function authorizeEmprendedorDocument(?User $user, Emprendedor $emprendedor): void
+    {
+        if (! $user) {
+            abort(403);
+        }
+
+        if ($user->isAdmin()) {
+            return;
+        }
+
+        if ($user->isEmprendedor() && $user->emprendedor?->id === $emprendedor->id) {
             return;
         }
 

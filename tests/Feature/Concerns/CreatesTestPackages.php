@@ -30,6 +30,7 @@ trait CreatesTestPackages
             'address' => 'Av. Principal',
             'commission_percentage' => 10.00,
             'status' => Ally::STATUS_ACTIVE,
+            'verification_status' => Ally::VERIFICATION_VERIFIED,
         ], $overrides));
     }
 

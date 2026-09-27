@@ -28,6 +28,7 @@ trait CreatesTestEmprendedores
             'address' => 'Av. Principal',
             'commission_percentage' => 10.00,
             'status' => Ally::STATUS_ACTIVE,
+            'verification_status' => Ally::VERIFICATION_VERIFIED,
         ], $overrides));
     }
 
@@ -44,6 +45,7 @@ trait CreatesTestEmprendedores
             'business_name' => 'Tienda de Prueba ' . str()->random(5),
             'document_id' => 'V-' . random_int(10000000, 99999999),
             'status' => Emprendedor::STATUS_ACTIVE,
+            'verification_status' => Emprendedor::VERIFICATION_VERIFIED,
         ], $overrides));
     }
 }

@@ -9,9 +9,7 @@ use App\Models\Emprendedor;
 use App\Models\User;
 use App\Notifications\AccountPendingApproval;
 use Illuminate\Foundation\Testing\RefreshDatabase;
-use Illuminate\Http\UploadedFile;
 use Illuminate\Support\Facades\Notification;
-use Illuminate\Support\Facades\Storage;
 use Livewire\Volt\Volt;
 use Tests\TestCase;
 
@@ -141,9 +139,14 @@ class RegistrationTest extends TestCase
         ]);
     }
 
-    public function test_new_ally_registers_as_pending_with_storefront_photo_and_location(): void
+    /**
+     * Registro ≠ Verificación: el registro de Aliado ya no pide
+     * documentos ni ubicación en el mapa (eso se completa después
+     * desde "Mi Verificación" / desde el panel de Admin — ver
+     * App\Livewire\Ally\Verificacion y AlliesManager::editLocation()).
+     */
+    public function test_new_ally_registers_as_pending_without_documents_or_location(): void
     {
-        Storage::fake('documents');
         Notification::fake();
 
         $component = Volt::test('pages.auth.register')
@@ -156,103 +159,38 @@ class RegistrationTest extends TestCase
             ->set('rif', 'J-12345678-9')
             ->set('state', 'Distrito Capital')
             ->set('city', 'Caracas')
-            ->set('address', 'Av. Principal, local 1')
-            ->set('storefront_photo', UploadedFile::fake()->create('fachada.jpg', 100, 'image/jpeg'))
-            ->set('rif_document', UploadedFile::fake()->create('rif.pdf', 200, 'application/pdf'))
-            ->set('mercantile_registry_document', UploadedFile::fake()->create('registro.pdf', 200, 'application/pdf'))
-            ->set('owner_id_document', UploadedFile::fake()->create('cedula.jpg', 100, 'image/jpeg'))
-            ->set('latitude', 10.5)
-            ->set('longitude', -66.9);
+            ->set('address', 'Av. Principal, local 1');
 
         $component->call('register');
 
+        $component->assertHasNoErrors();
         $component->assertRedirect(route('ally.dashboard', absolute: false));
 
         $ally = Ally::where('rif', 'J-12345678-9')->first();
 
         $this->assertNotNull($ally);
         $this->assertSame(Ally::STATUS_PENDING, $ally->status);
-        $this->assertNotNull($ally->storefront_photo_path);
-        $this->assertNotNull($ally->rif_document_path);
-        $this->assertNotNull($ally->mercantile_registry_document_path);
-        $this->assertNotNull($ally->owner_id_document_path);
-        $this->assertEquals(10.5, (float) $ally->latitude);
-        $this->assertEquals(-66.9, (float) $ally->longitude);
+        $this->assertSame(Ally::VERIFICATION_PENDING, $ally->verification_status);
 
-        Storage::disk('documents')->assertExists($ally->storefront_photo_path);
-        Storage::disk('documents')->assertExists($ally->rif_document_path);
-        Storage::disk('documents')->assertExists($ally->mercantile_registry_document_path);
-        Storage::disk('documents')->assertExists($ally->owner_id_document_path);
+        // Documentos y ubicación quedan vacíos: se completan después,
+        // no durante el registro.
+        $this->assertNull($ally->storefront_photo_path);
+        $this->assertNull($ally->rif_document_path);
+        $this->assertNull($ally->mercantile_registry_document_path);
+        $this->assertNull($ally->owner_id_document_path);
+        $this->assertNull($ally->latitude);
+        $this->assertNull($ally->longitude);
 
         Notification::assertSentTo($ally->user, AccountPendingApproval::class);
     }
 
-    public function test_ally_registration_requires_the_verification_documents(): void
+    /**
+     * Registro ≠ Verificación: el registro de Repartidor ya no pide
+     * documentos (eso se completa después desde "Mi Verificación" —
+     * ver App\Livewire\Driver\Verificacion).
+     */
+    public function test_new_driver_registers_as_pending_without_documents(): void
     {
-        Storage::fake('documents');
-
-        $component = Volt::test('pages.auth.register')
-            ->set('name', 'Dueño Agencia')
-            ->set('email', 'agencia2@example.com')
-            ->set('password', 'password')
-            ->set('password_confirmation', 'password')
-            ->set('role', 'aliado')
-            ->set('business_name', 'Agencia de Prueba 2')
-            ->set('rif', 'J-99999999-1')
-            ->set('state', 'Distrito Capital')
-            ->set('city', 'Caracas')
-            ->set('address', 'Av. Principal, local 2')
-            ->set('storefront_photo', UploadedFile::fake()->create('fachada.jpg', 100, 'image/jpeg'))
-            ->set('latitude', 10.5)
-            ->set('longitude', -66.9);
-
-        $component->call('register');
-
-        $component->assertHasErrors([
-            'rif_document',
-            'mercantile_registry_document',
-            'owner_id_document',
-        ]);
-
-        $this->assertDatabaseMissing('allies', [
-            'rif' => 'J-99999999-1',
-        ]);
-    }
-
-    public function test_ally_registration_rejects_a_dangerous_file_extension_for_verification_documents(): void
-    {
-        Storage::fake('documents');
-
-        $component = Volt::test('pages.auth.register')
-            ->set('name', 'Dueño Agencia')
-            ->set('email', 'agencia3@example.com')
-            ->set('password', 'password')
-            ->set('password_confirmation', 'password')
-            ->set('role', 'aliado')
-            ->set('business_name', 'Agencia de Prueba 3')
-            ->set('rif', 'J-88888888-2')
-            ->set('state', 'Distrito Capital')
-            ->set('city', 'Caracas')
-            ->set('address', 'Av. Principal, local 3')
-            ->set('storefront_photo', UploadedFile::fake()->create('fachada.jpg', 100, 'image/jpeg'))
-            ->set('rif_document', UploadedFile::fake()->create('rif.exe', 100, 'application/x-msdownload'))
-            ->set('mercantile_registry_document', UploadedFile::fake()->create('registro.pdf', 200, 'application/pdf'))
-            ->set('owner_id_document', UploadedFile::fake()->create('cedula.jpg', 100, 'image/jpeg'))
-            ->set('latitude', 10.5)
-            ->set('longitude', -66.9);
-
-        $component->call('register');
-
-        $component->assertHasErrors(['rif_document']);
-
-        $this->assertDatabaseMissing('allies', [
-            'rif' => 'J-88888888-2',
-        ]);
-    }
-
-    public function test_new_driver_registers_as_pending_with_documents(): void
-    {
-        Storage::fake('documents');
         Notification::fake();
 
         $component = Volt::test('pages.auth.register')
@@ -263,45 +201,26 @@ class RegistrationTest extends TestCase
             ->set('role', 'repartidor')
             ->set('vehicle_plate', 'ABC123')
             ->set('vehicle_type', 'Moto')
-            ->set('phone', '+58 412 1234567')
-            ->set('license_photo', UploadedFile::fake()->create('licencia.jpg', 100, 'image/jpeg'))
-            ->set('id_photo', UploadedFile::fake()->create('cedula.jpg', 100, 'image/jpeg'))
-            ->set('vehicle_registration_photo', UploadedFile::fake()->create('carnet.jpg', 100, 'image/jpeg'));
+            ->set('phone', '+58 412 1234567');
 
         $component->call('register');
 
+        $component->assertHasNoErrors();
         $component->assertRedirect(route('repartidor.dashboard', absolute: false));
 
         $user = User::where('email', 'repartidor@example.com')->first();
 
         $this->assertNotNull($user->driver);
         $this->assertSame(Driver::STATUS_PENDING, $user->driver->status);
-        $this->assertNotNull($user->driver->license_photo_path);
-        $this->assertNotNull($user->driver->id_photo_path);
-        $this->assertNotNull($user->driver->vehicle_registration_photo_path);
+        $this->assertSame(Driver::VERIFICATION_PENDING, $user->driver->verification_status);
 
-        Storage::disk('documents')->assertExists($user->driver->license_photo_path);
-        Storage::disk('documents')->assertExists($user->driver->id_photo_path);
-        Storage::disk('documents')->assertExists($user->driver->vehicle_registration_photo_path);
+        // Documentos quedan vacíos: se completan después, no durante
+        // el registro.
+        $this->assertNull($user->driver->license_photo_path);
+        $this->assertNull($user->driver->id_photo_path);
+        $this->assertNull($user->driver->vehicle_registration_photo_path);
 
         Notification::assertSentTo($user, AccountPendingApproval::class);
-    }
-
-    public function test_driver_registration_requires_all_three_documents(): void
-    {
-        Storage::fake('documents');
-
-        Volt::test('pages.auth.register')
-            ->set('name', 'Repartidor Incompleto')
-            ->set('email', 'incompleto@example.com')
-            ->set('password', 'password')
-            ->set('password_confirmation', 'password')
-            ->set('role', 'repartidor')
-            ->set('vehicle_plate', 'XYZ999')
-            ->set('vehicle_type', 'Moto')
-            ->set('phone', '+58 412 1234567')
-            ->call('register')
-            ->assertHasErrors(['license_photo', 'id_photo', 'vehicle_registration_photo']);
     }
 
     private function createActiveAlly(): Ally

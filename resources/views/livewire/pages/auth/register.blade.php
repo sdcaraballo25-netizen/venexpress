@@ -18,12 +18,9 @@ use Illuminate\Validation\Rules;
 use Livewire\Attributes\Layout;
 use Livewire\Attributes\Locked;
 use Livewire\Volt\Component;
-use Livewire\WithFileUploads;
 
 new #[Layout('layouts.guest')] class extends Component
 {
-    use WithFileUploads;
-
     public string $name = '';
     public string $email = '';
     public string $password = '';
@@ -51,31 +48,34 @@ new #[Layout('layouts.guest')] class extends Component
 
     /**
      * Datos adicionales para aliados.
+     *
+     * Documentos de verificación (RIF, registro mercantil, cédula del
+     * titular, fachada) y ubicación en el mapa ya NO se piden aquí:
+     * se completan después desde "Mi Verificación"
+     * (App\Livewire\Ally\Verificacion) una vez la cuenta existe, y la
+     * ubicación exacta la fija un Admin desde su propio mapa
+     * (App\Livewire\Admin\AlliesManager::editLocation()).
      */
     public string $business_name = '';
     public string $rif = '';
     public string $state = '';
     public string $city = '';
     public string $address = '';
-    public $storefront_photo = null;
-    public $rif_document = null;
-    public $mercantile_registry_document = null;
-    public $owner_id_document = null;
-    public ?float $latitude = null;
-    public ?float $longitude = null;
 
     public array $states = [];
     public array $cities = [];
 
     /**
      * Datos adicionales para repartidores.
+     *
+     * Documentos de verificación (licencia, cédula, carnet de
+     * circulación) ya NO se piden aquí: se completan después desde
+     * "Mi Verificación" (App\Livewire\Driver\Verificacion) una vez la
+     * cuenta existe.
      */
     public string $vehicle_plate = '';
     public string $vehicle_type = '';
     public string $phone = '';
-    public $license_photo = null;
-    public $id_photo = null;
-    public $vehicle_registration_photo = null;
 
     /**
      * Datos adicionales para clientes.
@@ -142,15 +142,6 @@ new #[Layout('layouts.guest')] class extends Component
         $this->cities = $this->state !== ''
             ? $locationService->citiesByState($this->state)
             : [];
-    }
-
-    /**
-     * Recibe la posición elegida por clic en el mapa (evento de Alpine/Leaflet).
-     */
-    public function setLocationFromMap(float $lat, float $lng): void
-    {
-        $this->latitude = round($lat, 7);
-        $this->longitude = round($lng, 7);
     }
 
     /**
@@ -246,56 +237,6 @@ new #[Layout('layouts.guest')] class extends Component
                     'string',
                     'max:255',
                 ],
-
-                'storefront_photo' => [
-                    'required',
-                    'image',
-                    'mimes:jpg,jpeg,png,webp',
-                    'max:4096',
-                ],
-
-                /*
-                 * Documentos de verificación (RIF, registro
-                 * mercantil, cédula del titular). No forzamos
-                 * 'image' aquí: el aliado puede subir una foto o un
-                 * PDF/documento escaneado, según lo que tenga a
-                 * mano. 'mimes' es una lista blanca, así que
-                 * cualquier otro tipo de archivo (.exe, .zip, .rar,
-                 * etc.) queda rechazado automáticamente sin
-                 * necesidad de una lista negra.
-                 */
-                'rif_document' => [
-                    'required',
-                    'file',
-                    'mimes:jpg,jpeg,png,webp,pdf,doc,docx',
-                    'max:8192',
-                ],
-
-                'mercantile_registry_document' => [
-                    'required',
-                    'file',
-                    'mimes:jpg,jpeg,png,webp,pdf,doc,docx',
-                    'max:8192',
-                ],
-
-                'owner_id_document' => [
-                    'required',
-                    'file',
-                    'mimes:jpg,jpeg,png,webp,pdf,doc,docx',
-                    'max:8192',
-                ],
-
-                'latitude' => [
-                    'required',
-                    'numeric',
-                    'between:-90,90',
-                ],
-
-                'longitude' => [
-                    'required',
-                    'numeric',
-                    'between:-180,180',
-                ],
             ]);
         }
 
@@ -324,27 +265,6 @@ new #[Layout('layouts.guest')] class extends Component
                     'required',
                     'string',
                     'max:30',
-                ],
-
-                'license_photo' => [
-                    'required',
-                    'image',
-                    'mimes:jpg,jpeg,png,webp',
-                    'max:4096',
-                ],
-
-                'id_photo' => [
-                    'required',
-                    'image',
-                    'mimes:jpg,jpeg,png,webp',
-                    'max:4096',
-                ],
-
-                'vehicle_registration_photo' => [
-                    'required',
-                    'image',
-                    'mimes:jpg,jpeg,png,webp',
-                    'max:4096',
                 ],
             ]);
         }
@@ -471,8 +391,6 @@ new #[Layout('layouts.guest')] class extends Component
              */
             try {
                 DB::transaction(function () use ($user, $validated) {
-                    $storefrontPhotoPath = $this->storefront_photo->store('allies', 'documents');
-
                     Ally::create([
                         'user_id' => $user->id,
                         'business_name' => $validated['business_name'],
@@ -480,15 +398,13 @@ new #[Layout('layouts.guest')] class extends Component
                         'state' => $validated['state'],
                         'city' => $validated['city'],
                         'address' => $validated['address'],
-                        'storefront_photo_path' => $storefrontPhotoPath,
-                        'rif_document_path' => $this->rif_document->store('allies', 'documents'),
-                        'mercantile_registry_document_path' => $this->mercantile_registry_document->store('allies', 'documents'),
-                        'owner_id_document_path' => $this->owner_id_document->store('allies', 'documents'),
-                        'latitude' => $validated['latitude'],
-                        'longitude' => $validated['longitude'],
                         'commission_percentage' => 10.00,
 
-                        // Un aliado nuevo comienza como PENDIENTE.
+                        // Un aliado nuevo comienza como PENDIENTE. Los
+                        // documentos de verificación y la ubicación en
+                        // el mapa se completan después, desde "Mi
+                        // Verificación" y desde el panel de Admin
+                        // respectivamente — no aquí.
                         'status' => Ally::STATUS_PENDING,
                     ]);
                 });
@@ -530,12 +446,11 @@ new #[Layout('layouts.guest')] class extends Component
                         'vehicle_type' => $validated['vehicle_type'],
                         'phone' => $validated['phone'],
                         'driver_type' => Driver::TYPE_DELIVERY,
-                        'license_photo_path' => $this->license_photo->store('drivers', 'documents'),
-                        'id_photo_path' => $this->id_photo->store('drivers', 'documents'),
-                        'vehicle_registration_photo_path' => $this->vehicle_registration_photo->store('drivers', 'documents'),
 
                         // Un repartidor nuevo comienza como PENDIENTE, igual
-                        // que un aliado, hasta que un admin lo apruebe.
+                        // que un aliado, hasta que un admin lo apruebe. Los
+                        // documentos de verificación se completan después,
+                        // desde "Mi Verificación" — no aquí.
                         'status' => Driver::STATUS_PENDING,
                     ]);
                 });
@@ -1005,190 +920,6 @@ new #[Layout('layouts.guest')] class extends Component
                 />
             </div>
 
-            {{--
-                DOCUMENTOS DE VERIFICACIÓN (RIF, registro mercantil,
-                cédula del titular). A diferencia de la foto de
-                fachada, aquí el aliado puede subir una foto o un
-                PDF/documento escaneado según lo que tenga a mano, así
-                que no forzamos accept="image/*" ni mostramos una
-                vista previa de imagen para cualquier archivo (un PDF
-                no se puede previsualizar como <img>).
-            --}}
-            <div>
-                <p class="text-sm font-medium text-gray-700">
-                    Documentos de verificación
-                </p>
-                <p class="mt-1 text-xs text-gray-500">
-                    Foto o documento escaneado (imagen, PDF o Word). Máx. 8MB por archivo.
-                </p>
-            </div>
-
-            {{-- RIF --}}
-            <div>
-                <x-input-label
-                    for="rif_document"
-                    value="RIF"
-                />
-
-                <input
-                    type="file"
-                    wire:model="rif_document"
-                    id="rif_document"
-                    accept="image/*,.pdf,.doc,.docx"
-                    class="block mt-1.5 w-full text-sm text-gray-600
-                           file:mr-4 file:py-2 file:px-4 file:rounded-md
-                           file:border-0 file:text-sm file:font-semibold
-                           file:bg-blue-50 file:text-blue-700 hover:file:bg-blue-100"
-                />
-
-                <p class="mt-1 text-xs text-gray-500" wire:loading wire:target="rif_document">
-                    Subiendo archivo...
-                </p>
-
-                @if ($rif_document)
-                    @if (str_starts_with($rif_document->getMimeType(), 'image/'))
-                        <img src="{{ $rif_document->temporaryUrl() }}" class="mt-2 h-24 rounded-lg object-cover" alt="Vista previa">
-                    @else
-                        <p class="mt-2 text-xs text-gray-600">📄 {{ $rif_document->getClientOriginalName() }}</p>
-                    @endif
-                @endif
-
-                <x-input-error
-                    :messages="$errors->get('rif_document')"
-                    class="mt-2"
-                />
-            </div>
-
-            {{-- REGISTRO MERCANTIL --}}
-            <div>
-                <x-input-label
-                    for="mercantile_registry_document"
-                    value="Registro mercantil"
-                />
-
-                <input
-                    type="file"
-                    wire:model="mercantile_registry_document"
-                    id="mercantile_registry_document"
-                    accept="image/*,.pdf,.doc,.docx"
-                    class="block mt-1.5 w-full text-sm text-gray-600
-                           file:mr-4 file:py-2 file:px-4 file:rounded-md
-                           file:border-0 file:text-sm file:font-semibold
-                           file:bg-blue-50 file:text-blue-700 hover:file:bg-blue-100"
-                />
-
-                <p class="mt-1 text-xs text-gray-500" wire:loading wire:target="mercantile_registry_document">
-                    Subiendo archivo...
-                </p>
-
-                @if ($mercantile_registry_document)
-                    @if (str_starts_with($mercantile_registry_document->getMimeType(), 'image/'))
-                        <img src="{{ $mercantile_registry_document->temporaryUrl() }}" class="mt-2 h-24 rounded-lg object-cover" alt="Vista previa">
-                    @else
-                        <p class="mt-2 text-xs text-gray-600">📄 {{ $mercantile_registry_document->getClientOriginalName() }}</p>
-                    @endif
-                @endif
-
-                <x-input-error
-                    :messages="$errors->get('mercantile_registry_document')"
-                    class="mt-2"
-                />
-            </div>
-
-            {{-- CÉDULA DEL TITULAR --}}
-            <div>
-                <x-input-label
-                    for="owner_id_document"
-                    value="Cédula del titular"
-                />
-
-                <input
-                    type="file"
-                    wire:model="owner_id_document"
-                    id="owner_id_document"
-                    accept="image/*,.pdf,.doc,.docx"
-                    class="block mt-1.5 w-full text-sm text-gray-600
-                           file:mr-4 file:py-2 file:px-4 file:rounded-md
-                           file:border-0 file:text-sm file:font-semibold
-                           file:bg-blue-50 file:text-blue-700 hover:file:bg-blue-100"
-                />
-
-                <p class="mt-1 text-xs text-gray-500" wire:loading wire:target="owner_id_document">
-                    Subiendo archivo...
-                </p>
-
-                @if ($owner_id_document)
-                    @if (str_starts_with($owner_id_document->getMimeType(), 'image/'))
-                        <img src="{{ $owner_id_document->temporaryUrl() }}" class="mt-2 h-24 rounded-lg object-cover" alt="Vista previa">
-                    @else
-                        <p class="mt-2 text-xs text-gray-600">📄 {{ $owner_id_document->getClientOriginalName() }}</p>
-                    @endif
-                @endif
-
-                <x-input-error
-                    :messages="$errors->get('owner_id_document')"
-                    class="mt-2"
-                />
-            </div>
-
-            {{-- FOTO DE FACHADA --}}
-            <div>
-                <x-input-label
-                    for="storefront_photo"
-                    value="Foto de la fachada del local"
-                />
-
-                <input
-                    type="file"
-                    wire:model="storefront_photo"
-                    id="storefront_photo"
-                    accept="image/*"
-                    class="block mt-1.5 w-full text-sm text-gray-600
-                           file:mr-4 file:py-2 file:px-4 file:rounded-md
-                           file:border-0 file:text-sm file:font-semibold
-                           file:bg-blue-50 file:text-blue-700 hover:file:bg-blue-100"
-                />
-
-                <p class="mt-1 text-xs text-gray-500" wire:loading wire:target="storefront_photo">
-                    Subiendo foto...
-                </p>
-
-                @if ($storefront_photo)
-                    <img src="{{ $storefront_photo->temporaryUrl() }}" class="mt-2 h-24 rounded-lg object-cover" alt="Vista previa">
-                @endif
-
-                <x-input-error
-                    :messages="$errors->get('storefront_photo')"
-                    class="mt-2"
-                />
-            </div>
-
-            {{-- UBICACIÓN EN EL MAPA --}}
-            <div>
-                <x-input-label value="Ubicación exacta en el mapa" />
-
-                <p class="mt-1 text-xs text-gray-500">
-                    Haz clic en el mapa sobre la ubicación exacta del establecimiento.
-                </p>
-
-                <div
-                    x-data="registerLocationMap({
-                        lat: @js($latitude ?? 10.4806),
-                        lng: @js($longitude ?? -66.9036),
-                        hasPoint: @js((bool) $latitude),
-                    })"
-                    x-init="init($el)"
-                    wire:ignore
-                    class="mt-2 rounded-xl overflow-hidden border border-gray-300"
-                    style="height: 240px;"
-                ></div>
-
-                <x-input-error
-                    :messages="$errors->get('latitude')"
-                    class="mt-2"
-                />
-            </div>
-
         @endif
 
         {{-- ====================================================== --}}
@@ -1262,116 +993,6 @@ new #[Layout('layouts.guest')] class extends Component
 
                 <x-input-error
                     :messages="$errors->get('phone')"
-                    class="mt-2"
-                />
-            </div>
-
-            <div class="border-t border-gray-200 pt-5">
-                <h2 class="text-sm font-semibold text-blue-950">
-                    Documentos
-                </h2>
-
-                <p class="mt-1 text-xs text-gray-500">
-                    Estos documentos serán revisados por VenExpress antes de aprobar tu cuenta.
-                </p>
-            </div>
-
-            {{-- FOTO DE LA LICENCIA --}}
-            <div>
-                <x-input-label
-                    for="license_photo"
-                    value="Foto de la licencia de conducir"
-                />
-
-                <input
-                    type="file"
-                    wire:model="license_photo"
-                    id="license_photo"
-                    accept="image/*"
-                    class="block mt-1.5 w-full text-sm text-gray-600
-                           file:mr-4 file:py-2 file:px-4 file:rounded-md
-                           file:border-0 file:text-sm file:font-semibold
-                           file:bg-blue-50 file:text-blue-700 hover:file:bg-blue-100"
-                />
-
-                <p class="mt-1 text-xs text-gray-500" wire:loading wire:target="license_photo">
-                    Subiendo foto...
-                </p>
-
-                @if ($license_photo)
-                    <img src="{{ $license_photo->temporaryUrl() }}" class="mt-2 h-24 rounded-lg object-cover" alt="Vista previa">
-                @endif
-
-                <x-input-error
-                    :messages="$errors->get('license_photo')"
-                    class="mt-2"
-                />
-            </div>
-
-            {{-- FOTO DE LA CÉDULA --}}
-            <div>
-                <x-input-label
-                    for="id_photo"
-                    value="Foto de la cédula de identidad"
-                />
-
-                <input
-                    type="file"
-                    wire:model="id_photo"
-                    id="id_photo"
-                    accept="image/*"
-                    class="block mt-1.5 w-full text-sm text-gray-600
-                           file:mr-4 file:py-2 file:px-4 file:rounded-md
-                           file:border-0 file:text-sm file:font-semibold
-                           file:bg-blue-50 file:text-blue-700 hover:file:bg-blue-100"
-                />
-
-                <p class="mt-1 text-xs text-gray-500" wire:loading wire:target="id_photo">
-                    Subiendo foto...
-                </p>
-
-                @if ($id_photo)
-                    <img src="{{ $id_photo->temporaryUrl() }}" class="mt-2 h-24 rounded-lg object-cover" alt="Vista previa">
-                @endif
-
-                <x-input-error
-                    :messages="$errors->get('id_photo')"
-                    class="mt-2"
-                />
-            </div>
-
-            {{-- CARNET DE CIRCULACIÓN --}}
-            <div>
-                <x-input-label
-                    for="vehicle_registration_photo"
-                    value="Foto del carnet de circulación"
-                />
-
-                <p class="mt-1 text-xs text-gray-500">
-                    Debe corresponder a la placa {{ $vehicle_plate !== '' ? $vehicle_plate : 'indicada arriba' }}.
-                </p>
-
-                <input
-                    type="file"
-                    wire:model="vehicle_registration_photo"
-                    id="vehicle_registration_photo"
-                    accept="image/*"
-                    class="block mt-1.5 w-full text-sm text-gray-600
-                           file:mr-4 file:py-2 file:px-4 file:rounded-md
-                           file:border-0 file:text-sm file:font-semibold
-                           file:bg-blue-50 file:text-blue-700 hover:file:bg-blue-100"
-                />
-
-                <p class="mt-1 text-xs text-gray-500" wire:loading wire:target="vehicle_registration_photo">
-                    Subiendo foto...
-                </p>
-
-                @if ($vehicle_registration_photo)
-                    <img src="{{ $vehicle_registration_photo->temporaryUrl() }}" class="mt-2 h-24 rounded-lg object-cover" alt="Vista previa">
-                @endif
-
-                <x-input-error
-                    :messages="$errors->get('vehicle_registration_photo')"
                     class="mt-2"
                 />
             </div>

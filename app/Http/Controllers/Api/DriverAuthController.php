@@ -59,11 +59,20 @@ class DriverAuthController extends Controller
             ]);
         }
 
-        if ($driver->status !== Driver::STATUS_ACTIVE) {
-            $message = match ($driver->status) {
-                Driver::STATUS_PENDING => 'Tu cuenta de repartidor está pendiente de aprobación por un administrador.',
-                Driver::STATUS_REJECTED => 'Tu solicitud de repartidor fue rechazada. Contacta al administrador.',
-                Driver::STATUS_SUSPENDED => 'Tu cuenta de repartidor está suspendida. Contacta al administrador.',
+        /*
+         * canOperate() exige verification_status === VERIFICADO
+         * ADEMÁS de status === ACTIVO: un repartidor con status
+         * ACTIVO pero todavía no verificado documentalmente no debe
+         * poder obtener un token operativo. Los mensajes por status
+         * se mantienen exactamente iguales a los de antes; el nuevo
+         * caso (activo pero no verificado) es el único mensaje nuevo.
+         */
+        if (! $driver->canOperate()) {
+            $message = match (true) {
+                $driver->status === Driver::STATUS_PENDING => 'Tu cuenta de repartidor está pendiente de aprobación por un administrador.',
+                $driver->status === Driver::STATUS_REJECTED => 'Tu solicitud de repartidor fue rechazada. Contacta al administrador.',
+                $driver->status === Driver::STATUS_SUSPENDED => 'Tu cuenta de repartidor está suspendida. Contacta al administrador.',
+                $driver->verification_status !== Driver::VERIFICATION_VERIFIED => 'Tu cuenta de repartidor está pendiente de verificación por un administrador.',
                 default => 'Tu cuenta de repartidor no está activa.',
             };
 

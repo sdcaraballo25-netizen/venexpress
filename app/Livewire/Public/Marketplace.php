@@ -116,7 +116,10 @@ class Marketplace extends Component
             // coincidía con nada), mostrando "Tienda de Emprendedores"
             // en vez de un error — confuso para quien abre un enlace de
             // tienda compartido. Se trata igual que un id inexistente.
-            abort_unless($emprendedor->status === Emprendedor::STATUS_ACTIVE, 404);
+            // canOperate() exige además verification_status ===
+            // VERIFICADO: una tienda activa pero no verificada tampoco
+            // debe exponerse públicamente.
+            abort_unless($emprendedor->canOperate(), 404);
 
             $this->tiendaEmprendedor = $emprendedor->loadMissing('user');
         }
@@ -338,7 +341,9 @@ class Marketplace extends Component
         $productos = Producto::query()
             ->where('activo', true)
             ->where('stock', '>', 0)
-            ->whereHas('emprendedor', fn ($query) => $query->where('status', Emprendedor::STATUS_ACTIVE))
+            ->whereHas('emprendedor', fn ($query) => $query
+                ->where('status', Emprendedor::STATUS_ACTIVE)
+                ->where('verification_status', Emprendedor::VERIFICATION_VERIFIED))
             ->when(
                 $this->tiendaEmprendedor,
                 fn ($query) => $query->where('emprendedor_id', $this->tiendaEmprendedor->id)
@@ -371,7 +376,9 @@ class Marketplace extends Component
             'categorias' => Categoria::withCount(['productos' => fn ($query) => $query
                 ->where('activo', true)
                 ->where('stock', '>', 0)
-                ->whereHas('emprendedor', fn ($sub) => $sub->where('status', Emprendedor::STATUS_ACTIVE)),
+                ->whereHas('emprendedor', fn ($sub) => $sub
+                    ->where('status', Emprendedor::STATUS_ACTIVE)
+                    ->where('verification_status', Emprendedor::VERIFICATION_VERIFIED)),
             ])->orderBy('nombre')->get(),
             'productoComprar' => $this->productoComprarDetalle(),
         ])->layout(

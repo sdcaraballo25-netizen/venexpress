@@ -18,6 +18,7 @@ class DriverFactory extends Factory
             'phone' => fake()->numerify('04########'),
             'vehicle_plate' => strtoupper($this->faker->unique()->bothify('???-###')),
             'status' => Driver::STATUS_ACTIVE,
+            'verification_status' => Driver::VERIFICATION_VERIFIED,
             'driver_type' => Driver::TYPE_DELIVERY,
         ];
     }

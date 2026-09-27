@@ -44,6 +44,7 @@ use App\Livewire\Ally\Packages as AllyPackages;
 use App\Livewire\Ally\Reports as AllyReports;
 use App\Livewire\Ally\SalesCloseout as AllySalesCloseout;
 use App\Livewire\Ally\StaffManager as AllyStaffManager;
+use App\Livewire\Ally\Verificacion as AllyVerificacion;
 use App\Livewire\Almacen\Dashboard as AlmacenDashboard;
 use App\Livewire\Almacen\HelpCenter as AlmacenHelpCenter;
 use App\Livewire\Client\Compras as ClientCompras;
@@ -59,12 +60,14 @@ use App\Livewire\Driver\Packages;
 use App\Livewire\Driver\RouteDetail;
 use App\Livewire\Driver\RouteHistory;
 use App\Livewire\Driver\Scanner;
+use App\Livewire\Driver\Verificacion as DriverVerificacion;
 use App\Livewire\Emprendedor\Dashboard as EmprendedorDashboard;
 use App\Livewire\Emprendedor\Pedidos as EmprendedorPedidos;
 use App\Livewire\Emprendedor\PedidoShow as EmprendedorPedidoShow;
 use App\Livewire\Emprendedor\Perfil as EmprendedorPerfil;
 use App\Livewire\Emprendedor\Productos as EmprendedorProductos;
 use App\Livewire\Emprendedor\Reports as EmprendedorReports;
+use App\Livewire\Emprendedor\Verificacion as EmprendedorVerificacion;
 use App\Livewire\Profile\Show as ProfileShow;
 use App\Livewire\Public\HelpCenter;
 use App\Livewire\Public\Marketplace;
@@ -176,6 +179,33 @@ Route::prefix('ally')
 
 /*
 |--------------------------------------------------------------------------
+| Verificación de identidad (auto-servicio)
+|--------------------------------------------------------------------------
+|
+| A propósito FUERA de los grupos con 'account.approved': si un
+| repartidor/aliado/emprendedor todavía no puede operar, esta es la
+| única pantalla donde puede completar o corregir su verificación —
+| si estuviera detrás de ese middleware, quedaría atrapado sin forma
+| de llegar aquí (ver account-pending.blade.php, que enlaza a estas
+| rutas). Solo el Aliado Administrador (role 'aliado') tiene identidad
+| propia que verificar, no el personal de Taquilla.
+|
+*/
+
+Route::get('/ally/verificacion', AllyVerificacion::class)
+    ->middleware(['auth', 'verified', 'role:aliado'])
+    ->name('ally.verificacion');
+
+Route::get('/repartidor/verificacion', DriverVerificacion::class)
+    ->middleware(['auth', 'verified', 'role:repartidor'])
+    ->name('repartidor.verificacion');
+
+Route::get('/emprendedor/verificacion', EmprendedorVerificacion::class)
+    ->middleware(['auth', 'verified', 'role:emprendedor'])
+    ->name('emprendedor.verificacion');
+
+/*
+|--------------------------------------------------------------------------
 | Cuenta pendiente de aprobación
 |--------------------------------------------------------------------------
 */
@@ -195,12 +225,14 @@ Route::get('/cuenta/pendiente', function () {
 Route::get('/', function () {
     // Vista previa del marketplace en la landing: mismas reglas de
     // disponibilidad que App\Livewire\Public\Marketplace::render()
-    // (activo, con stock, emprendedor activo), sin paginación ni
-    // filtros — solo los 4 más recientes.
+    // (activo, con stock, emprendedor verificado y activo), sin
+    // paginación ni filtros — solo los 4 más recientes.
     $productosDestacados = Producto::query()
         ->where('activo', true)
         ->where('stock', '>', 0)
-        ->whereHas('emprendedor', fn ($query) => $query->where('status', Emprendedor::STATUS_ACTIVE))
+        ->whereHas('emprendedor', fn ($query) => $query
+            ->where('status', Emprendedor::STATUS_ACTIVE)
+            ->where('verification_status', Emprendedor::VERIFICATION_VERIFIED))
         ->with(['emprendedor', 'fotos'])
         ->withAvg('resenas', 'estrellas')
         ->withCount('resenas')
@@ -720,6 +752,13 @@ Route::get(
     ->name('allies.documents.owner-id');
 
 Route::get(
+    '/aliados/{ally}/documentos/cedula-titular-reverso',
+    [DocumentPhotoController::class, 'allyOwnerIdBackDocument']
+)
+    ->middleware(['auth'])
+    ->name('allies.documents.owner-id-back');
+
+Route::get(
     '/repartidores/{driver}/documentos/licencia',
     [DocumentPhotoController::class, 'driverLicense']
 )
@@ -734,11 +773,67 @@ Route::get(
     ->name('drivers.documents.id');
 
 Route::get(
+    '/repartidores/{driver}/documentos/cedula-reverso',
+    [DocumentPhotoController::class, 'driverCedulaBack']
+)
+    ->middleware(['auth'])
+    ->name('drivers.documents.cedula-back');
+
+Route::get(
+    '/repartidores/{driver}/documentos/selfie',
+    [DocumentPhotoController::class, 'driverSelfie']
+)
+    ->middleware(['auth'])
+    ->name('drivers.documents.selfie');
+
+Route::get(
+    '/repartidores/{driver}/documentos/foto-vehiculo',
+    [DocumentPhotoController::class, 'driverVehiclePhoto']
+)
+    ->middleware(['auth'])
+    ->name('drivers.documents.vehicle-photo');
+
+Route::get(
+    '/repartidores/{driver}/documentos/foto-placa',
+    [DocumentPhotoController::class, 'driverPlatePhoto']
+)
+    ->middleware(['auth'])
+    ->name('drivers.documents.plate-photo');
+
+Route::get(
     '/repartidores/{driver}/documentos/carnet-circulacion',
     [DocumentPhotoController::class, 'driverVehicleRegistration']
 )
     ->middleware(['auth'])
     ->name('drivers.documents.vehicle-registration');
+
+Route::get(
+    '/emprendedores/{emprendedor}/documentos/cedula-frente',
+    [DocumentPhotoController::class, 'emprendedorCedulaFront']
+)
+    ->middleware(['auth'])
+    ->name('emprendedores.documents.cedula-front');
+
+Route::get(
+    '/emprendedores/{emprendedor}/documentos/cedula-reverso',
+    [DocumentPhotoController::class, 'emprendedorCedulaBack']
+)
+    ->middleware(['auth'])
+    ->name('emprendedores.documents.cedula-back');
+
+Route::get(
+    '/emprendedores/{emprendedor}/documentos/rif',
+    [DocumentPhotoController::class, 'emprendedorRifDocument']
+)
+    ->middleware(['auth'])
+    ->name('emprendedores.documents.rif');
+
+Route::get(
+    '/emprendedores/{emprendedor}/documentos/productos-espacio',
+    [DocumentPhotoController::class, 'emprendedorProductOrWorkspacePhoto']
+)
+    ->middleware(['auth'])
+    ->name('emprendedores.documents.product-or-workspace');
 
 Route::get(
     '/paquetes/{package}/evidencia-entrega',

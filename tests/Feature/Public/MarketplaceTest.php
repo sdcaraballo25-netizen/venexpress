@@ -70,6 +70,47 @@ class MarketplaceTest extends TestCase
             ->assertDontSee('Producto De Suspendido');
     }
 
+    /**
+     * Fase 2: la visibilidad pública ahora exige verification_status
+     * === VERIFICADO, además de status === ACTIVO (Emprendedor::canOperate()).
+     * Un emprendedor con status ACTIVO pero todavía no verificado
+     * documentalmente no debe aparecer en el listado.
+     */
+    public function test_products_from_an_active_but_unverified_emprendedor_are_not_listed(): void
+    {
+        $emprendedor = $this->createEmprendedor(['verification_status' => Emprendedor::VERIFICATION_PENDING]);
+        $this->createProducto($emprendedor, ['nombre' => 'Producto De No Verificado']);
+
+        Livewire::test(Marketplace::class)
+            ->assertDontSee('Producto De No Verificado');
+    }
+
+    public function test_products_from_a_verified_and_active_emprendedor_are_listed(): void
+    {
+        $emprendedor = $this->createEmprendedor(['verification_status' => Emprendedor::VERIFICATION_VERIFIED]);
+        $this->createProducto($emprendedor, ['nombre' => 'Producto De Verificado']);
+
+        Livewire::test(Marketplace::class)
+            ->assertSee('Producto De Verificado');
+    }
+
+    /**
+     * Mismo criterio que test_products_from_an_active_but_unverified_emprendedor_are_not_listed,
+     * pero sobre el contador de productos por categoría (el tercer
+     * filtro que dependía de Emprendedor::STATUS_ACTIVE en Marketplace.php).
+     */
+    public function test_category_product_count_excludes_unverified_emprendedor_products(): void
+    {
+        $categoria = Categoria::first();
+
+        $emprendedor = $this->createEmprendedor(['verification_status' => Emprendedor::VERIFICATION_PENDING]);
+        $this->createProducto($emprendedor, ['nombre' => 'De No Verificado', 'categoria_id' => $categoria->id]);
+
+        $categorias = Livewire::test(Marketplace::class)->viewData('categorias');
+
+        $this->assertSame(0, $categorias->firstWhere('id', $categoria->id)->productos_count);
+    }
+
     public function test_a_guest_can_place_a_pedido_for_a_product(): void
     {
         $emprendedor = $this->createEmprendedor();
@@ -238,6 +279,19 @@ class MarketplaceTest extends TestCase
     {
         $emprendedor = $this->createEmprendedor(['status' => Emprendedor::STATUS_SUSPENDED]);
         $this->createProducto($emprendedor, ['nombre' => 'Producto Suspendido']);
+
+        $this->get(route('public.marketplace.store', $emprendedor->id))
+            ->assertNotFound();
+    }
+
+    /**
+     * Fase 2: la tienda pública de un emprendedor no verificado (aunque
+     * su status siga ACTIVO) no debe exponer sus productos.
+     */
+    public function test_the_per_emprendedor_store_page_404s_for_an_unverified_emprendedor(): void
+    {
+        $emprendedor = $this->createEmprendedor(['verification_status' => Emprendedor::VERIFICATION_IN_REVIEW]);
+        $this->createProducto($emprendedor, ['nombre' => 'Producto En Revision']);
 
         $this->get(route('public.marketplace.store', $emprendedor->id))
             ->assertNotFound();

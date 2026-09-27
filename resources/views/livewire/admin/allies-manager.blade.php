@@ -75,6 +75,18 @@
 
 
     {{-- =========================================================
+         MENSAJE DE ERROR
+    ========================================================== --}}
+    @if (session()->has('error'))
+
+        <div class="mb-6 rounded-xl border border-red-200 bg-red-50 px-4 py-3 text-sm font-medium text-red-700">
+            {{ session('error') }}
+        </div>
+
+    @endif
+
+
+    {{-- =========================================================
          BUSCADOR
     ========================================================== --}}
     <div class="bg-white border border-[#E5E5E0] rounded-2xl p-5 shadow-sm mb-6">
@@ -227,25 +239,38 @@
 
 
                             {{-- =================================================
-                                 ESTADO
+                                 ESTADO (operativo + verificación)
                             ================================================== --}}
                             <td class="px-6 py-4 text-center">
 
-                                <span
-                                    class="inline-flex items-center gap-2
-                                           px-3 py-1.5 rounded-lg
-                                           text-xs font-semibold
-                                           {{ $style['bg'] }}
-                                           {{ $style['text'] }}"
-                                >
+                                <div class="flex flex-col items-center gap-1">
 
                                     <span
-                                        class="w-1.5 h-1.5 rounded-full {{ $style['dot'] }}"
-                                    ></span>
+                                        class="inline-flex items-center gap-2
+                                               px-3 py-1.5 rounded-lg
+                                               text-xs font-semibold
+                                               {{ $style['bg'] }}
+                                               {{ $style['text'] }}"
+                                        title="Estado operativo"
+                                    >
 
-                                    {{ str_replace('_', ' ', $ally->status) }}
+                                        <span
+                                            class="w-1.5 h-1.5 rounded-full {{ $style['dot'] }}"
+                                        ></span>
 
-                                </span>
+                                        {{ str_replace('_', ' ', $ally->status) }}
+
+                                    </span>
+
+                                    <x-verification-status-badge :status="$ally->verification_status" small title="Verificación de identidad" />
+
+                                    @if($ally->verification_status === Ally::VERIFICATION_REJECTED && $ally->verification_rejection_reason)
+                                        <p class="text-[10px] text-red-600 max-w-[10rem] truncate" title="{{ $ally->verification_rejection_reason }}">
+                                            {{ $ally->verification_rejection_reason }}
+                                        </p>
+                                    @endif
+
+                                </div>
 
                             </td>
 
@@ -341,14 +366,9 @@
                                         </button>
 
 
-                                        {{-- Rechazar --}}
+                                        {{-- Rechazar (motivo obligatorio, ver modal al final) --}}
                                         <button
-                                            @click.prevent="$store.confirm.open({
-                                                message: '¿Estás seguro de que deseas rechazar este aliado?',
-                                                confirmText: 'Rechazar',
-                                                variant: 'danger',
-                                                onConfirm: () => $wire.reject({{ $ally->id }}),
-                                            })"
+                                            wire:click="openReject({{ $ally->id }})"
                                             class="px-3 py-2 rounded-lg
                                                    bg-red-50 text-red-700
                                                    hover:bg-red-100
@@ -680,11 +700,43 @@
 
                 </dl>
 
-                @if($viewingAlly->rif_document_path || $viewingAlly->mercantile_registry_document_path || $viewingAlly->owner_id_document_path)
+                <div class="border-t border-[#E5E5E0] mt-4 pt-4">
+                    <p class="text-xs font-medium text-[#6B6B66] mb-2">Verificación de identidad</p>
+
+                    <x-verification-status-badge :status="$viewingAlly->verification_status" />
+
+                    @if($viewingAlly->verification_reviewed_at)
+                        <p class="text-xs text-[#6B6B66] mt-1.5">
+                            Revisado el {{ $viewingAlly->verification_reviewed_at->format('d/m/Y h:i A') }}
+                        </p>
+                    @endif
+
+                    @if($viewingAlly->verification_status === Ally::VERIFICATION_REJECTED && $viewingAlly->verification_rejection_reason)
+                        <p class="text-xs text-red-700 bg-red-50 border border-red-200 rounded-lg px-3 py-2 mt-2">
+                            <strong>Motivo del rechazo:</strong> {{ $viewingAlly->verification_rejection_reason }}
+                        </p>
+                    @endif
+                </div>
+
+                @if($viewingAlly->rif_document_path || $viewingAlly->mercantile_registry_document_path || $viewingAlly->owner_id_document_path || $viewingAlly->owner_id_back_document_path)
                     <div class="border-t border-[#E5E5E0] mt-4 pt-4">
                         <p class="text-xs font-medium text-[#6B6B66] mb-2">Documentos de verificación</p>
 
                         <div class="flex flex-col gap-1.5 text-sm">
+                            @if($viewingAlly->owner_id_document_path)
+                                <a href="{{ route('allies.documents.owner-id', $viewingAlly) }}" target="_blank"
+                                   class="inline-flex items-center gap-1.5 text-blue-700 hover:underline">
+                                    <i class="fa-solid fa-file"></i> Cédula del titular (frente)
+                                </a>
+                            @endif
+
+                            @if($viewingAlly->owner_id_back_document_path)
+                                <a href="{{ route('allies.documents.owner-id-back', $viewingAlly) }}" target="_blank"
+                                   class="inline-flex items-center gap-1.5 text-blue-700 hover:underline">
+                                    <i class="fa-solid fa-file"></i> Cédula del titular (reverso)
+                                </a>
+                            @endif
+
                             @if($viewingAlly->rif_document_path)
                                 <a href="{{ route('allies.documents.rif', $viewingAlly) }}" target="_blank"
                                    class="inline-flex items-center gap-1.5 text-blue-700 hover:underline">
@@ -696,13 +748,6 @@
                                 <a href="{{ route('allies.documents.mercantile-registry', $viewingAlly) }}" target="_blank"
                                    class="inline-flex items-center gap-1.5 text-blue-700 hover:underline">
                                     <i class="fa-solid fa-file"></i> Registro mercantil
-                                </a>
-                            @endif
-
-                            @if($viewingAlly->owner_id_document_path)
-                                <a href="{{ route('allies.documents.owner-id', $viewingAlly) }}" target="_blank"
-                                   class="inline-flex items-center gap-1.5 text-blue-700 hover:underline">
-                                    <i class="fa-solid fa-file"></i> Cédula del titular
                                 </a>
                             @endif
                         </div>
@@ -737,6 +782,62 @@
                     >
                 </div>
             @endif
+
+        </div>
+
+    @endif
+
+    {{-- =========================================================
+         MODAL: MOTIVO DE RECHAZO (obligatorio)
+    ========================================================== --}}
+    @if($rejectingAllyId)
+
+        <div
+            class="fixed inset-0 z-50 flex items-center justify-center bg-black/40 px-4"
+            wire:key="reject-modal-{{ $rejectingAllyId }}"
+        >
+
+            <div class="bg-white rounded-2xl shadow-xl w-full max-w-md p-6">
+
+                <h3 class="font-display text-lg font-bold text-[#111111] mb-2">
+                    Motivo de rechazo
+                </h3>
+
+                <p class="text-sm text-[#6B6B66] mb-4">
+                    Este motivo quedará guardado y el aliado podrá verlo para corregir su solicitud.
+                </p>
+
+                <textarea
+                    wire:model="rejectionReason"
+                    rows="4"
+                    class="w-full rounded-xl border border-[#E5E5E0] px-4 py-3 text-sm text-[#111111]
+                           placeholder:text-[#B8B8B2] focus:border-red-500 focus:ring-red-500"
+                    placeholder="Ej: La foto de la cédula está borrosa, por favor sube una nueva."
+                ></textarea>
+
+                @error('rejectionReason')
+                    <p class="mt-1.5 text-xs text-red-600">{{ $message }}</p>
+                @enderror
+
+                <div class="flex justify-end gap-2 mt-4">
+                    <button
+                        type="button"
+                        wire:click="cancelReject"
+                        class="px-4 py-2 rounded-lg text-sm font-semibold text-slate-600 hover:bg-slate-50 transition"
+                    >
+                        Cancelar
+                    </button>
+
+                    <button
+                        type="button"
+                        wire:click="reject"
+                        class="px-4 py-2 rounded-lg text-sm font-semibold text-white bg-red-600 hover:bg-red-700 transition"
+                    >
+                        Rechazar
+                    </button>
+                </div>
+
+            </div>
 
         </div>
 

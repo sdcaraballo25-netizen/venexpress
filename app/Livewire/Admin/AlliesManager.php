@@ -42,6 +42,14 @@ class AlliesManager extends Component
     public ?int $viewingAllyId = null;
 
     /**
+     * Id del aliado cuyo modal de rechazo está abierto (motivo
+     * obligatorio, ver reject()).
+     */
+    public ?int $rejectingAllyId = null;
+
+    public string $rejectionReason = '';
+
+    /**
      * Abre el modal de detalle con los datos completos del aliado,
      * incluyendo la foto de fachada en tamaño grande, para que el
      * Admin pueda revisarlos antes de aprobar/rechazar la postulación.
@@ -130,22 +138,32 @@ class AlliesManager extends Component
     }
 
     /**
-     * Aprobar un aliado.
+     * Aprobar un aliado: marca la verificación de identidad como
+     * VERIFICADO y activa la cuenta operativa en el mismo paso.
      */
     public function approve(int $allyId): void
     {
         $ally = Ally::findOrFail($allyId);
         $previousStatus = $ally->status;
+        $previousVerification = $ally->verification_status;
 
         $ally->update([
             'status' => Ally::STATUS_ACTIVE,
+            'verification_status' => Ally::VERIFICATION_VERIFIED,
+            'verification_rejection_reason' => null,
+            'verification_reviewed_at' => now(),
         ]);
 
         $this->logAllyAction(
             $ally,
             'ally.approved',
             "Aprobó al aliado {$ally->business_name}.",
-            ['previous_status' => $previousStatus, 'new_status' => Ally::STATUS_ACTIVE]
+            [
+                'previous_status' => $previousStatus,
+                'new_status' => Ally::STATUS_ACTIVE,
+                'previous_verification_status' => $previousVerification,
+                'new_verification_status' => Ally::VERIFICATION_VERIFIED,
+            ]
         );
 
         $ally->user?->notify(new AccountApproved('Aliado'));
@@ -154,31 +172,62 @@ class AlliesManager extends Component
     }
 
     /**
-     * Rechazar un aliado.
+     * Abre el modal donde el Admin escribe el motivo obligatorio de
+     * rechazo.
      */
-    public function reject(int $allyId): void
+    public function openReject(int $allyId): void
     {
-        $ally = Ally::findOrFail($allyId);
-        $previousStatus = $ally->status;
+        $this->rejectingAllyId = $allyId;
+        $this->rejectionReason = '';
+        $this->resetErrorBag('rejectionReason');
+    }
+
+    public function cancelReject(): void
+    {
+        $this->rejectingAllyId = null;
+        $this->rejectionReason = '';
+        $this->resetErrorBag('rejectionReason');
+    }
+
+    /**
+     * Rechazar un aliado: solo mueve verification_status, no toca
+     * status. El motivo es obligatorio.
+     */
+    public function reject(): void
+    {
+        $this->validate([
+            'rejectionReason' => ['required', 'string', 'min:10', 'max:1000'],
+        ], [], ['rejectionReason' => 'motivo de rechazo']);
+
+        $ally = Ally::findOrFail($this->rejectingAllyId);
+        $previousVerification = $ally->verification_status;
 
         $ally->update([
-            'status' => Ally::STATUS_REJECTED,
+            'verification_status' => Ally::VERIFICATION_REJECTED,
+            'verification_rejection_reason' => $this->rejectionReason,
+            'verification_reviewed_at' => now(),
         ]);
 
         $this->logAllyAction(
             $ally,
             'ally.rejected',
             "Rechazó al aliado {$ally->business_name}.",
-            ['previous_status' => $previousStatus, 'new_status' => Ally::STATUS_REJECTED]
+            [
+                'previous_verification_status' => $previousVerification,
+                'new_verification_status' => Ally::VERIFICATION_REJECTED,
+                'reason' => $this->rejectionReason,
+            ]
         );
 
-        $ally->user?->notify(new AccountRejected('Aliado'));
+        $ally->user?->notify(new AccountRejected('Aliado', $this->rejectionReason));
+
+        $this->cancelReject();
 
         session()->flash('success', 'El aliado fue rechazado.');
     }
 
     /**
-     * Suspender un aliado.
+     * Suspender un aliado: solo afecta el estado operativo.
      */
     public function suspend(int $allyId): void
     {
@@ -200,11 +249,20 @@ class AlliesManager extends Component
     }
 
     /**
-     * Reactivar un aliado suspendido.
+     * Reactivar un aliado suspendido. No se puede activar una cuenta
+     * que no esté VERIFICADA — validación de backend, no solo de la
+     * vista.
      */
     public function activate(int $allyId): void
     {
         $ally = Ally::findOrFail($allyId);
+
+        if ($ally->verification_status !== Ally::VERIFICATION_VERIFIED) {
+            session()->flash('error', 'No se puede activar: el aliado todavía no está verificado.');
+
+            return;
+        }
+
         $previousStatus = $ally->status;
 
         $ally->update([
