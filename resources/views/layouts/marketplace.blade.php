@@ -40,8 +40,8 @@
     logueado sigue viendo /tienda dentro de SU panel de rol, sin
     pasar por aquí). El header/nav/mega-menú del marketplace vive
     dentro del componente Livewire (marketplace.blade.php) porque
-    necesita datos en vivo (carrito, búsqueda) que un layout estático
-    no puede tener.
+    necesita datos en vivo (búsqueda, sesión de usuario) que un layout
+    estático no puede tener.
 --}}
 <body class="antialiased bg-white text-[#111111]">
 

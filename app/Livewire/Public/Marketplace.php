@@ -11,7 +11,6 @@ use App\Models\PedidoItem;
 use App\Models\Producto;
 use App\Notifications\NuevoPedidoRecibido;
 use App\Services\VenezuelaLocationService;
-use Illuminate\Support\Collection;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Log;
@@ -24,23 +23,21 @@ use Throwable;
 
 /**
  * Vitrina pública del marketplace. Cualquier visitante puede navegar
- * el catálogo, armar un carrito y dejar un pedido; el pago lo acuerdan
+ * el catálogo y comprar UN producto a la vez; el pago lo acuerdan
  * comprador y vendedor por fuera de la plataforma (ver PedidoService)
  * — aquí solo se muestra el contacto del emprendedor una vez el
  * pedido queda registrado.
  *
- * El carrito solo admite productos de UN emprendedor a la vez: un
- * Pedido tiene un solo remitente/agencia de retiro (mismo criterio
- * que ya usaba el flujo de "Pedir" un solo producto). Se guarda en la
- * sesión (no en base de datos): es estado de compra, no un pedido
- * real todavía.
+ * Sin carrito: "Comprar" en un producto va directo al checkout de
+ * ese único producto (Pedido + un solo PedidoItem). Pedido/PedidoItem
+ * siguen soportando varias líneas por pedido (no se limitó el
+ * esquema) para no bloquear un futuro carrito real, pero este flujo
+ * nunca crea más de una línea.
  */
 class Marketplace extends Component
 {
     use ResolvesLayoutForViewer;
     use WithPagination;
-
-    protected const SESSION_KEY = 'marketplace_cart';
 
     public ?int $viewingProductoId = null;
 
@@ -52,22 +49,13 @@ class Marketplace extends Component
      */
     public ?Emprendedor $tiendaEmprendedor = null;
 
-    /** @var array<int, int> [producto_id => cantidad] */
-    public array $carrito = [];
+    public ?int $productoComprarId = null;
 
-    public bool $showCarrito = false;
+    public int $cantidadComprar = 1;
 
     public bool $showCheckout = false;
 
-    public ?string $carritoError = null;
-
-    /**
-     * Cuando se intenta agregar un producto de OTRO emprendedor con el
-     * carrito no vacío: guarda el producto en conflicto para que la
-     * vista pregunte "¿vaciar el carrito y agregar este?" en vez de
-     * mezclar tiendas silenciosamente.
-     */
-    public ?int $conflictoProductoId = null;
+    public ?string $compraError = null;
 
     public string $cliente_nombre = '';
 
@@ -133,11 +121,6 @@ class Marketplace extends Component
             $this->tiendaEmprendedor = $emprendedor->loadMissing('user');
         }
 
-        $this->carrito = array_filter(
-            (array) session(self::SESSION_KEY, []),
-            fn ($cantidad) => is_int($cantidad) && $cantidad > 0
-        );
-
         $this->prefillDatosCliente();
     }
 
@@ -160,11 +143,6 @@ class Marketplace extends Component
         $this->cliente_telefono = $customer->phone ?: ($user->phone ?? '');
         $this->cliente_email = $user->email;
         $this->clienteAutenticadoConDatos = true;
-    }
-
-    protected function guardarCarritoEnSesion(): void
-    {
-        session([self::SESSION_KEY => $this->carrito]);
     }
 
     public function updatedBusqueda(): void
@@ -198,14 +176,13 @@ class Marketplace extends Component
 
     /*
     |--------------------------------------------------------------------------
-    | CARRITO
+    | COMPRA (un solo producto)
     |--------------------------------------------------------------------------
     */
 
-    public function agregarAlCarrito(int $productoId, int $cantidad = 1): void
+    public function comprarProducto(int $productoId, int $cantidad = 1): void
     {
-        $this->carritoError = null;
-        $this->conflictoProductoId = null;
+        $this->compraError = null;
 
         $producto = Producto::query()
             ->where('activo', true)
@@ -213,158 +190,62 @@ class Marketplace extends Component
             ->find($productoId);
 
         if (! $producto) {
-            $this->carritoError = 'Este producto ya no está disponible.';
+            $this->compraError = 'Este producto ya no está disponible.';
 
             return;
         }
 
-        if ($this->carrito && ! isset($this->carrito[$productoId])) {
-            $emprendedorActual = $this->carritoEmprendedorId();
-
-            if ($emprendedorActual !== null && $emprendedorActual !== $producto->emprendedor_id) {
-                $this->conflictoProductoId = $productoId;
-
-                return;
-            }
-        }
-
-        $cantidadDeseada = ($this->carrito[$productoId] ?? 0) + max(1, $cantidad);
-
-        if ($cantidadDeseada > $producto->stock) {
-            $this->carritoError = "Solo quedan {$producto->stock} unidad(es) de \"{$producto->nombre}\".";
-
-            return;
-        }
-
-        $this->carrito[$productoId] = $cantidadDeseada;
-        $this->guardarCarritoEnSesion();
-        $this->viewingProductoId = null;
-        $this->showCarrito = true;
-    }
-
-    /**
-     * Producto de otra tienda distinta a la que ya está en el
-     * carrito: el usuario confirmó explícitamente que quiere vaciarlo
-     * y empezar de nuevo con este producto.
-     */
-    public function vaciarYAgregar(int $productoId): void
-    {
-        $this->carrito = [];
-        $this->conflictoProductoId = null;
-        $this->agregarAlCarrito($productoId);
-    }
-
-    public function cancelarConflicto(): void
-    {
-        $this->conflictoProductoId = null;
-    }
-
-    protected function carritoEmprendedorId(): ?int
-    {
-        if (! $this->carrito) {
-            return null;
-        }
-
-        return Producto::whereIn('id', array_keys($this->carrito))->value('emprendedor_id');
-    }
-
-    public function actualizarCantidad(int $productoId, int $cantidad): void
-    {
-        $this->carritoError = null;
-
-        if ($cantidad < 1) {
-            $this->quitarDelCarrito($productoId);
-
-            return;
-        }
-
-        $producto = Producto::find($productoId);
-
-        if (! $producto) {
-            $this->quitarDelCarrito($productoId);
-
-            return;
-        }
+        $cantidad = max(1, $cantidad);
 
         if ($cantidad > $producto->stock) {
-            $this->carritoError = "Solo quedan {$producto->stock} unidad(es) de \"{$producto->nombre}\".";
-            $cantidad = $producto->stock;
-        }
+            $this->compraError = "Solo quedan {$producto->stock} unidad(es) de \"{$producto->nombre}\".";
 
-        $this->carrito[$productoId] = $cantidad;
-        $this->guardarCarritoEnSesion();
-    }
-
-    public function quitarDelCarrito(int $productoId): void
-    {
-        unset($this->carrito[$productoId]);
-        $this->guardarCarritoEnSesion();
-    }
-
-    public function vaciarCarrito(): void
-    {
-        $this->carrito = [];
-        $this->guardarCarritoEnSesion();
-        $this->showCarrito = false;
-        $this->showCheckout = false;
-    }
-
-    public function toggleCarrito(): void
-    {
-        $this->showCarrito = ! $this->showCarrito;
-    }
-
-    public function abrirCheckout(): void
-    {
-        if (! $this->carrito) {
             return;
         }
 
+        $this->productoComprarId = $productoId;
+        $this->cantidadComprar = $cantidad;
+        $this->viewingProductoId = null;
         $this->showCheckout = true;
-        $this->showCarrito = false;
         $this->resetValidation();
     }
 
     public function cancelarCheckout(): void
     {
         $this->showCheckout = false;
+        $this->productoComprarId = null;
+        $this->cantidadComprar = 1;
     }
 
     /**
-     * @return Collection<int, object{producto: Producto, cantidad: int, subtotal: float}>
+     * Línea de la compra en curso (el único producto seleccionado), o
+     * null si no hay ninguno todavía.
      */
-    protected function carritoDetalle(): Collection
+    protected function productoComprarDetalle(): ?object
     {
-        if (! $this->carrito) {
-            return collect();
+        if (! $this->productoComprarId) {
+            return null;
         }
 
-        $productos = Producto::whereIn('id', array_keys($this->carrito))->get()->keyBy('id');
+        $producto = Producto::find($this->productoComprarId);
 
-        return collect($this->carrito)
-            ->map(function (int $cantidad, int $productoId) use ($productos) {
-                $producto = $productos->get($productoId);
+        if (! $producto) {
+            return null;
+        }
 
-                if (! $producto) {
-                    return null;
-                }
-
-                return (object) [
-                    'producto' => $producto,
-                    'cantidad' => $cantidad,
-                    'subtotal' => (float) $producto->precio_usd * $cantidad,
-                ];
-            })
-            ->filter()
-            ->values();
+        return (object) [
+            'producto' => $producto,
+            'cantidad' => $this->cantidadComprar,
+            'subtotal' => (float) $producto->precio_usd * $this->cantidadComprar,
+        ];
     }
 
     public function confirmarPedido(): void
     {
-        $detalle = $this->carritoDetalle();
+        $linea = $this->productoComprarDetalle();
 
-        if ($detalle->isEmpty()) {
-            $this->carritoError = 'Tu carrito está vacío.';
+        if (! $linea) {
+            $this->compraError = 'Este producto ya no está disponible.';
             $this->showCheckout = false;
 
             return;
@@ -381,28 +262,23 @@ class Marketplace extends Component
             'referencia_entrega' => ['nullable', 'string', 'max:255'],
         ]);
 
-        foreach ($detalle as $linea) {
-            if ($linea->cantidad > $linea->producto->stock) {
-                $this->carritoError = "Solo quedan {$linea->producto->stock} unidad(es) de \"{$linea->producto->nombre}\".";
-                $this->showCheckout = false;
+        if ($linea->cantidad > $linea->producto->stock) {
+            $this->compraError = "Solo quedan {$linea->producto->stock} unidad(es) de \"{$linea->producto->nombre}\".";
+            $this->showCheckout = false;
 
-                return;
-            }
+            return;
         }
 
-        $emprendedorId = $detalle->first()->producto->emprendedor_id;
-        $totalUsd = $detalle->sum('subtotal');
-
-        $pedido = DB::transaction(function () use ($detalle, $emprendedorId, $totalUsd) {
+        $pedido = DB::transaction(function () use ($linea) {
             $pedido = Pedido::create([
-                'emprendedor_id' => $emprendedorId,
+                'emprendedor_id' => $linea->producto->emprendedor_id,
                 // Nullable: el comprador nunca necesitó cuenta para pedir
                 // (accede al chat por chat_token). Si sí tiene sesión
                 // iniciada como Cliente, lo enlazamos para que aparezca en
                 // su panel ("Mis Compras") sin depender de guardar el
                 // enlace del chat.
                 'user_id' => Auth::check() && Auth::user()->isCliente() ? Auth::id() : null,
-                'precio_total_usd' => $totalUsd,
+                'precio_total_usd' => $linea->subtotal,
                 'cliente_nombre' => $this->cliente_nombre,
                 'cliente_id_doc' => $this->cliente_id_doc,
                 'cliente_telefono' => $this->cliente_telefono,
@@ -415,15 +291,13 @@ class Marketplace extends Component
                 'chat_token' => Str::random(40),
             ]);
 
-            foreach ($detalle as $linea) {
-                PedidoItem::create([
-                    'pedido_id' => $pedido->id,
-                    'producto_id' => $linea->producto->id,
-                    'cantidad' => $linea->cantidad,
-                    'precio_unitario_usd' => $linea->producto->precio_usd,
-                    'subtotal_usd' => $linea->subtotal,
-                ]);
-            }
+            PedidoItem::create([
+                'pedido_id' => $pedido->id,
+                'producto_id' => $linea->producto->id,
+                'cantidad' => $linea->cantidad,
+                'precio_unitario_usd' => $linea->producto->precio_usd,
+                'subtotal_usd' => $linea->subtotal,
+            ]);
 
             return $pedido;
         });
@@ -431,8 +305,7 @@ class Marketplace extends Component
         $this->notificarEmprendedor($pedido);
 
         $this->pedidoCreado = $pedido->load('emprendedor.user', 'items.producto');
-        $this->vaciarCarrito();
-        $this->showCheckout = false;
+        $this->cancelarCheckout();
     }
 
     /**
@@ -492,8 +365,6 @@ class Marketplace extends Component
             ? Producto::with(['emprendedor', 'fotos'])->withAvg('resenas', 'estrellas')->withCount('resenas')->find($this->viewingProductoId)
             : null;
 
-        $carritoDetalle = $this->carritoDetalle();
-
         return view('public.marketplace', [
             'productos' => $productos,
             'productoViendo' => $productoViendo,
@@ -502,10 +373,7 @@ class Marketplace extends Component
                 ->where('stock', '>', 0)
                 ->whereHas('emprendedor', fn ($sub) => $sub->where('status', Emprendedor::STATUS_ACTIVE)),
             ])->orderBy('nombre')->get(),
-            'carritoDetalle' => $carritoDetalle,
-            'carritoTotal' => $carritoDetalle->sum('subtotal'),
-            'carritoCount' => $carritoDetalle->sum('cantidad'),
-            'conflictoProducto' => $this->conflictoProductoId ? Producto::find($this->conflictoProductoId) : null,
+            'productoComprar' => $this->productoComprarDetalle(),
         ])->layout(
             $this->resolveLayoutForViewer('layouts.marketplace'),
             [

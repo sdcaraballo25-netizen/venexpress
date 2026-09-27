@@ -4,8 +4,8 @@
     100% Blade (sin wire:click) de la tarjeta interactiva que usa
     resources/views/public/marketplace.blade.php: esa tarjeta llama a
     métodos del componente Livewire Marketplace (verProducto,
-    agregarAlCarrito) y solo tiene sentido dentro de ese componente.
-    Aquí no hay carrito ni modal de detalle, solo enlace directo a la
+    comprarProducto) y solo tiene sentido dentro de ese componente.
+    Aquí no hay compra ni modal de detalle, solo enlace directo a la
     tienda del emprendedor.
 --}}
 

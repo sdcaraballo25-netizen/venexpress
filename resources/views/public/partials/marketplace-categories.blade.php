@@ -21,7 +21,7 @@
     <button
         type="button"
         wire:click="$set('categoriaId', '')"
-        class="w-full flex items-center justify-between rounded-lg px-3 py-2.5 text-sm font-semibold transition
+        class="w-full flex items-center justify-between rounded-lg px-3 py-2.5 mb-2 pb-3 border-b border-gray-100 text-sm font-semibold transition
         {{ $categoriaId === '' ? 'bg-amber-50 text-[#111111]' : 'text-gray-600 hover:bg-gray-50' }}"
     >
         Todas las categorías
@@ -37,15 +37,15 @@
         <button
             type="button"
             wire:click="$set('categoriaId', {{ $categoria->id }})"
-            class="w-full flex items-center gap-3 rounded-lg px-3 py-2.5 text-sm text-left transition
-            {{ $activa ? 'bg-amber-50 text-[#111111] font-semibold' : 'text-gray-600 hover:bg-gray-50' }}"
+            class="w-full flex items-center gap-3 rounded-lg pl-2.5 pr-3 py-2.5 text-sm text-left transition border-l-2
+            {{ $activa ? 'border-amber-400 bg-amber-50 text-[#111111] font-semibold' : 'border-transparent text-gray-600 hover:bg-gray-50' }}"
         >
-            <i class="fa-solid {{ $icono }} text-xs w-4 text-center {{ $activa ? 'text-[#111111]' : 'text-gray-400' }}"></i>
+            <i class="fa-solid {{ $icono }} text-xs w-4 text-center {{ $activa ? 'text-amber-500' : 'text-gray-400' }}"></i>
 
             <span class="flex-1 truncate">{{ $categoria->nombre }}</span>
 
             @if (($categoria->productos_count ?? 0) > 0)
-                <span class="text-[0.68rem] font-semibold text-gray-400">{{ $categoria->productos_count }}</span>
+                <span class="text-[0.68rem] font-semibold {{ $activa ? 'text-amber-600' : 'text-gray-400' }}">{{ $categoria->productos_count }}</span>
             @endif
         </button>
 

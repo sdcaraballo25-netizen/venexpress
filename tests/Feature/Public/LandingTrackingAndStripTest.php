@@ -83,7 +83,7 @@ class LandingTrackingAndStripTest extends TestCase
 
         $this->assertStringNotContainsString('pnav-link', $html);
         $this->assertStringNotContainsString('pnav-menu-link', $html);
-        $this->assertStringContainsString('aria-label="Ver carrito"', $html);
+        $this->assertStringContainsString('aria-label="Ayuda"', $html);
         $this->assertStringContainsString('Buscar productos, marcas y más...', $html);
     }
 

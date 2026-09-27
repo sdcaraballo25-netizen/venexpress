@@ -3210,9 +3210,9 @@
     "semantic_hash": ""
   },
   "app/Livewire/Public/Marketplace.php": {
-    "mtime": 1790538091.1820157,
-    "seen": 1790538659.9080136,
-    "ast_hash": "62d66ac28a5fd70c7bdcf6dac30e3d76",
+    "mtime": 1790541157.5470073,
+    "seen": 1790541678.9334114,
+    "ast_hash": "a3b10ad8333619c408aacdbf14633bf2",
     "semantic_hash": ""
   },
   "app/Livewire/Public/PedidoChat.php": {
@@ -3534,9 +3534,9 @@
     "semantic_hash": ""
   },
   "resources/views/components/marketplace-preview-card.blade.php": {
-    "mtime": 1790536963.3544679,
-    "seen": 1790537308.640358,
-    "ast_hash": "28d45b157e8d520845d00b8c61f1f826",
+    "mtime": 1790541225.1746273,
+    "seen": 1790541678.9340987,
+    "ast_hash": "3ed2f69bcd834a4a4d9495ba71ccd068",
     "semantic_hash": ""
   },
   "resources/views/components/public-navbar.blade.php": {
@@ -3678,9 +3678,9 @@
     "semantic_hash": ""
   },
   "resources/views/public/marketplace.blade.php": {
-    "mtime": 1790538243.303384,
-    "seen": 1790538659.909047,
-    "ast_hash": "c0987214dba836d8ad6c23c30c861870",
+    "mtime": 1790541209.585724,
+    "seen": 1790541678.93443,
+    "ast_hash": "38a442a71612eeae4d3e4d4e584bfc7d",
     "semantic_hash": ""
   },
   "resources/views/public/pedido-chat.blade.php": {
@@ -3948,9 +3948,9 @@
     "semantic_hash": ""
   },
   "tests/Feature/Public/LandingTrackingAndStripTest.php": {
-    "mtime": 1790538360.3866272,
-    "seen": 1790538659.9093823,
-    "ast_hash": "4b56554ba2166ddae74775f4ef62c73a",
+    "mtime": 1790541273.871452,
+    "seen": 1790541678.9348533,
+    "ast_hash": "9947ab8e2e63b54e29f8954e10ab973a",
     "semantic_hash": ""
   },
   "tests/Feature/Public/LegalPagesTest.php": {
@@ -3960,9 +3960,9 @@
     "semantic_hash": ""
   },
   "tests/Feature/Public/MarketplaceTest.php": {
-    "mtime": 1790538500.8591716,
-    "seen": 1790538659.9093876,
-    "ast_hash": "898cd23ec5da9bfbc7b1f63034070160",
+    "mtime": 1790541266.4658175,
+    "seen": 1790541678.9348598,
+    "ast_hash": "fca1185d6d7cfcd04506550c94ab946d",
     "semantic_hash": ""
   },
   "tests/Feature/Public/PedidoChatTest.php": {
@@ -4038,15 +4038,15 @@
     "semantic_hash": ""
   },
   "resources/views/layouts/marketplace.blade.php": {
-    "mtime": 1790538060.1927266,
-    "seen": 1790538659.908817,
-    "ast_hash": "877270038e605473c1e5c16d6f8f4ed7",
+    "mtime": 1790541219.709159,
+    "seen": 1790541678.934159,
+    "ast_hash": "0814ef2f18cb9a33b41f2c6f8518ed6b",
     "semantic_hash": ""
   },
   "resources/views/public/partials/marketplace-categories.blade.php": {
-    "mtime": 1790538084.7637844,
-    "seen": 1790538659.909052,
-    "ast_hash": "57433dd00ba516930131873ce849839b",
+    "mtime": 1790539588.0844004,
+    "seen": 1790539656.1013834,
+    "ast_hash": "db0f84fcb6d30c5ed47bc00705d25c50",
     "semantic_hash": ""
   }
 }

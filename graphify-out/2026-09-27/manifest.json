@@ -3210,9 +3210,9 @@
     "semantic_hash": ""
   },
   "app/Livewire/Public/Marketplace.php": {
-    "mtime": 1790482059.3902626,
-    "seen": 1790537308.6397722,
-    "ast_hash": "aae512d73cc381a120ef50c7203a50e4",
+    "mtime": 1790538091.1820157,
+    "seen": 1790538659.9080136,
+    "ast_hash": "62d66ac28a5fd70c7bdcf6dac30e3d76",
     "semantic_hash": ""
   },
   "app/Livewire/Public/PedidoChat.php": {
@@ -3678,9 +3678,9 @@
     "semantic_hash": ""
   },
   "resources/views/public/marketplace.blade.php": {
-    "mtime": 1790482068.161116,
-    "seen": 1790537308.6406338,
-    "ast_hash": "bfb331e7d36510802a81d3019a21b48b",
+    "mtime": 1790540311.0332744,
+    "seen": 1790540433.8848553,
+    "ast_hash": "2182b25a10a95d2a7e35e285c4c93422",
     "semantic_hash": ""
   },
   "resources/views/public/pedido-chat.blade.php": {
@@ -3948,9 +3948,9 @@
     "semantic_hash": ""
   },
   "tests/Feature/Public/LandingTrackingAndStripTest.php": {
-    "mtime": 1790482101.555391,
-    "seen": 1790537308.6409593,
-    "ast_hash": "e61a93851363272ba308bb8cca47c02e",
+    "mtime": 1790538360.3866272,
+    "seen": 1790538659.9093823,
+    "ast_hash": "4b56554ba2166ddae74775f4ef62c73a",
     "semantic_hash": ""
   },
   "tests/Feature/Public/LegalPagesTest.php": {
@@ -3960,9 +3960,9 @@
     "semantic_hash": ""
   },
   "tests/Feature/Public/MarketplaceTest.php": {
-    "mtime": 1790482068.587201,
-    "seen": 1790537308.6409638,
-    "ast_hash": "4ed70625051602eac2ce8612fb62f2cf",
+    "mtime": 1790538500.8591716,
+    "seen": 1790538659.9093876,
+    "ast_hash": "898cd23ec5da9bfbc7b1f63034070160",
     "semantic_hash": ""
   },
   "tests/Feature/Public/PedidoChatTest.php": {
@@ -4029,6 +4029,24 @@
     "mtime": 1790482101.4151313,
     "seen": 1790537308.6410708,
     "ast_hash": "dc3ac6d9b2ad13d2daa4dc69159fc863",
+    "semantic_hash": ""
+  },
+  "resources/views/components/marketplace-mega-menu.blade.php": {
+    "mtime": 1790538076.923287,
+    "seen": 1790538659.9086757,
+    "ast_hash": "6a52c8f90f3efc733c9562624749466a",
+    "semantic_hash": ""
+  },
+  "resources/views/layouts/marketplace.blade.php": {
+    "mtime": 1790538060.1927266,
+    "seen": 1790538659.908817,
+    "ast_hash": "877270038e605473c1e5c16d6f8f4ed7",
+    "semantic_hash": ""
+  },
+  "resources/views/public/partials/marketplace-categories.blade.php": {
+    "mtime": 1790539588.0844004,
+    "seen": 1790539656.1013834,
+    "ast_hash": "db0f84fcb6d30c5ed47bc00705d25c50",
     "semantic_hash": ""
   }
 }
