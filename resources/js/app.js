@@ -75,4 +75,20 @@ document.addEventListener('alpine:init', () => {
             this.show = false;
         },
     });
+
+    /**
+     * Estado del sidebar móvil (hamburguesa) de los 6 layouts de panel
+     * (admin/ally/driver/almacen/client/emprendedor). Antes vivía en
+     * x-data="{ sidebarOpen: false }" puesto directamente en <html> de
+     * cada layout — pero wire:navigate (usado por el redirect de
+     * login) reemplaza <body> y NUNCA toca los atributos de <html>, así
+     * que al entrar desde layouts.guest (sin ese x-data) a cualquier
+     * panel, sidebarOpen quedaba sin definir hasta el próximo refresh
+     * completo de página ("sidebarOpen is not defined" en consola, y
+     * el botón de hamburguesa roto en móvil). Un store global evita
+     * depender de qué x-data traía la página anterior.
+     */
+    Alpine.store('sidebar', {
+        open: false,
+    });
 });

@@ -11,11 +11,28 @@ class Producto extends Model
 {
     use HasFactory;
 
+    /**
+     * Categorías de una implementación previa (lista fija, sin tabla),
+     * superada por el sistema relacional categoria_id -> Categoria ya
+     * en uso. Se deja sin exponer en la UI — ver categoria_legacy.
+     */
+    public const CATEGORIAS = [
+        'ropa' => 'Ropa y accesorios',
+        'hogar' => 'Hogar y decoración',
+        'comida' => 'Alimentos y bebidas',
+        'belleza' => 'Belleza y cuidado personal',
+        'tecnologia' => 'Tecnología',
+        'otros' => 'Otros',
+    ];
+
     protected $fillable = [
         'emprendedor_id',
+        'categoria_id',
         'nombre',
         'descripcion',
+        'categoria_legacy',
         'foto_path',
+        'fotos_legacy',
         'precio_usd',
         'peso_kg',
         'stock',
@@ -28,12 +45,23 @@ class Producto extends Model
             'precio_usd' => 'decimal:2',
             'peso_kg' => 'decimal:3',
             'activo' => 'boolean',
+            'fotos_legacy' => 'array',
         ];
     }
 
     public function emprendedor(): BelongsTo
     {
         return $this->belongsTo(Emprendedor::class);
+    }
+
+    public function categoria(): BelongsTo
+    {
+        return $this->belongsTo(Categoria::class);
+    }
+
+    public function fotos(): HasMany
+    {
+        return $this->hasMany(ProductoFoto::class)->orderBy('orden');
     }
 
     /**
@@ -53,6 +81,16 @@ class Producto extends Model
     public function pedidos(): HasMany
     {
         return $this->hasMany(Pedido::class);
+    }
+
+    /**
+     * Primera foto de la galería (producto_fotos), o foto_path si el
+     * producto es de antes de que existiera la galería. Null si no
+     * tiene ninguna foto todavía.
+     */
+    public function getFotoPrincipalPathAttribute(): ?string
+    {
+        return $this->fotos->first()?->path ?? $this->foto_path;
     }
 
     public function resenas(): HasMany
@@ -76,5 +114,20 @@ class Producto extends Model
     public function getTotalResenasAttribute(): int
     {
         return $this->resenas()->count();
+    }
+
+    /**
+     * Galería de la implementación previa (ver categoria_legacy):
+     * combina foto_path con fotos_legacy. No se usa en la UI actual,
+     * que ya tiene su propia galería vía Producto::fotos()
+     * (producto_fotos) y getFotoPrincipalPathAttribute().
+     */
+    public function getGaleriaLegacyAttribute(): array
+    {
+        return collect([$this->foto_path])
+            ->merge($this->fotos_legacy ?? [])
+            ->filter()
+            ->values()
+            ->all();
     }
 }

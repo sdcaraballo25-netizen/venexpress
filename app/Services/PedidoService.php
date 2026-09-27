@@ -7,8 +7,12 @@ use App\Models\Package;
 use App\Models\Pedido;
 use App\Models\Producto;
 use App\Models\RateMatrix;
+use App\Notifications\PedidoEstadoActualizado;
 use Illuminate\Support\Facades\DB;
+use Illuminate\Support\Facades\Log;
+use Illuminate\Support\Facades\Notification;
 use RuntimeException;
+use Throwable;
 
 /**
  * Puente entre un Pedido del marketplace y una guía de envío real.
@@ -32,22 +36,25 @@ class PedidoService
 {
     public function __construct(
         protected PackageService $packageService,
-    ) {
-    }
+    ) {}
 
     public function marcarComoPagado(Pedido $pedido): Pedido
     {
-        return DB::transaction(function () use ($pedido) {
+        $locked = DB::transaction(function () use ($pedido) {
             $locked = Pedido::whereKey($pedido->id)->lockForUpdate()->firstOrFail();
 
             if ($locked->status !== Pedido::STATUS_PENDIENTE) {
                 throw new RuntimeException('Este pedido ya fue procesado.');
             }
 
-            $producto = Producto::whereKey($locked->producto_id)->lockForUpdate()->firstOrFail();
+            $items = $locked->items()->with('producto')->get();
 
-            if ($producto->stock < $locked->cantidad) {
-                throw new RuntimeException('No hay stock suficiente para este pedido.');
+            foreach ($items as $item) {
+                $producto = Producto::whereKey($item->producto_id)->lockForUpdate()->firstOrFail();
+
+                if ($producto->stock < $item->cantidad) {
+                    throw new RuntimeException("No hay stock suficiente de \"{$producto->nombre}\" para este pedido.");
+                }
             }
 
             if (! $locked->emprendedor->pickupAlly) {
@@ -56,12 +63,18 @@ class PedidoService
                 );
             }
 
-            $producto->decrement('stock', $locked->cantidad);
+            foreach ($items as $item) {
+                Producto::whereKey($item->producto_id)->decrement('stock', $item->cantidad);
+            }
 
             $locked->update(['status' => Pedido::STATUS_PAGADO]);
 
             return $locked;
         });
+
+        $this->notificarCliente($locked, Pedido::STATUS_PAGADO);
+
+        return $locked;
     }
 
     /**
@@ -73,7 +86,7 @@ class PedidoService
      */
     public function registrarGuia(Pedido $pedido, array $datosPaquete, ?int $registeredByUserId, Ally $ally): Package
     {
-        return DB::transaction(function () use ($pedido, $datosPaquete, $registeredByUserId, $ally) {
+        [$package, $locked] = DB::transaction(function () use ($pedido, $datosPaquete, $registeredByUserId, $ally) {
             $locked = Pedido::whereKey($pedido->id)->lockForUpdate()->firstOrFail();
 
             if ($locked->status !== Pedido::STATUS_PAGADO) {
@@ -131,7 +144,47 @@ class PedidoService
                 'status' => Pedido::STATUS_CONFIRMADO,
             ]);
 
-            return $package;
+            return [$package, $locked];
         });
+
+        $this->notificarCliente($locked, Pedido::STATUS_CONFIRMADO);
+
+        return $package;
+    }
+
+    /**
+     * Avisa por correo al cliente que su pedido cambió de estado. Se
+     * envía al correo que haya disponible (Pedido::cliente_email, o el
+     * de su cuenta si tenía sesión iniciada al pedir) — sin ninguno de
+     * los dos, no hay a quién avisar y no se envía nada, mismo criterio
+     * que PackageService::notifyStatusChange.
+     *
+     * Nunca se deja que un fallo de correo interrumpa una operación ya
+     * confirmada en base de datos (pago recibido / guía generada), por
+     * eso queda protegido en un try/catch.
+     */
+    protected function notificarCliente(Pedido $pedido, string $status): void
+    {
+        try {
+            $pedido->loadMissing('user');
+
+            $email = $pedido->cliente_email ?: $pedido->user?->email;
+
+            if (! $email) {
+                return;
+            }
+
+            Notification::route('mail', $email)
+                ->notify(new PedidoEstadoActualizado($pedido->id, $status));
+        } catch (Throwable $e) {
+            Log::warning(
+                'No se pudo enviar la notificación de cambio de estado del pedido.',
+                [
+                    'pedido_id' => $pedido->id,
+                    'status' => $status,
+                    'error' => $e->getMessage(),
+                ]
+            );
+        }
     }
 }

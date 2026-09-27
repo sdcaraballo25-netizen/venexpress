@@ -9,6 +9,7 @@ use Illuminate\Support\Facades\Auth;
 use Livewire\Attributes\Layout;
 use Livewire\Attributes\Title;
 use Livewire\Component;
+use Livewire\Features\SupportFileUploads\TemporaryUploadedFile;
 use Livewire\WithFileUploads;
 use RuntimeException;
 
@@ -22,7 +23,7 @@ class PedidoShow extends Component
 
     public string $texto = '';
 
-    /** @var \Livewire\Features\SupportFileUploads\TemporaryUploadedFile|null */
+    /** @var TemporaryUploadedFile|null */
     public $archivo = null;
 
     public ?string $errorMessage = null;
@@ -32,7 +33,7 @@ class PedidoShow extends Component
     public function mount(int $pedidoId): void
     {
         $this->pedido = Pedido::where('emprendedor_id', Auth::user()->emprendedor->id)
-            ->with(['producto', 'package', 'resena'])
+            ->with(['items.producto', 'package', 'resena'])
             ->findOrFail($pedidoId);
     }
 

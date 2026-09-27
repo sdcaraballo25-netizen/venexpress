@@ -1,5 +1,5 @@
 <!DOCTYPE html>
-<html lang="es" x-data="{ sidebarOpen: false }">
+<html lang="es">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
@@ -48,7 +48,7 @@
     =========================================================== --}}
     <aside
         class="fixed inset-y-0 left-0 z-40 w-64 border-r border-[#E5E5E0] bg-white px-5 py-8 flex flex-col justify-between transform transition-transform duration-200 md:relative md:translate-x-0"
-        :class="sidebarOpen ? 'translate-x-0' : '-translate-x-full md:translate-x-0'"
+        :class="$store.sidebar.open ? 'translate-x-0' : '-translate-x-full md:translate-x-0'"
     >
 
         <div class="min-h-0 flex flex-col">
@@ -140,7 +140,7 @@
                 <a
                     href="{{ route('cliente.dashboard') }}"
                     wire:navigate
-                    @click="sidebarOpen = false"
+                    @click="$store.sidebar.open = false"
                     class="flex items-center gap-3 px-4 py-3 rounded-xl font-medium transition-colors
                     {{ request()->routeIs('cliente.dashboard')
                         ? 'bg-amber-400 text-[#111111]'
@@ -171,7 +171,7 @@
                 <a
                     href="{{ route('public.calculator') }}"
                     wire:navigate
-                    @click="sidebarOpen = false"
+                    @click="$store.sidebar.open = false"
                     class="flex items-center gap-3 px-4 py-3 rounded-xl font-medium transition-colors
                     {{ request()->routeIs('public.calculator')
                         ? 'bg-amber-400 text-[#111111]'
@@ -202,7 +202,7 @@
                 <a
                     href="{{ route('cliente.incidents') }}"
                     wire:navigate
-                    @click="sidebarOpen = false"
+                    @click="$store.sidebar.open = false"
                     class="flex items-center gap-3 px-4 py-3 rounded-xl font-medium transition-colors
                     {{ request()->routeIs('cliente.incidents')
                         ? 'bg-amber-400 text-[#111111]'
@@ -233,7 +233,7 @@
                 <a
                     href="{{ route('recommendations.create') }}"
                     wire:navigate
-                    @click="sidebarOpen = false"
+                    @click="$store.sidebar.open = false"
                     class="flex items-center gap-3 px-4 py-3 rounded-xl font-medium transition-colors
                     {{ request()->routeIs('recommendations.create')
                         ? 'bg-amber-400 text-[#111111]'
@@ -264,7 +264,7 @@
                 <a
                     href="{{ route('cliente.pending-payments') }}"
                     wire:navigate
-                    @click="sidebarOpen = false"
+                    @click="$store.sidebar.open = false"
                     class="flex items-center gap-3 px-4 py-3 rounded-xl font-medium transition-colors
                     {{ request()->routeIs('cliente.pending-payments')
                         ? 'bg-amber-400 text-[#111111]'
@@ -299,7 +299,7 @@
                 <a
                     href="{{ route('public.offices') }}"
                     wire:navigate
-                    @click="sidebarOpen = false"
+                    @click="$store.sidebar.open = false"
                     class="flex items-center gap-3 px-4 py-3 rounded-xl font-medium transition-colors
                     {{ request()->routeIs('public.offices')
                         ? 'bg-amber-400 text-[#111111]'
@@ -336,7 +336,7 @@
                 <a
                     href="{{ route('public.marketplace') }}"
                     wire:navigate
-                    @click="sidebarOpen = false"
+                    @click="$store.sidebar.open = false"
                     class="flex items-center gap-3 px-4 py-3 rounded-xl font-medium transition-colors
                     {{ request()->routeIs('public.marketplace')
                         ? 'bg-amber-400 text-[#111111]'
@@ -367,7 +367,7 @@
                 <a
                     href="{{ route('cliente.compras') }}"
                     wire:navigate
-                    @click="sidebarOpen = false"
+                    @click="$store.sidebar.open = false"
                     class="flex items-center gap-3 px-4 py-3 rounded-xl font-medium transition-colors
                     {{ request()->routeIs('cliente.compras')
                         ? 'bg-amber-400 text-[#111111]'
@@ -398,7 +398,7 @@
                 <a
                     href="{{ route('cliente.help') }}"
                     wire:navigate
-                    @click="sidebarOpen = false"
+                    @click="$store.sidebar.open = false"
                     class="flex items-center gap-3 px-4 py-3 rounded-xl font-medium transition-colors
                     {{ request()->routeIs('cliente.help')
                         ? 'bg-amber-400 text-[#111111]'
@@ -520,8 +520,8 @@
          OVERLAY MÓVIL
     =========================================================== --}}
     <div
-        x-show="sidebarOpen"
-        @click="sidebarOpen = false"
+        x-show="$store.sidebar.open"
+        @click="$store.sidebar.open = false"
         class="fixed inset-0 bg-black/40 z-30 md:hidden"
         x-cloak
     ></div>
@@ -539,7 +539,7 @@
 
             <button
                 type="button"
-                @click="sidebarOpen = !sidebarOpen"
+                @click="$store.sidebar.open = !$store.sidebar.open"
                 class="md:hidden inline-flex items-center justify-center w-10 h-10 rounded-xl text-[#111111] hover:bg-slate-100"
                 aria-label="Abrir menú"
             >

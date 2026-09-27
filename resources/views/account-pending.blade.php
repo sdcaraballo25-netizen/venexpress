@@ -8,6 +8,7 @@
         $user->isAliado() => $user->ally?->status,
         $user->isAliadoTaquilla() => $user->alliedAgency?->status,
         $user->isRepartidor() => $user->driver?->status,
+        $user->isEmprendedor() => $user->emprendedor?->status,
         default => null,
     };
 

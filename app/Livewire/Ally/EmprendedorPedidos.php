@@ -49,11 +49,17 @@ class EmprendedorPedidos extends Component
 
     // Datos que solo se conocen con el paquete físico en mano.
     public ?float $physical_weight_kg = null;
+
     public ?float $length_cm = null;
+
     public ?float $width_cm = null;
+
     public ?float $height_cm = null;
+
     public bool $is_fragile = false;
+
     public bool $has_insurance = false;
+
     public ?float $declared_value_usd = null;
 
     /**
@@ -91,7 +97,7 @@ class EmprendedorPedidos extends Component
             return;
         }
 
-        $pedido = Pedido::with(['producto', 'emprendedor.pickupAlly'])->find((int) $id);
+        $pedido = Pedido::with(['items.producto', 'emprendedor.pickupAlly'])->find((int) $id);
 
         if (! $pedido) {
             $this->searchError = 'No existe ningún pedido con ese número.';
