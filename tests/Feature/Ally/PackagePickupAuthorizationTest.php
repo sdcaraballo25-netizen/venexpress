@@ -4,6 +4,7 @@ namespace Tests\Feature\Ally;
 
 use App\Livewire\Ally\PackagePickup;
 use App\Models\Package;
+use App\Services\PackageService;
 use Illuminate\Foundation\Testing\RefreshDatabase;
 use Livewire\Livewire;
 use Tests\Feature\Concerns\CreatesTestPackages;
@@ -86,5 +87,45 @@ class PackagePickupAuthorizationTest extends TestCase
             ->assertSet('message', 'Retiro confirmado. El paquete quedó ENTREGADO.');
 
         $this->assertSame(Package::STATUS_ENTREGADO, $package->fresh()->current_status);
+    }
+
+    /**
+     * Antes deliver() usaba changeStatus() en vez de
+     * PackageService::completeAgencyPickup(): un COD retirado en
+     * agencia quedaba ENTREGADO pero sin cod_collected_at, así que
+     * nunca se podía liquidar y el cliente lo seguía viendo pendiente.
+     */
+    public function test_picking_up_a_cod_package_records_the_collection_so_it_can_be_liquidated(): void
+    {
+        $originAlly = $this->createAlly();
+        $pickupAlly = $this->createAlly();
+
+        $package = $this->createPackage($originAlly, [
+            'requires_delivery' => false,
+            'pickup_ally_id' => $pickupAlly->id,
+            'current_status' => Package::STATUS_LISTO_RETIRO,
+            'recipient_id_doc' => 'V-87654321',
+            'is_cod' => true,
+            'cod_amount_usd' => 10.00,
+            'cod_status' => Package::COD_PENDIENTE,
+        ]);
+
+        Livewire::actingAs($pickupAlly->user)
+            ->test(PackagePickup::class)
+            ->set('trackingNumber', $package->tracking_number)
+            ->set('recipientIdDoc', 'V-87654321')
+            ->call('deliver')
+            ->assertSet('error', null);
+
+        $package->refresh();
+
+        $this->assertSame(Package::STATUS_ENTREGADO, $package->current_status);
+        $this->assertNotNull($package->cod_collected_at);
+        $this->assertSame($pickupAlly->user->id, (int) $package->cod_collected_by_user_id);
+        $this->assertNotNull($package->delivery_completed_at);
+
+        $liquidated = app(PackageService::class)->liquidateCod($package, $originAlly->user->id);
+
+        $this->assertSame(Package::COD_LIQUIDADO, $liquidated->cod_status);
     }
 }

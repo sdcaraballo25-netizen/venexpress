@@ -908,13 +908,15 @@ class PackageService
         Package $package,
         int $userId,
         string $recipientIdDoc,
-        ?string $locationDescription = null
+        ?string $locationDescription = null,
+        ?string $originLocation = null,
     ): Package {
         $updatedPackage = DB::transaction(function () use (
             $package,
             $userId,
             $recipientIdDoc,
-            $locationDescription
+            $locationDescription,
+            $originLocation
         ) {
             $locked = Package::query()
                 ->whereKey($package->id)
@@ -951,7 +953,7 @@ class PackageService
                 locationDescription:
                     $locationDescription ?? 'Retiro confirmado en agencia destino',
                 eventType: PackageHistory::EVENT_ENTREGA,
-                originLocation: 'Agencia destino',
+                originLocation: $originLocation ?? 'Agencia destino',
                 destinationLocation: 'Destinatario',
             );
 
