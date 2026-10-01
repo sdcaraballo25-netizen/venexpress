@@ -20,6 +20,7 @@ use App\Livewire\Admin\EmprendedoresApprovalManager;
 use App\Livewire\Admin\HelpCenter as AdminHelpCenter;
 use App\Livewire\Admin\IncidentsManager;
 use App\Livewire\Admin\PackageDispatch;
+use App\Livewire\Admin\PackageReturns as AdminPackageReturns;
 use App\Livewire\Admin\PaymentOrders;
 use App\Livewire\Admin\RateMatrixManager;
 use App\Livewire\Admin\RecommendationsManager;
@@ -40,6 +41,7 @@ use App\Livewire\Ally\PackageCreate as AllyPackageCreate;
 use App\Livewire\Ally\PackageDetail as AllyPackageDetail;
 use App\Livewire\Ally\PackagePickup as AllyPackagePickup;
 use App\Livewire\Ally\PackageReception;
+use App\Livewire\Ally\PackageReturns as AllyPackageReturns;
 use App\Livewire\Ally\Packages as AllyPackages;
 use App\Livewire\Ally\Reports as AllyReports;
 use App\Livewire\Ally\SalesCloseout as AllySalesCloseout;
@@ -171,6 +173,12 @@ Route::prefix('ally')
         Route::get('/paquetes/recepcion', PackageReception::class)
             ->middleware('role:aliado,aliado_taquilla')
             ->name('packages.reception');
+
+        // Devoluciones al remitente: guías de esta agencia (origen) que
+        // un admin puso en devolución. Ver Ally\PackageReturns.
+        Route::get('/devoluciones', AllyPackageReturns::class)
+            ->middleware('role:aliado,aliado_taquilla')
+            ->name('packages.returns');
 
         Route::get('/ayuda', AllyHelpCenter::class)
             ->middleware('role:aliado,aliado_taquilla')
@@ -645,6 +653,9 @@ Route::prefix('admin')
 
         Route::get('/incidencias', IncidentsManager::class)
             ->name('incidents');
+
+        Route::get('/devoluciones', AdminPackageReturns::class)
+            ->name('package-returns');
 
         /*
         |--------------------------------------------------------------------------

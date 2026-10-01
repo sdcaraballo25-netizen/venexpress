@@ -200,10 +200,11 @@ class Dashboard extends Component
      * separados en dos vistas:
      *
      * - Pendientes: todo lo que todavía no llegó a su destino final
-     *   (current_status distinto de ENTREGADO). Es la vista por
-     *   defecto.
-     * - Historial: paquetes ya ENTREGADO, del más reciente al más
-     *   antiguo, filtrable por rango de fecha de entrega.
+     *   (ni ENTREGADO ni DEVUELTO; incluye EN_DEVOLUCION). Es la
+     *   vista por defecto.
+     * - Historial: paquetes ENTREGADO o DEVUELTO al remitente, del
+     *   más reciente al más antiguo, filtrable por rango de fecha de
+     *   entrega/devolución.
      */
     public function render()
     {
@@ -226,24 +227,31 @@ class Dashboard extends Component
         $packages = collect();
         $historyPackages = null;
 
+        // Estados finales: entregado al destinatario o devuelto al
+        // remitente. Un DEVUELTO ya no está "en curso", así que va al
+        // historial (fechado por returned_at) en vez de quedarse para
+        // siempre entre los pendientes.
+        $finalStatuses = [Package::STATUS_ENTREGADO, Package::STATUS_DEVUELTO];
+        $finishedAt = 'COALESCE(delivery_completed_at, returned_at)';
+
         if ($this->activeTab === self::TAB_HISTORY) {
             $historyPackages = $baseQuery()
-                ->where('current_status', Package::STATUS_ENTREGADO)
+                ->whereIn('current_status', $finalStatuses)
                 ->when(
                     $this->historyFrom !== '',
-                    fn ($q) => $q->whereDate('delivery_completed_at', '>=', $this->historyFrom)
+                    fn ($q) => $q->whereRaw("DATE({$finishedAt}) >= ?", [$this->historyFrom])
                 )
                 ->when(
                     $this->historyTo !== '',
-                    fn ($q) => $q->whereDate('delivery_completed_at', '<=', $this->historyTo)
+                    fn ($q) => $q->whereRaw("DATE({$finishedAt}) <= ?", [$this->historyTo])
                 )
                 ->with(['histories', 'incidents'])
-                ->orderByDesc('delivery_completed_at')
+                ->orderByRaw("{$finishedAt} DESC")
                 ->paginate(10)
                 ->through(fn (Package $package) => $this->withClientRole($package, $idDocs));
         } else {
             $packages = $baseQuery()
-                ->where('current_status', '!=', Package::STATUS_ENTREGADO)
+                ->whereNotIn('current_status', $finalStatuses)
                 ->with(['histories', 'incidents'])
                 ->latest()
                 ->get()

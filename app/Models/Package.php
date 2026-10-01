@@ -18,6 +18,15 @@ class Package extends Model
     public const STATUS_LISTO_RETIRO = 'LISTO_RETIRO';
     public const STATUS_ENTREGADO = 'ENTREGADO';
 
+    /**
+     * Devolución al remitente (ver PackageService::startReturn() y
+     * completeReturn()). Fuera del flujo normal: solo esos dos métodos
+     * mueven un paquete a estos estados — no figuran en las
+     * transiciones genéricas de PackageService::changeStatus().
+     */
+    public const STATUS_EN_DEVOLUCION = 'EN_DEVOLUCION';
+    public const STATUS_DEVUELTO = 'DEVUELTO';
+
     public const STATUSES = [
         self::STATUS_RECIBIDO_AGENCIA,
         self::STATUS_RECOLECTADO_VENEXPRESS,
@@ -25,6 +34,8 @@ class Package extends Model
         self::STATUS_EN_TRANSITO_NACIONAL,
         self::STATUS_LISTO_RETIRO,
         self::STATUS_ENTREGADO,
+        self::STATUS_EN_DEVOLUCION,
+        self::STATUS_DEVUELTO,
     ];
 
     public const STATUS_LABELS = [
@@ -34,6 +45,21 @@ class Package extends Model
         self::STATUS_EN_TRANSITO_NACIONAL => 'En Tránsito',
         self::STATUS_LISTO_RETIRO => 'Listo para Retiro',
         self::STATUS_ENTREGADO => 'Entregado',
+        self::STATUS_EN_DEVOLUCION => 'En devolución',
+        self::STATUS_DEVUELTO => 'Devuelto al remitente',
+    ];
+
+    /**
+     * Estados desde los que un admin puede iniciar una devolución: el
+     * paquete ya salió de la agencia de origen y todavía no se
+     * entregó. En RECIBIDO_AGENCIA sigue en el origen, así que no hay
+     * nada que devolver por la red.
+     */
+    public const RETURNABLE_STATUSES = [
+        self::STATUS_RECOLECTADO_VENEXPRESS,
+        self::STATUS_EN_HUB,
+        self::STATUS_EN_TRANSITO_NACIONAL,
+        self::STATUS_LISTO_RETIRO,
     ];
 
     /**
@@ -64,6 +90,12 @@ class Package extends Model
 
     public const COD_PENDIENTE = 'pendiente';
     public const COD_LIQUIDADO = 'liquidado';
+
+    /**
+     * COD de un paquete devuelto al remitente: nunca se entregó, así
+     * que no hay nada que cobrar en destino.
+     */
+    public const COD_CANCELADO = 'cancelado';
 
     /**
      * Formas de pago aceptadas, usadas tanto por el aliado al
@@ -194,6 +226,10 @@ class Package extends Model
 
         'commission_percentage_used',
         'commission_amount_usd',
+
+        'return_reason',
+        'return_requested_at',
+        'returned_at',
     ];
 
     protected function casts(): array
@@ -237,6 +273,9 @@ class Package extends Model
             'is_cod' => 'boolean',
             'cod_amount_usd' => 'decimal:2',
             'cod_liquidated_at' => 'datetime',
+
+            'return_requested_at' => 'datetime',
+            'returned_at' => 'datetime',
             'cod_collected_at' => 'datetime',
 
             'commission_percentage_used' => 'decimal:2',
@@ -338,6 +377,16 @@ class Package extends Model
     public function getStatusLabelAttribute(): string
     {
         return $this->statusLabel();
+    }
+
+    public function isReturnable(): bool
+    {
+        return in_array($this->current_status, self::RETURNABLE_STATUSES, true);
+    }
+
+    public function isInReturn(): bool
+    {
+        return $this->current_status === self::STATUS_EN_DEVOLUCION;
     }
 
     public function isSobre(): bool

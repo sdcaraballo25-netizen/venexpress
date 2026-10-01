@@ -57,6 +57,18 @@
                         <tr class="border-b border-[#F0F0EC] last:border-0 hover:bg-slate-50">
                             <td class="px-6 py-4 font-medium text-[#111111]">
                                 {{ $incident->package?->tracking_number ?? '—' }}
+
+                                @if ($incident->package?->isReturnable())
+                                    <a
+                                        href="{{ route('admin.package-returns', ['guia' => $incident->package->tracking_number]) }}"
+                                        wire:navigate
+                                        class="mt-1 block text-xs font-semibold text-red-600 hover:text-red-700"
+                                    >
+                                        Iniciar devolución
+                                    </a>
+                                @elseif ($incident->package?->isInReturn())
+                                    <span class="mt-1 block text-xs font-semibold text-amber-700">En devolución</span>
+                                @endif
                             </td>
                             <td class="px-6 py-4 text-[#6B6B66]">
                                 {{ $incident->ally?->business_name ?? '—' }}

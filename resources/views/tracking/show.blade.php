@@ -143,7 +143,11 @@
 
 
                             <span
-                                class="text-xs font-semibold px-3 py-1 rounded-full bg-green-100 text-green-700"
+                                class="text-xs font-semibold px-3 py-1 rounded-full {{ match ($package->current_status) {
+                                    \App\Models\Package::STATUS_EN_DEVOLUCION => 'bg-red-100 text-red-700',
+                                    \App\Models\Package::STATUS_DEVUELTO => 'bg-slate-100 text-slate-700',
+                                    default => 'bg-green-100 text-green-700',
+                                } }}"
                             >
 
                                 {{ $currentStatusLabel ?? $package->status_label }}
@@ -185,7 +189,7 @@
                 </div>
 
 
-                @if (! ($statusIsKnown ?? true))
+                @if (! ($statusIsKnown ?? true) && ! in_array($package->current_status, [\App\Models\Package::STATUS_EN_DEVOLUCION, \App\Models\Package::STATUS_DEVUELTO], true))
 
                     <div
                         class="mb-4 rounded-xl border border-amber-200 bg-amber-50 px-4 py-3 text-sm text-amber-800"
@@ -209,6 +213,21 @@
 
                         Tu envío tiene una incidencia en revisión, contáctanos.
 
+                    </div>
+
+                @endif
+
+                {{-- Devolución al remitente: fuera de la línea de tiempo normal --}}
+                @if ($package->current_status === \App\Models\Package::STATUS_EN_DEVOLUCION)
+
+                    <div class="mb-4 rounded-xl border border-red-200 bg-red-50 px-4 py-3 text-sm text-red-800">
+                        Este envío no se pudo entregar y está siendo devuelto al remitente. El remitente podrá retirarlo en la agencia donde lo envió.
+                    </div>
+
+                @elseif ($package->current_status === \App\Models\Package::STATUS_DEVUELTO)
+
+                    <div class="mb-4 rounded-xl border border-slate-200 bg-slate-50 px-4 py-3 text-sm text-slate-700">
+                        Este envío fue devuelto al remitente{{ $package->returned_at ? ' el '.$package->returned_at->format('d/m/Y') : '' }}.
                     </div>
 
                 @endif

@@ -9,6 +9,7 @@
         \App\Models\Package::STATUS_EN_TRANSITO_NACIONAL => 'bg-blue-500',
         \App\Models\Package::STATUS_EN_HUB => 'bg-indigo-500',
         \App\Models\Package::STATUS_ENTREGADO => 'bg-emerald-500',
+        \App\Models\Package::STATUS_EN_DEVOLUCION => 'bg-red-500',
         default => 'bg-slate-400',
     };
 @endphp
@@ -231,12 +232,21 @@
                                 </div>
 
                                 <div class="flex shrink-0 items-center gap-3">
-                                    <span class="text-xs font-medium text-emerald-600">
-                                        Entregado
-                                        @if ($package->delivery_completed_at)
-                                            · {{ $package->delivery_completed_at->format('d/m/Y') }}
-                                        @endif
-                                    </span>
+                                    @if ($package->current_status === \App\Models\Package::STATUS_DEVUELTO)
+                                        <span class="text-xs font-medium text-slate-500">
+                                            Devuelto al remitente
+                                            @if ($package->returned_at)
+                                                · {{ $package->returned_at->format('d/m/Y') }}
+                                            @endif
+                                        </span>
+                                    @else
+                                        <span class="text-xs font-medium text-emerald-600">
+                                            Entregado
+                                            @if ($package->delivery_completed_at)
+                                                · {{ $package->delivery_completed_at->format('d/m/Y') }}
+                                            @endif
+                                        </span>
+                                    @endif
 
                                     <svg
                                         class="h-4 w-4 shrink-0 text-slate-400 transition-transform"

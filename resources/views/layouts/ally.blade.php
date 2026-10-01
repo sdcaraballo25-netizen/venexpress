@@ -108,6 +108,7 @@
                                 'ally.packages.index',
                                 'ally.packages.reception',
                                 'ally.packages.pickup',
+                                'ally.packages.returns',
                                 'ally.cod'
                             ) ? 'true' : 'false' }}
                         ) {
@@ -373,6 +374,38 @@
 
                             <span>
                                 Retiro en agencia
+                            </span>
+
+                        </a>
+
+
+                        {{-- DEVOLUCIONES --}}
+                        <a
+                            href="{{ route('ally.packages.returns') }}"
+                            wire:navigate
+                            @click="$store.sidebar.open = false"
+                            class="flex items-center gap-3 px-4 py-3 rounded-xl font-medium transition-colors
+                            {{ request()->routeIs('ally.packages.returns')
+                                ? 'bg-amber-400 text-[#111111]'
+                                : 'text-[#6B6B66] hover:bg-slate-50 hover:text-[#111111]' }}"
+                        >
+
+                            <svg
+                                class="w-5 h-5"
+                                fill="none"
+                                stroke="currentColor"
+                                viewBox="0 0 24 24"
+                            >
+                                <path
+                                    stroke-linecap="round"
+                                    stroke-linejoin="round"
+                                    stroke-width="2"
+                                    d="M3 10h10a8 8 0 018 8v2M3 10l6 6m-6-6l6-6"
+                                />
+                            </svg>
+
+                            <span>
+                                Devoluciones
                             </span>
 
                         </a>

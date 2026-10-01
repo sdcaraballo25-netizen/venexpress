@@ -26,6 +26,13 @@ class PackageHistory extends Model
 
     public const EVENT_CORRECCION = 'CORRECCION';
 
+    /**
+     * Devolución al remitente (inicio y entrega al remitente). Evento
+     * propio, distinto de EVENT_ENTREGA, para que una devolución nunca
+     * se cuente como una entrega al destinatario.
+     */
+    public const EVENT_DEVOLUCION = 'DEVOLUCION';
+
     public const EVENTOS = [
         self::EVENT_MOVIMIENTO,
         self::EVENT_RECEPCION,
@@ -35,6 +42,7 @@ class PackageHistory extends Model
         self::EVENT_ENTREGA,
         self::EVENT_INCIDENCIA,
         self::EVENT_CORRECCION,
+        self::EVENT_DEVOLUCION,
     ];
 
     protected $fillable = [

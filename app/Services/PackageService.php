@@ -967,6 +967,163 @@ class PackageService
 
     /*
     |--------------------------------------------------------------------------
+    | DEVOLUCIÓN AL REMITENTE
+    |--------------------------------------------------------------------------
+    |
+    | Un admin la inicia sobre un paquete que no se pudo entregar
+    | (startReturn) y la agencia de ORIGEN la cierra al entregárselo
+    | al remitente verificando su cédula (completeReturn). El traslado
+    | físico de regreso lo coordina operaciones: no pasa por escaneos
+    | de ruta. Sin reembolso ni cargo extra: el envío y la comisión
+    | del aliado se mantienen; un COD pendiente se cancela porque el
+    | paquete nunca llegó al destinatario.
+    |
+    */
+
+    public function startReturn(Package $package, int $userId, string $reason): Package
+    {
+        $reason = trim($reason);
+
+        if ($reason === '') {
+            throw new RuntimeException('Indica el motivo de la devolución.');
+        }
+
+        $updatedPackage = DB::transaction(function () use ($package, $userId, $reason) {
+            $locked = Package::query()
+                ->whereKey($package->id)
+                ->lockForUpdate()
+                ->firstOrFail();
+
+            if (! $locked->isReturnable()) {
+                throw new RuntimeException(match ($locked->current_status) {
+                    Package::STATUS_RECIBIDO_AGENCIA => 'Esta guía todavía no ha salido de la agencia de origen: no hay nada que devolver por la red.',
+                    Package::STATUS_ENTREGADO => 'Esta guía ya fue entregada al destinatario.',
+                    Package::STATUS_EN_DEVOLUCION => 'Esta guía ya está en devolución.',
+                    Package::STATUS_DEVUELTO => 'Esta guía ya fue devuelta al remitente.',
+                    default => 'Esta guía no se puede devolver en su estado actual.',
+                });
+            }
+
+            $previousStatusLabel = $locked->statusLabel();
+
+            $updates = [
+                'current_status' => Package::STATUS_EN_DEVOLUCION,
+                'return_reason' => $reason,
+                'return_requested_at' => now(),
+                // Nadie la tiene en custodia dentro del sistema hasta
+                // que la agencia de origen la entregue: así deja de
+                // aparecer como pendiente en el panel/app del repartidor.
+                'driver_id' => null,
+            ];
+
+            if ($locked->is_cod && $locked->cod_status === Package::COD_PENDIENTE) {
+                $updates['cod_status'] = Package::COD_CANCELADO;
+            }
+
+            $locked->update($updates);
+
+            $this->recordHistory(
+                package: $locked,
+                status: Package::STATUS_EN_DEVOLUCION,
+                userId: $userId,
+                locationDescription: 'Devolución al remitente iniciada. Motivo: '.$reason,
+                eventType: PackageHistory::EVENT_DEVOLUCION,
+                originLocation: $previousStatusLabel,
+                destinationLocation: 'Agencia de origen',
+            );
+
+            return $locked->fresh();
+        });
+
+        $this->notifyReturnStatus($updatedPackage, Package::STATUS_EN_DEVOLUCION);
+
+        return $updatedPackage;
+    }
+
+    public function completeReturn(Package $package, int $userId, string $senderIdDoc, Ally $originAlly): Package
+    {
+        $updatedPackage = DB::transaction(function () use ($package, $userId, $senderIdDoc, $originAlly) {
+            $locked = Package::query()
+                ->whereKey($package->id)
+                ->lockForUpdate()
+                ->firstOrFail();
+
+            if ((int) $locked->ally_id !== (int) $originAlly->id) {
+                throw new RuntimeException('Esta guía no se registró en tu agencia.');
+            }
+
+            if (! $locked->isInReturn()) {
+                throw new RuntimeException(
+                    'Esta guía no está en devolución. Estado actual: '.$locked->statusLabel().'.'
+                );
+            }
+
+            if (trim((string) $locked->sender_id_doc) !== trim($senderIdDoc)) {
+                throw new RuntimeException('El documento no coincide con el del remitente.');
+            }
+
+            $locked->update([
+                'current_status' => Package::STATUS_DEVUELTO,
+                'returned_at' => now(),
+            ]);
+
+            $this->recordHistory(
+                package: $locked,
+                status: Package::STATUS_DEVUELTO,
+                userId: $userId,
+                locationDescription: 'Devuelto al remitente en la agencia de origen',
+                eventType: PackageHistory::EVENT_DEVOLUCION,
+                originLocation: 'Agencia de origen',
+                destinationLocation: 'Remitente',
+            );
+
+            return $locked->fresh();
+        });
+
+        $this->notifyReturnStatus($updatedPackage, Package::STATUS_DEVUELTO);
+
+        return $updatedPackage;
+    }
+
+    /**
+     * En una devolución el interesado principal es el remitente (es
+     * quien recupera el paquete), así que además del destinatario
+     * (notifyStatusChange) se le avisa a él.
+     */
+    protected function notifyReturnStatus(Package $package, string $status): void
+    {
+        $this->notifyStatusChange($package, $status);
+
+        try {
+            $senderEmail = Customer::query()
+                ->where('id_doc', $package->sender_id_doc)
+                ->whereNotNull('email')
+                ->value('email');
+
+            $recipientEmail = Customer::query()
+                ->where('id_doc', $package->recipient_id_doc)
+                ->value('email');
+
+            if (! $senderEmail || $senderEmail === $recipientEmail) {
+                return;
+            }
+
+            Notification::route('mail', $senderEmail)
+                ->notify(new PackageStatusUpdated($package->id, $status));
+        } catch (Throwable $e) {
+            Log::warning(
+                'No se pudo avisar al remitente de la devolución.',
+                [
+                    'package_id' => $package->id,
+                    'status' => $status,
+                    'error' => $e->getMessage(),
+                ]
+            );
+        }
+    }
+
+    /*
+    |--------------------------------------------------------------------------
     | COD
     |--------------------------------------------------------------------------
     */
