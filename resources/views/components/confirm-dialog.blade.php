@@ -27,7 +27,15 @@
     (wire:navigate no re-ejecuta <script> insertados en el body).
 --}}
 
+{{--
+    x-data (vacío) es imprescindible: este diálogo vive en el layout,
+    fuera de cualquier componente Livewire/Alpine, y Alpine solo
+    inicializa directivas (x-show, @click...) dentro de un elemento con
+    x-data. Sin él el diálogo nunca se mostraba y todos los botones que
+    piden confirmación ($store.confirm.open) no hacían nada.
+--}}
 <div
+    x-data
     x-show="$store.confirm.show"
     x-cloak
     class="fixed inset-0 z-[100] flex items-center justify-center bg-black/40 px-4"

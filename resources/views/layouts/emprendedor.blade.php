@@ -28,7 +28,13 @@
 
 </head>
 
-<body class="bg-[#F7F7F4] text-[#111111] antialiased">
+{{-- x-data en <body>: Alpine solo inicializa directivas (@click,
+     x-show, :class...) dentro de un elemento con x-data. El sidebar
+     móvil, el diálogo de confirmación y demás piezas del layout viven
+     fuera de los componentes Livewire, así que sin esto no hacían
+     nada. Va en <body> (no en <html>) porque wire:navigate reemplaza
+     el <body> completo, atributos incluidos. --}}
+<body x-data class="bg-[#F7F7F4] text-[#111111] antialiased">
 
 <div class="min-h-screen flex">
 
