@@ -11,8 +11,12 @@ use App\Models\PedidoItem;
 use App\Models\Producto;
 use App\Models\Resena;
 use App\Models\User;
+use App\Services\PedidoService;
 use Illuminate\Foundation\Testing\RefreshDatabase;
+use Illuminate\Support\Str;
+use Livewire\Features\SupportLockedProperties\CannotUpdateLockedPropertyException;
 use Livewire\Livewire;
+use RuntimeException;
 use Tests\Feature\Concerns\CreatesTestEmprendedores;
 use Tests\TestCase;
 
@@ -423,5 +427,106 @@ class MarketplaceTest extends TestCase
         $this->assertDatabaseMissing('pedidos', [
             'cliente_id_doc' => 'V-11122233',
         ]);
+    }
+
+    /**
+     * productoComprarId/cantidadComprar son #[Locked]: una petición
+     * manipulada ya no puede fijar una cantidad negativa (antes
+     * creaba un pedido con precio negativo y, al marcarlo pagado, el
+     * stock SUBÍA en vez de bajar).
+     */
+    public function test_the_purchase_quantity_cannot_be_tampered_with(): void
+    {
+        $emprendedor = $this->createEmprendedor();
+        $producto = $this->createProducto($emprendedor, ['stock' => 5]);
+
+        $this->expectException(CannotUpdateLockedPropertyException::class);
+
+        Livewire::test(Marketplace::class)
+            ->call('comprarProducto', $producto->id, 1)
+            ->set('cantidadComprar', -50);
+    }
+
+    public function test_the_product_to_buy_cannot_be_swapped_for_an_inactive_one(): void
+    {
+        $emprendedor = $this->createEmprendedor();
+        $producto = $this->createProducto($emprendedor, ['stock' => 5]);
+
+        $this->expectException(CannotUpdateLockedPropertyException::class);
+
+        Livewire::test(Marketplace::class)
+            ->call('comprarProducto', $producto->id, 1)
+            ->set('productoComprarId', 999);
+    }
+
+    public function test_a_product_from_an_unverified_emprendedor_cannot_be_bought_directly(): void
+    {
+        $emprendedor = $this->createEmprendedor([
+            'verification_status' => Emprendedor::VERIFICATION_PENDING,
+        ]);
+        $producto = $this->createProducto($emprendedor, ['stock' => 5]);
+
+        Livewire::test(Marketplace::class)
+            ->call('comprarProducto', $producto->id, 1)
+            ->assertSet('showCheckout', false)
+            ->assertSet('compraError', 'Este producto ya no está disponible.');
+    }
+
+    public function test_marking_a_pedido_with_an_invalid_quantity_as_paid_never_increases_stock(): void
+    {
+        $emprendedor = $this->createEmprendedor();
+        $producto = $this->createProducto($emprendedor, ['stock' => 5]);
+
+        $pedido = Pedido::create([
+            'emprendedor_id' => $emprendedor->id,
+            'precio_total_usd' => -150,
+            'cliente_nombre' => 'X',
+            'cliente_id_doc' => 'V-1',
+            'cliente_telefono' => '1',
+            'destino_ciudad' => 'Valencia',
+            'destino_estado' => 'Carabobo',
+            'direccion_entrega' => 'Calle 1',
+            'status' => Pedido::STATUS_PENDIENTE,
+            'chat_token' => Str::random(40),
+        ]);
+
+        PedidoItem::create([
+            'pedido_id' => $pedido->id,
+            'producto_id' => $producto->id,
+            'cantidad' => -10,
+            'precio_unitario_usd' => 15,
+            'subtotal_usd' => -150,
+        ]);
+
+        try {
+            app(PedidoService::class)->marcarComoPagado($pedido);
+            $this->fail('Se esperaba una excepción por cantidad inválida.');
+        } catch (RuntimeException) {
+            // esperado
+        }
+
+        $this->assertSame(5, (int) $producto->fresh()->stock);
+        $this->assertSame(Pedido::STATUS_PENDIENTE, $pedido->fresh()->status);
+    }
+
+    public function test_guest_checkout_is_rate_limited_per_ip(): void
+    {
+        $emprendedor = $this->createEmprendedor();
+        $producto = $this->createProducto($emprendedor, ['stock' => 50]);
+
+        for ($i = 0; $i < 6; $i++) {
+            $component = Livewire::test(Marketplace::class)
+                ->call('comprarProducto', $producto->id, 1)
+                ->set('cliente_nombre', 'Comprador')
+                ->set('cliente_id_doc', 'V-'.$i)
+                ->set('cliente_telefono', '0414')
+                ->set('destino_estado', 'Carabobo')
+                ->set('destino_ciudad', 'Valencia')
+                ->set('direccion_entrega', 'Av. Bolívar')
+                ->call('confirmarPedido');
+        }
+
+        $this->assertSame(5, Pedido::count());
+        $this->assertStringContainsString('demasiados pedidos', (string) $component->get('compraError'));
     }
 }

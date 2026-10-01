@@ -112,6 +112,7 @@ class PedidoChatTest extends TestCase
     public function test_a_guest_can_attach_a_payment_receipt_without_any_text(): void
     {
         Storage::fake('public');
+        Storage::fake('documents');
 
         $pedido = $this->createPedidoWithToken('token-chat-adjunto');
 
@@ -129,7 +130,9 @@ class PedidoChatTest extends TestCase
         $this->assertSame('comprobante.jpg', $mensaje->archivo_nombre);
         $this->assertTrue($mensaje->esImagen());
 
-        Storage::disk('public')->assertExists($mensaje->archivo_path);
+        // Comprobante de pago: disco privado, nunca el "public".
+        Storage::disk('documents')->assertExists($mensaje->archivo_path);
+        Storage::disk('public')->assertMissing($mensaje->archivo_path);
     }
 
     public function test_sending_neither_text_nor_an_attachment_is_rejected(): void
@@ -324,5 +327,58 @@ class PedidoChatTest extends TestCase
             ->call('enviarResena');
 
         $this->assertSame(0, Resena::count());
+    }
+
+    public function test_an_attachment_is_served_only_with_the_pedido_chat_token(): void
+    {
+        Storage::fake('documents');
+
+        $pedido = $this->createPedidoWithToken('token-adjunto-ok');
+        $otro = $this->createPedidoWithToken('token-de-otro-pedido');
+
+        Storage::disk('documents')->put('mensajes-pedido/recibo.jpg', 'contenido');
+
+        $mensaje = MensajePedido::create([
+            'pedido_id' => $pedido->id,
+            'autor' => MensajePedido::AUTOR_CLIENTE,
+            'texto' => '',
+            'archivo_path' => 'mensajes-pedido/recibo.jpg',
+            'archivo_nombre' => 'recibo.jpg',
+        ]);
+
+        $this->get($mensaje->archivoUrl('token-adjunto-ok'))->assertOk();
+
+        $this->get(route('public.marketplace.pedido.attachment', ['token' => 'token-de-otro-pedido', 'mensaje' => $mensaje->id]))
+            ->assertNotFound();
+
+        $this->get(route('public.marketplace.pedido.attachment', ['token' => 'inventado', 'mensaje' => $mensaje->id]))
+            ->assertNotFound();
+    }
+
+    public function test_legacy_attachments_on_the_public_disk_are_still_served_and_can_be_moved(): void
+    {
+        Storage::fake('public');
+        Storage::fake('documents');
+
+        $pedido = $this->createPedidoWithToken('token-legado');
+
+        Storage::disk('public')->put('mensajes-pedido/viejo.pdf', 'pdf');
+
+        $mensaje = MensajePedido::create([
+            'pedido_id' => $pedido->id,
+            'autor' => MensajePedido::AUTOR_CLIENTE,
+            'texto' => '',
+            'archivo_path' => 'mensajes-pedido/viejo.pdf',
+            'archivo_nombre' => 'viejo.pdf',
+        ]);
+
+        $this->get($mensaje->archivoUrl('token-legado'))->assertOk();
+
+        $this->artisan('venexpress:move-chat-attachments')->assertSuccessful();
+
+        Storage::disk('public')->assertMissing('mensajes-pedido/viejo.pdf');
+        Storage::disk('documents')->assertExists('mensajes-pedido/viejo.pdf');
+
+        $this->get($mensaje->archivoUrl('token-legado'))->assertOk();
     }
 }

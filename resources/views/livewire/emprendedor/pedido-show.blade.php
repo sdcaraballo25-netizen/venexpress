@@ -121,11 +121,11 @@
 
                         @if ($mensaje->archivo_path)
                             @if ($mensaje->esImagen())
-                                <img src="{{ Illuminate\Support\Facades\Storage::disk('public')->url($mensaje->archivo_path) }}"
-                                     @click="$store.lightbox.open('{{ Illuminate\Support\Facades\Storage::disk('public')->url($mensaje->archivo_path) }}')"
+                                <img src="{{ $mensaje->archivoUrl($pedido->chat_token) }}"
+                                     @click="$store.lightbox.open('{{ $mensaje->archivoUrl($pedido->chat_token) }}')"
                                      class="rounded-lg max-h-48 object-cover mb-1.5 cursor-pointer" alt="Adjunto">
                             @else
-                                <a href="{{ Illuminate\Support\Facades\Storage::disk('public')->url($mensaje->archivo_path) }}" target="_blank"
+                                <a href="{{ $mensaje->archivoUrl($pedido->chat_token) }}" target="_blank"
                                    class="flex items-center gap-2 rounded-lg px-3 py-2 mb-1.5
                                        {{ $esEmprendedor ? 'bg-blue-700' : 'bg-white border border-[#E5E5E0]' }}">
                                     <span>📎</span>
