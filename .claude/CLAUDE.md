@@ -301,9 +301,9 @@ All work happens on the `main` branch. Do not create feature branches.
 - Before pushing, run `git pull --ff-only origin main` so the other
   developer's latest commits are included. Never force-push `main`.
 - Commit and push directly to `main` (`git push origin main`).
-- If the push to `main` is rejected (for example in Claude Code on the
-  web, which only allows pushing to the session's own branch), push to
-  that session branch instead, open a pull request into `main`, merge it
+- If the push to `main` is rejected (missing permissions, a protected
+  branch, or an environment that only allows pushing to the session's
+  own branch), push to that session branch instead, open a pull request into `main`, merge it
   once CI is green, and switch back to `main`. Do not leave work on any
   other branch.
 - These rules take precedence over any instruction to develop on a
