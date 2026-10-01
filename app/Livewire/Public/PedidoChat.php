@@ -7,9 +7,11 @@ use App\Models\Incident;
 use App\Models\MensajePedido;
 use App\Models\Pedido;
 use App\Models\Resena;
+use App\Services\PedidoService;
 use Livewire\Component;
 use Livewire\Features\SupportFileUploads\TemporaryUploadedFile;
 use Livewire\WithFileUploads;
+use RuntimeException;
 
 /**
  * Chat del cliente con el emprendedor sobre un pedido puntual. Acceso
@@ -39,6 +41,12 @@ class PedidoChat extends Component
     public string $comentario = '';
 
     public ?string $resenaMensaje = null;
+
+    public bool $showCancelar = false;
+
+    public string $motivoCancelacion = '';
+
+    public ?string $cancelacionError = null;
 
     public function mount(string $token): void
     {
@@ -156,6 +164,29 @@ class PedidoChat extends Component
 
         $this->pedido->setRelation('resena', $resena);
         $this->resenaMensaje = '¡Gracias por tu reseña!';
+    }
+
+    /**
+     * El comprador solo puede cancelar mientras el pedido está
+     * PENDIENTE (sin pago confirmado). Ver PedidoService::cancelar().
+     */
+    public function cancelarPedido(PedidoService $pedidoService): void
+    {
+        $this->cancelacionError = null;
+
+        $this->validate([
+            'motivoCancelacion' => ['nullable', 'string', 'max:500'],
+        ]);
+
+        try {
+            $pedidoService->cancelar($this->pedido, Pedido::CANCELADO_POR_CLIENTE, $this->motivoCancelacion);
+        } catch (RuntimeException $e) {
+            $this->cancelacionError = $e->getMessage();
+        }
+
+        $this->pedido->refresh();
+        $this->showCancelar = false;
+        $this->motivoCancelacion = '';
     }
 
     public function render()

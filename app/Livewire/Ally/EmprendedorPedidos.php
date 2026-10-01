@@ -112,9 +112,11 @@ class EmprendedorPedidos extends Component
         }
 
         if ($pedido->status !== Pedido::STATUS_PAGADO) {
-            $this->searchError = $pedido->status === Pedido::STATUS_CONFIRMADO
-                ? 'Este pedido ya tiene una guía generada.'
-                : 'Este pedido todavía no fue confirmado como pagado por el emprendedor.';
+            $this->searchError = match ($pedido->status) {
+                Pedido::STATUS_CONFIRMADO => 'Este pedido ya tiene una guía generada.',
+                Pedido::STATUS_CANCELADO => 'Este pedido fue cancelado: no se le puede generar guía.',
+                default => 'Este pedido todavía no fue confirmado como pagado por el emprendedor.',
+            };
 
             return;
         }

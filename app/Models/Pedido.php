@@ -29,6 +29,15 @@ class Pedido extends Model
 
     public const STATUS_CANCELADO = 'CANCELADO';
 
+    /**
+     * Quién canceló el pedido (cancelado_por). Ver PedidoService::cancelar():
+     * el comprador solo mientras está PENDIENTE; el emprendedor
+     * mientras está PENDIENTE o PAGADO (devolviendo el stock).
+     */
+    public const CANCELADO_POR_CLIENTE = 'cliente';
+
+    public const CANCELADO_POR_EMPRENDEDOR = 'emprendedor';
+
     protected $fillable = [
         'emprendedor_id',
         'user_id',
@@ -44,13 +53,27 @@ class Pedido extends Model
         'referencia_entrega',
         'status',
         'chat_token',
+        'cancelado_por',
+        'motivo_cancelacion',
+        'cancelado_at',
     ];
 
     protected function casts(): array
     {
         return [
             'precio_total_usd' => 'decimal:2',
+            'cancelado_at' => 'datetime',
         ];
+    }
+
+    public function puedeCancelarCliente(): bool
+    {
+        return $this->status === self::STATUS_PENDIENTE;
+    }
+
+    public function puedeCancelarEmprendedor(): bool
+    {
+        return in_array($this->status, [self::STATUS_PENDIENTE, self::STATUS_PAGADO], true);
     }
 
     /**

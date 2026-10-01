@@ -3,14 +3,17 @@
 namespace App\Services;
 
 use App\Models\Ally;
+use App\Models\MensajePedido;
 use App\Models\Package;
 use App\Models\Pedido;
 use App\Models\Producto;
 use App\Models\RateMatrix;
+use App\Notifications\PedidoCanceladoPorCliente;
 use App\Notifications\PedidoEstadoActualizado;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Log;
 use Illuminate\Support\Facades\Notification;
+use InvalidArgumentException;
 use RuntimeException;
 use Throwable;
 
@@ -89,6 +92,88 @@ class PedidoService
      *     declared_value_usd?: ?float,
      * } $datosPaquete
      */
+    /**
+     * Cancela un pedido del marketplace.
+     *
+     * - El comprador (desde el chat del pedido) solo mientras está
+     *   PENDIENTE: todavía no hay pago confirmado ni stock descontado.
+     * - El emprendedor mientras está PENDIENTE o PAGADO. Si estaba
+     *   PAGADO se devuelve el stock que marcarComoPagado() descontó;
+     *   el reembolso lo acuerdan comprador y vendedor por fuera de la
+     *   plataforma, igual que el pago.
+     * - Un pedido CONFIRMADO ya tiene guía de envío: no se cancela
+     *   desde aquí.
+     *
+     * Deja un mensaje en el chat del pedido para que la otra parte lo
+     * vea y le avisa por correo.
+     */
+    public function cancelar(Pedido $pedido, string $canceladoPor, ?string $motivo = null): Pedido
+    {
+        if (! in_array($canceladoPor, [Pedido::CANCELADO_POR_CLIENTE, Pedido::CANCELADO_POR_EMPRENDEDOR], true)) {
+            throw new InvalidArgumentException("Origen de cancelación inválido: {$canceladoPor}");
+        }
+
+        $motivo = trim((string) $motivo);
+
+        $cancelado = DB::transaction(function () use ($pedido, $canceladoPor, $motivo) {
+            $locked = Pedido::whereKey($pedido->id)->lockForUpdate()->firstOrFail();
+
+            if ($locked->status === Pedido::STATUS_CANCELADO) {
+                throw new RuntimeException('Este pedido ya estaba cancelado.');
+            }
+
+            if ($locked->status === Pedido::STATUS_CONFIRMADO) {
+                throw new RuntimeException('Este pedido ya tiene guía de envío y no se puede cancelar.');
+            }
+
+            if ($canceladoPor === Pedido::CANCELADO_POR_CLIENTE && ! $locked->puedeCancelarCliente()) {
+                throw new RuntimeException(
+                    'El vendedor ya confirmó tu pago, así que no puedes cancelar el pedido desde aquí. '
+                    .'Escríbele por este chat para acordarlo.'
+                );
+            }
+
+            if ($canceladoPor === Pedido::CANCELADO_POR_EMPRENDEDOR && ! $locked->puedeCancelarEmprendedor()) {
+                throw new RuntimeException('Este pedido no se puede cancelar en su estado actual.');
+            }
+
+            if ($locked->status === Pedido::STATUS_PAGADO) {
+                foreach ($locked->items()->get() as $item) {
+                    $producto = Producto::whereKey($item->producto_id)->lockForUpdate()->first();
+
+                    // Un producto ya eliminado del catálogo no tiene
+                    // stock que devolver.
+                    $producto?->increment('stock', (int) $item->cantidad);
+                }
+            }
+
+            $locked->update([
+                'status' => Pedido::STATUS_CANCELADO,
+                'cancelado_por' => $canceladoPor,
+                'motivo_cancelacion' => $motivo !== '' ? $motivo : null,
+                'cancelado_at' => now(),
+            ]);
+
+            MensajePedido::create([
+                'pedido_id' => $locked->id,
+                'autor' => $canceladoPor === Pedido::CANCELADO_POR_CLIENTE
+                    ? MensajePedido::AUTOR_CLIENTE
+                    : MensajePedido::AUTOR_EMPRENDEDOR,
+                'texto' => 'Canceló el pedido.'.($motivo !== '' ? " Motivo: {$motivo}" : ''),
+            ]);
+
+            return $locked;
+        });
+
+        if ($canceladoPor === Pedido::CANCELADO_POR_EMPRENDEDOR) {
+            $this->notificarCliente($cancelado, Pedido::STATUS_CANCELADO);
+        } else {
+            $this->notificarEmprendedorCancelacion($cancelado);
+        }
+
+        return $cancelado;
+    }
+
     public function registrarGuia(Pedido $pedido, array $datosPaquete, ?int $registeredByUserId, Ally $ally): Package
     {
         [$package, $locked] = DB::transaction(function () use ($pedido, $datosPaquete, $registeredByUserId, $ally) {
@@ -168,6 +253,30 @@ class PedidoService
      * confirmada en base de datos (pago recibido / guía generada), por
      * eso queda protegido en un try/catch.
      */
+    protected function notificarEmprendedorCancelacion(Pedido $pedido): void
+    {
+        try {
+            $pedido->loadMissing('emprendedor.user');
+
+            $email = $pedido->emprendedor?->user?->email;
+
+            if (! $email) {
+                return;
+            }
+
+            Notification::route('mail', $email)
+                ->notify(new PedidoCanceladoPorCliente($pedido->id));
+        } catch (Throwable $e) {
+            Log::warning(
+                'No se pudo avisar al emprendedor de la cancelación del pedido.',
+                [
+                    'pedido_id' => $pedido->id,
+                    'error' => $e->getMessage(),
+                ]
+            );
+        }
+    }
+
     protected function notificarCliente(Pedido $pedido, string $status): void
     {
         try {

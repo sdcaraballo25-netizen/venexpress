@@ -17,7 +17,11 @@
         </div>
 
         <span class="text-xs font-semibold px-2.5 py-1 rounded-lg
-            {{ $pedido->status === Pedido::STATUS_CONFIRMADO ? 'bg-emerald-50 text-emerald-700' : 'bg-amber-50 text-amber-700' }}">
+            {{ match ($pedido->status) {
+                Pedido::STATUS_CONFIRMADO => 'bg-emerald-50 text-emerald-700',
+                Pedido::STATUS_CANCELADO => 'bg-red-50 text-red-700',
+                default => 'bg-amber-50 text-amber-700',
+            } }}">
             {{ $pedido->status }}
         </span>
     </div>
@@ -62,7 +66,14 @@
             </div>
         </div>
 
-        @if ($pedido->package)
+        @if ($pedido->status === Pedido::STATUS_CANCELADO)
+            <p class="mt-4 text-sm text-[#6B6B66]">
+                {{ $pedido->cancelado_por === Pedido::CANCELADO_POR_CLIENTE ? 'El comprador canceló este pedido' : 'Cancelaste este pedido' }}{{ $pedido->cancelado_at ? ' el '.$pedido->cancelado_at->format('d/m/Y') : '' }}.
+                @if ($pedido->motivo_cancelacion)
+                    Motivo: {{ $pedido->motivo_cancelacion }}
+                @endif
+            </p>
+        @elseif ($pedido->package)
             <p class="mt-4 text-sm text-[#6B6B66]">
                 Guía generada: <strong class="text-[#111111]">{{ $pedido->package->tracking_number }}</strong>
             </p>
@@ -82,6 +93,37 @@
             >
                 Confirmar pedido
             </button>
+        @endif
+
+        @if ($pedido->puedeCancelarEmprendedor())
+            @if ($showCancelar)
+                <div class="mt-4 rounded-xl border border-[#E5E5E0] bg-[#F7F7F4] p-4">
+                    <p class="text-sm font-semibold text-[#111111]">¿Cancelar este pedido?</p>
+                    <p class="mt-1 text-xs text-[#6B6B66]">
+                        @if ($pedido->status === Pedido::STATUS_PAGADO)
+                            El stock de los productos se repone. Si el comprador ya te pagó, acuerda el reembolso con él por el chat.
+                        @else
+                            El comprador recibirá un aviso con el motivo.
+                        @endif
+                    </p>
+                    <textarea wire:model="motivoCancelacion" rows="2"
+                              placeholder="Motivo (el comprador lo verá)"
+                              class="mt-3 w-full rounded-xl border-[#E5E5E0] text-sm focus:border-blue-600 focus:ring-blue-600"></textarea>
+                    @error('motivoCancelacion') <p class="mt-1 text-xs text-red-600">{{ $message }}</p> @enderror
+                    <div class="mt-3 flex gap-3">
+                        <button type="button" wire:click="cancelar" class="px-4 py-2 rounded-xl bg-red-600 text-white hover:bg-red-700 text-sm font-semibold transition">
+                            Cancelar pedido
+                        </button>
+                        <button type="button" wire:click="$set('showCancelar', false)" class="text-sm text-[#6B6B66] hover:text-[#111111]">
+                            Volver
+                        </button>
+                    </div>
+                </div>
+            @else
+                <button type="button" wire:click="$set('showCancelar', true)" class="mt-3 block text-sm font-semibold text-red-600 hover:text-red-800">
+                    Cancelar pedido
+                </button>
+            @endif
         @endif
 
         @if ($pedido->resena)

@@ -55,7 +55,11 @@
                             </td>
                             <td class="px-6 py-4 text-center">
                                 <span class="text-xs font-semibold px-2.5 py-1 rounded-lg
-                                    {{ $pedido->status === Pedido::STATUS_CONFIRMADO ? 'bg-emerald-50 text-emerald-700' : 'bg-amber-50 text-amber-700' }}">
+                                    {{ match ($pedido->status) {
+                                        Pedido::STATUS_CONFIRMADO => 'bg-emerald-50 text-emerald-700',
+                                        Pedido::STATUS_CANCELADO => 'bg-red-50 text-red-700',
+                                        default => 'bg-amber-50 text-amber-700',
+                                    } }}">
                                     {{ $pedido->status }}
                                 </span>
                                 @if ($pedido->package)

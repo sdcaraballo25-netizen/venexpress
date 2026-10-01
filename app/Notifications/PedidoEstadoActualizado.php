@@ -46,7 +46,16 @@ class PedidoEstadoActualizado extends Notification implements ShouldQueue
             ->subject("Tu pedido #{$pedido->id} — Venexpress")
             ->greeting('¡Hola!');
 
-        if ($this->status === Pedido::STATUS_PAGADO) {
+        if ($this->status === Pedido::STATUS_CANCELADO) {
+            $mail->subject("Tu pedido #{$pedido->id} fue cancelado — Venexpress")
+                ->line("{$pedido->emprendedor->business_name} canceló tu pedido #{$pedido->id}.");
+
+            if ($pedido->motivo_cancelacion) {
+                $mail->line("Motivo: {$pedido->motivo_cancelacion}");
+            }
+
+            $mail->line('Si ya habías pagado, acuerda el reembolso directamente con el vendedor por el chat del pedido.');
+        } elseif ($this->status === Pedido::STATUS_PAGADO) {
             $mail->line(
                 "{$pedido->emprendedor->business_name} confirmó que recibió tu pago del pedido #{$pedido->id}. "
                 .'Pronto llevará el paquete a la agencia para generar la guía de envío.'

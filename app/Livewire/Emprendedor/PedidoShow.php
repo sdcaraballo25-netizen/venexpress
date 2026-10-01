@@ -30,6 +30,10 @@ class PedidoShow extends Component
 
     public ?string $successMessage = null;
 
+    public bool $showCancelar = false;
+
+    public string $motivoCancelacion = '';
+
     public function mount(int $pedidoId): void
     {
         $this->pedido = Pedido::where('emprendedor_id', Auth::user()->emprendedor->id)
@@ -80,6 +84,36 @@ class PedidoShow extends Component
         } catch (RuntimeException $e) {
             $this->errorMessage = $e->getMessage();
         }
+    }
+
+    /**
+     * El emprendedor puede cancelar mientras el pedido está PENDIENTE o
+     * PAGADO (si estaba pagado se le devuelve el stock). El motivo es
+     * obligatorio: se le muestra al comprador en el chat y por correo.
+     */
+    public function cancelar(PedidoService $pedidoService): void
+    {
+        $this->successMessage = null;
+        $this->errorMessage = null;
+
+        $this->validate([
+            'motivoCancelacion' => ['required', 'string', 'min:5', 'max:500'],
+        ], [
+            'motivoCancelacion.required' => 'Indica el motivo: el comprador lo verá.',
+            'motivoCancelacion.min' => 'Describe el motivo con un poco más de detalle.',
+        ]);
+
+        try {
+            $pedidoService->cancelar($this->pedido, Pedido::CANCELADO_POR_EMPRENDEDOR, $this->motivoCancelacion);
+
+            $this->successMessage = 'Pedido cancelado. Le avisamos al comprador.';
+            $this->showCancelar = false;
+            $this->motivoCancelacion = '';
+        } catch (RuntimeException $e) {
+            $this->errorMessage = $e->getMessage();
+        }
+
+        $this->pedido->refresh();
     }
 
     public function render()
