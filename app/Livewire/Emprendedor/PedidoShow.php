@@ -57,7 +57,7 @@ class PedidoShow extends Component
         ];
 
         if ($this->archivo) {
-            $data['archivo_path'] = $this->archivo->store('mensajes-pedido', 'public');
+            $data['archivo_path'] = $this->archivo->store('mensajes-pedido', 'documents');
             $data['archivo_nombre'] = $this->archivo->getClientOriginalName();
         }
 

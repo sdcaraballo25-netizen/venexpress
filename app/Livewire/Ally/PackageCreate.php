@@ -690,6 +690,14 @@ class PackageCreate extends Component
     protected function syncCustomer(string $idDoc, string $name, ?string $phone, ?string $email): void
     {
         $customer = Customer::firstOrNew(['id_doc' => $idDoc]);
+
+        // Si esa cédula ya pertenece a una cuenta de cliente
+        // registrada, sus datos los administra el propio cliente desde
+        // su perfil: taquilla no debe poder reescribirlos.
+        if ($customer->exists && $customer->user_id !== null) {
+            return;
+        }
+
         $customer->name = $name;
         $customer->phone = $phone;
 

@@ -15,6 +15,8 @@ use Livewire\Form;
 
 class LoginForm extends Form
 {
+    protected const LOCKOUT_EMAIL_COOLDOWN_SECONDS = 3600;
+
     /**
      * Acepta un correo o un "usuario" simple (ej. "taquilla1") — las
      * cuentas de Taquilla no tienen un correo real que el Aliado
@@ -94,23 +96,29 @@ class LoginForm extends Form
      * contraseña" — un token aleatorio de un solo uso, hasheado en
      * la base de datos, que expira).
      *
-     * Cache::add() garantiza un solo envío por ventana de bloqueo
-     * (60s, igual que el decay de RateLimiter::hit() en authenticate()),
-     * aunque el usuario siga reintentando mientras sigue bloqueado.
+     * Cache::add() garantiza como mucho un envío por cuenta por hora
+     * (LOCKOUT_EMAIL_COOLDOWN_SECONDS), aunque se siga reintentando
+     * desde una o varias IPs.
      */
     protected function sendRecoveryEmailOnLockout(): void
     {
-        if (! Cache::add('login-lockout-email:'.$this->throttleKey(), true, 60)) {
-            return;
-        }
-
         $field = str_contains($this->email, '@') ? 'email' : 'username';
 
         $user = User::where($field, $this->email)->first();
 
-        if ($user?->email) {
-            Password::sendResetLink(['email' => $user->email]);
+        if (! $user?->email) {
+            return;
         }
+
+        // Como mucho un correo por CUENTA por hora. Antes la clave
+        // incluía la IP (throttleKey()), así que alguien rotando IPs
+        // podía forzar fallos de login y llenar de correos de
+        // recuperación el buzón de cualquier usuario.
+        if (! Cache::add('login-lockout-email:user:'.$user->id, true, self::LOCKOUT_EMAIL_COOLDOWN_SECONDS)) {
+            return;
+        }
+
+        Password::sendResetLink(['email' => $user->email]);
     }
 
     /**

@@ -8,6 +8,7 @@ use App\Models\CityDistance;
 use App\Models\Customer;
 use App\Models\Package;
 use App\Models\RateMatrix;
+use App\Models\User;
 use App\Notifications\PackageCreated;
 use Illuminate\Foundation\Testing\RefreshDatabase;
 use Illuminate\Support\Facades\Http;
@@ -146,5 +147,37 @@ class PackageCreateEmailNotificationTest extends TestCase
                 return $notifiable->routes['mail'] === 'maria.gomez@example.com';
             }
         );
+    }
+
+    /**
+     * Un Customer reclamado por una cuenta de cliente (user_id) lo
+     * administra su dueño: taquilla no debe reescribir su nombre ni
+     * su teléfono al registrar una guía.
+     */
+    public function test_registering_a_package_does_not_overwrite_a_registered_clients_data(): void
+    {
+        $ally = $this->createAlly(['city' => 'Caracas', 'state' => 'Distrito Capital']);
+        $clientUser = User::factory()->create(['role' => User::ROLE_CLIENTE]);
+
+        Customer::create([
+            'id_doc' => 'V-87654321',
+            'user_id' => $clientUser->id,
+            'name' => 'María Gómez (su cuenta)',
+            'phone' => '0412-0000000',
+            'email' => 'maria.real@example.com',
+        ]);
+
+        $this->fillRequiredFields(Livewire::actingAs($ally->user)->test(PackageCreate::class))
+            ->set('sender_email', 'juan.perez@example.com')
+            ->set('recipient_name', 'Nombre Distinto')
+            ->set('recipient_phone', '0424-9999999')
+            ->call('save')
+            ->assertHasNoErrors();
+
+        $customer = Customer::where('id_doc', 'V-87654321')->first();
+
+        $this->assertSame('María Gómez (su cuenta)', $customer->name);
+        $this->assertSame('0412-0000000', $customer->phone);
+        $this->assertSame($clientUser->id, $customer->user_id);
     }
 }

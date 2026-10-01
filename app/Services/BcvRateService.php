@@ -135,6 +135,30 @@ class BcvRateService
             if ($diff < 0.005) {
                 return null;
             }
+
+            // Si la API devuelve un valor absurdo (error de la fuente,
+            // cambio de formato, decimales corridos), todos los precios
+            // se calcularían con él sin que nadie lo note. Un salto
+            // mayor al umbral no se guarda solo: falla la sincronización
+            // (bcv:sync avisa por correo a los admins) y un admin
+            // confirma la tasa a mano en el panel de Tasa BCV.
+            $maxChangePercent = (float) config('services.bcv_api.max_change_percent', 30);
+            $currentRate = (float) $current->rate;
+
+            if ($maxChangePercent > 0 && $currentRate > 0) {
+                $changePercent = $diff / $currentRate * 100;
+
+                if ($changePercent > $maxChangePercent) {
+                    throw new RuntimeException(sprintf(
+                        'La API BCV devolvió %s VES/USD, un cambio de %.1f%% frente a la tasa vigente (%s). '
+                        .'Supera el máximo automático de %s%%: verifica la tasa oficial y cárgala a mano.',
+                        number_format((float) $data['rate'], 4, '.', ''),
+                        $changePercent,
+                        number_format($currentRate, 4, '.', ''),
+                        rtrim(rtrim(number_format($maxChangePercent, 2, '.', ''), '0'), '.'),
+                    ));
+                }
+            }
         }
 
         return BcvRate::create([

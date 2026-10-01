@@ -50,7 +50,11 @@ return [
     |
     */
 
-    'expiration' => null,
+    // Minutos. Los tokens de la app del repartidor antes no vencían
+    // nunca; ahora duran 30 días por defecto (la app vuelve a pedir
+    // el login al recibir un 401). Se limpian con sanctum:prune-expired
+    // (routes/console.php).
+    'expiration' => env('SANCTUM_TOKEN_EXPIRATION_MINUTES', 60 * 24 * 30),
 
     /*
     |--------------------------------------------------------------------------

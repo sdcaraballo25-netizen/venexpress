@@ -433,6 +433,12 @@ Route::get('/tienda/emprendedor/{emprendedor}', Marketplace::class)
 Route::get('/tienda/pedido/{token}', PedidoChat::class)
     ->name('public.marketplace.pedido');
 
+// Adjuntos del chat (comprobantes de pago): privados, solo con el
+// chat_token del pedido. Ver DocumentPhotoController::pedidoAttachment().
+Route::get('/tienda/pedido/{token}/adjuntos/{mensaje}', [DocumentPhotoController::class, 'pedidoAttachment'])
+    ->middleware('throttle:60,1')
+    ->name('public.marketplace.pedido.attachment');
+
 /*
 |--------------------------------------------------------------------------
 | Rastreo público

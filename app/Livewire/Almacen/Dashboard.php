@@ -9,7 +9,6 @@ use App\Models\Warehouse;
 use App\Services\DeliveryAssignmentService;
 use App\Services\DestinationReceptionService;
 use App\Services\PackageService;
-use App\Models\PackageHistory;
 use Illuminate\Support\Facades\Auth;
 use Livewire\Attributes\Computed;
 use Livewire\Attributes\Layout;
@@ -262,15 +261,15 @@ class Dashboard extends Component
                 throw new RuntimeException('El documento del receptor no coincide.');
             }
 
-            $this->dispatchPackage = $packageService->changeStatus(
+            // completeAgencyPickup() (no changeStatus()) también registra
+            // el cobro COD y delivery_completed_at, igual que en
+            // Ally\PackagePickup.
+            $this->dispatchPackage = $packageService->completeAgencyPickup(
                 $package,
-                Package::STATUS_ENTREGADO,
                 (int) Auth::id(),
+                $this->recipientIdDoc,
                 'Retiro confirmado en almacén '.($warehouse?->name ?? ''),
-                null,
-                PackageHistory::EVENT_ENTREGA,
                 'Almacén '.($warehouse?->name ?? ''),
-                'Destinatario',
             );
 
             $this->dispatchSuccess = 'Retiro confirmado. El paquete quedó ENTREGADO.';

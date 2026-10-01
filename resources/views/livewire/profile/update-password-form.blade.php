@@ -115,6 +115,10 @@ new class extends Component
 
         $user->clearPasswordChangeCode();
 
+        // Cambiar la contraseña cierra también las sesiones de la app
+        // del repartidor (tokens emitidos con la contraseña anterior).
+        $user->tokens()->delete();
+
         $this->reset('code', 'password', 'password_confirmation');
         $this->step = 'request';
 

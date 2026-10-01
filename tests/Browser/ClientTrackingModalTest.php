@@ -3,7 +3,7 @@
 namespace Tests\Browser;
 
 use App\Models\User;
-use Illuminate\Foundation\Testing\DatabaseMigrations;
+use Illuminate\Foundation\Testing\DatabaseTruncation;
 use Laravel\Dusk\Browser;
 use Tests\DuskTestCase;
 
@@ -18,7 +18,9 @@ use Tests\DuskTestCase;
  */
 class ClientTrackingModalTest extends DuskTestCase
 {
-    use DatabaseMigrations;
+    // DatabaseTruncation (no DatabaseMigrations): no depende de que
+    // cada down() de las migraciones funcione en SQLite al revertir.
+    use DatabaseTruncation;
 
     public function test_the_sidebar_and_the_tracking_modal_work(): void
     {

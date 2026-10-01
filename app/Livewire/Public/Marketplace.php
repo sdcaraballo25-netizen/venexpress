@@ -15,7 +15,9 @@ use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Log;
 use Illuminate\Support\Facades\Notification;
+use Illuminate\Support\Facades\RateLimiter;
 use Illuminate\Support\Str;
+use Livewire\Attributes\Locked;
 use Livewire\Attributes\Url;
 use Livewire\Component;
 use Livewire\WithPagination;
@@ -39,6 +41,10 @@ class Marketplace extends Component
     use ResolvesLayoutForViewer;
     use WithPagination;
 
+    protected const MAX_PEDIDOS_POR_VENTANA = 5;
+
+    protected const VENTANA_PEDIDOS_SEGUNDOS = 600;
+
     public ?int $viewingProductoId = null;
 
     /**
@@ -49,8 +55,18 @@ class Marketplace extends Component
      */
     public ?Emprendedor $tiendaEmprendedor = null;
 
+    /**
+     * #[Locked]: solo comprarProducto() puede fijarlos (tras validar
+     * disponibilidad y cantidad). Sin esto, una petición manipulada
+     * podía cambiarlos directamente y crear un pedido con cantidad
+     * negativa (precio negativo, y al marcarlo pagado el stock
+     * SUBÍA) o de un producto inactivo/sin stock/de una tienda
+     * suspendida.
+     */
+    #[Locked]
     public ?int $productoComprarId = null;
 
+    #[Locked]
     public int $cantidadComprar = 1;
 
     public bool $showCheckout = false;
@@ -183,14 +199,27 @@ class Marketplace extends Component
     |--------------------------------------------------------------------------
     */
 
+    /**
+     * Productos que se pueden ver y comprar: activos, con stock y de
+     * un emprendedor que puede operar (activo y verificado). Misma
+     * regla que el listado de render(), aplicada también al detalle,
+     * a comprarProducto() y a confirmarPedido().
+     */
+    protected function productosDisponibles()
+    {
+        return Producto::query()
+            ->where('activo', true)
+            ->where('stock', '>', 0)
+            ->whereHas('emprendedor', fn ($query) => $query
+                ->where('status', Emprendedor::STATUS_ACTIVE)
+                ->where('verification_status', Emprendedor::VERIFICATION_VERIFIED));
+    }
+
     public function comprarProducto(int $productoId, int $cantidad = 1): void
     {
         $this->compraError = null;
 
-        $producto = Producto::query()
-            ->where('activo', true)
-            ->where('stock', '>', 0)
-            ->find($productoId);
+        $producto = $this->productosDisponibles()->find($productoId);
 
         if (! $producto) {
             $this->compraError = 'Este producto ya no está disponible.';
@@ -230,9 +259,9 @@ class Marketplace extends Component
             return null;
         }
 
-        $producto = Producto::find($this->productoComprarId);
+        $producto = $this->productosDisponibles()->find($this->productoComprarId);
 
-        if (! $producto) {
+        if (! $producto || $this->cantidadComprar < 1) {
             return null;
         }
 
@@ -271,6 +300,21 @@ class Marketplace extends Component
 
             return;
         }
+
+        // El checkout es público (sin cuenta) y cada pedido envía un
+        // correo al emprendedor: sin un límite, cualquiera podía crear
+        // pedidos falsos en masa y llenar de correos a los vendedores.
+        $rateLimitKey = 'marketplace-pedido|'.request()->ip();
+
+        if (RateLimiter::tooManyAttempts($rateLimitKey, self::MAX_PEDIDOS_POR_VENTANA)) {
+            $minutes = (int) ceil(RateLimiter::availableIn($rateLimitKey) / 60);
+            $this->compraError = "Registraste demasiados pedidos seguidos. Intenta de nuevo en {$minutes} minuto(s).";
+            $this->showCheckout = false;
+
+            return;
+        }
+
+        RateLimiter::hit($rateLimitKey, self::VENTANA_PEDIDOS_SEGUNDOS);
 
         $pedido = DB::transaction(function () use ($linea) {
             $pedido = Pedido::create([
@@ -338,12 +382,7 @@ class Marketplace extends Component
 
     public function render()
     {
-        $productos = Producto::query()
-            ->where('activo', true)
-            ->where('stock', '>', 0)
-            ->whereHas('emprendedor', fn ($query) => $query
-                ->where('status', Emprendedor::STATUS_ACTIVE)
-                ->where('verification_status', Emprendedor::VERIFICATION_VERIFIED))
+        $productos = $this->productosDisponibles()
             ->when(
                 $this->tiendaEmprendedor,
                 fn ($query) => $query->where('emprendedor_id', $this->tiendaEmprendedor->id)
@@ -367,7 +406,7 @@ class Marketplace extends Component
             ->paginate(12);
 
         $productoViendo = $this->viewingProductoId
-            ? Producto::with(['emprendedor', 'fotos'])->withAvg('resenas', 'estrellas')->withCount('resenas')->find($this->viewingProductoId)
+            ? $this->productosDisponibles()->with(['emprendedor', 'fotos'])->withAvg('resenas', 'estrellas')->withCount('resenas')->find($this->viewingProductoId)
             : null;
 
         return view('public.marketplace', [

@@ -5,6 +5,7 @@ namespace App\Http\Controllers;
 use App\Models\Ally;
 use App\Models\Driver;
 use App\Models\Emprendedor;
+use App\Models\MensajePedido;
 use App\Models\Package;
 use App\Models\User;
 use Illuminate\Http\Request;
@@ -142,6 +143,40 @@ class DocumentPhotoController extends Controller
     /**
      * Administradores o el propio Aliado dueño del documento.
      */
+    /**
+     * Adjunto del chat de un pedido del marketplace (comprobante de
+     * pago, foto de guía, etc.). Lo pueden ver quienes ya tienen
+     * acceso al chat: el chat_token del pedido funciona como la
+     * credencial, igual que en public.marketplace.pedido (el comprador
+     * no necesita cuenta). Antes estos archivos vivían en el disco
+     * "public", accesibles sin ninguna verificación.
+     */
+    public function pedidoAttachment(string $token, MensajePedido $mensaje): StreamedResponse
+    {
+        $pedido = $mensaje->pedido;
+
+        if (! $pedido || ! is_string($pedido->chat_token) || ! hash_equals($pedido->chat_token, $token)) {
+            abort(404);
+        }
+
+        $path = $mensaje->archivo_path;
+
+        if (! $path) {
+            abort(404);
+        }
+
+        // Adjuntos subidos antes del cambio siguen en el disco
+        // "public" hasta que se corra `php artisan
+        // venexpress:move-chat-attachments`; se sirven igual desde aquí.
+        foreach (['documents', 'public'] as $disk) {
+            if (Storage::disk($disk)->exists($path)) {
+                return Storage::disk($disk)->response($path, $mensaje->archivo_nombre);
+            }
+        }
+
+        abort(404);
+    }
+
     protected function authorizeAllyDocument(?User $user, Ally $ally): void
     {
         if (! $user) {

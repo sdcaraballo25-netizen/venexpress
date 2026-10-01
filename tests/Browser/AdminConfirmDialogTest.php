@@ -4,7 +4,7 @@ namespace Tests\Browser;
 
 use App\Models\Recommendation;
 use App\Models\User;
-use Illuminate\Foundation\Testing\DatabaseMigrations;
+use Illuminate\Foundation\Testing\DatabaseTruncation;
 use Laravel\Dusk\Browser;
 use Tests\DuskTestCase;
 
@@ -17,7 +17,9 @@ use Tests\DuskTestCase;
  */
 class AdminConfirmDialogTest extends DuskTestCase
 {
-    use DatabaseMigrations;
+    // DatabaseTruncation (no DatabaseMigrations): no depende de que
+    // cada down() de las migraciones funcione en SQLite al revertir.
+    use DatabaseTruncation;
 
     public function test_admin_can_archive_a_recommendation_through_the_confirm_dialog(): void
     {

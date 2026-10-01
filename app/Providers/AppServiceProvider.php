@@ -2,10 +2,15 @@
 
 namespace App\Providers;
 
+use App\Http\Middleware\EnsureAccountIsApproved;
+use App\Http\Middleware\EnsureAccountIsVerified;
+use App\Http\Middleware\EnsureUserHasRole;
 use App\Models\Package;
 use App\Observers\PackageObserver;
+use Illuminate\Http\Middleware\TrustProxies;
 use Illuminate\Support\Facades\Log;
 use Illuminate\Support\ServiceProvider;
+use Livewire\Livewire;
 
 class AppServiceProvider extends ServiceProvider
 {
@@ -21,6 +26,35 @@ class AppServiceProvider extends ServiceProvider
         );
 
         $this->warnIfNotificationsAreNotReallySent();
+
+        $this->configureTrustedProxies();
+
+        // Livewire solo vuelve a aplicar en cada acción (wire:click,
+        // etc.) los middleware marcados como persistentes. Sin esto,
+        // un usuario desactivado, suspendido o al que se le cambió el
+        // rol seguía ejecutando acciones desde una pestaña ya abierta
+        // hasta que vencía su sesión (24 h).
+        Livewire::addPersistentMiddleware([
+            EnsureUserHasRole::class,
+            EnsureAccountIsApproved::class,
+            EnsureAccountIsVerified::class,
+        ]);
+    }
+
+    /**
+     * Ver config/app.php 'trusted_proxies'.
+     */
+    private function configureTrustedProxies(): void
+    {
+        $proxies = config('app.trusted_proxies');
+
+        if (blank($proxies)) {
+            return;
+        }
+
+        TrustProxies::at(
+            $proxies === '*' ? '*' : array_map('trim', explode(',', $proxies))
+        );
     }
 
     /**

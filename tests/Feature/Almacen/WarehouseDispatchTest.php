@@ -86,6 +86,38 @@ class WarehouseDispatchTest extends TestCase
         $this->assertSame(Package::STATUS_ENTREGADO, $package->fresh()->current_status);
     }
 
+    public function test_warehouse_pickup_of_a_cod_package_records_the_collection(): void
+    {
+        $warehouse = Warehouse::factory()->create(['city' => 'Valencia', 'state' => 'Carabobo']);
+        $almacenUser = $this->createWarehouseUser($warehouse);
+        $ally = $this->createAlly();
+
+        $package = $this->createPackage($ally, [
+            'destination_city' => 'Valencia',
+            'destination_state' => 'Carabobo',
+            'current_status' => Package::STATUS_LISTO_RETIRO,
+            'requires_delivery' => false,
+            'recipient_id_doc' => 'V-87654321',
+            'is_cod' => true,
+            'cod_amount_usd' => 10.00,
+            'cod_status' => Package::COD_PENDIENTE,
+        ]);
+
+        Livewire::actingAs($almacenUser)
+            ->test(Dashboard::class)
+            ->set('dispatchTrackingNumber', $package->tracking_number)
+            ->call('searchDispatch')
+            ->set('recipientIdDoc', 'V-87654321')
+            ->call('deliverToClient')
+            ->assertSet('dispatchError', null);
+
+        $package->refresh();
+
+        $this->assertSame(Package::STATUS_ENTREGADO, $package->current_status);
+        $this->assertNotNull($package->cod_collected_at);
+        $this->assertNotNull($package->delivery_completed_at);
+    }
+
     public function test_warehouse_cannot_deliver_to_client_with_wrong_id_doc(): void
     {
         $warehouse = Warehouse::factory()->create(['city' => 'Valencia', 'state' => 'Carabobo']);

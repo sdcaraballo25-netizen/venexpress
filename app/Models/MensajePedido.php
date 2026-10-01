@@ -31,6 +31,24 @@ class MensajePedido extends Model
         return $this->belongsTo(Pedido::class);
     }
 
+    /**
+     * URL autenticada del adjunto. Los adjuntos (comprobantes de pago,
+     * guías) ya no viven en el disco "public" — se sirven a través de
+     * DocumentPhotoController::pedidoAttachment(), que exige el
+     * chat_token del pedido, igual que la página del chat.
+     */
+    public function archivoUrl(string $chatToken): ?string
+    {
+        if (! $this->archivo_path) {
+            return null;
+        }
+
+        return route('public.marketplace.pedido.attachment', [
+            'token' => $chatToken,
+            'mensaje' => $this->id,
+        ]);
+    }
+
     public function esImagen(): bool
     {
         if (! $this->archivo_path) {

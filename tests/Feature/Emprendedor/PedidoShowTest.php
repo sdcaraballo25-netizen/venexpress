@@ -106,6 +106,7 @@ class PedidoShowTest extends TestCase
     public function test_an_emprendedor_can_attach_a_file_to_a_message(): void
     {
         Storage::fake('public');
+        Storage::fake('documents');
 
         $emprendedor = $this->createEmprendedor();
         $pedido = $this->createPedidoFor($emprendedor);
@@ -124,7 +125,8 @@ class PedidoShowTest extends TestCase
         $this->assertSame('guia.pdf', $mensaje->archivo_nombre);
         $this->assertFalse($mensaje->esImagen());
 
-        Storage::disk('public')->assertExists($mensaje->archivo_path);
+        Storage::disk('documents')->assertExists($mensaje->archivo_path);
+        Storage::disk('public')->assertMissing($mensaje->archivo_path);
     }
 
     public function test_an_emprendedor_cannot_view_another_emprendedors_pedido(): void

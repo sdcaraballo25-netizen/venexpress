@@ -50,6 +50,11 @@ class PedidoService
             $items = $locked->items()->with('producto')->get();
 
             foreach ($items as $item) {
+                // Una cantidad < 1 haría que decrement() SUMARA stock.
+                if ((int) $item->cantidad < 1) {
+                    throw new RuntimeException('Este pedido tiene una cantidad inválida y no puede confirmarse.');
+                }
+
                 $producto = Producto::whereKey($item->producto_id)->lockForUpdate()->firstOrFail();
 
                 if ($producto->stock < $item->cantidad) {

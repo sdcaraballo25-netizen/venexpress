@@ -16,6 +16,11 @@ return [
         // — bastante margen sobre una falla puntual, pero sin dejar
         // que el sistema siga cotizando con una tasa vieja por días.
         'max_age_hours' => env('BCV_MAX_RATE_AGE_HOURS', 48),
+
+        // Variación máxima (en %) que bcv:sync acepta sola frente a la
+        // tasa vigente. Un salto mayor no se guarda: se avisa a los
+        // admins para que la confirmen a mano. 0 = sin límite.
+        'max_change_percent' => env('BCV_MAX_RATE_CHANGE_PERCENT', 30),
     ],
 
     'google_maps' => [
