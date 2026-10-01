@@ -28,16 +28,15 @@ class PaymentWebhookController extends Controller
         Request $request,
         PaymentOrder $paymentOrder
     ): JsonResponse {
-        if (
-            ! in_array(
-                $request->user()?->role,
-                [
-                    'admin_principal',
-                    'admin_operativo',
-                ],
-                true
-            )
-        ) {
+        // Concilia un pago sin verificarlo contra el banco: nunca debe
+        // estar disponible en producción (ahí solo un webhook
+        // autenticado o una consulta al banco pueden confirmar pagos),
+        // y fuera de producción solo para el Administrador Principal.
+        if (app()->environment('production')) {
+            abort(404);
+        }
+
+        if (! $request->user()?->isAdminPrincipal()) {
             abort(403);
         }
 

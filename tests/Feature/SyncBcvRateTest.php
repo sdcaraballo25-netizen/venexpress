@@ -2,8 +2,10 @@
 
 namespace Tests\Feature;
 
+use App\Models\BcvRate;
 use App\Models\User;
 use App\Notifications\BcvRateSyncFailed;
+use Illuminate\Console\Scheduling\Schedule;
 use Illuminate\Foundation\Testing\RefreshDatabase;
 use Illuminate\Support\Facades\Cache;
 use Illuminate\Support\Facades\Http;
@@ -93,5 +95,63 @@ class SyncBcvRateTest extends TestCase
         $this->artisan('bcv:sync')->assertExitCode(0);
 
         Notification::assertNothingSent();
+    }
+
+    public function test_an_implausible_jump_from_the_api_is_not_saved_and_admins_are_notified(): void
+    {
+        Notification::fake();
+
+        $admin = $this->createAdmin();
+
+        BcvRate::create([
+            'rate' => 40.00,
+            'effective_date' => now()->toDateString(),
+            'effective_at' => now()->subHour(),
+            'source' => 'BCV',
+        ]);
+
+        // Ej. decimales corridos en la fuente: 400 en vez de 40.
+        Http::fake([
+            config('services.bcv_api.url') => Http::response([
+                'promedio' => 400.00,
+                'fechaActualizacion' => now()->toIso8601String(),
+                'fuente' => 'BCV',
+            ], 200),
+        ]);
+
+        $this->artisan('bcv:sync')->assertExitCode(1);
+
+        $this->assertSame(1, BcvRate::count());
+        Notification::assertSentTo($admin, BcvRateSyncFailed::class);
+    }
+
+    public function test_a_normal_daily_change_is_still_saved_automatically(): void
+    {
+        BcvRate::create([
+            'rate' => 40.00,
+            'effective_date' => now()->toDateString(),
+            'effective_at' => now()->subHour(),
+            'source' => 'BCV',
+        ]);
+
+        Http::fake([
+            config('services.bcv_api.url') => Http::response([
+                'promedio' => 41.20,
+                'fechaActualizacion' => now()->toIso8601String(),
+                'fuente' => 'BCV',
+            ], 200),
+        ]);
+
+        $this->artisan('bcv:sync')->assertExitCode(0);
+
+        $this->assertSame(2, BcvRate::count());
+    }
+
+    public function test_bcv_sync_is_scheduled_only_once(): void
+    {
+        $events = collect(app(Schedule::class)->events())
+            ->filter(fn ($event) => str_contains((string) $event->command, 'bcv:sync'));
+
+        $this->assertCount(1, $events);
     }
 }

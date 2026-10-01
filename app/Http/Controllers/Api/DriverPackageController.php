@@ -231,8 +231,10 @@ class DriverPackageController extends Controller
             default => null,
         };
 
+        // Acotado: sin límite, ?per_page=100000 devolvía toda la tabla
+        // de un solo golpe.
         $paginated = $query->paginate(
-            (int) $request->query('per_page', 15)
+            min(max((int) $request->query('per_page', 15), 1), 50)
         );
 
         return response()->json([

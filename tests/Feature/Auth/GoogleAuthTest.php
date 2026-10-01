@@ -6,6 +6,7 @@ use App\Models\User;
 use Illuminate\Foundation\Testing\RefreshDatabase;
 use Laravel\Socialite\Contracts\Provider;
 use Laravel\Socialite\Facades\Socialite;
+use Laravel\Socialite\Two\InvalidStateException;
 use Laravel\Socialite\Two\User as SocialiteUser;
 use Livewire\Volt\Volt;
 use Mockery;
@@ -15,16 +16,16 @@ class GoogleAuthTest extends TestCase
 {
     use RefreshDatabase;
 
-    private function fakeGoogleCallback(string $email, string $googleId = 'google-123', string $name = 'Google Person'): void
+    private function fakeGoogleCallback(string $email, string $googleId = 'google-123', string $name = 'Google Person', array $extra = []): void
     {
-        $socialiteUser = SocialiteUser::fake([
+        $socialiteUser = SocialiteUser::fake(array_merge([
             'id' => $googleId,
             'name' => $name,
             'email' => $email,
-        ]);
+        ], $extra));
 
         $provider = Mockery::mock(Provider::class);
-        $provider->shouldReceive('stateless')->once()->andReturnSelf();
+        $provider->shouldNotReceive('stateless');
         $provider->shouldReceive('user')->once()->andReturn($socialiteUser);
 
         Socialite::shouldReceive('driver')->once()->with('google')->andReturn($provider);
@@ -176,6 +177,105 @@ class GoogleAuthTest extends TestCase
         $response = $this->get(route('auth.google.callback', ['error' => 'access_denied']));
 
         $response->assertRedirect(route('login'));
+
+        $this->assertGuest();
+    }
+
+    public function test_a_client_registered_through_google_can_actually_open_their_dashboard(): void
+    {
+        session([
+            'google_pending' => [
+                'google_id' => 'google-dash',
+                'name' => 'Cliente Google',
+                'email' => 'cliente-google@example.com',
+            ],
+        ]);
+
+        Volt::test('pages.auth.register')
+            ->set('id_doc', 'V-22223333')
+            ->set('phone', '+58 412 1234567')
+            ->call('register')
+            ->assertRedirect('/cliente/dashboard');
+
+        $user = User::where('email', 'cliente-google@example.com')->firstOrFail();
+
+        $this->assertTrue($user->isAccountVerified());
+
+        // Antes EnsureAccountIsVerified lo mandaba a /verify-account.
+        $this->actingAs($user)->get('/cliente/dashboard')->assertOk();
+    }
+
+    public function test_an_inactive_account_cannot_log_in_through_google(): void
+    {
+        User::factory()->create([
+            'email' => 'inactivo@example.com',
+            'role' => User::ROLE_CLIENTE,
+            'status' => User::STATUS_INACTIVE,
+        ]);
+
+        $this->fakeGoogleCallback('inactivo@example.com', 'google-inactivo');
+
+        $this->get(route('auth.google.callback'))->assertRedirect(route('login'));
+
+        $this->assertGuest();
+    }
+
+    public function test_an_emprendedor_is_sent_to_their_own_dashboard(): void
+    {
+        User::factory()->create([
+            'email' => 'emprendedor@example.com',
+            'role' => User::ROLE_EMPRENDEDOR,
+            'status' => User::STATUS_ACTIVE,
+        ]);
+
+        $this->fakeGoogleCallback('emprendedor@example.com', 'google-emp');
+
+        $this->get(route('auth.google.callback'))->assertRedirect(route('emprendedor.dashboard'));
+    }
+
+    public function test_an_unverified_google_email_cannot_take_over_an_existing_account(): void
+    {
+        $user = User::factory()->create([
+            'email' => 'victima@example.com',
+            'role' => User::ROLE_CLIENTE,
+            'status' => User::STATUS_ACTIVE,
+            'google_id' => null,
+        ]);
+
+        $this->fakeGoogleCallback('victima@example.com', 'google-atacante', 'X', ['email_verified' => false]);
+
+        $this->get(route('auth.google.callback'))->assertRedirect(route('login'));
+
+        $this->assertGuest();
+        $this->assertNull($user->fresh()->google_id);
+    }
+
+    public function test_a_client_who_never_entered_the_code_is_verified_by_logging_in_with_google(): void
+    {
+        $user = User::factory()->create([
+            'email' => 'sin-codigo@example.com',
+            'role' => User::ROLE_CLIENTE,
+            'status' => User::STATUS_ACTIVE,
+        ]);
+
+        $this->assertFalse($user->isAccountVerified());
+
+        $this->fakeGoogleCallback('sin-codigo@example.com', 'google-sin-codigo');
+
+        $this->get(route('auth.google.callback'))->assertRedirect(route('cliente.dashboard'));
+
+        $this->assertTrue($user->fresh()->isAccountVerified());
+    }
+
+    public function test_an_invalid_oauth_state_redirects_to_login_instead_of_crashing(): void
+    {
+        $provider = Mockery::mock(Provider::class);
+        $provider->shouldReceive('user')->once()->andThrow(new InvalidStateException);
+
+        Socialite::shouldReceive('driver')->once()->with('google')->andReturn($provider);
+
+        $this->get(route('auth.google.callback', ['code' => 'x', 'state' => 'forjado']))
+            ->assertRedirect(route('login'));
 
         $this->assertGuest();
     }

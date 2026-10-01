@@ -457,6 +457,13 @@ class UsersManager extends Component
         DB::transaction(function () use ($actor, $target, $data, $driverData, $previousDriverType) {
             $target->update($data);
 
+            // Si un Admin restablece la contraseña (p. ej. porque la
+            // cuenta estaba comprometida), los tokens de la app
+            // emitidos con la contraseña anterior dejan de servir.
+            if (isset($data['password'])) {
+                $target->tokens()->delete();
+            }
+
             $metadata = [
                 'fields' => array_keys($data),
             ];
@@ -515,20 +522,35 @@ class UsersManager extends Component
                 'status' => $newStatus,
             ]);
 
-            if ($target->isRepartidor()) {
-                $target->driver?->update([
-                    'status' => $newStatus === User::STATUS_ACTIVE
-                            ? Driver::STATUS_ACTIVE
-                            : Driver::STATUS_SUSPENDED,
-                ]);
+            // Solo se alterna ACTIVO <-> SUSPENDIDO. Antes desactivar y
+            // reactivar a un repartidor/aliado PENDIENTE o RECHAZADO lo
+            // dejaba ACTIVO, saltándose la aprobación del Admin.
+            $reactivating = $newStatus === User::STATUS_ACTIVE;
+
+            if ($target->isRepartidor() && $target->driver) {
+                $from = $reactivating ? Driver::STATUS_SUSPENDED : Driver::STATUS_ACTIVE;
+
+                if ($target->driver->status === $from) {
+                    $target->driver->update([
+                        'status' => $reactivating ? Driver::STATUS_ACTIVE : Driver::STATUS_SUSPENDED,
+                    ]);
+                }
             }
 
-            if ($target->isAliado()) {
-                $target->ally?->update([
-                    'status' => $newStatus === User::STATUS_ACTIVE
-                            ? Ally::STATUS_ACTIVE
-                            : Ally::STATUS_SUSPENDED,
-                ]);
+            if ($target->isAliado() && $target->ally) {
+                $from = $reactivating ? Ally::STATUS_SUSPENDED : Ally::STATUS_ACTIVE;
+
+                if ($target->ally->status === $from) {
+                    $target->ally->update([
+                        'status' => $reactivating ? Ally::STATUS_ACTIVE : Ally::STATUS_SUSPENDED,
+                    ]);
+                }
+            }
+
+            // Un usuario desactivado no debe conservar tokens de la
+            // app del repartidor ya emitidos.
+            if (! $reactivating) {
+                $target->tokens()->delete();
             }
         });
 

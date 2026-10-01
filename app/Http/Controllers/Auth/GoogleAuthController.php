@@ -9,6 +9,7 @@ use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Session;
 use Laravel\Socialite\Facades\Socialite;
+use Laravel\Socialite\Two\InvalidStateException;
 
 /**
  * "Continuar con Google" para login y registro.
@@ -40,7 +41,30 @@ class GoogleAuthController extends Controller
             ]);
         }
 
-        $googleUser = Socialite::driver('google')->stateless()->user();
+        // Sin stateless(): Socialite valida el parámetro "state" contra
+        // la sesión, lo que impide que un atacante complete el login
+        // con SU cuenta de Google en el navegador de otra persona
+        // (login CSRF).
+        try {
+            $googleUser = Socialite::driver('google')->user();
+        } catch (InvalidStateException) {
+            return redirect()->route('login')->withErrors([
+                'form.email' => 'La sesión con Google expiró. Inténtalo de nuevo.',
+            ]);
+        }
+
+        // Google marca si el correo está verificado. Un correo no
+        // verificado no prueba que la persona sea dueña de esa
+        // dirección, así que no debe abrir ni vincular una cuenta
+        // existente con ese mismo correo.
+        $raw = (array) $googleUser->getRaw();
+        $emailVerified = ($raw['email_verified'] ?? $raw['verified_email'] ?? true) !== false;
+
+        if (! $emailVerified || ! $googleUser->getEmail()) {
+            return redirect()->route('login')->withErrors([
+                'form.email' => 'Tu correo de Google no está verificado. Verifícalo en Google o inicia sesión con tu contraseña.',
+            ]);
+        }
 
         $user = User::where('google_id', $googleUser->getId())
             ->orWhere('email', $googleUser->getEmail())
@@ -65,6 +89,14 @@ class GoogleAuthController extends Controller
             ]);
         }
 
+        // Mismo criterio que LoginForm::authenticate(): una cuenta
+        // desactivada no inicia sesión, tampoco por Google.
+        if (! $user->isActive()) {
+            return redirect()->route('login')->withErrors([
+                'form.email' => 'Esta cuenta está inactiva. Contacta a un administrador.',
+            ]);
+        }
+
         // Cuenta creada originalmente con correo/contraseña: la
         // vinculamos con este Google ID para que la próxima vez entre
         // directo por aquí también.
@@ -72,38 +104,20 @@ class GoogleAuthController extends Controller
             $user->forceFill(['google_id' => $googleUser->getId()])->save();
         }
 
+        // Google acaba de probar que esta persona controla el correo
+        // de la cuenta: un cliente que nunca completó el código de
+        // verificación queda verificado (si no, EnsureAccountIsVerified
+        // lo devolvería a /verify-account en cada intento).
+        if ($user->isCliente() && ! $user->isAccountVerified()) {
+            $user->markAccountAsVerified();
+        }
+
         Auth::login($user);
 
         Session::regenerate();
 
-        return $this->redirectForUser($user);
-    }
-
-    /**
-     * Mismo mapa rol -> panel que login.blade.php.
-     */
-    private function redirectForUser(User $user): RedirectResponse
-    {
-        if ($user->isCliente()) {
-            return redirect()->route('cliente.dashboard');
-        }
-
-        if ($user->isChofer()) {
-            return redirect()->route('repartidor.dashboard');
-        }
-
-        if ($user->isAliado()) {
-            return redirect()->route('ally.dashboard');
-        }
-
-        if ($user->isAliadoTaquilla()) {
-            return redirect()->route('ally.packages.create');
-        }
-
-        if ($user->isAlmacen()) {
-            return redirect()->route('almacen.dashboard');
-        }
-
-        return redirect()->route('dashboard');
+        // Mismo mapa rol -> panel que login.blade.php (incluye
+        // Emprendedor, que antes caía en el dashboard genérico).
+        return redirect()->route($user->homeRouteName());
     }
 }

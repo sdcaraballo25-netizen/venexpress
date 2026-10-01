@@ -65,6 +65,23 @@ return [
     |
     */
 
+    /*
+    |--------------------------------------------------------------------------
+    | Proxies de confianza
+    |--------------------------------------------------------------------------
+    |
+    | Detrás de Cloudflare o de un balanceador, sin esto request()->ip()
+    | sería la IP del proxy: los límites de intentos (login, rastreo,
+    | pedidos) serían compartidos por todos los usuarios y la bitácora
+    | registraría la IP equivocada. "*" confía en cualquier proxy (solo
+    | si el servidor NO es accesible directamente desde internet) o una
+    | lista de IPs/rangos separados por coma. Vacío = no confiar en
+    | ninguno (correcto si la app se sirve directo, sin proxy).
+    |
+    */
+
+    'trusted_proxies' => env('TRUSTED_PROXIES'),
+
     'timezone' => env('APP_TIMEZONE', 'America/Caracas'),
 
     /*

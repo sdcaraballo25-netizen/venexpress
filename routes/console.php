@@ -29,3 +29,9 @@ Schedule::command('bcv:sync')
     ->between('13:30', '18:30')
     ->timezone('America/Caracas')
     ->withoutOverlapping();
+
+// Borra de la base de datos los tokens de Sanctum ya vencidos
+// (config/sanctum.php 'expiration').
+Schedule::command('sanctum:prune-expired --hours=24')
+    ->daily()
+    ->timezone('America/Caracas');

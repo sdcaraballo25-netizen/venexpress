@@ -81,4 +81,38 @@ class UsersManagerToggleStatusTest extends TestCase
 
         $this->assertSame(Driver::STATUS_SUSPENDED, $driver->fresh()->status);
     }
+
+    /**
+     * Antes, desactivar y reactivar a un repartidor PENDIENTE lo
+     * dejaba ACTIVO (Driver::STATUS_SUSPENDED -> ACTIVO), saltándose
+     * la aprobación del Admin. Lo mismo con un aliado.
+     */
+    public function test_toggling_a_pending_driver_does_not_approve_them(): void
+    {
+        $admin = $this->createAdmin();
+        $user = User::factory()->create(['role' => User::ROLE_REPARTIDOR, 'status' => User::STATUS_ACTIVE]);
+        $driver = Driver::factory()->create(['user_id' => $user->id, 'status' => Driver::STATUS_PENDING]);
+
+        $component = Livewire::actingAs($admin)->test(UsersManager::class);
+
+        $component->call('toggleStatus', $user->id);
+        $this->assertSame(Driver::STATUS_PENDING, $driver->fresh()->status);
+
+        $component->call('toggleStatus', $user->id);
+        $this->assertSame(User::STATUS_ACTIVE, $user->fresh()->status);
+        $this->assertSame(Driver::STATUS_PENDING, $driver->fresh()->status);
+    }
+
+    public function test_toggling_a_rejected_ally_does_not_approve_them(): void
+    {
+        $admin = $this->createAdmin();
+        $ally = $this->createAlly(['status' => Ally::STATUS_REJECTED]);
+
+        $component = Livewire::actingAs($admin)->test(UsersManager::class);
+
+        $component->call('toggleStatus', $ally->user_id);
+        $component->call('toggleStatus', $ally->user_id);
+
+        $this->assertSame(Ally::STATUS_REJECTED, $ally->fresh()->status);
+    }
 }

@@ -535,21 +535,31 @@ new #[Layout('layouts.guest')] class extends Component
          * user_id queda fijado a ESTE usuario: la validación de arriba
          * ya garantizó que nadie más lo había reclamado todavía.
          */
-        Customer::updateOrCreate(
-            ['id_doc' => $validated['id_doc']],
-            [
-                'user_id' => $user->id,
-                'name' => $validated['name'],
-                'phone' => $validated['phone'],
-                'email' => $validated['email'],
-            ]
-        );
+        $customer = Customer::firstOrNew(['id_doc' => $validated['id_doc']]);
+
+        $customer->user_id = $user->id;
+
+        // Si un aliado ya había registrado a esta persona, se conservan
+        // los datos de contacto que tecleó en taquilla y solo se
+        // completan los que faltaban: registrarse con una cédula no
+        // debe poder reescribir el nombre/teléfono/correo que ya
+        // estaban asociados a ella.
+        $customer->name = $customer->name ?: $validated['name'];
+        $customer->phone = $customer->phone ?: $validated['phone'];
+        $customer->email = $customer->email ?: $validated['email'];
+
+        $customer->save();
 
         // Un correo de Google ya viene verificado por Google (y
         // email_verified_at ya quedó marcado al crear el User arriba),
         // así que el código de 6 dígitos por correo sería redundante.
         if ($this->viaGoogle) {
             session()->forget('google_pending');
+
+            // Sin esto account_verified_at quedaba null y
+            // EnsureAccountIsVerified sacaba al cliente de su panel
+            // hacia /verify-account, sin ningún código enviado.
+            $user->markAccountAsVerified();
 
             Auth::login($user);
 

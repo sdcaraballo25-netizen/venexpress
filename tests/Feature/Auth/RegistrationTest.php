@@ -103,6 +103,33 @@ class RegistrationTest extends TestCase
         );
     }
 
+    public function test_registering_never_overwrites_contact_data_an_ally_already_recorded(): void
+    {
+        Customer::create([
+            'id_doc' => 'V-44445555',
+            'name' => 'Nombre en Taquilla',
+            'phone' => '0414-1111111',
+            'email' => null,
+        ]);
+
+        Volt::test('pages.auth.register')
+            ->set('name', 'Otro Nombre')
+            ->set('email', 'nuevo-registro@example.com')
+            ->set('password', 'password')
+            ->set('password_confirmation', 'password')
+            ->set('id_doc', 'V-44445555')
+            ->set('phone', '0424-9999999')
+            ->call('register')
+            ->assertHasNoErrors();
+
+        $customer = Customer::where('id_doc', 'V-44445555')->first();
+
+        $this->assertSame('Nombre en Taquilla', $customer->name);
+        $this->assertSame('0414-1111111', $customer->phone);
+        // Lo que faltaba sí se completa.
+        $this->assertSame('nuevo-registro@example.com', $customer->email);
+    }
+
     /**
      * Una vez que una cuenta reclamó una cédula (user_id fijado), un
      * segundo registro con la misma cédula debe rechazarse, sin

@@ -45,6 +45,13 @@ class EnsureAccountIsApproved
         };
 
         if (! $canOperate) {
+            // API de la app del repartidor: un token emitido antes de
+            // una suspensión/rechazo no debe seguir operando, y la app
+            // necesita un error JSON, no una redirección HTML.
+            if ($request->expectsJson() || $request->is('api/*')) {
+                abort(403, 'Tu cuenta no está habilitada para operar. Contacta al administrador.');
+            }
+
             return redirect()->route('account.pending');
         }
 

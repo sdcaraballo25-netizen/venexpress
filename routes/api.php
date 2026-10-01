@@ -28,6 +28,10 @@ Route::prefix('driver')
             'auth:sanctum',
             'ability:driver',
             'role:repartidor',
+            // El login ya exige Driver::canOperate(), pero un token
+            // emitido antes de una suspensión o de perder la
+            // verificación debe dejar de servir de inmediato.
+            'account.approved',
             // Sin esto, un token válido podía usarse para automatizar
             // cientos de peticiones por segundo (p. ej. enumerar
             // números de guía en /packages/lookup) sin ningún límite.
