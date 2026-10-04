@@ -7,7 +7,7 @@ use App\Http\Resources\DriverPackageResource;
 use App\Models\Driver;
 use App\Models\Package;
 use App\Services\GeocodingService;
-use App\Services\PackageService;
+use App\Services\LogisticsScanService;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
@@ -103,28 +103,28 @@ class DriverDeliveryController extends Controller
     }
 
     /**
-     * Pedidos disponibles para reclamar: ya están en tránsito
-     * nacional, requieren entrega a domicilio, y nadie los ha
-     * tomado todavía. Visible para CUALQUIER repartidor de entrega
-     * activo, sin importar su ubicación.
+     * Antes devolvía a cualquier repartidor de entrega TODOS los
+     * pedidos reclamables del país, con nombre, cédula, teléfono y
+     * dirección de remitente y destinatario. Ya no existe una lista
+     * global de paquetes para elegir: un repartidor solo opera lo que
+     * le asignaron (su ruta) o la guía que escanea físicamente
+     * (claimByScan), y es el backend quien decide si puede tomarla.
+     *
+     * Se conserva el endpoint con la misma forma de respuesta (lista
+     * vacía) para no romper versiones de la app que todavía lo llamen.
      */
     public function available(): JsonResponse
     {
         $this->driver();
 
-        $packages = Package::query()
-            ->availableForDeliveryClaim()
-            ->with('ally')
-            ->orderBy('created_at')
-            ->paginate(20);
-
         return response()->json([
-            'data' => DriverPackageResource::collection($packages->items()),
+            'data' => [],
             'meta' => [
-                'current_page' => $packages->currentPage(),
-                'last_page' => $packages->lastPage(),
-                'total' => $packages->total(),
+                'current_page' => 1,
+                'last_page' => 1,
+                'total' => 0,
             ],
+            'message' => 'Escanea la guía del paquete para tomar una entrega.',
         ]);
     }
 
@@ -152,45 +152,45 @@ class DriverDeliveryController extends Controller
         }
 
         try {
-            $package = app(PackageService::class)->claimForDelivery(
+            // Misma decisión que el escáner del panel web
+            // (Livewire\Driver\Scanner): ruta propia, paquete ya suyo,
+            // o entrega individual sin ruta vía claimForDelivery().
+            [$result, $package] = app(LogisticsScanService::class)->scanForDelivery(
                 package: $package,
                 driver: $driver,
                 userId: (int) Auth::id(),
             );
 
             return response()->json([
-                'message' => '¡Pedido reclamado! Ya es tuyo para entregar.',
+                'message' => match ($result) {
+                    LogisticsScanService::DELIVERY_SCAN_COLLECTION => 'Recolección registrada en tu ruta.',
+                    LogisticsScanService::DELIVERY_SCAN_ASSIGNED => 'Este pedido ya está asignado a ti.',
+                    default => '¡Pedido reclamado! Ya es tuyo para entregar.',
+                },
                 'package' => new DriverPackageResource($package),
             ]);
         } catch (RuntimeException $e) {
+            // Sin datos del paquete: aún no se validó que le corresponda.
             return response()->json(['message' => $e->getMessage()], 422);
         }
     }
 
     /**
-     * Reclama un pedido disponible. "Primero en escanear, primero en
-     * repartir" — si dos repartidores lo intentan casi al mismo
-     * tiempo, solo el primero gana (ver PackageService::claimForDelivery).
+     * Reclamar por ID ya no está permitido: los IDs son secuenciales,
+     * así que cualquiera podía recorrerlos y quedarse con pedidos (y
+     * sus datos personales) sin tener el paquete en la mano. Tomar una
+     * entrega individual se hace escaneando la guía (claimByScan), que
+     * aplica las mismas validaciones de PackageService::claimForDelivery().
+     *
+     * Se conserva la ruta para que una versión anterior de la app
+     * reciba un mensaje claro en vez de un 404.
      */
     public function claim(int $packageId): JsonResponse
     {
-        $driver = $this->driver();
+        $this->driver();
 
-        $package = Package::query()->findOrFail($packageId);
-
-        try {
-            $package = app(PackageService::class)->claimForDelivery(
-                package: $package,
-                driver: $driver,
-                userId: (int) Auth::id(),
-            );
-
-            return response()->json([
-                'message' => '¡Pedido reclamado! Ya es tuyo para entregar.',
-                'package' => new DriverPackageResource($package),
-            ]);
-        } catch (RuntimeException $e) {
-            return response()->json(['message' => $e->getMessage()], 422);
-        }
+        return response()->json([
+            'message' => 'Para tomar una entrega, escanea la guía del paquete.',
+        ], 422);
     }
 }

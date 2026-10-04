@@ -176,9 +176,26 @@ class Scanner extends Component
             return;
         }
 
-        $this->checkSecurity($package);
+        $scanService = app(LogisticsScanService::class);
 
-        $this->package = $package;
+        // Repartidor de entrega: con o sin ruta. El backend decide si
+        // esta guía le corresponde (ver LogisticsScanService::scanForDelivery()).
+        if ($driver->driver_type === Driver::TYPE_DELIVERY) {
+            $this->processDeliveryScan($scanService, $package, $driver, (int) $user->id);
+
+            return;
+        }
+
+        // Los datos del paquete (destinatario, dirección, COD) solo se
+        // muestran si la guía realmente le toca a este repartidor —
+        // mismo criterio que la API (canDriverAccessPackage). Antes se
+        // mostraban para cualquier guía escaneada, aunque la operación
+        // fuera a rechazarse después.
+        if ($scanService->canDriverAccessPackage($package, $driver)) {
+            $this->checkSecurity($package);
+
+            $this->package = $package;
+        }
 
         $activeRoute = $this->activeRoute($driver);
 
@@ -400,7 +417,12 @@ class Scanner extends Component
             $this->lastProcessedPackageId = $package->id;
         } catch (RuntimeException $e) {
             $this->errorMessage = $e->getMessage();
-            $this->package = $package->fresh(['ally', 'driver', 'histories']) ?? $package;
+
+            $fresh = $package->fresh(['ally', 'driver', 'histories']);
+
+            $this->package = $fresh && $service->canDriverAccessPackage($fresh, $driver)
+                ? $fresh
+                : null;
         } finally {
             // Se limpia siempre, haya éxito o error, para que ningún
             // clic/escaneo posterior (doble clic que se coló, botón
@@ -408,6 +430,54 @@ class Scanner extends Component
             // pendiente.
             $this->clearPendingOperation();
         }
+    }
+
+    /**
+     * Escaneo de un repartidor de entrega. Toda la decisión (ruta
+     * propia, paquete ya suyo, entrega individual sin ruta, o rechazo)
+     * vive en LogisticsScanService::scanForDelivery(), la misma que usa
+     * la API (DriverDeliveryController::claimByScan). Aquí solo se
+     * presenta el resultado.
+     *
+     * Un reescaneo de la misma guía es inofensivo: el paquete ya es
+     * suyo, así que solo se vuelve a mostrar, sin encadenar ninguna
+     * operación — no hace falta el mecanismo de confirmación de HUB.
+     */
+    protected function processDeliveryScan(
+        LogisticsScanService $service,
+        Package $package,
+        Driver $driver,
+        int $userId,
+    ): void {
+        try {
+            [$result, $package] = $service->scanForDelivery($package, $driver, $userId);
+        } catch (RuntimeException $e) {
+            // Sin datos del paquete: no le corresponde a este repartidor.
+            $this->errorMessage = $e->getMessage();
+
+            return;
+        }
+
+        $this->checkSecurity($package);
+
+        $this->package = $package;
+        $this->lastProcessedPackageId = $package->id;
+
+        $this->lastAction = match ($result) {
+            LogisticsScanService::DELIVERY_SCAN_COLLECTION => 'delivery_collection',
+            LogisticsScanService::DELIVERY_SCAN_ASSIGNED => 'delivery_assigned',
+            default => 'delivery_claimed',
+        };
+
+        if ($result !== LogisticsScanService::DELIVERY_SCAN_ASSIGNED) {
+            $this->processedCount++;
+        }
+
+        $this->successMessage = match ($result) {
+            LogisticsScanService::DELIVERY_SCAN_COLLECTION => 'Recolección registrada. El paquete quedó bajo tu custodia en esta ruta.',
+            LogisticsScanService::DELIVERY_SCAN_ASSIGNED => 'Esta guía ya está asignada a ti. Puedes continuar con la entrega.',
+            default => 'Entrega tomada. El paquete quedó asignado a ti.',
+        };
     }
 
     protected function clearPendingOperation(): void
@@ -616,12 +686,21 @@ class Scanner extends Component
 
         $routeType = $activeRoute?->route_type;
 
+        $isDelivery = $driver?->driver_type === Driver::TYPE_DELIVERY;
+
         $operation = null;
         $operationTitle = null;
         $operationInstructions = null;
         $contextStop = null;
 
-        if ($routeType === Route::TYPE_HUB_TRANSFER) {
+        if ($isDelivery) {
+            // Con o sin ruta: el repartidor de entrega no necesita una
+            // ruta para tomar una entrega individual.
+            $operationTitle = 'ENTREGAS';
+            $operationInstructions = $activeRoute
+                ? 'Escanea las guías de tu ruta o una entrega individual. El sistema valida si la guía te corresponde.'
+                : 'Sin ruta asignada: escanea la guía de un paquete listo para entrega. El sistema valida si puedes tomarlo.';
+        } elseif ($routeType === Route::TYPE_HUB_TRANSFER) {
             $operation = $this->lastAction === 'hub_reception'
                 ? 'hub_reception'
                 : 'collection';
@@ -703,11 +782,12 @@ class Scanner extends Component
         // distintas.
         $pendingOperationView = null;
 
-        if ($this->pendingOperation !== null && $this->package && $activeRoute) {
+        if (! $isDelivery && $this->pendingOperation !== null && $this->package && $activeRoute) {
             $pendingOperationView = $this->resolveOperation($this->package, $activeRoute);
         }
 
         return view('livewire.driver.scanner', [
+            'isDelivery' => $isDelivery,
             'isDistribution' => $routeType === Route::TYPE_HUB_DISTRIBUTION,
             'activeRoute' => $activeRoute,
             'operation' => $operation,

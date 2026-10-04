@@ -97,18 +97,33 @@ class GoogleAuthController extends Controller
             ]);
         }
 
-        // Cuenta creada originalmente con correo/contraseña: la
-        // vinculamos con este Google ID para que la próxima vez entre
-        // directo por aquí también.
+        $matchedByGoogleId = $user->google_id !== null
+            && $user->google_id === $googleUser->getId();
+
+        // Nunca se vincula por correo una cuenta cuyo correo no se ha
+        // verificado: cualquiera pudo registrarla con un correo ajeno
+        // (y conoce su contraseña). Si se vinculara aquí, el dueño
+        // real del correo terminaría dentro de una cuenta que otra
+        // persona también controla. Quien sí es dueño del correo puede
+        // recuperarla con "¿Olvidaste tu contraseña?" (el enlace llega
+        // a ese correo y reemplaza la contraseña) y luego verificarla.
+        if (! $matchedByGoogleId && $user->requiresAccountVerification() && ! $user->isAccountVerified()) {
+            return redirect()->route('login')->withErrors([
+                'form.email' => 'Ya existe una cuenta con este correo que todavía no fue verificada. '
+                    .'Recupera el acceso con "¿Olvidaste tu contraseña?" y verifica tu correo para poder entrar con Google.',
+            ]);
+        }
+
+        // Cuenta creada originalmente con correo/contraseña (y ya
+        // verificada): la vinculamos con este Google ID para que la
+        // próxima vez entre directo por aquí también.
         if ($user->google_id === null) {
             $user->forceFill(['google_id' => $googleUser->getId()])->save();
         }
 
-        // Google acaba de probar que esta persona controla el correo
-        // de la cuenta: un cliente que nunca completó el código de
-        // verificación queda verificado (si no, EnsureAccountIsVerified
-        // lo devolvería a /verify-account en cada intento).
-        if ($user->isCliente() && ! $user->isAccountVerified()) {
+        // Cuenta ya vinculada a este mismo Google ID: Google acaba de
+        // probar otra vez que esta persona controla el correo.
+        if ($matchedByGoogleId && $user->requiresAccountVerification() && ! $user->isAccountVerified()) {
             $user->markAccountAsVerified();
         }
 

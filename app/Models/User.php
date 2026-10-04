@@ -132,6 +132,9 @@ class User extends Authenticatable
     {
         $this->forceFill([
             'account_verified_at' => now(),
+            // El código llega al correo de la cuenta: introducirlo (o
+            // entrar con Google) también prueba que el correo es suyo.
+            'email_verified_at' => $this->email_verified_at ?? now(),
             'verification_token' => null,
             'verification_token_expires_at' => null,
         ])->save();
@@ -140,6 +143,24 @@ class User extends Authenticatable
     public function isAccountVerified(): bool
     {
         return ! is_null($this->account_verified_at);
+    }
+
+    /**
+     * Roles que se autorregistran desde el formulario público y, por
+     * lo tanto, deben demostrar que el correo es suyo (código de 6
+     * dígitos) antes de entrar a su panel. Admin, Taquilla y Almacén
+     * no se autorregistran: los crea un Admin o el Aliado
+     * Administrador, que ya responde por esa cuenta (y Taquilla ni
+     * siquiera tiene un correo real — ver AllyStaffService).
+     */
+    public function requiresAccountVerification(): bool
+    {
+        return in_array($this->role, [
+            self::ROLE_CLIENTE,
+            self::ROLE_ALIADO,
+            self::ROLE_REPARTIDOR,
+            self::ROLE_EMPRENDEDOR,
+        ], true);
     }
 
     /**

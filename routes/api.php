@@ -28,6 +28,9 @@ Route::prefix('driver')
             'auth:sanctum',
             'ability:driver',
             'role:repartidor',
+            // Un token emitido antes de exigir la verificación de
+            // correo no debe seguir operando hasta completarla.
+            'account.verified',
             // El login ya exige Driver::canOperate(), pero un token
             // emitido antes de una suspensión o de perder la
             // verificación debe dejar de servir de inmediato.

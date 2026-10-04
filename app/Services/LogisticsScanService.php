@@ -69,6 +69,89 @@ class LogisticsScanService
             && $activeRoute->isHubDistribution();
     }
 
+    /**
+     * Resultados posibles de scanForDelivery().
+     */
+    public const DELIVERY_SCAN_COLLECTION = 'collection';
+
+    public const DELIVERY_SCAN_ASSIGNED = 'assigned';
+
+    public const DELIVERY_SCAN_CLAIMED = 'claimed';
+
+    /**
+     * Escaneo de una guía por un repartidor de entrega (driver_type
+     * delivery). El escaneo no sirve para "descubrir" paquetes: el
+     * backend decide si esta guía le corresponde a este repartidor y
+     * solo entonces la opera. Soporta los dos modelos que ya existen,
+     * sin lógica nueva — solo decide a cuál de los servicios actuales
+     * delegar:
+     *
+     * - Modelo con ruta: ruta de reparto (TYPE_DELIVERY) en curso y el
+     *   paquete sigue en la agencia (RECIBIDO_AGENCIA) → recolección
+     *   con scanCollection(), que valida que la agencia sea una parada
+     *   de SU ruta. Los paquetes que Admin asigna a su ruta
+     *   (DeliveryAssignmentService) ya tienen su driver_id.
+     * - Ya es suyo (driver_id = este repartidor, por su ruta o por un
+     *   reclamo anterior) → no cambia nada, solo lo devuelve para que
+     *   pueda continuar la entrega.
+     * - Asignado a otro repartidor → se rechaza.
+     * - Sin repartidor → entrega individual sin ruta con
+     *   PackageService::claimForDelivery(), que valida que requiera
+     *   domicilio, que esté en un estado reclamable y que nadie lo haya
+     *   tomado (con bloqueo de fila: solo uno gana si dos escanean a la
+     *   vez).
+     *
+     * @return array{0: string, 1: Package} [resultado, paquete]
+     *
+     * @throws RuntimeException si la guía no puede ser procesada por
+     *         este repartidor. Los mensajes nunca incluyen datos del
+     *         remitente/destinatario.
+     */
+    public function scanForDelivery(Package $package, Driver $driver, int $userId): array
+    {
+        if ($driver->driver_type !== Driver::TYPE_DELIVERY) {
+            throw new RuntimeException('Esta operación es solo para repartidores de entrega.');
+        }
+
+        if ($driver->status !== Driver::STATUS_ACTIVE) {
+            throw new RuntimeException('Solo un repartidor activo puede escanear paquetes.');
+        }
+
+        $activeRoute = Route::query()
+            ->where('driver_id', $driver->id)
+            ->where('status', Route::STATUS_IN_PROGRESS)
+            ->latest('started_at')
+            ->first();
+
+        if (
+            $activeRoute?->isDelivery()
+            && $package->current_status === Package::STATUS_RECIBIDO_AGENCIA
+        ) {
+            return [
+                self::DELIVERY_SCAN_COLLECTION,
+                $this->scanCollection($package, $driver, $userId),
+            ];
+        }
+
+        if ((int) $package->driver_id === (int) $driver->id) {
+            return [
+                self::DELIVERY_SCAN_ASSIGNED,
+                $package->fresh(['ally', 'driver', 'histories']),
+            ];
+        }
+
+        if ($package->driver_id !== null) {
+            throw new RuntimeException('Esta guía está asignada a otro repartidor.');
+        }
+
+        $claimed = $this->packageService->claimForDelivery($package, $driver, $userId);
+
+        return [
+            self::DELIVERY_SCAN_CLAIMED,
+            $claimed->fresh(['ally', 'driver', 'histories']),
+        ];
+    }
+
     public function scanCollection(
         Package $package,
         Driver $driver,

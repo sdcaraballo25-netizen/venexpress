@@ -198,6 +198,8 @@ class HubReleaseService
             'scanned_by_user_id' => $userId,
         ]);
 
+        app(PackageService::class)->notifyStatusChangeAfterCommit($locked, Package::STATUS_LISTO_RETIRO);
+
         return $locked->fresh([
             'ally',
             'driver',
@@ -256,6 +258,8 @@ class HubReleaseService
             'location_description' => 'Paquete liberado: listo para que un repartidor de entrega lo reclame.',
             'scanned_by_user_id' => $userId,
         ]);
+
+        app(PackageService::class)->notifyStatusChangeAfterCommit($locked, Package::STATUS_LISTO_RETIRO);
 
         return $locked->fresh([
             'ally',

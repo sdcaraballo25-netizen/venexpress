@@ -5,15 +5,20 @@ namespace App\Livewire\Driver;
 use App\Models\Driver;
 use App\Models\Package;
 use App\Models\Route;
+use App\Services\IncidentService;
 use App\Services\PackageService;
+use Illuminate\Support\Facades\Auth;
+use Illuminate\Support\Facades\Storage;
 use Livewire\Attributes\Layout;
 use Livewire\Component;
+use Livewire\WithFileUploads;
 use RuntimeException;
-use Illuminate\Support\Facades\Auth;
 
 #[Layout('layouts.driver')]
 class PackageDetail extends Component
 {
+    use WithFileUploads;
+
     public int $packageId;
 
     public Package $package;
@@ -26,6 +31,29 @@ class PackageDetail extends Component
      * todavía no se había cobrado.
      */
     public string $codPaymentMethod = '';
+
+    /*
+     * Datos de quién recibió el paquete: los mismos que ya exige la app
+     * (DriverPackageController::completeDelivery), para que confirmar
+     * desde el panel web deje el mismo registro que desde Flutter.
+     */
+    public string $receiverName = '';
+
+    public string $receiverIdDoc = '';
+
+    public string $receiverPhone = '';
+
+    public string $deliveryConfirmationMethod = '';
+
+    /** @var \Livewire\Features\SupportFileUploads\TemporaryUploadedFile|null */
+    public $deliveryPhoto = null;
+
+    /** Formulario de incidencia (p. ej. no se pudo entregar). */
+    public bool $showIncidentForm = false;
+
+    public string $incidentType = '';
+
+    public string $incidentDescription = '';
 
     public function mount(int $packageId): void
     {
@@ -158,16 +186,53 @@ $driver = $user?->driver;
                 );
             }
 
-            $this->package =
-                app(PackageService::class)->completeDelivery(
-                    package: $this->package,
-                    driver: $driver,
-                    locationDescription:
-                        'Entrega confirmada por el repartidor',
-                    codPaymentMethod: $this->codPaymentMethod !== '' ? $this->codPaymentMethod : null,
-                );
+            // Mismas reglas que la app (DriverPackageController::completeDelivery).
+            $this->validate([
+                'receiverName' => ['required', 'string', 'max:150'],
+                'receiverIdDoc' => ['required', 'string', 'max:30'],
+                'receiverPhone' => ['nullable', 'string', 'max:30'],
+                'deliveryConfirmationMethod' => ['required', 'in:firma,foto,cedula'],
+                'deliveryPhoto' => ['nullable', 'image', 'mimes:jpg,jpeg,png,webp', 'max:5120'],
+            ], [
+                'receiverName.required' => 'Indica el nombre de quien recibe.',
+                'receiverIdDoc.required' => 'Indica el documento de quien recibe.',
+                'deliveryConfirmationMethod.required' => 'Indica cómo se confirmó la entrega.',
+            ]);
 
-            $this->codPaymentMethod = '';
+            $photoPath = $this->deliveryPhoto
+                ? $this->deliveryPhoto->store('delivery-evidence', 'documents')
+                : null;
+
+            try {
+                $this->package =
+                    app(PackageService::class)->completeDelivery(
+                        package: $this->package,
+                        driver: $driver,
+                        locationDescription:
+                            'Entrega confirmada por el repartidor',
+                        receiverName: $this->receiverName,
+                        receiverIdDoc: $this->receiverIdDoc,
+                        receiverPhone: $this->receiverPhone !== '' ? $this->receiverPhone : null,
+                        deliveryConfirmationMethod: $this->deliveryConfirmationMethod,
+                        deliveryPhotoPath: $photoPath,
+                        codPaymentMethod: $this->codPaymentMethod !== '' ? $this->codPaymentMethod : null,
+                    );
+            } catch (RuntimeException $e) {
+                if ($photoPath) {
+                    Storage::disk('documents')->delete($photoPath);
+                }
+
+                throw $e;
+            }
+
+            $this->reset([
+                'codPaymentMethod',
+                'receiverName',
+                'receiverIdDoc',
+                'receiverPhone',
+                'deliveryConfirmationMethod',
+                'deliveryPhoto',
+            ]);
 
             session()->flash(
                 'success',
@@ -180,6 +245,49 @@ $driver = $user?->driver;
                 'error',
                 $e->getMessage()
             );
+        }
+    }
+
+    /**
+     * Reporta un problema con la entrega (cliente ausente, dirección
+     * incorrecta, etc.). Igual que en la app: no cambia el estado del
+     * paquete, solo deja la incidencia para que Admin la gestione.
+     * Reutiliza IncidentService::reportByDriver().
+     */
+    public function reportIncident(): void
+    {
+        $this->validate([
+            'incidentType' => ['required', 'in:'.implode(',', IncidentService::DRIVER_TYPES)],
+            'incidentDescription' => ['required', 'string', 'max:1000'],
+        ], [
+            'incidentType.required' => 'Selecciona el motivo.',
+            'incidentDescription.required' => 'Describe brevemente lo ocurrido.',
+        ]);
+
+        $driver = Auth::user()?->driver;
+
+        if (! $driver) {
+            abort(403, 'Tu usuario no tiene un perfil de repartidor asociado.');
+        }
+
+        try {
+            $this->package->refresh();
+
+            app(IncidentService::class)->reportByDriver(
+                package: $this->package,
+                driver: $driver,
+                type: $this->incidentType,
+                description: $this->incidentDescription,
+                userId: (int) Auth::id(),
+            );
+
+            $this->reset(['showIncidentForm', 'incidentType', 'incidentDescription']);
+
+            $this->package->load('incidents')->loadCount('incidents');
+
+            session()->flash('success', 'Incidencia reportada. El equipo administrativo la revisará.');
+        } catch (RuntimeException $e) {
+            session()->flash('error', $e->getMessage());
         }
     }
 

@@ -4,7 +4,9 @@ namespace App\Services;
 
 use App\Models\Ally;
 use App\Models\AuditLog;
+use App\Models\Driver;
 use App\Models\Incident;
+use App\Models\Package;
 use App\Models\PackageHistory;
 use App\Models\User;
 use Illuminate\Auth\Access\AuthorizationException;
@@ -37,6 +39,82 @@ class IncidentService
             'description' => $data['description'],
             'status' => Incident::STATUS_OPEN,
         ]);
+    }
+
+    /**
+     * Motivos que el repartidor puede reportar sobre una entrega
+     * (antes vivían solo en DriverIncidentController::TYPES, que ahora
+     * apunta aquí para que la app y el panel web usen la misma lista).
+     */
+    public const DRIVER_TYPES = [
+        'CLIENTE_AUSENTE',
+        'DIRECCION_INCORRECTA',
+        'PAQUETE_DANADO',
+        'RECHAZADO_POR_CLIENTE',
+        'OTRO',
+    ];
+
+    public const DRIVER_TYPE_LABELS = [
+        'CLIENTE_AUSENTE' => 'Cliente ausente',
+        'DIRECCION_INCORRECTA' => 'Dirección incorrecta',
+        'PAQUETE_DANADO' => 'Paquete dañado',
+        'RECHAZADO_POR_CLIENTE' => 'Rechazado por el cliente',
+        'OTRO' => 'Otro',
+    ];
+
+    /**
+     * Incidencia reportada por el repartidor sobre un paquete que tiene
+     * asignado (p. ej. no pudo entregarlo porque el cliente no estaba).
+     * Mismo comportamiento que tenía la app (DriverIncidentController):
+     * no cambia el estado del paquete, solo deja constancia para que
+     * Admin la gestione desde IncidentsManager. Usado por la API y por
+     * el panel web del repartidor.
+     *
+     * @throws RuntimeException si el repartidor no está activo, el
+     *         motivo no es válido o el paquete no es suyo.
+     */
+    public function reportByDriver(
+        Package $package,
+        Driver $driver,
+        string $type,
+        string $description,
+        int $userId,
+    ): Incident {
+        if ($driver->status !== Driver::STATUS_ACTIVE) {
+            throw new RuntimeException('Solo un repartidor activo puede reportar incidencias.');
+        }
+
+        if (! in_array($type, self::DRIVER_TYPES, true)) {
+            throw new RuntimeException('Motivo de incidencia inválido.');
+        }
+
+        if ((int) $package->driver_id !== (int) $driver->id) {
+            throw new RuntimeException('Este paquete no está asignado a ti.');
+        }
+
+        $incident = Incident::create([
+            'ally_id' => $package->ally_id,
+            'package_id' => $package->id,
+            'reported_by_user_id' => $userId,
+            'type' => $type,
+            'description' => $description,
+            'status' => Incident::STATUS_OPEN,
+        ]);
+
+        AuditLog::create([
+            'actor_user_id' => $userId,
+            'action' => 'incident.reported_by_driver',
+            'target_type' => Incident::class,
+            'target_id' => $incident->id,
+            'description' => "El repartidor reportó una incidencia en la guía {$package->tracking_number}: {$type}.",
+            'metadata' => [
+                'package_id' => $package->id,
+                'type' => $type,
+            ],
+            'ip_address' => request()?->ip(),
+        ]);
+
+        return $incident;
     }
 
     /**

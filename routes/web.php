@@ -101,6 +101,7 @@ Route::prefix('ally')
         'auth',
         'verified',
         'role:aliado,aliado_taquilla',
+        'account.verified',
         'account.approved',
     ])
     ->name('ally.')
@@ -201,15 +202,15 @@ Route::prefix('ally')
 */
 
 Route::get('/ally/verificacion', AllyVerificacion::class)
-    ->middleware(['auth', 'verified', 'role:aliado'])
+    ->middleware(['auth', 'verified', 'role:aliado', 'account.verified'])
     ->name('ally.verificacion');
 
 Route::get('/repartidor/verificacion', DriverVerificacion::class)
-    ->middleware(['auth', 'verified', 'role:repartidor'])
+    ->middleware(['auth', 'verified', 'role:repartidor', 'account.verified'])
     ->name('repartidor.verificacion');
 
 Route::get('/emprendedor/verificacion', EmprendedorVerificacion::class)
-    ->middleware(['auth', 'verified', 'role:emprendedor'])
+    ->middleware(['auth', 'verified', 'role:emprendedor', 'account.verified'])
     ->name('emprendedor.verificacion');
 
 /*
@@ -325,49 +326,49 @@ Route::prefix('cliente')
 */
 
 Route::get('/repartidor/dashboard', DriverDashboard::class)
-    ->middleware(['auth', 'verified', 'role:repartidor', 'account.approved'])
+    ->middleware(['auth', 'verified', 'role:repartidor', 'account.verified', 'account.approved'])
     ->name('repartidor.dashboard');
 
 Route::get(
     '/repartidor/escanear',
     Scanner::class
 )
-    ->middleware(['auth', 'verified', 'role:repartidor', 'account.approved'])
+    ->middleware(['auth', 'verified', 'role:repartidor', 'account.verified', 'account.approved'])
     ->name('repartidor.scanner');
 
 Route::get(
     '/repartidor/paquetes',
     Packages::class
 )
-    ->middleware(['auth', 'verified', 'role:repartidor', 'account.approved'])
+    ->middleware(['auth', 'verified', 'role:repartidor', 'account.verified', 'account.approved'])
     ->name('repartidor.packages');
 
 Route::get(
     '/repartidor/paquetes/{packageId}',
     PackageDetail::class
 )
-    ->middleware(['auth', 'verified', 'role:repartidor', 'account.approved'])
+    ->middleware(['auth', 'verified', 'role:repartidor', 'account.verified', 'account.approved'])
     ->name('repartidor.package-detail');
 
 Route::get(
     '/repartidor/ruta/{routeId}',
     RouteDetail::class
 )
-    ->middleware(['auth', 'verified', 'role:repartidor', 'account.approved'])
+    ->middleware(['auth', 'verified', 'role:repartidor', 'account.verified', 'account.approved'])
     ->name('repartidor.route-detail');
 
 Route::get(
     '/repartidor/historial-rutas',
     RouteHistory::class
 )
-    ->middleware(['auth', 'verified', 'role:repartidor', 'account.approved'])
+    ->middleware(['auth', 'verified', 'role:repartidor', 'account.verified', 'account.approved'])
     ->name('repartidor.route-history');
 
 Route::post(
     '/repartidor/verificar-guia',
     [DriverScanController::class, 'verify']
 )
-    ->middleware(['auth', 'verified', 'role:repartidor', 'account.approved'])
+    ->middleware(['auth', 'verified', 'role:repartidor', 'account.verified', 'account.approved'])
     ->name('repartidor.scan.verify');
 
 // IMPORTANTE: la descarga de la app vive detrás del login de
@@ -375,11 +376,11 @@ Route::post(
 // a cualquiera descargar el APK y explorar la superficie de la API
 // del driver sin ser un repartidor real.
 Route::get('/repartidor/descargar-app', AppDownload::class)
-    ->middleware(['auth', 'verified', 'role:repartidor', 'account.approved'])
+    ->middleware(['auth', 'verified', 'role:repartidor', 'account.verified', 'account.approved'])
     ->name('repartidor.app-download');
 
 Route::get('/repartidor/ayuda', DriverHelpCenter::class)
-    ->middleware(['auth', 'verified', 'role:repartidor', 'account.approved'])
+    ->middleware(['auth', 'verified', 'role:repartidor', 'account.verified', 'account.approved'])
     ->name('repartidor.help');
 
 /*
@@ -403,27 +404,27 @@ Route::get('/almacen/ayuda', AlmacenHelpCenter::class)
 */
 
 Route::get('/emprendedor/dashboard', EmprendedorDashboard::class)
-    ->middleware(['auth', 'verified', 'role:emprendedor', 'account.approved'])
+    ->middleware(['auth', 'verified', 'role:emprendedor', 'account.verified', 'account.approved'])
     ->name('emprendedor.dashboard');
 
 Route::get('/emprendedor/productos', EmprendedorProductos::class)
-    ->middleware(['auth', 'verified', 'role:emprendedor', 'account.approved'])
+    ->middleware(['auth', 'verified', 'role:emprendedor', 'account.verified', 'account.approved'])
     ->name('emprendedor.productos');
 
 Route::get('/emprendedor/pedidos', EmprendedorPedidos::class)
-    ->middleware(['auth', 'verified', 'role:emprendedor', 'account.approved'])
+    ->middleware(['auth', 'verified', 'role:emprendedor', 'account.verified', 'account.approved'])
     ->name('emprendedor.pedidos');
 
 Route::get('/emprendedor/pedidos/{pedidoId}', EmprendedorPedidoShow::class)
-    ->middleware(['auth', 'verified', 'role:emprendedor', 'account.approved'])
+    ->middleware(['auth', 'verified', 'role:emprendedor', 'account.verified', 'account.approved'])
     ->name('emprendedor.pedidos.show');
 
 Route::get('/emprendedor/reportes', EmprendedorReports::class)
-    ->middleware(['auth', 'verified', 'role:emprendedor', 'account.approved'])
+    ->middleware(['auth', 'verified', 'role:emprendedor', 'account.verified', 'account.approved'])
     ->name('emprendedor.reportes');
 
 Route::get('/emprendedor/perfil', EmprendedorPerfil::class)
-    ->middleware(['auth', 'verified', 'role:emprendedor', 'account.approved'])
+    ->middleware(['auth', 'verified', 'role:emprendedor', 'account.verified', 'account.approved'])
     ->name('emprendedor.perfil');
 
 /*

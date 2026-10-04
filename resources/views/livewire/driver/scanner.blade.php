@@ -42,7 +42,40 @@
         </a>
     </div>
 
-    @if ($activeRoute && $operationTitle)
+    @if ($isDelivery)
+        <div class="rounded-2xl border border-[#E5E5E0] bg-white p-5 shadow-sm">
+            <div class="grid grid-cols-2 gap-4 sm:grid-cols-3">
+                <div>
+                    <p class="text-xs font-bold uppercase tracking-wider text-slate-400">
+                        Ruta
+                    </p>
+                    <p class="mt-1 text-sm font-semibold text-[#111111]">
+                        {{ $activeRoute?->name ?? 'Sin ruta asignada' }}
+                    </p>
+                </div>
+
+                <div>
+                    <p class="text-xs font-bold uppercase tracking-wider text-slate-400">
+                        Modalidad
+                    </p>
+                    <p class="mt-1 text-sm font-semibold text-[#111111]">
+                        {{ $activeRoute ? 'Ruta + entregas individuales' : 'Entregas individuales' }}
+                    </p>
+                </div>
+
+                <div>
+                    <p class="text-xs font-bold uppercase tracking-wider text-slate-400">
+                        Procesados
+                    </p>
+                    <p class="mt-1 text-sm font-semibold text-[#111111]">
+                        {{ $processedCount }}
+                    </p>
+                </div>
+            </div>
+        </div>
+    @endif
+
+    @if ($activeRoute && $operationTitle && ! $isDelivery)
         <div class="rounded-2xl border border-[#E5E5E0] bg-white p-5 shadow-sm">
             <div class="grid grid-cols-2 gap-4 sm:grid-cols-5">
                 <div>
@@ -105,7 +138,9 @@
             </h3>
 
             <p class="mt-1 text-sm text-slate-500">
-                @if ($operation === 'hub_departure')
+                @if ($isDelivery)
+                    Escanea el QR de la guía. Solo podrás operarla si pertenece a tu ruta, ya está asignada a ti o está disponible para entrega individual.
+                @elseif ($operation === 'hub_departure')
                     Escanea el QR de la guía. El sistema validará que el paquete esté en HUB para tu ruta de distribución.
                 @elseif ($operation === 'hub_arrival')
                     Escanea el QR de la guía. El sistema validará que el paquete esté en tránsito nacional bajo tu custodia.
@@ -385,6 +420,30 @@
                                 @endif
                             </p>
                         @endif
+                    @elseif (in_array($lastAction, ['delivery_collection', 'delivery_assigned', 'delivery_claimed'], true))
+                        <p class="text-sm font-semibold text-emerald-800">
+                            @if ($lastAction === 'delivery_collection')
+                                ✓ Recolección registrada en tu ruta
+                            @elseif ($lastAction === 'delivery_claimed')
+                                ✓ Entrega individual asignada a ti
+                            @else
+                                ✓ Esta guía ya es tuya
+                            @endif
+                        </p>
+                        <p class="mt-1 font-mono text-xs text-emerald-700">
+                            {{ $package->tracking_number }}
+                        </p>
+                        <p class="mt-1 text-xs text-emerald-700">
+                            Estado: {{ $package->statusLabel() }}
+                        </p>
+
+                        <a
+                            href="{{ route('repartidor.package-detail', $package->id) }}"
+                            wire:navigate
+                            class="mt-4 inline-flex w-full items-center justify-center rounded-xl bg-emerald-600 px-5 py-3 text-sm font-semibold text-white transition hover:bg-emerald-700 sm:w-auto"
+                        >
+                            Abrir entrega
+                        </a>
                     @else
                         <p class="text-sm font-semibold text-slate-700">
                             {{ $package->statusLabel() }}
@@ -423,6 +482,21 @@
             let venexpressScannerState = null;
             let venexpressScannerRunning = false;
 
+            // Este script se inyecta en el layout, fuera del componente:
+            // ahí `$wire` no existe (solo dentro de Alpine o de un bloque
+            // script de Livewire), así que cada lectura del QR fallaba en
+            // silencio y solo funcionaba la entrada manual. Se busca el
+            // componente Livewire que contiene el lector y se le envía la guía.
+            function sendScanToComponent(trackingNumber) {
+                const root = document.getElementById('qr-reader')?.closest('[wire\\:id]');
+
+                if (!root || !trackingNumber) {
+                    return;
+                }
+
+                Livewire.find(root.getAttribute('wire:id'))?.call('scan', trackingNumber);
+            }
+
             async function startQrScanner() {
                 const element = document.getElementById('qr-reader');
 
@@ -447,7 +521,7 @@
 
                             await stopQrScanner();
 
-                            $wire.scan(decodedText.trim());
+                            sendScanToComponent(decodedText.trim());
 
                             setTimeout(startQrScanner, 700);
                         },

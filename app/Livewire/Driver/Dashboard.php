@@ -344,6 +344,40 @@ class Dashboard extends Component
 
         /*
         |--------------------------------------------------------------------------
+        | ENTREGAS DE LA RUTA vs. ENTREGAS INDIVIDUALES (Delivery)
+        |--------------------------------------------------------------------------
+        |
+        | Solo lo que ya le pertenece a este repartidor: los paquetes de
+        | SU ruta (RouteService::packageIdsForRoute()) y sus entregas
+        | individuales sin ruta (claimForDelivery). Nunca una lista de
+        | paquetes ajenos o "disponibles" para elegir.
+        */
+
+        $routePackages = collect();
+        $routePackageIds = collect();
+
+        if (! $isHub && $activeRoute) {
+            $routePackageIds = app(RouteService::class)->packageIdsForRoute($activeRoute);
+
+            $routePackages = Package::query()
+                ->whereIn('id', $routePackageIds)
+                ->where('driver_id', $driver->id)
+                ->orderByRaw('current_status = ? asc', [Package::STATUS_ENTREGADO])
+                ->orderBy('id')
+                ->limit(50)
+                ->get();
+        }
+
+        $routePackagesPendingCount = $routePackages
+            ->where('current_status', '!=', Package::STATUS_ENTREGADO)
+            ->count();
+
+        $routePackagesDeliveredCount = $routePackages->count() - $routePackagesPendingCount;
+
+        $routePackageIdList = $routePackageIds->all();
+
+        /*
+        |--------------------------------------------------------------------------
         | RESUMEN DEL DÍA
         |--------------------------------------------------------------------------
         */
@@ -424,6 +458,12 @@ class Dashboard extends Component
                 'routeProgress' => $routeProgress,
                 'nextPendingStop' => $nextPendingStop,
                 'routePackagesProcessed' => $routePackagesProcessed,
+
+                // Entregas de la ruta (Delivery) y marca ruta/individual
+                'routePackages' => $routePackages,
+                'routePackagesPendingCount' => $routePackagesPendingCount,
+                'routePackagesDeliveredCount' => $routePackagesDeliveredCount,
+                'routePackageIdList' => $routePackageIdList,
 
                 // Acción de escaneo principal (HUB)
                 'hubScanOperation' => $hubScanOperation,

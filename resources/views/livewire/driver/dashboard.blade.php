@@ -835,12 +835,12 @@
 
                     </div>
 
-                    <div class="h-full rounded-full bg-blue-700 transition-all duration-500">
-    <div
-        class="h-full rounded-full bg-blue-700 transition-all duration-500"
-        @style(['width' => $routeProgress . '%'])
-    ></div>
-</div>
+                    <div class="h-2 overflow-hidden rounded-full bg-slate-100">
+                        <div
+                            class="h-full rounded-full bg-blue-700 transition-all duration-500"
+                            @style(['width' => $routeProgress . '%'])
+                        ></div>
+                    </div>
 
                     <div class="mt-2 flex justify-between text-xs text-slate-500">
 
@@ -926,6 +926,70 @@
                         </p>
 
                     </div>
+
+                </div>
+
+
+                {{-- ENTREGAS DE ESTA RUTA (solo paquetes que ya son suyos) --}}
+                <div>
+
+                    <div class="mb-3 flex items-center justify-between gap-3">
+
+                        <span class="text-xs font-semibold uppercase tracking-wider text-slate-400">
+                            Entregas de esta ruta
+                        </span>
+
+                        <span class="text-xs text-slate-500">
+                            {{ $routePackagesPendingCount }} pendientes · {{ $routePackagesDeliveredCount }} completadas
+                        </span>
+
+                    </div>
+
+                    @if ($routePackages->isNotEmpty())
+
+                        <div class="space-y-2">
+
+                            @foreach ($routePackages as $routePackage)
+
+                                <a
+                                    href="{{ route('repartidor.package-detail', $routePackage->id) }}"
+                                    wire:navigate
+                                    class="flex items-center justify-between gap-3 rounded-xl border border-[#E5E5E0] p-3 transition hover:border-blue-300 hover:bg-blue-50"
+                                >
+
+                                    <div class="min-w-0">
+                                        <p class="font-mono text-sm font-semibold text-[#111111]">
+                                            {{ $routePackage->tracking_number }}
+                                        </p>
+                                        <p class="mt-0.5 truncate text-xs text-slate-500">
+                                            {{ $routePackage->recipient_name }}
+                                            @if ($routePackage->delivery_sector)
+                                                · {{ $routePackage->delivery_sector }}
+                                            @endif
+                                        </p>
+                                    </div>
+
+                                    <span @class([
+                                        'shrink-0 rounded-lg px-2 py-1 text-[10px] font-semibold uppercase',
+                                        'bg-emerald-50 text-emerald-700' => $routePackage->current_status === \App\Models\Package::STATUS_ENTREGADO,
+                                        'bg-slate-100 text-slate-600' => $routePackage->current_status !== \App\Models\Package::STATUS_ENTREGADO,
+                                    ])>
+                                        {{ $routePackage->statusLabel() }}
+                                    </span>
+
+                                </a>
+
+                            @endforeach
+
+                        </div>
+
+                    @else
+
+                        <p class="rounded-xl bg-slate-50 px-4 py-3 text-sm text-slate-500">
+                            Todavía no hay paquetes registrados en esta ruta. Escanea las guías en cada parada para recolectarlas.
+                        </p>
+
+                    @endif
 
                 </div>
 
@@ -1017,6 +1081,42 @@
 
 
     {{-- =========================================================
+         SIN RUTA: ENTREGAS INDIVIDUALES
+         No se muestra ninguna lista de paquetes disponibles: el
+         repartidor escanea la guía y el backend decide si puede
+         tomarla (LogisticsScanService::scanForDelivery()).
+    ========================================================== --}}
+    @unless ($activeRoute)
+
+        <div class="flex flex-col gap-4 rounded-2xl border border-blue-100 bg-blue-50 p-5 sm:flex-row sm:items-center sm:justify-between">
+
+            <div>
+                <p class="text-xs font-bold uppercase tracking-wider text-blue-700">
+                    Sin ruta asignada
+                </p>
+                <h2 class="mt-1 font-display text-lg font-bold text-blue-950">
+                    Entregas individuales
+                </h2>
+                <p class="mt-1 max-w-xl text-sm text-blue-900/80">
+                    Puedes entregar un paquete sin ruta: escanea su guía o escribe el número.
+                    El sistema verifica si está listo para entrega y si nadie más lo tomó.
+                </p>
+            </div>
+
+            <a
+                href="{{ route('repartidor.scanner') }}"
+                wire:navigate
+                class="inline-flex shrink-0 items-center justify-center rounded-xl bg-blue-900 px-5 py-3 text-sm font-semibold text-white transition hover:bg-blue-800"
+            >
+                Escanear guía
+            </a>
+
+        </div>
+
+    @endunless
+
+
+    {{-- =========================================================
          ACCIONES RÁPIDAS
     ========================================================== --}}
     <div>
@@ -1055,7 +1155,7 @@
                         </h3>
 
                         <p class="mt-1 text-sm text-slate-500">
-                            Registrar una recolección mediante pistoleo.
+                            Recolectar en tu ruta, tomar una entrega individual o abrir una guía tuya.
                         </p>
 
                     </div>
@@ -1136,7 +1236,11 @@
 
                     @foreach ($pendingPackages as $package)
 
-                        <div class="rounded-xl border border-slate-100 bg-slate-50 p-4">
+                        <a
+                            href="{{ route('repartidor.package-detail', $package->id) }}"
+                            wire:navigate
+                            class="block rounded-xl border border-slate-100 bg-slate-50 p-4 transition hover:border-blue-300 hover:bg-blue-50"
+                        >
 
                             <div class="flex items-start justify-between gap-4">
 
@@ -1144,6 +1248,12 @@
 
                                     <p class="font-mono text-sm font-semibold text-[#111111]">
                                         {{ $package->tracking_number }}
+
+                                        @unless ($isHub)
+                                            <span class="ml-1 rounded-md bg-white px-1.5 py-0.5 font-sans text-[10px] font-semibold uppercase text-slate-500">
+                                                {{ in_array($package->id, $routePackageIdList, true) ? 'Ruta' : 'Individual' }}
+                                            </span>
+                                        @endunless
                                     </p>
 
                                     <p class="mt-1 truncate text-sm font-medium text-slate-700">
@@ -1165,7 +1275,7 @@
 
                             </div>
 
-                        </div>
+                        </a>
 
                     @endforeach
 

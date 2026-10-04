@@ -105,8 +105,10 @@ class VerifyAccount extends Component
 
         session()->regenerate();
 
+        // Ya no es solo para clientes: Aliado, Repartidor y Emprendedor
+        // también verifican su correo aquí (ver register.blade.php).
         $this->redirect(
-            route('cliente.dashboard', absolute: false),
+            route($user->homeRouteName(), absolute: false),
             navigate: true
         );
     }

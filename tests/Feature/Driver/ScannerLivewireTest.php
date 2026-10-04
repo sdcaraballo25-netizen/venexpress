@@ -206,11 +206,19 @@ class ScannerLivewireTest extends TestCase
         $this->assertSame(RouteStop::STATUS_VISITED, $stop->fresh()->status);
     }
 
-    public function test_shows_explicit_error_for_unsupported_route_type(): void
+    /**
+     * Antes una ruta de entrega (TYPE_DELIVERY) no se podía operar desde
+     * el panel web ("Tipo de ruta no soportado"), aunque la API sí
+     * recolectaba en sus paradas. Ahora el escaneo de un repartidor de
+     * entrega pasa por LogisticsScanService::scanForDelivery(): si la
+     * agencia del paquete no es una parada de SU ruta, se rechaza sin
+     * mutar nada y sin mostrar los datos del paquete.
+     */
+    public function test_delivery_route_rejects_a_package_from_an_agency_outside_the_route(): void
     {
         [$user, $driver] = $this->createDriverUser(Driver::TYPE_DELIVERY);
 
-        $route = Route::create([
+        Route::create([
             'city' => 'Caracas',
             'state' => 'Distrito Capital',
             'name' => 'Ruta de entrega',
@@ -230,16 +238,14 @@ class ScannerLivewireTest extends TestCase
             ->test(Scanner::class)
             ->set('trackingNumber', $package->tracking_number)
             ->call('searchPackage')
-            ->assertSet(
-                'errorMessage',
-                "Tipo de ruta no soportado para escaneo: {$route->route_type}."
-            );
+            ->assertSet('errorMessage', 'La agencia de este paquete no pertenece a tu ruta activa.')
+            ->assertSet('package', null);
 
-        // No debe haber intentado escanear como recolección.
         $this->assertSame(
             Package::STATUS_RECIBIDO_AGENCIA,
             $package->fresh()->current_status
         );
+        $this->assertNull($package->fresh()->driver_id);
     }
 
     public function test_shows_error_when_driver_has_no_active_route(): void

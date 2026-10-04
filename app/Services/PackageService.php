@@ -37,7 +37,7 @@ class PackageService
      * interrumpa una operación de guía ya confirmada en base de
      * datos: por eso todo el envío queda protegido en un try/catch.
      */
-    protected function notifyStatusChange(Package $package, string $status): void
+    public function notifyStatusChange(Package $package, string $status): void
     {
         try {
             $customer = Customer::query()
@@ -61,6 +61,21 @@ class PackageService
                 ]
             );
         }
+    }
+
+    /**
+     * Igual que notifyStatusChange(), pero para los servicios que
+     * cambian current_status dentro de su propia transacción en vez de
+     * pasar por changeStatus() (DestinationReceptionService,
+     * HubReleaseService): el aviso sale solo si esa transacción — y la
+     * exterior, si la hay, como HubReceptionService::attemptAutoRelease()
+     * — se confirma. Si algo revierte el cambio, el cliente nunca recibe
+     * un aviso de un estado que no quedó guardado. Fuera de una
+     * transacción se ejecuta de inmediato.
+     */
+    public function notifyStatusChangeAfterCommit(Package $package, string $status): void
+    {
+        DB::afterCommit(fn () => $this->notifyStatusChange($package, $status));
     }
 
     /**

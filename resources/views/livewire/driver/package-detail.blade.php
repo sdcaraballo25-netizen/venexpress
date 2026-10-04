@@ -508,14 +508,14 @@
                 === \App\Models\Package::STATUS_EN_TRANSITO_NACIONAL
             )
 
-                @if (
-                    $package->requires_delivery
-                    && $package->delivery_status
-                    === \App\Models\Package::DELIVERY_ACCEPTED
-                )
+                {{-- Misma condición que el backend (PackageService::completeDelivery):
+                     asignado a este repartidor, a domicilio y en reparto. --}}
+                @if ($package->requires_delivery)
+
+                    <div class="w-full space-y-3">
 
                     @if ($package->is_cod && ! $package->cod_collected_at)
-                        <div class="mb-3">
+                        <div>
                             <label class="text-sm font-medium text-slate-700">
                                 Forma de pago del cobro (COD: US$ {{ number_format((float) $package->cod_amount_usd, 2) }})
                             </label>
@@ -530,6 +530,49 @@
                             </select>
                         </div>
                     @endif
+
+                    <div class="grid grid-cols-1 gap-3 sm:grid-cols-2">
+                        <div>
+                            <label for="receiverName" class="text-sm font-medium text-slate-700">Nombre de quien recibe</label>
+                            <input id="receiverName" type="text" wire:model="receiverName" autocomplete="off"
+                                   class="mt-1 w-full rounded-xl border border-slate-300 px-3 py-2 text-sm shadow-sm focus:border-emerald-600 focus:ring-emerald-600">
+                            @error('receiverName') <p class="mt-1 text-xs text-red-600">{{ $message }}</p> @enderror
+                        </div>
+
+                        <div>
+                            <label for="receiverIdDoc" class="text-sm font-medium text-slate-700">Documento de quien recibe</label>
+                            <input id="receiverIdDoc" type="text" wire:model="receiverIdDoc" autocomplete="off" placeholder="V-12345678"
+                                   class="mt-1 w-full rounded-xl border border-slate-300 px-3 py-2 text-sm shadow-sm focus:border-emerald-600 focus:ring-emerald-600">
+                            @error('receiverIdDoc') <p class="mt-1 text-xs text-red-600">{{ $message }}</p> @enderror
+                        </div>
+
+                        <div>
+                            <label for="receiverPhone" class="text-sm font-medium text-slate-700">Teléfono (opcional)</label>
+                            <input id="receiverPhone" type="tel" wire:model="receiverPhone" autocomplete="off"
+                                   class="mt-1 w-full rounded-xl border border-slate-300 px-3 py-2 text-sm shadow-sm focus:border-emerald-600 focus:ring-emerald-600">
+                            @error('receiverPhone') <p class="mt-1 text-xs text-red-600">{{ $message }}</p> @enderror
+                        </div>
+
+                        <div>
+                            <label for="deliveryConfirmationMethod" class="text-sm font-medium text-slate-700">Confirmación</label>
+                            <select id="deliveryConfirmationMethod" wire:model="deliveryConfirmationMethod"
+                                    class="mt-1 w-full rounded-xl border border-slate-300 px-3 py-2 text-sm shadow-sm focus:border-emerald-600 focus:ring-emerald-600">
+                                <option value="">Selecciona...</option>
+                                <option value="cedula">Verifiqué su cédula</option>
+                                <option value="firma">Firma</option>
+                                <option value="foto">Foto</option>
+                            </select>
+                            @error('deliveryConfirmationMethod') <p class="mt-1 text-xs text-red-600">{{ $message }}</p> @enderror
+                        </div>
+                    </div>
+
+                    <div>
+                        <label for="deliveryPhoto" class="text-sm font-medium text-slate-700">Foto de evidencia (opcional)</label>
+                        <input id="deliveryPhoto" type="file" accept="image/*" capture="environment" wire:model="deliveryPhoto"
+                               class="mt-1 block w-full text-sm text-slate-600 file:mr-3 file:rounded-lg file:border-0 file:bg-slate-100 file:px-3 file:py-2 file:text-sm file:font-medium">
+                        <p wire:loading wire:target="deliveryPhoto" class="mt-1 text-xs text-slate-500">Subiendo foto...</p>
+                        @error('deliveryPhoto') <p class="mt-1 text-xs text-red-600">{{ $message }}</p> @enderror
+                    </div>
 
                     <button
                         type="button"
@@ -552,24 +595,6 @@
                         </span>
                     </button>
 
-                @elseif (
-                    $package->requires_delivery
-                    && $package->delivery_status
-                    === \App\Models\Package::DELIVERY_PENDING
-                )
-
-                    <div class="rounded-xl bg-amber-50 px-5 py-3 text-sm font-medium text-amber-700">
-                        Esperando aceptación del cliente
-                    </div>
-
-                @elseif (
-                    $package->requires_delivery
-                    && $package->delivery_status
-                    === \App\Models\Package::DELIVERY_REJECTED
-                )
-
-                    <div class="rounded-xl bg-red-50 px-5 py-3 text-sm font-medium text-red-700">
-                        Entrega rechazada por el cliente
                     </div>
 
                 @else
@@ -596,14 +621,17 @@
             @endif
 
 
-            {{-- Incidencia --}}
+            {{-- Incidencia (p. ej. no se pudo entregar). Antes este botón
+                 no hacía nada en el panel web. --}}
             @if (
                 $package->current_status
                 !== \App\Models\Package::STATUS_ENTREGADO
+                && ! $showIncidentForm
             )
 
                 <button
                     type="button"
+                    wire:click="$set('showIncidentForm', true)"
                     class="rounded-xl border border-red-200 px-5 py-3 text-sm font-medium text-red-700 transition hover:bg-red-50"
                 >
                     Reportar incidencia
@@ -612,6 +640,52 @@
             @endif
 
         </div>
+
+        @if ($showIncidentForm && $package->current_status !== \App\Models\Package::STATUS_ENTREGADO)
+
+            <form wire:submit="reportIncident" class="mt-5 space-y-3 rounded-xl border border-red-200 bg-red-50/40 p-4">
+
+                <p class="text-sm font-semibold text-red-800">
+                    Reportar incidencia
+                </p>
+                <p class="text-xs text-red-700">
+                    El estado del paquete no cambia: el equipo administrativo revisará el reporte y te indicará cómo seguir.
+                </p>
+
+                <div>
+                    <label for="incidentType" class="text-sm font-medium text-slate-700">Motivo</label>
+                    <select id="incidentType" wire:model="incidentType"
+                            class="mt-1 w-full rounded-xl border border-slate-300 px-3 py-2 text-sm shadow-sm focus:border-red-600 focus:ring-red-600">
+                        <option value="">Selecciona...</option>
+                        @foreach (\App\Services\IncidentService::DRIVER_TYPE_LABELS as $value => $label)
+                            <option value="{{ $value }}">{{ $label }}</option>
+                        @endforeach
+                    </select>
+                    @error('incidentType') <p class="mt-1 text-xs text-red-600">{{ $message }}</p> @enderror
+                </div>
+
+                <div>
+                    <label for="incidentDescription" class="text-sm font-medium text-slate-700">Descripción</label>
+                    <textarea id="incidentDescription" wire:model="incidentDescription" rows="3" maxlength="1000"
+                              class="mt-1 w-full rounded-xl border border-slate-300 px-3 py-2 text-sm shadow-sm focus:border-red-600 focus:ring-red-600"></textarea>
+                    @error('incidentDescription') <p class="mt-1 text-xs text-red-600">{{ $message }}</p> @enderror
+                </div>
+
+                <div class="flex flex-wrap gap-2">
+                    <button type="submit" wire:loading.attr="disabled" wire:target="reportIncident"
+                            class="rounded-xl bg-red-600 px-5 py-2.5 text-sm font-semibold text-white transition hover:bg-red-700 disabled:opacity-60">
+                        <span wire:loading.remove wire:target="reportIncident">Enviar reporte</span>
+                        <span wire:loading wire:target="reportIncident">Enviando...</span>
+                    </button>
+                    <button type="button" wire:click="$set('showIncidentForm', false)"
+                            class="rounded-xl border border-slate-300 px-5 py-2.5 text-sm font-medium text-slate-700 transition hover:bg-white">
+                        Cancelar
+                    </button>
+                </div>
+
+            </form>
+
+        @endif
 
     </div>
 

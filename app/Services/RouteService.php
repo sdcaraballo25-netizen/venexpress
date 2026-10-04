@@ -719,6 +719,27 @@ class RouteService
     }
 
     /**
+     * IDs de todos los paquetes que pertenecen a esta ruta según su
+     * route_type, combinando las fuentes de verdad de arriba (mismo
+     * criterio que pendingPackagesCountFor()). Lo usa el panel del
+     * repartidor para listar "las entregas de mi ruta" sin confundirlas
+     * con las entregas individuales (claimForDelivery), que también
+     * llevan su driver_id pero no pertenecen a ninguna ruta.
+     */
+    public function packageIdsForRoute(Route $route): \Illuminate\Support\Collection
+    {
+        return match ($route->route_type) {
+            Route::TYPE_DELIVERY => $this->packageIdsCollectedOnRoute($route)
+                ->merge($this->packageIdsAssignedDirectlyOnRoute($route))
+                ->unique()
+                ->values(),
+            Route::TYPE_HUB_TRANSFER => $this->packageIdsCollectedOnRoute($route),
+            Route::TYPE_HUB_DISTRIBUTION => $this->packageIdsDispatchedOnRoute($route),
+            default => collect(),
+        };
+    }
+
+    /**
      * Cuenta los paquetes de esta ruta que todavía no llegaron a su
      * hito final, según route_type — la definición de "pendiente" no
      * es la misma para los tres tipos:

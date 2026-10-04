@@ -250,21 +250,88 @@ class GoogleAuthTest extends TestCase
         $this->assertNull($user->fresh()->google_id);
     }
 
-    public function test_a_client_who_never_entered_the_code_is_verified_by_logging_in_with_google(): void
+    /**
+     * Antes, entrar con Google vinculaba (e iniciaba sesión en)
+     * cualquier cuenta con ese correo aunque nunca se hubiera
+     * verificado. Cualquiera puede registrar una cuenta con un correo
+     * ajeno y conocer su contraseña: vincularla dejaba al dueño real
+     * del correo dentro de una cuenta que otra persona controla.
+     */
+    public function test_an_unverified_account_is_not_auto_linked_through_google(): void
     {
-        $user = User::factory()->create([
+        $user = User::factory()->unverifiedAccount()->create([
             'email' => 'sin-codigo@example.com',
             'role' => User::ROLE_CLIENTE,
             'status' => User::STATUS_ACTIVE,
+            'google_id' => null,
         ]);
 
         $this->assertFalse($user->isAccountVerified());
 
         $this->fakeGoogleCallback('sin-codigo@example.com', 'google-sin-codigo');
 
+        $this->get(route('auth.google.callback'))->assertRedirect(route('login'));
+
+        $this->assertGuest();
+        $this->assertNull($user->fresh()->google_id);
+        $this->assertFalse($user->fresh()->isAccountVerified());
+    }
+
+    public function test_an_unverified_operator_account_is_not_auto_linked_through_google(): void
+    {
+        $user = User::factory()->unverifiedAccount()->create([
+            'email' => 'aliado-sin-codigo@example.com',
+            'role' => User::ROLE_ALIADO,
+            'status' => User::STATUS_ACTIVE,
+            'google_id' => null,
+        ]);
+
+        $this->fakeGoogleCallback('aliado-sin-codigo@example.com', 'google-aliado');
+
+        $this->get(route('auth.google.callback'))->assertRedirect(route('login'));
+
+        $this->assertGuest();
+        $this->assertNull($user->fresh()->google_id);
+    }
+
+    public function test_an_account_already_linked_to_the_same_google_id_still_logs_in(): void
+    {
+        $user = User::factory()->create([
+            'email' => 'vinculada@example.com',
+            'role' => User::ROLE_CLIENTE,
+            'status' => User::STATUS_ACTIVE,
+            'google_id' => 'google-vinculada',
+        ]);
+
+        $this->fakeGoogleCallback('vinculada@example.com', 'google-vinculada');
+
         $this->get(route('auth.google.callback'))->assertRedirect(route('cliente.dashboard'));
 
-        $this->assertTrue($user->fresh()->isAccountVerified());
+        $this->assertAuthenticatedAs($user->fresh());
+    }
+
+    public function test_an_operator_registered_through_google_is_verified_without_a_code(): void
+    {
+        session([
+            'google_pending' => [
+                'google_id' => 'google-repartidor',
+                'name' => 'Repartidor Google',
+                'email' => 'repartidor-google@example.com',
+            ],
+        ]);
+
+        Volt::test('pages.auth.register')
+            ->set('role', 'repartidor')
+            ->set('vehicle_plate', 'GOO123')
+            ->set('vehicle_type', 'Moto')
+            ->set('phone', '+58 412 1234567')
+            ->call('register')
+            ->assertRedirect(route('repartidor.dashboard', absolute: false));
+
+        $user = User::where('email', 'repartidor-google@example.com')->firstOrFail();
+
+        $this->assertTrue($user->isAccountVerified());
+        $this->assertAuthenticatedAs($user);
     }
 
     public function test_an_invalid_oauth_state_redirects_to_login_instead_of_crashing(): void

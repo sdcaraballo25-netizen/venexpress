@@ -416,14 +416,7 @@ new #[Layout('layouts.guest')] class extends Component
 
             $user->notify(new AccountPendingApproval('Aliado'));
 
-            Auth::login($user);
-
-            session()->forget('google_pending');
-
-            $this->redirect(
-                route('ally.dashboard', absolute: false),
-                navigate: true
-            );
+            $this->finishRegistration($user);
 
             return;
         }
@@ -462,14 +455,7 @@ new #[Layout('layouts.guest')] class extends Component
 
             $user->notify(new AccountPendingApproval('Repartidor'));
 
-            Auth::login($user);
-
-            session()->forget('google_pending');
-
-            $this->redirect(
-                route('repartidor.dashboard', absolute: false),
-                navigate: true
-            );
+            $this->finishRegistration($user);
 
             return;
         }
@@ -506,14 +492,7 @@ new #[Layout('layouts.guest')] class extends Component
 
             $user->notify(new AccountPendingApproval('Emprendedor'));
 
-            Auth::login($user);
-
-            session()->forget('google_pending');
-
-            $this->redirect(
-                route('emprendedor.dashboard', absolute: false),
-                navigate: true
-            );
+            $this->finishRegistration($user);
 
             return;
         }
@@ -550,39 +529,45 @@ new #[Layout('layouts.guest')] class extends Component
 
         $customer->save();
 
-        // Un correo de Google ya viene verificado por Google (y
-        // email_verified_at ya quedó marcado al crear el User arriba),
-        // así que el código de 6 dígitos por correo sería redundante.
+        $this->finishRegistration($user);
+    }
+
+    /**
+     * Cierre común del registro para todos los roles (Cliente, Aliado,
+     * Repartidor y Emprendedor): el correo debe quedar verificado antes
+     * de entrar al panel (EnsureAccountIsVerified).
+     *
+     * - Por Google: Google ya verificó el correo, así que el código de
+     *   6 dígitos sería redundante — se marca verificado y entra.
+     * - Manual: se envía el código y se manda a /verify-account sin
+     *   iniciar sesión todavía; VerifyAccount inicia la sesión al
+     *   confirmar el código y redirige al panel de cada rol.
+     */
+    protected function finishRegistration(User $user): void
+    {
         if ($this->viaGoogle) {
             session()->forget('google_pending');
 
-            // Sin esto account_verified_at quedaba null y
-            // EnsureAccountIsVerified sacaba al cliente de su panel
-            // hacia /verify-account, sin ningún código enviado.
             $user->markAccountAsVerified();
 
             Auth::login($user);
 
             $this->redirect(
-                route('cliente.dashboard', absolute: false),
+                route($user->homeRouteName(), absolute: false),
                 navigate: true
             );
 
             return;
         }
 
-        // Generar y guardar el código de verificación.
         $plainToken = $user->generateVerificationToken();
 
-        // Enviar el código al correo del cliente.
         $user->notify(new WelcomeVerificationToken($plainToken));
 
-        // Guardar temporalmente el usuario pendiente de verificación.
         session([
             'pending_verification_user_id' => $user->id,
         ]);
 
-        // El cliente debe verificar su cuenta antes de entrar al panel.
         $this->redirect(
             route('verify-account', absolute: false),
             navigate: true

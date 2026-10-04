@@ -88,6 +88,9 @@ class PackageDetailCodPaymentMethodTest extends TestCase
         Livewire::actingAs($user)
             ->test(PackageDetail::class, ['packageId' => $package->id])
             ->set('codPaymentMethod', 'transferencia')
+            ->set('receiverName', 'María Gómez')
+            ->set('receiverIdDoc', 'V-87654321')
+            ->set('deliveryConfirmationMethod', 'cedula')
             ->call('completeDelivery');
 
         $package->refresh();
@@ -112,6 +115,9 @@ class PackageDetailCodPaymentMethodTest extends TestCase
         Livewire::actingAs($user)
             ->test(PackageDetail::class, ['packageId' => $package->id])
             ->assertDontSee('Forma de pago del cobro')
+            ->set('receiverName', 'María Gómez')
+            ->set('receiverIdDoc', 'V-87654321')
+            ->set('deliveryConfirmationMethod', 'cedula')
             ->call('completeDelivery');
 
         $package->refresh();

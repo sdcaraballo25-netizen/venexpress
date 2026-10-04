@@ -51,6 +51,14 @@ class DriverAuthController extends Controller
             ]);
         }
 
+        // Mismo requisito que el panel web (EnsureAccountIsVerified):
+        // sin código de verificación confirmado, no hay token operativo.
+        if (! $user->isAccountVerified()) {
+            throw ValidationException::withMessages([
+                'email' => ['Debes verificar tu correo antes de usar la app. Ingresa al sitio web para completar la verificación.'],
+            ]);
+        }
+
         $driver = $user->driver;
 
         if (! $driver) {

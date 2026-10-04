@@ -223,6 +223,10 @@ class UsersManager extends Component
                 'email_verified_at' => now(),
             ]);
 
+            // Cuenta creada por un Admin (no autorregistrada): no pasa
+            // por el código de verificación de EnsureAccountIsVerified.
+            $user->forceFill(['account_verified_at' => now()])->save();
+
             if ($user->isAliado()) {
                 Ally::create([
                     'user_id' => $user->id,

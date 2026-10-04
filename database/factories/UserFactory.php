@@ -28,6 +28,9 @@ class UserFactory extends Factory
             'name' => fake()->name(),
             'email' => fake()->unique()->safeEmail(),
             'email_verified_at' => now(),
+            // Código de verificación de VenExpress ya confirmado
+            // (EnsureAccountIsVerified). Ver unverifiedAccount().
+            'account_verified_at' => now(),
             'password' => static::$password ??= Hash::make('password'),
             'remember_token' => Str::random(10),
         ];
@@ -40,6 +43,18 @@ class UserFactory extends Factory
     {
         return $this->state(fn (array $attributes) => [
             'email_verified_at' => null,
+            'account_verified_at' => null,
+        ]);
+    }
+
+    /**
+     * Cuenta autorregistrada que todavía no introdujo el código de
+     * verificación de 6 dígitos.
+     */
+    public function unverifiedAccount(): static
+    {
+        return $this->state(fn (array $attributes) => [
+            'account_verified_at' => null,
         ]);
     }
 }

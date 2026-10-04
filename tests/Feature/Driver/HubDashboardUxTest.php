@@ -540,6 +540,10 @@ class HubDashboardUxTest extends TestCase
         Livewire::actingAs($user)
             ->test(PackageDetail::class, ['packageId' => $enReparto->id])
             ->assertSee('Confirmar entrega')
+            // Mismos datos del receptor que exige la app.
+            ->set('receiverName', 'María Gómez')
+            ->set('receiverIdDoc', 'V-87654321')
+            ->set('deliveryConfirmationMethod', 'cedula')
             ->call('completeDelivery');
 
         $this->assertSame(

@@ -52,6 +52,13 @@ class DestinationReceptionService
                 'scanned_by_user_id' => $userId,
             ]);
 
+            // El destinatario ya puede pasar a retirarlo: mismo aviso
+            // por correo que el resto de cambios de estado.
+            app(PackageService::class)->notifyStatusChangeAfterCommit(
+                $locked,
+                Package::STATUS_LISTO_RETIRO
+            );
+
             return $locked->fresh(['ally', 'driver', 'histories']);
         });
     }

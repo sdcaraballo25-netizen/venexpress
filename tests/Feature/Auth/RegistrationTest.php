@@ -8,6 +8,7 @@ use App\Models\Driver;
 use App\Models\Emprendedor;
 use App\Models\User;
 use App\Notifications\AccountPendingApproval;
+use App\Notifications\WelcomeVerificationToken;
 use Illuminate\Foundation\Testing\RefreshDatabase;
 use Illuminate\Support\Facades\Notification;
 use Livewire\Volt\Volt;
@@ -191,7 +192,10 @@ class RegistrationTest extends TestCase
         $component->call('register');
 
         $component->assertHasNoErrors();
-        $component->assertRedirect(route('ally.dashboard', absolute: false));
+        // Como el cliente: primero verifica el correo con el código,
+        // sin sesión iniciada todavía (EnsureAccountIsVerified).
+        $component->assertRedirect(route('verify-account', absolute: false));
+        $this->assertGuest();
 
         $ally = Ally::where('rif', 'J-12345678-9')->first();
 
@@ -209,6 +213,8 @@ class RegistrationTest extends TestCase
         $this->assertNull($ally->longitude);
 
         Notification::assertSentTo($ally->user, AccountPendingApproval::class);
+        Notification::assertSentTo($ally->user, WelcomeVerificationToken::class);
+        $this->assertFalse($ally->user->isAccountVerified());
     }
 
     /**
@@ -233,7 +239,8 @@ class RegistrationTest extends TestCase
         $component->call('register');
 
         $component->assertHasNoErrors();
-        $component->assertRedirect(route('repartidor.dashboard', absolute: false));
+        $component->assertRedirect(route('verify-account', absolute: false));
+        $this->assertGuest();
 
         $user = User::where('email', 'repartidor@example.com')->first();
 
@@ -248,6 +255,8 @@ class RegistrationTest extends TestCase
         $this->assertNull($user->driver->vehicle_registration_photo_path);
 
         Notification::assertSentTo($user, AccountPendingApproval::class);
+        Notification::assertSentTo($user, WelcomeVerificationToken::class);
+        $this->assertFalse($user->isAccountVerified());
     }
 
     private function createActiveAlly(): Ally
@@ -284,7 +293,8 @@ class RegistrationTest extends TestCase
 
         $component->call('register');
 
-        $component->assertRedirect(route('emprendedor.dashboard', absolute: false));
+        $component->assertRedirect(route('verify-account', absolute: false));
+        $this->assertGuest();
 
         $user = User::where('email', 'emprendedor@example.com')->first();
 
@@ -295,6 +305,8 @@ class RegistrationTest extends TestCase
         $this->assertSame($pickupAlly->id, $user->emprendedor->pickup_ally_id);
 
         Notification::assertSentTo($user, AccountPendingApproval::class);
+        Notification::assertSentTo($user, WelcomeVerificationToken::class);
+        $this->assertFalse($user->isAccountVerified());
     }
 
     public function test_emprendedor_registration_requires_an_active_pickup_ally(): void

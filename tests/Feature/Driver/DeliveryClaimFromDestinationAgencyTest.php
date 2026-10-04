@@ -88,19 +88,28 @@ class DeliveryClaimFromDestinationAgencyTest extends TestCase
             ->assertJsonPath('package.current_status', Package::STATUS_ENTREGADO);
     }
 
-    public function test_available_deliveries_list_includes_packages_at_destination_agency(): void
+    /**
+     * Ya no existe una lista global de paquetes para elegir: el
+     * endpoint se conserva (mismo formato, para versiones anteriores de
+     * la app) pero nunca devuelve paquetes ni sus datos personales.
+     * Tomar una entrega se hace escaneando la guía (claim-by-scan).
+     */
+    public function test_available_deliveries_endpoint_no_longer_lists_packages(): void
     {
         [$user] = $this->createDeliveryDriverUser();
         $ally = $this->createAlly();
 
-        $this->createPackage($ally, [
+        $package = $this->createPackage($ally, [
             'requires_delivery' => true,
             'current_status' => Package::STATUS_LISTO_RETIRO,
         ]);
 
         $this->getJson('/api/driver/deliveries/available', $this->authHeaders($user))
             ->assertOk()
-            ->assertJsonCount(1, 'data');
+            ->assertJsonCount(0, 'data')
+            ->assertJsonPath('meta.total', 0)
+            ->assertDontSee($package->tracking_number)
+            ->assertDontSee($package->recipient_name);
     }
 
     public function test_still_cannot_claim_an_already_delivered_package(): void
