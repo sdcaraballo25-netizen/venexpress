@@ -1081,10 +1081,11 @@
 
 
     {{-- =========================================================
-         SIN RUTA: ENTREGAS INDIVIDUALES
-         No se muestra ninguna lista de paquetes disponibles: el
-         repartidor escanea la guía y el backend decide si puede
-         tomarla (LogisticsScanService::scanForDelivery()).
+         SIN RUTA
+         No se muestra ninguna lista de paquetes disponibles. Tomar una
+         entrega exige una ruta de reparto en curso
+         (PackageService::claimForDelivery()); sin ella el escáner solo
+         sirve para abrir paquetes que ya le pertenecen.
     ========================================================== --}}
     @unless ($activeRoute)
 
@@ -1095,11 +1096,11 @@
                     Sin ruta asignada
                 </p>
                 <h2 class="mt-1 font-display text-lg font-bold text-blue-950">
-                    Entregas individuales
+                    Toma una ruta para empezar a entregar
                 </h2>
                 <p class="mt-1 max-w-xl text-sm text-blue-900/80">
-                    Puedes entregar un paquete sin ruta: escanea su guía o escribe el número.
-                    El sistema verifica si está listo para entrega y si nadie más lo tomó.
+                    Las entregas se toman escaneando la guía con una ruta de reparto en curso.
+                    El sistema verifica que el paquete esté en el HUB de tu zona y que nadie más lo tomó.
                 </p>
             </div>
 

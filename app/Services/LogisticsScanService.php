@@ -60,7 +60,13 @@ class LogisticsScanService
             return false;
         }
 
-        if ($activeRoute->stops->contains('ally_id', $package->ally_id)) {
+        // Solo los paquetes que todavía puede recolectar en esa parada:
+        // ser parada de su ruta no le da acceso al histórico completo de
+        // guías (y sus datos personales) de esa agencia.
+        if (
+            $package->current_status === Package::STATUS_RECIBIDO_AGENCIA
+            && $activeRoute->stops->contains('ally_id', $package->ally_id)
+        ) {
             return true;
         }
 
@@ -95,11 +101,11 @@ class LogisticsScanService
      *   reclamo anterior) → no cambia nada, solo lo devuelve para que
      *   pueda continuar la entrega.
      * - Asignado a otro repartidor → se rechaza.
-     * - Sin repartidor → entrega individual sin ruta con
-     *   PackageService::claimForDelivery(), que valida que requiera
-     *   domicilio, que esté en un estado reclamable y que nadie lo haya
-     *   tomado (con bloqueo de fila: solo uno gana si dos escanean a la
-     *   vez).
+     * - Sin repartidor → PackageService::claimForDelivery(), que exige
+     *   una ruta de reparto en curso, que el paquete requiera domicilio,
+     *   esté LISTO_RETIRO en su HUB destino, que ese HUB sea el de la
+     *   zona de la ruta (WarehouseCoverage) y que nadie lo haya tomado
+     *   (con bloqueo de fila: solo uno gana si dos escanean a la vez).
      *
      * @return array{0: string, 1: Package} [resultado, paquete]
      *

@@ -10,6 +10,7 @@ use App\Services\DeliveryAssignmentService;
 use App\Services\DestinationReceptionService;
 use App\Services\PackageService;
 use Illuminate\Support\Facades\Auth;
+use Illuminate\Support\Facades\DB;
 use Livewire\Attributes\Computed;
 use Livewire\Attributes\Layout;
 use Livewire\Attributes\Title;
@@ -155,22 +156,31 @@ class Dashboard extends Component
             ->first();
 
         try {
-            // Libera la custodia del driver de HUB que lo trajo: sin
-            // esto, DeliveryAssignmentService::assign() más adelante
-            // rechazaría asignarlo a un repartidor de reparto distinto
-            // (cree que "ya está asignado a otro repartidor").
-            $package->update(['driver_id' => null]);
+            // Una sola transacción: si la recepción falla (p. ej. el
+            // paquete no está EN_TRANSITO_NACIONAL), no queda nada a
+            // medias — antes driver_id se borraba ANTES de validar y
+            // fuera de cualquier transacción.
+            DB::transaction(function () use ($receptionService, $package, $warehouse, $stop) {
+                $received = $receptionService->receive(
+                    package: $package,
+                    userId: (int) Auth::id(),
+                    destinationLocation: 'Almacén '.$warehouse->name,
+                    routeStopId: $stop?->id,
+                );
 
-            $receptionService->receive(
-                package: $package,
-                userId: (int) Auth::id(),
-                destinationLocation: 'Almacén '.$warehouse->name,
-                routeStopId: $stop?->id,
-            );
+                // Recibido: libera la custodia del driver de HUB que lo
+                // trajo (sin esto, DeliveryAssignmentService::assign()
+                // rechazaría asignarlo a otro repartidor) y deja
+                // constancia del HUB donde quedó físicamente.
+                $received->forceFill([
+                    'driver_id' => null,
+                    'current_warehouse_id' => $warehouse->id,
+                ])->save();
 
-            if ($stop && $stop->status === RouteStop::STATUS_PENDING) {
-                $stop->update(['status' => RouteStop::STATUS_VISITED, 'visited_at' => now()]);
-            }
+                if ($stop && $stop->status === RouteStop::STATUS_PENDING) {
+                    $stop->update(['status' => RouteStop::STATUS_VISITED, 'visited_at' => now()]);
+                }
+            });
 
             $this->scanSuccess = "Guía {$trackingNumber} recibida en {$warehouse->name}. Ya está lista para entregar.";
             $this->trackingNumber = '';

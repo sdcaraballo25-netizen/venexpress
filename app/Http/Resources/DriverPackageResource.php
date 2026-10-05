@@ -19,16 +19,16 @@ class DriverPackageResource extends JsonResource
 
             // Datos del remitente (necesarios para que el
             // repartidor pueda contactarlo si hay un problema).
+            // La Cédula/RIF (sender_id_doc / recipient_id_doc) nunca
+            // se envía al repartidor: no la necesita para entregar.
             'sender' => [
                 'name' => $this->sender_name,
-                'id_doc' => $this->sender_id_doc,
                 'phone' => $this->sender_phone,
             ],
 
             // Datos del destinatario, necesarios para entregar.
             'recipient' => [
                 'name' => $this->recipient_name,
-                'id_doc' => $this->recipient_id_doc,
                 'phone' => $this->recipient_phone,
             ],
 

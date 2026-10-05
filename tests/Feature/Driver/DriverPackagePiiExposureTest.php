@@ -121,4 +121,112 @@ class DriverPackagePiiExposureTest extends TestCase
         $this->assertStringNotContainsString('Destinatario Secreto', $response->getContent());
         $this->assertStringNotContainsString('250', $response->getContent());
     }
+
+    /*
+    |--------------------------------------------------------------------------
+    | Cédula/RIF: nunca llega al repartidor, ni de sus propios paquetes
+    |--------------------------------------------------------------------------
+    */
+
+    private const SENDER_DOC = 'V-11222333';
+
+    private const RECIPIENT_DOC = 'J-44555666-7';
+
+    private function ownPackage(Driver $driver): \App\Models\Package
+    {
+        return $this->createPackage($this->createAlly(), [
+            'driver_id' => $driver->id,
+            'sender_id_doc' => self::SENDER_DOC,
+            'recipient_id_doc' => self::RECIPIENT_DOC,
+            'requires_delivery' => true,
+            'delivery_address' => 'Av. Bolívar, casa 10',
+            'delivery_reference' => 'Frente a la plaza',
+            'current_status' => \App\Models\Package::STATUS_EN_TRANSITO_NACIONAL,
+        ]);
+    }
+
+    public function test_api_detail_and_list_never_include_the_cedula_or_rif(): void
+    {
+        [$user, $driver] = $this->createDriverUser();
+        $package = $this->ownPackage($driver);
+        $headers = $this->authHeaders($user);
+
+        $detail = $this->getJson("/api/driver/packages/{$package->id}", $headers)
+            ->assertOk()
+            // Lo que sí necesita para entregar.
+            ->assertJsonPath('package.recipient.name', 'María Gómez')
+            ->assertJsonPath('package.recipient.phone', '0424-7654321')
+            ->assertJsonPath('package.delivery_address', 'Av. Bolívar, casa 10')
+            ->assertJsonPath('package.delivery_reference', 'Frente a la plaza')
+            ->assertJsonMissingPath('package.recipient.id_doc')
+            ->assertJsonMissingPath('package.sender.id_doc');
+
+        $this->assertStringNotContainsString(self::SENDER_DOC, $detail->getContent());
+        $this->assertStringNotContainsString(self::RECIPIENT_DOC, $detail->getContent());
+
+        $list = $this->getJson('/api/driver/packages', $headers)->assertOk();
+        $this->assertStringNotContainsString(self::SENDER_DOC, $list->getContent());
+        $this->assertStringNotContainsString(self::RECIPIENT_DOC, $list->getContent());
+
+        $lookup = $this->getJson('/api/driver/packages/lookup?tracking_number='.$package->tracking_number, $headers)
+            ->assertOk();
+        $this->assertStringNotContainsString(self::RECIPIENT_DOC, $lookup->getContent());
+    }
+
+    public function test_web_package_detail_does_not_show_the_cedula_or_rif(): void
+    {
+        [$user, $driver] = $this->createDriverUser();
+        $package = $this->ownPackage($driver);
+
+        \Livewire\Livewire::actingAs($user)
+            ->test(\App\Livewire\Driver\PackageDetail::class, ['packageId' => $package->id])
+            ->assertSee('María Gómez')
+            ->assertSee('0424-7654321')
+            ->assertSee('Av. Bolívar, casa 10')
+            ->assertDontSee(self::SENDER_DOC)
+            ->assertDontSee(self::RECIPIENT_DOC);
+    }
+
+    public function test_label_pdf_hides_the_cedula_or_rif_for_the_driver_only(): void
+    {
+        [$user, $driver] = $this->createDriverUser();
+        $package = $this->ownPackage($driver);
+
+        \Barryvdh\DomPDF\Facade\Pdf::shouldReceive('loadView')
+            ->once()
+            ->withArgs(fn ($view, $data) => $view === 'pdf.package-label' && $data['hideIdDocs'] === true)
+            ->andReturnSelf();
+        \Barryvdh\DomPDF\Facade\Pdf::shouldReceive('setPaper')->andReturnSelf();
+        \Barryvdh\DomPDF\Facade\Pdf::shouldReceive('stream')->andReturn(new \Illuminate\Http\Response('pdf'));
+
+        $this->actingAs($user)
+            ->get(route('packages.label', $package))
+            ->assertOk();
+
+        $data = ['package' => $package, 'barcodeSvg' => '', 'qrDataUri' => ''];
+
+        $forDriver = view('pdf.package-label', $data + ['hideIdDocs' => true])->render();
+        $this->assertStringNotContainsString(self::SENDER_DOC, $forDriver);
+        $this->assertStringNotContainsString(self::RECIPIENT_DOC, $forDriver);
+        $this->assertStringContainsString('0424-7654321', $forDriver);
+
+        // Admin/Aliado (hideIdDocs falso o ausente) la siguen viendo.
+        $forStaff = view('pdf.package-label', $data)->render();
+        $this->assertStringContainsString(self::SENDER_DOC, $forStaff);
+        $this->assertStringContainsString(self::RECIPIENT_DOC, $forStaff);
+    }
+
+    public function test_the_ally_still_sees_the_cedula_or_rif_of_its_packages(): void
+    {
+        $ally = $this->createAlly();
+        $package = $this->createPackage($ally, [
+            'sender_id_doc' => self::SENDER_DOC,
+            'recipient_id_doc' => self::RECIPIENT_DOC,
+        ]);
+
+        \Livewire\Livewire::actingAs($ally->user)
+            ->test(\App\Livewire\Ally\PackageDetail::class, ['packageId' => $package->id])
+            ->assertSee(self::SENDER_DOC)
+            ->assertSee(self::RECIPIENT_DOC);
+    }
 }

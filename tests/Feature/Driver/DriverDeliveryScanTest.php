@@ -12,6 +12,9 @@ use App\Models\Package;
 use App\Models\Route;
 use App\Models\RouteStop;
 use App\Models\User;
+use App\Models\Warehouse;
+use App\Models\WarehouseCoverage;
+use App\Services\RouteService;
 use Illuminate\Foundation\Testing\RefreshDatabase;
 use Livewire\Livewire;
 use Tests\Feature\Concerns\CreatesTestPackages;
@@ -22,10 +25,12 @@ use Tests\TestCase;
  * depender de Flutter) y la API, compartiendo la misma decisión
  * (LogisticsScanService::scanForDelivery()):
  *
- * - Modelo con ruta: paquetes de SU ruta (recolección en una parada o
- *   asignación de Admin a la ruta).
- * - Modelo sin ruta: entrega individual de un paquete listo, tomada
- *   escaneando la guía (PackageService::claimForDelivery()).
+ * - Paquetes de SU ruta (recolección en una parada o asignación de
+ *   Admin a la ruta).
+ * - Toma por escaneo (PackageService::claimForDelivery()): solo con una
+ *   ruta de reparto en curso, y solo un paquete LISTO_RETIRO que ya
+ *   está en el HUB destino de la zona de esa ruta (WarehouseCoverage).
+ *   Conocer el número de guía no basta.
  * - No existe ninguna lista ni búsqueda global de paquetes, y los datos
  *   personales solo se muestran una vez validado que la guía le toca.
  */
@@ -35,6 +40,35 @@ class DriverDeliveryScanTest extends TestCase
     use RefreshDatabase;
 
     private const RECIPIENT = 'María Gómez';
+
+    /** HUB de Valencia, con cobertura activa de Valencia (Carabobo). */
+    private function valenciaHub(): Warehouse
+    {
+        return $this->hubCovering('Carabobo', 'Valencia');
+    }
+
+    private function hubCovering(string $state, string $city): Warehouse
+    {
+        $hub = Warehouse::factory()->create(['state' => $state, 'city' => $city]);
+
+        WarehouseCoverage::create([
+            'warehouse_id' => $hub->id,
+            'state' => $state,
+            'city' => $city,
+            'is_active' => true,
+        ]);
+
+        return $hub;
+    }
+
+    /** Paquete a domicilio ya recibido (LISTO_RETIRO) en su HUB destino. */
+    private function readyAtHub(Warehouse $hub, array $overrides = []): Package
+    {
+        return $this->readyForDelivery(array_merge([
+            'current_warehouse_id' => $hub->id,
+            'destination_warehouse_id' => $hub->id,
+        ], $overrides));
+    }
 
     private function deliveryDriver(string $password = 'password-seguro'): array
     {
@@ -212,16 +246,38 @@ class DriverDeliveryScanTest extends TestCase
 
     /*
     |--------------------------------------------------------------------------
-    | Modelo sin ruta (entrega individual)
+    | Toma por escaneo (claimForDelivery)
     |--------------------------------------------------------------------------
     */
 
-    public function test_a_ready_package_without_route_can_be_taken_by_scanning(): void
+    /**
+     * Antes: test_a_ready_package_without_route_can_be_taken_by_scanning
+     * validaba que cualquier repartidor tomara un paquete solo con su
+     * guía, sin ruta. La regla actual lo prohíbe: sin ruta de reparto
+     * en curso no hay relación operativa con el paquete.
+     */
+    public function test_a_ready_package_cannot_be_taken_without_a_delivery_route(): void
     {
         [$user, $driver] = $this->deliveryDriver();
-        $package = $this->readyForDelivery();
+        $package = $this->readyAtHub($this->valenciaHub());
 
         $this->assertFalse(Route::where('driver_id', $driver->id)->exists());
+
+        $this->scan($user, $package->tracking_number)
+            ->assertSet('errorMessage', 'Necesitas una ruta de reparto en curso para tomar entregas. Toma e inicia una ruta antes de escanear.')
+            ->assertSet('package', null)
+            ->assertDontSee(self::RECIPIENT);
+
+        $package->refresh();
+        $this->assertNull($package->driver_id);
+        $this->assertSame(Package::STATUS_LISTO_RETIRO, $package->current_status);
+    }
+
+    public function test_a_ready_package_at_the_route_hub_is_taken_by_scanning_and_linked_to_the_route(): void
+    {
+        [$user, $driver] = $this->deliveryDriver();
+        $route = $this->deliveryRoute($driver, $user);
+        $package = $this->readyAtHub($this->valenciaHub());
 
         $this->scan($user, $package->tracking_number)
             ->assertSet('errorMessage', null)
@@ -232,15 +288,127 @@ class DriverDeliveryScanTest extends TestCase
         $this->assertSame($driver->id, $package->driver_id);
         $this->assertSame(Package::STATUS_EN_TRANSITO_NACIONAL, $package->current_status);
 
-        // No se creó ninguna ruta artificial para poder entregarlo.
-        $this->assertFalse(Route::where('driver_id', $driver->id)->exists());
+        // Queda ligado a SU ruta: cuenta para completarla/cancelarla.
+        $this->assertTrue(
+            app(RouteService::class)->packageIdsForRoute($route)->contains($package->id)
+        );
+    }
+
+    public function test_a_package_still_in_national_transit_cannot_be_taken_even_with_a_route(): void
+    {
+        [$user, $driver] = $this->deliveryDriver();
+        $this->deliveryRoute($driver, $user);
+        $hub = $this->valenciaHub();
+
+        // Viajando entre HUBs (custodia ya liberada por scanHubArrival,
+        // o despachado sin repartidor): antes era reclamable.
+        $package = $this->readyForDelivery([
+            'current_status' => Package::STATUS_EN_TRANSITO_NACIONAL,
+            'destination_warehouse_id' => $hub->id,
+        ]);
+
+        $this->scan($user, $package->tracking_number)
+            ->assertSet('errorMessage', 'Este paquete todavía no está listo para reparto. Estado actual: En Tránsito.')
+            ->assertSet('package', null)
+            ->assertDontSee(self::RECIPIENT);
+
+        $package->refresh();
+        $this->assertNull($package->driver_id);
+        $this->assertSame(Package::STATUS_EN_TRANSITO_NACIONAL, $package->current_status);
+    }
+
+    public function test_a_package_released_by_a_cancelled_route_cannot_be_taken_by_another_driver(): void
+    {
+        [$userA, $driverA] = $this->deliveryDriver();
+        [$userB, $driverB] = $this->deliveryDriver();
+        $hub = $this->valenciaHub();
+
+        $routeA = $this->deliveryRoute($driverA, $userA);
+        $this->deliveryRoute($driverB, $userB);
+
+        $package = $this->readyAtHub($hub);
+        $this->scan($userA, $package->tracking_number)->assertSet('errorMessage', null);
+
+        app(RouteService::class)->cancel($routeA, $userA->id);
+
+        $package->refresh();
+        $this->assertNull($package->driver_id);
+        $this->assertSame(Package::STATUS_EN_TRANSITO_NACIONAL, $package->current_status);
+
+        $this->scan($userB, $package->tracking_number)
+            ->assertSet('package', null)
+            ->assertNotSet('errorMessage', null)
+            ->assertDontSee(self::RECIPIENT);
+
+        $this->assertNull($package->fresh()->driver_id);
+    }
+
+    public function test_a_package_of_another_zone_cannot_be_taken(): void
+    {
+        [$user, $driver] = $this->deliveryDriver();
+        $this->valenciaHub();
+        $this->deliveryRoute($driver, $user); // Zona: Valencia.
+
+        $maracaiboHub = $this->hubCovering('Zulia', 'Maracaibo');
+        $package = $this->readyAtHub($maracaiboHub, [
+            'destination_city' => 'Maracaibo',
+            'destination_state' => 'Zulia',
+        ]);
+
+        $this->scan($user, $package->tracking_number)
+            ->assertSet('errorMessage', 'Este paquete no pertenece a la zona de tu ruta de reparto.')
+            ->assertSet('package', null)
+            ->assertDontSee(self::RECIPIENT);
+
+        $this->assertNull($package->fresh()->driver_id);
+    }
+
+    public function test_a_package_not_yet_received_at_its_destination_hub_cannot_be_taken(): void
+    {
+        [$user, $driver] = $this->deliveryDriver();
+        $this->deliveryRoute($driver, $user);
+        $valencia = $this->valenciaHub();
+        $otherHub = $this->hubCovering('Zulia', 'Maracaibo');
+
+        $cases = [
+            // LISTO_RETIRO sin HUB físico registrado.
+            $this->readyForDelivery(['current_warehouse_id' => null]),
+            // Físicamente en un HUB que no es su destino.
+            $this->readyForDelivery([
+                'current_warehouse_id' => $otherHub->id,
+                'destination_warehouse_id' => $valencia->id,
+            ]),
+        ];
+
+        foreach ($cases as $package) {
+            $this->scan($user, $package->tracking_number)
+                ->assertSet('errorMessage', 'Este paquete todavía no fue recibido en su HUB destino. No puede salir a reparto.')
+                ->assertSet('package', null);
+
+            $this->assertNull($package->fresh()->driver_id);
+        }
+    }
+
+    public function test_a_route_that_is_only_assigned_but_not_started_cannot_take_packages(): void
+    {
+        [$user, $driver] = $this->deliveryDriver();
+        $this->deliveryRoute($driver, $user, ['status' => Route::STATUS_ASSIGNED, 'started_at' => null]);
+        $package = $this->readyAtHub($this->valenciaHub());
+
+        $this->scan($user, $package->tracking_number)
+            ->assertSet('package', null)
+            ->assertNotSet('errorMessage', null);
+
+        $this->assertNull($package->fresh()->driver_id);
     }
 
     public function test_once_taken_by_driver_a_driver_b_cannot_take_it(): void
     {
         [$userA, $driverA] = $this->deliveryDriver();
-        [$userB] = $this->deliveryDriver();
-        $package = $this->readyForDelivery();
+        [$userB, $driverB] = $this->deliveryDriver();
+        $this->deliveryRoute($driverA, $userA);
+        $this->deliveryRoute($driverB, $userB);
+        $package = $this->readyAtHub($this->valenciaHub());
 
         $this->scan($userA, $package->tracking_number)->assertSet('errorMessage', null);
 
@@ -275,12 +443,17 @@ class DriverDeliveryScanTest extends TestCase
         }
     }
 
-    public function test_an_individual_delivery_is_completed_without_any_route(): void
+    /**
+     * Antes: test_an_individual_delivery_is_completed_without_any_route.
+     * Ahora la entrega tomada por escaneo pertenece a la ruta en curso.
+     */
+    public function test_a_delivery_taken_by_scanning_on_the_route_is_completed(): void
     {
         [$user, $driver] = $this->deliveryDriver();
-        $package = $this->readyForDelivery();
+        $this->deliveryRoute($driver, $user);
+        $package = $this->readyAtHub($this->valenciaHub());
 
-        $this->scan($user, $package->tracking_number);
+        $this->scan($user, $package->tracking_number)->assertSet('errorMessage', null);
 
         Livewire::actingAs($user)
             ->test(PackageDetail::class, ['packageId' => $package->id])
@@ -294,7 +467,6 @@ class DriverDeliveryScanTest extends TestCase
         $this->assertSame(Package::STATUS_ENTREGADO, $package->current_status);
         $this->assertSame('María Gómez', $package->receiver_name);
         $this->assertSame('cedula', $package->delivery_confirmation_method);
-        $this->assertFalse(Route::where('driver_id', $driver->id)->exists());
     }
 
     public function test_delivery_cannot_be_confirmed_from_the_web_without_receiver_data(): void
@@ -425,18 +597,58 @@ class DriverDeliveryScanTest extends TestCase
         $this->assertNull($package->fresh()->driver_id);
     }
 
-    public function test_api_claim_by_scan_takes_an_individual_delivery(): void
+    public function test_api_claim_by_scan_takes_a_delivery_for_the_drivers_route(): void
     {
         [$user, $driver] = $this->deliveryDriver();
-        $package = $this->readyForDelivery();
+        $this->deliveryRoute($driver, $user);
+        $package = $this->readyAtHub($this->valenciaHub());
 
         $this->postJson('/api/driver/deliveries/claim-by-scan', [
             'tracking_number' => $package->tracking_number,
         ], $this->apiHeaders($user))
             ->assertOk()
-            ->assertJsonPath('package.recipient.name', self::RECIPIENT);
+            ->assertJsonPath('package.recipient.name', self::RECIPIENT)
+            ->assertJsonMissingPath('package.recipient.id_doc')
+            ->assertJsonMissingPath('package.sender.id_doc')
+            ->assertDontSee($package->recipient_id_doc)
+            ->assertDontSee($package->sender_id_doc);
 
         $this->assertSame($driver->id, $package->fresh()->driver_id);
+    }
+
+    /**
+     * Una petición HTTP manual tampoco puede saltarse la regla: sin ruta
+     * de reparto en curso, la API rechaza la toma y no expone nada.
+     */
+    public function test_api_claim_by_scan_without_route_is_rejected_and_exposes_nothing(): void
+    {
+        [$user] = $this->deliveryDriver();
+        $package = $this->readyAtHub($this->valenciaHub());
+
+        $this->postJson('/api/driver/deliveries/claim-by-scan', [
+            'tracking_number' => $package->tracking_number,
+        ], $this->apiHeaders($user))
+            ->assertUnprocessable()
+            ->assertJsonMissingPath('package')
+            ->assertDontSee(self::RECIPIENT);
+
+        $this->assertNull($package->fresh()->driver_id);
+    }
+
+    public function test_api_claim_by_scan_of_a_package_in_transit_is_rejected(): void
+    {
+        [$user, $driver] = $this->deliveryDriver();
+        $this->deliveryRoute($driver, $user);
+        $this->valenciaHub();
+        $package = $this->readyForDelivery(['current_status' => Package::STATUS_EN_TRANSITO_NACIONAL]);
+
+        $this->postJson('/api/driver/deliveries/claim-by-scan', [
+            'tracking_number' => $package->tracking_number,
+        ], $this->apiHeaders($user))
+            ->assertUnprocessable()
+            ->assertJsonMissingPath('package');
+
+        $this->assertNull($package->fresh()->driver_id);
     }
 
     public function test_api_claim_by_scan_of_another_drivers_package_exposes_nothing(): void

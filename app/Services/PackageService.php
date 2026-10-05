@@ -8,6 +8,7 @@ use App\Models\Customer;
 use App\Models\Driver;
 use App\Models\Package;
 use App\Models\PackageHistory;
+use App\Models\Route;
 use App\Notifications\PackageCreated;
 use App\Notifications\PackageStatusUpdated;
 use App\Support\Money;
@@ -696,17 +697,26 @@ class PackageService
     }
 
     /**
-     * Un repartidor de entrega (driver_type = delivery) reclama un
-     * pedido que necesita entrega a domicilio, sin necesidad de una
-     * ruta asignada por el admin.
+     * Un repartidor de entrega (driver_type = delivery) toma, escaneando
+     * la guía, un pedido a domicilio para SU ruta de reparto en curso.
      *
-     * Acepta el paquete en cualquiera de los dos estados de
-     * Package::CLAIMABLE_FOR_DELIVERY_STATUSES:
-     * - EN_TRANSITO_NACIONAL: todavía no pasó por la agencia destino.
-     * - LISTO_RETIRO: la agencia destino ya lo recibió en mostrador
-     *   (Ally\PackageReception no distingue si requiere entrega a
-     *   domicilio), pero como nadie lo ha tomado, el repartidor puede
-     *   autoasignárselo igual escaneando la guía.
+     * Conocer el número de guía no basta: el paquete debe estar
+     * disponible para reparto en la zona de esa ruta. Validaciones
+     * (todas del lado del servidor, con el paquete bloqueado):
+     * - Estado LISTO_RETIRO (Package::CLAIMABLE_FOR_DELIVERY_STATUSES):
+     *   ya llegó a destino. Un paquete EN_TRANSITO_NACIONAL (viajando
+     *   entre HUBs, despachado o liberado de una ruta cancelada) nunca
+     *   se puede tomar.
+     * - El repartidor tiene una ruta TYPE_DELIVERY en curso.
+     * - El paquete está físicamente en su HUB destino
+     *   (LogisticsResolutionService::isAtDestinationWarehouse(), que
+     *   resuelve con WarehouseCoverage) y ese HUB es el de la zona de la
+     *   ruta (ver deliveryRouteWarehouseId()).
+     *
+     * La asignación en sí la hace DeliveryAssignmentService::assign() —
+     * la misma que usa Admin/Almacén —, así el paquete queda ligado a la
+     * ruta (AuditLog con route_id, ver RouteService::packageIdsForRoute())
+     * y pasa por la misma validación de ruta/ciudad.
      *
      * "Primero en escanear, primero en repartir": el lockForUpdate()
      * garantiza que si dos repartidores escanean la misma guía casi
@@ -732,17 +742,6 @@ class PackageService
                 ->lockForUpdate()
                 ->firstOrFail();
 
-            if (! $locked->requires_delivery) {
-                throw new RuntimeException('Este paquete no requiere entrega a domicilio.');
-            }
-
-            if (! in_array($locked->current_status, Package::CLAIMABLE_FOR_DELIVERY_STATUSES, true)) {
-                throw new RuntimeException(
-                    'Este paquete todavía no está listo para reparto. Estado actual: '
-                    . $locked->statusLabel() . '.'
-                );
-            }
-
             // isClaimedForDelivery() no basta aquí: solo es cierto
             // cuando delivery_status === DELIVERY_ACCEPTED, pero un
             // paquete también puede tener driver_id asignado por la
@@ -761,41 +760,69 @@ class PackageService
                 throw new RuntimeException('Este pedido ya fue reclamado por otro repartidor.');
             }
 
-            $wasAtDestinationAgency = $locked->current_status === Package::STATUS_LISTO_RETIRO;
+            if (! $locked->requires_delivery) {
+                throw new RuntimeException('Este paquete no requiere entrega a domicilio.');
+            }
 
-            $locked->update([
-                'driver_id' => $driver->id,
-                'delivery_status' => Package::DELIVERY_ACCEPTED,
-            ]);
-
-            if ($wasAtDestinationAgency) {
-                // LISTO_RETIRO -> EN_TRANSITO_NACIONAL: para que
-                // completeDelivery() (que exige EN_TRANSITO_NACIONAL)
-                // funcione igual sin importar de cuál estado vino.
-                // notifyCustomer: false porque esto es un traspaso
-                // interno (de "listo para retiro" a reparto a
-                // domicilio), no un hito que el cliente deba ver como
-                // que su paquete "volvió a estar en tránsito".
-                return $this->changeStatus(
-                    package: $locked,
-                    newStatus: Package::STATUS_EN_TRANSITO_NACIONAL,
-                    userId: $userId,
-                    locationDescription: 'Pedido reclamado por el repartidor desde la agencia destino',
-                    eventType: PackageHistory::EVENT_MOVIMIENTO,
-                    notifyCustomer: false,
+            if (! in_array($locked->current_status, Package::CLAIMABLE_FOR_DELIVERY_STATUSES, true)) {
+                throw new RuntimeException(
+                    'Este paquete todavía no está listo para reparto. Estado actual: '
+                    . $locked->statusLabel() . '.'
                 );
             }
 
-            $this->recordHistory(
-                package: $locked,
-                status: $locked->current_status,
-                userId: $userId,
-                locationDescription: 'Pedido reclamado por el repartidor para entrega a domicilio',
-                eventType: PackageHistory::EVENT_MOVIMIENTO,
-            );
+            $route = Route::query()
+                ->where('driver_id', $driver->id)
+                ->where('status', Route::STATUS_IN_PROGRESS)
+                ->where('route_type', Route::TYPE_DELIVERY)
+                ->latest('started_at')
+                ->first();
+
+            if (! $route) {
+                throw new RuntimeException(
+                    'Necesitas una ruta de reparto en curso para tomar entregas. '
+                    . 'Toma e inicia una ruta antes de escanear.'
+                );
+            }
+
+            $resolution = app(LogisticsResolutionService::class);
+
+            if (! $resolution->isAtDestinationWarehouse($locked)) {
+                throw new RuntimeException(
+                    'Este paquete todavía no fue recibido en su HUB destino. No puede salir a reparto.'
+                );
+            }
+
+            if ($this->deliveryRouteWarehouseId($route) !== (int) $locked->current_warehouse_id) {
+                throw new RuntimeException('Este paquete no pertenece a la zona de tu ruta de reparto.');
+            }
+
+            app(DeliveryAssignmentService::class)->assign($locked, $route, $userId);
+
+            $locked->refresh();
+            $locked->update(['delivery_status' => Package::DELIVERY_ACCEPTED]);
 
             return $locked->fresh();
         });
+    }
+
+    /**
+     * HUB (Warehouse) que atiende la zona de una ruta de reparto:
+     * origin_warehouse_id si Admin lo fijó; si no, el que
+     * WarehouseCoverage resuelve para el estado/ciudad de la ruta
+     * (misma fuente de verdad que el destino de los paquetes). Null si
+     * no se puede resolver, y entonces la ruta no puede tomar entregas.
+     */
+    protected function deliveryRouteWarehouseId(Route $route): ?int
+    {
+        if ($route->origin_warehouse_id !== null) {
+            return (int) $route->origin_warehouse_id;
+        }
+
+        $result = app(LogisticsResolutionService::class)
+            ->resolveDestinationWarehouse($route->state, $route->city);
+
+        return $result->isResolved() ? (int) $result->warehouseId : null;
     }
 
     /*

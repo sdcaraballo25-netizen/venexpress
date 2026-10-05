@@ -65,6 +65,9 @@ class PackageLabelController extends Controller
             'package' => $package,
             'barcodeSvg' => $barcodeSvg,
             'qrDataUri' => $qrDataUri,
+            // El repartidor no debe obtener la Cédula/RIF de remitente
+            // ni destinatario, tampoco a través del PDF de la guía.
+            'hideIdDocs' => (bool) $request->user()?->isRepartidor(),
         ])->setPaper([0, 0, 288, 432]);
 
         return $request->boolean('download')

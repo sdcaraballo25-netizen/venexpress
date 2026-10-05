@@ -6,6 +6,7 @@ use App\Livewire\Almacen\Dashboard;
 use App\Models\Ally;
 use App\Models\Driver;
 use App\Models\Package;
+use App\Models\PackageHistory;
 use App\Models\Route;
 use App\Models\User;
 use App\Models\Warehouse;
@@ -59,6 +60,50 @@ class WarehouseDispatchTest extends TestCase
 
         $this->assertSame(Package::STATUS_LISTO_RETIRO, $package->current_status);
         $this->assertNull($package->driver_id);
+        // Queda registrado el HUB donde está físicamente.
+        $this->assertSame($warehouse->id, $package->current_warehouse_id);
+
+        $reception = $package->histories()->latest('id')->first();
+        $this->assertSame(PackageHistory::EVENT_RECEPCION, $reception->event_type);
+        $this->assertSame(Package::STATUS_LISTO_RETIRO, $reception->status);
+        $this->assertSame($almacenUser->id, $reception->scanned_by_user_id);
+    }
+
+    /**
+     * Antes driver_id se borraba ANTES de llamar a la recepción y fuera
+     * de cualquier transacción: si la recepción fallaba, el paquete
+     * perdía su custodia igual. Ahora todo ocurre en una transacción.
+     */
+    public function test_a_failed_arrival_scan_leaves_the_package_untouched(): void
+    {
+        $warehouse = Warehouse::factory()->create(['city' => 'Valencia', 'state' => 'Carabobo']);
+        $almacenUser = $this->createWarehouseUser($warehouse);
+        $hubDriver = Driver::factory()->create(['driver_type' => Driver::TYPE_HUB]);
+
+        // Destino correcto, pero todavía no salió del HUB origen:
+        // DestinationReceptionService::receive() lo rechaza.
+        $package = $this->createPackage($this->createAlly(), [
+            'destination_city' => 'Valencia',
+            'destination_state' => 'Carabobo',
+            'current_status' => Package::STATUS_RECOLECTADO_VENEXPRESS,
+            'driver_id' => $hubDriver->id,
+        ]);
+
+        $historiesBefore = $package->histories()->count();
+
+        Livewire::actingAs($almacenUser)
+            ->test(Dashboard::class)
+            ->set('trackingNumber', $package->tracking_number)
+            ->call('scanArrival')
+            ->assertNotSet('scanError', null)
+            ->assertSet('scanSuccess', null);
+
+        $package->refresh();
+
+        $this->assertSame(Package::STATUS_RECOLECTADO_VENEXPRESS, $package->current_status);
+        $this->assertSame($hubDriver->id, $package->driver_id);
+        $this->assertNull($package->current_warehouse_id);
+        $this->assertSame($historiesBefore, $package->histories()->count());
     }
 
     public function test_warehouse_can_deliver_a_pickup_package_to_the_client(): void

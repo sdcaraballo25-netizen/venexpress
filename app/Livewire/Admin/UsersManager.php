@@ -237,6 +237,12 @@ class UsersManager extends Component
                     'address' => $validated['address'],
                     'commission_percentage' => 10.00,
                     'status' => Ally::STATUS_ACTIVE,
+                    // Creado directamente por un Admin: la creación
+                    // administrativa cuenta como aprobación, así que
+                    // puede operar sin pasar por la verificación
+                    // documental (Ally::canOperate()).
+                    'verification_status' => Ally::VERIFICATION_VERIFIED,
+                    'verification_reviewed_at' => now(),
                 ]);
             }
 
@@ -252,6 +258,10 @@ class UsersManager extends Component
                     'phone' => $validated['phone'],
                     'status' => Driver::STATUS_ACTIVE,
                     'driver_type' => $validated['driver_type'],
+                    // Mismo criterio que el Aliado de arriba: creado
+                    // por un Admin = aprobado (Driver::canOperate()).
+                    'verification_status' => Driver::VERIFICATION_VERIFIED,
+                    'verification_reviewed_at' => now(),
                 ]);
             }
 

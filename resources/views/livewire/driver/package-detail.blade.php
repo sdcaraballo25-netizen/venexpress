@@ -80,16 +80,6 @@
 
                 <p>
                     <span class="font-medium text-slate-500">
-                        Documento:
-                    </span>
-
-                    <span class="text-slate-800">
-                        {{ $package->sender_id_doc }}
-                    </span>
-                </p>
-
-                <p>
-                    <span class="font-medium text-slate-500">
                         Teléfono:
                     </span>
 
@@ -119,16 +109,6 @@
 
                     <span class="text-slate-800">
                         {{ $package->recipient_name }}
-                    </span>
-                </p>
-
-                <p>
-                    <span class="font-medium text-slate-500">
-                        Documento:
-                    </span>
-
-                    <span class="text-slate-800">
-                        {{ $package->recipient_id_doc }}
                     </span>
                 </p>
 

@@ -63,20 +63,17 @@ class Package extends Model
     ];
 
     /**
-     * Estados desde los que un repartidor de entrega puede
-     * autoasignarse un paquete escaneando su guía (self-claim):
-     * - EN_TRANSITO_NACIONAL: todavía no pasó por la agencia destino.
-     * - LISTO_RETIRO: ya fue recibido en la agencia destino (Ally\PackageReception
-     *   no distingue si requiere entrega a domicilio), pero sigue sin
-     *   repartidor asignado.
+     * Estados desde los que un repartidor de entrega puede tomar un
+     * paquete escaneando su guía: solo LISTO_RETIRO, es decir, ya
+     * recibido en su HUB destino y sin repartidor asignado. Un paquete
+     * EN_TRANSITO_NACIONAL (todavía viajando entre HUBs, o liberado de
+     * una ruta cancelada) nunca es tomable.
      *
-     * Ver PackageService::claimForDelivery(), que además regresa el
-     * paquete a EN_TRANSITO_NACIONAL al reclamarlo desde LISTO_RETIRO,
-     * para que completeDelivery() (que exige EN_TRANSITO_NACIONAL)
-     * funcione igual sin importar de cuál de los dos estados vino.
+     * Ver PackageService::claimForDelivery(), que además exige una ruta
+     * de reparto en curso en la zona del paquete y lo pasa a
+     * EN_TRANSITO_NACIONAL vía DeliveryAssignmentService::assign().
      */
     public const CLAIMABLE_FOR_DELIVERY_STATUSES = [
-        self::STATUS_EN_TRANSITO_NACIONAL,
         self::STATUS_LISTO_RETIRO,
     ];
 

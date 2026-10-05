@@ -4,20 +4,20 @@ namespace Tests\Feature\Driver;
 
 use App\Models\Driver;
 use App\Models\Package;
+use App\Models\Route;
 use App\Models\User;
+use App\Models\Warehouse;
+use App\Models\WarehouseCoverage;
 use Illuminate\Foundation\Testing\RefreshDatabase;
 use Tests\Feature\Concerns\CreatesTestPackages;
 use Tests\TestCase;
 
 /**
- * Un repartidor de entrega debe poder autoasignarse (escaneando) un
- * paquete que ya fue recibido en la agencia destino (LISTO_RETIRO),
- * sin depender de que un admin lo asigne primero desde
- * "Asignar Repartidor". Antes solo se podía reclamar en
- * EN_TRANSITO_NACIONAL, así que cualquier paquete que la agencia ya
- * hubiera recibido en mostrador (Ally\PackageReception, que no
- * distingue si requiere entrega a domicilio) quedaba inalcanzable
- * para "Escanear para Reclamar" en la app.
+ * Un repartidor de entrega puede tomar (escaneando) un paquete que ya
+ * fue recibido en su HUB destino (LISTO_RETIRO), sin depender de que un
+ * admin lo asigne primero desde "Asignar Repartidor" — pero solo con
+ * una ruta de reparto en curso en la zona de ese HUB
+ * (PackageService::claimForDelivery()).
  */
 class DeliveryClaimFromDestinationAgencyTest extends TestCase
 {
@@ -53,14 +53,53 @@ class DeliveryClaimFromDestinationAgencyTest extends TestCase
         return ['Authorization' => "Bearer {$token}"];
     }
 
-    public function test_driver_can_claim_by_scan_a_package_already_received_at_destination_agency(): void
+    private function valenciaHub(): Warehouse
     {
-        [$user] = $this->createDeliveryDriverUser();
+        $hub = Warehouse::factory()->create(['state' => 'Carabobo', 'city' => 'Valencia']);
+
+        WarehouseCoverage::create([
+            'warehouse_id' => $hub->id,
+            'state' => 'Carabobo',
+            'city' => 'Valencia',
+            'is_active' => true,
+        ]);
+
+        return $hub;
+    }
+
+    private function startDeliveryRoute(User $user, Driver $driver): Route
+    {
+        return Route::create([
+            'city' => 'Valencia',
+            'state' => 'Carabobo',
+            'name' => 'Reparto Valencia',
+            'driver_id' => $driver->id,
+            'created_by' => $user->id,
+            'status' => Route::STATUS_IN_PROGRESS,
+            'started_at' => now(),
+            'route_type' => Route::TYPE_DELIVERY,
+        ]);
+    }
+
+    /**
+     * Antes este test validaba que bastaba escanear un paquete
+     * LISTO_RETIRO para tomarlo, sin ruta ni HUB. La regla vigente
+     * exige ruta de reparto en curso y que el paquete esté en el HUB
+     * destino de la zona de esa ruta; con eso sí se puede tomar y
+     * entregar de punta a punta.
+     */
+    public function test_driver_with_a_route_can_claim_by_scan_a_package_received_at_its_destination_hub(): void
+    {
+        [$user, $driver] = $this->createDeliveryDriverUser();
         $ally = $this->createAlly();
+        $hub = $this->valenciaHub();
+        $this->startDeliveryRoute($user, $driver);
 
         $package = $this->createPackage($ally, [
             'requires_delivery' => true,
             'current_status' => Package::STATUS_LISTO_RETIRO,
+            'current_warehouse_id' => $hub->id,
+            'destination_warehouse_id' => $hub->id,
         ]);
 
         $headers = $this->authHeaders($user);
@@ -86,6 +125,33 @@ class DeliveryClaimFromDestinationAgencyTest extends TestCase
             $headers
         )->assertOk()
             ->assertJsonPath('package.current_status', Package::STATUS_ENTREGADO);
+    }
+
+    /**
+     * Negativo de la regla anterior: un paquete LISTO_RETIRO no se puede
+     * tomar solo por conocer su guía, sin ruta de reparto en curso.
+     */
+    public function test_driver_without_a_route_cannot_claim_a_package_received_at_destination(): void
+    {
+        [$user] = $this->createDeliveryDriverUser();
+        $hub = $this->valenciaHub();
+
+        $package = $this->createPackage($this->createAlly(), [
+            'requires_delivery' => true,
+            'current_status' => Package::STATUS_LISTO_RETIRO,
+            'current_warehouse_id' => $hub->id,
+            'destination_warehouse_id' => $hub->id,
+        ]);
+
+        $this->postJson('/api/driver/deliveries/claim-by-scan', [
+            'tracking_number' => $package->tracking_number,
+        ], $this->authHeaders($user))
+            ->assertUnprocessable()
+            ->assertJsonMissingPath('package');
+
+        $package->refresh();
+        $this->assertNull($package->driver_id);
+        $this->assertSame(Package::STATUS_LISTO_RETIRO, $package->current_status);
     }
 
     /**

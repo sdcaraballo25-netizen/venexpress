@@ -50,9 +50,11 @@ class DeliveryAssignmentService
                 throw new RuntimeException('El paquete no requiere entrega a domicilio.');
             }
 
-            if ($lockedPackage->delivery_status !== Package::DELIVERY_ACCEPTED) {
-                throw new RuntimeException('El cliente debe aceptar la entrega antes de asignarla a reparto.');
-            }
+            // Ya no se exige delivery_status === DELIVERY_ACCEPTED: la
+            // modalidad a domicilio se decide al crear el envío y la
+            // aceptación posterior del cliente quedó fuera de las reglas
+            // del MVP. Exigirla dejaba sin camino la asignación por
+            // Admin/Almacén y la toma por escaneo de un repartidor.
 
             if ($lockedPackage->driver_id !== null && (int) $lockedPackage->driver_id !== (int) $lockedRoute->driver_id) {
                 throw new RuntimeException('El paquete ya está asignado a otro repartidor.');

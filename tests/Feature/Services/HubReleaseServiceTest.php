@@ -10,6 +10,7 @@ use App\Models\Customer;
 use App\Models\Driver;
 use App\Models\Package;
 use App\Models\PackageHistory;
+use App\Models\Route;
 use App\Models\User;
 use App\Models\Warehouse;
 use App\Models\WarehouseCoverage;
@@ -717,6 +718,20 @@ class HubReleaseServiceTest extends TestCase
 
         $released = $this->service()->release($package, $ally->user_id);
         $this->assertSame(Package::STATUS_LISTO_RETIRO, $released->current_status);
+
+        // La toma por escaneo exige una ruta de reparto en curso en la
+        // zona del HUB destino (PackageService::claimForDelivery()).
+        Route::create([
+            'city' => 'Valencia',
+            'state' => 'Carabobo',
+            'name' => 'Reparto Valencia',
+            'driver_id' => $deliveryDriver->id,
+            'created_by' => $ally->user_id,
+            'status' => Route::STATUS_IN_PROGRESS,
+            'started_at' => now(),
+            'route_type' => Route::TYPE_DELIVERY,
+            'origin_warehouse_id' => $hub->id,
+        ]);
 
         $claimed = app(PackageService::class)->claimForDelivery(
             $released,

@@ -173,13 +173,13 @@
     <div class="box">
         <div class="section-title">Remitente</div>
         <div class="value">{{ $package->sender_name }}</div>
-        <div>C.I./RIF: {{ $package->sender_id_doc }} · Tel: {{ $package->sender_phone }}</div>
+        <div>@unless ($hideIdDocs ?? false)C.I./RIF: {{ $package->sender_id_doc }} · @endunless Tel: {{ $package->sender_phone }}</div>
     </div>
 
     <div class="box">
         <div class="section-title">Destinatario</div>
         <div class="value">{{ $package->recipient_name }}</div>
-        <div>C.I./RIF: {{ $package->recipient_id_doc }} · Tel: {{ $package->recipient_phone }}</div>
+        <div>@unless ($hideIdDocs ?? false)C.I./RIF: {{ $package->recipient_id_doc }} · @endunless Tel: {{ $package->recipient_phone }}</div>
     </div>
 
     <table class="info">
