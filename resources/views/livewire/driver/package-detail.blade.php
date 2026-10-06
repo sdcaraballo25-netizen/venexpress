@@ -228,7 +228,7 @@
 
 
     {{-- Estado de entrega --}}
-    @if ($package->requires_delivery && in_array($package->current_status, [\App\Models\Package::STATUS_EN_RUTA, \App\Models\Package::STATUS_ENTREGADO], true))
+    @if ($package->requires_delivery && in_array($package->current_status, [\App\Models\Package::STATUS_EN_RUTA, \App\Models\Package::STATUS_ENTREGA_FALLIDA, \App\Models\Package::STATUS_ENTREGADO], true))
 
         <div class="rounded-2xl border border-[#E5E5E0] bg-white p-5">
 
@@ -251,11 +251,25 @@
                         </div>
                     @endif
 
+                @elseif ($package->current_status === \App\Models\Package::STATUS_ENTREGA_FALLIDA)
+
+                    <div class="rounded-xl bg-red-50 p-4 text-sm text-red-700">
+                        <p class="font-semibold">Entrega fallida (intento #{{ $package->delivery_attempts }}): {{ $package->failedDeliveryReasonLabel() }}</p>
+                        @if ($package->failed_delivery_notes)
+                            <p class="mt-1">{{ $package->failed_delivery_notes }}</p>
+                        @endif
+                        <p class="mt-2">Devuelve el paquete al almacén: allí deciden si sale en un nuevo intento o vuelve al remitente.</p>
+                    </div>
+
                 @else
 
                     <div class="rounded-xl bg-emerald-50 p-4 text-sm text-emerald-700">
                         Entrega completada
-                        {{ $package->delivery_confirmation_method === \App\Models\Package::DELIVERY_CONFIRMATION_PIN ? '(verificada con PIN).' : '(verificada con cédula y foto).' }}
+                        {{ match ($package->delivery_confirmation_method) {
+                            \App\Models\Package::DELIVERY_CONFIRMATION_PIN => '(verificada con PIN).',
+                            \App\Models\Package::DELIVERY_CONFIRMATION_THIRD_PARTY => '(a un tercero autorizado: '.$package->receiver_name.').',
+                            default => '(verificada con cédula y foto).',
+                        } }}
                     </div>
 
                 @endif
@@ -564,21 +578,46 @@
                             @error('deliveryPin') <p class="mt-1 text-xs text-red-600">{{ $message }}</p> @enderror
                         </div>
                     @else
+                        <label class="flex items-center gap-2 text-sm text-slate-700">
+                            <input type="checkbox" wire:model.live="receivedByThirdParty" class="rounded border-slate-300 text-emerald-600 focus:ring-emerald-600">
+                            Lo recibe un tercero autorizado por el destinatario
+                        </label>
+
                         <div class="grid grid-cols-1 gap-3 sm:grid-cols-2">
                             <div>
-                                <label for="receiverIdDoc" class="text-sm font-medium text-slate-700">Cédula del destinatario</label>
+                                <label for="receiverIdDoc" class="text-sm font-medium text-slate-700">
+                                    {{ $receivedByThirdParty ? 'Cédula de quien recibe' : 'Cédula del destinatario' }}
+                                </label>
                                 <input id="receiverIdDoc" type="text" wire:model="receiverIdDoc" autocomplete="off" placeholder="V-12345678"
                                        class="mt-1 w-full rounded-xl border border-slate-300 px-3 py-2 text-sm shadow-sm focus:border-emerald-600 focus:ring-emerald-600">
                                 @error('receiverIdDoc') <p class="mt-1 text-xs text-red-600">{{ $message }}</p> @enderror
                             </div>
 
                             <div>
-                                <label for="deliveryPhoto" class="text-sm font-medium text-slate-700">Foto de la entrega</label>
+                                <label for="deliveryPhoto" class="text-sm font-medium text-slate-700">
+                                    Foto de la entrega{{ $receivedByThirdParty ? ' (opcional)' : '' }}
+                                </label>
                                 <input id="deliveryPhoto" type="file" accept="image/*" capture="environment" wire:model="deliveryPhoto"
                                        class="mt-1 block w-full text-sm text-slate-600 file:mr-3 file:rounded-lg file:border-0 file:bg-slate-100 file:px-3 file:py-2 file:text-sm file:font-medium">
                                 <p wire:loading wire:target="deliveryPhoto" class="mt-1 text-xs text-slate-500">Subiendo foto...</p>
                                 @error('deliveryPhoto') <p class="mt-1 text-xs text-red-600">{{ $message }}</p> @enderror
                             </div>
+
+                            @if ($receivedByThirdParty)
+                                <div>
+                                    <label for="thirdPartyIdPhoto" class="text-sm font-medium text-slate-700">Foto de la cédula de quien recibe</label>
+                                    <input id="thirdPartyIdPhoto" type="file" accept="image/*" capture="environment" wire:model="thirdPartyIdPhoto"
+                                           class="mt-1 block w-full text-sm text-slate-600 file:mr-3 file:rounded-lg file:border-0 file:bg-slate-100 file:px-3 file:py-2 file:text-sm file:font-medium">
+                                    @error('thirdPartyIdPhoto') <p class="mt-1 text-xs text-red-600">{{ $message }}</p> @enderror
+                                </div>
+
+                                <div>
+                                    <label for="recipientIdCopy" class="text-sm font-medium text-slate-700">Foto de la copia de la cédula del destinatario</label>
+                                    <input id="recipientIdCopy" type="file" accept="image/*" capture="environment" wire:model="recipientIdCopy"
+                                           class="mt-1 block w-full text-sm text-slate-600 file:mr-3 file:rounded-lg file:border-0 file:bg-slate-100 file:px-3 file:py-2 file:text-sm file:font-medium">
+                                    @error('recipientIdCopy') <p class="mt-1 text-xs text-red-600">{{ $message }}</p> @enderror
+                                </div>
+                            @endif
                         </div>
                     @endif
 
@@ -602,6 +641,65 @@
                             Confirmando...
                         </span>
                     </button>
+
+                    {{-- No se pudo entregar --}}
+                    <div class="border-t border-slate-200 pt-4">
+                        @if (! $showFailedForm)
+                            <button
+                                type="button"
+                                wire:click="$set('showFailedForm', true)"
+                                class="rounded-xl border border-red-200 bg-white px-5 py-3 text-sm font-semibold text-red-700 transition hover:bg-red-50"
+                            >
+                                No se pudo entregar
+                            </button>
+                        @else
+                            <div class="space-y-3 rounded-xl border border-red-200 bg-red-50 p-4">
+                                <p class="text-sm font-semibold text-red-800">No se pudo entregar</p>
+
+                                <div>
+                                    <label for="failedReason" class="text-sm font-medium text-slate-700">Motivo</label>
+                                    <select id="failedReason" wire:model.live="failedReason"
+                                            class="mt-1 w-full rounded-xl border border-slate-300 px-3 py-2 text-sm shadow-sm focus:border-red-600 focus:ring-red-600">
+                                        <option value="">Selecciona el motivo...</option>
+                                        @foreach (\App\Models\Package::FAILED_DELIVERY_REASON_LABELS as $value => $label)
+                                            <option value="{{ $value }}">{{ $label }}</option>
+                                        @endforeach
+                                    </select>
+                                    @error('failedReason') <p class="mt-1 text-xs text-red-600">{{ $message }}</p> @enderror
+                                </div>
+
+                                <div>
+                                    <label for="failedNotes" class="text-sm font-medium text-slate-700">
+                                        Detalle{{ $failedReason === 'OTRO' ? '' : ' (opcional)' }}
+                                    </label>
+                                    <textarea id="failedNotes" rows="2" wire:model="failedNotes"
+                                              class="mt-1 w-full rounded-xl border border-slate-300 px-3 py-2 text-sm shadow-sm focus:border-red-600 focus:ring-red-600"></textarea>
+                                    @error('failedNotes') <p class="mt-1 text-xs text-red-600">{{ $message }}</p> @enderror
+                                </div>
+
+                                <div class="flex flex-wrap gap-2">
+                                    <button
+                                        type="button"
+                                        wire:loading.attr="disabled"
+                                        wire:target="markDeliveryFailed"
+                                        @click.prevent="$store.confirm.open({
+                                            message: '¿Confirmas que no se pudo entregar? Tendrás que devolver el paquete al almacén.',
+                                            confirmText: 'Marcar entrega fallida',
+                                            variant: 'danger',
+                                            onConfirm: () => $wire.markDeliveryFailed(),
+                                        })"
+                                        class="rounded-xl bg-red-600 px-4 py-2 text-sm font-semibold text-white hover:bg-red-700 disabled:opacity-60"
+                                    >
+                                        Marcar entrega fallida
+                                    </button>
+                                    <button type="button" wire:click="$set('showFailedForm', false)"
+                                            class="rounded-xl border border-slate-300 bg-white px-4 py-2 text-sm text-slate-700">
+                                        Cancelar
+                                    </button>
+                                </div>
+                            </div>
+                        @endif
+                    </div>
 
                     </div>
 

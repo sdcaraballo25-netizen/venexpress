@@ -116,6 +116,9 @@ Route::prefix('driver')
             Route::post('/packages/{packageId}/collect-cod', [DriverPackageController::class, 'collectCod'])
                 ->name('packages.collect-cod');
 
+            Route::post('/packages/{packageId}/failed-delivery', [DriverPackageController::class, 'markDeliveryFailed'])
+                ->name('packages.failed-delivery');
+
             Route::get('/packages/{packageId}/incidents', [DriverIncidentController::class, 'index'])
                 ->name('packages.incidents.index');
 

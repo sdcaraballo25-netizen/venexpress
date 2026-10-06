@@ -2,6 +2,7 @@
 
 namespace App\Services;
 
+use App\Exceptions\MisroutedPackageException;
 use App\Models\Package;
 use App\Models\PackageHistory;
 use App\Models\Warehouse;
@@ -296,9 +297,10 @@ class HubReceptionService
             }
 
             if ($resolution->warehouseId !== $warehouse->id) {
-                throw new RuntimeException(
+                throw new MisroutedPackageException(
                     'Este paquete no tiene como destino este almacén. Verifica que lo estás recibiendo '
-                    .'en el HUB correcto.'
+                    .'en el HUB correcto.',
+                    $resolution->warehouseId,
                 );
             }
 

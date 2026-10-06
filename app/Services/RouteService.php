@@ -860,8 +860,8 @@ class RouteService
                 : "tienes {$count} paquetes pendientes de llegar al almacén destino.",
 
             default => $count === 1
-                ? 'tienes 1 paquete pendiente de entregar.'
-                : "tienes {$count} paquetes pendientes de entregar.",
+                ? 'tienes 1 paquete pendiente de entregar (o de devolver al almacén si la entrega falló).'
+                : "tienes {$count} paquetes pendientes de entregar (o de devolver al almacén si la entrega falló).",
         };
 
         return "No puedes finalizar esta ruta: todavía {$suffix}";

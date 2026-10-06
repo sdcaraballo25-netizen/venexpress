@@ -860,6 +860,27 @@ Route::get(
     ->middleware(['auth'])
     ->name('packages.delivery-evidence');
 
+Route::get(
+    '/paquetes/{package}/cedula-tercero',
+    [DocumentPhotoController::class, 'packageThirdPartyId']
+)
+    ->middleware(['auth'])
+    ->name('packages.third-party-id');
+
+Route::get(
+    '/paquetes/{package}/copia-cedula-destinatario',
+    [DocumentPhotoController::class, 'packageRecipientIdCopy']
+)
+    ->middleware(['auth'])
+    ->name('packages.recipient-id-copy');
+
+Route::get(
+    '/paquetes/{package}/comprobante-cobro',
+    [DocumentPhotoController::class, 'packageCodPaymentProof']
+)
+    ->middleware(['auth'])
+    ->name('packages.cod-payment-proof');
+
 /*
 |--------------------------------------------------------------------------
 | Autenticación

@@ -58,8 +58,28 @@ class PackageDetail extends Component
      */
     public bool $deliverWithoutPin = false;
 
+    /**
+     * Sin PIN, lo recibe un tercero autorizado por el destinatario: su
+     * cédula (receiverIdDoc), una foto de ella y una de la copia de la
+     * cédula del destinatario.
+     */
+    public bool $receivedByThirdParty = false;
+
+    /** @var \Livewire\Features\SupportFileUploads\TemporaryUploadedFile|null */
+    public $thirdPartyIdPhoto = null;
+
+    /** @var \Livewire\Features\SupportFileUploads\TemporaryUploadedFile|null */
+    public $recipientIdCopy = null;
+
     /** @var \Livewire\Features\SupportFileUploads\TemporaryUploadedFile|null */
     public $deliveryPhoto = null;
+
+    /** Formulario de "No se pudo entregar" (EN_RUTA -> ENTREGA_FALLIDA). */
+    public bool $showFailedForm = false;
+
+    public string $failedReason = '';
+
+    public string $failedNotes = '';
 
     /** Formulario de incidencia (p. ej. no se pudo entregar). */
     public bool $showIncidentForm = false;
@@ -193,6 +213,7 @@ $driver = $user?->driver;
 
             $codPending = $this->package->is_cod && ! $this->package->cod_collected_at;
             $withPin = $this->package->acceptsDeliveryPin() && ! $this->deliverWithoutPin;
+            $thirdParty = ! $withPin && $this->receivedByThirdParty;
 
             // Mismas reglas que la app (DriverPackageController::completeDelivery).
             $this->validate([
@@ -200,7 +221,9 @@ $driver = $user?->driver;
                 'receiverIdDoc' => [$withPin ? 'nullable' : 'required', 'string', 'max:30'],
                 'receiverPhone' => ['nullable', 'string', 'max:30'],
                 'deliveryPin' => [$withPin ? 'required' : 'nullable', 'digits:6'],
-                'deliveryPhoto' => [$withPin ? 'nullable' : 'required', 'image', 'mimes:jpg,jpeg,png,webp', 'max:5120'],
+                'deliveryPhoto' => [$withPin || $thirdParty ? 'nullable' : 'required', 'image', 'mimes:jpg,jpeg,png,webp', 'max:5120'],
+                'thirdPartyIdPhoto' => [$thirdParty ? 'required' : 'nullable', 'image', 'mimes:jpg,jpeg,png,webp', 'max:5120'],
+                'recipientIdCopy' => [$thirdParty ? 'required' : 'nullable', 'image', 'mimes:jpg,jpeg,png,webp', 'max:5120'],
                 'codPaymentMethod' => [$codPending ? 'required' : 'nullable', 'in:'.implode(',', Package::PAYMENT_METHODS)],
                 'codPaymentReference' => [
                     $codPending && in_array($this->codPaymentMethod, Package::PAYMENT_METHODS_REQUIRING_REFERENCE, true) ? 'required' : 'nullable',
@@ -214,6 +237,8 @@ $driver = $user?->driver;
                 'deliveryPin.required' => 'Pídele al destinatario el PIN de entrega.',
                 'deliveryPin.digits' => 'El PIN tiene 6 dígitos.',
                 'deliveryPhoto.required' => 'Sin PIN, toma una foto de la entrega.',
+                'thirdPartyIdPhoto.required' => 'Toma una foto de la cédula de quien recibe.',
+                'recipientIdCopy.required' => 'Toma una foto de la copia de la cédula del destinatario.',
                 'codPaymentMethod.required' => 'Este pedido es contra entrega (COD): indica la forma de pago con la que te cancelaron.',
                 'codPaymentReference.required' => 'Indica el número de referencia del pago.',
             ]);
@@ -224,6 +249,14 @@ $driver = $user?->driver;
 
             $proofPath = $codPending && $this->codPaymentProof
                 ? $this->codPaymentProof->store('cod-payment-proofs', 'documents')
+                : null;
+
+            $thirdPartyIdPath = $thirdParty
+                ? $this->thirdPartyIdPhoto->store('third-party-ids', 'documents')
+                : null;
+
+            $recipientIdCopyPath = $thirdParty
+                ? $this->recipientIdCopy->store('third-party-ids', 'documents')
                 : null;
 
             try {
@@ -241,9 +274,12 @@ $driver = $user?->driver;
                         codPaymentMethod: $this->codPaymentMethod !== '' ? $this->codPaymentMethod : null,
                         codPaymentReference: $this->codPaymentReference,
                         codPaymentProofPath: $proofPath,
+                        receivedByThirdParty: $thirdParty,
+                        thirdPartyIdPhotoPath: $thirdPartyIdPath,
+                        recipientIdCopyPath: $recipientIdCopyPath,
                     );
             } catch (RuntimeException $e) {
-                foreach (array_filter([$photoPath, $proofPath]) as $path) {
+                foreach (array_filter([$photoPath, $proofPath, $thirdPartyIdPath, $recipientIdCopyPath]) as $path) {
                     Storage::disk('documents')->delete($path);
                 }
 
@@ -264,6 +300,9 @@ $driver = $user?->driver;
                 'deliveryPin',
                 'deliverWithoutPin',
                 'deliveryPhoto',
+                'receivedByThirdParty',
+                'thirdPartyIdPhoto',
+                'recipientIdCopy',
             ]);
 
             session()->flash(
@@ -277,6 +316,43 @@ $driver = $user?->driver;
                 'error',
                 $e->getMessage()
             );
+        }
+    }
+
+    /**
+     * No se pudo entregar: queda ENTREGA_FALLIDA con el motivo y se
+     * cuenta el intento (PackageService::markDeliveryFailed()). El
+     * repartidor debe devolver el paquete al almacén.
+     */
+    public function markDeliveryFailed(): void
+    {
+        $this->validate([
+            'failedReason' => ['required', 'in:'.implode(',', array_keys(Package::FAILED_DELIVERY_REASON_LABELS))],
+            'failedNotes' => [$this->failedReason === 'OTRO' ? 'required' : 'nullable', 'string', 'max:1000'],
+        ], [
+            'failedReason.required' => 'Selecciona por qué no se pudo entregar.',
+            'failedNotes.required' => 'Describe brevemente qué pasó.',
+        ]);
+
+        $driver = Auth::user()?->driver;
+
+        if (! $driver) {
+            abort(403, 'Tu usuario no tiene un perfil de repartidor asociado.');
+        }
+
+        try {
+            $this->package = app(PackageService::class)->markDeliveryFailed(
+                package: $this->package,
+                driver: $driver,
+                reason: $this->failedReason,
+                notes: $this->failedNotes,
+            );
+
+            $this->reset(['showFailedForm', 'failedReason', 'failedNotes']);
+
+            session()->flash('success', 'Entrega marcada como fallida. Devuelve el paquete al almacén.');
+        } catch (RuntimeException $e) {
+            session()->flash('error', $e->getMessage());
         }
     }
 

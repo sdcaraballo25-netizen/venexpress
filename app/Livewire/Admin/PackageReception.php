@@ -2,12 +2,14 @@
 
 namespace App\Livewire\Admin;
 
+use App\Exceptions\MisroutedPackageException;
 use App\Models\Package;
 use App\Models\Warehouse;
 use App\Services\HubReceptionService;
 use App\Services\HubReleaseService;
 use App\Services\LogisticsResolutionResult;
 use App\Services\LogisticsResolutionService;
+use App\Services\MisroutedPackageAlertService;
 use Illuminate\Validation\Rule;
 use Livewire\Attributes\Layout;
 use Livewire\Component;
@@ -164,6 +166,16 @@ class PackageReception extends Component
             $this->package = $received;
 
             $this->successMessage = $this->outcomeMessage($received, $warehouse);
+        } catch (MisroutedPackageException $e) {
+            app(MisroutedPackageAlertService::class)->report(
+                $package,
+                'el almacén '.$warehouse->name,
+                (int) auth()->id(),
+                Warehouse::find($e->expectedWarehouseId)?->name,
+            );
+
+            $this->errorMessage = $e->getMessage().' Se dejó una incidencia de destino equivocado.';
+            $this->package = $package->fresh(['ally', 'driver', 'histories']);
         } catch (RuntimeException $e) {
             $this->errorMessage = $e->getMessage();
             $this->package = $package->fresh([

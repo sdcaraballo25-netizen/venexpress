@@ -102,6 +102,17 @@
                                 </dd>
                             </div>
                         @endif
+                        @if ($package->delivery_attempts > 0)
+                            <div class="sm:col-span-2">
+                                <dt class="text-slate-400">Intentos de entrega fallidos</dt>
+                                <dd class="font-medium text-slate-700">
+                                    {{ $package->delivery_attempts }}
+                                    @if ($package->failed_delivery_reason)
+                                        · último: {{ $package->failedDeliveryReasonLabel() }}{{ $package->failed_delivery_notes ? ' — '.$package->failed_delivery_notes : '' }}
+                                    @endif
+                                </dd>
+                            </div>
+                        @endif
                         @if ($package->return_reason)
                             <div class="sm:col-span-2">
                                 <dt class="text-slate-400">Motivo de la devolución</dt>
@@ -143,6 +154,29 @@
                     @endswitch
                 </p>
             @else
+                @if ($package->isDeliveryFailed())
+                    <div class="mt-5 rounded-xl border border-blue-100 bg-blue-50 p-4">
+                        <p class="text-sm font-semibold text-blue-900">¿Intentar entregarla otra vez?</p>
+                        <p class="mt-1 text-sm text-blue-800">
+                            La guía vuelve a quedar pendiente de entrega para asignarla a un repartidor
+                            (ya lleva {{ $package->delivery_attempts }} {{ $package->delivery_attempts === 1 ? 'intento fallido' : 'intentos fallidos' }}).
+                            O, si no conviene, inicia la devolución al remitente aquí abajo.
+                        </p>
+                        <button
+                            type="button"
+                            @click.prevent="$store.confirm.open({
+                                message: '¿Programar un nuevo intento de entrega de la guía {{ $package->tracking_number }}?',
+                                confirmText: 'Programar nuevo intento',
+                                variant: 'primary',
+                                onConfirm: () => $wire.retryDelivery(),
+                            })"
+                            class="mt-3 w-full rounded-xl bg-blue-900 px-5 py-3 text-sm font-semibold text-white hover:bg-blue-800"
+                        >
+                            Programar nuevo intento
+                        </button>
+                    </div>
+                @endif
+
                 <div class="mt-5 space-y-4">
                     <div>
                         <label for="return-reason" class="text-sm font-medium text-slate-600">
@@ -179,6 +213,45 @@
                     </button>
                 </div>
             @endif
+        </div>
+    </div>
+
+    {{-- Entregas fallidas pendientes de decisión --}}
+    <div class="rounded-2xl border border-slate-200 bg-white shadow-sm">
+        <div class="border-b border-slate-200 px-6 py-4">
+            <h3 class="font-display text-lg font-semibold text-slate-900">Entregas fallidas</h3>
+            <p class="text-sm text-slate-500">Pendientes de decidir un nuevo intento o la devolución al remitente.</p>
+        </div>
+
+        <div class="overflow-x-auto">
+            <table class="min-w-full text-sm">
+                <thead class="bg-slate-50 text-left text-xs uppercase tracking-wide text-slate-500">
+                    <tr>
+                        <th class="px-6 py-3">Guía</th>
+                        <th class="px-6 py-3">Intentos</th>
+                        <th class="px-6 py-3">Último motivo</th>
+                        <th class="px-6 py-3">Repartidor</th>
+                        <th class="px-6 py-3">Desde</th>
+                    </tr>
+                </thead>
+                <tbody class="divide-y divide-slate-100">
+                    @forelse ($failedDeliveries as $failed)
+                        <tr wire:key="failed-{{ $failed->id }}">
+                            <td class="whitespace-nowrap px-6 py-3 font-medium text-slate-800">
+                                <a href="{{ route('admin.package-returns', ['guia' => $failed->tracking_number]) }}" class="text-blue-900 hover:underline">{{ $failed->tracking_number }}</a>
+                            </td>
+                            <td class="px-6 py-3 text-slate-600">{{ $failed->delivery_attempts }}</td>
+                            <td class="px-6 py-3 text-slate-600">{{ $failed->failedDeliveryReasonLabel() ?? '—' }}</td>
+                            <td class="px-6 py-3 text-slate-600">{{ $failed->driver?->user?->name ?? 'De vuelta en almacén' }}</td>
+                            <td class="whitespace-nowrap px-6 py-3 text-slate-500">{{ $failed->failed_delivery_at?->diffForHumans() }}</td>
+                        </tr>
+                    @empty
+                        <tr>
+                            <td colspan="5" class="px-6 py-8 text-center text-slate-400">No hay entregas fallidas pendientes.</td>
+                        </tr>
+                    @endforelse
+                </tbody>
+            </table>
         </div>
     </div>
 

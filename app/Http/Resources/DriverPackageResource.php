@@ -26,6 +26,13 @@ class DriverPackageResource extends JsonResource
                 fn () => \App\Models\Package::DELIVERY_PIN_MAX_ATTEMPTS - (int) $this->delivery_pin_failed_attempts
             ),
             'delivery_confirmation_method' => $this->delivery_confirmation_method,
+            'received_by_third_party' => (bool) $this->received_by_third_party,
+
+            // Entregas fallidas: intentos y último motivo.
+            'delivery_attempts' => (int) $this->delivery_attempts,
+            'failed_delivery_reason' => $this->failed_delivery_reason,
+            'failed_delivery_reason_label' => $this->failedDeliveryReasonLabel(),
+            'failed_delivery_notes' => $this->failed_delivery_notes,
 
             // Datos del remitente (necesarios para que el
             // repartidor pueda contactarlo si hay un problema).

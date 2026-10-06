@@ -159,8 +159,10 @@
                     <input
                         wire:model="recipientIdDoc"
                         class="w-full rounded-xl border px-4 py-3"
-                        placeholder="Documento del destinatario"
+                        placeholder="{{ $byThirdParty ? 'Cédula de quien retira' : 'Documento del destinatario' }}"
                     >
+
+                    @include('livewire.shared.third-party-pickup-fields')
 
                     <button
                         wire:loading.attr="disabled"

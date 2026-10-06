@@ -108,9 +108,30 @@ class Package extends Model
 
     public const DELIVERY_CONFIRMATION_ID_DOC = 'cedula';
 
+    /**
+     * Sin PIN, lo recibió un tercero autorizado por el destinatario:
+     * se registra su nombre y cédula, una foto de su cédula y una de la
+     * copia de la cédula del destinatario.
+     */
+    public const DELIVERY_CONFIRMATION_THIRD_PARTY = 'tercero_autorizado';
+
     public const DELIVERY_CONFIRMATION_METHODS = [
         self::DELIVERY_CONFIRMATION_PIN,
         self::DELIVERY_CONFIRMATION_ID_DOC,
+        self::DELIVERY_CONFIRMATION_THIRD_PARTY,
+    ];
+
+    /**
+     * Motivos por los que un repartidor no pudo entregar (EN_RUTA ->
+     * ENTREGA_FALLIDA, ver PackageService::markDeliveryFailed()).
+     */
+    public const FAILED_DELIVERY_REASON_LABELS = [
+        'CLIENTE_AUSENTE' => 'Destinatario ausente',
+        'DIRECCION_INCORRECTA' => 'Dirección incorrecta o no encontrada',
+        'RECHAZADO_POR_CLIENTE' => 'El destinatario lo rechazó',
+        'SIN_PAGO' => 'No pagó el cobro contra entrega',
+        'ZONA_INACCESIBLE' => 'Zona inaccesible o insegura',
+        'OTRO' => 'Otro',
     ];
 
     /**
@@ -281,6 +302,15 @@ class Package extends Model
         'delivery_pin_generated_at',
         'delivery_pin_failed_attempts',
 
+        'delivery_attempts',
+        'failed_delivery_reason',
+        'failed_delivery_notes',
+        'failed_delivery_at',
+
+        'received_by_third_party',
+        'third_party_id_photo_path',
+        'recipient_id_copy_path',
+
         'commission_percentage_used',
         'commission_amount_usd',
 
@@ -344,6 +374,10 @@ class Package extends Model
 
             'delivery_pin_generated_at' => 'datetime',
             'delivery_pin_failed_attempts' => 'integer',
+
+            'delivery_attempts' => 'integer',
+            'failed_delivery_at' => 'datetime',
+            'received_by_third_party' => 'boolean',
 
             'commission_percentage_used' => 'decimal:2',
             'commission_amount_usd' => 'decimal:2',
@@ -454,6 +488,18 @@ class Package extends Model
     public function isInReturn(): bool
     {
         return $this->current_status === self::STATUS_EN_DEVOLUCION;
+    }
+
+    public function isDeliveryFailed(): bool
+    {
+        return $this->current_status === self::STATUS_ENTREGA_FALLIDA;
+    }
+
+    public function failedDeliveryReasonLabel(): ?string
+    {
+        return $this->failed_delivery_reason
+            ? (self::FAILED_DELIVERY_REASON_LABELS[$this->failed_delivery_reason] ?? $this->failed_delivery_reason)
+            : null;
     }
 
     public function isOutForDelivery(): bool

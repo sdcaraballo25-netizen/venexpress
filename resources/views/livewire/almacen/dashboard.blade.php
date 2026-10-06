@@ -164,7 +164,7 @@
                 <p class="mt-3 text-sm text-emerald-700 font-medium">✓ {{ $dispatchSuccess }}</p>
             @endif
 
-            @if ($dispatchPackage && in_array($dispatchPackage->current_status, [Package::STATUS_LISTO_RETIRO, Package::STATUS_PENDIENTE_ENTREGA], true))
+            @if ($dispatchPackage && in_array($dispatchPackage->current_status, [Package::STATUS_LISTO_RETIRO, Package::STATUS_PENDIENTE_ENTREGA, Package::STATUS_ENTREGA_FALLIDA], true))
 
                 <div class="mt-5 pt-5 border-t border-[#E5E5E0]">
 
@@ -173,7 +173,64 @@
                         · {{ $dispatchPackage->destination_city }}, {{ $dispatchPackage->destination_state }}
                     </p>
 
-                    @if ($dispatchPackage->requires_delivery)
+                    @if ($dispatchPackage->current_status === Package::STATUS_ENTREGA_FALLIDA)
+
+                        {{-- ENTREGA FALLIDA: NUEVO INTENTO O DEVOLUCIÓN --}}
+                        <div class="mt-2 rounded-xl border border-red-200 bg-red-50 p-4 text-sm text-red-800">
+                            <p class="font-semibold">
+                                Entrega fallida · {{ $dispatchPackage->delivery_attempts }} {{ $dispatchPackage->delivery_attempts === 1 ? 'intento' : 'intentos' }}
+                            </p>
+                            <p class="mt-1">
+                                Motivo: {{ $dispatchPackage->failedDeliveryReasonLabel() ?? '—' }}{{ $dispatchPackage->failed_delivery_notes ? ' — '.$dispatchPackage->failed_delivery_notes : '' }}
+                            </p>
+                            <p class="mt-1 text-xs">Al decidir, el paquete queda registrado de vuelta en este almacén.</p>
+                        </div>
+
+                        <div class="mt-4 grid grid-cols-1 gap-4 lg:grid-cols-2">
+                            <div class="rounded-xl border border-[#E5E5E0] p-4">
+                                <p class="text-sm font-semibold text-[#111111]">Nuevo intento de entrega</p>
+                                <p class="mt-1 text-xs text-[#6B6B66]">Queda pendiente de entrega para asignarlo a un repartidor.</p>
+                                <button
+                                    type="button"
+                                    @click.prevent="$store.confirm.open({
+                                        message: '¿Programar un nuevo intento de entrega?',
+                                        confirmText: 'Nuevo intento',
+                                        variant: 'primary',
+                                        onConfirm: () => $wire.retryDelivery(),
+                                    })"
+                                    class="mt-3 w-full rounded-xl bg-blue-900 hover:bg-blue-800 text-white font-semibold text-sm px-5 py-3 transition"
+                                >
+                                    Programar nuevo intento
+                                </button>
+                            </div>
+
+                            <div class="rounded-xl border border-[#E5E5E0] p-4">
+                                <p class="text-sm font-semibold text-[#111111]">Devolver al remitente</p>
+                                <textarea
+                                    wire:model="returnReason"
+                                    rows="2"
+                                    placeholder="Motivo de la devolución"
+                                    class="mt-2 w-full rounded-xl border border-[#E5E5E0] px-3 py-2 text-sm"
+                                ></textarea>
+                                @error('returnReason')
+                                    <p class="mt-1 text-xs text-red-600">{{ $message }}</p>
+                                @enderror
+                                <button
+                                    type="button"
+                                    @click.prevent="$store.confirm.open({
+                                        message: '¿Iniciar la devolución al remitente?',
+                                        confirmText: 'Devolver al remitente',
+                                        variant: 'danger',
+                                        onConfirm: () => $wire.returnToSender(),
+                                    })"
+                                    class="mt-3 w-full rounded-xl bg-red-600 hover:bg-red-700 text-white font-semibold text-sm px-5 py-3 transition"
+                                >
+                                    Devolver al remitente
+                                </button>
+                            </div>
+                        </div>
+
+                    @elseif ($dispatchPackage->requires_delivery)
 
                         {{-- ASIGNAR A REPARTIDOR --}}
                         <p class="text-xs text-[#6B6B66] mt-1 mb-3">
@@ -209,24 +266,29 @@
                             Este envío se retira en persona. Verifica el documento de quien lo retira antes de entregarlo.
                         </p>
 
-                        <form wire:submit="deliverToClient" class="flex flex-col sm:flex-row gap-3">
-                            <input
-                                type="text"
-                                wire:model="recipientIdDoc"
-                                placeholder="Cédula de quien retira"
-                                class="flex-1 rounded-xl border border-[#E5E5E0] px-4 py-3 text-sm focus:border-emerald-700 focus:ring-emerald-700"
-                            >
-                            <button
-                                type="submit"
-                                class="rounded-xl bg-emerald-700 hover:bg-emerald-800 text-white font-semibold text-sm px-6 py-3 transition"
-                            >
-                                Confirmar entrega
-                            </button>
-                        </form>
+                        <form wire:submit="deliverToClient" class="space-y-3">
+                            <div class="flex flex-col sm:flex-row gap-3">
+                                <input
+                                    type="text"
+                                    wire:model="recipientIdDoc"
+                                    placeholder="{{ $byThirdParty ? 'Cédula de quien retira (tercero)' : 'Cédula del destinatario' }}"
+                                    class="flex-1 rounded-xl border border-[#E5E5E0] px-4 py-3 text-sm focus:border-emerald-700 focus:ring-emerald-700"
+                                >
+                                <button
+                                    type="submit"
+                                    wire:loading.attr="disabled"
+                                    class="rounded-xl bg-emerald-700 hover:bg-emerald-800 text-white font-semibold text-sm px-6 py-3 transition disabled:opacity-60"
+                                >
+                                    Confirmar entrega
+                                </button>
+                            </div>
 
-                        @error('recipientIdDoc')
-                            <p class="mt-2 text-xs text-red-600">{{ $message }}</p>
-                        @enderror
+                            @error('recipientIdDoc')
+                                <p class="text-xs text-red-600">{{ $message }}</p>
+                            @enderror
+
+                            @include('livewire.shared.third-party-pickup-fields')
+                        </form>
 
                     @endif
 

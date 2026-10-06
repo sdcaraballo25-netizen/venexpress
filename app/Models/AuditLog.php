@@ -58,6 +58,8 @@ class AuditLog extends Model
         'package.cod_liquidated' => 'Cobro contra entrega liquidado',
         'package.delivery_assigned' => 'Paquete asignado a reparto',
         'package.delivery_unassigned' => 'Asignación de reparto retirada',
+        'package.delivery_retry_scheduled' => 'Nuevo intento de entrega programado',
+        'package.misrouted_scan' => 'Paquete escaneado en destino equivocado',
         'rate_matrix.updated' => 'Tarifas actualizadas',
         'route.created' => 'Ruta creada',
         'route.updated' => 'Ruta actualizada',

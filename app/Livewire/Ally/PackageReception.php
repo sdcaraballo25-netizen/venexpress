@@ -5,6 +5,7 @@ namespace App\Livewire\Ally;
 use App\Models\Ally;
 use App\Models\Package;
 use App\Services\DestinationReceptionService;
+use App\Services\MisroutedPackageAlertService;
 use Livewire\Attributes\Layout;
 use Livewire\Component;
 use RuntimeException;
@@ -64,14 +65,42 @@ class PackageReception extends Component
             $package,
             $ally
         )) {
-            $this->error =
-                'Esta guía no está asignada a tu agencia como '
-                . 'punto de retiro.';
+            $this->error = $this->reportIfMisrouted($package, $ally)
+                ?? 'Esta guía no está asignada a tu agencia como punto de retiro.';
 
             return;
         }
 
         $this->package = $package;
+    }
+
+    /**
+     * Un paquete en tránsito que llegó físicamente a una agencia que no
+     * es su punto de retiro: se avisa al administrador
+     * (MisroutedPackageAlertService) sin mostrarle a esta agencia los
+     * datos de la guía. Devuelve el mensaje para la agencia, o null si
+     * no aplica (p. ej. una guía en otro estado, tecleada por error).
+     */
+    protected function reportIfMisrouted(Package $package, Ally $ally): ?string
+    {
+        // Si esta agencia SÍ es su punto de retiro (pero no está activa o
+        // verificada como destino) no es un error de envío, es de
+        // configuración: no se alerta.
+        if (
+            $package->current_status !== Package::STATUS_EN_TRANSITO_NACIONAL
+            || (int) $package->pickup_ally_id === (int) $ally->id
+        ) {
+            return null;
+        }
+
+        app(MisroutedPackageAlertService::class)->report(
+            $package,
+            'la agencia '.$ally->business_name,
+            (int) auth()->id(),
+            $package->pickupAlly?->business_name ?? $package->destinationWarehouse?->name,
+        );
+
+        return 'Esta guía va a otro punto de retiro: no la recibas. Ya avisamos a Venexpress para corregir el envío.';
     }
 
     public function receive(): void
@@ -113,8 +142,8 @@ class PackageReception extends Component
                 $ally
             )) {
                 throw new RuntimeException(
-                    'La guía no está asignada a esta agencia como '
-                    . 'punto de retiro.'
+                    $this->reportIfMisrouted($package, $ally)
+                    ?? 'La guía no está asignada a esta agencia como punto de retiro.'
                 );
             }
 

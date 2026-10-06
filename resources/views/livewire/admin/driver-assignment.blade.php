@@ -26,8 +26,36 @@
                 <div class="mt-4 text-sm">
                     <strong>Entrega:</strong>
                     {{ $package->requires_delivery ? 'A domicilio' : 'Retiro en agencia' }}
-                    · <strong>Cliente:</strong> {{ $package->delivery_status }}
+                    @if ($package->delivery_attempts > 0)
+                        · <strong>Intentos fallidos:</strong> {{ $package->delivery_attempts }}
+                    @endif
                 </div>
+
+                @if ($package->isDelivered() && $package->receiver_name)
+                    <div class="mt-3 text-sm text-slate-600">
+                        <strong>Recibió:</strong> {{ $package->receiver_name }}{{ $package->receiver_id_doc ? ' ('.$package->receiver_id_doc.')' : '' }}
+                        @if ($package->received_by_third_party)
+                            · tercero autorizado
+                        @endif
+                    </div>
+                @endif
+
+                @php
+                    $evidence = array_filter([
+                        'Foto de la entrega' => $package->delivery_photo_path ? route('packages.delivery-evidence', $package) : null,
+                        'Cédula de quien recibió' => $package->third_party_id_photo_path ? route('packages.third-party-id', $package) : null,
+                        'Copia de la cédula del destinatario' => $package->recipient_id_copy_path ? route('packages.recipient-id-copy', $package) : null,
+                        'Comprobante del cobro' => $package->cod_payment_proof_path ? route('packages.cod-payment-proof', $package) : null,
+                    ]);
+                @endphp
+
+                @if ($evidence)
+                    <div class="mt-3 flex flex-wrap gap-2 text-xs">
+                        @foreach ($evidence as $label => $url)
+                            <a href="{{ $url }}" target="_blank" rel="noopener" class="rounded-lg border border-slate-300 bg-white px-3 py-1.5 font-medium text-slate-700 hover:bg-slate-100">{{ $label }}</a>
+                        @endforeach
+                    </div>
+                @endif
 
                 <form wire:submit.prevent="assign" class="mt-5 space-y-4">
                     <div>

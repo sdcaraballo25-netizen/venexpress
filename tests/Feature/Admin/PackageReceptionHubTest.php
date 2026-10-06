@@ -264,12 +264,23 @@ class PackageReceptionHubTest extends TestCase
             ->assertSet(
                 'errorMessage',
                 'Este paquete no tiene como destino este almacén. Verifica que lo estás recibiendo en el '
-                    .'HUB correcto.'
+                    .'HUB correcto. Se dejó una incidencia de destino equivocado.'
             );
 
         $this->assertDatabaseHas('packages', [
             'id' => $package->id,
             'current_status' => Package::STATUS_EN_TRANSITO_NACIONAL,
+        ]);
+
+        // Alerta para Admin: incidencia abierta y entrada en la bitácora.
+        $this->assertDatabaseHas('incidents', [
+            'package_id' => $package->id,
+            'type' => 'DESTINO_EQUIVOCADO',
+            'status' => 'abierta',
+        ]);
+        $this->assertDatabaseHas('audit_logs', [
+            'action' => 'package.misrouted_scan',
+            'target_id' => $package->id,
         ]);
     }
 

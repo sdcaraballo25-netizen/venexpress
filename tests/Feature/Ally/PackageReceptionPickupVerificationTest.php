@@ -4,6 +4,7 @@ namespace Tests\Feature\Ally;
 
 use App\Livewire\Ally\PackageReception;
 use App\Models\Ally;
+use App\Models\Incident;
 use App\Models\Package;
 use Illuminate\Foundation\Testing\RefreshDatabase;
 use Livewire\Livewire;
@@ -21,6 +22,8 @@ class PackageReceptionPickupVerificationTest extends TestCase
 {
     use CreatesTestPackages;
     use RefreshDatabase;
+
+    private const MISROUTED_MESSAGE = 'Esta guía va a otro punto de retiro: no la recibas. Ya avisamos a Venexpress para corregir el envío.';
 
     private function createVerifiedAlly(array $overrides = []): Ally
     {
@@ -74,9 +77,20 @@ class PackageReceptionPickupVerificationTest extends TestCase
             ->set('trackingNumber', $package->tracking_number)
             ->call('search')
             ->assertSet('package', null)
-            ->assertSet('error', 'Esta guía no está asignada a tu agencia como punto de retiro.');
+            ->assertSet('error', self::MISROUTED_MESSAGE)
+            ->assertDontSee($package->recipient_name);
 
         $this->assertSame(Package::STATUS_EN_TRANSITO_NACIONAL, $package->fresh()->current_status);
+
+        // Llegó físicamente a la agencia equivocada: queda una alerta
+        // para Admin (una sola, aunque se vuelva a escanear).
+        Livewire::actingAs($otherAllySameCity->user)
+            ->test(PackageReception::class)
+            ->set('trackingNumber', $package->tracking_number)
+            ->call('receive')
+            ->assertSet('error', self::MISROUTED_MESSAGE);
+
+        $this->assertSame(1, Incident::where('package_id', $package->id)->where('type', 'DESTINO_EQUIVOCADO')->count());
     }
 
     public function test_the_pickup_ally_cannot_receive_when_not_verified_as_destination(): void
@@ -151,7 +165,7 @@ class PackageReceptionPickupVerificationTest extends TestCase
             ->set('trackingNumber', $package->tracking_number)
             ->call('search')
             ->assertSet('package', null)
-            ->assertSet('error', 'Esta guía no está asignada a tu agencia como punto de retiro.');
+            ->assertSet('error', self::MISROUTED_MESSAGE);
 
         $this->assertSame(Package::STATUS_EN_TRANSITO_NACIONAL, $package->fresh()->current_status);
     }

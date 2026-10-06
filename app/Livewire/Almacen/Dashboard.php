@@ -2,12 +2,16 @@
 
 namespace App\Livewire\Almacen;
 
+use App\Exceptions\MisroutedPackageException;
+use App\Livewire\Concerns\HandlesThirdPartyPickup;
+use App\Models\AuditLog;
 use App\Models\Package;
 use App\Models\Route;
 use App\Models\RouteStop;
 use App\Models\Warehouse;
 use App\Services\DeliveryAssignmentService;
-use App\Services\DestinationReceptionService;
+use App\Services\HubReceptionService;
+use App\Services\MisroutedPackageAlertService;
 use App\Services\PackageService;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\DB;
@@ -15,6 +19,7 @@ use Livewire\Attributes\Computed;
 use Livewire\Attributes\Layout;
 use Livewire\Attributes\Title;
 use Livewire\Component;
+use Livewire\WithFileUploads;
 use RuntimeException;
 
 /**
@@ -23,27 +28,37 @@ use RuntimeException;
  * - Lista las paradas de rutas HUB Distribución que tienen a este
  *   almacén como destino, separadas en pendientes y ya recibidas.
  * - Permite escanear la llegada de un paquete, lo que lo recibe
- *   físicamente en el almacén (EN_TRANSITO_NACIONAL -> LISTO_RETIRO, o
- *   PENDIENTE_ENTREGA si es a domicilio; mismo mecanismo que
- *   Ally\PackageReception usa para agencias, vía
- *   DestinationReceptionService).
- * - Permite despachar un paquete ya recibido: a un cliente que lo
- *   retira en persona (LISTO_RETIRO, mismo flujo que
- *   Ally\PackagePickup), o a un repartidor con una ruta de reparto en
- *   curso desde este almacén hacia esa ciudad (PENDIENTE_ENTREGA, mismo
- *   flujo que Admin\DriverAssignment, vía DeliveryAssignmentService).
+ *   físicamente en el almacén con HubReceptionService, igual que la
+ *   recepción en HUB de Admin (Admin\PackageReception): queda EN_HUB y,
+ *   si este almacén es su destino, se libera solo (LISTO_RETIRO,
+ *   PENDIENTE_ENTREGA o despacho a la agencia de retiro). Si llega a un
+ *   almacén que no es su destino se rechaza y se avisa al administrador
+ *   (MisroutedPackageAlertService).
+ * - Permite despachar un paquete ya recibido: a un cliente (o a un
+ *   tercero autorizado) que lo retira en persona (LISTO_RETIRO, mismo
+ *   flujo que Ally\PackagePickup), o a un repartidor con una ruta de
+ *   reparto en curso desde este almacén hacia esa ciudad
+ *   (PENDIENTE_ENTREGA, vía DeliveryAssignmentService).
+ * - Tras una entrega a domicilio fallida (ENTREGA_FALLIDA), al recibir
+ *   el paquete de vuelta decide un nuevo intento o la devolución al
+ *   remitente.
  */
 #[Layout('layouts.almacen')]
 #[Title('Almacén')]
 class Dashboard extends Component
 {
+    use HandlesThirdPartyPickup;
+    use WithFileUploads;
+
     /**
      * Ya recibidos en el almacén y listos para salir: retiro en persona
-     * (LISTO_RETIRO) o entrega a domicilio (PENDIENTE_ENTREGA).
+     * (LISTO_RETIRO), entrega a domicilio (PENDIENTE_ENTREGA) o de vuelta
+     * de una entrega fallida, pendiente de decidir (ENTREGA_FALLIDA).
      */
     private const DISPATCHABLE_STATUSES = [
         Package::STATUS_LISTO_RETIRO,
         Package::STATUS_PENDIENTE_ENTREGA,
+        Package::STATUS_ENTREGA_FALLIDA,
     ];
 
     public string $trackingNumber = '';
@@ -58,6 +73,9 @@ class Dashboard extends Component
     public ?Package $dispatchPackage = null;
 
     public string $recipientIdDoc = '';
+
+    /** Motivo al devolver al remitente una entrega fallida. */
+    public string $returnReason = '';
 
     public ?string $dispatchSuccess = null;
 
@@ -88,13 +106,24 @@ class Dashboard extends Component
     }
 
     /**
+     * El paquete está físicamente en este almacén (current_warehouse_id,
+     * fijado al recibirlo) o, para guías anteriores a ese dato, va a su
+     * misma ciudad.
+     */
+    protected function isHandledByWarehouse(Package $package, Warehouse $warehouse): bool
+    {
+        return (int) $package->current_warehouse_id === (int) $warehouse->id
+            || $this->belongsToWarehouse($package, $warehouse);
+    }
+
+    /**
      * Entrada única para el lector QR de la cámara: decide si la
      * guía escaneada corresponde a una llegada (todavía no recibida
      * en este almacén) o a un despacho (ya LISTO_RETIRO), y dispara
      * la acción correspondiente. Mismo patrón que Driver\Scanner::
      * scan(), llamado desde JS vía $wire.scanGuide(...).
      */
-    public function scanGuide(string $code, DestinationReceptionService $receptionService): void
+    public function scanGuide(string $code, HubReceptionService $receptionService): void
     {
         $code = trim($code);
 
@@ -122,7 +151,7 @@ class Dashboard extends Component
         $this->scanArrival($receptionService);
     }
 
-    public function scanArrival(DestinationReceptionService $receptionService): void
+    public function scanArrival(HubReceptionService $receptionService): void
     {
         $this->scanSuccess = null;
         $this->scanError = null;
@@ -149,12 +178,6 @@ class Dashboard extends Component
             return;
         }
 
-        if (! $this->belongsToWarehouse($package, $warehouse)) {
-            $this->scanError = 'Este paquete no tiene como destino este almacén.';
-
-            return;
-        }
-
         $stop = RouteStop::query()
             ->where('warehouse_id', $warehouse->id)
             ->where('status', RouteStop::STATUS_PENDING)
@@ -166,40 +189,59 @@ class Dashboard extends Component
             ->first();
 
         try {
-            // Una sola transacción: si la recepción falla (p. ej. el
-            // paquete no está EN_TRANSITO_NACIONAL), no queda nada a
-            // medias — antes driver_id se borraba ANTES de validar y
-            // fuera de cualquier transacción.
-            DB::transaction(function () use ($receptionService, $package, $warehouse, $stop) {
-                $received = $receptionService->receive(
-                    package: $package,
-                    userId: (int) Auth::id(),
-                    destinationLocation: 'Almacén '.$warehouse->name,
-                    routeStopId: $stop?->id,
-                );
+            // Una sola transacción: si la recepción falla, no queda
+            // nada a medias (ni la parada marcada como visitada).
+            $received = DB::transaction(function () use ($receptionService, $package, $warehouse, $stop) {
+                $userId = (int) Auth::id();
 
-                // Recibido: libera la custodia del driver de HUB que lo
-                // trajo (sin esto, DeliveryAssignmentService::assign()
-                // rechazaría asignarlo a otro repartidor) y deja
-                // constancia del HUB donde quedó físicamente.
-                $received->forceFill([
-                    'driver_id' => null,
-                    'current_warehouse_id' => $warehouse->id,
-                ])->save();
+                $received = match ($package->current_status) {
+                    Package::STATUS_RECOLECTADO_VENEXPRESS => $receptionService->receiveAtWarehouse($package, $userId, $warehouse),
+                    Package::STATUS_EN_TRANSITO_NACIONAL => $receptionService->receiveTransferAtWarehouse($package, $userId, $warehouse),
+                    default => throw new RuntimeException(
+                        'Esta guía no está en un estado que permita recibirla en el almacén. Estado actual: '
+                        .$package->statusLabel().'.'
+                    ),
+                };
 
                 if ($stop && $stop->status === RouteStop::STATUS_PENDING) {
                     $stop->update(['status' => RouteStop::STATUS_VISITED, 'visited_at' => now()]);
                 }
+
+                return $received;
             });
 
-            $this->scanSuccess = "Guía {$trackingNumber} recibida en {$warehouse->name}. "
-                .($package->requires_delivery
-                    ? 'Quedó pendiente de entrega a domicilio: asígnala a un repartidor.'
-                    : 'Ya está lista para entregar.');
+            $this->scanSuccess = $this->receptionMessage($received, $warehouse);
             $this->trackingNumber = '';
+        } catch (MisroutedPackageException $e) {
+            $expected = Warehouse::find($e->expectedWarehouseId);
+
+            app(MisroutedPackageAlertService::class)->report(
+                $package,
+                'el almacén '.$warehouse->name,
+                (int) Auth::id(),
+                $expected?->name,
+            );
+
+            $this->scanError = 'Este paquete no tiene como destino este almacén'
+                .($expected ? " (va a {$expected->name})" : '')
+                .'. No lo recibas: se avisó al administrador para corregir el envío.';
         } catch (RuntimeException $e) {
             $this->scanError = $e->getMessage();
         }
+    }
+
+    protected function receptionMessage(Package $received, Warehouse $warehouse): string
+    {
+        $prefix = "Guía {$received->tracking_number} recibida en {$warehouse->name}. ";
+
+        return $prefix.match ($received->current_status) {
+            Package::STATUS_LISTO_RETIRO => 'Ya está lista para retiro.',
+            Package::STATUS_PENDIENTE_ENTREGA => 'Quedó pendiente de entrega a domicilio: asígnala a un repartidor.',
+            Package::STATUS_EN_TRANSITO_NACIONAL => 'Salió despachada hacia su agencia de retiro.',
+            default => (int) $received->destination_warehouse_id === (int) $warehouse->id
+                ? 'Quedó en el almacén: revisa con el administrador su liberación.'
+                : 'Debe seguir hacia '.($received->destinationWarehouse?->name ?? 'su almacén destino').'.',
+        };
     }
 
     /**
@@ -212,6 +254,8 @@ class Dashboard extends Component
         $this->dispatchError = null;
         $this->dispatchPackage = null;
         $this->recipientIdDoc = '';
+        $this->returnReason = '';
+        $this->resetThirdParty();
 
         $trackingNumber = trim($this->dispatchTrackingNumber);
 
@@ -241,7 +285,7 @@ class Dashboard extends Component
             return;
         }
 
-        if (! $this->belongsToWarehouse($package, $warehouse)) {
+        if (! $this->isHandledByWarehouse($package, $warehouse)) {
             $this->dispatchError = 'Este paquete no tiene como destino este almacén.';
 
             return;
@@ -251,15 +295,22 @@ class Dashboard extends Component
     }
 
     /**
-     * Entrega en persona a quien retira el paquete en el almacén.
-     * Mismo flujo que Ally\PackagePickup::deliver().
+     * Entrega en persona a quien retira el paquete en el almacén: el
+     * destinatario (su cédula debe coincidir) o un tercero autorizado
+     * por él (HandlesThirdPartyPickup). Mismo flujo que
+     * Ally\PackagePickup::deliver().
      */
     public function deliverToClient(PackageService $packageService): void
     {
         $this->dispatchSuccess = null;
         $this->dispatchError = null;
 
-        $this->validate(['recipientIdDoc' => ['required', 'string', 'max:50']]);
+        $this->validate(array_merge(
+            ['recipientIdDoc' => ['required', 'string', 'max:50']],
+            $this->thirdPartyRules(),
+        ), $this->thirdPartyMessages());
+
+        $photos = [null, null];
 
         try {
             $warehouse = $this->warehouse();
@@ -272,7 +323,7 @@ class Dashboard extends Component
                 ->where('current_status', Package::STATUS_LISTO_RETIRO)
                 ->firstOrFail();
 
-            if (! $this->belongsToWarehouse($package, $warehouse)) {
+            if (! $this->isHandledByWarehouse($package, $warehouse)) {
                 throw new RuntimeException('Este paquete no tiene como destino este almacén.');
             }
 
@@ -280,26 +331,127 @@ class Dashboard extends Component
                 throw new RuntimeException('Este envío requiere entrega a domicilio; no puede retirarse en el almacén.');
             }
 
-            if (trim($package->recipient_id_doc) !== trim($this->recipientIdDoc)) {
-                throw new RuntimeException('El documento del receptor no coincide.');
-            }
+            $photos = $this->storeThirdPartyPhotos();
 
             // completeAgencyPickup() (no changeStatus()) también registra
-            // el cobro COD y delivery_completed_at, igual que en
-            // Ally\PackagePickup.
+            // el cobro COD y delivery_completed_at, y valida la cédula del
+            // destinatario (o los datos del tercero autorizado).
             $this->dispatchPackage = $packageService->completeAgencyPickup(
                 $package,
                 (int) Auth::id(),
                 $this->recipientIdDoc,
-                'Retiro confirmado en almacén '.($warehouse?->name ?? ''),
-                'Almacén '.($warehouse?->name ?? ''),
+                'Retiro confirmado en almacén '.$warehouse->name,
+                'Almacén '.$warehouse->name,
+                receivedByThirdParty: $this->byThirdParty,
+                receiverName: $this->thirdPartyName,
+                thirdPartyIdPhotoPath: $photos[0],
+                recipientIdCopyPath: $photos[1],
             );
 
-            $this->dispatchSuccess = 'Retiro confirmado. El paquete quedó ENTREGADO.';
+            $this->dispatchSuccess = $this->byThirdParty
+                ? 'Retiro confirmado por un tercero autorizado. El paquete quedó ENTREGADO.'
+                : 'Retiro confirmado. El paquete quedó ENTREGADO.';
             $this->recipientIdDoc = '';
+            $this->resetThirdParty();
+        } catch (RuntimeException $e) {
+            $this->deleteThirdPartyPhotos($photos);
+            $this->dispatchError = $e->getMessage();
+        }
+    }
+
+    /**
+     * Entrega fallida de vuelta en el almacén: sale de nuevo a reparto
+     * (queda PENDIENTE_ENTREGA para asignarla a un repartidor).
+     */
+    public function retryDelivery(PackageService $packageService): void
+    {
+        $this->dispatchSuccess = null;
+        $this->dispatchError = null;
+
+        try {
+            [$package, $warehouse] = $this->failedPackageForWarehouse();
+
+            $this->dispatchPackage = $packageService->scheduleDeliveryRetry($package, (int) Auth::id(), $warehouse);
+
+            $this->dispatchSuccess = 'Nuevo intento programado: quedó pendiente de entrega. Asígnala a un repartidor.';
         } catch (RuntimeException $e) {
             $this->dispatchError = $e->getMessage();
         }
+    }
+
+    /**
+     * Entrega fallida de vuelta en el almacén: se devuelve al remitente
+     * (PackageService::startReturn(), igual que desde Admin).
+     */
+    public function returnToSender(PackageService $packageService): void
+    {
+        $this->dispatchSuccess = null;
+        $this->dispatchError = null;
+
+        $this->validate([
+            'returnReason' => ['required', 'string', 'min:5', 'max:1000'],
+        ], [
+            'returnReason.required' => 'Indica el motivo de la devolución.',
+            'returnReason.min' => 'Describe el motivo con un poco más de detalle.',
+        ]);
+
+        try {
+            [$package, $warehouse] = $this->failedPackageForWarehouse();
+
+            $returned = DB::transaction(function () use ($packageService, $package, $warehouse) {
+                $returned = $packageService->startReturn($package, (int) Auth::id(), $this->returnReason);
+
+                // Queda constancia de dónde está físicamente mientras
+                // operaciones coordina el traslado a la agencia de origen.
+                $returned->forceFill(['current_warehouse_id' => $warehouse->id])->save();
+
+                AuditLog::create([
+                    'actor_user_id' => Auth::id(),
+                    'action' => 'package.return_started',
+                    'target_type' => Package::class,
+                    'target_id' => $returned->id,
+                    'description' => "Inició la devolución al remitente de la guía {$returned->tracking_number} desde el almacén {$warehouse->name}.",
+                    'metadata' => [
+                        'tracking_number' => $returned->tracking_number,
+                        'reason' => $returned->return_reason,
+                        'warehouse_id' => $warehouse->id,
+                    ],
+                    'ip_address' => request()->ip(),
+                ]);
+
+                return $returned;
+            });
+
+            $this->dispatchPackage = $returned;
+            $this->returnReason = '';
+            $this->dispatchSuccess = 'Devolución iniciada: la agencia de origen la entregará al remitente cuando regrese.';
+        } catch (RuntimeException $e) {
+            $this->dispatchError = $e->getMessage();
+        }
+    }
+
+    /**
+     * @return array{0: Package, 1: Warehouse}
+     */
+    protected function failedPackageForWarehouse(): array
+    {
+        $warehouse = $this->warehouse();
+
+        if (! $warehouse) {
+            throw new RuntimeException('Tu usuario no tiene un almacén asignado.');
+        }
+
+        $package = Package::where('tracking_number', trim($this->dispatchTrackingNumber))->first();
+
+        if (! $package || ! $package->isDeliveryFailed()) {
+            throw new RuntimeException('Esta guía no es una entrega fallida pendiente de decidir.');
+        }
+
+        if (! $this->isHandledByWarehouse($package, $warehouse)) {
+            throw new RuntimeException('Este paquete no corresponde a este almacén.');
+        }
+
+        return [$package, $warehouse];
     }
 
     /**
@@ -346,7 +498,7 @@ class Dashboard extends Component
                 ->where('current_status', Package::STATUS_PENDIENTE_ENTREGA)
                 ->firstOrFail();
 
-            if (! $this->belongsToWarehouse($package, $warehouse)) {
+            if (! $this->isHandledByWarehouse($package, $warehouse)) {
                 throw new RuntimeException('Este paquete no tiene como destino este almacén.');
             }
 

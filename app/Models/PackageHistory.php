@@ -33,6 +33,9 @@ class PackageHistory extends Model
      */
     public const EVENT_DEVOLUCION = 'DEVOLUCION';
 
+    /** Un repartidor no pudo entregar (EN_RUTA -> ENTREGA_FALLIDA). */
+    public const EVENT_ENTREGA_FALLIDA = 'ENTREGA_FALLIDA';
+
     public const EVENTOS = [
         self::EVENT_MOVIMIENTO,
         self::EVENT_RECEPCION,
@@ -43,6 +46,7 @@ class PackageHistory extends Model
         self::EVENT_INCIDENCIA,
         self::EVENT_CORRECCION,
         self::EVENT_DEVOLUCION,
+        self::EVENT_ENTREGA_FALLIDA,
     ];
 
     protected $fillable = [
@@ -120,6 +124,12 @@ class PackageHistory extends Model
 
             self::EVENT_CORRECCION =>
                 'Corrección',
+
+            self::EVENT_DEVOLUCION =>
+                'Devolución',
+
+            self::EVENT_ENTREGA_FALLIDA =>
+                'Entrega fallida',
 
             default =>
                 'Movimiento',

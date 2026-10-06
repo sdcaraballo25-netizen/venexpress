@@ -243,4 +243,90 @@ class HomeDeliveryVerificationTest extends TestCase
 
         Storage::disk('documents')->assertExists($package->fresh()->delivery_photo_path);
     }
+
+    public function test_without_pin_an_authorized_third_party_can_receive_with_id_copies(): void
+    {
+        [, $driver] = $this->driverWithUser();
+        $package = $this->outForDelivery($driver);
+
+        try {
+            $this->complete($package, $driver, [
+                'receiverName' => 'Pedro Gómez',
+                'receiverIdDoc' => 'V-11111111',
+                'receivedByThirdParty' => true,
+                'thirdPartyIdPhotoPath' => 'third-party-ids/tercero.jpg',
+            ]);
+            $this->fail('Se entregó a un tercero sin la copia de la cédula del destinatario.');
+        } catch (RuntimeException $e) {
+            $this->assertStringContainsString('copia de la cédula del destinatario', $e->getMessage());
+        }
+
+        $delivered = $this->complete($package, $driver, [
+            'receiverName' => 'Pedro Gómez',
+            'receiverIdDoc' => 'V-11111111',
+            'receivedByThirdParty' => true,
+            'thirdPartyIdPhotoPath' => 'third-party-ids/tercero.jpg',
+            'recipientIdCopyPath' => 'third-party-ids/copia.jpg',
+        ]);
+
+        $this->assertSame(Package::STATUS_ENTREGADO, $delivered->current_status);
+        $this->assertSame(Package::DELIVERY_CONFIRMATION_THIRD_PARTY, $delivered->delivery_confirmation_method);
+        $this->assertTrue($delivered->received_by_third_party);
+        $this->assertSame('V-11111111', $delivered->receiver_id_doc);
+        $this->assertSame('third-party-ids/copia.jpg', $delivered->recipient_id_copy_path);
+    }
+
+    public function test_the_api_accepts_a_third_party_with_both_id_photos(): void
+    {
+        Storage::fake('documents');
+
+        [$user, $driver] = $this->driverWithUser();
+        $package = $this->outForDelivery($driver);
+
+        $token = $this->postJson('/api/driver/login', [
+            'email' => $user->email,
+            'password' => 'password-seguro',
+            'device_name' => 'telefono-de-prueba',
+        ])->json('token');
+
+        $headers = ['Authorization' => "Bearer {$token}", 'Accept' => 'application/json'];
+
+        $this->post("/api/driver/packages/{$package->id}/complete-delivery", [
+            'receiver_name' => 'Pedro Gómez',
+            'receiver_id_doc' => 'V-11111111',
+            'received_by_third_party' => '1',
+        ], $headers)
+            ->assertUnprocessable()
+            ->assertJsonValidationErrors(['third_party_id_photo', 'recipient_id_copy'])
+            ->assertJsonMissingValidationErrors(['photo']);
+
+        $this->post("/api/driver/packages/{$package->id}/complete-delivery", [
+            'receiver_name' => 'Pedro Gómez',
+            'receiver_id_doc' => 'V-11111111',
+            'received_by_third_party' => '1',
+            'third_party_id_photo' => UploadedFile::fake()->image('tercero.jpg'),
+            'recipient_id_copy' => UploadedFile::fake()->image('copia.jpg'),
+        ], $headers)
+            ->assertOk()
+            ->assertJsonPath('package.received_by_third_party', true)
+            ->assertJsonPath('package.delivery_confirmation_method', Package::DELIVERY_CONFIRMATION_THIRD_PARTY);
+
+        Storage::disk('documents')->assertExists($package->fresh()->third_party_id_photo_path);
+    }
+
+    public function test_only_admins_can_see_the_id_copies_and_payment_proof(): void
+    {
+        Storage::fake('documents');
+        Storage::disk('documents')->put('third-party-ids/copia.jpg', 'img');
+
+        [$driverUser, $driver] = $this->driverWithUser();
+        $package = $this->outForDelivery($driver, ['recipient_id_copy_path' => 'third-party-ids/copia.jpg']);
+
+        $admin = User::factory()->create(['role' => User::ROLE_ADMIN_PRINCIPAL, 'status' => User::STATUS_ACTIVE]);
+
+        $this->actingAs($admin)->get(route('packages.recipient-id-copy', $package))->assertOk();
+        $this->actingAs($driverUser)->get(route('packages.recipient-id-copy', $package))->assertForbidden();
+        $this->actingAs($package->ally->user)->get(route('packages.recipient-id-copy', $package))->assertForbidden();
+        $this->actingAs($admin)->get(route('packages.cod-payment-proof', $package))->assertNotFound();
+    }
 }

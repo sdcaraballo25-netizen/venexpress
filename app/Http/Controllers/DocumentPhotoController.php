@@ -141,8 +141,39 @@ class DocumentPhotoController extends Controller
     }
 
     /**
-     * Administradores o el propio Aliado dueño del documento.
+     * Fotos de la cédula de un tercero autorizado que recibió el
+     * paquete y de la copia de la cédula del destinatario, y el
+     * comprobante de un cobro contra entrega. Son datos personales o de
+     * pago: solo los ve un administrador.
      */
+    public function packageThirdPartyId(Request $request, Package $package): StreamedResponse
+    {
+        $this->authorizeAdminOnly($request->user());
+
+        return $this->serve($package->third_party_id_photo_path);
+    }
+
+    public function packageRecipientIdCopy(Request $request, Package $package): StreamedResponse
+    {
+        $this->authorizeAdminOnly($request->user());
+
+        return $this->serve($package->recipient_id_copy_path);
+    }
+
+    public function packageCodPaymentProof(Request $request, Package $package): StreamedResponse
+    {
+        $this->authorizeAdminOnly($request->user());
+
+        return $this->serve($package->cod_payment_proof_path);
+    }
+
+    protected function authorizeAdminOnly(?User $user): void
+    {
+        if (! $user || ! $user->isAdmin()) {
+            abort(403, 'No tienes permiso para ver este documento.');
+        }
+    }
+
     /**
      * Adjunto del chat de un pedido del marketplace (comprobante de
      * pago, foto de guía, etc.). Lo pueden ver quienes ya tienen

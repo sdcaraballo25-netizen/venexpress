@@ -10,6 +10,7 @@ use App\Models\Package;
 use App\Models\PackageHistory;
 use App\Models\Pedido;
 use App\Models\Route;
+use App\Models\Warehouse;
 use App\Notifications\DeliveryPinIssued;
 use App\Notifications\PackageCreated;
 use App\Notifications\PackageStatusUpdated;
@@ -579,6 +580,13 @@ class PackageService
 
             Package::STATUS_EN_RUTA => [
                 Package::STATUS_ENTREGADO,
+                Package::STATUS_ENTREGA_FALLIDA,
+            ],
+
+            // Al volver al almacén: nuevo intento (scheduleDeliveryRetry())
+            // o devolución al remitente (startReturn(), fuera de este mapa).
+            Package::STATUS_ENTREGA_FALLIDA => [
+                Package::STATUS_PENDIENTE_ENTREGA,
             ],
 
             Package::STATUS_ENTREGADO => [],
@@ -922,6 +930,11 @@ class PackageService
      *   intentos): la cédula de quien recibe debe coincidir con la del
      *   destinatario y se exige una foto de la entrega
      *   (DELIVERY_CONFIRMATION_ID_DOC).
+     * - Sin PIN, a un tercero autorizado por el destinatario
+     *   ($receivedByThirdParty): su nombre y cédula, una foto de su
+     *   cédula y una de la copia de la cédula del destinatario
+     *   (DELIVERY_CONFIRMATION_THIRD_PARTY). Con PIN, un tercero que lo
+     *   tenga puede recibir sin más (el PIN es la autorización).
      *
      * No se entrega con un pago pendiente: un COD sin cobrar exige la
      * forma de pago y, si es electrónica (pago móvil, transferencia,
@@ -939,6 +952,9 @@ class PackageService
         ?string $codPaymentMethod = null,
         ?string $codPaymentReference = null,
         ?string $codPaymentProofPath = null,
+        bool $receivedByThirdParty = false,
+        ?string $thirdPartyIdPhotoPath = null,
+        ?string $recipientIdCopyPath = null,
     ): Package {
         $deliveryPin = trim((string) $deliveryPin);
         $receiverName = trim((string) $receiverName);
@@ -959,7 +975,10 @@ class PackageService
             $deliveryPhotoPath,
             $codPaymentMethod,
             $codPaymentReference,
-            $codPaymentProofPath
+            $codPaymentProofPath,
+            $receivedByThirdParty,
+            $thirdPartyIdPhotoPath,
+            $recipientIdCopyPath
         ) {
             $lockedPackage = Package::query()
                 ->whereKey($package->id)
@@ -1014,6 +1033,10 @@ class PackageService
                 }
 
                 $confirmationMethod = Package::DELIVERY_CONFIRMATION_PIN;
+            } elseif ($receivedByThirdParty) {
+                $this->assertThirdPartyEvidence($receiverIdDoc, $thirdPartyIdPhotoPath, $recipientIdCopyPath);
+
+                $confirmationMethod = Package::DELIVERY_CONFIRMATION_THIRD_PARTY;
             } else {
                 if (! Package::idDocsMatch($receiverIdDoc, $lockedPackage->recipient_id_doc)) {
                     throw new RuntimeException(
@@ -1067,6 +1090,9 @@ class PackageService
                 'receiver_phone' => $receiverPhone,
                 'delivery_confirmation_method' => $confirmationMethod,
                 'delivery_photo_path' => $deliveryPhotoPath,
+                'received_by_third_party' => $receivedByThirdParty,
+                'third_party_id_photo_path' => $receivedByThirdParty ? $thirdPartyIdPhotoPath : null,
+                'recipient_id_copy_path' => $receivedByThirdParty ? $recipientIdCopyPath : null,
                 // Ya entregado, el PIN no sirve para nada más.
                 'delivery_pin_hash' => null,
             ])->save();
@@ -1082,9 +1108,11 @@ class PackageService
                 userId: $driver->user_id,
                 locationDescription:
                     ($locationDescription ?? 'Entrega completada por el repartidor')
-                    .($confirmationMethod === Package::DELIVERY_CONFIRMATION_PIN
-                        ? ' (verificada con PIN)'
-                        : ' (sin PIN: verificada con cédula y foto)'),
+                    .match ($confirmationMethod) {
+                        Package::DELIVERY_CONFIRMATION_PIN => ' (verificada con PIN)',
+                        Package::DELIVERY_CONFIRMATION_THIRD_PARTY => " (sin PIN: a un tercero autorizado, {$receiverName}, con copias de cédula)",
+                        default => ' (sin PIN: verificada con cédula y foto)',
+                    },
                 eventType: PackageHistory::EVENT_ENTREGA,
                 originLocation: 'Dirección de entrega',
                 destinationLocation: 'Destinatario',
@@ -1103,6 +1131,153 @@ class PackageService
     }
 
     /**
+     * Entrega a un tercero autorizado por el destinatario: su cédula y
+     * las fotos de su cédula y de la copia de la del destinatario.
+     */
+    protected function assertThirdPartyEvidence(
+        string $receiverIdDoc,
+        ?string $thirdPartyIdPhotoPath,
+        ?string $recipientIdCopyPath,
+    ): void {
+        if ($receiverIdDoc === '') {
+            throw new RuntimeException('Indica la cédula del tercero autorizado que recibe el paquete.');
+        }
+
+        if (! $thirdPartyIdPhotoPath || ! $recipientIdCopyPath) {
+            throw new RuntimeException(
+                'Para entregar a un tercero autorizado adjunta una foto de su cédula y una de la copia de la cédula del destinatario.'
+            );
+        }
+    }
+
+    /**
+     * El repartidor no pudo entregar: EN_RUTA -> ENTREGA_FALLIDA con el
+     * motivo (Package::FAILED_DELIVERY_REASON_LABELS) y se cuenta el
+     * intento. El paquete sigue bajo su custodia hasta que lo devuelva
+     * al almacén, donde Almacén o Admin deciden un nuevo intento
+     * (scheduleDeliveryRetry()) o la devolución al remitente
+     * (startReturn()). Mientras tanto la ruta no se puede finalizar
+     * (RouteService::pendingPackagesCountFor()). El PIN emitido deja de
+     * servir: el próximo intento genera uno nuevo.
+     */
+    public function markDeliveryFailed(
+        Package $package,
+        Driver $driver,
+        string $reason,
+        ?string $notes = null,
+    ): Package {
+        if (! array_key_exists($reason, Package::FAILED_DELIVERY_REASON_LABELS)) {
+            throw new RuntimeException('Indica un motivo válido de por qué no se pudo entregar.');
+        }
+
+        $notes = trim((string) $notes);
+
+        if ($reason === 'OTRO' && $notes === '') {
+            throw new RuntimeException('Describe brevemente por qué no se pudo entregar.');
+        }
+
+        $updatedPackage = DB::transaction(function () use ($package, $driver, $reason, $notes) {
+            $locked = Package::query()
+                ->whereKey($package->id)
+                ->lockForUpdate()
+                ->firstOrFail();
+
+            if ($driver->status !== Driver::STATUS_ACTIVE) {
+                throw new RuntimeException('El repartidor no está activo.');
+            }
+
+            if ((int) $locked->driver_id !== (int) $driver->id) {
+                throw new RuntimeException('Este paquete no está asignado a este repartidor.');
+            }
+
+            if ($locked->current_status !== Package::STATUS_EN_RUTA) {
+                throw new RuntimeException(
+                    'Solo se puede marcar como fallida una entrega en ruta. Estado actual: '
+                    .$locked->statusLabel().'.'
+                );
+            }
+
+            $attempt = (int) $locked->delivery_attempts + 1;
+
+            $locked->update([
+                'current_status' => Package::STATUS_ENTREGA_FALLIDA,
+                'delivery_attempts' => $attempt,
+                'failed_delivery_reason' => $reason,
+                'failed_delivery_notes' => $notes !== '' ? $notes : null,
+                'failed_delivery_at' => now(),
+                'delivery_pin_hash' => null,
+                'delivery_pin_failed_attempts' => 0,
+            ]);
+
+            $this->recordHistory(
+                package: $locked,
+                status: Package::STATUS_ENTREGA_FALLIDA,
+                userId: $driver->user_id,
+                locationDescription: "Intento de entrega #{$attempt} fallido: "
+                    .Package::FAILED_DELIVERY_REASON_LABELS[$reason]
+                    .($notes !== '' ? ". {$notes}" : '.'),
+                eventType: PackageHistory::EVENT_ENTREGA_FALLIDA,
+                originLocation: 'Dirección de entrega',
+                destinationLocation: 'Repartidor',
+            );
+
+            return $locked->fresh();
+        });
+
+        $this->notifyStatusChange($updatedPackage, Package::STATUS_ENTREGA_FALLIDA);
+
+        return $updatedPackage;
+    }
+
+    /**
+     * Nuevo intento de entrega tras una entrega fallida, decidido por
+     * Almacén (al recibir el paquete de vuelta, $warehouse) o por Admin:
+     * ENTREGA_FALLIDA -> PENDIENTE_ENTREGA, sin repartidor, para que se
+     * vuelva a asignar o tomar como cualquier otro.
+     */
+    public function scheduleDeliveryRetry(Package $package, int $userId, ?Warehouse $warehouse = null): Package
+    {
+        return DB::transaction(function () use ($package, $userId, $warehouse) {
+            $locked = Package::query()
+                ->whereKey($package->id)
+                ->lockForUpdate()
+                ->firstOrFail();
+
+            if (! $locked->isDeliveryFailed()) {
+                throw new RuntimeException(
+                    'Solo se puede programar un nuevo intento para una entrega fallida. Estado actual: '
+                    .$locked->statusLabel().'.'
+                );
+            }
+
+            $updates = [
+                'current_status' => Package::STATUS_PENDIENTE_ENTREGA,
+                'driver_id' => null,
+                'delivery_status' => Package::DELIVERY_PENDING,
+            ];
+
+            if ($warehouse) {
+                $updates['current_warehouse_id'] = $warehouse->id;
+            }
+
+            $locked->update($updates);
+
+            $this->recordHistory(
+                package: $locked,
+                status: Package::STATUS_PENDIENTE_ENTREGA,
+                userId: $userId,
+                locationDescription: 'Se programa el intento de entrega #'.((int) $locked->delivery_attempts + 1)
+                    .($warehouse ? " (paquete de vuelta en {$warehouse->name})" : '').'.',
+                eventType: PackageHistory::EVENT_RECEPCION,
+                originLocation: 'Repartidor',
+                destinationLocation: $warehouse?->name ?? 'Almacén destino',
+            );
+
+            return $locked->fresh();
+        });
+    }
+
+    /**
      * Completa un retiro presencial en la agencia destino.
      * No genera remuneración de repartidor porque no hubo entrega a domicilio.
      */
@@ -1112,13 +1287,24 @@ class PackageService
         string $recipientIdDoc,
         ?string $locationDescription = null,
         ?string $originLocation = null,
+        bool $receivedByThirdParty = false,
+        ?string $receiverName = null,
+        ?string $thirdPartyIdPhotoPath = null,
+        ?string $recipientIdCopyPath = null,
     ): Package {
+        $recipientIdDoc = trim($recipientIdDoc);
+        $receiverName = trim((string) $receiverName);
+
         $updatedPackage = DB::transaction(function () use (
             $package,
             $userId,
             $recipientIdDoc,
             $locationDescription,
-            $originLocation
+            $originLocation,
+            $receivedByThirdParty,
+            $receiverName,
+            $thirdPartyIdPhotoPath,
+            $recipientIdCopyPath
         ) {
             $locked = Package::query()
                 ->whereKey($package->id)
@@ -1135,7 +1321,23 @@ class PackageService
                 );
             }
 
-            if (trim((string) $locked->recipient_id_doc) !== trim($recipientIdDoc)) {
+            if ($receivedByThirdParty) {
+                // Lo retira otra persona autorizada por el destinatario:
+                // su cédula no tiene que coincidir, pero quedan su nombre,
+                // su cédula y las fotos de ambas cédulas.
+                if ($receiverName === '') {
+                    throw new RuntimeException('Indica el nombre del tercero autorizado que retira el paquete.');
+                }
+
+                $this->assertThirdPartyEvidence($recipientIdDoc, $thirdPartyIdPhotoPath, $recipientIdCopyPath);
+
+                $locked->received_by_third_party = true;
+                $locked->receiver_name = $receiverName;
+                $locked->receiver_id_doc = $recipientIdDoc;
+                $locked->third_party_id_photo_path = $thirdPartyIdPhotoPath;
+                $locked->recipient_id_copy_path = $recipientIdCopyPath;
+                $locked->delivery_confirmation_method = Package::DELIVERY_CONFIRMATION_THIRD_PARTY;
+            } elseif (trim((string) $locked->recipient_id_doc) !== $recipientIdDoc) {
                 throw new RuntimeException('El documento del receptor no coincide.');
             }
 
@@ -1153,7 +1355,8 @@ class PackageService
                 status: Package::STATUS_ENTREGADO,
                 userId: $userId,
                 locationDescription:
-                    $locationDescription ?? 'Retiro confirmado en agencia destino',
+                    ($locationDescription ?? 'Retiro confirmado en agencia destino')
+                    .($receivedByThirdParty ? " (retirado por un tercero autorizado: {$receiverName})" : ''),
                 eventType: PackageHistory::EVENT_ENTREGA,
                 originLocation: $originLocation ?? 'Agencia destino',
                 destinationLocation: 'Destinatario',

@@ -6,6 +6,8 @@ use App\Livewire\Ally\PackagePickup;
 use App\Models\Package;
 use App\Services\PackageService;
 use Illuminate\Foundation\Testing\RefreshDatabase;
+use Illuminate\Http\UploadedFile;
+use Illuminate\Support\Facades\Storage;
 use Livewire\Livewire;
 use Tests\Feature\Concerns\CreatesTestPackages;
 use Tests\TestCase;
@@ -127,5 +129,46 @@ class PackagePickupAuthorizationTest extends TestCase
         $liquidated = app(PackageService::class)->liquidateCod($package, $originAlly->user->id);
 
         $this->assertSame(Package::COD_LIQUIDADO, $liquidated->cod_status);
+    }
+
+    public function test_an_authorized_third_party_can_pick_up_with_id_copies(): void
+    {
+        Storage::fake('documents');
+
+        $pickupAlly = $this->createAlly();
+
+        $package = $this->createPackage($this->createAlly(), [
+            'requires_delivery' => false,
+            'pickup_ally_id' => $pickupAlly->id,
+            'current_status' => Package::STATUS_LISTO_RETIRO,
+            'recipient_id_doc' => 'V-87654321',
+        ]);
+
+        // Sin marcar "tercero", otra cédula no sirve.
+        Livewire::actingAs($pickupAlly->user)
+            ->test(PackagePickup::class)
+            ->set('trackingNumber', $package->tracking_number)
+            ->call('search')
+            ->set('recipientIdDoc', 'V-11111111')
+            ->call('deliver')
+            ->assertSet('error', 'El documento del receptor no coincide.')
+            ->set('byThirdParty', true)
+            ->set('thirdPartyName', 'Pedro Gómez')
+            ->set('thirdPartyIdPhoto', UploadedFile::fake()->image('cedula-tercero.jpg'))
+            ->set('recipientIdCopy', UploadedFile::fake()->image('copia-cedula.jpg'))
+            ->call('deliver')
+            ->assertSet('error', null)
+            ->assertSet('message', 'Retiro confirmado por un tercero autorizado. El paquete quedó ENTREGADO.');
+
+        $package->refresh();
+        $this->assertSame(Package::STATUS_ENTREGADO, $package->current_status);
+        $this->assertTrue($package->received_by_third_party);
+        $this->assertSame('Pedro Gómez', $package->receiver_name);
+        $this->assertSame(Package::DELIVERY_CONFIRMATION_THIRD_PARTY, $package->delivery_confirmation_method);
+        Storage::disk('documents')->assertExists($package->recipient_id_copy_path);
+        $this->assertStringContainsString(
+            'tercero autorizado: Pedro Gómez',
+            $package->histories()->latest('id')->first()->location_description
+        );
     }
 }

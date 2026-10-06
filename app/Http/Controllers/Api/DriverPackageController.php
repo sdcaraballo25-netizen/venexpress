@@ -278,7 +278,9 @@ class DriverPackageController extends Controller
      * Confirma la entrega a domicilio (solo desde EN_RUTA). Con el PIN
      * que el destinatario recibió por correo (delivery_pin) o, sin él,
      * con la cédula del destinatario (receiver_id_doc) y una foto de la
-     * entrega (photo). Un COD sin cobrar exige la forma de pago y, si es
+     * entrega (photo); o a un tercero autorizado (received_by_third_party,
+     * su cédula en receiver_id_doc, third_party_id_photo y
+     * recipient_id_copy). Un COD sin cobrar exige la forma de pago y, si es
      * electrónica, la referencia (cod_payment_reference); el comprobante
      * (cod_payment_proof) es opcional. Dispara la remuneración pendiente
      * del repartidor (DriverPaymentService, vía
@@ -298,6 +300,7 @@ class DriverPackageController extends Controller
 
         $codPending = $package->is_cod && ! $package->cod_collected_at;
         $withPin = $request->filled('delivery_pin');
+        $thirdParty = ! $withPin && $request->boolean('received_by_third_party');
 
         $validated = $request->validate([
             'receiver_name' => ['required', 'string', 'max:150'],
@@ -305,7 +308,10 @@ class DriverPackageController extends Controller
             'receiver_phone' => ['nullable', 'string', 'max:30'],
             'delivery_pin' => ['nullable', 'digits:6'],
             'delivery_confirmation_method' => ['nullable', 'string', 'max:30'],
-            'photo' => [$withPin ? 'nullable' : 'required', 'image', 'mimes:jpg,jpeg,png,webp', 'max:5120'],
+            'photo' => [$withPin || $thirdParty ? 'nullable' : 'required', 'image', 'mimes:jpg,jpeg,png,webp', 'max:5120'],
+            'received_by_third_party' => ['nullable', 'boolean'],
+            'third_party_id_photo' => [$thirdParty ? 'required' : 'nullable', 'image', 'mimes:jpg,jpeg,png,webp', 'max:5120'],
+            'recipient_id_copy' => [$thirdParty ? 'required' : 'nullable', 'image', 'mimes:jpg,jpeg,png,webp', 'max:5120'],
             'cod_payment_method' => [
                 $codPending ? 'required' : 'nullable',
                 'in:'.implode(',', Package::PAYMENT_METHODS),
@@ -321,6 +327,8 @@ class DriverPackageController extends Controller
         ], [
             'receiver_id_doc.required' => 'Sin PIN, indica la cédula del destinatario.',
             'photo.required' => 'Sin PIN, adjunta una foto de la entrega.',
+            'third_party_id_photo.required' => 'Adjunta una foto de la cédula de quien recibe.',
+            'recipient_id_copy.required' => 'Adjunta una foto de la copia de la cédula del destinatario.',
             'delivery_pin.digits' => 'El PIN tiene 6 dígitos.',
             'cod_payment_method.required' => 'Este pedido es contra entrega (COD): indica la forma de pago con la que te cancelaron.',
             'cod_payment_reference.required' => 'Indica el número de referencia del pago.',
@@ -332,6 +340,14 @@ class DriverPackageController extends Controller
 
         $proofPath = $codPending && $request->hasFile('cod_payment_proof')
             ? $request->file('cod_payment_proof')->store('cod-payment-proofs', 'documents')
+            : null;
+
+        $thirdPartyIdPath = $thirdParty
+            ? $request->file('third_party_id_photo')->store('third-party-ids', 'documents')
+            : null;
+
+        $recipientIdCopyPath = $thirdParty
+            ? $request->file('recipient_id_copy')->store('third-party-ids', 'documents')
             : null;
 
         try {
@@ -347,6 +363,9 @@ class DriverPackageController extends Controller
                 codPaymentMethod: $validated['cod_payment_method'] ?? null,
                 codPaymentReference: $validated['cod_payment_reference'] ?? null,
                 codPaymentProofPath: $proofPath,
+                receivedByThirdParty: $thirdParty,
+                thirdPartyIdPhotoPath: $thirdPartyIdPath,
+                recipientIdCopyPath: $recipientIdCopyPath,
             );
 
             return response()->json([
@@ -354,7 +373,7 @@ class DriverPackageController extends Controller
                 'package' => new DriverPackageResource($package),
             ]);
         } catch (RuntimeException $e) {
-            foreach (array_filter([$photoPath, $proofPath]) as $path) {
+            foreach (array_filter([$photoPath, $proofPath, $thirdPartyIdPath, $recipientIdCopyPath]) as $path) {
                 Storage::disk('documents')->delete($path);
             }
 
@@ -362,6 +381,43 @@ class DriverPackageController extends Controller
                 'message' => $e->getMessage(),
                 'package' => new DriverPackageResource($package->fresh()),
             ], 422);
+        }
+    }
+
+    /**
+     * No se pudo entregar: EN_RUTA -> ENTREGA_FALLIDA con el motivo
+     * (Package::FAILED_DELIVERY_REASON_LABELS) y se cuenta el intento.
+     */
+    public function markDeliveryFailed(Request $request, int $packageId): JsonResponse
+    {
+        $driver = $this->driver();
+
+        $package = Package::query()
+            ->where('driver_id', $driver->id)
+            ->findOrFail($packageId);
+
+        $validated = $request->validate([
+            'reason' => ['required', 'in:'.implode(',', array_keys(Package::FAILED_DELIVERY_REASON_LABELS))],
+            'notes' => [$request->input('reason') === 'OTRO' ? 'required' : 'nullable', 'string', 'max:1000'],
+        ], [
+            'reason.required' => 'Indica por qué no se pudo entregar.',
+            'notes.required' => 'Describe brevemente qué pasó.',
+        ]);
+
+        try {
+            $package = app(PackageService::class)->markDeliveryFailed(
+                package: $package,
+                driver: $driver,
+                reason: $validated['reason'],
+                notes: $validated['notes'] ?? null,
+            );
+
+            return response()->json([
+                'message' => 'Entrega marcada como fallida. Devuelve el paquete al almacén.',
+                'package' => new DriverPackageResource($package),
+            ]);
+        } catch (RuntimeException $e) {
+            return response()->json(['message' => $e->getMessage()], 422);
         }
     }
 

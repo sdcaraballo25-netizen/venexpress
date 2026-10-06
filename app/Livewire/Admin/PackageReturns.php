@@ -16,6 +16,10 @@ use RuntimeException;
  * Devolución al remitente (lado Admin): busca una guía que no se pudo
  * entregar e inicia su devolución con un motivo. La cierra la agencia
  * de origen desde Ally\PackageReturns. Ver PackageService::startReturn().
+ *
+ * Para una entrega a domicilio fallida (ENTREGA_FALLIDA) Admin decide
+ * aquí entre un nuevo intento (PackageService::scheduleDeliveryRetry())
+ * o la devolución; lo mismo puede hacer Almacén al recibirla de vuelta.
  */
 #[Layout('layouts.admin')]
 class PackageReturns extends Component
@@ -114,9 +118,54 @@ class PackageReturns extends Component
             .'la entregará al remitente cuando el paquete regrese.';
     }
 
+    public function retryDelivery(PackageService $packageService): void
+    {
+        $this->reset(['successMessage', 'errorMessage']);
+
+        $package = Package::query()
+            ->where('tracking_number', trim($this->trackingNumber))
+            ->first();
+
+        if (! $package) {
+            $this->errorMessage = 'La guía no existe.';
+
+            return;
+        }
+
+        try {
+            $retried = $packageService->scheduleDeliveryRetry($package, (int) Auth::id());
+        } catch (RuntimeException $e) {
+            $this->errorMessage = $e->getMessage();
+
+            return;
+        }
+
+        AuditLog::create([
+            'actor_user_id' => Auth::id(),
+            'action' => 'package.delivery_retry_scheduled',
+            'target_type' => Package::class,
+            'target_id' => $retried->id,
+            'description' => "Programó un nuevo intento de entrega de la guía {$retried->tracking_number}.",
+            'metadata' => [
+                'tracking_number' => $retried->tracking_number,
+                'failed_attempts' => $retried->delivery_attempts,
+            ],
+            'ip_address' => request()->ip(),
+        ]);
+
+        $this->package = $retried->load('ally');
+        $this->successMessage = 'Nuevo intento programado: la guía quedó pendiente de entrega para asignarla a un repartidor.';
+    }
+
     public function render()
     {
         return view('livewire.admin.package-returns', [
+            'failedDeliveries' => Package::query()
+                ->where('current_status', Package::STATUS_ENTREGA_FALLIDA)
+                ->with('driver.user')
+                ->orderBy('failed_delivery_at')
+                ->limit(50)
+                ->get(),
             'inReturn' => Package::query()
                 ->where('current_status', Package::STATUS_EN_DEVOLUCION)
                 ->with('ally')
