@@ -510,9 +510,9 @@
     "semantic_hash": "e1790b7d0d6e0f4a34bb7497b14eeace"
   },
   "resources/views/layouts/admin.blade.php": {
-    "mtime": 1790884405.846536,
-    "seen": 1790884884.76292,
-    "ast_hash": "bbd5fad15077d201f33a733182a471e8",
+    "mtime": 1791263252.3476388,
+    "seen": 1791264192.6283238,
+    "ast_hash": "4952b8c43caa6d25f2208565032b24e8",
     "semantic_hash": ""
   },
   "resources/views/layouts/app.blade.php": {
@@ -552,9 +552,9 @@
     "semantic_hash": ""
   },
   "routes/web.php": {
-    "mtime": 1791262331.4204988,
-    "seen": 1791262565.4490223,
-    "ast_hash": "fbe887cae11731f57e4bbaa25e4ef2a9",
+    "mtime": 1791263252.3459473,
+    "seen": 1791264192.628408,
+    "ast_hash": "acaea2893b7ff1c6f348c6027158d7bb",
     "semantic_hash": ""
   },
   "tailwind.config.js": {
@@ -786,9 +786,9 @@
     "semantic_hash": ""
   },
   "app/Models/AuditLog.php": {
-    "mtime": 1791261896.9049137,
-    "seen": 1791262565.4487193,
-    "ast_hash": "44022891f87bca8033400a61d9cfc4a5",
+    "mtime": 1791263252.3465118,
+    "seen": 1791264192.628146,
+    "ast_hash": "e24fe2c32599bb93526417b2badf8da4",
     "semantic_hash": ""
   },
   "database/migrations/2026_08_22_230000_update_user_roles_and_add_status.php": {
@@ -3999,6 +3999,30 @@
     "mtime": 1791262269.6991792,
     "seen": 1791262565.4491134,
     "ast_hash": "f336bebd6ab1cb243cd55e033901a6fa",
+    "semantic_hash": ""
+  },
+  "app/Livewire/Admin/PackageModality.php": {
+    "mtime": 1791263252.3289886,
+    "seen": 1791264192.6280847,
+    "ast_hash": "d3c235c4cfb0a8d0a70490fe6f1ad9b9",
+    "semantic_hash": ""
+  },
+  "app/Services/PackageModalityService.php": {
+    "mtime": 1791263214.7332125,
+    "seen": 1791264192.6281898,
+    "ast_hash": "aba7d3f7c8e34b1916bc80519a4f0351",
+    "semantic_hash": ""
+  },
+  "resources/views/livewire/admin/package-modality.blade.php": {
+    "mtime": 1791263252.3312662,
+    "seen": 1791264192.628342,
+    "ast_hash": "abc762a234b37b1e4a1976ad4e1cdb8f",
+    "semantic_hash": ""
+  },
+  "tests/Feature/PackageModalityTest.php": {
+    "mtime": 1791264156.6330357,
+    "seen": 1791264192.6285114,
+    "ast_hash": "3ade165a1f75859ceff49d3239432d6c",
     "semantic_hash": ""
   }
 }
