@@ -145,6 +145,7 @@
                                 {{ request()->routeIs(
                                     'admin.packages.reception',
                                     'admin.packages.assignment',
+                                    'admin.packages.modality',
                                     'admin.packages.dispatch',
                                     'admin.routes',
                                     'admin.routes.dashboard',
@@ -351,6 +352,34 @@
                                 </svg>
 
                                 Asignar a reparto
+
+                            </a>
+
+
+                            {{-- Cambiar modalidad --}}
+                            <a
+                                href="{{ route('admin.packages.modality') }}"
+                                class="flex items-center gap-3 px-4 py-3 rounded-xl font-medium transition-colors
+                                {{ request()->routeIs('admin.packages.modality')
+                                    ? 'bg-amber-400 text-[#111111]'
+                                    : 'text-[#6B6B66] hover:bg-slate-50 hover:text-[#111111]' }}"
+                            >
+
+                                <svg
+                                    class="w-5 h-5"
+                                    fill="none"
+                                    stroke="currentColor"
+                                    viewBox="0 0 24 24"
+                                >
+                                    <path
+                                        stroke-linecap="round"
+                                        stroke-linejoin="round"
+                                        stroke-width="2"
+                                        d="M7 16V4m0 0L3 8m4-4l4 4m6 0v12m0 0l4-4m-4 4l-4-4"
+                                    />
+                                </svg>
+
+                                Cambiar modalidad
 
                             </a>
 

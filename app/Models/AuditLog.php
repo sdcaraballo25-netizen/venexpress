@@ -60,6 +60,7 @@ class AuditLog extends Model
         'package.delivery_unassigned' => 'Asignación de reparto retirada',
         'package.delivery_retry_scheduled' => 'Nuevo intento de entrega programado',
         'package.misrouted_scan' => 'Paquete escaneado en destino equivocado',
+        'package.modality_changed' => 'Modalidad de entrega cambiada',
         'rate_matrix.updated' => 'Tarifas actualizadas',
         'route.created' => 'Ruta creada',
         'route.updated' => 'Ruta actualizada',

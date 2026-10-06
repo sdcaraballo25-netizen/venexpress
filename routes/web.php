@@ -616,6 +616,12 @@ Route::prefix('admin')
         )
             ->name('packages.assignment');
 
+        Route::get(
+            '/paquetes/modalidad',
+            App\Livewire\Admin\PackageModality::class
+        )
+            ->name('packages.modality');
+
         /*
         |--------------------------------------------------------------------------
         | Repartidores
