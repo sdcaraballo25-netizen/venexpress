@@ -72,7 +72,7 @@ class ReadyForPickupNotificationTest extends TestCase
         return $hub;
     }
 
-    private function assertReadyNotificationSentTimes(int $times, ?Package $package = null): void
+    private function assertReadyNotificationSentTimes(int $times, ?Package $package = null, string $status = Package::STATUS_LISTO_RETIRO): void
     {
         Notification::assertSentTimes(PackageStatusUpdated::class, $times);
 
@@ -83,11 +83,11 @@ class ReadyForPickupNotificationTest extends TestCase
         Notification::assertSentTo(
             new AnonymousNotifiable,
             PackageStatusUpdated::class,
-            function (PackageStatusUpdated $notification, array $channels, AnonymousNotifiable $notifiable) use ($package) {
+            function (PackageStatusUpdated $notification, array $channels, AnonymousNotifiable $notifiable) use ($package, $status) {
                 $data = $notification->toArray($notifiable);
 
                 return $notifiable->routes['mail'] === self::RECIPIENT_EMAIL
-                    && $data['status'] === Package::STATUS_LISTO_RETIRO
+                    && $data['status'] === $status
                     && ($package === null || $data['package_id'] === $package->id);
             }
         );
@@ -149,9 +149,10 @@ class ReadyForPickupNotificationTest extends TestCase
             'delivery_address' => 'Calle 1',
         ]);
 
-        app(HubReleaseService::class)->release($package, $ally->user_id);
+        $released = app(HubReleaseService::class)->release($package, $ally->user_id);
 
-        $this->assertReadyNotificationSentTimes(1, $package);
+        $this->assertSame(Package::STATUS_PENDIENTE_ENTREGA, $released->current_status);
+        $this->assertReadyNotificationSentTimes(1, $package, Package::STATUS_PENDIENTE_ENTREGA);
     }
 
     public function test_an_invalid_reception_does_not_send_a_false_notification(): void
@@ -254,13 +255,14 @@ class ReadyForPickupNotificationTest extends TestCase
         $ally = $this->createAlly();
 
         $package = $this->createPackage($ally, [
-            'current_status' => Package::STATUS_LISTO_RETIRO,
+            'current_status' => Package::STATUS_PENDIENTE_ENTREGA,
             'requires_delivery' => true,
         ]);
 
-        $mail = (new PackageStatusUpdated($package->id, Package::STATUS_LISTO_RETIRO))
+        $mail = (new PackageStatusUpdated($package->id, Package::STATUS_PENDIENTE_ENTREGA))
             ->toMail(new AnonymousNotifiable);
 
         $this->assertStringContainsString('lista para entrega a domicilio', $mail->subject);
+        $this->assertStringContainsString('PIN de entrega', implode(' ', $mail->introLines));
     }
 }

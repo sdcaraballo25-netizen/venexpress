@@ -359,12 +359,10 @@ class HubReceptionServiceTest extends TestCase
 
     /**
      * requires_delivery = true en su HUB destino final: ya no debe
-     * pasar por EN_TRANSITO_NACIONAL, se libera directo a LISTO_RETIRO
-     * (mismo destino final que retiro en HUB) para que
-     * PackageService::claimForDelivery() lo reclame desde ahí, tal como
-     * ya hace hoy con paquetes recibidos en un Aliado.
+     * pasar por EN_TRANSITO_NACIONAL, se libera directo a
+     * PENDIENTE_ENTREGA para que un repartidor lo tome desde ahí.
      */
-    public function test_receive_at_warehouse_auto_releases_to_listo_retiro_when_requires_delivery_is_true(): void
+    public function test_receive_at_warehouse_auto_releases_to_pendiente_entrega_when_requires_delivery_is_true(): void
     {
         $ally = $this->createAlly();
         $warehouse = Warehouse::factory()->create(['state' => 'Carabobo', 'city' => 'Valencia']);
@@ -387,7 +385,7 @@ class HubReceptionServiceTest extends TestCase
 
         $received = $this->service()->receiveAtWarehouse($package, $ally->user_id, $warehouse);
 
-        $this->assertSame(Package::STATUS_LISTO_RETIRO, $received->current_status);
+        $this->assertSame(Package::STATUS_PENDIENTE_ENTREGA, $received->current_status);
         $this->assertNotSame(Package::STATUS_EN_TRANSITO_NACIONAL, $received->current_status);
         $this->assertTrue($received->isAvailableForDeliveryClaim());
     }
@@ -747,10 +745,10 @@ class HubReceptionServiceTest extends TestCase
      * HUB -> HUB en su almacén destino resuelto (Mérida). Antes del
      * fix, se quedaba en EN_HUB indefinidamente porque
      * attemptAutoRelease() solo consideraba pickup_mode = HUB. Debe
-     * quedar LISTO_RETIRO, listo para que un repartidor de entrega lo
-     * reclame — nunca EN_TRANSITO_NACIONAL ni EN_HUB.
+     * quedar PENDIENTE_ENTREGA, listo para que un repartidor de entrega
+     * lo tome — nunca EN_TRANSITO_NACIONAL ni EN_HUB.
      */
-    public function test_transfer_reception_auto_releases_to_listo_retiro_when_requires_delivery_is_true(): void
+    public function test_transfer_reception_auto_releases_to_pendiente_entrega_when_requires_delivery_is_true(): void
     {
         $ally = $this->createAlly(['city' => 'Cumaná', 'state' => 'Sucre']);
         $originWarehouse = Warehouse::factory()->create(['name' => 'Hub central']);
@@ -787,7 +785,7 @@ class HubReceptionServiceTest extends TestCase
             $destinationWarehouse
         );
 
-        $this->assertSame(Package::STATUS_LISTO_RETIRO, $received->current_status);
+        $this->assertSame(Package::STATUS_PENDIENTE_ENTREGA, $received->current_status);
         $this->assertNotSame(Package::STATUS_EN_TRANSITO_NACIONAL, $received->current_status);
         $this->assertNotSame(Package::STATUS_EN_HUB, $received->current_status);
         $this->assertSame($destinationWarehouse->id, $received->current_warehouse_id);

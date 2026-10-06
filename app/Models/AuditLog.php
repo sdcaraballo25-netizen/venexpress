@@ -63,6 +63,7 @@ class AuditLog extends Model
         'route.updated' => 'Ruta actualizada',
         'route.stops_updated' => 'Paradas de ruta actualizadas',
         'route.claimed' => 'Ruta tomada por repartidor',
+        'route.assigned' => 'Ruta asignada a repartidor',
         'route.released' => 'Ruta liberada',
         'route.started' => 'Ruta iniciada',
         'route.stop_visited' => 'Parada de ruta visitada',

@@ -16,6 +16,18 @@ class Package extends Model
     public const STATUS_EN_HUB = 'EN_HUB';
     public const STATUS_EN_TRANSITO_NACIONAL = 'EN_TRANSITO_NACIONAL';
     public const STATUS_LISTO_RETIRO = 'LISTO_RETIRO';
+
+    /**
+     * Entrega a domicilio (requires_delivery): el paquete espera
+     * repartidor en su almacén destino (PENDIENTE_ENTREGA), un
+     * repartidor lo lleva (EN_RUTA) o no lo pudo entregar
+     * (ENTREGA_FALLIDA). LISTO_RETIRO queda solo para el retiro en
+     * persona en agencia o almacén.
+     */
+    public const STATUS_PENDIENTE_ENTREGA = 'PENDIENTE_ENTREGA';
+    public const STATUS_EN_RUTA = 'EN_RUTA';
+    public const STATUS_ENTREGA_FALLIDA = 'ENTREGA_FALLIDA';
+
     public const STATUS_ENTREGADO = 'ENTREGADO';
 
     /**
@@ -33,6 +45,9 @@ class Package extends Model
         self::STATUS_EN_HUB,
         self::STATUS_EN_TRANSITO_NACIONAL,
         self::STATUS_LISTO_RETIRO,
+        self::STATUS_PENDIENTE_ENTREGA,
+        self::STATUS_EN_RUTA,
+        self::STATUS_ENTREGA_FALLIDA,
         self::STATUS_ENTREGADO,
         self::STATUS_EN_DEVOLUCION,
         self::STATUS_DEVUELTO,
@@ -44,6 +59,9 @@ class Package extends Model
         self::STATUS_EN_HUB => 'En Hub',
         self::STATUS_EN_TRANSITO_NACIONAL => 'En Tránsito',
         self::STATUS_LISTO_RETIRO => 'Listo para Retiro',
+        self::STATUS_PENDIENTE_ENTREGA => 'Pendiente de entrega',
+        self::STATUS_EN_RUTA => 'En ruta de entrega',
+        self::STATUS_ENTREGA_FALLIDA => 'Entrega fallida',
         self::STATUS_ENTREGADO => 'Entregado',
         self::STATUS_EN_DEVOLUCION => 'En devolución',
         self::STATUS_DEVUELTO => 'Devuelto al remitente',
@@ -60,22 +78,47 @@ class Package extends Model
         self::STATUS_EN_HUB,
         self::STATUS_EN_TRANSITO_NACIONAL,
         self::STATUS_LISTO_RETIRO,
+        self::STATUS_PENDIENTE_ENTREGA,
+        self::STATUS_EN_RUTA,
+        self::STATUS_ENTREGA_FALLIDA,
     ];
 
     /**
      * Estados desde los que un repartidor de entrega puede tomar un
-     * paquete escaneando su guía: solo LISTO_RETIRO, es decir, ya
-     * recibido en su HUB destino y sin repartidor asignado. Un paquete
-     * EN_TRANSITO_NACIONAL (todavía viajando entre HUBs, o liberado de
-     * una ruta cancelada) nunca es tomable.
+     * paquete (o Admin/Almacén asignárselo): solo PENDIENTE_ENTREGA, es
+     * decir, ya recibido en su almacén destino y sin repartidor. Un
+     * paquete EN_TRANSITO_NACIONAL (todavía viajando entre HUBs) nunca
+     * es tomable.
      *
-     * Ver PackageService::claimForDelivery(), que además exige una ruta
-     * de reparto en curso en la zona del paquete y lo pasa a
-     * EN_TRANSITO_NACIONAL vía DeliveryAssignmentService::assign().
+     * Ver DeliveryAssignmentService::assign(), que además exige que el
+     * paquete esté en el almacén de la zona de la ruta y lo pasa a
+     * EN_RUTA (generando el PIN de entrega).
      */
     public const CLAIMABLE_FOR_DELIVERY_STATUSES = [
-        self::STATUS_LISTO_RETIRO,
+        self::STATUS_PENDIENTE_ENTREGA,
     ];
+
+    /**
+     * Cómo se verificó a quien recibió una entrega a domicilio: con el
+     * PIN que se le envió al destinatario al salir a reparto, o, si no
+     * lo tiene, con su cédula (que debe coincidir con la del
+     * destinatario) y una foto de la entrega.
+     */
+    public const DELIVERY_CONFIRMATION_PIN = 'pin';
+
+    public const DELIVERY_CONFIRMATION_ID_DOC = 'cedula';
+
+    public const DELIVERY_CONFIRMATION_METHODS = [
+        self::DELIVERY_CONFIRMATION_PIN,
+        self::DELIVERY_CONFIRMATION_ID_DOC,
+    ];
+
+    /**
+     * Intentos fallidos de PIN tras los cuales el PIN deja de
+     * aceptarse para esa guía (evita adivinarlo probando): la entrega
+     * solo puede confirmarse con cédula + foto.
+     */
+    public const DELIVERY_PIN_MAX_ATTEMPTS = 5;
 
     public const TYPE_SOBRE = 'sobre';
     public const TYPE_PAQUETE = 'paquete';
@@ -105,6 +148,17 @@ class Package extends Model
         'pago_movil',
         'transferencia',
         'punto_venta',
+        'zelle',
+    ];
+
+    /**
+     * Formas de pago de un cobro contra entrega que dejan un número de
+     * referencia: el repartidor debe registrarlo (y puede adjuntar el
+     * comprobante) antes de entregar.
+     */
+    public const PAYMENT_METHODS_REQUIRING_REFERENCE = [
+        'pago_movil',
+        'transferencia',
         'zelle',
     ];
 
@@ -220,6 +274,12 @@ class Package extends Model
         'cod_collected_at',
         'cod_collected_by_user_id',
         'cod_payment_method',
+        'cod_payment_reference',
+        'cod_payment_proof_path',
+
+        'delivery_pin_hash',
+        'delivery_pin_generated_at',
+        'delivery_pin_failed_attempts',
 
         'commission_percentage_used',
         'commission_amount_usd',
@@ -227,6 +287,13 @@ class Package extends Model
         'return_reason',
         'return_requested_at',
         'returned_at',
+    ];
+
+    /**
+     * El hash del PIN de entrega nunca sale del servidor (API, JSON).
+     */
+    protected $hidden = [
+        'delivery_pin_hash',
     ];
 
     protected function casts(): array
@@ -274,6 +341,9 @@ class Package extends Model
             'return_requested_at' => 'datetime',
             'returned_at' => 'datetime',
             'cod_collected_at' => 'datetime',
+
+            'delivery_pin_generated_at' => 'datetime',
+            'delivery_pin_failed_attempts' => 'integer',
 
             'commission_percentage_used' => 'decimal:2',
             'commission_amount_usd' => 'decimal:2',
@@ -384,6 +454,52 @@ class Package extends Model
     public function isInReturn(): bool
     {
         return $this->current_status === self::STATUS_EN_DEVOLUCION;
+    }
+
+    public function isOutForDelivery(): bool
+    {
+        return $this->current_status === self::STATUS_EN_RUTA;
+    }
+
+    /**
+     * Si el repartidor todavía puede confirmar la entrega con el PIN:
+     * se generó uno al salir a reparto y no se agotaron los intentos.
+     */
+    public function acceptsDeliveryPin(): bool
+    {
+        return $this->delivery_pin_hash !== null
+            && (int) $this->delivery_pin_failed_attempts < self::DELIVERY_PIN_MAX_ATTEMPTS;
+    }
+
+    /**
+     * Compara dos documentos de identidad ignorando mayúsculas,
+     * espacios, puntos y guiones ("V-12.345.678" = "v12345678"). Si
+     * uno trae letra de nacionalidad y el otro no, compara solo los
+     * números.
+     */
+    public static function idDocsMatch(?string $a, ?string $b): bool
+    {
+        $normalize = fn (?string $doc) => strtoupper(preg_replace('/[^A-Za-z0-9]/', '', (string) $doc));
+
+        $a = $normalize($a);
+        $b = $normalize($b);
+
+        if ($a === '' || $b === '') {
+            return false;
+        }
+
+        if ($a === $b) {
+            return true;
+        }
+
+        $digitsA = preg_replace('/\D/', '', $a);
+        $digitsB = preg_replace('/\D/', '', $b);
+        $lettersA = preg_replace('/\d/', '', $a);
+        $lettersB = preg_replace('/\d/', '', $b);
+
+        return $digitsA !== ''
+            && $digitsA === $digitsB
+            && ($lettersA === '' || $lettersB === '');
     }
 
     public function isSobre(): bool

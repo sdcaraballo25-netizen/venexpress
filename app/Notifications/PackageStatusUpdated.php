@@ -55,7 +55,7 @@ class PackageStatusUpdated extends Notification implements ShouldQueue
             'guia' => $package->tracking_number,
         ]);
 
-        if ($this->status === Package::STATUS_LISTO_RETIRO) {
+        if (in_array($this->status, [Package::STATUS_LISTO_RETIRO, Package::STATUS_PENDIENTE_ENTREGA], true)) {
             return $this->readyMail($package, $trackingUrl);
         }
 
@@ -80,11 +80,10 @@ class PackageStatusUpdated extends Notification implements ShouldQueue
     }
 
     /**
-     * LISTO_RETIRO significa cosas distintas según la modalidad que se
-     * eligió al registrar la guía (mismo criterio que la línea de
-     * tiempo pública de TrackingController): con entrega a domicilio,
-     * el paquete ya está listo para que un repartidor lo lleve; sin
-     * ella, ya se puede pasar a retirar en la agencia o el HUB destino.
+     * Llegó a destino: con entrega a domicilio (PENDIENTE_ENTREGA) el
+     * paquete ya está listo para que un repartidor lo lleve; sin ella
+     * (LISTO_RETIRO), ya se puede pasar a retirar en la agencia o el
+     * HUB destino.
      */
     protected function readyMail(Package $package, string $trackingUrl): MailMessage
     {
@@ -93,7 +92,7 @@ class PackageStatusUpdated extends Notification implements ShouldQueue
                 ->subject("Guía {$package->tracking_number}: lista para entrega a domicilio — VenExpress")
                 ->greeting('¡Hola!')
                 ->line("Tu envío con guía {$package->tracking_number} llegó a su destino y está listo para la entrega a domicilio.")
-                ->line('Un repartidor de VenExpress lo llevará a la dirección indicada.')
+                ->line('Un repartidor de VenExpress lo llevará a la dirección indicada. Cuando salga a reparto te enviaremos el PIN de entrega.')
                 ->action('Rastrear mi envío', $trackingUrl)
                 ->line('Gracias por confiar en VenExpress para tus envíos a nivel nacional.');
         }

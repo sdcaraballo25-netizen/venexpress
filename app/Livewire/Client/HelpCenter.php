@@ -23,8 +23,8 @@ class HelpCenter extends Component
             'answer' => '"Pendientes" muestra todo lo que aún no llega a su destino final. "Retiros" son los paquetes que ya están en la agencia esperando que pases a buscarlos. "Historial" son tus entregas ya completadas.',
         ],
         [
-            'question' => '¿Cómo confirmo la recepción de una entrega a domicilio?',
-            'answer' => 'Cuando tu paquete esté "Listo para Retiro" y requiera entrega a domicilio, verás un botón "Confirmar recepción a domicilio" en "Mis pedidos".',
+            'question' => '¿Cómo recibo una entrega a domicilio?',
+            'answer' => 'Cuando tu paquete salga a reparto te enviaremos por correo un PIN de entrega. Dáselo al repartidor solo cuando tengas el paquete en tus manos. Si no tienes el PIN a mano, también puedes recibirlo mostrando tu cédula.',
         ],
         [
             'question' => '¿Cómo pago un pedido contra entrega (COD)?',

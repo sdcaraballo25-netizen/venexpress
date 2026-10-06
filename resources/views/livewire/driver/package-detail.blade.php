@@ -227,8 +227,8 @@
     @endif
 
 
-    {{-- Estado de aceptación --}}
-    @if ($package->requires_delivery)
+    {{-- Estado de entrega --}}
+    @if ($package->requires_delivery && in_array($package->current_status, [\App\Models\Package::STATUS_EN_RUTA, \App\Models\Package::STATUS_ENTREGADO], true))
 
         <div class="rounded-2xl border border-[#E5E5E0] bg-white p-5">
 
@@ -238,40 +238,24 @@
 
             <div class="mt-4">
 
-                @if ($package->delivery_status === \App\Models\Package::DELIVERY_PENDING)
+                @if ($package->current_status === \App\Models\Package::STATUS_EN_RUTA)
 
-                    <div class="rounded-xl bg-amber-50 p-4 text-sm text-amber-700">
-                        El cliente todavía no ha respondido la solicitud de entrega.
-                    </div>
+                    @if ($package->acceptsDeliveryPin())
+                        <div class="rounded-xl bg-blue-50 p-4 text-sm text-blue-800">
+                            El destinatario recibió por correo un <strong>PIN de entrega</strong>. Pídeselo cuando le entregues el paquete.
+                            Si no lo tiene, confirma con su cédula y una foto de la entrega.
+                        </div>
+                    @else
+                        <div class="rounded-xl bg-amber-50 p-4 text-sm text-amber-800">
+                            Esta entrega no tiene PIN disponible: confirma con la cédula del destinatario y una foto de la entrega.
+                        </div>
+                    @endif
 
-                @elseif ($package->delivery_status === \App\Models\Package::DELIVERY_ACCEPTED)
-
-                    <div class="rounded-xl bg-emerald-50 p-4 text-sm text-emerald-700">
-                        El cliente aceptó la entrega.
-                        Puedes realizar la entrega y confirmarla al finalizar.
-                    </div>
-
-                @elseif ($package->delivery_status === \App\Models\Package::DELIVERY_REJECTED)
-
-                    <div class="rounded-xl bg-red-50 p-4 text-sm text-red-700">
-
-                        <p class="font-semibold">
-                            El cliente rechazó la entrega.
-                        </p>
-
-                        @if ($package->delivery_rejection_reason)
-                            <p class="mt-1">
-                                Motivo:
-                                {{ $package->delivery_rejection_reason }}
-                            </p>
-                        @endif
-
-                    </div>
-
-                @elseif ($package->delivery_status === \App\Models\Package::DELIVERY_COMPLETED)
+                @else
 
                     <div class="rounded-xl bg-emerald-50 p-4 text-sm text-emerald-700">
-                        Entrega completada correctamente.
+                        Entrega completada
+                        {{ $package->delivery_confirmation_method === \App\Models\Package::DELIVERY_CONFIRMATION_PIN ? '(verificada con PIN).' : '(verificada con cédula y foto).' }}
                     </div>
 
                 @endif
@@ -482,32 +466,70 @@
                 </button>
 
 
-            {{-- En tránsito --}}
+            {{-- En ruta de entrega --}}
             @elseif (
                 $package->current_status
-                === \App\Models\Package::STATUS_EN_TRANSITO_NACIONAL
+                === \App\Models\Package::STATUS_EN_RUTA
             )
 
                 {{-- Misma condición que el backend (PackageService::completeDelivery):
-                     asignado a este repartidor, a domicilio y en reparto. --}}
+                     asignado a este repartidor, a domicilio y en ruta. --}}
                 @if ($package->requires_delivery)
 
-                    <div class="w-full space-y-3">
+                    @php
+                        $withPin = $package->acceptsDeliveryPin() && ! $deliverWithoutPin;
+                    @endphp
+
+                    <div class="w-full space-y-4">
+
+                    @if ($package->is_cod && $package->cod_collected_at)
+                        <div class="rounded-xl border border-emerald-200 bg-emerald-50 p-4 text-sm text-emerald-800">
+                            Este pedido contra entrega ya figura como pagado: no cobres al entregar.
+                        </div>
+                    @endif
 
                     @if ($package->is_cod && ! $package->cod_collected_at)
-                        <div>
-                            <label class="text-sm font-medium text-slate-700">
-                                Forma de pago del cobro (COD: US$ {{ number_format((float) $package->cod_amount_usd, 2) }})
-                            </label>
-                            <select
-                                wire:model="codPaymentMethod"
-                                class="mt-1 w-full rounded-xl border border-slate-300 px-3 py-2 text-sm shadow-sm focus:border-emerald-600 focus:ring-emerald-600"
-                            >
-                                <option value="">Selecciona cómo te cancelaron...</option>
-                                @foreach (\App\Models\Package::PAYMENT_METHOD_LABELS as $value => $label)
-                                    <option value="{{ $value }}">{{ $label }}</option>
-                                @endforeach
-                            </select>
+                        <div class="rounded-xl border border-amber-200 bg-amber-50 p-4 space-y-3">
+                            <p class="text-sm font-semibold text-amber-800">
+                                Cobro contra entrega: US$ {{ number_format((float) $package->cod_amount_usd, 2) }}
+                            </p>
+                            <p class="text-xs text-amber-700">No entregues el paquete sin registrar el pago.</p>
+
+                            <div>
+                                <label for="codPaymentMethod" class="text-sm font-medium text-slate-700">Forma de pago</label>
+                                <select
+                                    id="codPaymentMethod"
+                                    wire:model.live="codPaymentMethod"
+                                    class="mt-1 w-full rounded-xl border border-slate-300 px-3 py-2 text-sm shadow-sm focus:border-emerald-600 focus:ring-emerald-600"
+                                >
+                                    <option value="">Selecciona cómo te cancelaron...</option>
+                                    @foreach (\App\Models\Package::PAYMENT_METHOD_LABELS as $value => $label)
+                                        <option value="{{ $value }}">{{ $label }}</option>
+                                    @endforeach
+                                </select>
+                                @error('codPaymentMethod') <p class="mt-1 text-xs text-red-600">{{ $message }}</p> @enderror
+                            </div>
+
+                            @if ($codPaymentMethod !== '' && ! str_starts_with($codPaymentMethod, 'efectivo'))
+                                <div class="grid grid-cols-1 gap-3 sm:grid-cols-2">
+                                    <div>
+                                        <label for="codPaymentReference" class="text-sm font-medium text-slate-700">
+                                            Número de referencia{{ in_array($codPaymentMethod, \App\Models\Package::PAYMENT_METHODS_REQUIRING_REFERENCE, true) ? '' : ' (opcional)' }}
+                                        </label>
+                                        <input id="codPaymentReference" type="text" wire:model="codPaymentReference" autocomplete="off"
+                                               class="mt-1 w-full rounded-xl border border-slate-300 px-3 py-2 text-sm shadow-sm focus:border-emerald-600 focus:ring-emerald-600">
+                                        @error('codPaymentReference') <p class="mt-1 text-xs text-red-600">{{ $message }}</p> @enderror
+                                    </div>
+
+                                    <div>
+                                        <label for="codPaymentProof" class="text-sm font-medium text-slate-700">Comprobante (opcional)</label>
+                                        <input id="codPaymentProof" type="file" accept="image/*" wire:model="codPaymentProof"
+                                               class="mt-1 block w-full text-sm text-slate-600 file:mr-3 file:rounded-lg file:border-0 file:bg-white file:px-3 file:py-2 file:text-sm file:font-medium">
+                                        <p wire:loading wire:target="codPaymentProof" class="mt-1 text-xs text-slate-500">Subiendo comprobante...</p>
+                                        @error('codPaymentProof') <p class="mt-1 text-xs text-red-600">{{ $message }}</p> @enderror
+                                    </div>
+                                </div>
+                            @endif
                         </div>
                     @endif
 
@@ -520,39 +542,45 @@
                         </div>
 
                         <div>
-                            <label for="receiverIdDoc" class="text-sm font-medium text-slate-700">Documento de quien recibe</label>
-                            <input id="receiverIdDoc" type="text" wire:model="receiverIdDoc" autocomplete="off" placeholder="V-12345678"
-                                   class="mt-1 w-full rounded-xl border border-slate-300 px-3 py-2 text-sm shadow-sm focus:border-emerald-600 focus:ring-emerald-600">
-                            @error('receiverIdDoc') <p class="mt-1 text-xs text-red-600">{{ $message }}</p> @enderror
-                        </div>
-
-                        <div>
                             <label for="receiverPhone" class="text-sm font-medium text-slate-700">Teléfono (opcional)</label>
                             <input id="receiverPhone" type="tel" wire:model="receiverPhone" autocomplete="off"
                                    class="mt-1 w-full rounded-xl border border-slate-300 px-3 py-2 text-sm shadow-sm focus:border-emerald-600 focus:ring-emerald-600">
                             @error('receiverPhone') <p class="mt-1 text-xs text-red-600">{{ $message }}</p> @enderror
                         </div>
+                    </div>
 
+                    @if ($package->acceptsDeliveryPin())
+                        <label class="flex items-center gap-2 text-sm text-slate-700">
+                            <input type="checkbox" wire:model.live="deliverWithoutPin" class="rounded border-slate-300 text-emerald-600 focus:ring-emerald-600">
+                            El destinatario no tiene el PIN
+                        </label>
+                    @endif
+
+                    @if ($withPin)
                         <div>
-                            <label for="deliveryConfirmationMethod" class="text-sm font-medium text-slate-700">Confirmación</label>
-                            <select id="deliveryConfirmationMethod" wire:model="deliveryConfirmationMethod"
-                                    class="mt-1 w-full rounded-xl border border-slate-300 px-3 py-2 text-sm shadow-sm focus:border-emerald-600 focus:ring-emerald-600">
-                                <option value="">Selecciona...</option>
-                                <option value="cedula">Verifiqué su cédula</option>
-                                <option value="firma">Firma</option>
-                                <option value="foto">Foto</option>
-                            </select>
-                            @error('deliveryConfirmationMethod') <p class="mt-1 text-xs text-red-600">{{ $message }}</p> @enderror
+                            <label for="deliveryPin" class="text-sm font-medium text-slate-700">PIN de entrega</label>
+                            <input id="deliveryPin" type="text" inputmode="numeric" maxlength="6" wire:model="deliveryPin" autocomplete="off" placeholder="6 dígitos"
+                                   class="mt-1 w-full rounded-xl border border-slate-300 px-3 py-2 text-lg tracking-[0.4em] shadow-sm focus:border-emerald-600 focus:ring-emerald-600 sm:w-48">
+                            @error('deliveryPin') <p class="mt-1 text-xs text-red-600">{{ $message }}</p> @enderror
                         </div>
-                    </div>
+                    @else
+                        <div class="grid grid-cols-1 gap-3 sm:grid-cols-2">
+                            <div>
+                                <label for="receiverIdDoc" class="text-sm font-medium text-slate-700">Cédula del destinatario</label>
+                                <input id="receiverIdDoc" type="text" wire:model="receiverIdDoc" autocomplete="off" placeholder="V-12345678"
+                                       class="mt-1 w-full rounded-xl border border-slate-300 px-3 py-2 text-sm shadow-sm focus:border-emerald-600 focus:ring-emerald-600">
+                                @error('receiverIdDoc') <p class="mt-1 text-xs text-red-600">{{ $message }}</p> @enderror
+                            </div>
 
-                    <div>
-                        <label for="deliveryPhoto" class="text-sm font-medium text-slate-700">Foto de evidencia (opcional)</label>
-                        <input id="deliveryPhoto" type="file" accept="image/*" capture="environment" wire:model="deliveryPhoto"
-                               class="mt-1 block w-full text-sm text-slate-600 file:mr-3 file:rounded-lg file:border-0 file:bg-slate-100 file:px-3 file:py-2 file:text-sm file:font-medium">
-                        <p wire:loading wire:target="deliveryPhoto" class="mt-1 text-xs text-slate-500">Subiendo foto...</p>
-                        @error('deliveryPhoto') <p class="mt-1 text-xs text-red-600">{{ $message }}</p> @enderror
-                    </div>
+                            <div>
+                                <label for="deliveryPhoto" class="text-sm font-medium text-slate-700">Foto de la entrega</label>
+                                <input id="deliveryPhoto" type="file" accept="image/*" capture="environment" wire:model="deliveryPhoto"
+                                       class="mt-1 block w-full text-sm text-slate-600 file:mr-3 file:rounded-lg file:border-0 file:bg-slate-100 file:px-3 file:py-2 file:text-sm file:font-medium">
+                                <p wire:loading wire:target="deliveryPhoto" class="mt-1 text-xs text-slate-500">Subiendo foto...</p>
+                                @error('deliveryPhoto') <p class="mt-1 text-xs text-red-600">{{ $message }}</p> @enderror
+                            </div>
+                        </div>
+                    @endif
 
                     <button
                         type="button"

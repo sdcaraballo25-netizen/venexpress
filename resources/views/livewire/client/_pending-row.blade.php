@@ -1,7 +1,6 @@
 @php
     $isActionable = $package->requires_delivery
-        && $package->delivery_status === \App\Models\Package::DELIVERY_PENDING
-        && $package->current_status === \App\Models\Package::STATUS_LISTO_RETIRO;
+        && $package->current_status === \App\Models\Package::STATUS_EN_RUTA;
 @endphp
 
 <div x-data="{ open: false }" wire:key="{{ $rowKeyPrefix }}-{{ $package->id }}">
@@ -29,7 +28,7 @@
         <div class="flex shrink-0 items-center gap-3">
             @if ($isActionable)
                 <span class="hidden text-xs font-semibold text-amber-600 sm:inline">
-                    Acción requerida
+                    En camino
                 </span>
             @endif
 
@@ -70,35 +69,30 @@
                     </p>
                 @endif
 
-                @if ($package->delivery_status === \App\Models\Package::DELIVERY_PENDING)
-
-                    @if ($isActionable)
-                        <div class="mt-4">
-                            <button
-                                type="button"
-                                wire:click="acceptDelivery({{ $package->id }})"
-                                wire:loading.attr="disabled"
-                                class="rounded-xl bg-emerald-600 px-4 py-2.5 text-sm font-semibold text-white hover:bg-emerald-700 disabled:opacity-60"
-                            >
-                                Confirmar recepción a domicilio
-                            </button>
-                        </div>
-                    @else
+                @switch ($package->current_status)
+                    @case (\App\Models\Package::STATUS_PENDIENTE_ENTREGA)
                         <div class="mt-3 rounded-lg bg-blue-100 p-3 text-sm text-blue-800">
-                            Podrás confirmar la recepción cuando tu paquete esté Listo para Retiro.
+                            Tu paquete llegó a su ciudad de destino y pronto saldrá a reparto. Cuando salga te enviaremos por correo el PIN de entrega.
                         </div>
-                    @endif
+                        @break
 
-                @elseif ($package->delivery_status === \App\Models\Package::DELIVERY_ACCEPTED)
-                    <div class="mt-3 rounded-lg bg-emerald-100 p-3 text-sm text-emerald-700">
-                        Confirmaste la recepción a domicilio. Un repartidor se pondrá en camino.
-                    </div>
+                    @case (\App\Models\Package::STATUS_EN_RUTA)
+                        <div class="mt-3 rounded-lg bg-emerald-100 p-3 text-sm text-emerald-800">
+                            Tu paquete va en camino. Cuando lo tengas en tus manos, dale al repartidor el PIN de entrega que te enviamos por correo (o muestra tu cédula).
+                        </div>
+                        @break
 
-                @elseif ($package->delivery_status === \App\Models\Package::DELIVERY_REJECTED)
-                    <div class="mt-3 rounded-lg bg-red-100 p-3 text-sm text-red-700">
-                        Se rechazó esta entrega a domicilio.
-                    </div>
-                @endif
+                    @case (\App\Models\Package::STATUS_ENTREGA_FALLIDA)
+                        <div class="mt-3 rounded-lg bg-red-100 p-3 text-sm text-red-700">
+                            No pudimos entregar tu paquete. Te contactaremos para coordinar un nuevo intento.
+                        </div>
+                        @break
+
+                    @default
+                        <div class="mt-3 rounded-lg bg-blue-100 p-3 text-sm text-blue-800">
+                            Te avisaremos por correo cuando llegue a tu ciudad y salga a reparto.
+                        </div>
+                @endswitch
             </div>
         @else
             {{-- Retiro en agencia (requires_delivery = false) --}}

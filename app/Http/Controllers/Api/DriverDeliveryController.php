@@ -35,7 +35,7 @@ class DriverDeliveryController extends Controller
         $packages = Package::query()
             ->where('driver_id', $driver->id)
             ->where('requires_delivery', true)
-            ->where('current_status', Package::STATUS_EN_TRANSITO_NACIONAL)
+            ->where('current_status', Package::STATUS_EN_RUTA)
             ->get();
 
         $notGeocodedYet = [];

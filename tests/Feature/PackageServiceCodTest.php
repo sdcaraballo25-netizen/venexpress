@@ -272,79 +272,96 @@ class PackageServiceCodTest extends TestCase
         $this->service->collectCod($package, $driver->user_id, $driver);
     }
 
-    public function test_complete_delivery_requires_a_payment_method_for_cod_packages(): void
+    private function outForDelivery(Driver $driver, array $overrides = []): Package
     {
-        $ally = $this->createAlly();
-        $driver = $this->createActiveDriver();
-
-        $package = $this->createPackage($ally, [
+        return $this->createPackage($this->createAlly(), array_merge([
             'requires_delivery' => true,
             'driver_id' => $driver->id,
-            'current_status' => Package::STATUS_EN_TRANSITO_NACIONAL,
-            'is_cod' => true,
-            'cod_amount_usd' => 15.00,
-        ]);
+            'current_status' => Package::STATUS_EN_RUTA,
+        ], $overrides));
+    }
+
+    /**
+     * Sin PIN la entrega se confirma con la cédula del destinatario y
+     * una foto (aquí, una ruta ya guardada).
+     */
+    private function completeWithoutPin(Package $package, Driver $driver, array $args = []): Package
+    {
+        return $this->service->completeDelivery(...array_merge([
+            'package' => $package,
+            'driver' => $driver,
+            'receiverName' => 'María Gómez',
+            'receiverIdDoc' => 'V-87654321',
+            'deliveryPhotoPath' => 'delivery-evidence/foto.jpg',
+        ], $args));
+    }
+
+    public function test_complete_delivery_requires_a_payment_method_for_cod_packages(): void
+    {
+        $driver = $this->createActiveDriver();
+        $package = $this->outForDelivery($driver, ['is_cod' => true, 'cod_amount_usd' => 15.00]);
 
         $this->expectException(RuntimeException::class);
         $this->expectExceptionMessage(
             'Este pedido es contra entrega (COD): indica la forma de pago con la que te cancelaron antes de confirmar la entrega.'
         );
 
-        $this->service->completeDelivery(
-            package: $package,
-            driver: $driver,
-            receiverName: 'María Gómez',
-            receiverIdDoc: 'V-87654321',
-            deliveryConfirmationMethod: 'cedula',
-        );
+        $this->completeWithoutPin($package, $driver);
     }
 
-    public function test_complete_delivery_stores_the_cod_payment_method(): void
+    public function test_an_electronic_cod_payment_requires_its_reference(): void
     {
-        $ally = $this->createAlly();
         $driver = $this->createActiveDriver();
+        $package = $this->outForDelivery($driver, ['is_cod' => true, 'cod_amount_usd' => 15.00]);
 
-        $package = $this->createPackage($ally, [
-            'requires_delivery' => true,
-            'driver_id' => $driver->id,
-            'current_status' => Package::STATUS_EN_TRANSITO_NACIONAL,
-            'is_cod' => true,
-            'cod_amount_usd' => 15.00,
+        try {
+            $this->completeWithoutPin($package, $driver, ['codPaymentMethod' => 'pago_movil']);
+            $this->fail('Se entregó un COD por pago móvil sin referencia.');
+        } catch (RuntimeException $e) {
+            $this->assertSame('Indica el número de referencia del pago (Pago móvil) antes de confirmar la entrega.', $e->getMessage());
+        }
+
+        $package->refresh();
+        $this->assertSame(Package::STATUS_EN_RUTA, $package->current_status);
+        $this->assertNull($package->cod_collected_at);
+    }
+
+    public function test_complete_delivery_stores_the_cod_payment_method_reference_and_proof(): void
+    {
+        $driver = $this->createActiveDriver();
+        $package = $this->outForDelivery($driver, ['is_cod' => true, 'cod_amount_usd' => 15.00]);
+
+        $delivered = $this->completeWithoutPin($package, $driver, [
+            'codPaymentMethod' => 'pago_movil',
+            'codPaymentReference' => ' 00123456 ',
+            'codPaymentProofPath' => 'cod-payment-proofs/comprobante.jpg',
         ]);
-
-        $delivered = $this->service->completeDelivery(
-            package: $package,
-            driver: $driver,
-            receiverName: 'María Gómez',
-            receiverIdDoc: 'V-87654321',
-            deliveryConfirmationMethod: 'cedula',
-            codPaymentMethod: 'pago_movil',
-        );
 
         $this->assertSame(Package::STATUS_ENTREGADO, $delivered->current_status);
         $this->assertNotNull($delivered->cod_collected_at);
         $this->assertSame('pago_movil', $delivered->cod_payment_method);
+        $this->assertSame('00123456', $delivered->cod_payment_reference);
+        $this->assertSame('cod-payment-proofs/comprobante.jpg', $delivered->cod_payment_proof_path);
+    }
+
+    public function test_a_cash_cod_payment_needs_no_reference(): void
+    {
+        $driver = $this->createActiveDriver();
+        $package = $this->outForDelivery($driver, ['is_cod' => true, 'cod_amount_usd' => 15.00]);
+
+        $delivered = $this->completeWithoutPin($package, $driver, ['codPaymentMethod' => 'efectivo_usd']);
+
+        $this->assertSame(Package::STATUS_ENTREGADO, $delivered->current_status);
+        $this->assertSame('efectivo_usd', $delivered->cod_payment_method);
+        $this->assertNull($delivered->cod_payment_reference);
     }
 
     public function test_complete_delivery_does_not_require_a_payment_method_for_non_cod_packages(): void
     {
-        $ally = $this->createAlly();
         $driver = $this->createActiveDriver();
+        $package = $this->outForDelivery($driver, ['is_cod' => false]);
 
-        $package = $this->createPackage($ally, [
-            'requires_delivery' => true,
-            'driver_id' => $driver->id,
-            'current_status' => Package::STATUS_EN_TRANSITO_NACIONAL,
-            'is_cod' => false,
-        ]);
-
-        $delivered = $this->service->completeDelivery(
-            package: $package,
-            driver: $driver,
-            receiverName: 'María Gómez',
-            receiverIdDoc: 'V-87654321',
-            deliveryConfirmationMethod: 'cedula',
-        );
+        $delivered = $this->completeWithoutPin($package, $driver);
 
         $this->assertSame(Package::STATUS_ENTREGADO, $delivered->current_status);
         $this->assertNull($delivered->cod_collected_at);

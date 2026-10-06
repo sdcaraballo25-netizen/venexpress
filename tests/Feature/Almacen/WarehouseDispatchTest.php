@@ -16,7 +16,7 @@ use Tests\Feature\Concerns\CreatesTestPackages;
 use Tests\TestCase;
 
 /**
- * El almacén recibe paquetes (EN_TRANSITO_NACIONAL -> LISTO_RETIRO,
+ * El almacén recibe paquetes (EN_TRANSITO_NACIONAL -> LISTO_RETIRO o PENDIENTE_ENTREGA,
  * igual que Ally\PackageReception para agencias) y luego los
  * despacha: a un cliente que lo retira en persona, o a un repartidor
  * con una ruta de reparto en curso hacia esa ciudad.
@@ -203,32 +203,83 @@ class WarehouseDispatchTest extends TestCase
         $route = Route::create([
             'name' => 'Ruta Valencia',
             'city' => 'Valencia',
+            'state' => 'Carabobo',
             'route_type' => Route::TYPE_DELIVERY,
             'status' => Route::STATUS_IN_PROGRESS,
             'driver_id' => $driver->id,
             'created_by' => $almacenUser->id,
             'started_at' => now(),
+            'origin_warehouse_id' => $warehouse->id,
+        ]);
+
+        // Ruta en curso hacia la misma ciudad pero desde otro almacén:
+        // no se ofrece (regla de zona).
+        $otherWarehouse = Warehouse::factory()->create(['city' => 'Valencia', 'state' => 'Carabobo']);
+        Route::create([
+            'name' => 'Ruta de otro almacén',
+            'city' => 'Valencia',
+            'state' => 'Carabobo',
+            'route_type' => Route::TYPE_DELIVERY,
+            'status' => Route::STATUS_IN_PROGRESS,
+            'driver_id' => Driver::factory()->create(['driver_type' => Driver::TYPE_DELIVERY])->id,
+            'created_by' => $almacenUser->id,
+            'started_at' => now(),
+            'origin_warehouse_id' => $otherWarehouse->id,
         ]);
 
         $package = $this->createPackage($ally, [
             'destination_city' => 'Valencia',
             'destination_state' => 'Carabobo',
-            'current_status' => Package::STATUS_LISTO_RETIRO,
+            'current_status' => Package::STATUS_PENDIENTE_ENTREGA,
+            'current_warehouse_id' => $warehouse->id,
             'requires_delivery' => true,
-            'delivery_status' => Package::DELIVERY_ACCEPTED,
         ]);
 
         Livewire::actingAs($almacenUser)
             ->test(Dashboard::class)
             ->set('dispatchTrackingNumber', $package->tracking_number)
             ->call('searchDispatch')
+            ->assertSee('Ruta Valencia')
+            ->assertDontSee('Ruta de otro almacén')
             ->call('assignToDriver', $route->id)
+            ->assertSet('dispatchError', null)
             ->assertHasNoErrors();
 
         $package->refresh();
 
-        $this->assertSame(Package::STATUS_EN_TRANSITO_NACIONAL, $package->current_status);
+        $this->assertSame(Package::STATUS_EN_RUTA, $package->current_status);
         $this->assertSame($driver->id, $package->driver_id);
+    }
+
+    public function test_scanning_arrival_of_a_home_delivery_leaves_it_pending_delivery(): void
+    {
+        $warehouse = Warehouse::factory()->create(['city' => 'Valencia', 'state' => 'Carabobo']);
+        $almacenUser = $this->createWarehouseUser($warehouse);
+
+        $package = $this->createPackage($this->createAlly(), [
+            'destination_city' => 'Valencia',
+            'destination_state' => 'Carabobo',
+            'current_status' => Package::STATUS_EN_TRANSITO_NACIONAL,
+            'requires_delivery' => true,
+        ]);
+
+        Livewire::actingAs($almacenUser)
+            ->test(Dashboard::class)
+            ->call('scanGuide', $package->tracking_number)
+            ->assertSet('scanError', null)
+            ->assertSee('pendiente de entrega a domicilio');
+
+        $package->refresh();
+        $this->assertSame(Package::STATUS_PENDIENTE_ENTREGA, $package->current_status);
+        $this->assertSame($warehouse->id, $package->current_warehouse_id);
+        $this->assertTrue($package->isAvailableForDeliveryClaim());
+
+        // Un segundo escaneo ya abre el despacho (asignar a repartidor).
+        $component = Livewire::actingAs($almacenUser)
+            ->test(Dashboard::class)
+            ->call('scanGuide', $package->tracking_number);
+
+        $this->assertSame($package->id, $component->get('dispatchPackage')->id);
     }
 
     public function test_warehouse_staff_from_a_different_warehouse_cannot_receive_a_package(): void
@@ -328,9 +379,8 @@ class WarehouseDispatchTest extends TestCase
         $package = $this->createPackage($ally, [
             'destination_city' => 'Maracaibo',
             'destination_state' => 'Zulia',
-            'current_status' => Package::STATUS_LISTO_RETIRO,
+            'current_status' => Package::STATUS_PENDIENTE_ENTREGA,
             'requires_delivery' => true,
-            'delivery_status' => Package::DELIVERY_ACCEPTED,
         ]);
 
         Livewire::actingAs($almacenUser)
@@ -340,7 +390,7 @@ class WarehouseDispatchTest extends TestCase
 
         $package->refresh();
 
-        $this->assertSame(Package::STATUS_LISTO_RETIRO, $package->current_status);
+        $this->assertSame(Package::STATUS_PENDIENTE_ENTREGA, $package->current_status);
         $this->assertNull($package->driver_id);
     }
 

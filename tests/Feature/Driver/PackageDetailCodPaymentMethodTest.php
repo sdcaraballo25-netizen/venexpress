@@ -7,6 +7,8 @@ use App\Models\Driver;
 use App\Models\Package;
 use App\Models\User;
 use Illuminate\Foundation\Testing\RefreshDatabase;
+use Illuminate\Http\UploadedFile;
+use Illuminate\Support\Facades\Storage;
 use Livewire\Livewire;
 use Tests\Feature\Concerns\CreatesTestPackages;
 use Tests\TestCase;
@@ -38,12 +40,19 @@ class PackageDetailCodPaymentMethodTest extends TestCase
         return [$user, $driver];
     }
 
+    protected function setUp(): void
+    {
+        parent::setUp();
+
+        Storage::fake('documents');
+    }
+
     private function createCodPackageInTransit($ally, Driver $driver): Package
     {
         return $this->createPackage($ally, [
             'requires_delivery' => true,
             'driver_id' => $driver->id,
-            'current_status' => Package::STATUS_EN_TRANSITO_NACIONAL,
+            'current_status' => Package::STATUS_EN_RUTA,
             'delivery_status' => Package::DELIVERY_ACCEPTED,
             'is_cod' => true,
             'cod_amount_usd' => 15.00,
@@ -58,7 +67,7 @@ class PackageDetailCodPaymentMethodTest extends TestCase
 
         Livewire::actingAs($user)
             ->test(PackageDetail::class, ['packageId' => $package->id])
-            ->assertSee('Forma de pago del cobro');
+            ->assertSee('Cobro contra entrega');
     }
 
     public function test_completing_delivery_without_payment_method_flashes_an_error(): void
@@ -88,14 +97,20 @@ class PackageDetailCodPaymentMethodTest extends TestCase
         Livewire::actingAs($user)
             ->test(PackageDetail::class, ['packageId' => $package->id])
             ->set('codPaymentMethod', 'transferencia')
+            ->assertSee('Número de referencia')
+            ->set('codPaymentReference', 'REF-998877')
+            ->set('codPaymentProof', UploadedFile::fake()->image('comprobante.jpg'))
             ->set('receiverName', 'María Gómez')
             ->set('receiverIdDoc', 'V-87654321')
-            ->set('deliveryConfirmationMethod', 'cedula')
+            ->set('deliveryPhoto', UploadedFile::fake()->image('entrega.jpg'))
             ->call('completeDelivery');
 
         $package->refresh();
         $this->assertSame(Package::STATUS_ENTREGADO, $package->current_status);
         $this->assertSame('transferencia', $package->cod_payment_method);
+        $this->assertSame('REF-998877', $package->cod_payment_reference);
+        $this->assertNotNull($package->cod_payment_proof_path);
+        Storage::disk('documents')->assertExists($package->cod_payment_proof_path);
         $this->assertNotNull($package->cod_collected_at);
     }
 
@@ -107,17 +122,17 @@ class PackageDetailCodPaymentMethodTest extends TestCase
         $package = $this->createPackage($ally, [
             'requires_delivery' => true,
             'driver_id' => $driver->id,
-            'current_status' => Package::STATUS_EN_TRANSITO_NACIONAL,
+            'current_status' => Package::STATUS_EN_RUTA,
             'delivery_status' => Package::DELIVERY_ACCEPTED,
             'is_cod' => false,
         ]);
 
         Livewire::actingAs($user)
             ->test(PackageDetail::class, ['packageId' => $package->id])
-            ->assertDontSee('Forma de pago del cobro')
+            ->assertDontSee('Cobro contra entrega')
             ->set('receiverName', 'María Gómez')
             ->set('receiverIdDoc', 'V-87654321')
-            ->set('deliveryConfirmationMethod', 'cedula')
+            ->set('deliveryPhoto', UploadedFile::fake()->image('entrega.jpg'))
             ->call('completeDelivery');
 
         $package->refresh();

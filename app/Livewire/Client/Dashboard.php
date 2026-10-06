@@ -2,7 +2,6 @@
 
 namespace App\Livewire\Client;
 
-use App\Models\AuditLog;
 use App\Models\Customer;
 use App\Models\Incident;
 use App\Models\Package;
@@ -10,7 +9,6 @@ use Illuminate\Support\Facades\Auth;
 use Livewire\Attributes\Layout;
 use Livewire\Component;
 use Livewire\WithPagination;
-use RuntimeException;
 
 #[Layout('layouts.client')]
 class Dashboard extends Component
@@ -58,80 +56,6 @@ class Dashboard extends Component
     }
 
     /**
-     * Confirma que el cliente recibirá el paquete a domicilio. Esto NO
-     * marca el paquete como entregado: solo da el visto bueno para que
-     * un repartidor pueda tomarlo (DeliveryAssignmentService::assign()
-     * exige delivery_status === DELIVERY_ACCEPTED antes de asignarlo a
-     * una ruta, y PackageService::claimForDelivery() lo mismo cuando
-     * un repartidor lo reclama). La entrega física la confirma el
-     * repartidor con completeDelivery(), que es lo que de verdad pone
-     * current_status en ENTREGADO.
-     *
-     * Solo se puede confirmar cuando el paquete ya está LISTO_RETIRO
-     * (llegó a la agencia/hub destino) — antes de eso no tiene sentido
-     * pedirle al cliente que confirme algo que todavía está en
-     * tránsito.
-     */
-    public function acceptDelivery(int $packageId): void
-    {
-        try {
-            $package = $this->clientPackage($packageId);
-
-            if (! $package->requires_delivery) {
-                throw new RuntimeException(
-                    'Este paquete no requiere entrega a domicilio.'
-                );
-            }
-
-            if ($package->current_status !== Package::STATUS_LISTO_RETIRO) {
-                throw new RuntimeException(
-                    'Todavía no puedes confirmar la recepción: tu paquete debe estar Listo para Retiro. '
-                    .'Estado actual: '.$package->statusLabel().'.'
-                );
-            }
-
-            if (
-                $package->delivery_status
-                !== Package::DELIVERY_PENDING
-            ) {
-                throw new RuntimeException(
-                    'Este paquete ya tiene una respuesta registrada.'
-                );
-            }
-
-            $package->update([
-                'delivery_status' =>
-                    Package::DELIVERY_ACCEPTED,
-
-                'delivery_accepted_at' =>
-                    now(),
-            ]);
-
-            AuditLog::create([
-                'actor_user_id' => Auth::id(),
-                'action' => 'client.delivery_accepted',
-                'target_type' => Package::class,
-                'target_id' => $package->id,
-                'description' => "El cliente confirmó la recepción a domicilio de la guía {$package->tracking_number}.",
-                'metadata' => [
-                    'tracking_number' => $package->tracking_number,
-                ],
-                'ip_address' => request()?->ip(),
-            ]);
-
-            session()->flash(
-                'success',
-                'Confirmaste la recepción a domicilio. Un repartidor se pondrá en camino.'
-            );
-        } catch (RuntimeException $e) {
-            session()->flash(
-                'error',
-                $e->getMessage()
-            );
-        }
-    }
-
-    /**
      * Hallazgo de auditoría #6: customers.email no es único (a
      * propósito: varios familiares pueden compartir un correo con
      * cédulas distintas). Antes este método tomaba solo el PRIMER
@@ -158,25 +82,6 @@ class Dashboard extends Component
             ->unique()
             ->values()
             ->all();
-    }
-
-    protected function clientPackage(int $packageId): Package
-    {
-        $idDocs = $this->customerIdDocsForCurrentUser();
-
-        if (empty($idDocs)) {
-            throw new RuntimeException(
-                'No existe un registro de cliente asociado a tu cuenta.'
-            );
-        }
-
-        return Package::query()
-            ->whereKey($packageId)
-            ->where(function ($query) use ($idDocs) {
-                $query->whereIn('recipient_id_doc', $idDocs)
-                    ->orWhereIn('sender_id_doc', $idDocs);
-            })
-            ->firstOrFail();
     }
 
     /**

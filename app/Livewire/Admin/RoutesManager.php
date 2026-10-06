@@ -101,9 +101,82 @@ class RoutesManager extends Component
 
     /*
     |--------------------------------------------------------------------------
+    | Asignar repartidor
+    |--------------------------------------------------------------------------
+    */
+
+    public function startAssigningDriver(int $routeId): void
+    {
+        $this->assigningRouteId = $routeId;
+        $this->assignDriverId = '';
+        $this->resetErrorBag('assignDriverId');
+    }
+
+    public function cancelAssigningDriver(): void
+    {
+        $this->reset(['assigningRouteId', 'assignDriverId']);
+    }
+
+    public function assignDriver(RouteService $routeService): void
+    {
+        $this->validate([
+            'assigningRouteId' => ['required', 'integer'],
+            'assignDriverId' => ['required', 'integer'],
+        ], [
+            'assignDriverId.required' => 'Selecciona un repartidor.',
+        ]);
+
+        try {
+            $route = Route::findOrFail($this->assigningRouteId);
+            $driver = Driver::with('user')->findOrFail((int) $this->assignDriverId);
+
+            $routeService->assignDriver($route, $driver, (int) Auth::id());
+
+            session()->flash('success', "Ruta asignada a {$driver->user?->name}.");
+
+            $this->cancelAssigningDriver();
+        } catch (RuntimeException $e) {
+            session()->flash('error', $e->getMessage());
+        }
+    }
+
+    /**
+     * Repartidores que pueden recibir la ruta que se está asignando:
+     * activos y verificados, de un tipo compatible y sin otra ruta
+     * activa (RouteService::assignDriver() lo vuelve a validar).
+     */
+    protected function assignableDrivers(RouteService $routeService)
+    {
+        $route = $this->assigningRouteId ? Route::find($this->assigningRouteId) : null;
+
+        if (! $route) {
+            return collect();
+        }
+
+        return Driver::query()
+            ->with('user')
+            ->where('status', Driver::STATUS_ACTIVE)
+            ->where('verification_status', Driver::VERIFICATION_VERIFIED)
+            ->whereDoesntHave('routes', fn ($q) => $q->whereIn('status', [Route::STATUS_ASSIGNED, Route::STATUS_IN_PROGRESS]))
+            ->get()
+            ->filter(fn (Driver $driver) => in_array($route->route_type, $routeService->compatibleRouteTypes($driver), true))
+            ->sortBy(fn (Driver $driver) => $driver->user?->name ?? '')
+            ->values();
+    }
+
+    /*
+    |--------------------------------------------------------------------------
     | Recolección
     |--------------------------------------------------------------------------
     */
+
+    /**
+     * Asignación de repartidor por Admin (RouteService::assignDriver):
+     * ruta abierta para elegir repartidor y el elegido.
+     */
+    public ?int $assigningRouteId = null;
+
+    public string $assignDriverId = '';
 
     public bool $showCollectionModal = false;
 
@@ -671,6 +744,7 @@ class RoutesManager extends Component
             'allWarehouses' => $allWarehouses,
             'collectiblePackages' => $collectiblePackages,
             'driversWithRoutes' => $driversWithRoutes,
+            'assignableDrivers' => $this->assignableDrivers($routeService),
         ]);
     }
 }

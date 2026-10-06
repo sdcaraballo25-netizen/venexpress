@@ -144,8 +144,9 @@
 
                             <span
                                 class="text-xs font-semibold px-3 py-1 rounded-full {{ match ($package->current_status) {
-                                    \App\Models\Package::STATUS_EN_DEVOLUCION => 'bg-red-100 text-red-700',
+                                    \App\Models\Package::STATUS_EN_DEVOLUCION, \App\Models\Package::STATUS_ENTREGA_FALLIDA => 'bg-red-100 text-red-700',
                                     \App\Models\Package::STATUS_DEVUELTO => 'bg-slate-100 text-slate-700',
+                                    \App\Models\Package::STATUS_EN_RUTA => 'bg-amber-100 text-amber-800',
                                     default => 'bg-green-100 text-green-700',
                                 } }}"
                             >
@@ -189,7 +190,7 @@
                 </div>
 
 
-                @if (! ($statusIsKnown ?? true) && ! in_array($package->current_status, [\App\Models\Package::STATUS_EN_DEVOLUCION, \App\Models\Package::STATUS_DEVUELTO], true))
+                @if (! ($statusIsKnown ?? true))
 
                     <div
                         class="mb-4 rounded-xl border border-amber-200 bg-amber-50 px-4 py-3 text-sm text-amber-800"
@@ -217,8 +218,20 @@
 
                 @endif
 
-                {{-- Devolución al remitente: fuera de la línea de tiempo normal --}}
-                @if ($package->current_status === \App\Models\Package::STATUS_EN_DEVOLUCION)
+                {{-- Entrega a domicilio en curso / fallida y devolución al remitente --}}
+                @if ($package->current_status === \App\Models\Package::STATUS_EN_RUTA)
+
+                    <div class="mb-4 rounded-xl border border-amber-200 bg-amber-50 px-4 py-3 text-sm text-amber-800">
+                        Tu envío va en camino a la dirección de entrega. Al recibirlo, dale al repartidor el PIN de entrega que te enviamos por correo (o muestra tu cédula).
+                    </div>
+
+                @elseif ($package->current_status === \App\Models\Package::STATUS_ENTREGA_FALLIDA)
+
+                    <div class="mb-4 rounded-xl border border-red-200 bg-red-50 px-4 py-3 text-sm text-red-800">
+                        No pudimos entregar tu envío en este intento. Te contactaremos para coordinar un nuevo intento.
+                    </div>
+
+                @elseif ($package->current_status === \App\Models\Package::STATUS_EN_DEVOLUCION)
 
                     <div class="mb-4 rounded-xl border border-red-200 bg-red-50 px-4 py-3 text-sm text-red-800">
                         Este envío no se pudo entregar y está siendo devuelto al remitente. El remitente podrá retirarlo en la agencia donde lo envió.
@@ -252,7 +265,7 @@
                     @foreach($statusSteps as $step)
 
                         <div
-                            class="relative z-10 flex flex-col items-center text-center w-1/6 px-1 min-w-[90px]"
+                            class="relative z-10 flex flex-1 flex-col items-center text-center px-1 min-w-[90px]"
                         >
 
                             <div

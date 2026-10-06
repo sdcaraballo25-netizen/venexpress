@@ -523,8 +523,9 @@ class HubDashboardUxTest extends TestCase
             ->assertDontSee('Volver a mi ruta')
             ->call('startDelivery');
 
+        // Sale a reparto directo desde la agencia (EN_RUTA).
         $this->assertSame(
-            Package::STATUS_EN_TRANSITO_NACIONAL,
+            Package::STATUS_EN_RUTA,
             $recolectado->fresh()->current_status
         );
 
@@ -532,18 +533,21 @@ class HubDashboardUxTest extends TestCase
         // para Delivery, usando exactamente el flujo/servicio existente.
         $enReparto = $this->createPackage($ally, [
             'driver_id' => $driver->id,
-            'current_status' => Package::STATUS_EN_TRANSITO_NACIONAL,
+            'current_status' => Package::STATUS_EN_RUTA,
             'requires_delivery' => true,
             'delivery_status' => Package::DELIVERY_ACCEPTED,
         ]);
 
+        \Illuminate\Support\Facades\Storage::fake('documents');
+
         Livewire::actingAs($user)
             ->test(PackageDetail::class, ['packageId' => $enReparto->id])
             ->assertSee('Confirmar entrega')
-            // Mismos datos del receptor que exige la app.
+            // Mismos datos del receptor que exige la app (sin PIN:
+            // cédula del destinatario + foto).
             ->set('receiverName', 'María Gómez')
             ->set('receiverIdDoc', 'V-87654321')
-            ->set('deliveryConfirmationMethod', 'cedula')
+            ->set('deliveryPhoto', \Illuminate\Http\UploadedFile::fake()->image('entrega.jpg'))
             ->call('completeDelivery');
 
         $this->assertSame(

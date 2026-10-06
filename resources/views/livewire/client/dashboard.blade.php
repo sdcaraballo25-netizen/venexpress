@@ -5,8 +5,9 @@
      * vista lo necesita).
      */
     $statusDotColor = fn (string $status) => match ($status) {
-        \App\Models\Package::STATUS_LISTO_RETIRO => 'bg-amber-500',
-        \App\Models\Package::STATUS_EN_TRANSITO_NACIONAL => 'bg-blue-500',
+        \App\Models\Package::STATUS_LISTO_RETIRO, \App\Models\Package::STATUS_PENDIENTE_ENTREGA => 'bg-amber-500',
+        \App\Models\Package::STATUS_EN_TRANSITO_NACIONAL, \App\Models\Package::STATUS_EN_RUTA => 'bg-blue-500',
+        \App\Models\Package::STATUS_ENTREGA_FALLIDA => 'bg-red-500',
         \App\Models\Package::STATUS_EN_HUB => 'bg-indigo-500',
         \App\Models\Package::STATUS_ENTREGADO => 'bg-emerald-500',
         \App\Models\Package::STATUS_EN_DEVOLUCION => 'bg-red-500',

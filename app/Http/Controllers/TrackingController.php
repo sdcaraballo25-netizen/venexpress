@@ -25,10 +25,12 @@ class TrackingController extends Controller
     }
 
     /**
-     * Línea de tiempo pública de estados. El orden de este array define
-     * el orden de los pasos que ve el cliente; no necesariamente coincide
-     * 1:1 con todos los estados internos del sistema (por ejemplo, no
-     * incluye estados de incidencia/devolución a propósito).
+     * Pasos de la línea de tiempo pública. Cada paquete ve los pasos de
+     * su modalidad (ver stepsFor()): retiro en persona (LISTO_RETIRO) o
+     * entrega a domicilio (PENDIENTE_ENTREGA -> EN_RUTA). Los estados
+     * fuera de la línea normal (ENTREGA_FALLIDA, EN_DEVOLUCION,
+     * DEVUELTO) se explican con un aviso aparte en la vista; junto con
+     * estos suman los 11 estados de Package::STATUSES.
      */
     private const STATUS_ORDER = [
 
@@ -57,10 +59,38 @@ class TrackingController extends Controller
             'icon'  => 'fa-truck-ramp-box',
         ],
 
+        'PENDIENTE_ENTREGA' => [
+            'label' => 'Pendiente de Entrega a Domicilio',
+            'icon'  => 'fa-box',
+        ],
+
+        'EN_RUTA' => [
+            'label' => 'En Ruta de Entrega',
+            'icon'  => 'fa-motorcycle',
+        ],
+
         'ENTREGADO' => [
             'label' => 'Entregado al Cliente',
             'icon'  => 'fa-house-circle-check',
         ],
+    ];
+
+    private const COMMON_STEPS = [
+        'RECIBIDO_AGENCIA',
+        'RECOLECTADO_VENEXPRESS',
+        'EN_HUB',
+        'EN_TRANSITO_NACIONAL',
+    ];
+
+    private const PICKUP_STEPS = [
+        'LISTO_RETIRO',
+        'ENTREGADO',
+    ];
+
+    private const HOME_DELIVERY_STEPS = [
+        'PENDIENTE_ENTREGA',
+        'EN_RUTA',
+        'ENTREGADO',
     ];
 
     public function index(): View
@@ -84,20 +114,10 @@ class TrackingController extends Controller
         $currentStatusLabel = null;
 
         if ($package) {
-            [$statusSteps, $progressPercent, $statusIsKnown] =
+            [$statusSteps, $progressPercent, $statusIsKnown, $currentStatusLabel] =
                 $this->buildTimeline($package);
 
-            // El badge de la cabecera debe mostrar exactamente el mismo
-            // texto que el paso "actual" del timeline (incluida la
-            // relabelación de EN_HUB/LISTO_RETIRO de arriba) — nunca el
-            // label genérico de Package::STATUS_LABELS por separado,
-            // para que ambos no puedan desincronizarse.
-            $currentStep = collect($statusSteps)->firstWhere('current', true);
-
-            $currentStatusLabel = $currentStep['label'] ?? $package->status_label;
-
-            // Hallazgo de auditoría #5: los 6 estados de
-            // Package::STATUSES no incluyen "devuelto"/"con
+            // Hallazgo de auditoría #5: no hay un estado "con
             // incidencia", así que un paquete con una incidencia
             // abierta se ve congelado en su último paso conocido sin
             // explicación. En vez de inventar un estado falso en la
@@ -120,34 +140,47 @@ class TrackingController extends Controller
     }
 
     /**
+     * @return list<string>
+     */
+    private function stepsFor(Package $package): array
+    {
+        return [
+            ...self::COMMON_STEPS,
+            ...($package->requires_delivery ? self::HOME_DELIVERY_STEPS : self::PICKUP_STEPS),
+        ];
+    }
+
+    /**
      * Calcula los pasos de la línea de tiempo pública y el porcentaje
      * de avance para un paquete dado.
      *
-     * @return array{0: array, 1: float, 2: bool}
+     * La línea de tiempo nunca retrocede: avanza hasta el paso más
+     * lejano que el paquete haya alcanzado (su estado actual o
+     * cualquiera de su historial). Así, un paquete que vuelve a EN_HUB
+     * en el HUB destino después de EN_TRANSITO_NACIONAL, o uno que
+     * vuelve a quedar pendiente de entrega porque se canceló la ruta
+     * de reparto, no "desanda" pasos ya mostrados al cliente.
+     *
+     * Devuelve también el texto del badge de la cabecera: el mismo del
+     * paso "actual" del timeline cuando lo hay (nunca dos textos
+     * distintos en pantalla); si no — fallida, devolución, o un paso
+     * que el timeline ya dejó atrás, como EN_HUB en el HUB destino
+     * después de EN_TRANSITO_NACIONAL —, el del estado real.
+     *
+     * @return array{0: array, 1: float, 2: bool, 3: string}
      */
     private function buildTimeline(Package $package): array
     {
-        $keys = array_keys(self::STATUS_ORDER);
+        $keys = $this->stepsFor($package);
 
-        $currentIndex = array_search(
-            $package->current_status,
-            $keys,
-            true
-        );
+        // Cualquiera de los 11 estados del sistema es conocido; los que
+        // no están en la línea de tiempo de su modalidad
+        // (ENTREGA_FALLIDA, EN_DEVOLUCION, DEVUELTO) se explican con un
+        // aviso aparte en la vista.
+        $statusIsKnown = in_array($package->current_status, Package::STATUSES, true);
 
-        // Si el estado actual del paquete no está en la línea de
-        // tiempo pública (ej. un estado nuevo agregado a futuro que
-        // aún no se refleja aquí), NO debemos tratarlo como si fuera
-        // el primer paso: eso mostraría "Recibido en Agencia" cuando
-        // en realidad podría estar, por ejemplo, devuelto o con una
-        // incidencia. En ese caso dejamos todos los pasos como
-        // pendientes (ningún índice actual) en vez de mentir sobre el
-        // progreso.
-        $statusIsKnown = $currentIndex !== false;
-
-        $currentIndex = $statusIsKnown
-            ? $currentIndex
-            : -1;
+        $currentIndex = array_search($package->current_status, $keys, true);
+        $currentInLine = $currentIndex !== false;
 
         /*
          * Historial ordenado cronológicamente.
@@ -173,21 +206,21 @@ class TrackingController extends Controller
                 ])->first();
             });
 
-        // Si el estado actual no está en la línea de tiempo pública,
-        // no inventamos un índice: usamos el último paso conocido que
-        // sí quedó registrado en el histórico. Así un paquete con un
-        // estado especial (ej. devuelto/incidencia) sigue mostrando
-        // correctamente lo que sí completó, sin marcar nada como "paso
-        // actual" de la línea de tiempo estándar.
-        $lastKnownIndex = -1;
+        $furthestIndex = $currentInLine ? $currentIndex : -1;
 
         foreach ($keys as $i => $key) {
             if ($latestHistoryByStatus->has($key)) {
-                $lastKnownIndex = $i;
+                $furthestIndex = max($furthestIndex, $i);
             }
         }
 
-        $effectiveIndex = $statusIsKnown ? $currentIndex : $lastKnownIndex;
+        // El paso "actual" (resaltado) solo existe si el estado actual
+        // está en la línea y es el más lejano alcanzado. Si el paquete
+        // está fuera de la línea (fallida/devolución) o volvió a un paso
+        // anterior, todo lo alcanzado se muestra como completado.
+        $currentStepIndex = $currentInLine && $currentIndex === $furthestIndex
+            ? $furthestIndex
+            : null;
 
         $statusSteps = [];
 
@@ -211,35 +244,10 @@ class TrackingController extends Controller
 
             $label = self::STATUS_ORDER[$key]['label'];
 
-            // EN_HUB no distingue, por sí solo, si el paquete sigue
-            // pendiente de otra transferencia HUB -> HUB o si ya
-            // llegó a su HUB destino final (current_warehouse_id ===
-            // destination_warehouse_id). Solo se ajusta la etiqueta
-            // del paso ACTUAL (no la de un EN_HUB pasado en el
-            // historial, que ya quedó completado de todas formas) —
-            // reutiliza LogisticsResolutionService::isAtDestinationWarehouse()
-            // tal cual, sin duplicar esa lógica. Si no se puede
-            // resolver (sin current_warehouse_id, sin cobertura,
-            // ambiguo, etc.), isAtDestinationWarehouse() ya devuelve
-            // false y se conserva la etiqueta genérica de siempre.
-            if ($key === Package::STATUS_EN_HUB && $package->current_status === Package::STATUS_EN_HUB) {
-                $label = $this->logisticsResolutionService->isAtDestinationWarehouse($package)
-                    ? 'Llegó al HUB de destino'
-                    : $label;
-            }
-
-            // LISTO_RETIRO representa dos situaciones distintas para el
-            // cliente según la modalidad de su pedido: retiro en
-            // persona (Agencia/HUB) o entrega a domicilio. No es un
-            // estado nuevo — Package::CLAIMABLE_FOR_DELIVERY_STATUSES y
-            // PackageService::claimForDelivery() ya tratan LISTO_RETIRO
-            // + requires_delivery como "listo para que un repartidor lo
-            // reclame" — aquí solo se ajusta el texto que ve el
-            // cliente para ese mismo estado interno.
-            if ($key === Package::STATUS_LISTO_RETIRO && $package->current_status === Package::STATUS_LISTO_RETIRO) {
-                $label = $package->requires_delivery
-                    ? 'Listo para Entrega'
-                    : $label;
+            // Solo el paso ACTUAL usa el texto del estado real (p. ej.
+            // "Llegó al HUB de destino"); los pasados, el genérico.
+            if ($currentStepIndex === $i) {
+                $label = $this->currentStatusLabel($package);
             }
 
             $statusSteps[] = [
@@ -248,21 +256,43 @@ class TrackingController extends Controller
 
                 'icon' => self::STATUS_ORDER[$key]['icon'],
 
-                'done' => $i < $effectiveIndex,
+                'done' => $currentStepIndex === null
+                    ? $i <= $furthestIndex
+                    : $i < $currentStepIndex,
 
-                'current' => $statusIsKnown && $i === $effectiveIndex,
+                'current' => $currentStepIndex === $i,
 
                 'timestamp' => $timestamp,
             ];
         }
 
-        $progressPercent = $effectiveIndex <= 0
+        $progressPercent = $furthestIndex <= 0
             ? 8
             : (
-                $effectiveIndex
+                $furthestIndex
                 / (count($keys) - 1)
             ) * 100;
 
-        return [$statusSteps, $progressPercent, $statusIsKnown];
+        return [$statusSteps, $progressPercent, $statusIsKnown, $this->currentStatusLabel($package)];
+    }
+
+    /**
+     * Texto público del estado actual. EN_HUB no distingue, por sí
+     * solo, si el paquete sigue pendiente de otra transferencia HUB ->
+     * HUB o si ya llegó a su HUB destino final: se reutiliza
+     * LogisticsResolutionService::isAtDestinationWarehouse() tal cual
+     * (si no se puede resolver, queda la etiqueta genérica).
+     */
+    private function currentStatusLabel(Package $package): string
+    {
+        if (
+            $package->current_status === Package::STATUS_EN_HUB
+            && $this->logisticsResolutionService->isAtDestinationWarehouse($package)
+        ) {
+            return 'Llegó al HUB de destino';
+        }
+
+        return self::STATUS_ORDER[$package->current_status]['label']
+            ?? $package->status_label;
     }
 }

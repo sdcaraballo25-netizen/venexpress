@@ -255,10 +255,52 @@ class RouteService
             );
         }
 
+        return $this->bindDriverToRoute($route, $driver, $actingUserId, byAdmin: false);
+    }
+
+    /**
+     * Admin asigna una ruta disponible (borrador, sin dueño) a un
+     * repartidor. Mismas reglas que claimRoute() — compatibilidad de
+     * tipo, una sola ruta activa por repartidor, al menos una parada —
+     * y además el repartidor debe poder operar (activo y verificado).
+     * La ruta queda ASSIGNED y el repartidor la inicia como siempre.
+     */
+    public function assignDriver(
+        Route $route,
+        Driver $driver,
+        int $actingUserId
+    ): Route {
+        if (! $driver->canOperate()) {
+            throw new RuntimeException(
+                'Este repartidor no está activo y verificado: no se le pueden asignar rutas.'
+            );
+        }
+
+        if (! $this->isCompatible($driver, $route)) {
+            throw new RuntimeException(
+                'Esta ruta no es compatible con el tipo de este repartidor.'
+            );
+        }
+
+        return $this->bindDriverToRoute($route, $driver, $actingUserId, byAdmin: true);
+    }
+
+    /**
+     * Núcleo compartido de claimRoute() y assignDriver(): con la ruta
+     * bloqueada, re-chequea que siga disponible y que el repartidor no
+     * tenga otra ruta activa, y la deja ASSIGNED a él.
+     */
+    protected function bindDriverToRoute(
+        Route $route,
+        Driver $driver,
+        int $actingUserId,
+        bool $byAdmin
+    ): Route {
         return DB::transaction(function () use (
             $route,
             $driver,
-            $actingUserId
+            $actingUserId,
+            $byAdmin
         ) {
             $lockedRoute = Route::query()
                 ->whereKey($route->id)
@@ -285,7 +327,9 @@ class RouteService
 
             if ($hasActiveRoute) {
                 throw new RuntimeException(
-                    'Ya tienes una ruta activa. Finalízala antes de tomar otra.'
+                    $byAdmin
+                        ? 'Este repartidor ya tiene una ruta activa. Debe finalizarla antes de recibir otra.'
+                        : 'Ya tienes una ruta activa. Finalízala antes de tomar otra.'
                 );
             }
 
@@ -317,10 +361,12 @@ class RouteService
 
             $this->log(
                 $actingUserId,
-                'route.claimed',
+                $byAdmin ? 'route.assigned' : 'route.claimed',
                 $lockedRoute,
-                "{$driver->user->name} ({$driver->vehicle_plate}) "
-                ."tomó la ruta \"{$lockedRoute->name}\".",
+                $byAdmin
+                    ? "Asignó la ruta \"{$lockedRoute->name}\" a {$driver->user->name} ({$driver->vehicle_plate})."
+                    : "{$driver->user->name} ({$driver->vehicle_plate}) "
+                        ."tomó la ruta \"{$lockedRoute->name}\".",
                 [
                     'driver_id' => $driver->id,
                     $locationColumn.'s' => $locationIds->all(),
@@ -987,6 +1033,37 @@ class RouteService
      */
     protected function releasePendingCustodyFor(Route $route): void
     {
+        if ($route->route_type === Route::TYPE_DELIVERY) {
+            $packageIds = $this->packageIdsCollectedOnRoute($route)
+                ->merge($this->packageIdsAssignedDirectlyOnRoute($route))
+                ->unique();
+
+            // Los que habían salido a reparto en esta ruta vuelven a
+            // quedar pendientes de entrega en el almacén (con su PIN
+            // anulado), para poder asignarlos a otro repartidor.
+            Package::query()
+                ->whereIn('id', $packageIds)
+                ->where('driver_id', $route->driver_id)
+                ->where('current_status', Package::STATUS_EN_RUTA)
+                ->get()
+                ->each(function (Package $package) use ($route) {
+                    $package->update([
+                        'current_status' => Package::STATUS_PENDIENTE_ENTREGA,
+                        'delivery_status' => Package::DELIVERY_PENDING,
+                        'delivery_pin_hash' => null,
+                        'delivery_pin_failed_attempts' => 0,
+                    ]);
+
+                    $package->histories()->create([
+                        'status' => Package::STATUS_PENDIENTE_ENTREGA,
+                        'event_type' => PackageHistory::EVENT_CORRECCION,
+                        'origin_location' => 'Ruta '.$route->name,
+                        'destination_location' => 'Almacén destino',
+                        'location_description' => 'Ruta de reparto cancelada: el paquete vuelve a quedar pendiente de entrega.',
+                    ]);
+                });
+        }
+
         match ($route->route_type) {
             Route::TYPE_DELIVERY => Package::query()
                 ->whereIn('id', $this->packageIdsCollectedOnRoute($route)

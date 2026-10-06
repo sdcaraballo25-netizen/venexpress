@@ -476,7 +476,7 @@ class Scanner extends Component
         $this->successMessage = match ($result) {
             LogisticsScanService::DELIVERY_SCAN_COLLECTION => 'Recolección registrada. El paquete quedó bajo tu custodia en esta ruta.',
             LogisticsScanService::DELIVERY_SCAN_ASSIGNED => 'Esta guía ya está asignada a ti. Puedes continuar con la entrega.',
-            default => 'Entrega tomada. El paquete quedó asignado a ti.',
+            default => 'Entrega tomada: el paquete salió a reparto contigo y el destinatario recibió su PIN de entrega.',
         };
     }
 

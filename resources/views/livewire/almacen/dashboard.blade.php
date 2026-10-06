@@ -164,7 +164,7 @@
                 <p class="mt-3 text-sm text-emerald-700 font-medium">✓ {{ $dispatchSuccess }}</p>
             @endif
 
-            @if ($dispatchPackage && $dispatchPackage->current_status === Package::STATUS_LISTO_RETIRO)
+            @if ($dispatchPackage && in_array($dispatchPackage->current_status, [Package::STATUS_LISTO_RETIRO, Package::STATUS_PENDIENTE_ENTREGA], true))
 
                 <div class="mt-5 pt-5 border-t border-[#E5E5E0]">
 
@@ -177,7 +177,7 @@
 
                         {{-- ASIGNAR A REPARTIDOR --}}
                         <p class="text-xs text-[#6B6B66] mt-1 mb-3">
-                            Este envío requiere entrega a domicilio. Asígnalo a un repartidor con una ruta de reparto en curso hacia esta ciudad.
+                            Este envío requiere entrega a domicilio. Asígnalo a un repartidor con una ruta de reparto en curso desde este almacén hacia esta ciudad. Al asignarlo sale a reparto y el destinatario recibe su PIN de entrega.
                         </p>
 
                         @forelse ($this->availableDeliveryRoutes as $route)

@@ -225,6 +225,8 @@ class DriverPackageController extends Controller
                 Package::STATUS_EN_HUB,
                 Package::STATUS_EN_TRANSITO_NACIONAL,
                 Package::STATUS_LISTO_RETIRO,
+                Package::STATUS_EN_RUTA,
+                Package::STATUS_ENTREGA_FALLIDA,
             ]),
             'delivered' => $query->where('current_status', Package::STATUS_ENTREGADO),
             'incidents' => $query->whereHas('incidents'),
@@ -273,11 +275,18 @@ class DriverPackageController extends Controller
     }
 
     /**
-     * Confirma la entrega a domicilio. Guarda los datos de quien
-     * recibió el paquete y, opcionalmente, una foto como evidencia.
-     * Dispara automáticamente la generación de la remuneración
-     * pendiente del repartidor (DriverPaymentService, vía
+     * Confirma la entrega a domicilio (solo desde EN_RUTA). Con el PIN
+     * que el destinatario recibió por correo (delivery_pin) o, sin él,
+     * con la cédula del destinatario (receiver_id_doc) y una foto de la
+     * entrega (photo). Un COD sin cobrar exige la forma de pago y, si es
+     * electrónica, la referencia (cod_payment_reference); el comprobante
+     * (cod_payment_proof) es opcional. Dispara la remuneración pendiente
+     * del repartidor (DriverPaymentService, vía
      * PackageService::completeDelivery).
+     *
+     * delivery_confirmation_method ya no se usa (lo decide el servidor
+     * según haya PIN o no); se sigue aceptando para no romper versiones
+     * anteriores de la app.
      */
     public function completeDelivery(Request $request, int $packageId): JsonResponse
     {
@@ -287,30 +296,43 @@ class DriverPackageController extends Controller
             ->where('driver_id', $driver->id)
             ->findOrFail($packageId);
 
-        // No se puede confirmar la entrega de un COD sin decir con
-        // qué forma de pago cancelaron (a menos que ya se hubiera
-        // cobrado antes, ej. collectCod()).
-        $codPaymentMethodRequired = $package->is_cod && ! $package->cod_collected_at;
+        $codPending = $package->is_cod && ! $package->cod_collected_at;
+        $withPin = $request->filled('delivery_pin');
 
         $validated = $request->validate([
             'receiver_name' => ['required', 'string', 'max:150'],
-            'receiver_id_doc' => ['required', 'string', 'max:30'],
+            'receiver_id_doc' => [$withPin ? 'nullable' : 'required', 'string', 'max:30'],
             'receiver_phone' => ['nullable', 'string', 'max:30'],
-            'delivery_confirmation_method' => ['required', 'in:firma,foto,cedula'],
-            'photo' => ['nullable', 'image', 'mimes:jpg,jpeg,png,webp', 'max:5120'],
+            'delivery_pin' => ['nullable', 'digits:6'],
+            'delivery_confirmation_method' => ['nullable', 'string', 'max:30'],
+            'photo' => [$withPin ? 'nullable' : 'required', 'image', 'mimes:jpg,jpeg,png,webp', 'max:5120'],
             'cod_payment_method' => [
-                $codPaymentMethodRequired ? 'required' : 'nullable',
+                $codPending ? 'required' : 'nullable',
                 'in:'.implode(',', Package::PAYMENT_METHODS),
             ],
+            'cod_payment_reference' => [
+                $codPending && in_array($request->input('cod_payment_method'), Package::PAYMENT_METHODS_REQUIRING_REFERENCE, true)
+                    ? 'required'
+                    : 'nullable',
+                'string',
+                'max:100',
+            ],
+            'cod_payment_proof' => ['nullable', 'image', 'mimes:jpg,jpeg,png,webp', 'max:5120'],
         ], [
+            'receiver_id_doc.required' => 'Sin PIN, indica la cédula del destinatario.',
+            'photo.required' => 'Sin PIN, adjunta una foto de la entrega.',
+            'delivery_pin.digits' => 'El PIN tiene 6 dígitos.',
             'cod_payment_method.required' => 'Este pedido es contra entrega (COD): indica la forma de pago con la que te cancelaron.',
+            'cod_payment_reference.required' => 'Indica el número de referencia del pago.',
         ]);
 
-        $photoPath = null;
+        $photoPath = $request->hasFile('photo')
+            ? $request->file('photo')->store('delivery-evidence', 'documents')
+            : null;
 
-        if ($request->hasFile('photo')) {
-            $photoPath = $request->file('photo')->store('delivery-evidence', 'documents');
-        }
+        $proofPath = $codPending && $request->hasFile('cod_payment_proof')
+            ? $request->file('cod_payment_proof')->store('cod-payment-proofs', 'documents')
+            : null;
 
         try {
             $package = app(PackageService::class)->completeDelivery(
@@ -318,11 +340,13 @@ class DriverPackageController extends Controller
                 driver: $driver,
                 locationDescription: 'Entrega confirmada desde la app del repartidor',
                 receiverName: $validated['receiver_name'],
-                receiverIdDoc: $validated['receiver_id_doc'],
+                receiverIdDoc: $validated['receiver_id_doc'] ?? null,
                 receiverPhone: $validated['receiver_phone'] ?? null,
-                deliveryConfirmationMethod: $validated['delivery_confirmation_method'],
+                deliveryPin: $validated['delivery_pin'] ?? null,
                 deliveryPhotoPath: $photoPath,
                 codPaymentMethod: $validated['cod_payment_method'] ?? null,
+                codPaymentReference: $validated['cod_payment_reference'] ?? null,
+                codPaymentProofPath: $proofPath,
             );
 
             return response()->json([
@@ -330,11 +354,14 @@ class DriverPackageController extends Controller
                 'package' => new DriverPackageResource($package),
             ]);
         } catch (RuntimeException $e) {
-            if ($photoPath) {
-                Storage::disk('documents')->delete($photoPath);
+            foreach (array_filter([$photoPath, $proofPath]) as $path) {
+                Storage::disk('documents')->delete($path);
             }
 
-            return response()->json(['message' => $e->getMessage()], 422);
+            return response()->json([
+                'message' => $e->getMessage(),
+                'package' => new DriverPackageResource($package->fresh()),
+            ], 422);
         }
     }
 

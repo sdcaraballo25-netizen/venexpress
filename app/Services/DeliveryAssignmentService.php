@@ -10,6 +10,18 @@ use App\Models\Route;
 use Illuminate\Support\Facades\DB;
 use RuntimeException;
 
+/**
+ * Asigna un paquete a domicilio a la ruta de reparto en curso de un
+ * repartidor. Punto único para las tres vías: Admin
+ * (Admin\DriverAssignment), Almacén (Almacen\Dashboard) y el propio
+ * repartidor escaneando la guía (PackageService::claimForDelivery()).
+ *
+ * Regla de zona (la misma para las tres): el paquete debe estar
+ * PENDIENTE_ENTREGA en el almacén que atiende la zona de la ruta
+ * (routeWarehouseId()) y su ciudad destino debe ser la ciudad de la
+ * ruta. Así un almacén que cubre varias ciudades no termina mandando
+ * a un repartidor de una ciudad a entregar en otra.
+ */
 class DeliveryAssignmentService
 {
     public function assign(Package $package, Route $route, int $userId): Package
@@ -42,12 +54,15 @@ class DeliveryAssignmentService
                 throw new RuntimeException('El repartidor de la ruta no está activo.');
             }
 
-            if ($lockedPackage->current_status !== Package::STATUS_LISTO_RETIRO) {
-                throw new RuntimeException('El paquete debe estar LISTO_RETIRO.');
-            }
-
             if (! $lockedPackage->requires_delivery) {
                 throw new RuntimeException('El paquete no requiere entrega a domicilio.');
+            }
+
+            if (! in_array($lockedPackage->current_status, Package::CLAIMABLE_FOR_DELIVERY_STATUSES, true)) {
+                throw new RuntimeException(
+                    'El paquete debe estar pendiente de entrega en su almacén destino. Estado actual: '
+                    .$lockedPackage->statusLabel().'.'
+                );
             }
 
             // Ya no se exige delivery_status === DELIVERY_ACCEPTED: la
@@ -60,29 +75,34 @@ class DeliveryAssignmentService
                 throw new RuntimeException('El paquete ya está asignado a otro repartidor.');
             }
 
+            $routeWarehouseId = $this->routeWarehouseId($lockedRoute);
+
+            if ($routeWarehouseId === null) {
+                throw new RuntimeException(
+                    'La ruta no tiene un almacén de salida ni hay uno que cubra su ciudad: no puede tomar entregas.'
+                );
+            }
+
+            if ((int) $lockedPackage->current_warehouse_id !== $routeWarehouseId) {
+                throw new RuntimeException('Este paquete no está en el almacén de la zona de la ruta.');
+            }
+
             if (mb_strtolower(trim((string) $lockedRoute->city)) !== mb_strtolower(trim((string) $lockedPackage->destination_city))) {
                 throw new RuntimeException('La ciudad de la ruta no coincide con la ciudad destino del paquete.');
             }
 
             $lockedPackage->driver_id = $lockedRoute->driver_id;
+            $lockedPackage->delivery_status = Package::DELIVERY_ACCEPTED;
             $lockedPackage->save();
 
-            // LISTO_RETIRO -> EN_TRANSITO_NACIONAL: el paquete pasa a
-            // manos del repartidor de la ruta. Sin este cambio de
-            // estado, el repartidor nunca podría completar la entrega
-            // desde la app (completeDelivery exige EN_TRANSITO_NACIONAL).
-            // notifyCustomer: false porque es un traspaso interno
-            // (admin -> repartidor), no un hito que deba notificarse
-            // al cliente como si el paquete "volviera a tránsito".
-            $lockedPackage = app(PackageService::class)->changeStatus(
+            // PENDIENTE_ENTREGA -> EN_RUTA: el paquete sale a reparto con
+            // el repartidor de la ruta, y se genera el PIN de entrega que
+            // se le envía al destinatario.
+            $lockedPackage = app(PackageService::class)->sendOutForDelivery(
                 package: $lockedPackage,
-                newStatus: Package::STATUS_EN_TRANSITO_NACIONAL,
                 userId: $userId,
-                locationDescription: 'Paquete asignado a reparto en la ruta '.$lockedRoute->name,
-                eventType: PackageHistory::EVENT_REPARTO,
-                originLocation: 'Agencia destino',
-                destinationLocation: 'Repartidor',
-                notifyCustomer: false,
+                locationDescription: 'Salió a reparto en la ruta '.$lockedRoute->name,
+                originLocation: $lockedPackage->currentWarehouse?->name ?? 'Almacén destino',
             );
 
             AuditLog::create([
@@ -121,6 +141,17 @@ class DeliveryAssignmentService
 
             $previousDriverId = $lockedPackage->driver_id;
             $lockedPackage->driver_id = null;
+
+            // Si ya había salido a reparto, vuelve a quedar pendiente de
+            // entrega en el almacén (para poder asignarlo a otro) y el
+            // PIN emitido deja de servir.
+            if ($lockedPackage->current_status === Package::STATUS_EN_RUTA) {
+                $lockedPackage->current_status = Package::STATUS_PENDIENTE_ENTREGA;
+                $lockedPackage->delivery_status = Package::DELIVERY_PENDING;
+                $lockedPackage->delivery_pin_hash = null;
+                $lockedPackage->delivery_pin_failed_attempts = 0;
+            }
+
             $lockedPackage->save();
 
             $lockedPackage->histories()->create([
@@ -149,4 +180,22 @@ class DeliveryAssignmentService
         });
     }
 
+    /**
+     * Almacén (HUB) que atiende la zona de una ruta de reparto:
+     * origin_warehouse_id si Admin lo fijó; si no, el que
+     * WarehouseCoverage resuelve para el estado/ciudad de la ruta
+     * (misma fuente de verdad que el destino de los paquetes). Null si
+     * no se puede resolver, y entonces la ruta no puede tomar entregas.
+     */
+    public function routeWarehouseId(Route $route): ?int
+    {
+        if ($route->origin_warehouse_id !== null) {
+            return (int) $route->origin_warehouse_id;
+        }
+
+        $result = app(LogisticsResolutionService::class)
+            ->resolveDestinationWarehouse($route->state, $route->city);
+
+        return $result->isResolved() ? (int) $result->warehouseId : null;
+    }
 }

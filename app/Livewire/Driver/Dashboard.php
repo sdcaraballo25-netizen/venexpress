@@ -245,6 +245,8 @@ class Dashboard extends Component
                 Package::STATUS_EN_HUB,
                 Package::STATUS_EN_TRANSITO_NACIONAL,
                 Package::STATUS_LISTO_RETIRO,
+                Package::STATUS_EN_RUTA,
+                Package::STATUS_ENTREGA_FALLIDA,
             ])
             ->count();
 

@@ -74,7 +74,7 @@ class DeliveryRouteOrderGeocodingTest extends TestCase
         $package = $this->createPackage($ally, [
             'requires_delivery' => true,
             'driver_id' => $driver->id,
-            'current_status' => Package::STATUS_EN_TRANSITO_NACIONAL,
+            'current_status' => Package::STATUS_EN_RUTA,
             'destination_city' => 'Cumaná',
             'delivery_address' => 'Av. Bermúdez',
         ]);
@@ -123,7 +123,7 @@ class DeliveryRouteOrderGeocodingTest extends TestCase
         $package = $this->createPackage($ally, [
             'requires_delivery' => true,
             'driver_id' => $driver->id,
-            'current_status' => Package::STATUS_EN_TRANSITO_NACIONAL,
+            'current_status' => Package::STATUS_EN_RUTA,
             'destination_city' => 'Cumaná',
             'destination_state' => 'Sucre',
             'delivery_address' => 'terrazas cumanesas torre B',
@@ -167,7 +167,7 @@ class DeliveryRouteOrderGeocodingTest extends TestCase
         $package = $this->createPackage($ally, [
             'requires_delivery' => true,
             'driver_id' => $driver->id,
-            'current_status' => Package::STATUS_EN_TRANSITO_NACIONAL,
+            'current_status' => Package::STATUS_EN_RUTA,
             'destination_city' => 'Cumaná',
             'destination_state' => 'Sucre',
             'delivery_address' => 'super bloques',
@@ -201,7 +201,7 @@ class DeliveryRouteOrderGeocodingTest extends TestCase
         $package = $this->createPackage($ally, [
             'requires_delivery' => true,
             'driver_id' => $driver->id,
-            'current_status' => Package::STATUS_EN_TRANSITO_NACIONAL,
+            'current_status' => Package::STATUS_EN_RUTA,
             'delivery_address' => 'Dirección inexistente xyz',
         ]);
 

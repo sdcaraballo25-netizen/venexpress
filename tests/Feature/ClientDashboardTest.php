@@ -3,7 +3,6 @@
 namespace Tests\Feature;
 
 use App\Livewire\Client\Dashboard;
-use App\Models\AuditLog;
 use App\Models\Customer;
 use App\Models\Package;
 use App\Models\User;
@@ -15,9 +14,8 @@ use Tests\TestCase;
 /**
  * Cubre los flujos del panel de Cliente:
  *
- * - Confirmar la recepción de una entrega a domicilio (solo cuando el
- *   paquete está LISTO_RETIRO).
- * - Impedir una segunda respuesta sobre la misma entrega.
+ * - Explicar en qué va una entrega a domicilio (ya no se le pide al
+ *   cliente que la acepte).
  * - Separar paquetes pendientes de los ya entregados (historial).
  * - Mostrar paquetes de varios clientes con el mismo correo.
  *
@@ -40,188 +38,45 @@ class ClientDashboardTest extends TestCase
         ]);
     }
 
-    public function test_client_can_accept_a_pending_delivery_once_the_package_is_ready_for_pickup(): void
+    /**
+     * El cliente ya no "acepta" la entrega a domicilio: la modalidad se
+     * decide al crear el envío. El panel solo le explica en qué va su
+     * entrega y, cuando sale a reparto, que use el PIN que le llegó por
+     * correo.
+     */
+    public function test_home_delivery_needs_no_client_acceptance_and_explains_the_pin(): void
     {
         $ally = $this->createAlly();
-
-        $user = $this->createClientUser(
-            'cliente@example.com'
-        );
+        $user = $this->createClientUser('cliente-domicilio@example.com');
 
         Customer::create([
-            'id_doc' => 'V-11111111',
-            'name' => 'Cliente de Prueba',
-            'phone' => '0414-0000000',
+            'id_doc' => 'V-20202020',
+            'name' => 'Cliente Domicilio',
+            'phone' => '0414-0000001',
             'email' => $user->email,
         ]);
 
-        $package = $this->createPackage($ally, [
-            'recipient_id_doc' => 'V-11111111',
+        $pending = $this->createPackage($ally, [
+            'tracking_number' => 'VEN-TEST-PENDIENTE',
+            'recipient_id_doc' => 'V-20202020',
             'requires_delivery' => true,
-            'current_status' => Package::STATUS_LISTO_RETIRO,
-            'delivery_status' => Package::DELIVERY_PENDING,
+            'current_status' => Package::STATUS_PENDIENTE_ENTREGA,
         ]);
 
         Livewire::actingAs($user)
             ->test(Dashboard::class)
-            ->call('acceptDelivery', $package->id)
-            ->assertHasNoErrors();
+            ->assertSee($pending->tracking_number)
+            ->assertSee('pronto saldrá a reparto')
+            ->assertDontSee('Confirmar recepción a domicilio');
 
-        $package->refresh();
-
-        $this->assertSame(
-            Package::DELIVERY_ACCEPTED,
-            $package->delivery_status
-        );
-
-        $this->assertNotNull(
-            $package->delivery_accepted_at
-        );
-
-        $this->assertSame(
-            1,
-            AuditLog::query()
-                ->where(
-                    'action',
-                    'client.delivery_accepted'
-                )
-                ->where(
-                    'target_id',
-                    $package->id
-                )
-                ->count()
-        );
-    }
-
-    public function test_client_cannot_accept_a_delivery_before_it_is_ready_for_pickup(): void
-    {
-        $ally = $this->createAlly();
-
-        $user = $this->createClientUser(
-            'cliente-temprano@example.com'
-        );
-
-        Customer::create([
-            'id_doc' => 'V-99999999',
-            'name' => 'Cliente Temprano',
-            'phone' => '0414-0000099',
-            'email' => $user->email,
-        ]);
-
-        $package = $this->createPackage($ally, [
-            'recipient_id_doc' => 'V-99999999',
-            'requires_delivery' => true,
-            'current_status' => Package::STATUS_RECIBIDO_AGENCIA,
-            'delivery_status' => Package::DELIVERY_PENDING,
-        ]);
+        $pending->update(['current_status' => Package::STATUS_EN_RUTA]);
 
         Livewire::actingAs($user)
             ->test(Dashboard::class)
-            ->call('acceptDelivery', $package->id)
-            ->assertHasNoErrors();
+            ->assertSee('Tu paquete va en camino')
+            ->assertSee('PIN de entrega');
 
-        $package->refresh();
-
-        $this->assertSame(
-            Package::DELIVERY_PENDING,
-            $package->delivery_status
-        );
-
-        $this->assertNull(
-            $package->delivery_accepted_at
-        );
-
-        $this->assertSame(
-            0,
-            AuditLog::query()
-                ->where('action', 'client.delivery_accepted')
-                ->where('target_id', $package->id)
-                ->count()
-        );
-    }
-
-    public function test_client_cannot_respond_twice_to_the_same_delivery(): void
-    {
-        $ally = $this->createAlly();
-
-        $user = $this->createClientUser(
-            'cliente3@example.com'
-        );
-
-        Customer::create([
-            'id_doc' => 'V-33333333',
-            'name' => 'Cliente de Prueba 3',
-            'phone' => '0414-0000002',
-            'email' => $user->email,
-        ]);
-
-        /*
-         * El paquete debe comenzar pendiente y listo para retiro.
-         * De esta manera la primera llamada representa
-         * una respuesta válida del cliente.
-         */
-        $package = $this->createPackage($ally, [
-            'recipient_id_doc' => 'V-33333333',
-            'requires_delivery' => true,
-            'current_status' => Package::STATUS_LISTO_RETIRO,
-            'delivery_status' => Package::DELIVERY_PENDING,
-            'delivery_accepted_at' => null,
-        ]);
-
-        $component = Livewire::actingAs($user)
-            ->test(Dashboard::class);
-
-        /*
-         * Primera respuesta:
-         * el cliente acepta la entrega.
-         */
-        $component
-            ->call('acceptDelivery', $package->id)
-            ->assertHasNoErrors();
-
-        $package->refresh();
-
-        $this->assertSame(
-            Package::DELIVERY_ACCEPTED,
-            $package->delivery_status
-        );
-
-        /*
-         * Segunda respuesta:
-         * el paquete ya no está pendiente, por lo tanto
-         * el componente debe rechazar la operación.
-         *
-         * El método acceptDelivery utiliza session()->flash()
-         * y no errores de validación de Livewire.
-         */
-        $component
-            ->call('acceptDelivery', $package->id)
-            ->assertHasNoErrors();
-
-        $package->refresh();
-
-        /*
-         * La segunda llamada no debe modificar nuevamente
-         * el estado ni crear otra auditoría de aceptación.
-         */
-        $this->assertSame(
-            Package::DELIVERY_ACCEPTED,
-            $package->delivery_status
-        );
-
-        $this->assertSame(
-            1,
-            AuditLog::query()
-                ->where(
-                    'action',
-                    'client.delivery_accepted'
-                )
-                ->where(
-                    'target_id',
-                    $package->id
-                )
-                ->count()
-        );
+        $this->assertFalse(method_exists(Dashboard::class, 'acceptDelivery'));
     }
 
     public function test_dashboard_shows_packages_for_every_customer_sharing_the_same_email(): void
@@ -500,14 +355,14 @@ class ClientDashboardTest extends TestCase
             'tracking_number' => 'VEN-TEST-NORECHAZO',
             'recipient_id_doc' => 'V-10101010',
             'requires_delivery' => true,
-            'current_status' => Package::STATUS_LISTO_RETIRO,
+            'current_status' => Package::STATUS_PENDIENTE_ENTREGA,
             'delivery_status' => Package::DELIVERY_PENDING,
         ]);
 
         Livewire::actingAs($user)
             ->test(Dashboard::class)
             ->assertDontSee('Rechazar entrega')
-            ->assertSee('Confirmar recepción a domicilio');
+            ->assertDontSee('Confirmar recepción a domicilio');
 
         $this->assertFalse(
             method_exists(Dashboard::class, 'rejectDelivery')

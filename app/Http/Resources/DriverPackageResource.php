@@ -17,6 +17,16 @@ class DriverPackageResource extends JsonResource
             'status_label' => $this->statusLabel(),
             'delivery_status' => $this->delivery_status,
 
+            // Entrega a domicilio: si el destinatario tiene un PIN de
+            // entrega vigente (si no, se confirma con su cédula + foto).
+            // El PIN nunca se envía al repartidor.
+            'has_delivery_pin' => $this->acceptsDeliveryPin(),
+            'delivery_pin_attempts_left' => $this->when(
+                $this->acceptsDeliveryPin(),
+                fn () => \App\Models\Package::DELIVERY_PIN_MAX_ATTEMPTS - (int) $this->delivery_pin_failed_attempts
+            ),
+            'delivery_confirmation_method' => $this->delivery_confirmation_method,
+
             // Datos del remitente (necesarios para que el
             // repartidor pueda contactarlo si hay un problema).
             // La Cédula/RIF (sender_id_doc / recipient_id_doc) nunca
@@ -57,6 +67,10 @@ class DriverPackageResource extends JsonResource
             'cod_payment_method' => $this->when(
                 $this->is_cod,
                 fn () => $this->cod_payment_method
+            ),
+            'cod_payment_reference' => $this->when(
+                $this->is_cod,
+                fn () => $this->cod_payment_reference
             ),
 
             'driver_remuneration_usd' => $this->driver_remuneration_usd !== null

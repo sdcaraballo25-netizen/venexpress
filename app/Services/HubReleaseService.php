@@ -21,15 +21,12 @@ use RuntimeException;
  *
  * - Retiro en HUB: EN_HUB -> LISTO_RETIRO directamente (nunca "viaja"
  *   a ningún lado, ya está donde el cliente lo retirará).
- * - Delivery (requires_delivery): EN_HUB -> LISTO_RETIRO directamente,
- *   igual que el retiro en HUB — el paquete ya está en el último punto
- *   que Venexpress controla; un repartidor de entrega lo reclama desde
- *   ahí (PackageService::claimForDelivery() ya acepta LISTO_RETIRO como
- *   uno de los dos estados reclamables, Package::CLAIMABLE_FOR_DELIVERY_STATUSES,
- *   y ya lo usa hoy para el camino Aliado -> Delivery vía
- *   DestinationReceptionService). No pasa por EN_TRANSITO_NACIONAL: ese
- *   estado quedaría reservado para cuando SÍ hay un traslado físico
- *   pendiente, y aquí ya no lo hay.
+ * - Delivery (requires_delivery): EN_HUB -> PENDIENTE_ENTREGA
+ *   directamente — el paquete ya está en el último punto que Venexpress
+ *   controla; un repartidor de entrega lo toma desde ahí
+ *   (Package::CLAIMABLE_FOR_DELIVERY_STATUSES). No pasa por
+ *   EN_TRANSITO_NACIONAL: ese estado queda reservado para cuando SÍ hay
+ *   un traslado físico entre HUBs pendiente.
  * - Retiro en Aliado: EN_HUB -> EN_TRANSITO_NACIONAL vía
  *   PackageDispatchService::dispatch() (reutilizado tal cual, sin
  *   modificarlo) — todavía falta el traslado físico hasta el Aliado de
@@ -37,8 +34,8 @@ use RuntimeException;
  *   llevan el paquete a LISTO_RETIRO cuando el Aliado lo reciba
  *   físicamente.
  *
- * No crea ningún PackageStatus nuevo: solo usa transiciones que ya
- * existen en el sistema (EN_HUB, LISTO_RETIRO, EN_TRANSITO_NACIONAL).
+ * Solo usa transiciones de salida de EN_HUB: LISTO_RETIRO,
+ * PENDIENTE_ENTREGA o EN_TRANSITO_NACIONAL.
  *
  * Antes de decidir cualquier cosa, release() vuelve a resolver el
  * destino en vivo y sincroniza destination_warehouse_id/
@@ -228,30 +225,25 @@ class HubReleaseService
     }
 
     /**
-     * C) Delivery: EN_HUB -> LISTO_RETIRO directamente, igual patrón
-     * que releaseForHubPickup() — el paquete ya está en el último HUB
-     * que Venexpress controla, ahí lo recoge un repartidor de entrega.
-     * No se despacha con PackageDispatchService::dispatch() porque no
-     * hay ningún traslado físico pendiente: ese método existe para
-     * cuando SÍ falta viajar a otro punto (HUB->HUB, HUB->Aliado), y
-     * aquí no es el caso.
+     * C) Delivery: EN_HUB -> PENDIENTE_ENTREGA directamente, igual
+     * patrón que releaseForHubPickup() — el paquete ya está en el
+     * último HUB que Venexpress controla, ahí lo recoge un repartidor
+     * de entrega. No se despacha con PackageDispatchService::dispatch()
+     * porque no hay ningún traslado físico pendiente.
      *
-     * PackageService::claimForDelivery()/DriverDeliveryController
-     * (Camino A, sin cambios) ya reclaman con normalidad desde
-     * LISTO_RETIRO — es uno de los dos estados de
-     * Package::CLAIMABLE_FOR_DELIVERY_STATUSES, y claimForDelivery()
-     * ya sabe transicionarlo a EN_TRANSITO_NACIONAL en el momento en
-     * que un repartidor lo reclama de verdad.
+     * Desde PENDIENTE_ENTREGA (Package::CLAIMABLE_FOR_DELIVERY_STATUSES)
+     * lo toma un repartidor escaneándolo o se lo asigna Admin/Almacén
+     * (DeliveryAssignmentService::assign()), y ahí pasa a EN_RUTA.
      */
     protected function releaseForDelivery(Package $locked, int $userId): Package
     {
-        $locked->current_status = Package::STATUS_LISTO_RETIRO;
+        $locked->current_status = Package::STATUS_PENDIENTE_ENTREGA;
         $locked->driver_id = null;
         $locked->save();
 
         PackageHistory::create([
             'package_id' => $locked->id,
-            'status' => Package::STATUS_LISTO_RETIRO,
+            'status' => Package::STATUS_PENDIENTE_ENTREGA,
             'event_type' => PackageHistory::EVENT_RECEPCION,
             'origin_location' => 'HUB destino',
             'destination_location' => 'Listo para entrega a domicilio',
@@ -259,7 +251,7 @@ class HubReleaseService
             'scanned_by_user_id' => $userId,
         ]);
 
-        app(PackageService::class)->notifyStatusChangeAfterCommit($locked, Package::STATUS_LISTO_RETIRO);
+        app(PackageService::class)->notifyStatusChangeAfterCommit($locked, Package::STATUS_PENDIENTE_ENTREGA);
 
         return $locked->fresh([
             'ally',

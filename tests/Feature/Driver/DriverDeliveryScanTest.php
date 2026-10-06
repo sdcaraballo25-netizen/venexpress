@@ -16,6 +16,8 @@ use App\Models\Warehouse;
 use App\Models\WarehouseCoverage;
 use App\Services\RouteService;
 use Illuminate\Foundation\Testing\RefreshDatabase;
+use Illuminate\Http\UploadedFile;
+use Illuminate\Support\Facades\Storage;
 use Livewire\Livewire;
 use Tests\Feature\Concerns\CreatesTestPackages;
 use Tests\TestCase;
@@ -28,7 +30,7 @@ use Tests\TestCase;
  * - Paquetes de SU ruta (recolección en una parada o asignación de
  *   Admin a la ruta).
  * - Toma por escaneo (PackageService::claimForDelivery()): solo con una
- *   ruta de reparto en curso, y solo un paquete LISTO_RETIRO que ya
+ *   ruta de reparto en curso, y solo un paquete PENDIENTE_ENTREGA que ya
  *   está en el HUB destino de la zona de esa ruta (WarehouseCoverage).
  *   Conocer el número de guía no basta.
  * - No existe ninguna lista ni búsqueda global de paquetes, y los datos
@@ -61,7 +63,7 @@ class DriverDeliveryScanTest extends TestCase
         return $hub;
     }
 
-    /** Paquete a domicilio ya recibido (LISTO_RETIRO) en su HUB destino. */
+    /** Paquete a domicilio ya recibido (PENDIENTE_ENTREGA) en su HUB destino. */
     private function readyAtHub(Warehouse $hub, array $overrides = []): Package
     {
         return $this->readyForDelivery(array_merge([
@@ -108,7 +110,7 @@ class DriverDeliveryScanTest extends TestCase
         return $this->createPackage($this->createAlly(), array_merge([
             'requires_delivery' => true,
             'delivery_address' => 'Av. Bolívar, casa 10',
-            'current_status' => Package::STATUS_LISTO_RETIRO,
+            'current_status' => Package::STATUS_PENDIENTE_ENTREGA,
         ], $overrides));
     }
 
@@ -118,7 +120,7 @@ class DriverDeliveryScanTest extends TestCase
         $package = $this->readyForDelivery([
             'driver_id' => $driver->id,
             'delivery_status' => Package::DELIVERY_ACCEPTED,
-            'current_status' => Package::STATUS_EN_TRANSITO_NACIONAL,
+            'current_status' => Package::STATUS_EN_RUTA,
         ]);
 
         AuditLog::create([
@@ -270,7 +272,7 @@ class DriverDeliveryScanTest extends TestCase
 
         $package->refresh();
         $this->assertNull($package->driver_id);
-        $this->assertSame(Package::STATUS_LISTO_RETIRO, $package->current_status);
+        $this->assertSame(Package::STATUS_PENDIENTE_ENTREGA, $package->current_status);
     }
 
     public function test_a_ready_package_at_the_route_hub_is_taken_by_scanning_and_linked_to_the_route(): void
@@ -286,7 +288,7 @@ class DriverDeliveryScanTest extends TestCase
 
         $package->refresh();
         $this->assertSame($driver->id, $package->driver_id);
-        $this->assertSame(Package::STATUS_EN_TRANSITO_NACIONAL, $package->current_status);
+        $this->assertSame(Package::STATUS_EN_RUTA, $package->current_status);
 
         // Queda ligado a SU ruta: cuenta para completarla/cancelarla.
         $this->assertTrue(
@@ -317,7 +319,12 @@ class DriverDeliveryScanTest extends TestCase
         $this->assertSame(Package::STATUS_EN_TRANSITO_NACIONAL, $package->current_status);
     }
 
-    public function test_a_package_released_by_a_cancelled_route_cannot_be_taken_by_another_driver(): void
+    /**
+     * Al cancelar la ruta, lo que había salido a reparto con ella vuelve
+     * a quedar pendiente de entrega en el almacén, así que otro
+     * repartidor de la misma zona puede tomarlo.
+     */
+    public function test_a_package_released_by_a_cancelled_route_can_be_taken_by_another_driver(): void
     {
         [$userA, $driverA] = $this->deliveryDriver();
         [$userB, $driverB] = $this->deliveryDriver();
@@ -333,14 +340,15 @@ class DriverDeliveryScanTest extends TestCase
 
         $package->refresh();
         $this->assertNull($package->driver_id);
-        $this->assertSame(Package::STATUS_EN_TRANSITO_NACIONAL, $package->current_status);
+        $this->assertSame(Package::STATUS_PENDIENTE_ENTREGA, $package->current_status);
 
         $this->scan($userB, $package->tracking_number)
-            ->assertSet('package', null)
-            ->assertNotSet('errorMessage', null)
-            ->assertDontSee(self::RECIPIENT);
+            ->assertSet('errorMessage', null)
+            ->assertSee(self::RECIPIENT);
 
-        $this->assertNull($package->fresh()->driver_id);
+        $package->refresh();
+        $this->assertSame($driverB->id, $package->driver_id);
+        $this->assertSame(Package::STATUS_EN_RUTA, $package->current_status);
     }
 
     public function test_a_package_of_another_zone_cannot_be_taken(): void
@@ -371,7 +379,7 @@ class DriverDeliveryScanTest extends TestCase
         $otherHub = $this->hubCovering('Zulia', 'Maracaibo');
 
         $cases = [
-            // LISTO_RETIRO sin HUB físico registrado.
+            // PENDIENTE_ENTREGA sin HUB físico registrado.
             $this->readyForDelivery(['current_warehouse_id' => null]),
             // Físicamente en un HUB que no es su destino.
             $this->readyForDelivery([
@@ -455,18 +463,23 @@ class DriverDeliveryScanTest extends TestCase
 
         $this->scan($user, $package->tracking_number)->assertSet('errorMessage', null);
 
+        Storage::fake('documents');
+
+        // Sin correo del destinatario no hay PIN: se confirma con su
+        // cédula y una foto de la entrega.
         Livewire::actingAs($user)
             ->test(PackageDetail::class, ['packageId' => $package->id])
             ->assertSee('Confirmar entrega')
             ->set('receiverName', 'María Gómez')
             ->set('receiverIdDoc', 'V-87654321')
-            ->set('deliveryConfirmationMethod', 'cedula')
+            ->set('deliveryPhoto', UploadedFile::fake()->image('entrega.jpg'))
             ->call('completeDelivery');
 
         $package->refresh();
         $this->assertSame(Package::STATUS_ENTREGADO, $package->current_status);
         $this->assertSame('María Gómez', $package->receiver_name);
-        $this->assertSame('cedula', $package->delivery_confirmation_method);
+        $this->assertSame(Package::DELIVERY_CONFIRMATION_ID_DOC, $package->delivery_confirmation_method);
+        $this->assertNotNull($package->delivery_photo_path);
     }
 
     public function test_delivery_cannot_be_confirmed_from_the_web_without_receiver_data(): void
@@ -474,15 +487,15 @@ class DriverDeliveryScanTest extends TestCase
         [$user, $driver] = $this->deliveryDriver();
         $package = $this->readyForDelivery([
             'driver_id' => $driver->id,
-            'current_status' => Package::STATUS_EN_TRANSITO_NACIONAL,
+            'current_status' => Package::STATUS_EN_RUTA,
         ]);
 
         Livewire::actingAs($user)
             ->test(PackageDetail::class, ['packageId' => $package->id])
             ->call('completeDelivery')
-            ->assertHasErrors(['receiverName', 'receiverIdDoc', 'deliveryConfirmationMethod']);
+            ->assertHasErrors(['receiverName', 'receiverIdDoc', 'deliveryPhoto']);
 
-        $this->assertSame(Package::STATUS_EN_TRANSITO_NACIONAL, $package->fresh()->current_status);
+        $this->assertSame(Package::STATUS_EN_RUTA, $package->fresh()->current_status);
     }
 
     public function test_dashboard_without_route_offers_individual_scan_but_no_package_list(): void
@@ -503,7 +516,7 @@ class DriverDeliveryScanTest extends TestCase
         [$user, $driver] = $this->deliveryDriver();
         $package = $this->readyForDelivery([
             'driver_id' => $driver->id,
-            'current_status' => Package::STATUS_EN_TRANSITO_NACIONAL,
+            'current_status' => Package::STATUS_EN_RUTA,
         ]);
 
         Livewire::actingAs($user)
@@ -520,7 +533,7 @@ class DriverDeliveryScanTest extends TestCase
         $this->assertSame($user->id, $incident->reported_by_user_id);
 
         // Igual que en la app: el estado del paquete no cambia.
-        $this->assertSame(Package::STATUS_EN_TRANSITO_NACIONAL, $package->fresh()->current_status);
+        $this->assertSame(Package::STATUS_EN_RUTA, $package->fresh()->current_status);
     }
 
     /*

@@ -67,6 +67,14 @@
                         Listo para retiro
                     </option>
 
+                    <option value="{{ \App\Models\Package::STATUS_PENDIENTE_ENTREGA }}">
+                        Pendiente de entrega
+                    </option>
+
+                    <option value="{{ \App\Models\Package::STATUS_EN_RUTA }}">
+                        En ruta de entrega
+                    </option>
+
                     <option value="{{ \App\Models\Package::STATUS_ENTREGADO }}">
                         Entregado
                     </option>
@@ -213,11 +221,17 @@
                                         \App\Models\Package::STATUS_ENTREGADO
                                             => 'bg-emerald-50 text-emerald-700',
 
-                                        \App\Models\Package::STATUS_LISTO_RETIRO
+                                        \App\Models\Package::STATUS_LISTO_RETIRO,
+                                        \App\Models\Package::STATUS_PENDIENTE_ENTREGA
                                             => 'bg-blue-50 text-blue-700',
 
-                                        \App\Models\Package::STATUS_EN_TRANSITO_NACIONAL
+                                        \App\Models\Package::STATUS_EN_TRANSITO_NACIONAL,
+                                        \App\Models\Package::STATUS_EN_RUTA
                                             => 'bg-amber-50 text-amber-700',
+
+                                        \App\Models\Package::STATUS_ENTREGA_FALLIDA,
+                                        \App\Models\Package::STATUS_EN_DEVOLUCION
+                                            => 'bg-red-50 text-red-700',
 
                                         \App\Models\Package::STATUS_EN_HUB
                                             => 'bg-violet-50 text-violet-700',

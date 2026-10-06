@@ -23,19 +23,29 @@ use RuntimeException;
  * - Lista las paradas de rutas HUB Distribución que tienen a este
  *   almacén como destino, separadas en pendientes y ya recibidas.
  * - Permite escanear la llegada de un paquete, lo que lo recibe
- *   físicamente en el almacén (EN_TRANSITO_NACIONAL -> LISTO_RETIRO,
- *   mismo mecanismo que Ally\PackageReception usa para agencias, vía
+ *   físicamente en el almacén (EN_TRANSITO_NACIONAL -> LISTO_RETIRO, o
+ *   PENDIENTE_ENTREGA si es a domicilio; mismo mecanismo que
+ *   Ally\PackageReception usa para agencias, vía
  *   DestinationReceptionService).
- * - Permite despachar un paquete ya recibido (LISTO_RETIRO): a un
- *   cliente que lo retira en persona (mismo flujo que
+ * - Permite despachar un paquete ya recibido: a un cliente que lo
+ *   retira en persona (LISTO_RETIRO, mismo flujo que
  *   Ally\PackagePickup), o a un repartidor con una ruta de reparto en
- *   curso hacia esa ciudad (mismo flujo que Admin\DriverAssignment,
- *   vía DeliveryAssignmentService).
+ *   curso desde este almacén hacia esa ciudad (PENDIENTE_ENTREGA, mismo
+ *   flujo que Admin\DriverAssignment, vía DeliveryAssignmentService).
  */
 #[Layout('layouts.almacen')]
 #[Title('Almacén')]
 class Dashboard extends Component
 {
+    /**
+     * Ya recibidos en el almacén y listos para salir: retiro en persona
+     * (LISTO_RETIRO) o entrega a domicilio (PENDIENTE_ENTREGA).
+     */
+    private const DISPATCHABLE_STATUSES = [
+        Package::STATUS_LISTO_RETIRO,
+        Package::STATUS_PENDIENTE_ENTREGA,
+    ];
+
     public string $trackingNumber = '';
 
     public ?string $scanSuccess = null;
@@ -101,7 +111,7 @@ class Dashboard extends Component
             return;
         }
 
-        if ($package->current_status === Package::STATUS_LISTO_RETIRO) {
+        if (in_array($package->current_status, self::DISPATCHABLE_STATUSES, true)) {
             $this->dispatchTrackingNumber = $code;
             $this->searchDispatch();
 
@@ -182,7 +192,10 @@ class Dashboard extends Component
                 }
             });
 
-            $this->scanSuccess = "Guía {$trackingNumber} recibida en {$warehouse->name}. Ya está lista para entregar.";
+            $this->scanSuccess = "Guía {$trackingNumber} recibida en {$warehouse->name}. "
+                .($package->requires_delivery
+                    ? 'Quedó pendiente de entrega a domicilio: asígnala a un repartidor.'
+                    : 'Ya está lista para entregar.');
             $this->trackingNumber = '';
         } catch (RuntimeException $e) {
             $this->scanError = $e->getMessage();
@@ -190,8 +203,8 @@ class Dashboard extends Component
     }
 
     /**
-     * Busca un paquete LISTO_RETIRO para despacharlo desde este
-     * almacén (a cliente o a repartidor).
+     * Busca un paquete ya recibido (LISTO_RETIRO o PENDIENTE_ENTREGA)
+     * para despacharlo desde este almacén (a cliente o a repartidor).
      */
     public function searchDispatch(): void
     {
@@ -222,7 +235,7 @@ class Dashboard extends Component
             return;
         }
 
-        if ($package->current_status !== Package::STATUS_LISTO_RETIRO) {
+        if (! in_array($package->current_status, self::DISPATCHABLE_STATUSES, true)) {
             $this->dispatchError = 'Esta guía todavía no está lista para despacho. Estado actual: '.$package->statusLabel().'.';
 
             return;
@@ -290,15 +303,20 @@ class Dashboard extends Component
     }
 
     /**
-     * Rutas de reparto en curso hacia la ciudad del paquete
-     * encontrado — mismo criterio que Admin\DriverAssignment.
+     * Rutas de reparto en curso hacia la ciudad del paquete encontrado
+     * que salen de este almacén — la misma regla de zona que aplica
+     * DeliveryAssignmentService::assign().
      */
     #[Computed]
     public function availableDeliveryRoutes()
     {
-        if (! $this->dispatchPackage) {
+        $warehouse = $this->warehouse();
+
+        if (! $this->dispatchPackage || ! $warehouse) {
             return collect();
         }
+
+        $assignmentService = app(DeliveryAssignmentService::class);
 
         return Route::query()
             ->with('driver.user')
@@ -307,7 +325,9 @@ class Dashboard extends Component
             ->where('route_type', Route::TYPE_DELIVERY)
             ->whereRaw('LOWER(city) = ?', [mb_strtolower(trim((string) $this->dispatchPackage->destination_city))])
             ->orderBy('name')
-            ->get();
+            ->get()
+            ->filter(fn (Route $route) => $assignmentService->routeWarehouseId($route) === (int) $warehouse->id)
+            ->values();
     }
 
     public function assignToDriver(int $routeId, DeliveryAssignmentService $assignmentService): void
@@ -323,7 +343,7 @@ class Dashboard extends Component
             }
 
             $package = Package::where('tracking_number', trim($this->dispatchTrackingNumber))
-                ->where('current_status', Package::STATUS_LISTO_RETIRO)
+                ->where('current_status', Package::STATUS_PENDIENTE_ENTREGA)
                 ->firstOrFail();
 
             if (! $this->belongsToWarehouse($package, $warehouse)) {
@@ -334,7 +354,7 @@ class Dashboard extends Component
 
             $this->dispatchPackage = $assignmentService->assign($package, $route, (int) Auth::id());
 
-            $this->dispatchSuccess = 'Paquete asignado correctamente al repartidor.';
+            $this->dispatchSuccess = 'Paquete asignado: salió a reparto con el repartidor.';
         } catch (RuntimeException $e) {
             $this->dispatchError = $e->getMessage();
         }

@@ -8,12 +8,15 @@ use App\Models\Customer;
 use App\Models\Driver;
 use App\Models\Package;
 use App\Models\PackageHistory;
+use App\Models\Pedido;
 use App\Models\Route;
+use App\Notifications\DeliveryPinIssued;
 use App\Notifications\PackageCreated;
 use App\Notifications\PackageStatusUpdated;
 use App\Support\Money;
 use Illuminate\Database\QueryException;
 use Illuminate\Support\Facades\DB;
+use Illuminate\Support\Facades\Hash;
 use Illuminate\Support\Facades\Log;
 use Illuminate\Support\Facades\Notification;
 use RuntimeException;
@@ -550,9 +553,9 @@ class PackageService
             Package::STATUS_RECOLECTADO_VENEXPRESS => [
                 Package::STATUS_EN_HUB,
                 // Un repartidor de tipo Delivery recolecta directo en
-                // la agencia y arranca el reparto a domicilio sin pasar
+                // la agencia y sale a reparto a domicilio sin pasar
                 // por el HUB (PackageDetail::startDelivery()).
-                Package::STATUS_EN_TRANSITO_NACIONAL,
+                Package::STATUS_EN_RUTA,
             ],
 
             Package::STATUS_EN_HUB => [
@@ -565,7 +568,17 @@ class PackageService
 
             Package::STATUS_LISTO_RETIRO => [
                 Package::STATUS_ENTREGADO,
-                Package::STATUS_EN_TRANSITO_NACIONAL,
+            ],
+
+            // Entrega a domicilio: solo sale a reparto desde el almacén
+            // destino (sendOutForDelivery()) y solo se entrega desde
+            // EN_RUTA (completeDelivery(), que no pasa por aquí).
+            Package::STATUS_PENDIENTE_ENTREGA => [
+                Package::STATUS_EN_RUTA,
+            ],
+
+            Package::STATUS_EN_RUTA => [
+                Package::STATUS_ENTREGADO,
             ],
 
             Package::STATUS_ENTREGADO => [],
@@ -703,20 +716,18 @@ class PackageService
      * Conocer el número de guía no basta: el paquete debe estar
      * disponible para reparto en la zona de esa ruta. Validaciones
      * (todas del lado del servidor, con el paquete bloqueado):
-     * - Estado LISTO_RETIRO (Package::CLAIMABLE_FOR_DELIVERY_STATUSES):
+     * - Estado PENDIENTE_ENTREGA (Package::CLAIMABLE_FOR_DELIVERY_STATUSES):
      *   ya llegó a destino. Un paquete EN_TRANSITO_NACIONAL (viajando
-     *   entre HUBs, despachado o liberado de una ruta cancelada) nunca
-     *   se puede tomar.
+     *   entre HUBs) nunca se puede tomar.
      * - El repartidor tiene una ruta TYPE_DELIVERY en curso.
      * - El paquete está físicamente en su HUB destino
-     *   (LogisticsResolutionService::isAtDestinationWarehouse(), que
-     *   resuelve con WarehouseCoverage) y ese HUB es el de la zona de la
-     *   ruta (ver deliveryRouteWarehouseId()).
+     *   (LogisticsResolutionService::isAtDestinationWarehouse()).
      *
      * La asignación en sí la hace DeliveryAssignmentService::assign() —
      * la misma que usa Admin/Almacén —, así el paquete queda ligado a la
-     * ruta (AuditLog con route_id, ver RouteService::packageIdsForRoute())
-     * y pasa por la misma validación de ruta/ciudad.
+     * ruta (AuditLog con route_id, ver RouteService::packageIdsForRoute()),
+     * pasa por la misma regla de zona (almacén de la ruta + ciudad
+     * destino) y sale a reparto (EN_RUTA) con su PIN de entrega.
      *
      * "Primero en escanear, primero en repartir": el lockForUpdate()
      * garantiza que si dos repartidores escanean la misma guía casi
@@ -793,36 +804,105 @@ class PackageService
                 );
             }
 
-            if ($this->deliveryRouteWarehouseId($route) !== (int) $locked->current_warehouse_id) {
+            $assignmentService = app(DeliveryAssignmentService::class);
+
+            if ($assignmentService->routeWarehouseId($route) !== (int) $locked->current_warehouse_id) {
                 throw new RuntimeException('Este paquete no pertenece a la zona de tu ruta de reparto.');
             }
 
-            app(DeliveryAssignmentService::class)->assign($locked, $route, $userId);
-
-            $locked->refresh();
-            $locked->update(['delivery_status' => Package::DELIVERY_ACCEPTED]);
+            $assignmentService->assign($locked, $route, $userId);
 
             return $locked->fresh();
         });
     }
 
     /**
-     * HUB (Warehouse) que atiende la zona de una ruta de reparto:
-     * origin_warehouse_id si Admin lo fijó; si no, el que
-     * WarehouseCoverage resuelve para el estado/ciudad de la ruta
-     * (misma fuente de verdad que el destino de los paquetes). Null si
-     * no se puede resolver, y entonces la ruta no puede tomar entregas.
+     * Sale a reparto: el paquete pasa a EN_RUTA en manos de su
+     * repartidor y se genera el PIN de entrega (6 dígitos). Solo se
+     * guarda su hash; el PIN en claro se le envía por correo al
+     * destinatario una vez confirmada la transacción. Si el
+     * destinatario no tiene correo registrado no se genera PIN: el
+     * repartidor entregará verificando su cédula y con una foto.
+     *
+     * Usado por DeliveryAssignmentService::assign() (Admin, Almacén y la
+     * toma por escaneo) y por Driver\PackageDetail::startDelivery().
      */
-    protected function deliveryRouteWarehouseId(Route $route): ?int
-    {
-        if ($route->origin_warehouse_id !== null) {
-            return (int) $route->origin_warehouse_id;
+    public function sendOutForDelivery(
+        Package $package,
+        int $userId,
+        string $locationDescription,
+        string $originLocation = 'Almacén destino',
+    ): Package {
+        $recipientEmail = $this->recipientEmail($package);
+        $pin = $recipientEmail
+            ? str_pad((string) random_int(0, 999999), 6, '0', STR_PAD_LEFT)
+            : null;
+
+        $updatedPackage = DB::transaction(function () use ($package, $userId, $locationDescription, $originLocation, $pin) {
+            $updated = $this->changeStatus(
+                package: $package,
+                newStatus: Package::STATUS_EN_RUTA,
+                userId: $userId,
+                locationDescription: $locationDescription,
+                eventType: PackageHistory::EVENT_REPARTO,
+                originLocation: $originLocation,
+                destinationLocation: 'Repartidor',
+                // El aviso al cliente es el correo con el PIN.
+                notifyCustomer: false,
+            );
+
+            $updated->forceFill([
+                'delivery_pin_hash' => $pin !== null ? Hash::make($pin) : null,
+                'delivery_pin_generated_at' => $pin !== null ? now() : null,
+                'delivery_pin_failed_attempts' => 0,
+            ])->save();
+
+            return $updated;
+        });
+
+        if ($pin !== null) {
+            DB::afterCommit(fn () => $this->notifyDeliveryPin($updatedPackage, $recipientEmail, $pin));
         }
 
-        $result = app(LogisticsResolutionService::class)
-            ->resolveDestinationWarehouse($route->state, $route->city);
+        return $updatedPackage;
+    }
 
-        return $result->isResolved() ? (int) $result->warehouseId : null;
+    /**
+     * Correo del destinatario: el de su cuenta de cliente (customers,
+     * por recipient_id_doc, igual que notifyStatusChange()) o, si la
+     * guía viene de un pedido del marketplace, el que dio al comprar.
+     */
+    protected function recipientEmail(Package $package): ?string
+    {
+        $email = Customer::query()
+            ->where('id_doc', $package->recipient_id_doc)
+            ->whereNotNull('email')
+            ->value('email');
+
+        if (! $email) {
+            $email = Pedido::query()
+                ->where('package_id', $package->id)
+                ->whereNotNull('cliente_email')
+                ->value('cliente_email');
+        }
+
+        return $email ?: null;
+    }
+
+    protected function notifyDeliveryPin(Package $package, string $email, string $pin): void
+    {
+        try {
+            Notification::route('mail', $email)
+                ->notify(new DeliveryPinIssued($package->id, $pin));
+        } catch (Throwable $e) {
+            Log::warning(
+                'No se pudo enviar el PIN de entrega al destinatario.',
+                [
+                    'package_id' => $package->id,
+                    'error' => $e->getMessage(),
+                ]
+            );
+        }
     }
 
     /*
@@ -831,6 +911,22 @@ class PackageService
     |--------------------------------------------------------------------------
     */
 
+    /**
+     * El repartidor confirma la entrega a domicilio. Solo desde EN_RUTA
+     * (el paquete salió a reparto con él) y verificando a quien recibe:
+     *
+     * - Con el PIN que se le envió al destinatario al salir a reparto
+     *   (DELIVERY_CONFIRMATION_PIN). Cada PIN incorrecto cuenta; tras
+     *   Package::DELIVERY_PIN_MAX_ATTEMPTS deja de aceptarse.
+     * - Sin PIN (no le llegó, no lo tiene a mano o se agotaron los
+     *   intentos): la cédula de quien recibe debe coincidir con la del
+     *   destinatario y se exige una foto de la entrega
+     *   (DELIVERY_CONFIRMATION_ID_DOC).
+     *
+     * No se entrega con un pago pendiente: un COD sin cobrar exige la
+     * forma de pago y, si es electrónica (pago móvil, transferencia,
+     * Zelle), el número de referencia; el comprobante es opcional.
+     */
     public function completeDelivery(
         Package $package,
         Driver $driver,
@@ -838,20 +934,32 @@ class PackageService
         ?string $receiverName = null,
         ?string $receiverIdDoc = null,
         ?string $receiverPhone = null,
-        ?string $deliveryConfirmationMethod = null,
+        ?string $deliveryPin = null,
         ?string $deliveryPhotoPath = null,
         ?string $codPaymentMethod = null,
+        ?string $codPaymentReference = null,
+        ?string $codPaymentProofPath = null,
     ): Package {
-        $updatedPackage = DB::transaction(function () use (
+        $deliveryPin = trim((string) $deliveryPin);
+        $receiverName = trim((string) $receiverName);
+        $receiverIdDoc = trim((string) $receiverIdDoc);
+        $codPaymentReference = trim((string) $codPaymentReference);
+
+        // Un PIN incorrecto se cuenta aunque la entrega no se confirme:
+        // por eso la transacción no lanza la excepción (revertiría el
+        // contador) sino que devuelve el error, y se lanza después.
+        $result = DB::transaction(function () use (
             $package,
             $driver,
             $locationDescription,
             $receiverName,
             $receiverIdDoc,
             $receiverPhone,
-            $deliveryConfirmationMethod,
+            $deliveryPin,
             $deliveryPhotoPath,
-            $codPaymentMethod
+            $codPaymentMethod,
+            $codPaymentReference,
+            $codPaymentProofPath
         ) {
             $lockedPackage = Package::query()
                 ->whereKey($package->id)
@@ -874,21 +982,56 @@ class PackageService
                 );
             }
 
-            if ($lockedPackage->current_status !== Package::STATUS_EN_TRANSITO_NACIONAL) {
+            if ($lockedPackage->current_status !== Package::STATUS_EN_RUTA) {
                 throw new RuntimeException(
-                    'El paquete no está en estado de reparto.'
+                    'El paquete no está en ruta de entrega. Estado actual: '
+                    .$lockedPackage->statusLabel().'.'
                 );
             }
 
-            // NOTA: se eliminó el requisito de "delivery_status ===
-            // DELIVERY_ACCEPTED" porque el flujo de aceptación del
-            // cliente todavía no existe en el sistema. El repartidor
-            // puede completar la entrega directamente.
+            if ($receiverName === '') {
+                throw new RuntimeException('Indica el nombre de quien recibe.');
+            }
 
-            // Un paquete COD no puede entregarse sin que el
-            // repartidor confirme que le cobraron y con qué forma de
-            // pago. Antes se marcaba "cobrado" automáticamente al
-            // completar la entrega, sin ningún registro real del pago.
+            if ($deliveryPin !== '') {
+                if (! $lockedPackage->acceptsDeliveryPin()) {
+                    throw new RuntimeException(
+                        $lockedPackage->delivery_pin_hash === null
+                            ? 'Esta guía no tiene PIN de entrega: confirma con la cédula del destinatario y una foto.'
+                            : 'Se agotaron los intentos de PIN para esta guía: confirma con la cédula del destinatario y una foto.'
+                    );
+                }
+
+                if (! Hash::check($deliveryPin, $lockedPackage->delivery_pin_hash)) {
+                    $lockedPackage->increment('delivery_pin_failed_attempts');
+
+                    $remaining = Package::DELIVERY_PIN_MAX_ATTEMPTS
+                        - (int) $lockedPackage->delivery_pin_failed_attempts;
+
+                    return $remaining > 0
+                        ? "PIN incorrecto. Te quedan {$remaining} intento(s)."
+                        : 'PIN incorrecto. Se agotaron los intentos: confirma con la cédula del destinatario y una foto.';
+                }
+
+                $confirmationMethod = Package::DELIVERY_CONFIRMATION_PIN;
+            } else {
+                if (! Package::idDocsMatch($receiverIdDoc, $lockedPackage->recipient_id_doc)) {
+                    throw new RuntimeException(
+                        $receiverIdDoc === ''
+                            ? 'Sin PIN, indica la cédula del destinatario para confirmar la entrega.'
+                            : 'La cédula no coincide con la del destinatario. Sin PIN, solo el destinatario puede recibir el paquete.'
+                    );
+                }
+
+                if (! $deliveryPhotoPath) {
+                    throw new RuntimeException(
+                        'Sin PIN, adjunta una foto de la entrega para confirmarla.'
+                    );
+                }
+
+                $confirmationMethod = Package::DELIVERY_CONFIRMATION_ID_DOC;
+            }
+
             if ($lockedPackage->is_cod && ! $lockedPackage->cod_collected_at) {
                 if (! $codPaymentMethod || ! in_array($codPaymentMethod, Package::PAYMENT_METHODS, true)) {
                     throw new RuntimeException(
@@ -896,26 +1039,37 @@ class PackageService
                     );
                 }
 
+                if (
+                    in_array($codPaymentMethod, Package::PAYMENT_METHODS_REQUIRING_REFERENCE, true)
+                    && $codPaymentReference === ''
+                ) {
+                    throw new RuntimeException(
+                        'Indica el número de referencia del pago ('
+                        .(Package::PAYMENT_METHOD_LABELS[$codPaymentMethod] ?? $codPaymentMethod)
+                        .') antes de confirmar la entrega.'
+                    );
+                }
+
                 $lockedPackage->cod_collected_at = now();
                 $lockedPackage->cod_collected_by_user_id = $driver->user_id;
                 $lockedPackage->cod_payment_method = $codPaymentMethod;
+                $lockedPackage->cod_payment_reference = $codPaymentReference !== '' ? $codPaymentReference : null;
+                $lockedPackage->cod_payment_proof_path = $codPaymentProofPath;
             }
 
-            $lockedPackage->update([
+            $lockedPackage->fill([
                 'current_status' => Package::STATUS_ENTREGADO,
                 'delivery_status' => Package::DELIVERY_COMPLETED,
                 'delivery_completed_at' => now(),
                 'driver_remuneration_status' => Package::REMUNERATION_PENDING,
                 'receiver_name' => $receiverName,
-                'receiver_id_doc' => $receiverIdDoc,
+                'receiver_id_doc' => $receiverIdDoc !== '' ? $receiverIdDoc : null,
                 'receiver_phone' => $receiverPhone,
-                'delivery_confirmation_method' => $deliveryConfirmationMethod,
+                'delivery_confirmation_method' => $confirmationMethod,
                 'delivery_photo_path' => $deliveryPhotoPath,
-            ]);
-
-            if ($lockedPackage->is_cod && $lockedPackage->cod_collected_at) {
-                $lockedPackage->save();
-            }
+                // Ya entregado, el PIN no sirve para nada más.
+                'delivery_pin_hash' => null,
+            ])->save();
 
             app(DriverPaymentService::class)->createForDeliveredPackage(
                 $lockedPackage,
@@ -927,8 +1081,10 @@ class PackageService
                 status: Package::STATUS_ENTREGADO,
                 userId: $driver->user_id,
                 locationDescription:
-                    $locationDescription
-                    ?? 'Entrega completada por el repartidor',
+                    ($locationDescription ?? 'Entrega completada por el repartidor')
+                    .($confirmationMethod === Package::DELIVERY_CONFIRMATION_PIN
+                        ? ' (verificada con PIN)'
+                        : ' (sin PIN: verificada con cédula y foto)'),
                 eventType: PackageHistory::EVENT_ENTREGA,
                 originLocation: 'Dirección de entrega',
                 destinationLocation: 'Destinatario',
@@ -937,9 +1093,13 @@ class PackageService
             return $lockedPackage->fresh();
         });
 
-        $this->notifyStatusChange($updatedPackage, Package::STATUS_ENTREGADO);
+        if (is_string($result)) {
+            throw new RuntimeException($result);
+        }
 
-        return $updatedPackage;
+        $this->notifyStatusChange($result, Package::STATUS_ENTREGADO);
+
+        return $result;
     }
 
     /**
@@ -1056,6 +1216,8 @@ class PackageService
                 // que la agencia de origen la entregue: así deja de
                 // aparecer como pendiente en el panel/app del repartidor.
                 'driver_id' => null,
+                // Si había salido a reparto, el PIN ya no sirve.
+                'delivery_pin_hash' => null,
             ];
 
             if ($locked->is_cod && $locked->cod_status === Package::COD_PENDIENTE) {

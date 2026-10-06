@@ -28,9 +28,15 @@ class PackageDetail extends Component
     /**
      * Forma de pago con la que el destinatario canceló el COD.
      * Requerida por completeDelivery() cuando el paquete es COD y
-     * todavía no se había cobrado.
+     * todavía no se había cobrado; si es electrónica también la
+     * referencia, y el comprobante es opcional.
      */
     public string $codPaymentMethod = '';
+
+    public string $codPaymentReference = '';
+
+    /** @var \Livewire\Features\SupportFileUploads\TemporaryUploadedFile|null */
+    public $codPaymentProof = null;
 
     /*
      * Datos de quién recibió el paquete: los mismos que ya exige la app
@@ -43,7 +49,14 @@ class PackageDetail extends Component
 
     public string $receiverPhone = '';
 
-    public string $deliveryConfirmationMethod = '';
+    /** PIN de entrega que el destinatario recibió por correo. */
+    public string $deliveryPin = '';
+
+    /**
+     * El destinatario no tiene el PIN: se confirma con su cédula y una
+     * foto de la entrega.
+     */
+    public bool $deliverWithoutPin = false;
 
     /** @var \Livewire\Features\SupportFileUploads\TemporaryUploadedFile|null */
     public $deliveryPhoto = null;
@@ -129,15 +142,13 @@ $driver = $user?->driver;
                 );
             }
 
+            // Sale a reparto (EN_RUTA) y se genera el PIN de entrega.
             $this->package =
-                app(PackageService::class)->changeStatus(
+                app(PackageService::class)->sendOutForDelivery(
                     package: $this->package,
-                    newStatus:
-                        Package::STATUS_EN_TRANSITO_NACIONAL,
-                    userId:
-                        Auth::id(),
-                    locationDescription:
-                        'Entrega iniciada por el repartidor',
+                    userId: (int) Auth::id(),
+                    locationDescription: 'Salió a reparto con el repartidor',
+                    originLocation: 'Agencia de origen',
                 );
 
             session()->flash(
@@ -180,27 +191,39 @@ $driver = $user?->driver;
 
             $this->package->refresh();
 
-            if ($this->package->is_cod && ! $this->package->cod_collected_at && $this->codPaymentMethod === '') {
-                throw new RuntimeException(
-                    'Este pedido es contra entrega (COD): indica la forma de pago con la que te cancelaron antes de confirmar la entrega.'
-                );
-            }
+            $codPending = $this->package->is_cod && ! $this->package->cod_collected_at;
+            $withPin = $this->package->acceptsDeliveryPin() && ! $this->deliverWithoutPin;
 
             // Mismas reglas que la app (DriverPackageController::completeDelivery).
             $this->validate([
                 'receiverName' => ['required', 'string', 'max:150'],
-                'receiverIdDoc' => ['required', 'string', 'max:30'],
+                'receiverIdDoc' => [$withPin ? 'nullable' : 'required', 'string', 'max:30'],
                 'receiverPhone' => ['nullable', 'string', 'max:30'],
-                'deliveryConfirmationMethod' => ['required', 'in:firma,foto,cedula'],
-                'deliveryPhoto' => ['nullable', 'image', 'mimes:jpg,jpeg,png,webp', 'max:5120'],
+                'deliveryPin' => [$withPin ? 'required' : 'nullable', 'digits:6'],
+                'deliveryPhoto' => [$withPin ? 'nullable' : 'required', 'image', 'mimes:jpg,jpeg,png,webp', 'max:5120'],
+                'codPaymentMethod' => [$codPending ? 'required' : 'nullable', 'in:'.implode(',', Package::PAYMENT_METHODS)],
+                'codPaymentReference' => [
+                    $codPending && in_array($this->codPaymentMethod, Package::PAYMENT_METHODS_REQUIRING_REFERENCE, true) ? 'required' : 'nullable',
+                    'string',
+                    'max:100',
+                ],
+                'codPaymentProof' => ['nullable', 'image', 'mimes:jpg,jpeg,png,webp', 'max:5120'],
             ], [
                 'receiverName.required' => 'Indica el nombre de quien recibe.',
-                'receiverIdDoc.required' => 'Indica el documento de quien recibe.',
-                'deliveryConfirmationMethod.required' => 'Indica cómo se confirmó la entrega.',
+                'receiverIdDoc.required' => 'Sin PIN, indica la cédula del destinatario.',
+                'deliveryPin.required' => 'Pídele al destinatario el PIN de entrega.',
+                'deliveryPin.digits' => 'El PIN tiene 6 dígitos.',
+                'deliveryPhoto.required' => 'Sin PIN, toma una foto de la entrega.',
+                'codPaymentMethod.required' => 'Este pedido es contra entrega (COD): indica la forma de pago con la que te cancelaron.',
+                'codPaymentReference.required' => 'Indica el número de referencia del pago.',
             ]);
 
             $photoPath = $this->deliveryPhoto
                 ? $this->deliveryPhoto->store('delivery-evidence', 'documents')
+                : null;
+
+            $proofPath = $codPending && $this->codPaymentProof
+                ? $this->codPaymentProof->store('cod-payment-proofs', 'documents')
                 : null;
 
             try {
@@ -213,24 +236,33 @@ $driver = $user?->driver;
                         receiverName: $this->receiverName,
                         receiverIdDoc: $this->receiverIdDoc,
                         receiverPhone: $this->receiverPhone !== '' ? $this->receiverPhone : null,
-                        deliveryConfirmationMethod: $this->deliveryConfirmationMethod,
+                        deliveryPin: $withPin ? $this->deliveryPin : null,
                         deliveryPhotoPath: $photoPath,
                         codPaymentMethod: $this->codPaymentMethod !== '' ? $this->codPaymentMethod : null,
+                        codPaymentReference: $this->codPaymentReference,
+                        codPaymentProofPath: $proofPath,
                     );
             } catch (RuntimeException $e) {
-                if ($photoPath) {
-                    Storage::disk('documents')->delete($photoPath);
+                foreach (array_filter([$photoPath, $proofPath]) as $path) {
+                    Storage::disk('documents')->delete($path);
                 }
+
+                // Un PIN incorrecto se cuenta: refresca para mostrar si
+                // ya no se acepta y hay que pasar a cédula + foto.
+                $this->package->refresh();
 
                 throw $e;
             }
 
             $this->reset([
                 'codPaymentMethod',
+                'codPaymentReference',
+                'codPaymentProof',
                 'receiverName',
                 'receiverIdDoc',
                 'receiverPhone',
-                'deliveryConfirmationMethod',
+                'deliveryPin',
+                'deliverWithoutPin',
                 'deliveryPhoto',
             ]);
 

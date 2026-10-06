@@ -4,9 +4,7 @@ namespace Tests\Feature\Services;
 
 use App\Livewire\Admin\PackageReception as AdminPackageReception;
 use App\Livewire\Ally\PackageReception as AllyPackageReception;
-use App\Livewire\Client\Dashboard as ClientDashboard;
 use App\Models\Ally;
-use App\Models\Customer;
 use App\Models\Driver;
 use App\Models\Package;
 use App\Models\PackageHistory;
@@ -204,7 +202,7 @@ class HubReleaseServiceTest extends TestCase
     |--------------------------------------------------------------------------
     */
 
-    public function test_delivery_package_at_destination_hub_transitions_to_listo_retiro_and_becomes_claimable(): void
+    public function test_delivery_package_at_destination_hub_transitions_to_pendiente_entrega_and_becomes_claimable(): void
     {
         $ally = $this->createAlly();
         $hub = $this->destinationHub();
@@ -224,13 +222,13 @@ class HubReleaseServiceTest extends TestCase
 
         $released = $this->service()->release($package, $ally->user_id);
 
-        $this->assertSame(Package::STATUS_LISTO_RETIRO, $released->current_status);
+        $this->assertSame(Package::STATUS_PENDIENTE_ENTREGA, $released->current_status);
         $this->assertNull($released->driver_id);
         $this->assertTrue($released->isAvailableForDeliveryClaim());
 
         $history = PackageHistory::where('package_id', $package->id)->latest('id')->first();
         $this->assertSame(PackageHistory::EVENT_RECEPCION, $history->event_type);
-        $this->assertSame(Package::STATUS_LISTO_RETIRO, $history->status);
+        $this->assertSame(Package::STATUS_PENDIENTE_ENTREGA, $history->status);
     }
 
     /*
@@ -717,7 +715,7 @@ class HubReleaseServiceTest extends TestCase
         ]);
 
         $released = $this->service()->release($package, $ally->user_id);
-        $this->assertSame(Package::STATUS_LISTO_RETIRO, $released->current_status);
+        $this->assertSame(Package::STATUS_PENDIENTE_ENTREGA, $released->current_status);
 
         // La toma por escaneo exige una ruta de reparto en curso en la
         // zona del HUB destino (PackageService::claimForDelivery()).
@@ -742,64 +740,8 @@ class HubReleaseServiceTest extends TestCase
         $this->assertSame($deliveryDriver->id, $claimed->driver_id);
         $this->assertSame(Package::DELIVERY_ACCEPTED, $claimed->delivery_status);
 
-        // claimForDelivery() lleva LISTO_RETIRO -> EN_TRANSITO_NACIONAL
-        // al reclamarlo de verdad (para que completeDelivery() funcione
-        // igual sin importar de cuál de los dos estados vino) — esto no
-        // cambió, sigue siendo responsabilidad exclusiva de Delivery.
-        $this->assertSame(Package::STATUS_EN_TRANSITO_NACIONAL, $claimed->current_status);
-    }
-
-    /**
-     * Regresión — Client\Dashboard::acceptDelivery() exige
-     * current_status === LISTO_RETIRO para que el cliente pueda
-     * confirmar que recibirá su pedido a domicilio. Antes de este fix,
-     * releaseForDelivery() dejaba el paquete en EN_TRANSITO_NACIONAL,
-     * así que el cliente NUNCA podía confirmar (quedaba bloqueado con
-     * "tu paquete debe estar Listo para Retiro" indefinidamente). Este
-     * test prueba que ese flujo, ya existente y no modificado, ahora
-     * funciona de punta a punta para un paquete liberado desde HUB.
-     */
-    public function test_regression_client_can_accept_delivery_after_hub_release(): void
-    {
-        $ally = $this->createAlly();
-        $hub = $this->destinationHub();
-
-        $clientUser = User::factory()->create([
-            'role' => User::ROLE_CLIENTE,
-            'status' => User::STATUS_ACTIVE,
-            'email' => 'cliente@example.com',
-        ]);
-
-        Customer::create([
-            'id_doc' => 'V-11111111',
-            'name' => 'Cliente de Prueba',
-            'phone' => '0414-0000000',
-            'email' => $clientUser->email,
-        ]);
-
-        $package = $this->createPackage($ally, [
-            'recipient_id_doc' => 'V-11111111',
-            'current_status' => Package::STATUS_EN_HUB,
-            'destination_state' => 'Carabobo',
-            'destination_city' => 'Valencia',
-            'current_warehouse_id' => $hub->id,
-            'destination_warehouse_id' => $hub->id,
-            'destination_resolution_status' => LogisticsResolutionResult::STATUS_RESOLVED,
-            'requires_delivery' => true,
-            'pickup_mode' => null,
-            'pickup_ally_id' => null,
-            'delivery_status' => Package::DELIVERY_PENDING,
-            'delivery_address' => 'Av. Bolívar, Valencia',
-        ]);
-
-        $released = $this->service()->release($package, $ally->user_id);
-        $this->assertSame(Package::STATUS_LISTO_RETIRO, $released->current_status);
-
-        Livewire::actingAs($clientUser)
-            ->test(ClientDashboard::class)
-            ->call('acceptDelivery', $package->id)
-            ->assertHasNoErrors();
-
-        $this->assertSame(Package::DELIVERY_ACCEPTED, $package->fresh()->delivery_status);
+        // claimForDelivery() lo saca a reparto: PENDIENTE_ENTREGA ->
+        // EN_RUTA, que es desde donde completeDelivery() lo entrega.
+        $this->assertSame(Package::STATUS_EN_RUTA, $claimed->current_status);
     }
 }

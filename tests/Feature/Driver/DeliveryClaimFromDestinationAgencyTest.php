@@ -9,12 +9,14 @@ use App\Models\User;
 use App\Models\Warehouse;
 use App\Models\WarehouseCoverage;
 use Illuminate\Foundation\Testing\RefreshDatabase;
+use Illuminate\Http\UploadedFile;
+use Illuminate\Support\Facades\Storage;
 use Tests\Feature\Concerns\CreatesTestPackages;
 use Tests\TestCase;
 
 /**
  * Un repartidor de entrega puede tomar (escaneando) un paquete que ya
- * fue recibido en su HUB destino (LISTO_RETIRO), sin depender de que un
+ * fue recibido en su HUB destino (PENDIENTE_ENTREGA), sin depender de que un
  * admin lo asigne primero desde "Asignar Repartidor" — pero solo con
  * una ruta de reparto en curso en la zona de ese HUB
  * (PackageService::claimForDelivery()).
@@ -83,7 +85,7 @@ class DeliveryClaimFromDestinationAgencyTest extends TestCase
 
     /**
      * Antes este test validaba que bastaba escanear un paquete
-     * LISTO_RETIRO para tomarlo, sin ruta ni HUB. La regla vigente
+     * listo en destino para tomarlo, sin ruta ni HUB. La regla vigente
      * exige ruta de reparto en curso y que el paquete esté en el HUB
      * destino de la zona de esa ruta; con eso sí se puede tomar y
      * entregar de punta a punta.
@@ -97,7 +99,7 @@ class DeliveryClaimFromDestinationAgencyTest extends TestCase
 
         $package = $this->createPackage($ally, [
             'requires_delivery' => true,
-            'current_status' => Package::STATUS_LISTO_RETIRO,
+            'current_status' => Package::STATUS_PENDIENTE_ENTREGA,
             'current_warehouse_id' => $hub->id,
             'destination_warehouse_id' => $hub->id,
         ]);
@@ -108,27 +110,31 @@ class DeliveryClaimFromDestinationAgencyTest extends TestCase
             'tracking_number' => $package->tracking_number,
         ], $headers)
             ->assertOk()
-            ->assertJsonPath('package.current_status', Package::STATUS_EN_TRANSITO_NACIONAL);
+            ->assertJsonPath('package.current_status', Package::STATUS_EN_RUTA)
+            ->assertJsonPath('package.has_delivery_pin', false);
 
         $package->refresh();
-        $this->assertSame(Package::STATUS_EN_TRANSITO_NACIONAL, $package->current_status);
+        $this->assertSame(Package::STATUS_EN_RUTA, $package->current_status);
         $this->assertNotNull($package->driver_id);
 
-        // Y ya puede completar la entrega normalmente.
-        $this->postJson(
+        // Y ya puede completar la entrega: sin PIN (el destinatario no
+        // tiene correo registrado), con su cédula y una foto.
+        Storage::fake('documents');
+
+        $this->post(
             "/api/driver/packages/{$package->id}/complete-delivery",
             [
                 'receiver_name' => 'María Gómez',
                 'receiver_id_doc' => 'V-87654321',
-                'delivery_confirmation_method' => 'cedula',
+                'photo' => UploadedFile::fake()->image('entrega.jpg'),
             ],
-            $headers
+            $headers + ['Accept' => 'application/json']
         )->assertOk()
             ->assertJsonPath('package.current_status', Package::STATUS_ENTREGADO);
     }
 
     /**
-     * Negativo de la regla anterior: un paquete LISTO_RETIRO no se puede
+     * Negativo de la regla anterior: un paquete PENDIENTE_ENTREGA no se puede
      * tomar solo por conocer su guía, sin ruta de reparto en curso.
      */
     public function test_driver_without_a_route_cannot_claim_a_package_received_at_destination(): void
@@ -138,7 +144,7 @@ class DeliveryClaimFromDestinationAgencyTest extends TestCase
 
         $package = $this->createPackage($this->createAlly(), [
             'requires_delivery' => true,
-            'current_status' => Package::STATUS_LISTO_RETIRO,
+            'current_status' => Package::STATUS_PENDIENTE_ENTREGA,
             'current_warehouse_id' => $hub->id,
             'destination_warehouse_id' => $hub->id,
         ]);
@@ -151,7 +157,7 @@ class DeliveryClaimFromDestinationAgencyTest extends TestCase
 
         $package->refresh();
         $this->assertNull($package->driver_id);
-        $this->assertSame(Package::STATUS_LISTO_RETIRO, $package->current_status);
+        $this->assertSame(Package::STATUS_PENDIENTE_ENTREGA, $package->current_status);
     }
 
     /**
@@ -167,7 +173,7 @@ class DeliveryClaimFromDestinationAgencyTest extends TestCase
 
         $package = $this->createPackage($ally, [
             'requires_delivery' => true,
-            'current_status' => Package::STATUS_LISTO_RETIRO,
+            'current_status' => Package::STATUS_PENDIENTE_ENTREGA,
         ]);
 
         $this->getJson('/api/driver/deliveries/available', $this->authHeaders($user))

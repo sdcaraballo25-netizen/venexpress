@@ -187,6 +187,11 @@ class PackageReception extends Component
                 .'LISTO PARA RETIRO automáticamente.';
         }
 
+        if ($received->current_status === Package::STATUS_PENDIENTE_ENTREGA) {
+            return 'Recepción registrada. Este almacén es el destino final de este paquete y quedó '
+                .'PENDIENTE DE ENTREGA a domicilio: ya se puede asignar a un repartidor.';
+        }
+
         $resolution = app(LogisticsResolutionService::class)->resolveForPackage($received);
 
         return match ($resolution->status) {

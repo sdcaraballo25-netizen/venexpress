@@ -223,6 +223,14 @@
                                 Editar
                             </button>
 
+                            @if ($route->status === \App\Models\Route::STATUS_DRAFT && ! $route->driver_id)
+                                <button
+                                    wire:click="startAssigningDriver({{ $route->id }})"
+                                    class="px-3 py-2 rounded-lg bg-blue-50 text-blue-700 text-sm hover:bg-blue-100">
+                                    Asignar repartidor
+                                </button>
+                            @endif
+
                             @if ($route->status !== 'completed' && $route->status !== 'cancelled')
                                 <button
                                     @click.prevent="$store.confirm.open({
@@ -249,6 +257,51 @@
 
                         </div>
                     </div>
+
+                    @if ($assigningRouteId === $route->id)
+                        <div class="mt-5 rounded-xl border border-blue-100 bg-blue-50 p-4">
+                            <p class="text-sm font-semibold text-blue-900">Asignar repartidor</p>
+                            <p class="text-xs text-blue-800 mt-1">
+                                Solo aparecen repartidores activos y verificados, de un tipo compatible con esta ruta y sin otra ruta activa.
+                            </p>
+
+                            <div class="mt-3 flex flex-col sm:flex-row gap-2">
+                                <select
+                                    wire:model="assignDriverId"
+                                    class="flex-1 rounded-lg border border-[#E5E5E0] px-3 py-2 text-sm"
+                                >
+                                    <option value="">Selecciona un repartidor...</option>
+                                    @foreach ($assignableDrivers as $assignable)
+                                        <option value="{{ $assignable->id }}">
+                                            {{ $assignable->user?->name ?? 'Repartidor #'.$assignable->id }}
+                                            @if ($assignable->vehicle_plate) · {{ $assignable->vehicle_plate }} @endif
+                                        </option>
+                                    @endforeach
+                                </select>
+
+                                <button
+                                    wire:click="assignDriver"
+                                    wire:loading.attr="disabled"
+                                    class="px-4 py-2 rounded-lg bg-blue-900 text-white text-sm font-semibold hover:bg-blue-800 disabled:opacity-60">
+                                    Asignar
+                                </button>
+
+                                <button
+                                    wire:click="cancelAssigningDriver"
+                                    class="px-4 py-2 rounded-lg border border-[#E5E5E0] text-sm text-[#4A4A45] hover:bg-white">
+                                    Cancelar
+                                </button>
+                            </div>
+
+                            @error('assignDriverId')
+                                <p class="mt-2 text-xs text-red-600">{{ $message }}</p>
+                            @enderror
+
+                            @if ($assignableDrivers->isEmpty())
+                                <p class="mt-2 text-xs text-[#6B6B66]">No hay repartidores disponibles para esta ruta en este momento.</p>
+                            @endif
+                        </div>
+                    @endif
 
                     {{-- INFORMACIÓN --}}
                     <div class="grid grid-cols-1 sm:grid-cols-3 gap-4 mt-5">

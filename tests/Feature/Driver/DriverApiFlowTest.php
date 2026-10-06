@@ -161,20 +161,25 @@ class DriverApiFlowTest extends TestCase
         //    repartidor de reparto, así que lo simulamos directamente
         //    para poder probar el endpoint de entrega.
         $package->forceFill([
-            'current_status' => \App\Models\Package::STATUS_EN_TRANSITO_NACIONAL,
+            'current_status' => \App\Models\Package::STATUS_EN_RUTA,
         ])->save();
+
+        \Illuminate\Support\Facades\Storage::fake('documents');
+
+        // Sin PIN (el destinatario no tiene correo): cédula + foto.
+        $withoutPin = fn () => [
+            'receiver_name' => 'María Gómez',
+            'receiver_id_doc' => 'V-87654321',
+            'receiver_phone' => '0424-7654321',
+            'photo' => \Illuminate\Http\UploadedFile::fake()->image('entrega.jpg'),
+        ];
 
         // 9. Un COD sin forma de pago no se puede entregar: el
         //    repartidor debe confirmar cómo le cancelaron primero.
-        $this->postJson(
+        $this->post(
             "/api/driver/packages/{$package->id}/complete-delivery",
-            [
-                'receiver_name' => 'María Gómez',
-                'receiver_id_doc' => 'V-87654321',
-                'receiver_phone' => '0424-7654321',
-                'delivery_confirmation_method' => 'cedula',
-            ],
-            $headers
+            $withoutPin(),
+            $headers + ['Accept' => 'application/json']
         )->assertUnprocessable()
             ->assertJsonValidationErrors(['cod_payment_method']);
 
@@ -182,16 +187,10 @@ class DriverApiFlowTest extends TestCase
         $this->assertNotSame(\App\Models\Package::STATUS_ENTREGADO, $package->current_status);
 
         // 10. Completar entrega vía API, esta vez sí indicando la forma de pago.
-        $this->postJson(
+        $this->post(
             "/api/driver/packages/{$package->id}/complete-delivery",
-            [
-                'receiver_name' => 'María Gómez',
-                'receiver_id_doc' => 'V-87654321',
-                'receiver_phone' => '0424-7654321',
-                'delivery_confirmation_method' => 'cedula',
-                'cod_payment_method' => 'efectivo_usd',
-            ],
-            $headers
+            $withoutPin() + ['cod_payment_method' => 'efectivo_usd'],
+            $headers + ['Accept' => 'application/json']
         )->assertOk()
             ->assertJsonPath('package.current_status', \App\Models\Package::STATUS_ENTREGADO);
 

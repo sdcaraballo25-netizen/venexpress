@@ -10,8 +10,10 @@ use RuntimeException;
 class DestinationReceptionService
 {
     /**
-     * Recepción física en la agencia destino.
-     * EN_TRANSITO_NACIONAL -> LISTO_RETIRO.
+     * Recepción física en la agencia o almacén destino.
+     * EN_TRANSITO_NACIONAL -> LISTO_RETIRO (retiro en persona), o
+     * -> PENDIENTE_ENTREGA si el envío es a domicilio: ahí espera a que
+     * un repartidor lo tome o se lo asignen.
      */
     public function receive(
         Package $package,
@@ -38,25 +40,32 @@ class DestinationReceptionService
                 );
             }
 
-            $locked->current_status = Package::STATUS_LISTO_RETIRO;
+            $newStatus = $locked->requires_delivery
+                ? Package::STATUS_PENDIENTE_ENTREGA
+                : Package::STATUS_LISTO_RETIRO;
+
+            $locked->current_status = $newStatus;
             $locked->save();
 
             PackageHistory::create([
                 'package_id' => $locked->id,
                 'route_stop_id' => $routeStopId,
-                'status' => Package::STATUS_LISTO_RETIRO,
+                'status' => $newStatus,
                 'event_type' => PackageHistory::EVENT_RECEPCION,
                 'origin_location' => 'Tránsito nacional',
                 'destination_location' => $destinationLocation,
-                'location_description' => 'Recepción física en agencia destino',
+                'location_description' => $locked->requires_delivery
+                    ? 'Recepción física en destino: pendiente de entrega a domicilio'
+                    : 'Recepción física en agencia destino',
                 'scanned_by_user_id' => $userId,
             ]);
 
-            // El destinatario ya puede pasar a retirarlo: mismo aviso
-            // por correo que el resto de cambios de estado.
+            // El destinatario ya puede pasar a retirarlo (o sabe que
+            // pronto sale a reparto): mismo aviso por correo que el
+            // resto de cambios de estado.
             app(PackageService::class)->notifyStatusChangeAfterCommit(
                 $locked,
-                Package::STATUS_LISTO_RETIRO
+                $newStatus
             );
 
             return $locked->fresh(['ally', 'driver', 'histories']);

@@ -93,8 +93,11 @@ class Packages extends Component
             Package::STATUS_EN_HUB => 'En hub',
             Package::STATUS_EN_TRANSITO_NACIONAL => 'En tránsito nacional',
             Package::STATUS_LISTO_RETIRO => 'Listo para retiro',
+            Package::STATUS_PENDIENTE_ENTREGA => 'Pendiente de entrega',
+            Package::STATUS_EN_RUTA => 'En ruta de entrega',
+            Package::STATUS_ENTREGA_FALLIDA => 'Entrega fallida',
             Package::STATUS_ENTREGADO => 'Entregado',
-            default => $status ?: 'Sin estado',
+            default => Package::STATUS_LABELS[$status] ?? ($status ?: 'Sin estado'),
         };
     }
 }
