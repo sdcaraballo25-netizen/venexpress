@@ -89,7 +89,6 @@
     <div
         wire:ignore
         x-data="venexpressEmprendedorReportsCharts(@js($chartLabels), @js($chartRegistered), @js($chartConfirmed), @js($chartSales))"
-        x-init="init()"
         class="grid grid-cols-1 lg:grid-cols-2 gap-5"
     >
         <div class="bg-white rounded-2xl border border-[#E5E5E0] p-6 shadow-sm">
@@ -153,12 +152,14 @@
 <script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/4.4.1/chart.umd.min.js"></script>
 <script>
     function venexpressEmprendedorReportsCharts(labels, registered, confirmed, sales) {
-        return {
-            pedidosChart: null,
-            salesChart: null,
+        // Fuera del estado reactivo de Alpine: dentro de su proxy, Chart.js
+        // entra en recursión infinita ("Maximum call stack size exceeded").
+        let pedidosChart = null;
+        let salesChart = null;
 
+        return {
             init() {
-                this.pedidosChart = new Chart(this.$refs.pedidosCanvas.getContext('2d'), {
+                pedidosChart = new Chart(this.$refs.pedidosCanvas.getContext('2d'), {
                     type: 'line',
                     data: {
                         labels,
@@ -188,7 +189,7 @@
                     },
                 });
 
-                this.salesChart = new Chart(this.$refs.salesCanvas.getContext('2d'), {
+                salesChart = new Chart(this.$refs.salesCanvas.getContext('2d'), {
                     type: 'bar',
                     data: {
                         labels,
@@ -207,14 +208,14 @@
                 });
 
                 Livewire.on('emprendedor-reports-updated', ({ labels, registered, confirmed, sales }) => {
-                    this.pedidosChart.data.labels = labels;
-                    this.pedidosChart.data.datasets[0].data = registered;
-                    this.pedidosChart.data.datasets[1].data = confirmed;
-                    this.pedidosChart.update();
+                    pedidosChart.data.labels = labels;
+                    pedidosChart.data.datasets[0].data = registered;
+                    pedidosChart.data.datasets[1].data = confirmed;
+                    pedidosChart.update();
 
-                    this.salesChart.data.labels = labels;
-                    this.salesChart.data.datasets[0].data = sales;
-                    this.salesChart.update();
+                    salesChart.data.labels = labels;
+                    salesChart.data.datasets[0].data = sales;
+                    salesChart.update();
                 });
             },
         };

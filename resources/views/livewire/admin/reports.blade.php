@@ -94,7 +94,6 @@
     <div
         wire:ignore
         x-data="venexpressReportsCharts(@js($chartLabels), @js($chartRegistered), @js($chartDelivered), @js($chartRevenue))"
-        x-init="init()"
         class="grid grid-cols-1 lg:grid-cols-2 gap-5"
     >
         <div class="bg-white rounded-2xl border border-[#E5E5E0] p-6 shadow-sm">
@@ -178,12 +177,14 @@
 <script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/4.4.1/chart.umd.min.js"></script>
 <script>
     function venexpressReportsCharts(labels, registered, delivered, revenue) {
-        return {
-            packagesChart: null,
-            revenueChart: null,
+        // Fuera del estado reactivo de Alpine: dentro de su proxy, Chart.js
+        // entra en recursión infinita ("Maximum call stack size exceeded").
+        let packagesChart = null;
+        let revenueChart = null;
 
+        return {
             init() {
-                this.packagesChart = new Chart(this.$refs.packagesCanvas.getContext('2d'), {
+                packagesChart = new Chart(this.$refs.packagesCanvas.getContext('2d'), {
                     type: 'line',
                     data: {
                         labels,
@@ -213,7 +214,7 @@
                     },
                 });
 
-                this.revenueChart = new Chart(this.$refs.revenueCanvas.getContext('2d'), {
+                revenueChart = new Chart(this.$refs.revenueCanvas.getContext('2d'), {
                     type: 'bar',
                     data: {
                         labels,
@@ -232,14 +233,14 @@
                 });
 
                 Livewire.on('reports-updated', ({ labels, registered, delivered, revenue }) => {
-                    this.packagesChart.data.labels = labels;
-                    this.packagesChart.data.datasets[0].data = registered;
-                    this.packagesChart.data.datasets[1].data = delivered;
-                    this.packagesChart.update();
+                    packagesChart.data.labels = labels;
+                    packagesChart.data.datasets[0].data = registered;
+                    packagesChart.data.datasets[1].data = delivered;
+                    packagesChart.update();
 
-                    this.revenueChart.data.labels = labels;
-                    this.revenueChart.data.datasets[0].data = revenue;
-                    this.revenueChart.update();
+                    revenueChart.data.labels = labels;
+                    revenueChart.data.datasets[0].data = revenue;
+                    revenueChart.update();
                 });
             },
         };
