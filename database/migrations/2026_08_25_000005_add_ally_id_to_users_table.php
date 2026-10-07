@@ -36,8 +36,9 @@ return new class extends Migration
     public function down(): void
     {
         Schema::table('users', function (Blueprint $table) {
+            $table->dropForeign(['ally_id']);
             $table->dropIndex(['ally_id', 'role']);
-            $table->dropConstrainedForeignId('ally_id');
+            $table->dropColumn('ally_id');
         });
     }
 };

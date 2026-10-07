@@ -1,38 +1,67 @@
-FROM php:8.2-apache
+# syntax=docker/dockerfile:1
+#
+# Venexpress en un solo contenedor, pensado para Render (plan gratis):
+# nginx + php-fpm + worker de colas + scheduler, bajo supervisord.
+# Ver docs/DESPLIEGUE_RENDER.md.
 
-# Instalar dependencias del sistema y librerías para extensiones de PHP y DomPDF
-RUN apt-get update && apt-get install -y \
-    libpng-dev \
-    libjpeg62-turbo-dev \
-    libfreetype6-dev \
-    zip \
-    unzip \
-    git \
-    curl \
-    libzip-dev \
-    && docker-php-ext-configure gd --with-freetype --with-jpeg \
-    && docker-php-ext-install pdo pdo_mysql gd zip
+# --- Dependencias PHP (sin las de desarrollo) --------------------------------
+FROM composer:2 AS vendor
+WORKDIR /app
+COPY composer.json composer.lock ./
+RUN composer install --no-dev --no-scripts --no-autoloader --prefer-dist \
+        --no-interaction --no-progress --ignore-platform-reqs
 
-# Habilitar mod_rewrite de Apache para Laravel
-RUN a2enmod rewrite
+# --- Assets (Vite + Tailwind) ------------------------------------------------
+FROM node:22-alpine AS assets
+WORKDIR /app
+COPY package.json package-lock.json ./
+RUN npm ci --no-audit --no-fund
+COPY vite.config.js tailwind.config.js postcss.config.js ./
+COPY resources ./resources
+# Tailwind también escanea las vistas de paginación de Laravel.
+COPY --from=vendor /app/vendor/laravel/framework/src/Illuminate/Pagination/resources/views \
+        ./vendor/laravel/framework/src/Illuminate/Pagination/resources/views
+RUN npm run build
 
-# Configurar Apache para apuntar a la carpeta /public de Laravel
-ENV APACHE_DOCUMENT_ROOT /var/www/html/public
-RUN sed -ri -e 's!/var/www/html!${APACHE_DOCUMENT_ROOT}!g' /etc/apache2/sites-available/*.conf \
-    && sed -ri -e 's!/var/www/html!${APACHE_DOCUMENT_ROOT}!g' /etc/apache2/conf-available/*.conf
+# --- Imagen final ------------------------------------------------------------
+# Ubuntu 24.04 trae PHP 8.3 (la misma versión que se usa en desarrollo).
+FROM ubuntu:24.04
 
-# Copiar Composer desde la imagen oficial
-COPY --from=composer:latest /usr/bin/composer /usr/bin/composer
+ENV DEBIAN_FRONTEND=noninteractive \
+    APP_DIR=/var/www/html \
+    PORT=10000
+
+RUN apt-get update \
+    && apt-get install -y --no-install-recommends \
+        ca-certificates nginx supervisor unzip \
+        php8.3-fpm php8.3-cli php8.3-pgsql php8.3-mysql php8.3-gd php8.3-zip \
+        php8.3-intl php8.3-bcmath php8.3-mbstring php8.3-xml php8.3-curl php8.3-opcache \
+    && rm -rf /var/lib/apt/lists/* \
+    && rm -f /etc/nginx/sites-enabled/default
+
+COPY --from=composer:2 /usr/bin/composer /usr/local/bin/composer
 
 WORKDIR /var/www/html
 
-# Copiar archivos del proyecto
 COPY . .
+COPY --from=vendor /app/vendor ./vendor
+COPY --from=assets /app/public/build ./public/build
 
-# Instalar dependencias de Composer
-RUN composer install --no-dev --optimize-autoloader --no-interaction
+COPY docker/php.ini /etc/php/8.3/fpm/conf.d/99-venexpress.ini
+COPY docker/php.ini /etc/php/8.3/cli/conf.d/99-venexpress.ini
+COPY docker/php-fpm-pool.conf /etc/php/8.3/fpm/pool.d/www.conf
+COPY docker/nginx.conf.template /etc/nginx/venexpress.conf.template
+COPY docker/supervisord.conf /etc/supervisor/supervisord.conf
+COPY docker/entrypoint.sh /usr/local/bin/venexpress-entrypoint
 
-# Permisos para carpetas de almacenamiento y cache
-RUN chown -R www-data:www-data /var/www/html/storage /var/www/html/bootstrap/cache
+RUN composer dump-autoload --optimize --no-dev --no-interaction \
+    && mkdir -p storage/app/public storage/app/private storage/framework/cache/data \
+        storage/framework/sessions storage/framework/views storage/logs bootstrap/cache /run/php \
+    && ln -sfn ../storage/app/public public/storage \
+    && php artisan view:cache \
+    && chown -R www-data:www-data storage bootstrap/cache \
+    && chmod +x /usr/local/bin/venexpress-entrypoint
 
-EXPOSE 80
+EXPOSE 10000
+
+ENTRYPOINT ["venexpress-entrypoint"]

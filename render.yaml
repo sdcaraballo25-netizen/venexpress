@@ -1,0 +1,111 @@
+# Despliegue de Venexpress en Render (plan gratis).
+# Guía paso a paso y limitaciones: docs/DESPLIEGUE_RENDER.md
+#
+# Crea tres recursos:
+#   - venexpress            backend Laravel (Docker): web + cola + scheduler
+#   - venexpress-db         PostgreSQL gratis (Render lo borra a los 30 días)
+#   - venexpress-repartidor app del repartidor (Flutter web, sitio estático),
+#                           desde el repositorio venexpress_driver
+
+databases:
+  - name: venexpress-db
+    plan: free
+    region: virginia
+    postgresMajorVersion: "17"
+    databaseName: venexpress
+    user: venexpress
+    # Solo accesible desde los servicios de Render (sin conexiones externas).
+    ipAllowList: []
+
+services:
+  - type: web
+    name: venexpress
+    runtime: docker
+    plan: free
+    region: virginia
+    dockerfilePath: ./Dockerfile
+    healthCheckPath: /up
+    # Despliega solo cuando el CI (tests) de GitHub pasa.
+    autoDeployTrigger: checksPass
+    buildFilter:
+      ignoredPaths:
+        - graphify-out/**
+        - tests/**
+        - docs/**
+        - .claude/**
+        - .github/**
+        - "**/*.md"
+        - "*.patch"
+    envVars:
+      - key: APP_NAME
+        value: Venexpress
+      - key: APP_ENV
+        value: production
+      - key: APP_DEBUG
+        value: "false"
+      # El contenedor deriva de este valor una llave válida de Laravel.
+      - key: APP_KEY
+        generateValue: true
+      - key: DB_CONNECTION
+        value: pgsql
+      - key: DB_URL
+        fromDatabase:
+          name: venexpress-db
+          property: connectionString
+      - key: LOG_CHANNEL
+        value: stderr
+      - key: LOG_LEVEL
+        value: warning
+      - key: TRUSTED_PROXIES
+        value: "*"
+      - key: SESSION_SECURE_COOKIE
+        value: "true"
+      - key: SESSION_DRIVER
+        value: database
+      - key: CACHE_STORE
+        value: database
+      - key: QUEUE_CONNECTION
+        value: database
+      # Primer administrador (se crea al arrancar si no existe).
+      - key: ADMIN_EMAIL
+        sync: false
+      - key: ADMIN_PASSWORD
+        sync: false
+      # Correo: en el plan gratis Render bloquea los puertos 25, 465 y 587.
+      # Usar un proveedor que acepte el puerto 2525 (ver la guía).
+      - key: MAIL_MAILER
+        value: smtp
+      - key: MAIL_PORT
+        value: "2525"
+      - key: MAIL_HOST
+        sync: false
+      - key: MAIL_USERNAME
+        sync: false
+      - key: MAIL_PASSWORD
+        sync: false
+      - key: MAIL_FROM_ADDRESS
+        sync: false
+      - key: MAIL_FROM_NAME
+        value: Venexpress
+
+  - type: web
+    name: venexpress-repartidor
+    runtime: static
+    repo: https://github.com/luislopezdev02-design/venexpress_driver
+    branch: main
+    buildCommand: ./render-build.sh
+    staticPublishPath: ./build/web
+    envVars:
+      # URL del backend + /api, p. ej. https://venexpress.onrender.com/api
+      - key: API_BASE_URL
+        sync: false
+    headers:
+      # main.dart.js no lleva hash en el nombre: que el navegador revalide
+      # siempre para recibir cada versión nueva.
+      - path: /*
+        name: Cache-Control
+        value: no-cache
+    routes:
+      - type: rewrite
+        source: /*
+        destination: /index.html

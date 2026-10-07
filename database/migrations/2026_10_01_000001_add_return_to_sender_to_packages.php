@@ -1,5 +1,6 @@
 <?php
 
+use App\Support\PostgresEnum;
 use Illuminate\Database\Migrations\Migration;
 use Illuminate\Database\Schema\Blueprint;
 use Illuminate\Support\Facades\DB;
@@ -34,24 +35,34 @@ return new class extends Migration
      */
     public function up(): void
     {
-        Schema::table('packages', function (Blueprint $table) {
-            $table->enum('current_status', [...self::BASE_STATUSES, ...self::RETURN_STATUSES])
-                ->default('RECIBIDO_AGENCIA')
-                ->change();
+        if (PostgresEnum::active()) {
+            PostgresEnum::allow('packages', 'current_status', [...self::BASE_STATUSES, ...self::RETURN_STATUSES], 'RECIBIDO_AGENCIA');
+            PostgresEnum::allow('packages', 'cod_status', ['pendiente', 'liquidado', 'cancelado']);
+            PostgresEnum::allow('package_histories', 'status', [...self::BASE_STATUSES, ...self::RETURN_STATUSES]);
+        }
 
-            $table->enum('cod_status', ['pendiente', 'liquidado', 'cancelado'])
-                ->nullable()
-                ->change();
+        Schema::table('packages', function (Blueprint $table) {
+            if (! PostgresEnum::active()) {
+                $table->enum('current_status', [...self::BASE_STATUSES, ...self::RETURN_STATUSES])
+                    ->default('RECIBIDO_AGENCIA')
+                    ->change();
+
+                $table->enum('cod_status', ['pendiente', 'liquidado', 'cancelado'])
+                    ->nullable()
+                    ->change();
+            }
 
             $table->text('return_reason')->nullable();
             $table->timestamp('return_requested_at')->nullable();
             $table->timestamp('returned_at')->nullable();
         });
 
-        Schema::table('package_histories', function (Blueprint $table) {
-            $table->enum('status', [...self::BASE_STATUSES, ...self::RETURN_STATUSES])
-                ->change();
-        });
+        if (! PostgresEnum::active()) {
+            Schema::table('package_histories', function (Blueprint $table) {
+                $table->enum('status', [...self::BASE_STATUSES, ...self::RETURN_STATUSES])
+                    ->change();
+            });
+        }
     }
 
     public function down(): void
@@ -68,6 +79,18 @@ return new class extends Migration
             throw new RuntimeException(
                 'Hay guías con devoluciones registradas: no se puede revertir esta migración sin perder esos datos.'
             );
+        }
+
+        if (PostgresEnum::active()) {
+            PostgresEnum::allow('package_histories', 'status', self::BASE_STATUSES);
+            PostgresEnum::allow('packages', 'cod_status', ['pendiente', 'liquidado']);
+            PostgresEnum::allow('packages', 'current_status', self::BASE_STATUSES, 'RECIBIDO_AGENCIA');
+
+            Schema::table('packages', function (Blueprint $table) {
+                $table->dropColumn(['return_reason', 'return_requested_at', 'returned_at']);
+            });
+
+            return;
         }
 
         Schema::table('package_histories', function (Blueprint $table) {

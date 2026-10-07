@@ -266,11 +266,13 @@ class LogisticsScanService
             // fresca fuera del snapshot de REPEATABLE READ, ya que el
             // stop está bloqueado y necesitamos ver también el commit
             // de una transacción concurrente que ya haya liberado el
-            // lock antes que esta.
+            // lock antes que esta. Se cuentan las filas leídas (no
+            // count()): PostgreSQL no permite FOR UPDATE con COUNT(*).
             $collectedCount = $stop->packageHistories()
                 ->where('event_type', PackageHistory::EVENT_SALIDA)
                 ->where('status', Package::STATUS_RECOLECTADO_VENEXPRESS)
                 ->lockForUpdate()
+                ->pluck('id')
                 ->count();
 
             $stop->update([

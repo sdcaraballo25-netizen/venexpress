@@ -1,5 +1,6 @@
 <?php
 
+use App\Support\PostgresEnum;
 use Illuminate\Database\Migrations\Migration;
 use Illuminate\Database\Schema\Blueprint;
 use Illuminate\Support\Facades\DB;
@@ -9,6 +10,11 @@ return new class extends Migration
 {
     public function up(): void
     {
+        if (PostgresEnum::active()) {
+            // De enum a texto libre: en PostgreSQL hay que quitar el CHECK.
+            PostgresEnum::dropCheck('users', 'role');
+        }
+
         Schema::table('users', function (Blueprint $table) {
             $table->string('role')->default('cliente')->change();
             $table->string('status')->default('activo')->after('role')->index();
@@ -24,9 +30,15 @@ return new class extends Migration
         DB::table('users')->where('role', 'repartidor')->update(['role' => 'chofer']);
 
         Schema::table('users', function (Blueprint $table) {
-            $table->dropIndex(['users_status_index']);
+            $table->dropIndex('users_status_index');
             $table->dropColumn('status');
-            $table->enum('role', ['admin', 'cliente', 'aliado', 'chofer'])->default('cliente')->change();
+            if (! PostgresEnum::active()) {
+                $table->enum('role', ['admin', 'cliente', 'aliado', 'chofer'])->default('cliente')->change();
+            }
         });
+
+        if (PostgresEnum::active()) {
+            PostgresEnum::allow('users', 'role', ['admin', 'cliente', 'aliado', 'chofer'], 'cliente');
+        }
     }
 };

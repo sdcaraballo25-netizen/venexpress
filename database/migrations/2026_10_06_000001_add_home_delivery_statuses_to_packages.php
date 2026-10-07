@@ -1,5 +1,6 @@
 <?php
 
+use App\Support\PostgresEnum;
 use Illuminate\Database\Migrations\Migration;
 use Illuminate\Database\Schema\Blueprint;
 use Illuminate\Support\Facades\DB;
@@ -42,10 +43,17 @@ return new class extends Migration
      */
     public function up(): void
     {
+        if (PostgresEnum::active()) {
+            PostgresEnum::allow('packages', 'current_status', [...self::PREVIOUS_STATUSES, ...self::DELIVERY_STATUSES], 'RECIBIDO_AGENCIA');
+            PostgresEnum::allow('package_histories', 'status', [...self::PREVIOUS_STATUSES, ...self::DELIVERY_STATUSES]);
+        }
+
         Schema::table('packages', function (Blueprint $table) {
-            $table->enum('current_status', [...self::PREVIOUS_STATUSES, ...self::DELIVERY_STATUSES])
-                ->default('RECIBIDO_AGENCIA')
-                ->change();
+            if (! PostgresEnum::active()) {
+                $table->enum('current_status', [...self::PREVIOUS_STATUSES, ...self::DELIVERY_STATUSES])
+                    ->default('RECIBIDO_AGENCIA')
+                    ->change();
+            }
 
             $table->string('delivery_pin_hash')->nullable();
             $table->timestamp('delivery_pin_generated_at')->nullable();
@@ -55,10 +63,12 @@ return new class extends Migration
             $table->string('cod_payment_proof_path')->nullable();
         });
 
-        Schema::table('package_histories', function (Blueprint $table) {
-            $table->enum('status', [...self::PREVIOUS_STATUSES, ...self::DELIVERY_STATUSES])
-                ->change();
-        });
+        if (! PostgresEnum::active()) {
+            Schema::table('package_histories', function (Blueprint $table) {
+                $table->enum('status', [...self::PREVIOUS_STATUSES, ...self::DELIVERY_STATUSES])
+                    ->change();
+            });
+        }
 
         // Paquetes a domicilio que ya esperaban repartidor en su almacén
         // destino: pasan al estado nuevo para que se puedan seguir
@@ -93,9 +103,14 @@ return new class extends Migration
             );
         }
 
-        Schema::table('package_histories', function (Blueprint $table) {
-            $table->enum('status', self::PREVIOUS_STATUSES)->change();
-        });
+        if (PostgresEnum::active()) {
+            PostgresEnum::allow('package_histories', 'status', self::PREVIOUS_STATUSES);
+            PostgresEnum::allow('packages', 'current_status', self::PREVIOUS_STATUSES, 'RECIBIDO_AGENCIA');
+        } else {
+            Schema::table('package_histories', function (Blueprint $table) {
+                $table->enum('status', self::PREVIOUS_STATUSES)->change();
+            });
+        }
 
         Schema::table('packages', function (Blueprint $table) {
             $table->dropColumn([
@@ -106,9 +121,11 @@ return new class extends Migration
                 'cod_payment_proof_path',
             ]);
 
-            $table->enum('current_status', self::PREVIOUS_STATUSES)
-                ->default('RECIBIDO_AGENCIA')
-                ->change();
+            if (! PostgresEnum::active()) {
+                $table->enum('current_status', self::PREVIOUS_STATUSES)
+                    ->default('RECIBIDO_AGENCIA')
+                    ->change();
+            }
         });
     }
 };

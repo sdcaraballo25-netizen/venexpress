@@ -38,13 +38,27 @@ return [
             'report' => false,
         ],
 
+        /*
+        | Fotos públicas (productos, logos y portadas del marketplace) y el
+        | APK del repartidor. Donde el disco del servidor no es permanente
+        | (Render gratis lo borra en cada reinicio), PUBLIC_DISK_DRIVER=s3
+        | los guarda en un bucket público propio (PUBLIC_AWS_BUCKET, con su
+        | URL pública en PUBLIC_DISK_URL), separado del de documentos.
+        */
         'public' => [
-            'driver' => 'local',
-            'root' => storage_path('app/public'),
-            'url' => rtrim(env('APP_URL', 'http://localhost'), '/').'/storage',
-            'visibility' => 'public',
+            'driver' => env('PUBLIC_DISK_DRIVER', 'local'),
+            'root' => env('PUBLIC_DISK_DRIVER', 'local') === 's3' ? '' : storage_path('app/public'),
+            'url' => env('PUBLIC_DISK_URL') ?: rtrim(env('APP_URL', 'http://localhost'), '/').'/storage',
+            // En S3 el acceso público lo da el bucket (R2/B2 no usan ACL por archivo).
+            'visibility' => env('PUBLIC_DISK_DRIVER', 'local') === 's3' ? null : 'public',
             'throw' => false,
             'report' => false,
+            'key' => env('AWS_ACCESS_KEY_ID'),
+            'secret' => env('AWS_SECRET_ACCESS_KEY'),
+            'region' => env('AWS_DEFAULT_REGION'),
+            'bucket' => env('PUBLIC_AWS_BUCKET'),
+            'endpoint' => env('AWS_ENDPOINT'),
+            'use_path_style_endpoint' => env('AWS_USE_PATH_STYLE_ENDPOINT', false),
         ],
 
         's3' => [
@@ -79,7 +93,9 @@ return [
 
         'documents' => [
             'driver' => env('DOCUMENTS_DISK_DRIVER', 'local'),
-            'root' => storage_path('app/private'),
+            // En S3 las rutas van desde la raíz del bucket, no con la ruta
+            // local del servidor como prefijo.
+            'root' => env('DOCUMENTS_DISK_DRIVER', 'local') === 's3' ? '' : storage_path('app/private'),
             'serve' => true,
             'throw' => false,
             'report' => false,

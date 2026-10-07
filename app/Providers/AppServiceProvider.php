@@ -2,11 +2,13 @@
 
 namespace App\Providers;
 
+use App\Database\PostgresConnection;
 use App\Http\Middleware\EnsureAccountIsApproved;
 use App\Http\Middleware\EnsureAccountIsVerified;
 use App\Http\Middleware\EnsureUserHasRole;
 use App\Models\Package;
 use App\Observers\PackageObserver;
+use Illuminate\Database\Connection;
 use Illuminate\Http\Middleware\TrustProxies;
 use Illuminate\Support\Facades\Log;
 use Illuminate\Support\ServiceProvider;
@@ -16,7 +18,7 @@ class AppServiceProvider extends ServiceProvider
 {
     public function register(): void
     {
-        //
+        Connection::resolverFor('pgsql', fn ($pdo, $database, $prefix, $config) => new PostgresConnection($pdo, $database, $prefix, $config));
     }
 
     public function boot(): void

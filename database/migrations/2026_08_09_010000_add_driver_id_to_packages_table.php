@@ -42,11 +42,9 @@ return new class extends Migration
     public function down(): void
     {
         Schema::table('packages', function (Blueprint $table) {
-            $table->dropIndex([
-                'packages_driver_id_current_status_index',
-            ]);
-
-            $table->dropConstrainedForeignId('driver_id');
+            $table->dropForeign(['driver_id']);
+            $table->dropIndex('packages_driver_id_current_status_index');
+            $table->dropColumn('driver_id');
         });
     }
 };

@@ -35,8 +35,9 @@ return new class extends Migration
     public function down(): void
     {
         Schema::table('package_histories', function (Blueprint $table) {
-            $table->dropIndex(['package_histories_route_stop_id_status_index']);
-            $table->dropConstrainedForeignId('route_stop_id');
+            $table->dropForeign(['route_stop_id']);
+            $table->dropIndex('package_histories_route_stop_id_status_index');
+            $table->dropColumn('route_stop_id');
         });
     }
 };

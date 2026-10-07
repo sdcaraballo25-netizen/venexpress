@@ -98,7 +98,7 @@ return new class extends Migration
         |--------------------------------------------------------------------------
         */
 
-        if (Schema::hasTable($table)) {
+        if (Schema::hasTable($table) && Schema::hasIndex($table, $indexName)) {
             Schema::table($table, function (Blueprint $table) use ($indexName) {
                 try {
                     $table->dropUnique($indexName);
