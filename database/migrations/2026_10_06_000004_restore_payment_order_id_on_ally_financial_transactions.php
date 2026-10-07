@@ -1,5 +1,6 @@
 <?php
 
+use App\Support\PostgresEnum;
 use Illuminate\Database\Migrations\Migration;
 use Illuminate\Database\Schema\Blueprint;
 use Illuminate\Support\Facades\Schema;
@@ -31,7 +32,10 @@ return new class extends Migration
             return;
         }
 
-        if (! $this->typeAcceptsPayment()) {
+        if (PostgresEnum::active()) {
+            // En PostgreSQL el enum es un CHECK: se reemplaza (idempotente).
+            PostgresEnum::allow($this->table, 'type', ['commission', 'settlement', 'payment', 'adjustment', 'reversal']);
+        } elseif (! $this->typeAcceptsPayment()) {
             Schema::table($this->table, function (Blueprint $table) {
                 $table->enum('type', [
                     'commission',

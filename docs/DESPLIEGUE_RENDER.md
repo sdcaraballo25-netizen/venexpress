@@ -161,9 +161,9 @@ flutter build apk --release --dart-define=API_BASE_URL=https://<tu-backend>.onre
 
 ## Qué se probó
 
-- Los 934 tests pasan en PostgreSQL 17 y en SQLite (en MySQL 8 todos
+- Los 949 tests pasan en PostgreSQL 17 y en SQLite (en MySQL 8 todos
   menos uno del marketplace que ya fallaba ahí antes de estos cambios),
-  y las 117 migraciones suben y se revierten completas.
+  y las 118 migraciones corren desde cero en los tres motores.
 - La imagen se probó con 512 MB y 0,1 CPU: arranque, migraciones,
   creación del admin, cola, scheduler, recorrido de todas las pantallas
   por rol sin errores, HTTPS detrás del proxy y almacenamiento S3.
