@@ -280,12 +280,6 @@
                         resultado.data.text || '';
 
 
-                    console.log(
-                        'Texto OCR retiro:',
-                        texto
-                    );
-
-
                     const guia =
                         extraerGuia(texto);
 

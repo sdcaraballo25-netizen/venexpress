@@ -214,8 +214,6 @@
 
                     const texto = resultado.data.text || '';
 
-                    console.log('Texto OCR recepción:', texto);
-
                     const guia = extraerGuia(texto);
 
                     if (guia) {
