@@ -53,7 +53,7 @@
          SIDEBAR
     =========================================================== --}}
     <aside
-        class="fixed inset-y-0 left-0 z-40 w-64 border-r border-[#E5E5E0] bg-white px-5 py-8 flex flex-col justify-between transform transition-transform duration-200 md:relative md:translate-x-0"
+        class="fixed inset-y-0 left-0 z-40 w-64 border-r border-[#E5E5E0] bg-white px-5 py-8 flex flex-col justify-between transform transition-transform duration-200 md:sticky md:top-0 md:h-screen md:translate-x-0"
         :class="$store.sidebar.open ? 'translate-x-0' : '-translate-x-full md:translate-x-0'"
     >
 

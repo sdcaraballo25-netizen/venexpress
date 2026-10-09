@@ -97,7 +97,7 @@
             border-r border-[#E5E5E0]
             flex flex-col
             transform transition-transform duration-200
-            md:relative
+            md:sticky md:top-0 md:h-screen
             md:translate-x-0
         "
         :class="

@@ -92,3 +92,15 @@ document.addEventListener('alpine:init', () => {
         open: false,
     });
 });
+
+/**
+ * El store 'sidebar' sobrevive a wire:navigate: si un enlace del menú
+ * móvil no lo cerraba (o su @click fallaba), la página siguiente
+ * arrancaba con el drawer y el overlay abiertos. Se cierra siempre al
+ * terminar cada navegación.
+ */
+document.addEventListener('livewire:navigated', () => {
+    if (window.Alpine?.store('sidebar')) {
+        window.Alpine.store('sidebar').open = false;
+    }
+});

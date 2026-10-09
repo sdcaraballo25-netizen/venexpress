@@ -96,8 +96,13 @@
              SIDEBAR
         ============================================================= --}}
 
+        {{-- Drawer en móvil (fixed + translate, controlado por
+             $store.sidebar como en los demás paneles) y columna sticky
+             desde md. Antes era `hidden md:flex`: en móvil el botón de
+             menú solo mostraba el overlay y el menú nunca aparecía. --}}
         <aside
-            class="w-64 border-r border-[#E5E5E0] px-5 py-8 flex flex-col justify-between hidden md:flex bg-white h-screen sticky top-0"
+            class="fixed inset-y-0 left-0 z-40 w-64 border-r border-[#E5E5E0] px-5 py-8 flex flex-col justify-between bg-white overflow-y-auto transform transition-transform duration-200 md:sticky md:top-0 md:h-screen md:translate-x-0"
+            :class="$store.sidebar.open ? 'translate-x-0' : '-translate-x-full md:translate-x-0'"
         >
 
             <div>
@@ -1125,7 +1130,7 @@
         <div
             x-show="$store.sidebar.open"
             @click="$store.sidebar.open = false"
-            class="fixed inset-0 bg-black/40 z-20 lg:hidden"
+            class="fixed inset-0 bg-black/40 z-30 md:hidden"
             x-cloak
         ></div>
 
@@ -1134,7 +1139,7 @@
              CONTENIDO PRINCIPAL
         ============================================================= --}}
 
-        <div class="flex-1 lg:ml-0 min-w-0">
+        <div class="flex-1 min-w-0">
 
             {{-- Header --}}
             <header
@@ -1144,7 +1149,7 @@
                 {{-- Botón menú móvil --}}
                 <button
                     @click="$store.sidebar.open = !$store.sidebar.open"
-                    class="lg:hidden text-[#111111] text-xl"
+                    class="md:hidden inline-flex items-center justify-center w-10 h-10 rounded-xl text-[#111111] text-xl hover:bg-slate-100"
                     type="button"
                     aria-label="Abrir menú"
                 >
@@ -1154,7 +1159,7 @@
 
                 <div class="flex items-center gap-4 ml-auto">
 
-                    <span class="text-sm text-[#6B6B66]">
+                    <span class="hidden sm:inline text-sm text-[#6B6B66]">
 
                         {{ auth()->user()->name ?? 'Admin' }}
 
@@ -1191,7 +1196,7 @@
 
 
             {{-- Contenido --}}
-            <main class="p-4 lg:p-8 max-w-7xl">
+            <main class="p-4 lg:p-8 w-full max-w-7xl mx-auto">
 
                 {{ $slot ?? '' }}
 

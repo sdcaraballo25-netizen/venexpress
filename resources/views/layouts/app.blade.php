@@ -29,7 +29,10 @@
 
 <body class="bg-[#F7F7F4] text-[#111111] antialiased">
 
-    <div class="min-h-screen flex">
+    {{-- flex-col: <livewire:layout.navigation> es una barra superior
+         horizontal (Breeze); en una fila flex quedaba aplastada como
+         columna a la izquierda del contenido. --}}
+    <div class="min-h-screen flex flex-col">
 
         {{-- NAVEGACIÓN --}}
         {{--
@@ -80,7 +83,7 @@
 
 
             {{-- CONTENIDO --}}
-            <main class="p-6 lg:p-8">
+            <main class="p-4 sm:p-6 lg:p-8">
 
                 @if (isset($header))
                     <div class="mb-6">

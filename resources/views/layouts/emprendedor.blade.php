@@ -44,7 +44,7 @@
 
     <aside
         class="fixed inset-y-0 left-0 z-40 w-72 bg-white border-r border-[#E5E5E0] flex flex-col
-               transform transition-transform duration-200 md:relative md:translate-x-0"
+               transform transition-transform duration-200 md:sticky md:top-0 md:h-screen md:translate-x-0"
         :class="$store.sidebar.open ? 'translate-x-0' : '-translate-x-full md:translate-x-0'"
     >
 
@@ -129,7 +129,7 @@
             <a
                 href="{{ route('emprendedor.reportes') }}"
                 wire:navigate
-                @click="sidebarOpen = false"
+                @click="$store.sidebar.open = false"
                 class="flex items-center gap-3 px-4 py-3 rounded-xl text-sm font-medium transition-colors
                     {{ request()->routeIs('emprendedor.reportes')
                         ? 'bg-amber-400 text-[#111111]'
