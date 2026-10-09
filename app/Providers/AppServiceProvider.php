@@ -6,11 +6,13 @@ use App\Database\PostgresConnection;
 use App\Http\Middleware\EnsureAccountIsApproved;
 use App\Http\Middleware\EnsureAccountIsVerified;
 use App\Http\Middleware\EnsureUserHasRole;
+use App\Mail\GmailApiTransport;
 use App\Models\Package;
 use App\Observers\PackageObserver;
 use Illuminate\Database\Connection;
 use Illuminate\Http\Middleware\TrustProxies;
 use Illuminate\Support\Facades\Log;
+use Illuminate\Support\Facades\Mail;
 use Illuminate\Support\ServiceProvider;
 use Livewire\Livewire;
 
@@ -26,6 +28,12 @@ class AppServiceProvider extends ServiceProvider
         Package::observe(
             PackageObserver::class
         );
+
+        Mail::extend('gmail', fn (array $config) => new GmailApiTransport(
+            (string) $config['client_id'],
+            (string) $config['client_secret'],
+            (string) $config['refresh_token'],
+        ));
 
         $this->warnIfNotificationsAreNotReallySent();
 

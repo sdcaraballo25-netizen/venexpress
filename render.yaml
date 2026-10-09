@@ -87,6 +87,14 @@ services:
         sync: false
       - key: MAIL_FROM_NAME
         value: Venexpress
+      # Alternativa sin SMTP: MAIL_MAILER=gmail envía por la API de
+      # Gmail (HTTPS) con estas credenciales OAuth (ver la guía).
+      - key: GMAIL_CLIENT_ID
+        sync: false
+      - key: GMAIL_CLIENT_SECRET
+        sync: false
+      - key: GMAIL_REFRESH_TOKEN
+        sync: false
 
   - type: web
     name: venexpress-repartidor

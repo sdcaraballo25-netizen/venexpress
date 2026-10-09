@@ -51,6 +51,26 @@ de entrega. Cualquier proveedor SMTP con puerto 2525 sirve; por ejemplo
 2. En *SMTP & API* copia el servidor (`smtp-relay.brevo.com`), el usuario
    y la clave SMTP.
 
+**Alternativa sin SMTP: Gmail por API (HTTPS).** Si no puedes usar un
+proveedor con puerto 2525 (p. ej. Brevo pide verificar un teléfono que
+no acepta), la app puede enviar con una cuenta de Gmail por la API de
+Gmail, que va por el puerto 443 y Render no lo bloquea:
+
+1. En [Google Cloud Console](https://console.cloud.google.com) (no hace
+   falta facturación) crea un proyecto y habilita la **Gmail API**.
+2. *Google Auth Platform*: configura la pantalla de consentimiento
+   (público **Externo**) y en *Público* pulsa **Publicar app** (en modo
+   de prueba el token vence a los 7 días).
+3. *Clientes* → **Crear cliente** de tipo *Aplicación web* con la URI de
+   redireccionamiento `https://developers.google.com/oauthplayground`.
+4. En el [OAuth Playground](https://developers.google.com/oauthplayground)
+   (⚙️ → *Use your own OAuth credentials*) autoriza el permiso
+   `https://www.googleapis.com/auth/gmail.send` con la cuenta remitente
+   y canjea el código por tokens.
+5. En Render: `MAIL_MAILER=gmail`, `GMAIL_CLIENT_ID`,
+   `GMAIL_CLIENT_SECRET`, `GMAIL_REFRESH_TOKEN` y `MAIL_FROM_ADDRESS`
+   (la misma cuenta de Gmail).
+
 ### 2. Crear todo con el Blueprint
 
 1. Entra a Render con tu cuenta de GitHub y dale acceso a los dos
@@ -151,7 +171,8 @@ flutter build apk --release --dart-define=API_BASE_URL=https://<tu-backend>.onre
 
 - **El servicio no arranca:** *Logs* del servicio `venexpress`. Los
   mensajes del arranque empiezan con `[venexpress]`.
-- **Los correos no llegan:** revisa `MAIL_*` y que el puerto sea 2525.
+- **Los correos no llegan:** revisa `MAIL_*` y que el puerto sea 2525
+  (o, con `MAIL_MAILER=gmail`, las variables `GMAIL_*`).
   Con `MAIL_MAILER=log` los correos solo se escriben en el log.
 - **La app del repartidor no inicia sesión:** `API_BASE_URL` debe
   terminar en `/api` y usar `https://`; después de cambiarla hay que
