@@ -42,7 +42,7 @@
 
                 <div>
                     <label class="text-sm text-slate-600">Nombre</label>
-                    <input type="text" wire:model="name"
+                    <input type="text" wire:model="name" autocomplete="off"
                         placeholder="Ej. Taquilla Los Próceres"
                         class="mt-1 w-full rounded-xl border border-slate-300 px-3 py-2 text-sm shadow-sm focus:border-blue-900 focus:ring-blue-900">
                     @error('name') <p class="text-xs text-red-600 mt-1">{{ $message }}</p> @enderror
@@ -50,7 +50,7 @@
 
                 <div>
                     <label class="text-sm text-slate-600">Usuario de acceso</label>
-                    <input type="text" wire:model="username"
+                    <input type="text" wire:model="username" name="staff_username" autocomplete="off"
                         placeholder="taquilla1"
                         autocapitalize="off" autocorrect="off"
                         class="mt-1 w-full rounded-xl border border-slate-300 px-3 py-2 text-sm shadow-sm focus:border-blue-900 focus:ring-blue-900">
@@ -62,14 +62,14 @@
                     <label class="text-sm text-slate-600">
                         Contraseña {{ $editingId ? '(déjala vacía para no cambiarla)' : '' }}
                     </label>
-                    <input type="password" wire:model="password"
+                    <input type="password" wire:model="password" autocomplete="new-password"
                         class="mt-1 w-full rounded-xl border border-slate-300 px-3 py-2 text-sm shadow-sm focus:border-blue-900 focus:ring-blue-900">
                     @error('password') <p class="text-xs text-red-600 mt-1">{{ $message }}</p> @enderror
                 </div>
 
                 <div>
                     <label class="text-sm text-slate-600">Confirmar contraseña</label>
-                    <input type="password" wire:model="password_confirmation"
+                    <input type="password" wire:model="password_confirmation" autocomplete="new-password"
                         class="mt-1 w-full rounded-xl border border-slate-300 px-3 py-2 text-sm shadow-sm focus:border-blue-900 focus:ring-blue-900">
                 </div>
 

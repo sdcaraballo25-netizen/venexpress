@@ -123,7 +123,7 @@
                             <label class="block text-xs font-bold text-[#6B6B66] uppercase tracking-wider mb-1">
                                 Confirma tu contraseña para guardar
                             </label>
-                            <input type="password" wire:model="confirm_password"
+                            <input type="password" wire:model="confirm_password" autocomplete="current-password"
                                    placeholder="Tu contraseña de administrador"
                                    class="w-full rounded-xl border-[#E5E5E0] focus:border-blue-500 focus:ring-blue-500 text-sm">
                             @error('confirm_password') <p class="text-red-600 text-xs mt-1">{{ $message }}</p> @enderror

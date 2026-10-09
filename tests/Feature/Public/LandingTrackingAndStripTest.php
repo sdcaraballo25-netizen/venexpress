@@ -24,6 +24,19 @@ class LandingTrackingAndStripTest extends TestCase
         $this->get(route('tracking.index'))->assertOk();
     }
 
+    public function test_tracking_page_scans_qr_live_instead_of_taking_a_photo(): void
+    {
+        $this->get(route('tracking.index'))
+            ->assertOk()
+            ->assertSee('Escanear QR')
+            ->assertSee('id="qr-reader"', false)
+            ->assertSee('html5-qrcode@2.3.8/html5-qrcode.min.js', false)
+            ->assertSee('action="' . route('tracking.show') . '"', false)
+            ->assertSee('name="guia"', false)
+            ->assertDontSee('id="take-photo"', false)
+            ->assertDontSee('id="camera-canvas"', false);
+    }
+
     public function test_landing_renders_carousel_with_arrows_and_track(): void
     {
         $this->get('/')

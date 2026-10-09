@@ -357,9 +357,17 @@
             box-shadow: 0 25px 70px rgba(0,0,0,0.45);
         }
 
-        #camera-video {
-            display: block;
+        #qr-reader {
             width: 100%;
+            min-height: 260px;
+            background: #000000;
+            border: 0 !important;
+        }
+
+        /* html5-qrcode fija el ancho del <video> en línea; se ajusta al visor. */
+        #qr-reader video {
+            display: block;
+            width: 100% !important;
             height: auto;
             max-height: 70dvh;
             min-height: 260px;
@@ -378,9 +386,8 @@
 
         .camera-guide-box {
             position: relative;
-            width: 86%;
-            max-width: 620px;
-            height: 125px;
+            width: min(62vw, 250px);
+            aspect-ratio: 1 / 1;
             border: 1px solid rgba(255,255,255,0.65);
             border-radius: 12px;
             box-shadow: 0 0 0 9999px rgba(0,0,0,0.18);
@@ -426,7 +433,7 @@
             position: absolute;
             left: 4%;
             right: 4%;
-            top: 50%;
+            top: 8%;
             height: 2px;
             border-radius: 999px;
             background: rgba(255,255,255,0.75);
@@ -437,12 +444,12 @@
         @keyframes cameraScanLine {
             0%,
             100% {
-                transform: translateY(-48px);
+                top: 8%;
                 opacity: 0.55;
             }
 
             50% {
-                transform: translateY(48px);
+                top: 92%;
                 opacity: 1;
             }
         }
@@ -468,49 +475,6 @@
 
         .camera-error.hidden {
             display: none;
-        }
-
-        .camera-action-row {
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            gap: 12px;
-        }
-
-        .camera-take-button {
-            min-height: 58px;
-            display: inline-flex;
-            align-items: center;
-            gap: 10px;
-            border: 0;
-            border-radius: 999px;
-            background: #ffffff;
-            color: #0A0A09;
-            padding: 7px 22px 7px 8px;
-            font-family: inherit;
-            font-size: 13px;
-            font-weight: 700;
-            cursor: pointer;
-            box-shadow: 0 12px 35px rgba(0,0,0,0.28);
-            transition:
-                background 0.2s ease,
-                transform 0.2s ease;
-        }
-
-        .camera-take-button:hover {
-            background: #F0F0EC;
-            transform: translateY(-1px);
-        }
-
-        .camera-take-icon {
-            width: 44px;
-            height: 44px;
-            border-radius: 50%;
-            background: #0A0A09;
-            color: #ffffff;
-            display: flex;
-            align-items: center;
-            justify-content: center;
         }
 
         .camera-hint {
@@ -873,13 +837,10 @@
                 border-radius: 12px;
             }
 
-            #camera-video {
+            #qr-reader,
+            #qr-reader video {
                 max-height: 68dvh;
                 min-height: 230px;
-            }
-
-            .camera-guide-box {
-                height: 105px;
             }
 
             .camera-bottom {
@@ -912,10 +873,6 @@
 
             .camera-header-subtitle {
                 font-size: 10px;
-            }
-
-            .camera-guide-box {
-                height: 90px;
             }
         }
     </style>
@@ -994,8 +951,8 @@
                 class="tracking-description mt-6 text-gray-600 text-base md:text-lg leading-7 font-medium"
             >
                 Consulta el estado de tu paquete de forma rápida y sencilla.
-                Ingresa tu número de guía o utiliza la cámara de tu teléfono
-                para leerlo automáticamente.
+                Ingresa tu número de guía o escanea el código QR de la guía
+                con la cámara de tu teléfono.
             </p>
 
 
@@ -1050,26 +1007,26 @@
 
                 <div class="scan-options">
 
-                    {{-- CÁMARA REAL --}}
+                    {{-- LECTOR QR EN TIEMPO REAL --}}
                     <button
                         id="open-camera"
                         type="button"
                         class="scan-button"
-                        aria-label="Abrir cámara para fotografiar la guía"
+                        aria-label="Abrir la cámara para escanear el código QR de la guía"
                     >
 
                         <span class="scan-icon">
-                            <i class="fa-solid fa-camera"></i>
+                            <i class="fa-solid fa-qrcode"></i>
                         </span>
 
                         <span>
 
                             <span class="scan-title">
-                                Usar cámara
+                                Escanear QR
                             </span>
 
                             <span class="scan-subtitle">
-                                Fotografiar la guía
+                                Lectura automática con la cámara
                             </span>
 
                         </span>
@@ -1808,11 +1765,11 @@
             <div>
 
                 <div class="camera-header-title">
-                    Escanear guía
+                    Escanear QR
                 </div>
 
                 <div class="camera-header-subtitle">
-                    Coloca el número de guía dentro del recuadro
+                    Coloca el código QR de la guía dentro del recuadro
                 </div>
 
             </div>
@@ -1837,12 +1794,8 @@
 
             <div class="camera-preview-wrapper">
 
-                <video
-                    id="camera-video"
-                    autoplay
-                    playsinline
-                    muted
-                ></video>
+                {{-- html5-qrcode inserta aquí la vista previa de la cámara --}}
+                <div id="qr-reader"></div>
 
 
                 {{-- MARCO DE GUÍA --}}
@@ -1872,30 +1825,12 @@
             <div
                 id="camera-error"
                 class="camera-error hidden"
+                role="alert"
             ></div>
 
 
-            <div class="camera-action-row">
-
-                <button
-                    id="take-photo"
-                    type="button"
-                    class="camera-take-button"
-                >
-
-                    <span class="camera-take-icon">
-                        <i class="fa-solid fa-camera"></i>
-                    </span>
-
-                    Tomar foto
-
-                </button>
-
-            </div>
-
-
             <p class="camera-hint">
-                Asegúrate de que la guía tenga buena iluminación y esté enfocada.
+                El código se lee automáticamente. Asegúrate de que tenga buena iluminación.
             </p>
 
         </div>
@@ -1903,13 +1838,6 @@
     </div>
 
 </div>
-
-
-{{-- CANVAS OCULTO PARA CAPTURAR LA FOTO --}}
-<canvas
-    id="camera-canvas"
-    class="hidden"
-></canvas>
 
 
 
@@ -1949,20 +1877,20 @@ document.addEventListener('DOMContentLoaded', function () {
     const closeCameraButton =
         document.getElementById('close-camera');
 
-    const takePhotoButton =
-        document.getElementById('take-photo');
-
-    const cameraVideo =
-        document.getElementById('camera-video');
-
-    const cameraCanvas =
-        document.getElementById('camera-canvas');
-
     const cameraError =
         document.getElementById('camera-error');
 
 
-    let cameraStream = null;
+    /*
+     * Lector QR (html5-qrcode, la misma biblioteca que usan los
+     * escáneres del repartidor y del almacén). Aquí solo se lee la
+     * guía y se envía el formulario público de rastreo.
+     */
+    let qrScanner = null;
+
+    let scanHandled = false;
+
+    let lastInvalidScanAt = 0;
 
 
     /* =====================================================
@@ -2230,18 +2158,117 @@ document.addEventListener('DOMContentLoaded', function () {
 
 
     /* =====================================================
-       ABRIR CÁMARA REAL
+       EXTRAER GUÍA DEL CÓDIGO QR
+    ====================================================== */
+
+    /*
+     * Las etiquetas de Venexpress codifican el número de guía tal cual
+     * (PackageService::generateTrackingNumber → VEN-AAAAMMDD-NNNNNN).
+     * Si algún QR trae una URL de rastreo, se toma su parámetro "guia".
+     */
+    function extractGuideFromQr(text) {
+
+        let value = String(text || '').trim();
+
+        try {
+
+            value = new URL(value).searchParams.get('guia') || '';
+
+        } catch (error) {
+            // No es una URL: el QR contiene directamente la guía.
+        }
+
+        value = value.trim().toUpperCase();
+
+        return /^VEN-\d{8}-\d{6}$/.test(value)
+            ? value
+            : null;
+
+    }
+
+
+    /* =====================================================
+       ERRORES DEL LECTOR
+    ====================================================== */
+
+    function showCameraError(message) {
+
+        cameraError.textContent = message;
+
+        cameraError.classList.remove('hidden');
+
+    }
+
+
+    function hideCameraError() {
+
+        cameraError.textContent = '';
+
+        cameraError.classList.add('hidden');
+
+    }
+
+
+    function cameraErrorMessage(error) {
+
+        const detail =
+            String((error && error.name) || '') +
+            ' ' +
+            String(error || '');
+
+        if (/NotAllowedError|Permission/i.test(detail)) {
+            return 'El acceso a la cámara fue bloqueado. Permite el uso de la cámara en tu navegador e inténtalo nuevamente.';
+        }
+
+        if (/NotFoundError|DevicesNotFound|Requested device not found/i.test(detail)) {
+            return 'No encontramos una cámara disponible en este dispositivo.';
+        }
+
+        if (/NotReadableError|TrackStartError|Could not start video/i.test(detail)) {
+            return 'La cámara está siendo utilizada por otra aplicación. Ciérrala e inténtalo nuevamente.';
+        }
+
+        if (/OverconstrainedError/i.test(detail)) {
+            return 'La cámara disponible no es compatible con el lector.';
+        }
+
+        if (/SecurityError/i.test(detail)) {
+            return 'El navegador bloqueó la cámara por motivos de seguridad.';
+        }
+
+        return 'No se pudo iniciar la cámara. Puedes escribir la guía manualmente.';
+
+    }
+
+
+    /* =====================================================
+       ABRIR LECTOR QR
     ====================================================== */
 
     async function openCamera() {
 
+        if (qrScanner) {
+            return;
+        }
+
         if (
+            !window.isSecureContext ||
             !navigator.mediaDevices ||
             !navigator.mediaDevices.getUserMedia
         ) {
 
             setStatus(
-                'Tu navegador no permite acceder a la cámara. Puedes subir una foto de la guía.',
+                'Tu navegador no permite acceder a la cámara en esta página. Escribe la guía manualmente.',
+                'error'
+            );
+
+            return;
+        }
+
+        if (typeof Html5Qrcode === 'undefined') {
+
+            setStatus(
+                'El lector QR todavía no está disponible. Recarga la página e inténtalo nuevamente.',
                 'error'
             );
 
@@ -2249,346 +2276,188 @@ document.addEventListener('DOMContentLoaded', function () {
         }
 
 
-        cameraError.classList.add('hidden');
-        cameraError.textContent = '';
+        hideCameraError();
+
+        scanHandled = false;
+
+
+        /*
+         * El visor se muestra antes de arrancar para que el lector
+         * tenga dimensiones y para que los errores sean visibles.
+         */
+        cameraModal.classList.add('is-open');
+
+        cameraModal.setAttribute('aria-hidden', 'false');
+
+        document.body.style.overflow = 'hidden';
+
+
+        const config = { verbose: false };
+
+        if (typeof Html5QrcodeSupportedFormats !== 'undefined') {
+            config.formatsToSupport = [
+                Html5QrcodeSupportedFormats.QR_CODE
+            ];
+        }
+
+        const instance =
+            new Html5Qrcode('qr-reader', config);
+
+        qrScanner = instance;
 
 
         try {
 
-            /*
-             * Si existía una cámara anterior,
-             * la cerramos primero.
-             */
-            stopCamera();
-
-
-            /*
-             * Solicitar cámara trasera.
-             *
-             * "ideal" permite que el navegador
-             * elija otra cámara si esta no existe.
-             */
-            cameraStream =
-                await navigator.mediaDevices.getUserMedia({
-
-                    video: {
-
-                        facingMode: {
-                            ideal: 'environment'
-                        },
-
-                        width: {
-                            ideal: 1920
-                        },
-
-                        height: {
-                            ideal: 1080
-                        }
-
-                    },
-
-                    audio: false
-
-                });
-
-
-            /*
-             * Conectar stream al video.
-             */
-            cameraVideo.srcObject =
-                cameraStream;
-
-
-            /*
-             * Mostrar modal.
-             */
-            cameraModal.classList.add(
-                'is-open'
+            await instance.start(
+                { facingMode: 'environment' },
+                { fps: 10 },
+                onQrDecoded,
+                function () {}
             );
 
-            cameraModal.setAttribute(
-                'aria-hidden',
-                'false'
-            );
-
-
             /*
-             * Evitar scroll detrás del modal.
+             * Si el visor se cerró mientras la cámara arrancaba,
+             * se libera ahora para no dejarla encendida.
              */
-            document.body.style.overflow =
-                'hidden';
-
-
-            /*
-             * Iniciar reproducción.
-             */
-            await cameraVideo.play();
-
+            if (qrScanner !== instance) {
+                await releaseScanner(instance);
+            }
 
         } catch (error) {
 
-            console.error(
-                'Camera error:',
-                error
+            console.error('QR scanner error:', error);
+
+            if (qrScanner === instance) {
+                qrScanner = null;
+            }
+
+            await releaseScanner(instance);
+
+            showCameraError(
+                cameraErrorMessage(error)
             );
 
+        }
 
-            stopCamera();
-
-
-            let message =
-                'No se pudo acceder a la cámara.';
+    }
 
 
-            if (
-                error.name ===
-                'NotAllowedError'
-            ) {
+    /* =====================================================
+       LECTURA DEL QR
+    ====================================================== */
 
-                message =
-                    'El acceso a la cámara fue bloqueado. Permite el uso de la cámara en tu navegador e inténtalo nuevamente.';
+    async function onQrDecoded(decodedText) {
 
-            } else if (
-                error.name ===
-                'NotFoundError'
-            ) {
+        if (scanHandled) {
+            return;
+        }
 
-                message =
-                    'No encontramos una cámara disponible en este dispositivo.';
+        const guide =
+            extractGuideFromQr(decodedText);
 
-            } else if (
-                error.name ===
-                'NotReadableError'
-            ) {
+        if (!guide) {
 
-                message =
-                    'La cámara está siendo utilizada por otra aplicación. Cierra otras aplicaciones que estén usando la cámara e inténtalo nuevamente.';
+            /*
+             * El lector sigue activo; el aviso se limita para no
+             * repetirse en cada fotograma.
+             */
+            const now = Date.now();
 
-            } else if (
-                error.name ===
-                'SecurityError'
-            ) {
+            if (now - lastInvalidScanAt > 2500) {
 
-                message =
-                    'El navegador bloqueó la cámara por motivos de seguridad.';
+                lastInvalidScanAt = now;
 
-            } else if (
-                error.name ===
-                'OverconstrainedError'
-            ) {
-
-                message =
-                    'La cámara disponible no es compatible con la configuración solicitada.';
+                showCameraError(
+                    'Este código QR no corresponde a una guía de Venexpress.'
+                );
 
             }
 
+            return;
+        }
 
-            cameraError.textContent =
-                message;
 
-            cameraError.classList.remove(
-                'hidden'
-            );
+        /*
+         * Una sola lectura válida: se bloquean las siguientes, se
+         * libera la cámara y se usa el formulario de rastreo existente.
+         */
+        scanHandled = true;
 
+        await closeCamera();
+
+        input.value = guide;
+
+        input.dispatchEvent(
+            new Event('input', { bubbles: true })
+        );
+
+        setStatus(
+            '✓ Guía detectada: ' + guide + '. Consultando el envío...',
+            'success'
+        );
+
+        if (typeof form.requestSubmit === 'function') {
+            form.requestSubmit();
+        } else {
+            form.submit();
         }
 
     }
 
 
     /* =====================================================
-       DETENER CÁMARA
+       DETENER LECTOR
     ====================================================== */
+
+    async function releaseScanner(instance) {
+
+        if (!instance) {
+            return;
+        }
+
+        try {
+
+            if (instance.isScanning) {
+                await instance.stop();
+            }
+
+        } catch (error) {
+            console.warn('No se pudo detener el lector QR:', error);
+        }
+
+        try {
+            instance.clear();
+        } catch (error) {
+            console.warn('No se pudo limpiar el lector QR:', error);
+        }
+
+    }
+
 
     function stopCamera() {
 
-        if (cameraStream) {
+        const instance = qrScanner;
 
-            cameraStream
-                .getTracks()
-                .forEach(function (track) {
+        qrScanner = null;
 
-                    track.stop();
-
-                });
-
-            cameraStream = null;
-
-        }
-
-
-        if (cameraVideo) {
-
-            cameraVideo.pause();
-
-            cameraVideo.srcObject = null;
-
-        }
+        return releaseScanner(instance);
 
     }
 
 
     /* =====================================================
-       CERRAR MODAL
+       CERRAR VISOR
     ====================================================== */
 
-    function closeCamera() {
+    async function closeCamera() {
 
-        stopCamera();
+        cameraModal.classList.remove('is-open');
 
+        cameraModal.setAttribute('aria-hidden', 'true');
 
-        cameraModal.classList.remove(
-            'is-open'
-        );
+        document.body.style.overflow = '';
 
-        cameraModal.setAttribute(
-            'aria-hidden',
-            'true'
-        );
-
-
-        document.body.style.overflow =
-            '';
-
-    }
-
-
-    /* =====================================================
-       TOMAR FOTO
-    ====================================================== */
-
-    function takePhoto() {
-
-        if (!cameraStream) {
-
-            setStatus(
-                'La cámara no está activa.',
-                'error'
-            );
-
-            return;
-
-        }
-
-
-        const width =
-            cameraVideo.videoWidth;
-
-        const height =
-            cameraVideo.videoHeight;
-
-
-        if (!width || !height) {
-
-            setStatus(
-                'La cámara todavía no está lista. Espera un momento e inténtalo nuevamente.',
-                'error'
-            );
-
-            return;
-
-        }
-
-
-        /*
-         * Preparar canvas con la misma
-         * resolución de la cámara.
-         */
-        cameraCanvas.width =
-            width;
-
-        cameraCanvas.height =
-            height;
-
-
-        const context =
-            cameraCanvas.getContext(
-                '2d'
-            );
-
-
-        if (!context) {
-
-            setStatus(
-                'No se pudo preparar la captura.',
-                'error'
-            );
-
-            return;
-
-        }
-
-
-        /*
-         * Dibujar el frame actual.
-         */
-        context.drawImage(
-            cameraVideo,
-            0,
-            0,
-            width,
-            height
-        );
-
-
-        /*
-         * Convertir la captura en JPEG.
-         */
-        cameraCanvas.toBlob(
-            function (blob) {
-
-                if (!blob) {
-
-                    setStatus(
-                        'No se pudo capturar la imagen.',
-                        'error'
-                    );
-
-                    return;
-
-                }
-
-
-                /*
-                 * Crear un File real.
-                 */
-                const file =
-                    new File(
-
-                        [blob],
-
-                        'guia-camera.jpg',
-
-                        {
-                            type:
-                                'image/jpeg',
-                            lastModified:
-                                Date.now()
-                        }
-
-                    );
-
-
-                /*
-                 * Cerramos cámara
-                 * antes del OCR.
-                 */
-                closeCamera();
-
-
-                /*
-                 * Procesamos la imagen
-                 * exactamente igual que
-                 * una foto subida.
-                 */
-                processImage(file);
-
-            },
-
-            'image/jpeg',
-
-            0.92
-
-        );
+        await stopCamera();
 
     }
 
@@ -2616,20 +2485,6 @@ document.addEventListener('DOMContentLoaded', function () {
         closeCameraButton.addEventListener(
             'click',
             closeCamera
-        );
-
-    }
-
-
-    /* =====================================================
-       BOTÓN TOMAR FOTO
-    ====================================================== */
-
-    if (takePhotoButton) {
-
-        takePhotoButton.addEventListener(
-            'click',
-            takePhoto
         );
 
     }
@@ -2745,11 +2600,15 @@ document.addEventListener('DOMContentLoaded', function () {
        LIBERAR CÁMARA AL SALIR
     ====================================================== */
 
+    /*
+     * pagehide también cubre la caché de retroceso (bfcache): al volver
+     * desde el resultado, el visor no reaparece abierto.
+     */
     window.addEventListener(
-        'beforeunload',
+        'pagehide',
         function () {
 
-            stopCamera();
+            closeCamera();
 
         }
     );
@@ -2766,7 +2625,7 @@ document.addEventListener('DOMContentLoaded', function () {
 
             if (
                 document.hidden &&
-                cameraStream
+                qrScanner
             ) {
 
                 closeCamera();
@@ -2787,6 +2646,16 @@ document.addEventListener('DOMContentLoaded', function () {
 
 <script
     src="https://cdn.jsdelivr.net/npm/tesseract.js@5/dist/tesseract.min.js"
+></script>
+
+
+{{-- =========================================================
+     LECTOR QR (misma biblioteca que los escáneres del repartidor
+     y del almacén, con versión fija)
+========================================================= --}}
+
+<script
+    src="https://unpkg.com/html5-qrcode@2.3.8/html5-qrcode.min.js"
 ></script>
 
 </body>

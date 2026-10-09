@@ -30,7 +30,8 @@
         <div class="grid gap-4 md:grid-cols-[1fr_220px_180px]">
             <div>
                 <label class="mb-2 block text-xs font-semibold uppercase tracking-wide text-[#6B6B66]">Buscar</label>
-                <input wire:model.live.debounce.300ms="search" type="text"
+                <input wire:model.live.debounce.300ms="search" type="search" name="user_search"
+                       autocomplete="off" enterkeyhint="search"
                        placeholder="Nombre o correo electrónico..."
                        class="w-full rounded-xl border border-[#E5E5E0] px-4 py-3 text-sm text-[#111111] placeholder:text-[#B8B8B2] focus:border-blue-500 focus:ring-blue-500">
             </div>
@@ -163,12 +164,12 @@
                     <div class="grid gap-5 md:grid-cols-2">
                         <div>
                             <x-input-label for="admin-user-name" value="Nombre completo" />
-                            <x-text-input wire:model="name" id="admin-user-name" class="mt-1.5 block w-full" type="text" />
+                            <x-text-input wire:model="name" autocomplete="off" id="admin-user-name" class="mt-1.5 block w-full" type="text" />
                             <x-input-error :messages="$errors->get('name')" class="mt-2" />
                         </div>
                         <div>
                             <x-input-label for="admin-user-email" value="Correo electrónico" />
-                            <x-text-input wire:model="email" id="admin-user-email" class="mt-1.5 block w-full" type="email" />
+                            <x-text-input wire:model="email" autocomplete="off" id="admin-user-email" class="mt-1.5 block w-full" type="email" />
                             <x-input-error :messages="$errors->get('email')" class="mt-2" />
                         </div>
                     </div>
@@ -176,12 +177,12 @@
                     <div class="grid gap-5 md:grid-cols-2">
                         <div>
                             <x-input-label for="admin-user-password" value="Contraseña inicial" />
-                            <x-password-input wire:model="password" id="admin-user-password" class="mt-1.5 block w-full" />
+                            <x-password-input wire:model="password" autocomplete="new-password" id="admin-user-password" class="mt-1.5 block w-full" />
                             <x-input-error :messages="$errors->get('password')" class="mt-2" />
                         </div>
                         <div>
                             <x-input-label for="admin-user-password-confirmation" value="Confirmar contraseña" />
-                            <x-password-input wire:model="password_confirmation" id="admin-user-password-confirmation" class="mt-1.5 block w-full" />
+                            <x-password-input wire:model="password_confirmation" autocomplete="new-password" id="admin-user-password-confirmation" class="mt-1.5 block w-full" />
                             <x-input-error :messages="$errors->get('password_confirmation')" class="mt-2" />
                         </div>
                     </div>
@@ -345,16 +346,20 @@
                 <h2 class="mt-4 font-display text-xl font-bold text-[#111111]">Confirmar creación</h2>
                 <p class="mt-2 text-sm leading-6 text-[#6B6B66]">Esta acción creará una cuenta con acceso al sistema. Introduce tu contraseña de administrador para confirmar que eres tú.</p>
 
-                <div class="mt-5">
-                    <x-input-label for="admin-password-create" value="Contraseña de administrador" />
-                    <x-password-input wire:model="adminPassword" id="admin-password-create" class="mt-1.5 block w-full" autofocus />
-                    <x-input-error :messages="$errors->get('adminPassword')" class="mt-2" />
-                </div>
+                {{-- Formulario propio: aísla la contraseña del buscador para que el
+                     gestor de contraseñas del navegador no rellene el buscador. --}}
+                <form wire:submit="createUser">
+                    <div class="mt-5">
+                        <x-input-label for="admin-password-create" value="Contraseña de administrador" />
+                        <x-password-input wire:model="adminPassword" id="admin-password-create" name="admin_password" autocomplete="current-password" class="mt-1.5 block w-full" autofocus />
+                        <x-input-error :messages="$errors->get('adminPassword')" class="mt-2" />
+                    </div>
 
-                <div class="mt-6 flex justify-end gap-3">
-                    <button wire:click="$set('showConfirmModal', false)" class="rounded-xl border border-[#E5E5E0] px-5 py-3 text-sm font-semibold text-[#4A4A45]">Volver</button>
-                    <button wire:click="createUser" class="rounded-xl bg-blue-900 px-5 py-3 text-sm font-semibold text-white hover:bg-blue-800">Confirmar creación</button>
-                </div>
+                    <div class="mt-6 flex justify-end gap-3">
+                        <button type="button" wire:click="$set('showConfirmModal', false)" class="rounded-xl border border-[#E5E5E0] px-5 py-3 text-sm font-semibold text-[#4A4A45]">Volver</button>
+                        <button type="submit" class="rounded-xl bg-blue-900 px-5 py-3 text-sm font-semibold text-white hover:bg-blue-800">Confirmar creación</button>
+                    </div>
+                </form>
             </div>
         </div>
     @endif
@@ -374,13 +379,13 @@
                 <form wire:submit="updateUser" class="space-y-6 p-6">
                     <div>
                         <x-input-label for="admin-user-edit-name" value="Nombre completo" />
-                        <x-text-input wire:model="edit_name" id="admin-user-edit-name" class="mt-1.5 block w-full" type="text" />
+                        <x-text-input wire:model="edit_name" autocomplete="off" id="admin-user-edit-name" class="mt-1.5 block w-full" type="text" />
                         <x-input-error :messages="$errors->get('edit_name')" class="mt-2" />
                     </div>
 
                     <div>
                         <x-input-label for="admin-user-edit-email" value="Correo electrónico" />
-                        <x-text-input wire:model="edit_email" id="admin-user-edit-email" class="mt-1.5 block w-full" type="email" />
+                        <x-text-input wire:model="edit_email" autocomplete="off" id="admin-user-edit-email" class="mt-1.5 block w-full" type="email" />
                         <x-input-error :messages="$errors->get('edit_email')" class="mt-2" />
                     </div>
 
@@ -425,12 +430,12 @@
                     <div class="grid gap-5 md:grid-cols-2">
                         <div>
                             <x-input-label for="admin-user-edit-password" value="Nueva contraseña (opcional)" />
-                            <x-password-input wire:model="edit_password" id="admin-user-edit-password" class="mt-1.5 block w-full" />
+                            <x-password-input wire:model="edit_password" autocomplete="new-password" id="admin-user-edit-password" class="mt-1.5 block w-full" />
                             <x-input-error :messages="$errors->get('edit_password')" class="mt-2" />
                         </div>
                         <div>
                             <x-input-label for="admin-user-edit-password-confirmation" value="Confirmar nueva contraseña" />
-                            <x-password-input wire:model="edit_password_confirmation" id="admin-user-edit-password-confirmation" class="mt-1.5 block w-full" />
+                            <x-password-input wire:model="edit_password_confirmation" autocomplete="new-password" id="admin-user-edit-password-confirmation" class="mt-1.5 block w-full" />
                         </div>
                     </div>
 
@@ -451,16 +456,19 @@
                 <h2 class="mt-4 font-display text-xl font-bold text-[#111111]">Eliminar usuario</h2>
                 <p class="mt-2 text-sm leading-6 text-[#6B6B66]">Esta acción es permanente. Confirma con tu contraseña de administrador para continuar.</p>
 
-                <div class="mt-5">
-                    <x-input-label for="admin-password-delete" value="Contraseña de administrador" />
-                    <x-password-input wire:model="adminPassword" id="admin-password-delete" class="mt-1.5 block w-full" autofocus />
-                    <x-input-error :messages="$errors->get('adminPassword')" class="mt-2" />
-                </div>
+                {{-- Formulario propio: aísla la contraseña del buscador (ver modal de creación). --}}
+                <form wire:submit="deleteUser">
+                    <div class="mt-5">
+                        <x-input-label for="admin-password-delete" value="Contraseña de administrador" />
+                        <x-password-input wire:model="adminPassword" id="admin-password-delete" name="admin_password" autocomplete="current-password" class="mt-1.5 block w-full" autofocus />
+                        <x-input-error :messages="$errors->get('adminPassword')" class="mt-2" />
+                    </div>
 
-                <div class="mt-6 flex justify-end gap-3">
-                    <button wire:click="$set('showDeleteModal', false)" class="rounded-xl border border-[#E5E5E0] px-5 py-3 text-sm font-semibold text-[#4A4A45]">Cancelar</button>
-                    <button wire:click="deleteUser" class="rounded-xl bg-red-600 px-5 py-3 text-sm font-semibold text-white hover:bg-red-700">Eliminar definitivamente</button>
-                </div>
+                    <div class="mt-6 flex justify-end gap-3">
+                        <button type="button" wire:click="$set('showDeleteModal', false)" class="rounded-xl border border-[#E5E5E0] px-5 py-3 text-sm font-semibold text-[#4A4A45]">Cancelar</button>
+                        <button type="submit" class="rounded-xl bg-red-600 px-5 py-3 text-sm font-semibold text-white hover:bg-red-700">Eliminar definitivamente</button>
+                    </div>
+                </form>
             </div>
         </div>
     @endif
