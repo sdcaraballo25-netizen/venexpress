@@ -232,7 +232,7 @@ class UsersManager extends Component
             // paga a la empresa ni la empresa le liquida (ver
             // Ally::isFranchise()).
             if ($user->isAgencyOwner()) {
-                Ally::create([
+                $ally = Ally::create([
                     'user_id' => $user->id,
                     'business_name' => $validated['business_name'],
                     'rif' => $validated['rif'],
@@ -248,6 +248,22 @@ class UsersManager extends Component
                     'verification_status' => Ally::VERIFICATION_VERIFIED,
                     'verification_reviewed_at' => now(),
                 ]);
+
+                // La franquicia también funciona como almacén de la red
+                // (recibe de repartidores HUB y despacha a repartidores y
+                // clientes), con su misma dirección física. El Admin le
+                // asigna coberturas y la agrega a rutas HUB desde
+                // Almacenes / Rutas, igual que a cualquier almacén.
+                if ($user->isFranquiciado()) {
+                    Warehouse::create([
+                        'ally_id' => $ally->id,
+                        'name' => $ally->business_name,
+                        'city' => $ally->city,
+                        'state' => $ally->state,
+                        'address' => $ally->address,
+                        'is_active' => true,
+                    ]);
+                }
             }
 
             if ($user->isRepartidor()) {
@@ -563,6 +579,10 @@ class UsersManager extends Component
                         'status' => $reactivating ? Ally::STATUS_ACTIVE : Ally::STATUS_SUSPENDED,
                     ]);
                 }
+
+                // Franquicia desactivada: su almacén deja de estar
+                // disponible para nuevas rutas y coberturas.
+                $target->ally->warehouse?->update(['is_active' => $reactivating]);
             }
 
             // Un usuario desactivado no debe conservar tokens de la

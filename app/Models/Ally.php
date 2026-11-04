@@ -7,6 +7,7 @@ use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
 use Illuminate\Database\Eloquent\Relations\HasMany;
+use Illuminate\Database\Eloquent\Relations\HasOne;
 
 class Ally extends Model
 {
@@ -199,6 +200,15 @@ class Ally extends Model
         return $this->hasMany(
             AllyFinancialTransaction::class
         );
+    }
+
+    /**
+     * Almacén de la red que opera esta franquicia (misma dirección
+     * física). Solo existe para franquicias; ver Warehouse::ally().
+     */
+    public function warehouse(): HasOne
+    {
+        return $this->hasOne(Warehouse::class);
     }
 
     public function franchiseExpenses(): HasMany

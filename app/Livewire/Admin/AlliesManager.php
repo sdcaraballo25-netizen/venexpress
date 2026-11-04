@@ -113,6 +113,9 @@ class AlliesManager extends Component
             'longitude' => $this->location_longitude,
         ]);
 
+        // Franquicia: su almacén comparte la misma dirección física.
+        $ally->warehouse?->update(['state' => $this->location_state]);
+
         $this->logAllyAction(
             $ally,
             'ally.location_updated',

@@ -368,6 +368,31 @@ class User extends Authenticatable
         return $this->belongsTo(Warehouse::class);
     }
 
+    /**
+     * Almacén que este usuario opera desde el panel de almacén:
+     *
+     * - Personal de almacén (role 'almacen'): su users.warehouse_id.
+     * - Franquiciado y sus Taquillas: el almacén de la franquicia
+     *   (Ally::warehouse()), porque la franquicia también funciona como
+     *   almacén de la red.
+     *
+     * Null para cualquier otro usuario (incluido un Aliado normal).
+     */
+    public function operatingWarehouse(): ?Warehouse
+    {
+        if ($this->isAlmacen()) {
+            return $this->warehouse;
+        }
+
+        if ($this->isAliadoModule()) {
+            $ally = $this->resolveAlly();
+
+            return $ally?->isFranchise() ? $ally->warehouse : null;
+        }
+
+        return null;
+    }
+
     public function packageHistories(): HasMany
     {
         return $this->hasMany(PackageHistory::class, 'scanned_by_user_id');

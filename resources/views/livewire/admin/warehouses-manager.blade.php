@@ -149,6 +149,9 @@
                         <tr>
                             <td class="px-6 py-4 font-medium text-slate-800">
                                 {{ $warehouse->name }}
+                                @if ($warehouse->isFranchise())
+                                    <span class="ml-2 inline-flex rounded-lg bg-amber-50 px-2 py-0.5 text-xs font-semibold text-amber-700">Franquicia</span>
+                                @endif
                             </td>
                             <td class="px-6 py-4 text-slate-600">
                                 {{ $warehouse->city }}

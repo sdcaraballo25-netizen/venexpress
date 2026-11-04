@@ -193,6 +193,14 @@ Route::prefix('ally')
         Route::get('/ayuda', AllyHelpCenter::class)
             ->middleware('role:aliado,franquiciado,aliado_taquilla')
             ->name('help');
+
+        // Almacén de la franquicia: el Franquiciado y sus Taquillas
+        // reciben paquetes de los repartidores HUB y los despachan a un
+        // repartidor o al cliente, con el mismo panel que el personal de
+        // almacén (Almacen\Dashboard valida que la agencia sea franquicia).
+        Route::get('/almacen', AlmacenDashboard::class)
+            ->middleware('role:franquiciado,aliado_taquilla')
+            ->name('warehouse');
     });
 
 /*

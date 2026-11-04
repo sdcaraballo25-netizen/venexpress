@@ -16,7 +16,6 @@ use App\Services\PackageService;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\DB;
 use Livewire\Attributes\Computed;
-use Livewire\Attributes\Layout;
 use Livewire\Attributes\Title;
 use Livewire\Component;
 use Livewire\WithFileUploads;
@@ -42,8 +41,12 @@ use RuntimeException;
  * - Tras una entrega a domicilio fallida (ENTREGA_FALLIDA), al recibir
  *   el paquete de vuelta decide un nuevo intento o la devolución al
  *   remitente.
+ *
+ * Lo usa también el Franquiciado (y sus Taquillas) desde el panel
+ * Aliado (ruta ally.warehouse): la franquicia funciona como almacén de
+ * la red con su propio Warehouse (ver User::operatingWarehouse()). En
+ * ese caso se muestra dentro de layouts.ally.
  */
-#[Layout('layouts.almacen')]
 #[Title('Almacén')]
 class Dashboard extends Component
 {
@@ -81,9 +84,23 @@ class Dashboard extends Component
 
     public ?string $dispatchError = null;
 
+    public function mount(): void
+    {
+        $user = Auth::user();
+
+        // Personal de almacén entra aunque aún no tenga almacén asignado
+        // (la vista lo explica). En el panel Aliado solo entra quien
+        // opera el almacén de una franquicia.
+        abort_unless(
+            $user->isAlmacen() || $user->operatingWarehouse(),
+            403,
+            'Tu agencia no funciona como almacén.'
+        );
+    }
+
     protected function warehouse(): ?Warehouse
     {
-        return Auth::user()->warehouse;
+        return Auth::user()->operatingWarehouse();
     }
 
     /**
@@ -526,10 +543,16 @@ class Dashboard extends Component
                 ->get()
             : collect();
 
-        return view('livewire.almacen.dashboard', [
+        $view = view('livewire.almacen.dashboard', [
             'warehouse' => $warehouse,
             'pendingStops' => $stops->where('status', RouteStop::STATUS_PENDING),
             'visitedStops' => $stops->where('status', RouteStop::STATUS_VISITED),
         ]);
+
+        // Franquicia: mismo panel, pero dentro de su propio layout. Se
+        // elige aquí (y no con #[Layout], que tendría prioridad).
+        return $view->layout(
+            Auth::user()->isAliadoModule() ? 'layouts.ally' : 'layouts.almacen'
+        );
     }
 }

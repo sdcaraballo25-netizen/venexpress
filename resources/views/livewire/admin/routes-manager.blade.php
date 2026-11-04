@@ -595,7 +595,7 @@
 
                                 @foreach ($allWarehouses as $warehouseOption)
                                     <option value="{{ $warehouseOption->id }}">
-                                        {{ $warehouseOption->name }} ({{ $warehouseOption->city }})
+                                        {{ $warehouseOption->name }} ({{ $warehouseOption->city }}){{ $warehouseOption->ally_id ? ' · Franquicia' : '' }}
                                     </option>
                                 @endforeach
 
@@ -621,7 +621,7 @@
 
                                 @foreach ($allWarehouses as $warehouseOption)
                                     <option value="{{ $warehouseOption->id }}">
-                                        {{ $warehouseOption->name }} ({{ $warehouseOption->city }})
+                                        {{ $warehouseOption->name }} ({{ $warehouseOption->city }}){{ $warehouseOption->ally_id ? ' · Franquicia' : '' }}
                                     </option>
                                 @endforeach
 
@@ -744,6 +744,9 @@
 
                                                 <p class="text-sm font-semibold text-[#111111]">
                                                     {{ $warehouse->name }}
+                                                    @if ($warehouse->ally_id)
+                                                        <span class="ml-1 rounded-md bg-amber-50 px-1.5 py-0.5 text-[10px] font-semibold text-amber-700">Franquicia</span>
+                                                    @endif
                                                 </p>
 
                                                 <p class="text-xs text-[#6B6B66]">

@@ -103,6 +103,7 @@
 
                         if (
                             {{ request()->routeIs(
+                                'ally.warehouse',
                                 'ally.packages.create',
                                 'ally.emprendedor-pedidos',
                                 'ally.packages.index',
@@ -223,6 +224,26 @@
                         x-cloak
                         class="mt-1 space-y-1"
                     >
+
+                        {{-- ALMACÉN (solo franquicias: la agencia también funciona como almacén de la red) --}}
+                        @if (auth()->user()->operatingWarehouse())
+                            <a
+                                href="{{ route('ally.warehouse') }}"
+                                wire:navigate
+                                @click="$store.sidebar.open = false"
+                                class="flex items-center gap-3 px-4 py-3 rounded-xl font-medium transition-colors
+                                {{ request()->routeIs('ally.warehouse')
+                                    ? 'bg-amber-400 text-[#111111]'
+                                    : 'text-[#6B6B66] hover:bg-slate-50 hover:text-[#111111]' }}"
+                            >
+                                <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                                        d="M3 9l9-6 9 6v10a2 2 0 01-2 2H5a2 2 0 01-2-2V9zm6 12V12h6v9" />
+                                </svg>
+
+                                <span>Almacén (recibir y despachar)</span>
+                            </a>
+                        @endif
 
                         {{-- REGISTRAR PEDIDO --}}
                         <a
