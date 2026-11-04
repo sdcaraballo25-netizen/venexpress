@@ -7,8 +7,8 @@
             Finanzas de {{ $ally->business_name }}
         </h2>
         <p class="text-sm text-slate-500">
-            Tus ventas, las de tus taquillas, tus gastos y tu utilidad. Como franquiciado no pagas
-            comisión a Venexpress: todo lo que vendes es tuyo.
+            Tus ventas, las de tus taquillas, tus gastos, tu cuota de franquicia
+            ({{ number_format($feePercentage, 2) }}% de tus ventas del mes) y tu utilidad.
         </p>
     </div>
 
@@ -104,7 +104,10 @@
         <div class="rounded-2xl border border-[#E5E5E0] bg-white px-5 py-4 shadow-sm">
             <p class="text-xs uppercase tracking-wide text-slate-500">Gastos</p>
             <p class="mt-1 font-display text-3xl font-bold text-red-600">${{ number_format($expensesTotal, 2) }}</p>
-            <p class="mt-1 text-xs text-slate-500">De toda la franquicia en el período</p>
+            <p class="mt-1 text-xs text-slate-500">
+                Operativos de toda la franquicia ·
+                + cuota {{ number_format($feePercentage, 2) }}%: <strong class="text-red-600">${{ number_format($feeAccrued, 2) }}</strong>
+            </p>
         </div>
 
         <div class="rounded-2xl border px-5 py-4 shadow-sm {{ $netProfit >= 0 ? 'border-green-200 bg-green-50' : 'border-red-200 bg-red-50' }}">
@@ -145,6 +148,56 @@
                 {{ $deliveredCount }} entregadas · {{ $returnedCount }} en devolución/devueltas
             </p>
         </div>
+    </div>
+
+    {{-- CUOTA DE FRANQUICIA (lo que registra el Admin en Cuentas por cobrar) --}}
+    <div class="rounded-2xl border border-[#E5E5E0] bg-white p-4 sm:p-5 shadow-sm">
+        <div class="flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
+            <div>
+                <h3 class="text-sm font-semibold text-[#111111]">Cuota de franquicia con Venexpress</h3>
+                <p class="text-xs text-slate-500">
+                    {{ number_format($feePercentage, 2) }}% de tus ventas del mes. Los pagos los registra Venexpress
+                    con tu número de factura y de voucher.
+                </p>
+            </div>
+            <span class="self-start rounded-lg px-3 py-1 text-sm font-bold
+                {{ $feeBalance > 0 ? 'bg-emerald-50 text-emerald-700' : ($feeBalance < 0 ? 'bg-red-50 text-red-700' : 'bg-slate-100 text-slate-600') }}">
+                @if ($feeBalance > 0)
+                    A tu favor ${{ number_format($feeBalance, 2) }}
+                @elseif ($feeBalance < 0)
+                    Pendiente por pagar ${{ number_format(abs($feeBalance), 2) }}
+                @else
+                    Al día
+                @endif
+            </span>
+        </div>
+
+        @if ($recentFranchisePayments->isNotEmpty())
+            <div class="mt-4 overflow-x-auto">
+                <table class="w-full min-w-[520px] text-sm">
+                    <thead>
+                        <tr class="border-b border-slate-200 text-left text-xs uppercase tracking-wide text-slate-400">
+                            <th class="py-2 pr-4">Fecha</th>
+                            <th class="py-2 pr-4">Factura</th>
+                            <th class="py-2 pr-4">Monto factura</th>
+                            <th class="py-2 pr-4">Pagado</th>
+                            <th class="py-2 pr-4">Referencia</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        @foreach ($recentFranchisePayments as $payment)
+                            <tr wire:key="fee-payment-{{ $payment->id }}" class="border-b border-slate-100 last:border-0">
+                                <td class="py-2 pr-4 text-slate-500">{{ $payment->paid_on?->format('d/m/Y') }}</td>
+                                <td class="py-2 pr-4 text-slate-600">{{ $payment->invoice->invoice_number }}</td>
+                                <td class="py-2 pr-4 text-slate-600">${{ number_format((float) $payment->invoice->invoice_amount_usd, 2) }}</td>
+                                <td class="py-2 pr-4 font-medium text-[#111111]">${{ number_format((float) $payment->amount_paid_usd, 2) }}</td>
+                                <td class="py-2 pr-4 text-slate-500">{{ $payment->payment_reference ?? '—' }}</td>
+                            </tr>
+                        @endforeach
+                    </tbody>
+                </table>
+            </div>
+        @endif
     </div>
 
     {{-- TENDENCIA --}}

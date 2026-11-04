@@ -29,8 +29,9 @@ class User extends Authenticatable
      * Franquiciado: dueño de una agencia con las mismas funciones que
      * el Aliado Administrador (role 'aliado'), pero sin postulación
      * pública — solo lo crea un Admin desde Gestión de Usuarios — y
-     * sin comisión/liquidación con la empresa: sus ventas son suyas
-     * (ver Ally::isFranchise() y PackageService::calculateCommission()).
+     * sin comisión por guía; en cambio paga a la empresa una cuota
+     * mensual (% de sus ventas, ver Ally::isFranchise() y
+     * FranchiseBillingService).
      */
     public const ROLE_FRANQUICIADO = 'franquiciado';
 

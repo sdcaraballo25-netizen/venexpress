@@ -71,9 +71,9 @@
         </div>
 
 
-        {{-- Franquicia: sin comisión con la empresa (Ally::isFranchise()),
-             así que en vez del saldo de comisiones se muestra el ticket
-             promedio y el acceso a Finanzas. --}}
+        {{-- Franquicia: sin comisión con la empresa (Ally::isFranchise();
+             paga una cuota mensual), así que en vez del saldo de
+             comisiones se muestra el ticket promedio y el acceso a Finanzas. --}}
         @if ($ally->isFranchise())
 
         <div class="rounded-2xl border border-[#E5E5E0] bg-white p-5">
@@ -93,7 +93,7 @@
             class="block rounded-2xl border border-[#E5E5E0] bg-blue-900 p-5 transition hover:bg-blue-800"
         >
             <p class="text-sm text-blue-200">
-                Franquicia · ventas 100% tuyas
+                Franquicia · cuota {{ number_format((float) $ally->franchise_fee_percentage, 2) }}% de ventas
             </p>
 
             <p class="mt-2 font-display text-2xl font-semibold text-white">

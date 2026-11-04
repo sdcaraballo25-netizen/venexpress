@@ -65,6 +65,7 @@ class FranchiseTest extends TestCase
             ->set('password', 'Password-seguro-123')
             ->set('password_confirmation', 'Password-seguro-123')
             ->set('role', User::ROLE_FRANQUICIADO)
+            ->set('franchise_fee_percentage', '8')
             ->set('business_name', 'Venexpress Maracay')
             ->set('rif', 'J-12345678-9')
             ->set('state', 'Aragua')
@@ -88,6 +89,7 @@ class FranchiseTest extends TestCase
         $this->assertTrue($ally->isFranchise());
         $this->assertTrue($ally->canOperate());
         $this->assertSame(0.0, (float) $ally->commission_percentage);
+        $this->assertSame(8.0, (float) $ally->franchise_fee_percentage);
     }
 
     public function test_franchise_cannot_self_register_from_the_public_form(): void

@@ -83,6 +83,7 @@ class FranchiseWarehouseTest extends TestCase
             ->set('password', 'Password-seguro-123')
             ->set('password_confirmation', 'Password-seguro-123')
             ->set('role', User::ROLE_FRANQUICIADO)
+            ->set('franchise_fee_percentage', '8')
             ->set('business_name', 'Venexpress Valencia')
             ->set('rif', 'J-11111111-1')
             ->set('state', 'Carabobo')

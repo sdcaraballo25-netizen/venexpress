@@ -7,6 +7,7 @@ use App\Http\Controllers\PaymentWebhookController;
 use App\Http\Controllers\TrackingController;
 use App\Livewire\Admin\AlliesManager;
 use App\Livewire\Admin\AllyFinance;
+use App\Livewire\Admin\FranchiseReceivables;
 use App\Livewire\Admin\AuditLogViewer;
 use App\Livewire\Admin\BcvRateManager;
 use App\Livewire\Admin\CategoriasManager;
@@ -123,8 +124,9 @@ Route::prefix('ally')
 
         // Comisiones y Corte de caja (liquidación de comisión con la
         // empresa) son solo del Aliado Administrador: el Franquiciado
-        // no tiene comisión ni liquidaciones con Venexpress. En su lugar
-        // tiene Finanzas (ingresos, gastos y ventas por taquilla).
+        // no tiene comisión ni liquidaciones con Venexpress (paga una cuota
+        // mensual, ver admin.franchise-receivables). En su lugar tiene
+        // Finanzas (ingresos, gastos, cuota y ventas por taquilla).
         Route::get('/comisiones', AllyCommissions::class)
             ->middleware('role:aliado')
             ->name('commissions');
@@ -569,6 +571,11 @@ Route::prefix('admin')
 
         Route::get('/finanzas-aliados', AllyFinance::class)
             ->name('ally-finance');
+
+        // Cuentas por cobrar de franquicias: cuota mensual (% de ventas)
+        // y pagos registrados manualmente por el Admin.
+        Route::get('/cuentas-por-cobrar-franquicias', FranchiseReceivables::class)
+            ->name('franchise-receivables');
 
         /*
         |--------------------------------------------------------------------------

@@ -1660,9 +1660,9 @@ class PackageService
     ): array {
         $ally = Ally::findOrFail($allyId);
 
-        // Franquicia: no le paga a la empresa ni la empresa le liquida
-        // comisión — la venta completa es del franquiciado, así que no
-        // se registra comisión (ni movimiento en el ledger).
+        // Franquicia: la empresa no le liquida comisión por guía (ni hay
+        // movimiento en el ledger). Lo que la franquicia le paga a la
+        // empresa es una cuota mensual aparte (FranchiseBillingService).
         $percentage = $ally->isFranchise()
             ? 0.0
             : (float) $ally->commission_percentage;

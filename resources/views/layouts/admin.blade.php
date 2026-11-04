@@ -163,7 +163,8 @@
                                 {{ request()->routeIs(
                                     'admin.allies',
                                     'admin.rate-matrices',
-                                    'admin.ally-finance'
+                                    'admin.ally-finance',
+                                    'admin.franchise-receivables'
                                 ) ? 'true' : 'false' }}
                             ) {
                                 this.openGroup = 'aliados';
@@ -668,6 +669,23 @@
                                 </svg>
 
                                 Finanzas de aliados
+
+                            </a>
+
+                            {{-- Cuentas por cobrar de franquicias --}}
+                            <a
+                                href="{{ route('admin.franchise-receivables') }}"
+                                class="flex items-center gap-3 px-4 py-3 rounded-xl font-medium transition-colors
+                                {{ request()->routeIs('admin.franchise-receivables')
+                                    ? 'bg-amber-400 text-[#111111]'
+                                    : 'text-[#6B6B66] hover:bg-slate-50 hover:text-[#111111]' }}"
+                            >
+                                <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.8"
+                                        d="M9 14l6-6m-5.5.5h.01m4.99 5h.01M19 21V5a2 2 0 00-2-2H7a2 2 0 00-2 2v16l3.5-2 3.5 2 3.5-2 3.5 2z" />
+                                </svg>
+
+                                Cuentas por cobrar (franquicias)
 
                             </a>
 

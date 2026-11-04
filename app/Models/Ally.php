@@ -67,6 +67,7 @@ class Ally extends Model
         'latitude',
         'longitude',
         'commission_percentage',
+        'franchise_fee_percentage',
         'bank_account_number',
         'bank_account_holder_name',
         'bank_account_holder_id',
@@ -83,6 +84,7 @@ class Ally extends Model
     {
         return [
             'commission_percentage' => 'decimal:2',
+            'franchise_fee_percentage' => 'decimal:2',
             'latitude' => 'decimal:7',
             'longitude' => 'decimal:7',
             'is_verified_destination' => 'boolean',
@@ -105,8 +107,10 @@ class Ally extends Model
     /**
      * True si esta agencia pertenece a un Franquiciado (role
      * 'franquiciado') en vez de a un Aliado Administrador. Una
-     * franquicia no genera comisiones ni liquidaciones con la empresa:
-     * lo que vende es suyo (ver PackageService::calculateCommission()).
+     * franquicia no genera comisiones ni liquidaciones con la empresa
+     * (ver PackageService::calculateCommission()); en cambio le paga a
+     * Venexpress una cuota mensual = franchise_fee_percentage % de sus
+     * ventas del mes (ver FranchiseBillingService).
      */
     public function isFranchise(): bool
     {
@@ -209,6 +213,20 @@ class Ally extends Model
     public function warehouse(): HasOne
     {
         return $this->hasOne(Warehouse::class);
+    }
+
+    public function franchiseInvoices(): HasMany
+    {
+        return $this->hasMany(
+            FranchiseInvoice::class
+        );
+    }
+
+    public function franchisePayments(): HasMany
+    {
+        return $this->hasMany(
+            FranchisePayment::class
+        );
     }
 
     public function franchiseExpenses(): HasMany

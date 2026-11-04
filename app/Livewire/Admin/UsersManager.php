@@ -68,6 +68,9 @@ class UsersManager extends Component
 
     public string $business_name = '';
 
+    /** Cuota mensual de la franquicia (% de sus ventas del mes). */
+    public string $franchise_fee_percentage = '';
+
     public string $rif = '';
 
     public string $state = '';
@@ -228,9 +231,9 @@ class UsersManager extends Component
             $user->forceFill(['account_verified_at' => now()])->save();
 
             // Aliado Administrador y Franquiciado tienen ambos su propia
-            // agencia (Ally). La franquicia no lleva comisión: no le
-            // paga a la empresa ni la empresa le liquida (ver
-            // Ally::isFranchise()).
+            // agencia (Ally). La franquicia no lleva comisión; en cambio
+            // paga una cuota mensual (% de sus ventas) que se cobra en
+            // Cuentas por cobrar (ver FranchiseBillingService).
             if ($user->isAgencyOwner()) {
                 $ally = Ally::create([
                     'user_id' => $user->id,
@@ -240,6 +243,9 @@ class UsersManager extends Component
                     'city' => $validated['city'],
                     'address' => $validated['address'],
                     'commission_percentage' => $user->isFranquiciado() ? 0.00 : 10.00,
+                    'franchise_fee_percentage' => $user->isFranquiciado()
+                        ? round((float) ($validated['franchise_fee_percentage'] ?? 0), 2)
+                        : 0,
                     'status' => Ally::STATUS_ACTIVE,
                     // Creado directamente por un Admin: la creación
                     // administrativa cuenta como aprobación, así que
@@ -812,6 +818,10 @@ class UsersManager extends Component
             ],
         ];
 
+        if ($this->role === User::ROLE_FRANQUICIADO) {
+            $rules['franchise_fee_percentage'] = ['required', 'numeric', 'min:0', 'max:100'];
+        }
+
         if (in_array($this->role, [User::ROLE_ALIADO, User::ROLE_FRANQUICIADO], true)) {
             $rules += [
                 'business_name' => [
@@ -900,6 +910,7 @@ class UsersManager extends Component
             'password',
             'password_confirmation',
             'business_name',
+            'franchise_fee_percentage',
             'rif',
             'state',
             'city',

@@ -6,6 +6,7 @@ use App\Livewire\Concerns\ExportsSpreadsheet;
 use App\Models\Ally;
 use App\Models\FranchiseExpense;
 use App\Models\Package;
+use App\Services\FranchiseBillingService;
 use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Support\Carbon;
 use Illuminate\Support\Collection;
@@ -22,14 +23,16 @@ use Symfony\Component\HttpFoundation\BinaryFileResponse;
  * Finanzas del Franquiciado (role 'franquiciado').
  *
  * A diferencia del Aliado Administrador, el Franquiciado no tiene
- * comisión ni liquidaciones con la empresa (ver Ally::isFranchise()):
- * todo lo que vende es suyo. Por eso, en lugar de "Comisiones y saldo"
+ * comisión ni liquidaciones con la empresa (ver Ally::isFranchise());
+ * en cambio paga a Venexpress una cuota mensual (% de sus ventas, ver
+ * FranchiseBillingService). Por eso, en lugar de "Comisiones y saldo"
  * y "Corte de caja", tiene este panel con control más completo:
  *
  * - Ventas del período elegido, comparadas contra el período anterior.
  * - Ventas por taquilla (participación, ticket promedio, COD).
  * - Ventas por forma de pago y tendencia diaria.
- * - Registro de gastos operativos y utilidad neta (ventas - gastos).
+ * - Registro de gastos operativos, cuota de franquicia y utilidad neta
+ *   (ventas - gastos - cuota).
  *
  * Las ventas se cuentan por fecha de registro de la guía, igual que
  * Ally\Dashboard y Ally\SalesCloseout, para que las cifras cuadren
@@ -347,7 +350,7 @@ class FranchiseFinance extends Component
             ->values();
     }
 
-    public function render()
+    public function render(FranchiseBillingService $billing)
     {
         $ally = $this->ally();
         [$from, $to] = $this->periodBounds();
@@ -412,8 +415,15 @@ class FranchiseFinance extends Component
             ? $prevGrossSales
             : (float) $this->salesQuery($prevFrom, $prevTo, applyStaffFilter: false)->sum('total_price_usd');
 
-        $netProfit = $grossAll - $expensesTotal;
-        $prevNetProfit = $prevGrossAll - $prevExpensesTotal;
+        // Cuota de franquicia del período: misma regla que Cuentas por
+        // cobrar (Admin\FranchiseReceivables), aplicada a las ventas
+        // totales del período elegido.
+        $feePercentage = (float) $ally->franchise_fee_percentage;
+        $feeAccrued = $billing->feeFor($grossAll, $feePercentage);
+        $prevFeeAccrued = $billing->feeFor($prevGrossAll, $feePercentage);
+
+        $netProfit = $grossAll - $expensesTotal - $feeAccrued;
+        $prevNetProfit = $prevGrossAll - $prevExpensesTotal - $prevFeeAccrued;
         $margin = $grossAll > 0 ? $netProfit / $grossAll * 100 : null;
 
         $expensesByCategory = $this->expensesQuery($from, $to)
@@ -452,6 +462,10 @@ class FranchiseFinance extends Component
             'grossAll' => $grossAll,
             'expensesTotal' => $expensesTotal,
             'netProfit' => $netProfit,
+            'feePercentage' => $feePercentage,
+            'feeAccrued' => $feeAccrued,
+            'feeBalance' => $billing->balance($ally),
+            'recentFranchisePayments' => $ally->franchisePayments()->with('invoice')->latest('paid_on')->latest('id')->limit(5)->get(),
             'prevNetProfit' => $prevNetProfit,
             'margin' => $margin,
             'expensesByCategory' => $expensesByCategory,

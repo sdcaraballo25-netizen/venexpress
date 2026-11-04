@@ -211,10 +211,16 @@
                             </h3>
                             @if ($role === 'franquiciado')
                                 <p class="mt-1 text-xs text-blue-900/80">
-                                    El franquiciado no se postula ni paga comisión a la empresa: queda activo
-                                    de inmediato con las credenciales que definas aquí. Entrégaselas por un
-                                    canal seguro.
+                                    El franquiciado no se postula: queda activo de inmediato con las
+                                    credenciales que definas aquí (entrégaselas por un canal seguro). Paga una
+                                    cuota mensual igual al porcentaje de sus ventas que indiques abajo; se cobra
+                                    en Cuentas por cobrar (franquicias).
                                 </p>
+                                <div class="mt-4 max-w-xs">
+                                    <x-input-label for="franchise-fee" value="Cuota mensual (% de las ventas)" />
+                                    <x-text-input wire:model="franchise_fee_percentage" id="franchise-fee" class="mt-1.5 block w-full" type="number" step="0.01" min="0" max="100" />
+                                    <x-input-error :messages="$errors->get('franchise_fee_percentage')" class="mt-2" />
+                                </div>
                             @endif
                             <div class="mt-4 grid gap-5 md:grid-cols-2">
                                 <div>
