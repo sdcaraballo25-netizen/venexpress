@@ -184,7 +184,10 @@ class FranchiseFinance extends Component
     {
         return FranchiseExpense::query()
             ->where('ally_id', $this->ally()->id)
-            ->whereBetween('spent_on', [$from->toDateString(), $to->toDateString()]);
+            // whereDate y no whereBetween: según el motor, la columna
+            // date puede guardarse con hora ("Y-m-d 00:00:00").
+            ->whereDate('spent_on', '>=', $from->toDateString())
+            ->whereDate('spent_on', '<=', $to->toDateString());
     }
 
     /*
@@ -227,11 +230,14 @@ class FranchiseFinance extends Component
 
     public function deleteExpense(int $expenseId): void
     {
-        FranchiseExpense::query()
+        $expense = FranchiseExpense::query()
             ->where('ally_id', $this->ally()->id)
             ->whereKey($expenseId)
-            ->firstOrFail()
-            ->delete();
+            ->first();
+
+        abort_unless($expense, 404);
+
+        $expense->delete();
 
         session()->flash('success', 'Gasto eliminado.');
     }
