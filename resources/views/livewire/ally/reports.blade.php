@@ -75,10 +75,18 @@
             <p class="mt-2 text-2xl font-bold text-emerald-600">${{ number_format((float) $revenueTotal, 2) }}</p>
         </div>
 
-        <div class="bg-white rounded-2xl border border-[#E5E5E0] p-5 shadow-sm">
-            <p class="text-xs font-bold text-[#6B6B66] uppercase tracking-wider">Comisiones (USD)</p>
-            <p class="mt-2 text-2xl font-bold text-[#111111]">${{ number_format((float) $commissionsTotal, 2) }}</p>
-        </div>
+        @if (auth()->user()->isFranquiciado())
+            {{-- Franquicia: sin comisión con la empresa. --}}
+            <div class="bg-white rounded-2xl border border-[#E5E5E0] p-5 shadow-sm">
+                <p class="text-xs font-bold text-[#6B6B66] uppercase tracking-wider">Ventas registradas (USD)</p>
+                <p class="mt-2 text-2xl font-bold text-[#111111]">${{ number_format((float) $registeredTotal, 2) }}</p>
+            </div>
+        @else
+            <div class="bg-white rounded-2xl border border-[#E5E5E0] p-5 shadow-sm">
+                <p class="text-xs font-bold text-[#6B6B66] uppercase tracking-wider">Comisiones (USD)</p>
+                <p class="mt-2 text-2xl font-bold text-[#111111]">${{ number_format((float) $commissionsTotal, 2) }}</p>
+            </div>
+        @endif
 
         <div class="bg-white rounded-2xl border border-[#E5E5E0] p-5 shadow-sm">
             <p class="text-xs font-bold text-[#6B6B66] uppercase tracking-wider">Incidencias</p>

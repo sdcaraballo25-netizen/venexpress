@@ -119,6 +119,7 @@
                                 'ally.sales-closeout',
                                 'ally.cash-cut',
                                 'ally.commissions',
+                                'ally.franchise-finance',
                                 'ally.reports'
                             ) ? 'true' : 'false' }}
                         ) {
@@ -150,8 +151,8 @@
                 </p>
 
 
-                {{-- DASHBOARD (solo Aliado Administrador: agrega TODAS las taquillas) --}}
-                @if (auth()->user()->isAliado())
+                {{-- DASHBOARD (solo el dueño: Aliado Administrador o Franquiciado: agrega TODAS las taquillas) --}}
+                @if (auth()->user()->isAgencyOwner())
                     <a
                         href="{{ route('ally.dashboard') }}"
                         wire:navigate
@@ -572,6 +573,36 @@
                                 <span>Comisiones y saldo</span>
                             </a>
 
+                        @endif
+
+                        @if (auth()->user()->isFranquiciado())
+
+                            {{-- Finanzas (solo Franquiciado: no tiene comisiones con la empresa) --}}
+                            <a
+                                href="{{ route('ally.franchise-finance') }}"
+                                wire:navigate
+                                class="mb-1 flex items-center gap-3 rounded-xl px-3 py-2.5 text-sm font-medium transition
+                                {{ request()->routeIs('ally.franchise-finance')
+                                    ? 'bg-amber-400 text-[#111111]'
+                                    : 'text-slate-600 hover:bg-slate-50' }}"
+                            >
+                                <svg class="h-5 w-5"
+                                    fill="none"
+                                    stroke="currentColor"
+                                    viewBox="0 0 24 24">
+                                    <path stroke-linecap="round"
+                                        stroke-linejoin="round"
+                                        stroke-width="2"
+                                        d="M16 8v8m-4-5v5m-4-2v2m-2 4h12a2 2 0 002-2V6a2 2 0 00-2-2H6a2 2 0 00-2 2v12a2 2 0 002 2z"/>
+                                </svg>
+
+                                <span>Finanzas</span>
+                            </a>
+
+                        @endif
+
+                        @if (auth()->user()->isAgencyOwner())
+
                             {{-- Reportes --}}
                             <a
                                 href="{{ route('ally.reports') }}"
@@ -640,7 +671,7 @@
                         class="mt-1 space-y-1"
                     >
 
-                        @if (auth()->user()->isAliado())
+                        @if (auth()->user()->isAgencyOwner())
 
                             {{-- TAQUILLAS --}}
                             <a

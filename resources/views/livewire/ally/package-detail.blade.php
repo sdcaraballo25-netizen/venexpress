@@ -19,7 +19,7 @@
                 {{ $package->tracking_number }}
             </p>
 
-            @if (auth()->user()->isAliado() && $package->registeredBy)
+            @if (auth()->user()->isAgencyOwner() && $package->registeredBy)
                 <p class="mt-1 text-xs text-slate-400">
                     Registrado por <span class="font-medium text-slate-600">{{ $package->registeredBy->name }}</span>
                 </p>

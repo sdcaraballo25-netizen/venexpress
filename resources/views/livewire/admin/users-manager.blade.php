@@ -89,6 +89,7 @@
                                         'admin_principal' => 'bg-violet-50 text-violet-700',
                                         'admin_operativo' => 'bg-indigo-50 text-indigo-700',
                                         'aliado' => 'bg-blue-50 text-blue-700',
+                                        'franquiciado' => 'bg-amber-50 text-amber-700',
                                         'repartidor' => 'bg-orange-50 text-orange-700',
                                         default => 'bg-slate-100 text-slate-700',
                                     };
@@ -191,6 +192,7 @@
                         <x-input-label for="admin-user-role" value="Tipo de usuario" />
                         <select wire:model.live="role" id="admin-user-role" class="mt-1.5 block w-full rounded-md border-gray-300 shadow-sm focus:border-blue-500 focus:ring-blue-500">
                             <option value="aliado">Aliado</option>
+                            <option value="franquiciado">Franquiciado</option>
                             <option value="repartidor">Repartidor</option>
                             <option value="almacen">Personal de Almacén</option>
                             <option value="admin_operativo">Administrador Operativo</option>
@@ -202,9 +204,18 @@
                         <x-input-error :messages="$errors->get('role')" class="mt-2" />
                     </div>
 
-                    @if ($role === 'aliado')
+                    @if (in_array($role, ['aliado', 'franquiciado'], true))
                         <div class="rounded-xl border border-blue-100 bg-blue-50/50 p-5">
-                            <h3 class="font-semibold text-blue-950">Información del aliado</h3>
+                            <h3 class="font-semibold text-blue-950">
+                                {{ $role === 'franquiciado' ? 'Información de la franquicia' : 'Información del aliado' }}
+                            </h3>
+                            @if ($role === 'franquiciado')
+                                <p class="mt-1 text-xs text-blue-900/80">
+                                    El franquiciado no se postula ni paga comisión a la empresa: queda activo
+                                    de inmediato con las credenciales que definas aquí. Entrégaselas por un
+                                    canal seguro.
+                                </p>
+                            @endif
                             <div class="mt-4 grid gap-5 md:grid-cols-2">
                                 <div>
                                     <x-input-label for="business-name" value="Nombre comercial" />

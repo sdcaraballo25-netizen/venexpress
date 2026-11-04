@@ -41,7 +41,7 @@ class Packages extends Component
             );
         }
 
-        $isPrincipal = $user->isAliado();
+        $isPrincipal = $user->isAgencyOwner();
 
         $query = Package::query()
             ->where('ally_id', $ally->id)

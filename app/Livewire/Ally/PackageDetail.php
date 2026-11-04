@@ -30,7 +30,7 @@ class PackageDetail extends Component
             ->where('ally_id', $ally->id)
             // Taquilla solo puede abrir el detalle de una guía que
             // ella misma registró — no las del resto del negocio.
-            ->when(! $user->isAliado(), fn ($query) => $query->where('registered_by_user_id', $user->id))
+            ->when(! $user->isAgencyOwner(), fn ($query) => $query->where('registered_by_user_id', $user->id))
             ->with([
                 'driver.user',
                 'registeredBy:id,name',

@@ -6,7 +6,7 @@
     $user = auth()->user();
 
     $status = match (true) {
-        $user->isAliado() => $user->ally?->status,
+        $user->isAgencyOwner() => $user->ally?->status,
         $user->isAliadoTaquilla() => $user->alliedAgency?->status,
         $user->isRepartidor() => $user->driver?->status,
         $user->isEmprendedor() => $user->emprendedor?->status,
@@ -22,7 +22,7 @@
      * operativo) y como respaldo para cuentas históricas.
      */
     $verification = match (true) {
-        $user->isAliado() => $user->ally?->verification_status,
+        $user->isAgencyOwner() => $user->ally?->verification_status,
         $user->isAliadoTaquilla() => $user->alliedAgency?->verification_status,
         $user->isRepartidor() => $user->driver?->verification_status,
         $user->isEmprendedor() => $user->emprendedor?->verification_status,

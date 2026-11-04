@@ -71,6 +71,38 @@
         </div>
 
 
+        {{-- Franquicia: sin comisión con la empresa (Ally::isFranchise()),
+             así que en vez del saldo de comisiones se muestra el ticket
+             promedio y el acceso a Finanzas. --}}
+        @if ($ally->isFranchise())
+
+        <div class="rounded-2xl border border-[#E5E5E0] bg-white p-5">
+            <p class="text-sm text-slate-500">
+                Ticket promedio
+            </p>
+
+            <p class="mt-2 font-display text-2xl font-semibold text-[#111111]">
+                ${{ number_format($processedCount > 0 ? $totalBilledUsd / $processedCount : 0, 2) }}
+            </p>
+        </div>
+
+
+        <a
+            href="{{ route('ally.franchise-finance') }}"
+            wire:navigate
+            class="block rounded-2xl border border-[#E5E5E0] bg-blue-900 p-5 transition hover:bg-blue-800"
+        >
+            <p class="text-sm text-blue-200">
+                Franquicia · ventas 100% tuyas
+            </p>
+
+            <p class="mt-2 font-display text-2xl font-semibold text-white">
+                Ver finanzas →
+            </p>
+        </a>
+
+        @else
+
         <div class="rounded-2xl border border-[#E5E5E0] bg-white p-5">
             <p class="text-sm text-slate-500">
                 Comisión del período
@@ -91,6 +123,8 @@
                 ${{ number_format($totalCommissionBalanceUsd, 2) }}
             </p>
         </div>
+
+        @endif
 
     </div>
 

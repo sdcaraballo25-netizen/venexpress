@@ -102,6 +102,33 @@ class Ally extends Model
     }
 
     /**
+     * True si esta agencia pertenece a un Franquiciado (role
+     * 'franquiciado') en vez de a un Aliado Administrador. Una
+     * franquicia no genera comisiones ni liquidaciones con la empresa:
+     * lo que vende es suyo (ver PackageService::calculateCommission()).
+     */
+    public function isFranchise(): bool
+    {
+        return $this->user?->isFranquiciado() ?? false;
+    }
+
+    public function scopeFranchises($query)
+    {
+        return $query->whereHas(
+            'user',
+            fn ($q) => $q->where('role', User::ROLE_FRANQUICIADO)
+        );
+    }
+
+    public function scopeWithoutFranchises($query)
+    {
+        return $query->whereDoesntHave(
+            'user',
+            fn ($q) => $q->where('role', User::ROLE_FRANQUICIADO)
+        );
+    }
+
+    /**
      * Aliado habilitado como punto final de entrega/retiro (no
      * redistribuye). Mientras no exista el flujo de verificación
      * documental completo, este flag lo activa el Admin manualmente.
@@ -171,6 +198,13 @@ class Ally extends Model
     {
         return $this->hasMany(
             AllyFinancialTransaction::class
+        );
+    }
+
+    public function franchiseExpenses(): HasMany
+    {
+        return $this->hasMany(
+            FranchiseExpense::class
         );
     }
 

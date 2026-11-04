@@ -35,6 +35,7 @@ use App\Livewire\Ally\Commissions as AllyCommissions;
 use App\Livewire\Ally\DailyCashCut;
 use App\Livewire\Ally\Dashboard as AllyDashboard;
 use App\Livewire\Ally\EmprendedorPedidos as AllyEmprendedorPedidos;
+use App\Livewire\Ally\FranchiseFinance;
 use App\Livewire\Ally\HelpCenter as AllyHelpCenter;
 use App\Livewire\Ally\Incidents as AllyIncidents;
 use App\Livewire\Ally\PackageCreate as AllyPackageCreate;
@@ -100,7 +101,7 @@ Route::prefix('ally')
     ->middleware([
         'auth',
         'verified',
-        'role:aliado,aliado_taquilla',
+        'role:aliado,franquiciado,aliado_taquilla',
         'account.verified',
         'account.approved',
     ])
@@ -108,10 +109,10 @@ Route::prefix('ally')
     ->group(function () {
 
         // Ventas de TODO el negocio (todas las taquillas combinadas):
-        // solo el Aliado Administrador. Taquilla usa /cierre-del-dia
+        // solo el dueño (Aliado Administrador o Franquiciado). Taquilla usa /cierre-del-dia
         // (más abajo), que solo muestra lo que ella misma registró.
         Route::get('/dashboard', AllyDashboard::class)
-            ->middleware('role:aliado')
+            ->middleware('role:aliado,franquiciado')
             ->name('dashboard');
 
         Route::get('/pedidos/nuevo', AllyPackageCreate::class)
@@ -120,12 +121,20 @@ Route::prefix('ally')
         Route::get('/pedidos-emprendedores', AllyEmprendedorPedidos::class)
             ->name('emprendedor-pedidos');
 
+        // Comisiones y Corte de caja (liquidación de comisión con la
+        // empresa) son solo del Aliado Administrador: el Franquiciado
+        // no tiene comisión ni liquidaciones con Venexpress. En su lugar
+        // tiene Finanzas (ingresos, gastos y ventas por taquilla).
         Route::get('/comisiones', AllyCommissions::class)
             ->middleware('role:aliado')
             ->name('commissions');
 
+        Route::get('/finanzas', FranchiseFinance::class)
+            ->middleware('role:franquiciado')
+            ->name('franchise-finance');
+
         Route::get('/reportes', AllyReports::class)
-            ->middleware('role:aliado')
+            ->middleware('role:aliado,franquiciado')
             ->name('reports');
 
         Route::get('/pedidos', AllyPackages::class)
@@ -141,7 +150,7 @@ Route::prefix('ally')
         */
 
         Route::get('/taquillas', AllyStaffManager::class)
-            ->middleware('role:aliado')
+            ->middleware('role:aliado,franquiciado')
             ->name('staff');
 
         /*
@@ -160,29 +169,29 @@ Route::prefix('ally')
             ->name('sales-closeout');
 
         Route::get('/cod', AllyCod::class)
-            ->middleware('role:aliado,aliado_taquilla')
+            ->middleware('role:aliado,franquiciado,aliado_taquilla')
             ->name('cod');
 
         Route::get('/incidencias', AllyIncidents::class)
-            ->middleware('role:aliado,aliado_taquilla')
+            ->middleware('role:aliado,franquiciado,aliado_taquilla')
             ->name('incidents');
 
         Route::get('/paquetes/retiro', AllyPackagePickup::class)
-            ->middleware('role:aliado,aliado_taquilla')
+            ->middleware('role:aliado,franquiciado,aliado_taquilla')
             ->name('packages.pickup');
 
         Route::get('/paquetes/recepcion', PackageReception::class)
-            ->middleware('role:aliado,aliado_taquilla')
+            ->middleware('role:aliado,franquiciado,aliado_taquilla')
             ->name('packages.reception');
 
         // Devoluciones al remitente: guías de esta agencia (origen) que
         // un admin puso en devolución. Ver Ally\PackageReturns.
         Route::get('/devoluciones', AllyPackageReturns::class)
-            ->middleware('role:aliado,aliado_taquilla')
+            ->middleware('role:aliado,franquiciado,aliado_taquilla')
             ->name('packages.returns');
 
         Route::get('/ayuda', AllyHelpCenter::class)
-            ->middleware('role:aliado,aliado_taquilla')
+            ->middleware('role:aliado,franquiciado,aliado_taquilla')
             ->name('help');
     });
 

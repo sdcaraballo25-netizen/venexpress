@@ -74,7 +74,7 @@ class SalesCloseout extends Component
     {
         $ally = $this->ally();
         $user = Auth::user();
-        $isPrincipal = $user->isAliado();
+        $isPrincipal = $user->isAgencyOwner();
 
         $day = Carbon::parse($this->date);
         $range = [$day->copy()->startOfDay(), $day->copy()->endOfDay()];
@@ -166,7 +166,7 @@ class SalesCloseout extends Component
     {
         $ally = $this->ally();
         $user = Auth::user();
-        $isPrincipal = $user->isAliado();
+        $isPrincipal = $user->isAgencyOwner();
 
         $baseQuery = $this->baseQuery();
 

@@ -37,7 +37,7 @@ class EnsureAccountIsApproved
          * porque no había nada que comparar.
          */
         $canOperate = match (true) {
-            $user->isAliado() => (bool) $user->ally?->canOperate(),
+            $user->isAgencyOwner() => (bool) $user->ally?->canOperate(),
             $user->isAliadoTaquilla() => (bool) $user->alliedAgency?->canOperate(),
             $user->isRepartidor() => (bool) $user->driver?->canOperate(),
             $user->isEmprendedor() => (bool) $user->emprendedor?->canOperate(),

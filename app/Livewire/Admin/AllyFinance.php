@@ -56,9 +56,11 @@ class AllyFinance extends Component
     public function selectAlly(
         int $allyId
     ): void {
-        Ally::findOrFail(
-            $allyId
-        );
+        Ally::query()
+            ->withoutFranchises()
+            ->findOrFail(
+                $allyId
+            );
 
         $this->selectedAllyId =
             $allyId;
@@ -404,8 +406,11 @@ class AllyFinance extends Component
     public function render(
         AllyFinancialService $financialService
     ) {
+        // Las franquicias no tienen comisiones ni liquidaciones con la
+        // empresa (Ally::isFranchise()): no aparecen aquí.
         $allies =
             Ally::query()
+                ->withoutFranchises()
                 ->when(
                     $this->search !== '',
                     function ($query) {

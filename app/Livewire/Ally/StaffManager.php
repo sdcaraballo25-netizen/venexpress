@@ -39,7 +39,7 @@ class StaffManager extends Component
         $user = Auth::user();
         $ally = $user?->resolveAlly();
 
-        abort_unless($ally && $user->isAliado(), 403, 'Solo el Aliado Administrador puede gestionar Taquillas.');
+        abort_unless($ally && $user->isAgencyOwner(), 403, 'Solo el dueño de la agencia puede gestionar Taquillas.');
 
         return $ally;
     }

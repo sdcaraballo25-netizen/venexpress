@@ -1660,8 +1660,12 @@ class PackageService
     ): array {
         $ally = Ally::findOrFail($allyId);
 
-        $percentage =
-            (float) $ally->commission_percentage;
+        // Franquicia: no le paga a la empresa ni la empresa le liquida
+        // comisión — la venta completa es del franquiciado, así que no
+        // se registra comisión (ni movimiento en el ledger).
+        $percentage = $ally->isFranchise()
+            ? 0.0
+            : (float) $ally->commission_percentage;
 
         $amount = Money::round(
             Money::mul($totalPriceUsd, Money::div($percentage, 100)),

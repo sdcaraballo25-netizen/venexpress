@@ -144,6 +144,7 @@ class Reports extends Component
         // Igual que Admin\Reports: la comisión se cuenta por fecha de
         // registro de la guía, no por fecha de entrega.
         $commissionsTotal = $baseQuery()->sum('commission_amount_usd');
+        $registeredTotal = $baseQuery()->sum('total_price_usd');
 
         $incidentsCount = Incident::query()
             ->where('ally_id', $ally->id)
@@ -223,6 +224,7 @@ class Reports extends Component
             'deliveryRate' => $deliveryRate,
             'revenueTotal' => $revenueTotal,
             'commissionsTotal' => $commissionsTotal,
+            'registeredTotal' => $registeredTotal,
             'incidentsCount' => $incidentsCount,
             'chartLabels' => $chartLabels,
             'chartRegistered' => $chartRegistered,

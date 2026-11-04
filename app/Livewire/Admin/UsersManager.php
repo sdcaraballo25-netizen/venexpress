@@ -227,7 +227,11 @@ class UsersManager extends Component
             // por el código de verificación de EnsureAccountIsVerified.
             $user->forceFill(['account_verified_at' => now()])->save();
 
-            if ($user->isAliado()) {
+            // Aliado Administrador y Franquiciado tienen ambos su propia
+            // agencia (Ally). La franquicia no lleva comisión: no le
+            // paga a la empresa ni la empresa le liquida (ver
+            // Ally::isFranchise()).
+            if ($user->isAgencyOwner()) {
                 Ally::create([
                     'user_id' => $user->id,
                     'business_name' => $validated['business_name'],
@@ -235,7 +239,7 @@ class UsersManager extends Component
                     'state' => $validated['state'],
                     'city' => $validated['city'],
                     'address' => $validated['address'],
-                    'commission_percentage' => 10.00,
+                    'commission_percentage' => $user->isFranquiciado() ? 0.00 : 10.00,
                     'status' => Ally::STATUS_ACTIVE,
                     // Creado directamente por un Admin: la creación
                     // administrativa cuenta como aprobación, así que
@@ -551,7 +555,7 @@ class UsersManager extends Component
                 }
             }
 
-            if ($target->isAliado() && $target->ally) {
+            if ($target->isAgencyOwner() && $target->ally) {
                 $from = $reactivating ? Ally::STATUS_SUSPENDED : Ally::STATUS_ACTIVE;
 
                 if ($target->ally->status === $from) {
@@ -788,7 +792,7 @@ class UsersManager extends Component
             ],
         ];
 
-        if ($this->role === User::ROLE_ALIADO) {
+        if (in_array($this->role, [User::ROLE_ALIADO, User::ROLE_FRANQUICIADO], true)) {
             $rules += [
                 'business_name' => [
                     'required',

@@ -25,6 +25,15 @@ class User extends Authenticatable
     public const ROLE_ALMACEN = 'almacen';
     public const ROLE_EMPRENDEDOR = 'emprendedor';
 
+    /**
+     * Franquiciado: dueño de una agencia con las mismas funciones que
+     * el Aliado Administrador (role 'aliado'), pero sin postulación
+     * pública — solo lo crea un Admin desde Gestión de Usuarios — y
+     * sin comisión/liquidación con la empresa: sus ventas son suyas
+     * (ver Ally::isFranchise() y PackageService::calculateCommission()).
+     */
+    public const ROLE_FRANQUICIADO = 'franquiciado';
+
     // Alias de compatibilidad para código existente.
     public const ROLE_ADMIN = self::ROLE_ADMIN_PRINCIPAL;
     public const ROLE_CHOFER = self::ROLE_REPARTIDOR;
@@ -148,7 +157,7 @@ class User extends Authenticatable
     /**
      * Roles que se autorregistran desde el formulario público y, por
      * lo tanto, deben demostrar que el correo es suyo (código de 6
-     * dígitos) antes de entrar a su panel. Admin, Taquilla y Almacén
+     * dígitos) antes de entrar a su panel. Admin, Franquiciado, Taquilla y Almacén
      * no se autorregistran: los crea un Admin o el Aliado
      * Administrador, que ya responde por esa cuenta (y Taquilla ni
      * siquiera tiene un correo real — ver AllyStaffService).
@@ -394,13 +403,28 @@ class User extends Authenticatable
         return $this->role === self::ROLE_ALIADO_TAQUILLA;
     }
 
+    public function isFranquiciado(): bool
+    {
+        return $this->role === self::ROLE_FRANQUICIADO;
+    }
+
+    /**
+     * True si el usuario es DUEÑO de una agencia (Aliado
+     * Administrador o Franquiciado): ve todo el negocio y gestiona
+     * sus Taquillas. Taquilla no lo es.
+     */
+    public function isAgencyOwner(): bool
+    {
+        return $this->isAliado() || $this->isFranquiciado();
+    }
+
     /**
      * True si el usuario opera dentro del módulo Aliado,
-     * sin importar si es Administrador o Taquilla.
+     * sin importar si es Administrador, Franquiciado o Taquilla.
      */
     public function isAliadoModule(): bool
     {
-        return $this->isAliado() || $this->isAliadoTaquilla();
+        return $this->isAgencyOwner() || $this->isAliadoTaquilla();
     }
 
     public function isRepartidor(): bool
@@ -439,7 +463,7 @@ class User extends Authenticatable
      */
     public function resolveAlly(): ?Ally
     {
-        if ($this->isAliado()) {
+        if ($this->isAgencyOwner()) {
             return $this->ally;
         }
 
@@ -462,6 +486,7 @@ class User extends Authenticatable
                 self::ROLE_ADMIN_PRINCIPAL,
                 self::ROLE_ADMIN_OPERATIVO,
                 self::ROLE_ALIADO,
+                self::ROLE_FRANQUICIADO,
                 self::ROLE_ALIADO_TAQUILLA,
                 self::ROLE_REPARTIDOR,
                 self::ROLE_CLIENTE,
@@ -473,6 +498,7 @@ class User extends Authenticatable
             return in_array($role, [
                 self::ROLE_ADMIN_OPERATIVO,
                 self::ROLE_ALIADO,
+                self::ROLE_FRANQUICIADO,
                 self::ROLE_ALIADO_TAQUILLA,
                 self::ROLE_REPARTIDOR,
                 self::ROLE_CLIENTE,
@@ -482,8 +508,9 @@ class User extends Authenticatable
 
         // El Aliado Administrador puede crear usuarios de Taquilla
         // de su propia agencia (RF-ALI-02). El scoping por agencia
-        // se valida en AllyStaffService, no aquí.
-        if ($this->isAliado()) {
+        // se valida en AllyStaffService, no aquí. El Franquiciado
+        // tiene las mismas facultades sobre sus Taquillas.
+        if ($this->isAgencyOwner()) {
             return $role === self::ROLE_ALIADO_TAQUILLA;
         }
 
@@ -496,7 +523,7 @@ class User extends Authenticatable
             return ! ($this->isAdminOperativo() && $target->isAdmin());
         }
 
-        if ($this->isAliado()) {
+        if ($this->isAgencyOwner()) {
             return $target->isAliadoTaquilla()
                 && $target->ally_id === optional($this->ally)->id;
         }
@@ -514,7 +541,7 @@ class User extends Authenticatable
             return ! ($this->isAdminOperativo() && $target->isAdmin());
         }
 
-        if ($this->isAliado()) {
+        if ($this->isAgencyOwner()) {
             return $target->isAliadoTaquilla()
                 && $target->ally_id === optional($this->ally)->id;
         }
@@ -565,7 +592,7 @@ class User extends Authenticatable
         return match (true) {
             $this->isCliente() => 'cliente.dashboard',
             $this->isChofer() => 'repartidor.dashboard',
-            $this->isAliado() => 'ally.dashboard',
+            $this->isAgencyOwner() => 'ally.dashboard',
             $this->isAliadoTaquilla() => 'ally.packages.create',
             $this->isAlmacen() => 'almacen.dashboard',
             $this->isAdmin() => 'admin.dashboard',
@@ -580,6 +607,7 @@ class User extends Authenticatable
             self::ROLE_ADMIN_PRINCIPAL => 'Administrador Principal',
             self::ROLE_ADMIN_OPERATIVO => 'Administrador Operativo',
             self::ROLE_ALIADO => 'Aliado Administrador',
+            self::ROLE_FRANQUICIADO => 'Franquiciado',
             self::ROLE_ALIADO_TAQUILLA => 'Aliado Taquilla',
             self::ROLE_REPARTIDOR => 'Repartidor',
             self::ROLE_CLIENTE => 'Cliente',
