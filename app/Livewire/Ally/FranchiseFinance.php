@@ -7,6 +7,7 @@ use App\Models\Ally;
 use App\Models\FranchiseExpense;
 use App\Models\Package;
 use App\Services\FranchiseBillingService;
+use App\Support\DateInput;
 use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Support\Carbon;
 use Illuminate\Support\Collection;
@@ -137,17 +138,8 @@ class FranchiseFinance extends Component
      */
     protected function customBounds(): array
     {
-        try {
-            $from = $this->customFrom !== ''
-                ? Carbon::parse($this->customFrom)->startOfDay()
-                : now()->startOfMonth();
-
-            $to = $this->customTo !== ''
-                ? Carbon::parse($this->customTo)->endOfDay()
-                : now()->endOfDay();
-        } catch (\Throwable) {
-            return [now()->startOfMonth(), now()->endOfDay()];
-        }
+        $from = DateInput::parse($this->customFrom)?->startOfDay() ?? now()->startOfMonth();
+        $to = DateInput::parse($this->customTo)?->endOfDay() ?? now()->endOfDay();
 
         return $from->lte($to)
             ? [$from, $to]

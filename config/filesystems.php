@@ -33,7 +33,11 @@ return [
         'local' => [
             'driver' => 'local',
             'root' => storage_path('app/private'),
-            'serve' => true,
+            // Desactivado a propósito: los archivos privados (documentos de
+            // identidad, evidencias) se sirven solo por
+            // DocumentPhotoController, con autorización por rol. 'serve'
+            // registraba además rutas públicas /storage/{path} y /{path}.
+            'serve' => false,
             'throw' => false,
             'report' => false,
         ],
@@ -96,7 +100,11 @@ return [
             // En S3 las rutas van desde la raíz del bucket, no con la ruta
             // local del servidor como prefijo.
             'root' => env('DOCUMENTS_DISK_DRIVER', 'local') === 's3' ? '' : storage_path('app/private'),
-            'serve' => true,
+            // Desactivado a propósito: los archivos privados (documentos de
+            // identidad, evidencias) se sirven solo por
+            // DocumentPhotoController, con autorización por rol. 'serve'
+            // registraba además rutas públicas /storage/{path} y /{path}.
+            'serve' => false,
             'throw' => false,
             'report' => false,
             'visibility' => 'private',

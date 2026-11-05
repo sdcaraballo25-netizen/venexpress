@@ -17,6 +17,18 @@
 
 <div class="space-y-6">
 
+    @if ($historyLinkPending)
+        <div class="rounded-xl border border-amber-200 bg-amber-50 p-4 text-sm text-amber-800">
+            <p class="font-semibold">Tus envíos anteriores todavía no están vinculados a esta cuenta.</p>
+            <p class="mt-1">
+                Para proteger tu información, solo mostramos los envíos de una cédula cuando el correo de tu cuenta
+                coincide con el que registró la agencia. Pide en tu agencia aliada que registren
+                <strong>{{ auth()->user()->email }}</strong> como tu correo, o escríbenos a
+                <a href="mailto:viayaenvios@gmail.com" class="font-semibold underline">viayaenvios@gmail.com</a>.
+            </p>
+        </div>
+    @endif
+
     {{-- Mensajes --}}
     @if (session('success'))
         <div class="rounded-xl border border-emerald-200 bg-emerald-50 p-4 text-sm text-emerald-700">

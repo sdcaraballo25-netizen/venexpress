@@ -30,28 +30,28 @@ class DocumentPhotoController extends Controller
 
     public function allyRifDocument(Request $request, Ally $ally): StreamedResponse
     {
-        $this->authorizeAllyDocument($request->user(), $ally);
+        $this->authorizeAllyDocument($request->user(), $ally, ownerOnly: true);
 
         return $this->serve($ally->rif_document_path);
     }
 
     public function allyMercantileRegistry(Request $request, Ally $ally): StreamedResponse
     {
-        $this->authorizeAllyDocument($request->user(), $ally);
+        $this->authorizeAllyDocument($request->user(), $ally, ownerOnly: true);
 
         return $this->serve($ally->mercantile_registry_document_path);
     }
 
     public function allyOwnerIdDocument(Request $request, Ally $ally): StreamedResponse
     {
-        $this->authorizeAllyDocument($request->user(), $ally);
+        $this->authorizeAllyDocument($request->user(), $ally, ownerOnly: true);
 
         return $this->serve($ally->owner_id_document_path);
     }
 
     public function allyOwnerIdBackDocument(Request $request, Ally $ally): StreamedResponse
     {
-        $this->authorizeAllyDocument($request->user(), $ally);
+        $this->authorizeAllyDocument($request->user(), $ally, ownerOnly: true);
 
         return $this->serve($ally->owner_id_back_document_path);
     }
@@ -208,7 +208,13 @@ class DocumentPhotoController extends Controller
         abort(404);
     }
 
-    protected function authorizeAllyDocument(?User $user, Ally $ally): void
+    /**
+     * $ownerOnly: documentos de identidad del titular (cédula, RIF,
+     * registro mercantil). Solo el dueño de la agencia (Aliado
+     * Administrador o Franquiciado) y los admins; el personal de
+     * Taquilla, que es de la agencia pero no su titular, no debe verlos.
+     */
+    protected function authorizeAllyDocument(?User $user, Ally $ally, bool $ownerOnly = false): void
     {
         if (! $user) {
             abort(403);
@@ -218,7 +224,7 @@ class DocumentPhotoController extends Controller
             return;
         }
 
-        if ($user->resolveAlly()?->id === $ally->id) {
+        if ($user->resolveAlly()?->id === $ally->id && (! $ownerOnly || $user->isAgencyOwner())) {
             return;
         }
 

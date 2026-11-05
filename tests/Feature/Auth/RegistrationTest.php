@@ -127,8 +127,83 @@ class RegistrationTest extends TestCase
 
         $this->assertSame('Nombre en Taquilla', $customer->name);
         $this->assertSame('0414-1111111', $customer->phone);
-        // Lo que faltaba sí se completa.
-        $this->assertSame('nuevo-registro@example.com', $customer->email);
+        // Sin correo registrado por la agencia no hay cómo probar que la
+        // cédula es suya: no se vincula ni se le asigna su correo (eso
+        // le daría acceso al historial ajeno).
+        $this->assertNull($customer->email);
+        $this->assertNull($customer->user_id);
+    }
+
+    /**
+     * SEGURIDAD: conocer una cédula ajena no da acceso a sus envíos. Antes
+     * ganaba quien se registrara primero con ella.
+     */
+    public function test_knowing_someone_elses_id_doc_does_not_expose_their_shipments(): void
+    {
+        Customer::create([
+            'id_doc' => 'V-20202020',
+            'name' => 'Víctima',
+            'phone' => '0414-2222222',
+            'email' => 'victima@example.com',
+        ]);
+
+        Volt::test('pages.auth.register')
+            ->set('name', 'Atacante')
+            ->set('email', 'atacante@example.com')
+            ->set('password', 'password')
+            ->set('password_confirmation', 'password')
+            ->set('id_doc', 'V-20202020')
+            ->set('phone', '0424-9999999')
+            ->call('register')
+            ->assertHasNoErrors();
+
+        $customer = Customer::where('id_doc', 'V-20202020')->first();
+        $attacker = User::where('email', 'atacante@example.com')->first();
+
+        $this->assertNull($customer->user_id);
+        $this->assertSame('victima@example.com', $customer->email);
+
+        // Y la víctima todavía puede registrarse y reclamar su cédula.
+        Volt::test('pages.auth.register')
+            ->set('name', 'Víctima')
+            ->set('email', 'victima@example.com')
+            ->set('password', 'password')
+            ->set('password_confirmation', 'password')
+            ->set('id_doc', 'V-20202020')
+            ->set('phone', '0414-2222222')
+            ->call('register')
+            ->assertHasNoErrors();
+
+        $victim = User::where('email', 'victima@example.com')->first();
+        $this->assertSame($victim->id, $customer->fresh()->user_id);
+        $this->assertNotSame($attacker->id, $customer->fresh()->user_id);
+    }
+
+    public function test_the_history_is_linked_when_the_verified_email_matches_the_agency_record(): void
+    {
+        Customer::create([
+            'id_doc' => 'V-30303030',
+            'name' => 'Cliente Real',
+            'phone' => '0414-0000000',
+            'email' => 'Cliente.Real@Example.com',
+        ]);
+
+        Volt::test('pages.auth.register')
+            ->set('name', 'Cliente Real')
+            ->set('email', 'cliente.real@example.com')
+            ->set('password', 'password')
+            ->set('password_confirmation', 'password')
+            ->set('id_doc', 'V-30303030')
+            ->set('phone', '0414-3333333')
+            ->call('register')
+            ->assertHasNoErrors();
+
+        $customer = Customer::where('id_doc', 'V-30303030')->first();
+        $user = User::where('email', 'cliente.real@example.com')->first();
+
+        $this->assertSame($user->id, $customer->user_id);
+        // Se conserva el teléfono que registró la agencia.
+        $this->assertSame('0414-0000000', $customer->phone);
     }
 
     /**
@@ -266,7 +341,7 @@ class RegistrationTest extends TestCase
         return Ally::create([
             'user_id' => $user->id,
             'business_name' => 'Agencia Aliada de Prueba',
-            'rif' => 'J-' . random_int(10000000, 99999999) . '-0',
+            'rif' => 'J-'.random_int(10000000, 99999999).'-0',
             'city' => 'Caracas',
             'state' => 'Distrito Capital',
             'address' => 'Av. Principal',

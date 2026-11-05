@@ -5,8 +5,9 @@ namespace App\Livewire\Ally;
 use App\Livewire\Concerns\ExportsSpreadsheet;
 use App\Models\Ally;
 use App\Models\Package;
+use App\Support\DateInput;
 use Illuminate\Database\Eloquent\Builder;
-use Illuminate\Support\Carbon;
+use Illuminate\Support\Collection;
 use Illuminate\Support\Facades\Auth;
 use Livewire\Attributes\Layout;
 use Livewire\Component;
@@ -76,7 +77,7 @@ class SalesCloseout extends Component
         $user = Auth::user();
         $isPrincipal = $user->isAgencyOwner();
 
-        $day = Carbon::parse($this->date);
+        $day = DateInput::parse($this->date) ?? now();
         $range = [$day->copy()->startOfDay(), $day->copy()->endOfDay()];
 
         $query = Package::query()
@@ -103,11 +104,11 @@ class SalesCloseout extends Component
      * negocio. Cada fila permite entrar al detalle (por forma de pago)
      * de esa persona reutilizando el mismo filtro `registeredBy`.
      *
-     * @return \Illuminate\Support\Collection<int, array{user_id:int, name:string, total:float, guides:int, is_self:bool}>
+     * @return Collection<int, array{user_id:int, name:string, total:float, guides:int, is_self:bool}>
      */
-    protected function perStaffSummary(Ally $ally): \Illuminate\Support\Collection
+    protected function perStaffSummary(Ally $ally): Collection
     {
-        $day = Carbon::parse($this->date);
+        $day = DateInput::parse($this->date) ?? now();
         $range = [$day->copy()->startOfDay(), $day->copy()->endOfDay()];
 
         $totals = Package::query()

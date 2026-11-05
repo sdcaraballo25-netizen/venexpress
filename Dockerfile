@@ -24,20 +24,33 @@ COPY --from=vendor /app/vendor/laravel/framework/src/Illuminate/Pagination/resou
 RUN npm run build
 
 # --- Imagen final ------------------------------------------------------------
-# Ubuntu 24.04 trae PHP 8.3 (la misma versión que se usa en desarrollo).
+# PHP 8.5 (última versión estable). Ubuntu 24.04 solo trae PHP 8.3, así
+# que se usa el repositorio de Ondřej Surý (ppa:ondrej/php), el estándar
+# para versiones actuales de PHP en Ubuntu/Debian. Para cambiar de
+# versión basta con PHP_VERSION (rutas de config y php-fpm la usan).
 FROM ubuntu:24.04
+
+ARG PHP_VERSION=8.5
 
 ENV DEBIAN_FRONTEND=noninteractive \
     APP_DIR=/var/www/html \
-    PORT=10000
+    PORT=10000 \
+    PHP_VERSION=${PHP_VERSION}
 
 RUN apt-get update \
+    && apt-get install -y --no-install-recommends ca-certificates gnupg software-properties-common \
+    && add-apt-repository -y ppa:ondrej/php \
+    && apt-get update \
     && apt-get install -y --no-install-recommends \
-        ca-certificates nginx supervisor unzip \
-        php8.3-fpm php8.3-cli php8.3-pgsql php8.3-mysql php8.3-gd php8.3-zip \
-        php8.3-intl php8.3-bcmath php8.3-mbstring php8.3-xml php8.3-curl php8.3-opcache \
+        nginx supervisor unzip \
+        php${PHP_VERSION}-fpm php${PHP_VERSION}-cli php${PHP_VERSION}-pgsql php${PHP_VERSION}-mysql \
+        php${PHP_VERSION}-gd php${PHP_VERSION}-zip php${PHP_VERSION}-intl php${PHP_VERSION}-bcmath \
+        php${PHP_VERSION}-mbstring php${PHP_VERSION}-xml php${PHP_VERSION}-curl \
+    && (apt-get install -y --no-install-recommends php${PHP_VERSION}-opcache || true) \
+    && apt-get purge -y --auto-remove software-properties-common gnupg \
     && rm -rf /var/lib/apt/lists/* \
-    && rm -f /etc/nginx/sites-enabled/default
+    && rm -f /etc/nginx/sites-enabled/default \
+    && ln -sf /usr/sbin/php-fpm${PHP_VERSION} /usr/local/sbin/php-fpm
 
 COPY --from=composer:2 /usr/bin/composer /usr/local/bin/composer
 
@@ -47,9 +60,9 @@ COPY . .
 COPY --from=vendor /app/vendor ./vendor
 COPY --from=assets /app/public/build ./public/build
 
-COPY docker/php.ini /etc/php/8.3/fpm/conf.d/99-venexpress.ini
-COPY docker/php.ini /etc/php/8.3/cli/conf.d/99-venexpress.ini
-COPY docker/php-fpm-pool.conf /etc/php/8.3/fpm/pool.d/www.conf
+COPY docker/php.ini /etc/php/${PHP_VERSION}/fpm/conf.d/99-venexpress.ini
+COPY docker/php.ini /etc/php/${PHP_VERSION}/cli/conf.d/99-venexpress.ini
+COPY docker/php-fpm-pool.conf /etc/php/${PHP_VERSION}/fpm/pool.d/www.conf
 COPY docker/nginx.conf.template /etc/nginx/venexpress.conf.template
 COPY docker/supervisord.conf /etc/supervisor/supervisord.conf
 COPY docker/entrypoint.sh /usr/local/bin/venexpress-entrypoint

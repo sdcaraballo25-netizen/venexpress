@@ -1,6 +1,7 @@
 <?php
 
 use App\Models\User;
+use App\Notifications\WelcomeVerificationToken;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Session;
 use Illuminate\Validation\Rule;
@@ -17,10 +18,21 @@ new class extends Component
      * pantallas de Cliente (Dashboard, Incidents, PendingPayments)
      * siguen usando el correo para encontrar guías de familiares que
      * comparten cuenta, y un cambio accidental o malintencionado
-     * podría desconectarlo de ese historial compartido. Los demás
-     * roles no tienen esa dependencia y sí pueden editarlo.
+     * podría desconectarlo de ese historial compartido.
+     *
+     * Tampoco Taquilla (su correo es técnico, lo genera AllyStaffService),
+     * Almacén ni Franquiciado: sus cuentas las administra su dueño o un
+     * Admin. Aliado, Repartidor y Emprendedor sí, pero el correo nuevo
+     * debe confirmarse con el código de verificación (ver
+     * updateProfileInformation()).
      */
     public bool $canChangeEmail = true;
+
+    protected function userCanChangeEmail(User $user): bool
+    {
+        return $user->isAdmin()
+            || in_array($user->role, [User::ROLE_ALIADO, User::ROLE_REPARTIDOR, User::ROLE_EMPRENDEDOR], true);
+    }
 
     /**
      * Mount the component.
@@ -30,7 +42,7 @@ new class extends Component
         $this->name = Auth::user()->name;
         $this->email = Auth::user()->email;
         $this->phone = (string) Auth::user()->phone;
-        $this->canChangeEmail = ! Auth::user()->isCliente();
+        $this->canChangeEmail = $this->userCanChangeEmail(Auth::user());
     }
 
     /**
@@ -39,7 +51,7 @@ new class extends Component
     public function updateProfileInformation(): void
     {
         $user = Auth::user();
-        $canChangeEmail = ! $user->isCliente();
+        $canChangeEmail = $this->userCanChangeEmail($user);
 
         $rules = [
             'name' => ['required', 'string', 'max:255'],
@@ -61,11 +73,33 @@ new class extends Component
 
         $user->fill($validated);
 
-        if ($user->isDirty('email')) {
+        $emailChanged = $user->isDirty('email');
+
+        if ($emailChanged) {
             $user->email_verified_at = null;
         }
 
         $user->save();
+
+        // SEGURIDAD: antes el correo nuevo quedaba activo sin probar que
+        // era suyo. Ahora, en los roles con verificación por código, se
+        // envía un código al correo nuevo y se cierra la sesión hasta
+        // confirmarlo (mismo flujo que el registro; EnsureAccountIsVerified
+        // y VerifyAccount).
+        if ($emailChanged && $user->requiresAccountVerification()) {
+            $user->forceFill(['account_verified_at' => null])->save();
+
+            $user->notify(new WelcomeVerificationToken($user->generateVerificationToken()));
+
+            Auth::guard('web')->logout();
+            Session::invalidate();
+            Session::regenerateToken();
+            Session::put('pending_verification_user_id', $user->id);
+
+            $this->redirect(route('verify-account'), navigate: false);
+
+            return;
+        }
 
         $this->dispatch('profile-updated', name: $user->name);
     }

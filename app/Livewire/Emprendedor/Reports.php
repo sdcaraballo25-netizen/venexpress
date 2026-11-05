@@ -6,6 +6,7 @@ use App\Livewire\Concerns\ExportsSpreadsheet;
 use App\Models\Emprendedor;
 use App\Models\Pedido;
 use App\Models\PedidoItem;
+use App\Support\DateInput;
 use Illuminate\Support\Carbon;
 use Illuminate\Support\Facades\Auth;
 use Livewire\Attributes\Layout;
@@ -61,13 +62,11 @@ class Reports extends Component
     protected function periodBounds(): array
     {
         if ($this->dateRange === self::RANGE_CUSTOM) {
-            $from = $this->customFrom !== ''
-                ? Carbon::parse($this->customFrom)->startOfDay()
-                : now()->subDays(29)->startOfDay();
+            $from = DateInput::parse($this->customFrom)?->startOfDay()
+                ?? now()->subDays(29)->startOfDay();
 
-            $to = $this->customTo !== ''
-                ? Carbon::parse($this->customTo)->endOfDay()
-                : now()->endOfDay();
+            $to = DateInput::parse($this->customTo)?->endOfDay()
+                ?? now()->endOfDay();
 
             return $from->lte($to) ? [$from, $to] : [$to->copy()->startOfDay(), $from->copy()->endOfDay()];
         }

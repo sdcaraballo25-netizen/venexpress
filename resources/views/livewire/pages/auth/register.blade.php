@@ -505,29 +505,41 @@ new #[Layout('layouts.guest')] class extends Component
 
         /*
          * El panel de Cliente busca sus guías por recipient_id_doc a
-         * través de este registro en customers. Si un aliado ya había
-         * registrado a esta persona como destinatario de una guía
-         * anterior, el customer ya existe con este id_doc: lo
-         * actualizamos en vez de duplicarlo, para que el historial de
-         * paquetes previos también quede visible.
+         * través de este registro en customers (user_id o email).
          *
-         * user_id queda fijado a ESTE usuario: la validación de arriba
-         * ya garantizó que nadie más lo había reclamado todavía.
+         * SEGURIDAD: conocer una cédula NO basta para ver los envíos de
+         * esa persona (antes ganaba quien se registrara primero con
+         * ella y veía direcciones, remitentes y cobros ajenos). Si la
+         * cédula ya tiene historial, solo se vincula cuando el correo
+         * de esta cuenta coincide con el que la agencia registró para
+         * esa persona: el código de verificación (finishRegistration)
+         * prueba que el correo es suyo. Si no coincide —o la ficha no
+         * tiene correo— la cuenta se crea igual, pero sin acceso a ese
+         * historial; el panel le explica cómo pedir la vinculación en
+         * su agencia aliada (que registra el correo tras verificar la
+         * identidad en persona, ver Ally\PackageCreate::syncCustomer()).
          */
-        $customer = Customer::firstOrNew(['id_doc' => $validated['id_doc']]);
+        $customer = Customer::where('id_doc', $validated['id_doc'])->first();
 
-        $customer->user_id = $user->id;
-
-        // Si un aliado ya había registrado a esta persona, se conservan
-        // los datos de contacto que tecleó en taquilla y solo se
-        // completan los que faltaban: registrarse con una cédula no
-        // debe poder reescribir el nombre/teléfono/correo que ya
-        // estaban asociados a ella.
-        $customer->name = $customer->name ?: $validated['name'];
-        $customer->phone = $customer->phone ?: $validated['phone'];
-        $customer->email = $customer->email ?: $validated['email'];
-
-        $customer->save();
+        if (! $customer) {
+            Customer::create([
+                'id_doc' => $validated['id_doc'],
+                'user_id' => $user->id,
+                'name' => $validated['name'],
+                'phone' => $validated['phone'],
+                'email' => $validated['email'],
+            ]);
+        } elseif (
+            filled($customer->email)
+            && strcasecmp(trim((string) $customer->email), trim($validated['email'])) === 0
+        ) {
+            $customer->user_id = $user->id;
+            // Se conservan los datos que tecleó la agencia; solo se
+            // completan los que faltaban.
+            $customer->name = $customer->name ?: $validated['name'];
+            $customer->phone = $customer->phone ?: $validated['phone'];
+            $customer->save();
+        }
 
         $this->finishRegistration($user);
     }

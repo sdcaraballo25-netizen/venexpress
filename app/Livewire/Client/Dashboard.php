@@ -5,6 +5,7 @@ namespace App\Livewire\Client;
 use App\Models\Customer;
 use App\Models\Incident;
 use App\Models\Package;
+use App\Support\DateInput;
 use Illuminate\Support\Facades\Auth;
 use Livewire\Attributes\Layout;
 use Livewire\Component;
@@ -143,12 +144,12 @@ class Dashboard extends Component
             $historyPackages = $baseQuery()
                 ->whereIn('current_status', $finalStatuses)
                 ->when(
-                    $this->historyFrom !== '',
-                    fn ($q) => $q->whereRaw("DATE({$finishedAt}) >= ?", [$this->historyFrom])
+                    DateInput::clean($this->historyFrom) !== '',
+                    fn ($q) => $q->whereRaw("DATE({$finishedAt}) >= ?", [DateInput::clean($this->historyFrom)])
                 )
                 ->when(
-                    $this->historyTo !== '',
-                    fn ($q) => $q->whereRaw("DATE({$finishedAt}) <= ?", [$this->historyTo])
+                    DateInput::clean($this->historyTo) !== '',
+                    fn ($q) => $q->whereRaw("DATE({$finishedAt}) <= ?", [DateInput::clean($this->historyTo)])
                 )
                 ->with(['histories', 'incidents'])
                 ->orderByRaw("{$finishedAt} DESC")
@@ -189,6 +190,10 @@ class Dashboard extends Component
                     fn (Package $package) => (float) $package->cod_amount_usd
                 ),
                 'openIncidentsCount' => $openIncidentsCount,
+                // Sin ficha de cliente vinculada (ver register.blade.php:
+                // la cédula ya tenía historial con otro correo): se le
+                // explica cómo pedir la vinculación en su agencia.
+                'historyLinkPending' => $idDocs === [],
             ]
         );
     }
