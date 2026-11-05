@@ -22,7 +22,7 @@
 
                 <section>
                     <h2 class="text-lg font-bold text-blue-950 mb-2">1. Qué datos recopilamos</h2>
-                    <p>Según cómo uses Venexpress, podemos recopilar:</p>
+                    <p>Según cómo uses ViaYaa, podemos recopilar:</p>
                     <ul class="list-disc list-inside mt-2 space-y-1">
                         <li>Datos de cuenta: nombre, correo, teléfono y contraseña (cifrada).</li>
                         <li>Datos de identidad: cédula de identidad, usada para verificar remitentes y destinatarios de un envío.</li>
@@ -78,7 +78,7 @@
                     <h2 class="text-lg font-bold text-blue-950 mb-2">6. Tus derechos</h2>
                     <p>
                         Puedes solicitar acceder, corregir o eliminar tus datos personales escribiéndonos a
-                        <a href="mailto:info@venexpress.com" class="text-blue-700 hover:text-blue-950 font-semibold">info@venexpress.com</a>.
+                        <a href="mailto:viayaenvios@gmail.com" class="text-blue-700 hover:text-blue-950 font-semibold">viayaenvios@gmail.com</a>.
                         Ten en cuenta que algunos datos (como el historial de una guía ya entregada) pueden
                         necesitar conservarse por razones legales u operativas aunque solicites su eliminación.
                     </p>

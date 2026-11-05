@@ -56,7 +56,7 @@ class PackageCreated extends Notification implements ShouldQueue
         ]);
 
         $mail = (new MailMessage)
-            ->subject("Guía {$package->tracking_number} registrada — VenExpress")
+            ->subject("Guía {$package->tracking_number} registrada — ViaYaa")
             ->greeting('¡Hola!');
 
         if ($this->role === self::ROLE_SENDER) {
@@ -76,7 +76,7 @@ class PackageCreated extends Notification implements ShouldQueue
             ->line("Remitente: {$package->sender_name}")
             ->line("Destinatario: {$package->recipient_name}")
             ->action('Rastrear mi envío', $trackingUrl)
-            ->line('Gracias por confiar en VenExpress para tus envíos a nivel nacional.');
+            ->line('Gracias por confiar en ViaYaa para tus envíos a nivel nacional.');
 
         return $mail;
     }

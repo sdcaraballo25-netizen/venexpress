@@ -1,4 +1,4 @@
-# Despliegue de Venexpress en Render (plan gratis).
+# Despliegue de ViaYaa en Render (plan gratis).
 # Guía paso a paso y limitaciones: docs/DESPLIEGUE_RENDER.md
 #
 # Crea tres recursos:
@@ -38,7 +38,7 @@ services:
         - "*.patch"
     envVars:
       - key: APP_NAME
-        value: Venexpress
+        value: ViaYaa
       - key: APP_ENV
         value: production
       - key: APP_DEBUG
@@ -86,7 +86,7 @@ services:
       - key: MAIL_FROM_ADDRESS
         sync: false
       - key: MAIL_FROM_NAME
-        value: Venexpress
+        value: ViaYaa
       # Alternativa sin SMTP: MAIL_MAILER=gmail envía por la API de
       # Gmail (HTTPS) con estas credenciales OAuth (ver la guía).
       - key: GMAIL_CLIENT_ID

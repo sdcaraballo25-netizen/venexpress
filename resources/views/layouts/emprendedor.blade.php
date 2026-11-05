@@ -7,7 +7,7 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <meta name="csrf-token" content="{{ csrf_token() }}">
 
-    <title>{{ $title ?? 'Emprendedor' }} — Venexpress</title>
+    <title>{{ $title ?? 'Emprendedor' }} — ViaYaa</title>
 
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
@@ -60,7 +60,7 @@
                 </div>
 
                 <div class="min-w-0">
-                    <span class="font-display font-bold text-xl text-[#111111] block leading-none">Venexpress</span>
+                    <span class="font-display font-bold text-xl text-[#111111] block leading-none">ViaYaa</span>
                     <span class="text-xs text-[#B8B8B2] block mt-1">Panel Emprendedor</span>
                 </div>
 

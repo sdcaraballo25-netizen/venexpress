@@ -22,7 +22,7 @@ use RuntimeException;
  * - Retiro en HUB: EN_HUB -> LISTO_RETIRO directamente (nunca "viaja"
  *   a ningún lado, ya está donde el cliente lo retirará).
  * - Delivery (requires_delivery): EN_HUB -> PENDIENTE_ENTREGA
- *   directamente — el paquete ya está en el último punto que Venexpress
+ *   directamente — el paquete ya está en el último punto que ViaYaa
  *   controla; un repartidor de entrega lo toma desde ahí
  *   (Package::CLAIMABLE_FOR_DELIVERY_STATUSES). No pasa por
  *   EN_TRANSITO_NACIONAL: ese estado queda reservado para cuando SÍ hay
@@ -227,7 +227,7 @@ class HubReleaseService
     /**
      * C) Delivery: EN_HUB -> PENDIENTE_ENTREGA directamente, igual
      * patrón que releaseForHubPickup() — el paquete ya está en el
-     * último HUB que Venexpress controla, ahí lo recoge un repartidor
+     * último HUB que ViaYaa controla, ahí lo recoge un repartidor
      * de entrega. No se despacha con PackageDispatchService::dispatch()
      * porque no hay ningún traslado físico pendiente.
      *

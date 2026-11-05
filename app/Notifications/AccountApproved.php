@@ -36,9 +36,9 @@ class AccountApproved extends Notification implements ShouldQueue
     public function toMail(object $notifiable): MailMessage
     {
         return (new MailMessage)
-            ->subject('Tu cuenta de VenExpress fue aprobada')
+            ->subject('Tu cuenta de ViaYaa fue aprobada')
             ->greeting("¡Hola, {$notifiable->name}!")
-            ->line("Buenas noticias: tu solicitud como {$this->roleLabel} en VenExpress fue aprobada.")
+            ->line("Buenas noticias: tu solicitud como {$this->roleLabel} en ViaYaa fue aprobada.")
             ->line('Ya puedes iniciar sesión y comenzar a usar tu panel con normalidad.')
             ->action('Iniciar sesión', route('login'));
     }

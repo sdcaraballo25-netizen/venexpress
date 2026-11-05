@@ -42,9 +42,9 @@ class AccountPendingApproval extends Notification implements ShouldQueue
     public function toMail(object $notifiable): MailMessage
     {
         return (new MailMessage)
-            ->subject('Bienvenido a VenExpress — Solicitud recibida')
+            ->subject('Bienvenido a ViaYaa — Solicitud recibida')
             ->greeting("¡Hola, {$notifiable->name}!")
-            ->line("Gracias por registrarte en VenExpress como {$this->roleLabel}.")
+            ->line("Gracias por registrarte en ViaYaa como {$this->roleLabel}.")
             ->line('Tu solicitud fue recibida y está pendiente de revisión por un administrador.')
             ->line('Te avisaremos por correo en cuanto tu cuenta sea aprobada.');
     }

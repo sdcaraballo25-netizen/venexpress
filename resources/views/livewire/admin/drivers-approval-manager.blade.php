@@ -15,7 +15,7 @@
             </h1>
 
             <p class="text-sm text-[#6B6B66] mt-1">
-                Revisa y aprueba a los repartidores que se registran en Venexpress.
+                Revisa y aprueba a los repartidores que se registran en ViaYaa.
             </p>
         </div>
 

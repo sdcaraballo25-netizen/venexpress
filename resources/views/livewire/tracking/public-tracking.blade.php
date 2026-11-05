@@ -1,7 +1,7 @@
 <div class="mx-auto max-w-3xl px-4 py-12">
     <div class="rounded-3xl border border-slate-200 bg-white p-6 shadow-sm dark:border-slate-700 dark:bg-slate-900">
         <div class="mb-6">
-            <p class="text-sm font-semibold uppercase tracking-wide text-blue-600">Venexpress</p>
+            <p class="text-sm font-semibold uppercase tracking-wide text-blue-600">ViaYaa</p>
             <h1 class="mt-2 text-3xl font-bold text-slate-900 dark:text-white">Rastrea tu envío</h1>
             <p class="mt-2 text-slate-600 dark:text-slate-300">Introduce el número de guía para consultar el estado de tu paquete.</p>
         </div>

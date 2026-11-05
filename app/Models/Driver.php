@@ -22,9 +22,9 @@ class Driver extends Model
     /**
      * Valor fijo de vehicle_type para drivers HUB: no manejan un
      * vehículo particular (moto/carro), sino un camión de la flota
-     * de Venexpress.
+     * de ViaYaa.
      */
-    public const HUB_VEHICLE_TYPE = 'Camión Venexpress';
+    public const HUB_VEHICLE_TYPE = 'Camión ViaYaa';
 
     /**
      * Estados del conductor.

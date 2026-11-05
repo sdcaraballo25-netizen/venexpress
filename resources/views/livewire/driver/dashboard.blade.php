@@ -47,7 +47,7 @@
                     </span>
 
                     <h2 class="mt-4 font-display text-2xl font-bold">
-                        ¡Bienvenido a Venexpress, {{ $driver->user?->name ?? auth()->user()->name }}!
+                        ¡Bienvenido a ViaYaa, {{ $driver->user?->name ?? auth()->user()->name }}!
                     </h2>
 
                     <p class="mt-2 text-sm text-blue-100">
@@ -121,9 +121,9 @@
                                 ·
 
                                 @if ($activeRoute->route_type === \App\Models\Route::TYPE_HUB_TRANSFER)
-                                    Agencias aliadas → Hub Venexpress
+                                    Agencias aliadas → Hub ViaYaa
                                 @elseif ($activeRoute->route_type === \App\Models\Route::TYPE_HUB_DISTRIBUTION)
-                                    Hub Venexpress → Almacén destino
+                                    Hub ViaYaa → Almacén destino
                                 @else
                                     Hub / Almacén → Cliente final
                                 @endif

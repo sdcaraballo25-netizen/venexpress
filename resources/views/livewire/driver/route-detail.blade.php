@@ -183,9 +183,9 @@
                 <p class="mt-1 text-sm font-semibold text-[#111111]">
 
                     @if ($route->route_type === \App\Models\Route::TYPE_HUB_TRANSFER)
-                        Agencias aliadas → Hub Venexpress
+                        Agencias aliadas → Hub ViaYaa
                     @elseif ($route->route_type === \App\Models\Route::TYPE_HUB_DISTRIBUTION)
-                        Hub Venexpress → Almacén destino
+                        Hub ViaYaa → Almacén destino
                     @elseif ($route->route_type === \App\Models\Route::TYPE_DELIVERY)
                         Hub / Almacén → Cliente final
                     @else

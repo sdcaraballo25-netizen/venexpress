@@ -16,7 +16,7 @@
     >
 
     <title>
-        {{ $title ?? 'Repartidor' }} — Venexpress
+        {{ $title ?? 'Repartidor' }} — ViaYaa
     </title>
 
     <link rel="preconnect" href="https://fonts.googleapis.com">
@@ -177,7 +177,7 @@
                             leading-none
                         "
                     >
-                        Venexpress
+                        ViaYaa
                     </span>
 
                     <span

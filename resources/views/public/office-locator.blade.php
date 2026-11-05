@@ -17,7 +17,7 @@
                 </span>
                 <h1 class="text-3xl md:text-4xl font-extrabold text-blue-950">Encuentra tu agencia aliada</h1>
                 <p class="text-gray-500 mt-3 max-w-xl mx-auto">
-                    Ubica la agencia Venexpress más cercana para entregar o retirar tu paquete.
+                    Ubica la agencia ViaYaa más cercana para entregar o retirar tu paquete.
                 </p>
             </div>
 

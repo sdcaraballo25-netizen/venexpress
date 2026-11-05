@@ -361,7 +361,7 @@ class User extends Authenticatable
     }
 
     /**
-     * Almacén propio de Venexpress al que pertenece este usuario
+     * Almacén propio de ViaYaa al que pertenece este usuario
      * cuando es personal de almacén (role 'almacen').
      */
     public function warehouse(): BelongsTo

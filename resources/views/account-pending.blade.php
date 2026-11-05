@@ -49,7 +49,7 @@
     $copy = match (true) {
         $status === Ally::STATUS_SUSPENDED => [
             'title' => 'Tu cuenta está suspendida',
-            'body' => 'Tu cuenta fue suspendida por un administrador. Contacta a soporte de Venexpress para más información.',
+            'body' => 'Tu cuenta fue suspendida por un administrador. Contacta a soporte de ViaYaa para más información.',
             'badge' => 'Suspendida',
             'icon' => 'pause',
             'color' => 'slate',
@@ -59,7 +59,7 @@
             'title' => 'Tu solicitud fue rechazada',
             'body' => $rejectionReason
                 ? "Motivo: {$rejectionReason}"
-                : 'Un administrador revisó tu solicitud y no fue aprobada. Si crees que es un error, contacta a soporte de Venexpress.',
+                : 'Un administrador revisó tu solicitud y no fue aprobada. Si crees que es un error, contacta a soporte de ViaYaa.',
             'badge' => 'Rechazada',
             'icon' => 'x',
             'color' => 'red',
@@ -87,7 +87,7 @@
         ],
         default => [
             'title' => 'Tu cuenta no está activa',
-            'body' => 'Contacta a soporte de Venexpress para más información.',
+            'body' => 'Contacta a soporte de ViaYaa para más información.',
             'badge' => 'Inactiva',
             'icon' => 'pause',
             'color' => 'slate',
@@ -110,7 +110,7 @@
     <meta name="viewport" content="width=device-width, initial-scale=1">
     <meta name="csrf-token" content="{{ csrf_token() }}">
 
-    <title>{{ $copy['title'] }} — VenExpress</title>
+    <title>{{ $copy['title'] }} — ViaYaa</title>
 
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
@@ -185,7 +185,7 @@
 
         <p class="mt-8 text-xs text-gray-400">
             ¿Necesitas ayuda? Escríbenos a
-            <a href="mailto:info@venexpress.com" class="font-semibold text-blue-700 hover:underline">info@venexpress.com</a>
+            <a href="mailto:viayaenvios@gmail.com" class="font-semibold text-blue-700 hover:underline">viayaenvios@gmail.com</a>
         </p>
 
     </div>

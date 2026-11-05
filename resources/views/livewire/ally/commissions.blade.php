@@ -39,7 +39,7 @@
             <p class="mt-1 font-display text-2xl font-semibold text-[#111111]">
                 {{ number_format($ally->commission_percentage, 2) }}%
             </p>
-            <p class="text-xs text-slate-400 mt-1">definido por Venexpress</p>
+            <p class="text-xs text-slate-400 mt-1">definido por ViaYaa</p>
         </div>
     </div>
 

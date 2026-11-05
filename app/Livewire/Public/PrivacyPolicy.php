@@ -6,7 +6,7 @@ use Livewire\Attributes\Layout;
 use Livewire\Attributes\Title;
 use Livewire\Component;
 
-#[Layout('layouts.public', ['title' => 'Política de Privacidad — Venexpress'])]
+#[Layout('layouts.public', ['title' => 'Política de Privacidad — ViaYaa'])]
 #[Title('Política de Privacidad')]
 class PrivacyPolicy extends Component
 {

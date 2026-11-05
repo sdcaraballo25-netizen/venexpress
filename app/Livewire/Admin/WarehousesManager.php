@@ -11,7 +11,7 @@ use Livewire\Attributes\Title;
 use Livewire\Component;
 
 /**
- * CRUD mínimo de almacenes propios de Venexpress (destino de las
+ * CRUD mínimo de almacenes propios de ViaYaa (destino de las
  * rutas de HUB Distribución). Deliberadamente simple: sin búsqueda ni
  * paginación, porque se esperan pocos almacenes.
  */

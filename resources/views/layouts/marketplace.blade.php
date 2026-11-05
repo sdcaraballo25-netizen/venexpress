@@ -4,9 +4,9 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
 
-    <title>{{ $title ?? 'Tienda Venexpress' }}</title>
+    <title>{{ $title ?? 'Tienda ViaYaa' }}</title>
 
-    <link rel="icon" href="{{ asset('images/venexpress-logo-solo.png') }}">
+    <link rel="icon" href="{{ asset('images/viayaa-logo-solo.png') }}">
 
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
@@ -51,11 +51,11 @@
         <div class="max-w-[1800px] mx-auto px-4 sm:px-6 lg:px-10 py-6 flex flex-col sm:flex-row items-center justify-between gap-3 text-xs text-gray-400">
 
             <a href="{{ route('home') }}" class="hover:text-gray-700 transition">
-                ← Volver a Venexpress
+                ← Volver a ViaYaa
             </a>
 
             <span>
-                &copy; {{ date('Y') }} Venexpress. Todos los derechos reservados.
+                &copy; {{ date('Y') }} ViaYaa. Todos los derechos reservados.
             </span>
 
         </div>

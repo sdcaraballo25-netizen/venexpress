@@ -90,7 +90,7 @@ class ScannerLivewireTest extends TestCase
             ->set('trackingNumber', $package->tracking_number)
             ->call('searchPackage')
             ->assertSet('errorMessage', null)
-            ->assertSet('successMessage', 'Salida registrada correctamente. El paquete quedó recolectado por Venexpress.')
+            ->assertSet('successMessage', 'Salida registrada correctamente. El paquete quedó recolectado por ViaYaa.')
             ->assertSet('pendingOperation', null)
             ->assertSet('lastProcessedPackageId', $package->id);
 

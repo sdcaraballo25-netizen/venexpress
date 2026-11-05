@@ -20,7 +20,7 @@ use Symfony\Component\HttpFoundation\BinaryFileResponse;
 /**
  * Cuentas por cobrar de franquicias.
  *
- * Cada franquicia paga a Venexpress una cuota mensual = un % de sus
+ * Cada franquicia paga a ViaYaa una cuota mensual = un % de sus
  * ventas del mes que fija el Admin. El Admin registra manualmente cada
  * pago (monto de la factura, monto pagado, N° de factura y N° de
  * voucher/referencia), y ve lo que queda a favor o debiendo. Exporta el

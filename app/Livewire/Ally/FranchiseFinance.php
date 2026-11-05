@@ -24,7 +24,7 @@ use Symfony\Component\HttpFoundation\BinaryFileResponse;
  *
  * A diferencia del Aliado Administrador, el Franquiciado no tiene
  * comisión ni liquidaciones con la empresa (ver Ally::isFranchise());
- * en cambio paga a Venexpress una cuota mensual (% de sus ventas, ver
+ * en cambio paga a ViaYaa una cuota mensual (% de sus ventas, ver
  * FranchiseBillingService). Por eso, en lugar de "Comisiones y saldo"
  * y "Corte de caja", tiene este panel con control más completo:
  *

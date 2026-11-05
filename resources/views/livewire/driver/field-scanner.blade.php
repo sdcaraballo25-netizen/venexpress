@@ -18,7 +18,7 @@
                 Escanear guía
             </h2>
             <p class="text-sm text-slate-500">
-                Registra la salida del paquete desde la agencia y su recolección por Venexpress.
+                Registra la salida del paquete desde la agencia y su recolección por ViaYaa.
             </p>
         </div>
 
@@ -183,7 +183,7 @@
                             ✓ Salida registrada
                         </p>
                         <p class="mt-1 text-xs text-emerald-700">
-                            El paquete ya quedó bajo custodia de Venexpress.
+                            El paquete ya quedó bajo custodia de ViaYaa.
                         </p>
                     @elseif ($package->current_status === \App\Models\Package::STATUS_RECIBIDO_AGENCIA)
                         <p class="text-sm font-semibold text-emerald-800">

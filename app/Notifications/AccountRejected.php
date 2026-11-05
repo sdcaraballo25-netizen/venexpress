@@ -40,9 +40,9 @@ class AccountRejected extends Notification implements ShouldQueue
     public function toMail(object $notifiable): MailMessage
     {
         $message = (new MailMessage)
-            ->subject('Tu solicitud de VenExpress no fue aprobada')
+            ->subject('Tu solicitud de ViaYaa no fue aprobada')
             ->greeting("Hola, {$notifiable->name}.")
-            ->line("Tu solicitud como {$this->roleLabel} en VenExpress no fue aprobada.");
+            ->line("Tu solicitud como {$this->roleLabel} en ViaYaa no fue aprobada.");
 
         if ($this->reason) {
             $message->line("Motivo: {$this->reason}");

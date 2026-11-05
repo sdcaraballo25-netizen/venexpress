@@ -3,7 +3,7 @@
     <span class="inline-block bg-amber-100 text-amber-700 text-xs font-semibold tracking-wide uppercase px-3 py-1 rounded-full mb-4">
         App de repartidor
     </span>
-    <h1 class="text-3xl font-display font-extrabold text-[#111111]">Descarga la app de Venexpress</h1>
+    <h1 class="text-3xl font-display font-extrabold text-[#111111]">Descarga la app de ViaYaa</h1>
     <p class="text-[#6B6B66] mt-3 max-w-xl mx-auto">
         Descarga la app para gestionar tus rutas y entregas desde tu celular.
     </p>

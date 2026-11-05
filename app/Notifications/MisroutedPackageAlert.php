@@ -35,7 +35,7 @@ class MisroutedPackageAlert extends Notification implements ShouldQueue
         $package = Package::findOrFail($this->packageId);
 
         return (new MailMessage)
-            ->subject("Alerta: guía {$package->tracking_number} en destino equivocado — VenExpress")
+            ->subject("Alerta: guía {$package->tracking_number} en destino equivocado — ViaYaa")
             ->greeting('Hola,')
             ->line("La guía {$package->tracking_number} se escaneó en {$this->scannedAt}, que no es su destino.")
             ->line($this->expectedDestination

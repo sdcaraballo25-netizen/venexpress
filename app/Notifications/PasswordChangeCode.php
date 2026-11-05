@@ -30,7 +30,7 @@ class PasswordChangeCode extends Notification
     public function toMail(object $notifiable): MailMessage
     {
         return (new MailMessage)
-            ->subject('VenExpress — Código para cambiar tu contraseña')
+            ->subject('ViaYaa — Código para cambiar tu contraseña')
             ->greeting("¡Hola, {$notifiable->name}!")
             ->line('Recibimos una solicitud para cambiar la contraseña de tu cuenta.')
             ->line('Ingresa este código para confirmar el cambio:')

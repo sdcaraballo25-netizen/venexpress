@@ -4,9 +4,9 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
 
-    <title>{{ $title ?? 'Venexpress' }}</title>
+    <title>{{ $title ?? 'ViaYaa' }}</title>
 
-    <link rel="icon" href="{{ asset('images/venexpress-logo-solo.png') }}">
+    <link rel="icon" href="{{ asset('images/viayaa-logo-solo.png') }}">
 
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
@@ -68,8 +68,8 @@
                 <div>
 
                     <img
-                        src="{{ asset('images/venexpress-logo-white.png') }}"
-                        alt="Venexpress"
+                        src="{{ asset('images/viayaa-logo-white.png') }}"
+                        alt="ViaYaa"
                         class="h-8 mb-4"
                     >
 
@@ -218,7 +218,7 @@
 
                         <li>
                             <a
-                                href="mailto:info@venexpress.com"
+                                href="mailto:viayaenvios@gmail.com"
                                 class="hover:text-white transition"
                             >
                                 Contáctanos
@@ -235,7 +235,7 @@
             {{-- Copyright --}}
             <div class="border-t border-white/10 mt-10 pt-6 text-xs text-white/40 text-center">
 
-                &copy; {{ date('Y') }} Venexpress. Todos los derechos reservados.
+                &copy; {{ date('Y') }} ViaYaa. Todos los derechos reservados.
 
             </div>
 

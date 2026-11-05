@@ -424,8 +424,8 @@ class Marketplace extends Component
             $this->resolveLayoutForViewer('layouts.marketplace'),
             [
                 'title' => $this->tiendaEmprendedor
-                    ? "{$this->tiendaEmprendedor->business_name} — Venexpress"
-                    : 'Tienda — Venexpress',
+                    ? "{$this->tiendaEmprendedor->business_name} — ViaYaa"
+                    : 'Tienda — ViaYaa',
             ]
         );
     }

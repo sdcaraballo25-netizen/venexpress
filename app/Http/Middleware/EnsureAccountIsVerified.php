@@ -11,7 +11,7 @@ use Symfony\Component\HttpFoundation\Response;
  * A diferencia del middleware nativo `verified` de Laravel (que en este
  * proyecto no tiene efecto, porque User no implementa MustVerifyEmail),
  * este middleware exige el sistema propio de verificación por código de
- * VenExpress (users.account_verified_at) a los roles que se
+ * ViaYaa (users.account_verified_at) a los roles que se
  * autorregistran: Cliente, Aliado, Repartidor y Emprendedor (ver
  * User::requiresAccountVerification()). Admin, Taquilla y Almacén los
  * crea alguien de confianza y no pasan por aquí.

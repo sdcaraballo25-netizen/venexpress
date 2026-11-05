@@ -23,7 +23,7 @@ class PackageReceptionPickupVerificationTest extends TestCase
     use CreatesTestPackages;
     use RefreshDatabase;
 
-    private const MISROUTED_MESSAGE = 'Esta guía va a otro punto de retiro: no la recibas. Ya avisamos a Venexpress para corregir el envío.';
+    private const MISROUTED_MESSAGE = 'Esta guía va a otro punto de retiro: no la recibas. Ya avisamos a ViaYaa para corregir el envío.';
 
     private function createVerifiedAlly(array $overrides = []): Ally
     {

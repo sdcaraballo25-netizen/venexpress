@@ -8,7 +8,7 @@ use App\Models\WarehouseCoverage;
 /**
  * Fase 4 — Resolución logística.
  *
- * Capa de LECTURA que determina a qué HUB propio de Venexpress
+ * Capa de LECTURA que determina a qué HUB propio de ViaYaa
  * pertenece un destino (estado + ciudad), y si un paquete ya se
  * encuentra físicamente en su HUB de destino.
  *

@@ -5,7 +5,7 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
 
     <title>
-        {{ $title ?? 'Mi cuenta' }} — Venexpress
+        {{ $title ?? 'Mi cuenta' }} — ViaYaa
     </title>
 
     <link rel="preconnect" href="https://fonts.googleapis.com">
@@ -80,7 +80,7 @@
 
                 <div>
                     <span class="font-display font-bold text-xl text-[#111111] block leading-none">
-                        Venexpress
+                        ViaYaa
                     </span>
 
                     <span class="text-xs text-[#B8B8B2]">

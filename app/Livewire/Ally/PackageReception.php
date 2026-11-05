@@ -100,7 +100,7 @@ class PackageReception extends Component
             $package->pickupAlly?->business_name ?? $package->destinationWarehouse?->name,
         );
 
-        return 'Esta guía va a otro punto de retiro: no la recibas. Ya avisamos a Venexpress para corregir el envío.';
+        return 'Esta guía va a otro punto de retiro: no la recibas. Ya avisamos a ViaYaa para corregir el envío.';
     }
 
     public function receive(): void

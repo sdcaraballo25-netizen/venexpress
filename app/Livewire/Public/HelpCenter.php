@@ -10,7 +10,7 @@ use Livewire\Component;
  * por ahora — sin modelo propio, igual que el resto de secciones
  * informativas de la landing.
  */
-#[Layout('layouts.public', ['title' => 'Centro de ayuda — Venexpress'])]
+#[Layout('layouts.public', ['title' => 'Centro de ayuda — ViaYaa'])]
 class HelpCenter extends Component
 {
     /**
@@ -18,7 +18,7 @@ class HelpCenter extends Component
      */
     public array $faqs = [
         [
-            'question' => '¿Cómo envío un paquete con Venexpress?',
+            'question' => '¿Cómo envío un paquete con ViaYaa?',
             'answer' => 'Acércate a cualquiera de nuestras agencias aliadas con tu paquete o sobre, indica el destino y paga el envío. Recibirás un número de guía para hacer seguimiento.',
         ],
         [
@@ -27,7 +27,7 @@ class HelpCenter extends Component
         ],
         [
             'question' => '¿Cómo me convierto en agencia aliada?',
-            'answer' => 'Regístrate como "Punto aliado" desde la pantalla de registro. Tu solicitud será revisada por el equipo de Venexpress antes de activarse.',
+            'answer' => 'Regístrate como "Punto aliado" desde la pantalla de registro. Tu solicitud será revisada por el equipo de ViaYaa antes de activarse.',
         ],
         [
             'question' => '¿Cómo me convierto en repartidor?',
@@ -35,7 +35,7 @@ class HelpCenter extends Component
         ],
         [
             'question' => '¿Qué hago si mi paquete tiene un problema?',
-            'answer' => 'Contacta a la agencia aliada donde lo enviaste o escríbenos a info@venexpress.com indicando tu número de guía.',
+            'answer' => 'Contacta a la agencia aliada donde lo enviaste o escríbenos a viayaenvios@gmail.com indicando tu número de guía.',
         ],
     ];
 

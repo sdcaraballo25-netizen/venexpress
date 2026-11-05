@@ -355,9 +355,9 @@
 
         <a href="{{ route('home') }}"
            class="pnav-logo"
-           aria-label="Venexpress - Inicio">
-            <img src="{{ asset('images/venexpress-logo.png') }}"
-                 alt="Venexpress">
+           aria-label="ViaYaa - Inicio">
+            <img src="{{ asset('images/viayaa-logo.png') }}"
+                 alt="ViaYaa">
         </a>
 
         <div class="pnav-links">

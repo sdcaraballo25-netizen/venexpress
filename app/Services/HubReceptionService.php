@@ -36,7 +36,7 @@ class HubReceptionService
 
             if ($locked->current_status !== Package::STATUS_RECOLECTADO_VENEXPRESS) {
                 throw new RuntimeException(
-                    'Solo se puede registrar recepción de Hub para un paquete recolectado por Venexpress. '
+                    'Solo se puede registrar recepción de Hub para un paquete recolectado por ViaYaa. '
                     . 'Estado actual: ' . $locked->statusLabel() . '.'
                 );
             }
@@ -60,7 +60,7 @@ class HubReceptionService
                 'event_type' => PackageHistory::EVENT_RECEPCION,
                 'origin_location' => 'Recolección del repartidor',
                 'destination_location' => $hubLocation,
-                'location_description' => 'Recepción física en Hub Venexpress',
+                'location_description' => 'Recepción física en Hub ViaYaa',
                 'scanned_by_user_id' => $userId,
             ]);
 
@@ -115,7 +115,7 @@ class HubReceptionService
 
             if ($locked->current_status !== Package::STATUS_RECOLECTADO_VENEXPRESS) {
                 throw new RuntimeException(
-                    'Solo se puede registrar recepción de Hub para un paquete recolectado por Venexpress. '
+                    'Solo se puede registrar recepción de Hub para un paquete recolectado por ViaYaa. '
                     . 'Estado actual: ' . $locked->statusLabel() . '.'
                 );
             }

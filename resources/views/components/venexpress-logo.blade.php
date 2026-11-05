@@ -5,8 +5,8 @@
 
 @php
     $logo = $variant === 'light'
-        ? asset('images/venexpress-logo-white.png')
-        : asset('images/venexpress-logo.png');
+        ? asset('images/viayaa-logo-white.png')
+        : asset('images/viayaa-logo.png');
 
     $sizeMap = [
         'sm' => 'h-7',
@@ -16,4 +16,4 @@
     $h = $sizeMap[$size] ?? $sizeMap['md'];
 @endphp
 
-<img src="{{ $logo }}" alt="VenExpress" {{ $attributes->merge(['class' => "$h w-auto"]) }}>
+<img src="{{ $logo }}" alt="ViaYaa" {{ $attributes->merge(['class' => "$h w-auto"]) }}>

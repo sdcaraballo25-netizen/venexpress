@@ -20,7 +20,7 @@ class HelpCenter extends Component
         ],
         [
             'question' => '¿Por qué mi cuenta aparece "en revisión"?',
-            'answer' => 'Todo aliado nuevo empieza como PENDIENTE hasta que un administrador de Venexpress revisa tus datos (RIF, foto de fachada y ubicación) y aprueba tu cuenta.',
+            'answer' => 'Todo aliado nuevo empieza como PENDIENTE hasta que un administrador de ViaYaa revisa tus datos (RIF, foto de fachada y ubicación) y aprueba tu cuenta.',
         ],
         [
             'question' => '¿Cómo agrego personal de taquilla?',
@@ -28,7 +28,7 @@ class HelpCenter extends Component
         ],
         [
             'question' => '¿Cómo cobro un pedido contra entrega (COD)?',
-            'answer' => 'En "COD" puedes ver los pedidos con cobro contra entrega pendientes de liquidar con Venexpress.',
+            'answer' => 'En "COD" puedes ver los pedidos con cobro contra entrega pendientes de liquidar con ViaYaa.',
         ],
         [
             'question' => '¿Dónde reporto un problema con un envío?',

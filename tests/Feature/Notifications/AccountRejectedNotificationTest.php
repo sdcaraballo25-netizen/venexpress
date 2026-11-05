@@ -58,7 +58,7 @@ class AccountRejectedNotificationTest extends TestCase
 
         $mail = (new AccountRejected('Aliado', 'RIF ilegible.'))->toMail($user);
 
-        $this->assertSame('Tu solicitud de VenExpress no fue aprobada', $mail->subject);
+        $this->assertSame('Tu solicitud de ViaYaa no fue aprobada', $mail->subject);
         $this->assertStringContainsString('Juan Pérez', $mail->greeting);
 
         $lines = [...$mail->introLines, ...$mail->outroLines];

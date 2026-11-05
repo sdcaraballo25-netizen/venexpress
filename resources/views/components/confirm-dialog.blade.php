@@ -1,7 +1,7 @@
 {{--
     Diálogo de confirmación reutilizable que reemplaza el confirm()
     nativo del navegador (antes disparado vía wire:confirm) por un
-    modal con el estilo visual de Venexpress.
+    modal con el estilo visual de ViaYaa.
 
     Se incluye una sola vez por layout, antes de @livewireScripts.
     Cualquier botón lo dispara así, en vez de wire:confirm:

@@ -246,7 +246,7 @@ class Scanner extends Component
                     'eligible' => true,
                     'label' => 'Registrar recolección',
                     'cta' => 'Confirmar recolección',
-                    'hint' => 'Guía localizada en la agencia. Confirma para registrar la salida hacia Venexpress.',
+                    'hint' => 'Guía localizada en la agencia. Confirma para registrar la salida hacia ViaYaa.',
                     'blockedReason' => null,
                 ];
             }
@@ -488,7 +488,7 @@ class Scanner extends Component
     }
 
     /**
-     * Ejecuta la recolección (agencia -> Venexpress). Reutiliza
+     * Ejecuta la recolección (agencia -> ViaYaa). Reutiliza
      * LogisticsScanService::scanCollection() tal cual, sin duplicar
      * ninguna de sus validaciones.
      */
@@ -509,7 +509,7 @@ class Scanner extends Component
         $this->trackOperation('collection:'.$package->ally_id);
 
         $this->successMessage =
-            'Salida registrada correctamente. El paquete quedó recolectado por Venexpress.';
+            'Salida registrada correctamente. El paquete quedó recolectado por ViaYaa.';
 
         return $package;
     }

@@ -2,7 +2,7 @@
     Panel de categorías del Marketplace, inspirado conceptualmente en
     el mega-menú de BestMarkets (categoría seleccionada + panel con
     subcategorías en columnas) pero adaptado a los datos reales de
-    Venexpress: Categoria es plana (sin parent_id/subcategorías), así
+    ViaYaa: Categoria es plana (sin parent_id/subcategorías), así
     que este panel muestra únicamente las categorías reales en
     columnas, sin inventar un segundo nivel.
 

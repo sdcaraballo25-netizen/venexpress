@@ -202,7 +202,7 @@ class RouteService
      *
      * Los IDs son de Ally para cualquier ruta normal, o de Warehouse
      * cuando la ruta es de tipo hub_distribution (HUB -> almacén
-     * propio de Venexpress). Una ruta nunca mezcla los dos tipos de
+     * propio de ViaYaa). Una ruta nunca mezcla los dos tipos de
      * parada.
      */
     protected function syncStops(

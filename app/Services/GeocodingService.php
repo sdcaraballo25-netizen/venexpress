@@ -18,7 +18,7 @@ class GeocodingService
      *
      * Si el volumen crece mucho en el futuro, la opción es
      * autohospedar Nominatim o pasar a un proveedor de pago — pero
-     * para el tamaño actual de Venexpress esto es más que suficiente.
+     * para el tamaño actual de ViaYaa esto es más que suficiente.
      */
     protected const BASE_URL = 'https://nominatim.openstreetmap.org/search';
 
@@ -33,7 +33,7 @@ class GeocodingService
         try {
             $response = Http::withHeaders([
                 // Nominatim exige identificar la app que consume el servicio.
-                'User-Agent' => 'Venexpress/1.0 (contacto@venexpress.com)',
+                'User-Agent' => 'ViaYaa/1.0 (+'.config('app.url').')',
             ])->get(self::BASE_URL, [
                 'q' => $address,
                 'format' => 'json',

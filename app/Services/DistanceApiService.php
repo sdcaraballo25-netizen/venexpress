@@ -141,7 +141,7 @@ class DistanceApiService
                     try {
                         $response = Http::withHeaders([
                             'User-Agent' =>
-                                'Venexpress/1.0 (shipping application)',
+                                'ViaYaa/1.0 (shipping application)',
                             'Accept-Language' => 'es',
                         ])
                             ->connectTimeout(3)

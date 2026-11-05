@@ -109,7 +109,7 @@ class Ally extends Model
      * 'franquiciado') en vez de a un Aliado Administrador. Una
      * franquicia no genera comisiones ni liquidaciones con la empresa
      * (ver PackageService::calculateCommission()); en cambio le paga a
-     * Venexpress una cuota mensual = franchise_fee_percentage % de sus
+     * ViaYaa una cuota mensual = franchise_fee_percentage % de sus
      * ventas del mes (ver FranchiseBillingService).
      */
     public function isFranchise(): bool

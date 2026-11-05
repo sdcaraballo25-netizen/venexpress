@@ -109,7 +109,7 @@
 <body>
 
     <div class="header">
-        <div class="brand">VENEXPRESS</div>
+        <div class="brand">VIAYAA</div>
         <div class="tracking-number">{{ $package->tracking_number }}</div>
 
         <div class="barcode">
@@ -209,7 +209,7 @@
     <div class="footer">
         Verificación: {{ $package->security_hash }} ·
         Generado {{ now()->format('d/m/Y H:i') }} ·
-        Rastrea tu envío en venexpress.com/rastreo
+        Rastrea tu envío en {{ parse_url(config('app.url'), PHP_URL_HOST) }}/rastreo
     </div>
 
 </body>

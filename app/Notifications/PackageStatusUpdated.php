@@ -61,7 +61,7 @@ class PackageStatusUpdated extends Notification implements ShouldQueue
 
         return (new MailMessage)
             ->subject(
-                "Guía {$package->tracking_number}: {$statusLabel} — VenExpress"
+                "Guía {$package->tracking_number}: {$statusLabel} — ViaYaa"
             )
             ->greeting('¡Hola!')
             ->line(
@@ -74,7 +74,7 @@ class PackageStatusUpdated extends Notification implements ShouldQueue
             )
             ->action('Rastrear mi envío', $trackingUrl)
             ->line(
-                'Gracias por confiar en VenExpress para tus envíos '
+                'Gracias por confiar en ViaYaa para tus envíos '
                 . 'a nivel nacional.'
             );
     }
@@ -89,12 +89,12 @@ class PackageStatusUpdated extends Notification implements ShouldQueue
     {
         if ($package->requires_delivery) {
             return (new MailMessage)
-                ->subject("Guía {$package->tracking_number}: lista para entrega a domicilio — VenExpress")
+                ->subject("Guía {$package->tracking_number}: lista para entrega a domicilio — ViaYaa")
                 ->greeting('¡Hola!')
                 ->line("Tu envío con guía {$package->tracking_number} llegó a su destino y está listo para la entrega a domicilio.")
-                ->line('Un repartidor de VenExpress lo llevará a la dirección indicada. Cuando salga a reparto te enviaremos el PIN de entrega.')
+                ->line('Un repartidor de ViaYaa lo llevará a la dirección indicada. Cuando salga a reparto te enviaremos el PIN de entrega.')
                 ->action('Rastrear mi envío', $trackingUrl)
-                ->line('Gracias por confiar en VenExpress para tus envíos a nivel nacional.');
+                ->line('Gracias por confiar en ViaYaa para tus envíos a nivel nacional.');
         }
 
         $pickupPlace = match ($package->pickup_mode) {
@@ -104,18 +104,18 @@ class PackageStatusUpdated extends Notification implements ShouldQueue
                 : 'la agencia aliada de destino',
             Package::PICKUP_MODE_HUB => $package->destinationWarehouse?->name
                 ? "el almacén {$package->destinationWarehouse->name}"
-                : 'el almacén VenExpress de destino',
+                : 'el almacén ViaYaa de destino',
             default => 'el punto de retiro de destino',
         };
 
         return (new MailMessage)
-            ->subject("Guía {$package->tracking_number}: ¡ya puedes retirarla! — VenExpress")
+            ->subject("Guía {$package->tracking_number}: ¡ya puedes retirarla! — ViaYaa")
             ->greeting('¡Hola!')
             ->line("Tu envío con guía {$package->tracking_number} ya está disponible para ser retirado.")
             ->line("Puedes pasar a buscarlo en {$pickupPlace}.")
             ->line('Lleva tu documento de identidad: se verificará al entregarte el paquete.')
             ->action('Ver mi envío', $trackingUrl)
-            ->line('Gracias por confiar en VenExpress para tus envíos a nivel nacional.');
+            ->line('Gracias por confiar en ViaYaa para tus envíos a nivel nacional.');
     }
 
     /**

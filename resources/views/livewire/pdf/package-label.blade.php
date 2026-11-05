@@ -220,7 +220,7 @@
         <div class="header-left">
 
             <p class="brand">
-                VENEXPRESS
+                VIAYAA
             </p>
 
             @if ($package->ally)
@@ -480,7 +480,7 @@
     <div class="footer">
 
         <p style="margin:0;">
-            VENEXPRESS
+            VIAYAA
         </p>
 
         <p style="margin:3px 0 0;">

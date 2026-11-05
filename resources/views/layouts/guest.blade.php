@@ -5,7 +5,7 @@
         <meta name="viewport" content="width=device-width, initial-scale=1">
         <meta name="csrf-token" content="{{ csrf_token() }}">
 
-        <title>{{ config('app.name', 'VenExpress') }}</title>
+        <title>{{ config('app.name', 'ViaYaa') }}</title>
 
         <link rel="preconnect" href="https://fonts.googleapis.com">
         <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
@@ -53,7 +53,7 @@
                     <span class="h-1.5 w-1.5 rounded-full bg-amber-400"></span>
                     <p class="text-xs font-medium text-blue-200">
                         @if (request()->routeIs('admin.login'))
-                            Panel privado — solo personal administrativo VenExpress
+                            Panel privado — solo personal administrativo ViaYaa
                         @else
                             Clientes, repartidores y puntos aliados, todo en un solo lugar.
                         @endif

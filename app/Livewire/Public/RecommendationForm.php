@@ -10,7 +10,7 @@ use Livewire\Component;
  * Formulario público de recomendaciones/sugerencias. Cualquier
  * visitante puede enviar una, sin necesidad de cuenta.
  */
-#[Layout('layouts.public', ['title' => 'Envíanos tu recomendación — Venexpress'])]
+#[Layout('layouts.public', ['title' => 'Envíanos tu recomendación — ViaYaa'])]
 class RecommendationForm extends Component
 {
     public string $name = '';

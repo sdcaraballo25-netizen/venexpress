@@ -36,7 +36,7 @@ class BcvRateSyncFailed extends Notification
     public function toMail(object $notifiable): MailMessage
     {
         return (new MailMessage)
-            ->subject('⚠ Falló la sincronización automática de la tasa BCV — VenExpress')
+            ->subject('⚠ Falló la sincronización automática de la tasa BCV — ViaYaa')
             ->error()
             ->line('El comando programado `bcv:sync` no pudo consultar o guardar la tasa oficial del BCV.')
             ->line('Error: '.$this->errorMessage)

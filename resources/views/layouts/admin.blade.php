@@ -5,7 +5,7 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
 
-    <title>{{ $title ?? 'Panel Administrativo' }} — Venexpress</title>
+    <title>{{ $title ?? 'Panel Administrativo' }} — ViaYaa</title>
 
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.googleapis.com" crossorigin>
@@ -129,7 +129,7 @@
                     </div>
 
                     <span class="font-display font-bold text-xl text-[#111111]">
-                        Venexpress
+                        ViaYaa
                     </span>
 
                 </div>
@@ -1101,7 +1101,7 @@
 
                         <p class="text-xs text-[#6B6B66] truncate">
 
-                            {{ Auth::user()->email ?? 'admin@venexpress.com' }}
+                            {{ Auth::user()->email ?? '' }}
 
                         </p>
 

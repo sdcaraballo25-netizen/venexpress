@@ -6,9 +6,9 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <meta name="csrf-token" content="{{ csrf_token() }}">
 
-    <title>Rastrea tu envío | Venexpress</title>
+    <title>Rastrea tu envío | ViaYaa</title>
 
-    <link rel="icon" href="{{ asset('images/venexpress-logo-solo.png') }}">
+    <link rel="icon" href="{{ asset('images/viayaa-logo-solo.png') }}">
 
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
@@ -1423,7 +1423,7 @@
                 <h2
                     class="mt-2 text-2xl md:text-3xl font-extrabold text-white"
                 >
-                    Calcula tu envío con Venexpress.
+                    Calcula tu envío con ViaYaa.
                 </h2>
 
                 <p class="mt-2 text-sm text-blue-200 max-w-xl">
@@ -1484,8 +1484,8 @@
         <div>
 
             <img
-                src="{{ asset('images/venexpress-logo-white.png') }}"
-                alt="Venexpress"
+                src="{{ asset('images/viayaa-logo-white.png') }}"
+                alt="ViaYaa"
                 class="h-8 mb-4"
             >
 
@@ -1672,7 +1672,7 @@
 
                 <li>
                     <a
-                        href="mailto:info@venexpress.com"
+                        href="mailto:viayaenvios@gmail.com"
                         class="hover:text-white transition"
                     >
                         Contáctanos
@@ -1693,24 +1693,12 @@
 
             <ul class="space-y-3 text-sm text-blue-200">
 
-                <li class="flex items-start gap-2">
-
-                    <i class="fa-solid fa-phone mt-0.5 text-white"></i>
-
-                    <span>
-                        0800-VENEXPRESS<br>
-                        0800-83639773
-                    </span>
-
-                </li>
-
-
                 <li class="flex items-center gap-2">
 
                     <i class="fa-solid fa-envelope text-white"></i>
 
                     <span>
-                        info@venexpress.com
+                        viayaenvios@gmail.com
                     </span>
 
                 </li>
@@ -1738,7 +1726,7 @@
         <div
             class="max-w-7xl mx-auto px-6 py-6 text-center text-sm text-blue-300"
         >
-            &copy; {{ date('Y') }} Venexpress. Todos los derechos reservados.
+            &copy; {{ date('Y') }} ViaYaa. Todos los derechos reservados.
         </div>
 
     </div>
@@ -2162,7 +2150,7 @@ document.addEventListener('DOMContentLoaded', function () {
     ====================================================== */
 
     /*
-     * Las etiquetas de Venexpress codifican el número de guía tal cual
+     * Las etiquetas de ViaYaa codifican el número de guía tal cual
      * (PackageService::generateTrackingNumber → VEN-AAAAMMDD-NNNNNN).
      * Si algún QR trae una URL de rastreo, se toma su parámetro "guia".
      */
@@ -2368,7 +2356,7 @@ document.addEventListener('DOMContentLoaded', function () {
                 lastInvalidScanAt = now;
 
                 showCameraError(
-                    'Este código QR no corresponde a una guía de Venexpress.'
+                    'Este código QR no corresponde a una guía de ViaYaa.'
                 );
 
             }

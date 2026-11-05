@@ -127,7 +127,7 @@ class PedidoChat extends Component
 
         $this->problemaDescripcion = '';
         $this->showReportarProblema = false;
-        $this->garantiaMensaje = 'Reporte enviado. El equipo de Venexpress lo revisará — recuerda que un producto '
+        $this->garantiaMensaje = 'Reporte enviado. El equipo de ViaYaa lo revisará — recuerda que un producto '
             .'defectuoso solo da derecho a cambio, no a devolución de dinero (ese acuerdo es directamente con el emprendedor).';
     }
 
@@ -195,7 +195,7 @@ class PedidoChat extends Component
             'mensajes' => $this->pedido->mensajes,
         ])->layout(
             $this->resolveLayoutForViewer(),
-            ['title' => 'Tu pedido — Venexpress']
+            ['title' => 'Tu pedido — ViaYaa']
         );
     }
 }

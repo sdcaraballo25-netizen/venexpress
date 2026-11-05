@@ -6,7 +6,7 @@
         </h1>
 
         <p class="text-sm text-[#6B6B66] mt-1">
-            ¿Se te ocurre algo que podríamos mejorar? Cuéntanos, el equipo de Venexpress lee cada una.
+            ¿Se te ocurre algo que podríamos mejorar? Cuéntanos, el equipo de ViaYaa lee cada una.
         </p>
     </div>
 
@@ -29,7 +29,7 @@
                 <textarea
                     wire:model="message"
                     rows="6"
-                    placeholder="Cuéntanos qué te gustaría ver en Venexpress..."
+                    placeholder="Cuéntanos qué te gustaría ver en ViaYaa..."
                     class="w-full rounded-lg border-[#E5E5E0] text-sm focus:ring-amber-400 focus:border-amber-400"
                 ></textarea>
                 @error('message') <p class="text-xs text-red-600 mt-1">{{ $message }}</p> @enderror

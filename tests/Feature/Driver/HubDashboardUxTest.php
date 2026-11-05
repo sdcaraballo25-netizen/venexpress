@@ -185,7 +185,7 @@ class HubDashboardUxTest extends TestCase
             ->test(Dashboard::class)
             ->assertSee($route->name)
             ->assertSee('Traslado a hub')
-            ->assertSee('Agencias aliadas → Hub Venexpress')
+            ->assertSee('Agencias aliadas → Hub ViaYaa')
             ->assertSee('Próxima parada')
             ->assertSee('Agencia Barquisimeto Centro')
             ->assertSee('Barquisimeto')
@@ -227,7 +227,7 @@ class HubDashboardUxTest extends TestCase
         Livewire::actingAs($user)
             ->test(Dashboard::class)
             ->assertSee('Distribución a almacén')
-            ->assertSee('Hub Venexpress → Almacén destino')
+            ->assertSee('Hub ViaYaa → Almacén destino')
             ->assertSee('Almacén Maracay')
             ->assertSee('Maracay');
     }

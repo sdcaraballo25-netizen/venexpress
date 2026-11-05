@@ -21,7 +21,7 @@
                 </h1>
 
                 <p class="mt-2 max-w-2xl text-sm leading-6 text-slate-500">
-                    Consulta y conciliación de pagos recibidos por VenExpress.
+                    Consulta y conciliación de pagos recibidos por ViaYaa.
                 </p>
             </div>
 

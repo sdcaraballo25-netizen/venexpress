@@ -128,7 +128,7 @@
         <div id="printable-invoice" style="display:none; width:100%; max-width:76mm; margin:0 auto; font-family: Arial, sans-serif; color:#000;" wire:key="invoice-{{ $createdTrackingNumber }}">
 
             <div style="text-align:center;border-bottom:1px dashed #000;padding-bottom:8px;margin-bottom:8px;">
-                <p style="font-size:18px;font-weight:700;margin:0;">VENEXPRESS</p>
+                <p style="font-size:18px;font-weight:700;margin:0;">VIAYAA</p>
                 @if ($ally = auth()->user()->resolveAlly())
                     <p style="font-size:11px;margin:2px 0 0;">{{ $ally->business_name ?? ($ally->name ?? '') }}</p>
                     <p style="font-size:11px;margin:0;">{{ $ally->address ?? '' }}</p>
@@ -214,7 +214,7 @@
             </div>
 
             <div style="text-align:center;font-size:11px;border-top:1px dashed #000;padding-top:8px;">
-                <p style="margin:0;">¡Gracias por preferir Venexpress!</p>
+                <p style="margin:0;">¡Gracias por preferir ViaYaa!</p>
             </div>
         </div>
 
@@ -224,7 +224,7 @@
         {{-- ======================================================= --}}
         <div id="printable-label" style="display:none;" wire:key="label-{{ $createdTrackingNumber }}">
             <div style="display:flex;justify-content:space-between;align-items:flex-start;border-bottom:3px solid #000;padding-bottom:6px;margin-bottom:10px;">
-                <p style="font-size:20px;font-weight:700;margin:0;">VENEXPRESS</p>
+                <p style="font-size:20px;font-weight:700;margin:0;">VIAYAA</p>
                 <p style="font-size:20px;font-weight:700;margin:0;">{{ $createdTrackingNumber }}</p>
             </div>
 

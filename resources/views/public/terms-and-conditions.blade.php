@@ -23,7 +23,7 @@
                 <section>
                     <h2 class="text-lg font-bold text-blue-950 mb-2">1. Quiénes somos</h2>
                     <p>
-                        Venexpress es una plataforma de logística y envíos que opera mediante una red de
+                        ViaYaa es una plataforma de logística y envíos que opera mediante una red de
                         Agencias Aliadas a nivel nacional en Venezuela, donde se reciben, procesan y entregan
                         los envíos ("guías") de nuestros clientes.
                     </p>
@@ -54,7 +54,7 @@
                     <h2 class="text-lg font-bold text-blue-950 mb-2">4. Pago contra entrega (COD)</h2>
                     <p>
                         Cuando un envío se marca como "pago contra entrega", el destinatario cancela el monto
-                        acordado al recibir el paquete. Venexpress registra ese cobro y lo liquida con la
+                        acordado al recibir el paquete. ViaYaa registra ese cobro y lo liquida con la
                         agencia aliada correspondiente según los procesos internos de conciliación.
                     </p>
                 </section>
@@ -63,7 +63,7 @@
                     <h2 class="text-lg font-bold text-blue-950 mb-2">5. Responsabilidad sobre el contenido de los envíos</h2>
                     <p>
                         El remitente declara que el contenido del paquete es lícito y no incluye artículos
-                        prohibidos por la legislación venezolana. Venexpress puede negarse a transportar, o
+                        prohibidos por la legislación venezolana. ViaYaa puede negarse a transportar, o
                         suspender el envío de, cualquier paquete que incumpla esta condición.
                     </p>
                 </section>
@@ -73,7 +73,7 @@
                     <p>
                         Si un envío presenta un problema (retraso, daño, dirección incorrecta, etc.), el
                         cliente o la agencia aliada pueden reportar una incidencia desde su panel para que el
-                        equipo de Venexpress la revise y le dé seguimiento.
+                        equipo de ViaYaa la revise y le dé seguimiento.
                     </p>
                 </section>
 
@@ -81,24 +81,24 @@
                     <h2 class="text-lg font-bold text-blue-950 mb-2">7. Agencias Aliadas y Repartidores</h2>
                     <p>
                         Las Agencias Aliadas y Repartidores son operadores independientes que se afilian a la
-                        red de Venexpress cumpliendo un proceso de verificación (documentos, ubicación,
+                        red de ViaYaa cumpliendo un proceso de verificación (documentos, ubicación,
                         vehículo, según corresponda) antes de poder operar. La aprobación de una solicitud es
-                        potestad de Venexpress.
+                        potestad de ViaYaa.
                     </p>
                 </section>
 
                 <section>
                     <h2 class="text-lg font-bold text-blue-950 mb-2">8. Marketplace de Emprendedores</h2>
                     <p>
-                        Venexpress también opera una tienda ("marketplace") donde emprendedores independientes
+                        ViaYaa también opera una tienda ("marketplace") donde emprendedores independientes
                         publican productos. El pago de una compra se acuerda directamente entre el cliente y el
-                        emprendedor; Venexpress no procesa ni retiene ese dinero, y su responsabilidad se limita
+                        emprendedor; ViaYaa no procesa ni retiene ese dinero, y su responsabilidad se limita
                         al transporte del producto desde la agencia aliada del emprendedor hasta el cliente.
                     </p>
                     <p class="mt-2">
                         Si un producto llega defectuoso o dañado, el cliente tiene derecho a un <strong>cambio</strong>,
                         no a la devolución del dinero pagado (esa devolución, de aplicar, es responsabilidad
-                        exclusiva del emprendedor). Venexpress cubre sin costo adicional el flete de la
+                        exclusiva del emprendedor). ViaYaa cubre sin costo adicional el flete de la
                         devolución del producto defectuoso y el reenvío del reemplazo, siempre que el reclamo se
                         reporte con evidencia y sea aprobado tras la revisión correspondiente.
                     </p>
@@ -116,7 +116,7 @@
                     <h2 class="text-lg font-bold text-blue-950 mb-2">10. Contacto</h2>
                     <p>
                         Para dudas sobre estos términos, escríbenos a
-                        <a href="mailto:info@venexpress.com" class="text-blue-700 hover:text-blue-950 font-semibold">info@venexpress.com</a>.
+                        <a href="mailto:viayaenvios@gmail.com" class="text-blue-700 hover:text-blue-950 font-semibold">viayaenvios@gmail.com</a>.
                     </p>
                 </section>
 

@@ -78,7 +78,7 @@ class RouteStop extends Model
     }
 
     /**
-     * Almacén propio de Venexpress, cuando esta parada pertenece a
+     * Almacén propio de ViaYaa, cuando esta parada pertenece a
      * una ruta de tipo Route::TYPE_HUB_DISTRIBUTION. Mutuamente
      * excluyente con ally(): una parada usa uno u otro, nunca ambos.
      */

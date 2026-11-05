@@ -27,9 +27,9 @@
                 @if ($operationInstructions)
                     {{ $operationInstructions }}
                 @elseif ($isDistribution)
-                    Registra la salida del HUB y la llegada al almacén destino de Venexpress.
+                    Registra la salida del HUB y la llegada al almacén destino de ViaYaa.
                 @else
-                    Registra la salida del paquete desde la agencia y su recolección por Venexpress.
+                    Registra la salida del paquete desde la agencia y su recolección por ViaYaa.
                 @endif
             </p>
         </div>
@@ -324,7 +324,7 @@
                             Salida registrada desde la agencia
                         </p>
                         <p class="mt-1 text-xs text-emerald-700">
-                            El paquete quedó bajo custodia de Venexpress.
+                            El paquete quedó bajo custodia de ViaYaa.
                         </p>
 
                         @if ($operationTotal)

@@ -6,7 +6,7 @@ use Livewire\Attributes\Layout;
 use Livewire\Attributes\Title;
 use Livewire\Component;
 
-#[Layout('layouts.public', ['title' => 'Términos y Condiciones — Venexpress'])]
+#[Layout('layouts.public', ['title' => 'Términos y Condiciones — ViaYaa'])]
 #[Title('Términos y Condiciones')]
 class TermsAndConditions extends Component
 {

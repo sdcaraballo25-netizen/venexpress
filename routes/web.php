@@ -124,7 +124,7 @@ Route::prefix('ally')
 
         // Comisiones y Corte de caja (liquidación de comisión con la
         // empresa) son solo del Aliado Administrador: el Franquiciado
-        // no tiene comisión ni liquidaciones con Venexpress (paga una cuota
+        // no tiene comisión ni liquidaciones con ViaYaa (paga una cuota
         // mensual, ver admin.franchise-receivables). En su lugar tiene
         // Finanzas (ingresos, gastos, cuota y ventas por taquilla).
         Route::get('/comisiones', AllyCommissions::class)
@@ -315,7 +315,7 @@ Route::prefix('cliente')
         'verified',
         'role:cliente',
 
-        // Verificación propia de VenExpress por código (distinta del
+        // Verificación propia de ViaYaa por código (distinta del
         // "verified" nativo de Laravel, que este proyecto no usa).
         'account.verified',
     ])

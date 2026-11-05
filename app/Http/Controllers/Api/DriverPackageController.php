@@ -71,7 +71,7 @@ class DriverPackageController extends Controller
             );
 
             return response()->json([
-                'message' => 'Salida registrada correctamente. El paquete quedó recolectado por Venexpress.',
+                'message' => 'Salida registrada correctamente. El paquete quedó recolectado por ViaYaa.',
                 'security_warning' => $securityWarning,
                 'package' => new DriverPackageResource($package),
             ]);

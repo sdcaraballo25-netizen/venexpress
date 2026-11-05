@@ -30,7 +30,7 @@ class PedidoCanceladoPorCliente extends Notification implements ShouldQueue
         $pedido = Pedido::findOrFail($this->pedidoId);
 
         $mail = (new MailMessage)
-            ->subject("Pedido #{$pedido->id} cancelado — Venexpress")
+            ->subject("Pedido #{$pedido->id} cancelado — ViaYaa")
             ->greeting('Un comprador canceló su pedido')
             ->line("{$pedido->cliente_nombre} canceló el pedido #{$pedido->id} antes de confirmar el pago.");
 

@@ -149,7 +149,7 @@ class Route extends Model
 
     /**
      * Ruta que transporta paquetes desde el HUB hasta un almacén
-     * propio de Venexpress destino. Sus paradas (RouteStop) usan
+     * propio de ViaYaa destino. Sus paradas (RouteStop) usan
      * warehouse_id en vez de ally_id.
      */
     public function isHubDistribution(): bool

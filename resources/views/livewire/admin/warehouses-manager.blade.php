@@ -6,7 +6,7 @@
                 Almacenes
             </h2>
             <p class="text-sm text-slate-500">
-                Almacenes propios de Venexpress: destino de las rutas de HUB Distribución.
+                Almacenes propios de ViaYaa: destino de las rutas de HUB Distribución.
             </p>
         </div>
 

@@ -586,7 +586,7 @@ new #[Layout('layouts.guest')] class extends Component
     </h1>
 
     <p class="mt-1.5 text-sm text-gray-500">
-        Regístrate para gestionar tus guías, tarifas o entregas en VenExpress.
+        Regístrate para gestionar tus guías, tarifas o entregas en ViaYaa.
     </p>
 
     @if ($viaGoogle)
@@ -783,7 +783,7 @@ new #[Layout('layouts.guest')] class extends Component
                 </h2>
 
                 <p class="mt-1 text-xs text-gray-500">
-                    Estos datos serán revisados por VenExpress antes de activar el comercio.
+                    Estos datos serán revisados por ViaYaa antes de activar el comercio.
                 </p>
             </div>
 
@@ -1002,7 +1002,7 @@ new #[Layout('layouts.guest')] class extends Component
                 </h2>
 
                 <p class="mt-1 text-xs text-gray-500">
-                    Tú entregas la mercancía en la agencia aliada que elijas — Venexpress no recolecta a domicilio.
+                    Tú entregas la mercancía en la agencia aliada que elijas — ViaYaa no recolecta a domicilio.
                 </p>
             </div>
 

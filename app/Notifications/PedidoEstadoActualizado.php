@@ -43,11 +43,11 @@ class PedidoEstadoActualizado extends Notification implements ShouldQueue
         $chatUrl = route('public.marketplace.pedido', $pedido->chat_token);
 
         $mail = (new MailMessage)
-            ->subject("Tu pedido #{$pedido->id} — Venexpress")
+            ->subject("Tu pedido #{$pedido->id} — ViaYaa")
             ->greeting('¡Hola!');
 
         if ($this->status === Pedido::STATUS_CANCELADO) {
-            $mail->subject("Tu pedido #{$pedido->id} fue cancelado — Venexpress")
+            $mail->subject("Tu pedido #{$pedido->id} fue cancelado — ViaYaa")
                 ->line("{$pedido->emprendedor->business_name} canceló tu pedido #{$pedido->id}.");
 
             if ($pedido->motivo_cancelacion) {

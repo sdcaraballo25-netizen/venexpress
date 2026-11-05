@@ -8,11 +8,11 @@
         content="width=device-width, initial-scale=1.0"
     >
 
-    <title>Venexpress - Resultado de rastreo</title>
+    <title>ViaYaa - Resultado de rastreo</title>
 
     <link
         rel="icon"
-        href="{{ asset('images/venexpress-logo.png') }}"
+        href="{{ asset('images/viayaa-logo.png') }}"
     >
 
     <link rel="preconnect" href="https://fonts.googleapis.com">
@@ -199,7 +199,7 @@
                         Este paquete tiene un estado especial que no forma
                         parte de la línea de tiempo estándar. La línea de
                         tiempo muestra el último paso conocido; consulta con
-                        Venexpress para más detalles.
+                        ViaYaa para más detalles.
 
                     </div>
 

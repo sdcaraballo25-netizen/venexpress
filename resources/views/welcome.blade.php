@@ -4,9 +4,9 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
 
-    <title>Venexpress | Envíos y rastreo en Venezuela</title>
+    <title>ViaYaa | Envíos y rastreo en Venezuela</title>
 
-    <link rel="icon" href="{{ asset('images/venexpress-logo-solo.png') }}">
+    <link rel="icon" href="{{ asset('images/viayaa-logo-solo.png') }}">
 
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
@@ -109,7 +109,7 @@
             max-height: 510px;
         }
 
-        /* Pista horizontal: los 4 slides conviven lado a lado y solo
+        /* Pista horizontal: los slides conviven lado a lado y solo
            cambia el translateX, así el arrastre puede seguir al dedo
            y la altura nunca salta entre slides. */
         .hero-track {
@@ -1220,10 +1220,10 @@
 
             <a href="{{ route('home') }}"
                class="shrink-0"
-               aria-label="Venexpress - Inicio">
+               aria-label="ViaYaa - Inicio">
 
-                <img src="{{ asset('images/venexpress-logo.png') }}"
-                     alt="Venexpress"
+                <img src="{{ asset('images/viayaa-logo.png') }}"
+                     alt="ViaYaa"
                      class="h-8 sm:h-9 w-auto">
 
             </a>
@@ -1433,7 +1433,7 @@
 
                 <img
                     src="{{ asset('images/hero1.png') }}"
-                    alt="Envíos Venexpress"
+                    alt="Envíos ViaYaa"
                     class="hero-image">
 
             </div>
@@ -1498,7 +1498,7 @@
 
                 <img
                     src="{{ asset('images/hero2.png') }}"
-                    alt="Agencia aliada Venexpress"
+                    alt="Agencia aliada ViaYaa"
                     class="hero-image">
 
             </div>
@@ -1554,7 +1554,7 @@
 
                 <img
                     src="{{ asset('images/hero3.png') }}"
-                    alt="Repartidor Venexpress"
+                    alt="Repartidor ViaYaa"
                     class="hero-image">
 
             </div>
@@ -1610,7 +1610,7 @@
 
                 <img
                     src="{{ asset('images/hero4.png') }}"
-                    alt="Emprendimiento en Venexpress"
+                    alt="Emprendimiento en ViaYaa"
                     class="hero-image">
 
             </div>
@@ -1644,6 +1644,64 @@
                            class="hero-primary hero-role-button">
 
                             Quiero ser emprendedor
+
+                            <i class="fa-solid fa-arrow-right text-xs"></i>
+
+                        </a>
+
+                    </div>
+
+                </div>
+
+            </div>
+
+        </div>
+
+        {{-- Slide 5: Franquicias (sin postulación pública: el contacto
+             llega a la empresa y un Admin crea al Franquiciado). --}}
+
+        <div id="hero-slide-4"
+             class="hero-slide hero-slide-item relative">
+
+            <div class="hero-image-panel">
+
+                <img
+                    src="{{ asset('images/hero-franquicia.png') }}"
+                    alt="Franquicias ViaYaa"
+                    class="hero-image"
+                    loading="lazy">
+
+            </div>
+
+            <div class="section-wrap hero-content">
+
+                <div class="hero-copy">
+
+                    <span class="eyebrow">
+                        Franquicias
+                    </span>
+
+                    <h2 class="hero-title">
+
+                        Lleva ViaYaa<br>
+                        a tu ciudad.
+
+                    </h2>
+
+                    <p class="hero-text">
+
+                        Abre tu propia franquicia: agencia, almacén
+                        de la red y panel de finanzas para controlar
+                        tus ventas y las de tus taquillas.
+
+                    </p>
+
+                    <div class="hero-actions">
+
+                        <a href="mailto:viayaenvios@gmail.com?subject={{ rawurlencode('Quiero una franquicia ViaYaa') }}&body={{ rawurlencode("Hola, me interesa abrir una franquicia ViaYaa.\n\nNombre:\nCiudad y estado:\nTeléfono:") }}"
+                           class="hero-primary hero-role-button">
+
+                            Contáctanos para más información
 
                             <i class="fa-solid fa-arrow-right text-xs"></i>
 
@@ -1702,6 +1760,12 @@
                     data-hero-dot="3"
                     class="hero-dot"
                     aria-label="Ver slide de emprendedores">
+            </button>
+
+            <button type="button"
+                    data-hero-dot="4"
+                    class="hero-dot"
+                    aria-label="Ver slide de franquicias">
             </button>
 
         </div>
@@ -1965,16 +2029,16 @@
             <div class="section-heading">
 
                 <span class="eyebrow">
-                    Tienda Venexpress
+                    Tienda ViaYaa
                 </span>
 
                 <h2 class="section-title">
-                    Descubre la Tienda Venexpress.
+                    Descubre la Tienda ViaYaa.
                 </h2>
 
                 <p class="section-subtitle">
                     Productos de emprendedores venezolanos, con envío
-                    por nuestra red de Venexpress.
+                    por nuestra red de ViaYaa.
                 </p>
 
                 <a href="{{ route('public.marketplace') }}"
@@ -2045,7 +2109,7 @@
 
                 <img
                     src="{{ asset('images/venezuela-map.png') }}"
-                    alt="Mapa de cobertura nacional de Venexpress"
+                    alt="Mapa de cobertura nacional de ViaYaa"
                     class="outline-map-image"
                 >
 
@@ -2403,7 +2467,7 @@
 
                     <img
                         src="{{ asset('images/hero6.png') }}"
-                        alt="Entrega de paquetes Venexpress"
+                        alt="Entrega de paquetes ViaYaa"
                         class="partner-main-image"
                     >
 
@@ -2719,8 +2783,8 @@
                class="inline-flex items-center mb-4">
 
                 <img
-                    src="{{ asset('images/venexpress-logo-white.png') }}"
-                    alt="Venexpress"
+                    src="{{ asset('images/viayaa-logo-white.png') }}"
+                    alt="ViaYaa"
                     class="h-10 w-auto block"
                 >
 
@@ -2823,7 +2887,7 @@
         <div>
 
             <h3 class="text-white text-[0.75rem] font-bold mb-4">
-                Venexpress
+                ViaYaa
             </h3>
 
             <ul class="space-y-2.5">
@@ -2892,7 +2956,7 @@
                 </li>
 
                 <li>
-                    <a href="mailto:info@venexpress.com"
+                    <a href="mailto:viayaenvios@gmail.com"
                        class="footer-link">
                         Contáctanos
                     </a>
@@ -2914,7 +2978,7 @@
                     text-[0.64rem] text-white/40">
 
             <span>
-                &copy; {{ date('Y') }} Venexpress.
+                &copy; {{ date('Y') }} ViaYaa.
                 Todos los derechos reservados.
             </span>
 

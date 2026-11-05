@@ -2,7 +2,7 @@
     <div class="flex flex-col gap-5 mb-8 md:flex-row md:items-center md:justify-between">
         <div>
             <h1 class="font-display text-3xl font-bold text-[#111111]">Gestión de usuarios</h1>
-            <p class="mt-1 text-sm text-[#6B6B66]">Consulta, filtra y administra las cuentas de Venexpress.</p>
+            <p class="mt-1 text-sm text-[#6B6B66]">Consulta, filtra y administra las cuentas de ViaYaa.</p>
         </div>
 
         <button wire:click="openCreateModal"

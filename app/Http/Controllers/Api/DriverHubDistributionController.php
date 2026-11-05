@@ -14,7 +14,7 @@ use RuntimeException;
 
 /**
  * Escaneos del driver de HUB Distribución (HUB -> almacén propio de
- * Venexpress destino). No confundir con el driver de HUB Recolección
+ * ViaYaa destino). No confundir con el driver de HUB Recolección
  * (DriverPackageController::scan) ni con la app de Delivery
  * (DriverDeliveryController) — son tres actores distintos.
  */
@@ -96,7 +96,7 @@ class DriverHubDistributionController extends Controller
 
     /**
      * Escanea la llegada de un paquete al almacén propio de
-     * Venexpress destino. No cambia el estado del paquete (sigue
+     * ViaYaa destino. No cambia el estado del paquete (sigue
      * EN_TRANSITO_NACIONAL) para no interferir con la app de Delivery.
      */
     public function arriveAtDestination(Request $request): JsonResponse

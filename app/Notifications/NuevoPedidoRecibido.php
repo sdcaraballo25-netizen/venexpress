@@ -43,7 +43,7 @@ class NuevoPedidoRecibido extends Notification implements ShouldQueue
             ->implode(', ');
 
         return (new MailMessage)
-            ->subject("Nuevo pedido #{$pedido->id} — Venexpress")
+            ->subject("Nuevo pedido #{$pedido->id} — ViaYaa")
             ->greeting('¡Tienes un pedido nuevo!')
             ->line("Pedido #{$pedido->id}: {$resumen}.")
             ->line("Total: \${$pedido->precio_total_usd} — a coordinar directamente con el comprador.")

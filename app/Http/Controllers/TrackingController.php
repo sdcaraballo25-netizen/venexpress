@@ -40,7 +40,7 @@ class TrackingController extends Controller
         ],
 
         'RECOLECTADO_VENEXPRESS' => [
-            'label' => 'Recolectado por Venexpress',
+            'label' => 'Recolectado por ViaYaa',
             'icon'  => 'fa-truck',
         ],
 

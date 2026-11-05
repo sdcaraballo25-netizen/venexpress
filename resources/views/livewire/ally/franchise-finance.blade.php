@@ -154,9 +154,9 @@
     <div class="rounded-2xl border border-[#E5E5E0] bg-white p-4 sm:p-5 shadow-sm">
         <div class="flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
             <div>
-                <h3 class="text-sm font-semibold text-[#111111]">Cuota de franquicia con Venexpress</h3>
+                <h3 class="text-sm font-semibold text-[#111111]">Cuota de franquicia con ViaYaa</h3>
                 <p class="text-xs text-slate-500">
-                    {{ number_format($feePercentage, 2) }}% de tus ventas del mes. Los pagos los registra Venexpress
+                    {{ number_format($feePercentage, 2) }}% de tus ventas del mes. Los pagos los registra ViaYaa
                     con tu número de factura y de voucher.
                 </p>
             </div>

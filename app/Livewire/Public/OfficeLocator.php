@@ -153,7 +153,7 @@ class OfficeLocator extends Component
             'userLng' => $this->userLng,
         ])->layout(
             $this->resolveLayoutForViewer(),
-            ['title' => 'Agencias aliadas — Venexpress']
+            ['title' => 'Agencias aliadas — ViaYaa']
         );
     }
 }

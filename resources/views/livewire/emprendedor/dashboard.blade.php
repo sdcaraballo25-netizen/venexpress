@@ -12,7 +12,7 @@
     @if ($emprendedor->status !== \App\Models\Emprendedor::STATUS_ACTIVE)
         <div class="rounded-2xl border border-amber-200 bg-amber-50 p-5 text-sm text-amber-800">
             @if ($emprendedor->status === \App\Models\Emprendedor::STATUS_PENDING)
-                Tu cuenta está pendiente de aprobación por el equipo de Venexpress. Podrás publicar productos y recibir pedidos una vez que sea aprobada.
+                Tu cuenta está pendiente de aprobación por el equipo de ViaYaa. Podrás publicar productos y recibir pedidos una vez que sea aprobada.
             @elseif ($emprendedor->status === \App\Models\Emprendedor::STATUS_SUSPENDED)
                 Tu cuenta está suspendida. Contacta a soporte para más información.
             @else

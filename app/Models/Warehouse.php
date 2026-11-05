@@ -8,7 +8,7 @@ use Illuminate\Database\Eloquent\Relations\BelongsTo;
 use Illuminate\Database\Eloquent\Relations\HasMany;
 
 /**
- * Almacén propio de Venexpress. Es infraestructura interna, no un
+ * Almacén propio de ViaYaa. Es infraestructura interna, no un
  * socio comercial — a diferencia de Ally, no tiene comisión, RIF ni
  * usuario dueño. Es el destino de las rutas de tipo
  * Route::TYPE_HUB_DISTRIBUTION.

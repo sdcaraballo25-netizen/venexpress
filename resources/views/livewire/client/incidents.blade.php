@@ -135,7 +135,7 @@
 
                     <div class="mt-4 rounded-xl bg-slate-50 p-4">
                         <p class="text-xs font-semibold uppercase tracking-wide text-slate-400">
-                            Respuesta de VenExpress
+                            Respuesta de ViaYaa
                         </p>
 
                         <p class="mt-1 text-sm text-slate-700">

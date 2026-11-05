@@ -24,7 +24,7 @@ class HelpCenter extends Component
         ],
         [
             'question' => '¿Qué diferencia hay entre repartidor de reparto y de HUB?',
-            'answer' => 'El repartidor de reparto (delivery) entrega paquetes directamente a los destinatarios. El repartidor de HUB traslada paquetes entre agencias y almacenes de Venexpress; tu tipo lo define un administrador.',
+            'answer' => 'El repartidor de reparto (delivery) entrega paquetes directamente a los destinatarios. El repartidor de HUB traslada paquetes entre agencias y almacenes de ViaYaa; tu tipo lo define un administrador.',
         ],
         [
             'question' => '¿Dónde descargo la app para el celular?',

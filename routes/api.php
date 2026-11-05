@@ -89,7 +89,7 @@ Route::prefix('driver')
             Route::post('/scan/hub-reception', [DriverPackageController::class, 'hubReception'])
                 ->name('scan.hub-reception');
 
-            // HUB Distribución: HUB -> almacén propio de Venexpress destino.
+            // HUB Distribución: HUB -> almacén propio de ViaYaa destino.
             // Actor distinto del driver de HUB Recolección (arriba) y de la
             // app de Delivery.
             Route::post('/hub/dispatch', [DriverHubDistributionController::class, 'departFromHub'])

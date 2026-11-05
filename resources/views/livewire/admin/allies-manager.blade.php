@@ -44,7 +44,7 @@
             </h1>
 
             <p class="text-sm text-[#6B6B66] mt-1">
-                Administra las taquillas aliadas de Venexpress.
+                Administra las taquillas aliadas de ViaYaa.
             </p>
         </div>
 

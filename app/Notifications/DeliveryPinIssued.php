@@ -39,14 +39,14 @@ class DeliveryPinIssued extends Notification implements ShouldBeEncrypted, Shoul
         $package = Package::findOrFail($this->packageId);
 
         return (new MailMessage)
-            ->subject("Guía {$package->tracking_number}: tu envío salió a reparto — VenExpress")
+            ->subject("Guía {$package->tracking_number}: tu envío salió a reparto — ViaYaa")
             ->greeting('¡Hola!')
             ->line("Tu envío con guía {$package->tracking_number} va en camino a la dirección de entrega.")
             ->line("Tu PIN de entrega es: **{$this->pin}**")
-            ->line('Dáselo al repartidor solo cuando tengas el paquete en tus manos. Nadie de VenExpress te lo pedirá por teléfono ni por mensaje.')
+            ->line('Dáselo al repartidor solo cuando tengas el paquete en tus manos. Nadie de ViaYaa te lo pedirá por teléfono ni por mensaje.')
             ->line('Si no tienes el PIN a mano, también puedes recibirlo mostrando tu cédula.')
             ->action('Rastrear mi envío', route('tracking.show', ['guia' => $package->tracking_number]))
-            ->line('Gracias por confiar en VenExpress para tus envíos a nivel nacional.');
+            ->line('Gracias por confiar en ViaYaa para tus envíos a nivel nacional.');
     }
 
     /**

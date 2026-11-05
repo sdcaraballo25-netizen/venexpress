@@ -162,7 +162,7 @@ class PriceCalculator extends Component
         return view('public.price-calculator')
             ->layout(
                 $this->resolveLayoutForViewer(),
-                ['title' => 'Calcula tu envío — Venexpress']
+                ['title' => 'Calcula tu envío — ViaYaa']
             );
     }
 }

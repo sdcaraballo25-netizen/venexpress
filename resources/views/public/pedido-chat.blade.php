@@ -115,7 +115,7 @@
                         <p class="text-sm font-semibold text-blue-950 mb-2">¿Llegó defectuoso o dañado?</p>
                         <p class="text-xs text-gray-500 mb-3">
                             Solo aplica cambio, no devolución de dinero (eso lo acuerdas con el emprendedor).
-                            Venexpress cubre el flete del cambio.
+                            ViaYaa cubre el flete del cambio.
                         </p>
                         <textarea wire:model="problemaDescripcion" rows="3"
                                   placeholder="Cuéntanos qué le pasó al producto..."

@@ -45,7 +45,7 @@ new #[Layout('layouts.guest')] class extends Component
 
     <h1 class="font-display text-2xl font-bold text-blue-950">Acceso administrador</h1>
     <p class="mt-1.5 text-sm text-gray-500">
-        Panel exclusivo para el equipo VenExpress.
+        Panel exclusivo para el equipo ViaYaa.
     </p>
 
     <x-auth-session-status class="mt-6" :status="session('status')" />
@@ -53,7 +53,7 @@ new #[Layout('layouts.guest')] class extends Component
     <form wire:submit="login" class="mt-8 space-y-5">
         <div>
             <x-input-label for="email" value="Correo electrónico" />
-            <x-text-input wire:model="form.email" id="email" class="block mt-1.5 w-full" type="email" name="email" required autofocus autocomplete="username" placeholder="admin@venexpress.com" />
+            <x-text-input wire:model="form.email" id="email" class="block mt-1.5 w-full" type="email" name="email" required autofocus autocomplete="username" placeholder="admin@ejemplo.com" />
             <x-input-error :messages="$errors->get('form.email')" class="mt-2" />
         </div>
 

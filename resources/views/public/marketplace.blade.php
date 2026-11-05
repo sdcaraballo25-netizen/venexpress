@@ -12,7 +12,7 @@
             <div class="flex items-center gap-4 py-4">
 
                 <a href="{{ route('home') }}" wire:navigate class="shrink-0 flex items-center gap-2">
-                    <img src="{{ asset('images/venexpress-logo.png') }}" alt="Venexpress" class="h-7 sm:h-8 w-auto">
+                    <img src="{{ asset('images/viayaa-logo.png') }}" alt="ViaYaa" class="h-7 sm:h-8 w-auto">
                     <span class="hidden sm:inline text-sm font-bold text-gray-400 border-l border-gray-200 pl-2">
                         Tienda
                     </span>
@@ -125,7 +125,7 @@
 
                         <div class="bg-white pt-12 px-5 pb-5 text-left">
                             <span class="inline-block bg-amber-100 text-amber-800 text-xs font-semibold tracking-wide uppercase px-3 py-1 rounded-full mb-2">
-                                Tienda verificada por Venexpress
+                                Tienda verificada por ViaYaa
                             </span>
                             <h1 class="text-2xl md:text-3xl font-extrabold text-[#111111]">{{ $tiendaEmprendedor->business_name }}</h1>
 
@@ -155,7 +155,7 @@
                     </span>
                     <h1 class="text-2xl md:text-3xl font-extrabold text-[#111111]">Tienda de Emprendedores</h1>
                     <p class="text-gray-500 mt-2 max-w-2xl">
-                        Productos de emprendedores venezolanos, con envío por Venexpress. Tú acuerdas el pago
+                        Productos de emprendedores venezolanos, con envío por ViaYaa. Tú acuerdas el pago
                         directamente con el emprendedor.
                     </p>
                 </div>
@@ -490,7 +490,7 @@
 
                                     <p class="text-xs text-gray-400 font-medium mt-1.5">
                                         <i class="fa-solid fa-box text-[0.65rem]"></i>
-                                        Envío por Venexpress
+                                        Envío por ViaYaa
                                     </p>
 
                                     <button wire:click="comprarProducto({{ $producto->id }})"

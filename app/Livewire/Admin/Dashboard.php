@@ -145,7 +145,7 @@ class Dashboard extends Component
             ->sum('commission_amount_usd');
 
         // Dinero contra-entrega (COD) que las agencias tienen en mano
-        // y todavía no han remitido a Venexpress.
+        // y todavía no han remitido a ViaYaa.
         $codPendingTotal = Package::query()
             ->where('is_cod', true)
             ->where('cod_status', Package::COD_PENDIENTE)

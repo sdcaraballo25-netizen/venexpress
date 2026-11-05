@@ -46,9 +46,9 @@ class WelcomeVerificationToken extends Notification
     public function toMail(object $notifiable): MailMessage
     {
         return (new MailMessage)
-            ->subject('Bienvenido a VenExpress — Verifica tu cuenta')
+            ->subject('Bienvenido a ViaYaa — Verifica tu cuenta')
             ->greeting("¡Hola, {$notifiable->name}!")
-            ->line('Gracias por registrarte en VenExpress.')
+            ->line('Gracias por registrarte en ViaYaa.')
             ->line('Para activar tu cuenta, ingresa este código de verificación:')
             ->line(new \Illuminate\Support\HtmlString(
                 '<div style="text-align:center;margin:24px 0;">'
