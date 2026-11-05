@@ -1,5 +1,9 @@
 @once
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/leaflet/1.9.4/leaflet.min.css">
+    <style>
+        /* Fondo claro y con poco ruido visual sobre las teselas OSM. */
+        .venexpress-osm-tiles { filter: grayscale(0.55) brightness(1.04) contrast(0.95); }
+    </style>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/leaflet/1.9.4/leaflet.min.js"></script>
 @endonce
 
@@ -125,14 +129,16 @@
                     maxBoundsViscosity: 1.0,
                 }).setView([8.0, -66.0], 6); // Centro aprox. de Venezuela
 
-                // CartoDB Positron: fondo claro/blanco con poco ruido
-                // visual (calles y ciudades se mantienen legibles),
-                // a diferencia del estilo OSM estándar (muy cargado
-                // de colores e íconos).
-                L.tileLayer('https://{s}.basemaps.cartocdn.com/light_all/{z}/{x}/{y}{r}.png', {
-                    attribution: '&copy; OpenStreetMap contributors &copy; CARTO',
-                    subdomains: 'abcd',
+                // Teselas estándar de OpenStreetMap (gratis, sin API key),
+                // las mismas del mapa del panel admin. Antes se usaba
+                // CartoDB Positron, pero CARTO empezó a exigir API key y
+                // mostraba "API KEY REQUIRED" en vez del mapa. El filtro
+                // CSS de .venexpress-osm-tiles las aclara para mantener
+                // un fondo limpio, parecido al estilo anterior.
+                L.tileLayer('https://tile.openstreetmap.org/{z}/{x}/{y}.png', {
+                    attribution: '&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors',
                     maxZoom: 19,
+                    className: 'venexpress-osm-tiles',
                 }).addTo(this.map);
 
                 this.renderPoints(initialPoints);
